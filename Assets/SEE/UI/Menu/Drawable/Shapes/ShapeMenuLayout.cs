@@ -44,266 +44,94 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// Updates the shape-menu layout for the currently selected shape.
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// Thrown if the selected shape has not yet been integrated into
-        /// the menu configuration.
-        /// </exception>
         internal void UpdateForSelection()
         {
             ResetAllValues();
             DisableAllValues();
 
-            switch (state.SelectedShape)
+            ShapeMenuLayoutRule rule =
+                ShapeMenuLayoutRules.Get(
+                    state.SelectedShape,
+                    state.SelectedUMLShape);
+
+            ApplyValueLayout(
+                controls.Value1Object,
+                rule.Value1);
+
+            ApplyValueLayout(
+                controls.Value2Object,
+                rule.Value2);
+
+            ApplyValueLayout(
+                controls.Value3Object,
+                rule.Value3);
+
+            ApplyValueLayout(
+                controls.Value4Object,
+                rule.Value4);
+
+            ApplyValueLayout(
+                controls.Angle1Object,
+                rule.Angle1);
+
+            ApplyValueLayout(
+                controls.Angle2Object,
+                rule.Angle2);
+
+            ApplyValueLayout(
+                controls.OffsetObject,
+                rule.Offset);
+
+            ApplyValueLayout(
+                controls.VerticesObject,
+                rule.Vertices);
+
+            if (rule.ShowBool)
             {
-                case Shape.Line:
-                    controls.FinishObject.SetActive(true);
-                    ActivateAndConfigureValue(
-                        controls.BoolValueObject,
-                        "Loop");
-                    SetLineStartActive(true);
-                    SetLineEndActive(true);
-                    MoveBoolValueToLinePosition();
-                    break;
+                ActivateAndConfigureValue(
+                    controls.BoolValueObject,
+                    rule.BoolIdentifier);
+            }
 
-                case Shape.Square:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a");
-                    controls.InfoObject.SetActive(true);
-                    break;
+            if (rule.ShowLineStart)
+            {
+                SetLineStartActive(true);
+            }
 
-                case Shape.Rectangle:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "b");
-                    controls.InfoObject.SetActive(true);
-                    break;
+            if (rule.ShowLineEnd)
+            {
+                SetLineEndActive(true);
+            }
 
-                case Shape.Rhombus:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "f");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "e");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Kite:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "f1");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "f2");
-                    ActivateAndConfigureValue(
-                        controls.Value3Object,
-                        "e");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Triangle:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "c");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "h");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Circle:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Radius");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.HalfCircle:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Radius");
+            if (rule.ShowOrientation)
+            {
+                if (rule.DefaultOrientation.HasValue)
+                {
+                    ActivateAndConfigureOrientation(
+                        rule.DefaultOrientation.Value);
+                }
+                else
+                {
                     SetOrientationActive(true);
-                    break;
-
-                case Shape.Ellipse:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "X-Scale");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "Y-Scale");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Parallelogram:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "h");
-                    ActivateAndConfigureValue(
-                        controls.OffsetObject,
-                        "Shift");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Trapezoid:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "c");
-                    ActivateAndConfigureValue(
-                        controls.Value3Object,
-                        "h");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Polygon:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Length");
-                    controls.VerticesObject.SetActive(true);
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Arc:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Radius");
-                    ActivateAndConfigureValue(
-                        controls.Angle1Object,
-                        "Start Angle");
-                    ActivateAndConfigureValue(
-                        controls.Angle2Object,
-                        "End Angle",
-                        360);
-                    ActivateAndConfigureValue(
-                        controls.VerticesObject,
-                        "Verticies",
-                        PointsCalculator.DefaultVertices);
-                    break;
-
-                case Shape.UML:
-                    ConfigureUMLLayout();
-                    break;
-
-                default:
-                    throw new NotImplementedException(
-                        $"The selected shape {state.SelectedShape} has not been integrated yet.");
+                }
             }
 
-            MenuHelper.CalculateHeight(controls.MenuObject);
-        }
+            controls.UMLShapeSelectorObject.SetActive(
+                rule.ShowUMLSelector);
 
-        /// <summary>
-        /// Configures the visible controls for the currently selected UML shape.
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// Thrown if the selected UML shape has not yet been integrated into
-        /// the menu configuration.
-        /// </exception>
-        private void ConfigureUMLLayout()
-        {
-            if (state.SelectedShape != Shape.UML)
+            controls.InfoObject.SetActive(
+                rule.ShowInfo);
+
+            controls.FinishObject.SetActive(
+                rule.ShowFinish);
+
+            if (rule.MoveBoolToLinePosition)
             {
-                return;
+                MoveBoolValueToLinePosition();
             }
 
-            controls.UMLShapeSelectorObject.SetActive(true);
-
-            switch (state.SelectedUMLShape)
-            {
-                case UMLShape.Actor:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Length",
-                        10);
-                    break;
-
-                case UMLShape.Note:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a",
-                        30);
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "b",
-                        20);
-                    break;
-
-                case UMLShape.Package:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a",
-                        30);
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "b",
-                        20);
-                    ActivateAndConfigureValue(
-                        controls.Value3Object,
-                        "Title-Width",
-                        15);
-                    ActivateAndConfigureValue(
-                        controls.Value4Object,
-                        "Title-Height");
-                    break;
-
-                case UMLShape.ProvideInterf:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Radius",
-                        10);
-                    ActivateAndConfigureOrientation(
-                        Orientation.Left);
-                    break;
-
-                case UMLShape.ReceiveInterf:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "Radius",
-                        10);
-                    ActivateAndConfigureOrientation(
-                        Orientation.Right);
-                    break;
-
-                case UMLShape.SendActivity:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a",
-                        20);
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "b",
-                        10);
-                    ActivateAndConfigureOrientation(
-                        Orientation.Right);
-                    break;
-
-                case UMLShape.ReceiveActivity:
-                    ActivateAndConfigureValue(
-                        controls.Value1Object,
-                        "a",
-                        20);
-                    ActivateAndConfigureValue(
-                        controls.Value2Object,
-                        "b",
-                        10);
-                    ActivateAndConfigureOrientation(
-                        Orientation.Left);
-                    break;
-
-                default:
-                    throw new NotImplementedException(
-                        $"The selected UML shape {state.SelectedUMLShape} has not been integrated yet.");
-            }
+            MenuHelper.CalculateHeight(
+                controls.MenuObject);
         }
 
         /// <summary>
@@ -474,6 +302,31 @@ namespace SEE.UI.Menu.Drawable.Shapes
             controls.OrientationSelector.index = index;
             controls.OrientationSelector.defaultIndex = index;
             controls.OrientationSelector.UpdateUI();
+        }
+
+        /// <summary>
+        /// Applies the given value-control layout if the control is required
+        /// by the current shape.
+        /// </summary>
+        /// <param name="valueObject">
+        /// The value control to configure.
+        /// </param>
+        /// <param name="valueLayout">
+        /// The layout to apply, or null if the control should stay disabled.
+        /// </param>
+        private static void ApplyValueLayout(
+            GameObject valueObject,
+            ShapeMenuValueLayout valueLayout)
+        {
+            if (valueLayout == null)
+            {
+                return;
+            }
+
+            ActivateAndConfigureValue(
+                valueObject,
+                valueLayout.Identifier,
+                valueLayout.DefaultValue);
         }
 
         /// <summary>
