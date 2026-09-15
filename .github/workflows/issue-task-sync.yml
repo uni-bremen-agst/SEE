@@ -1,0 +1,153 @@
+name: Issue task sync prototype
+
+on:
+  push:
+    branches:
+      - refactor/961-split-drawable-components
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-task-sync-961
+  cancel-in-progress: false
+
+jobs:
+  check-issue-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check issue tasks from commit messages
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const issueNumber = 961;
+            const branch = context.ref.replace(/^refs\/heads\//, "");
+            const branchId = Buffer.from(branch).toString("base64url");
+
+            const nimSuffix =
+              ` 🟡 **NIM** <!-- issue-task-sync branch=${branchId} -->`;
+
+            const commits = context.payload.commits ?? [];
+            const tasks = [];
+
+            for (const commit of commits) {
+              const pattern = /^Checks\s+#961:\s*(.+)$/gmi;
+              let match;
+
+              while ((match = pattern.exec(commit.message)) !== null) {
+                tasks.push(match[1].trim());
+              }
+            }
+
+            if (tasks.length === 0) {
+              core.info("No Checks #961 directives found.");
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const issue = await github.rest.issues.get({
+              owner,
+              repo,
+              issue_number: issueNumber
+            });
+
+            const body = issue.data.body ?? "";
+            const lines = body.split("\n");
+
+            function normalize(text) {
+              return text
+                .trim()
+                .replace(/\s+/g, " ");
+            }
+
+            function getTaskText(line) {
+              const match =
+                line.match(/^\s*[-*+]\s+\[[ xX]\]\s+(.*)$/);
+
+              if (match === null) {
+                return null;
+              }
+
+              return normalize(
+                match[1]
+                  .replace(
+                    /\s*🟡\s*\*\*NIM\*\*\s*<!--\s*issue-task-sync branch=[A-Za-z0-9_-]+\s*-->\s*$/,
+                    ""
+                  )
+              );
+            }
+
+            let changed = false;
+
+            for (const requestedTask of tasks) {
+              const normalizedRequestedTask = normalize(requestedTask);
+
+              const matches = [];
+
+              for (let index = 0; index < lines.length; index++) {
+                const taskText = getTaskText(lines[index]);
+
+                if (taskText === normalizedRequestedTask) {
+                  matches.push(index);
+                }
+              }
+
+              if (matches.length === 0) {
+                core.warning(
+                  `Task "${requestedTask}" was not found in issue #961.`
+                );
+                continue;
+              }
+
+              if (matches.length > 1) {
+                core.warning(
+                  `Task "${requestedTask}" occurs multiple times in issue #961. ` +
+                  "No change was made for safety."
+                );
+                continue;
+              }
+
+              const index = matches[0];
+              const line = lines[index];
+
+              if (/^\s*[-*+]\s+\[[xX]\]/.test(line)) {
+                if (line.includes("issue-task-sync")) {
+                  core.info(
+                    `Task "${requestedTask}" is already marked as NIM.`
+                  );
+                } else {
+                  core.info(
+                    `Task "${requestedTask}" is already completed without NIM.`
+                  );
+                }
+
+                continue;
+              }
+
+              lines[index] =
+                line.replace(/\[\s\]/, "[x]") + nimSuffix;
+
+              changed = true;
+
+              core.info(
+                `Marked "${requestedTask}" as completed on branch "${branch}" with NIM.`
+              );
+            }
+
+            if (!changed) {
+              core.info("Issue body does not need to be updated.");
+              return;
+            }
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: lines.join("\n")
+            });
+
+            core.info(`Issue #${issueNumber} successfully updated.`);
