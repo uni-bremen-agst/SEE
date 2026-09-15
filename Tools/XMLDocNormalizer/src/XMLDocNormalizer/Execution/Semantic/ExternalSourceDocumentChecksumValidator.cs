@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Security.Cryptography;
+using Microsoft.CodeAnalysis.Text;
 
 namespace XMLDocNormalizer.Execution.Semantic
 {
@@ -83,6 +84,46 @@ namespace XMLDocNormalizer.Execution.Semantic
                 actualHash,
                 expectedDocumentHash.AsSpan());
             return isChecksumValidated;
+        }
+
+        /// <summary>
+        /// Maps a Portable PDB document hash identifier to the exact source
+        /// hash algorithm representable by the current Roslyn API.
+        /// </summary>
+        /// <param name="identifier">The Portable PDB algorithm identifier.</param>
+        /// <param name="algorithm">The exact Roslyn source hash algorithm.</param>
+        /// <returns>
+        /// <see langword="true"/> for SHA-1 or SHA-256; otherwise
+        /// <see langword="false"/>. In particular, SHA-384 and SHA-512 are
+        /// not approximated by another algorithm.
+        /// </returns>
+        public static bool TryGetRoslynSourceHashAlgorithm(
+            Guid identifier,
+            out SourceHashAlgorithm algorithm)
+        {
+            if (!TryGetDocumentHashAlgorithm(
+                    identifier,
+                    out HashAlgorithmName hashAlgorithm,
+                    out _))
+            {
+                algorithm = default;
+                return false;
+            }
+
+            if (hashAlgorithm == HashAlgorithmName.SHA1)
+            {
+                algorithm = SourceHashAlgorithm.Sha1;
+                return true;
+            }
+
+            if (hashAlgorithm == HashAlgorithmName.SHA256)
+            {
+                algorithm = SourceHashAlgorithm.Sha256;
+                return true;
+            }
+
+            algorithm = default;
+            return false;
         }
 
         /// <summary>
