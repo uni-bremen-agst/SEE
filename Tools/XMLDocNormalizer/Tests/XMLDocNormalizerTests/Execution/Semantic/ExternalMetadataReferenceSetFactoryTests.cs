@@ -556,7 +556,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Creates a small valid top-level provenance shell with present or
         /// absent metadata-reference provenance.
         /// </summary>
-        private static ExternalCompilationProvenanceDescriptor CreateProvenance(
+        internal static ExternalCompilationProvenanceDescriptor CreateProvenance(
             IEnumerable<ExternalCompilationMetadataReferenceDescriptor>? expected)
         {
             ExternalPortablePdbDescriptor portablePdb = new(
@@ -577,7 +577,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Creates a top-level provenance descriptor from explicit expected
         /// ordinals.
         /// </summary>
-        private static ExternalCompilationProvenanceDescriptor CreateProvenance(
+        internal static ExternalCompilationProvenanceDescriptor CreateProvenance(
             params ExternalCompilationMetadataReferenceDescriptor[] expected)
         {
             return CreateProvenance(
@@ -616,7 +616,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Creates one expected descriptor from controlled PE bytes.
         /// </summary>
-        private static ExternalCompilationMetadataReferenceDescriptor CreateExpected(
+        internal static ExternalCompilationMetadataReferenceDescriptor CreateExpected(
             byte[] image,
             string name,
             ImmutableArray<string> aliases = default,
@@ -672,7 +672,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Emits a controlled deterministic assembly using the existing P5B
         /// test infrastructure.
         /// </summary>
-        private static byte[] EmitAssembly(string assemblyName, string source)
+        internal static byte[] EmitAssembly(string assemblyName, string source)
         {
             return P5BTests.EmitPe(
                 assemblyName,
@@ -683,7 +683,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Creates a controlled compilation for reference-set binding only.
         /// </summary>
-        private static CSharpCompilation CreateCompilation(
+        internal static CSharpCompilation CreateCompilation(
             string assemblyName,
             string source,
             IEnumerable<MetadataReference> references)
@@ -703,7 +703,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Requires a controlled binding compilation to contain no errors.
         /// </summary>
-        private static void AssertNoErrors(CSharpCompilation compilation)
+        internal static void AssertNoErrors(CSharpCompilation compilation)
         {
             Assert.DoesNotContain(
                 compilation.GetDiagnostics(),
