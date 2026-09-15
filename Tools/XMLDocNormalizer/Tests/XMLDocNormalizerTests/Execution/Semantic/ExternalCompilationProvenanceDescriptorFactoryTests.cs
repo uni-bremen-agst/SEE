@@ -569,13 +569,14 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Emits a real Roslyn PE and Portable PDB with selected compilation inputs.
         /// </summary>
-        private static PortablePdbTestData EmitPortablePdb(
+        internal static PortablePdbTestData EmitPortablePdb(
             string assemblyName,
             string source,
             CSharpParseOptions parseOptions,
             CSharpCompilationOptions compilationOptions,
             IEnumerable<MetadataReference>? references = null,
-            string? sourceLink = null)
+            string? sourceLink = null,
+            EmitOptions? emitOptions = null)
         {
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
                 source,
@@ -594,9 +595,10 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 Path.GetTempPath(),
                 $"xmldocnormalizer-p5a-codeview-{Guid.NewGuid():N}",
                 "candidate.pdb");
-            EmitOptions emitOptions = new(
-                debugInformationFormat: DebugInformationFormat.PortablePdb,
-                pdbFilePath: codeViewPath);
+            EmitOptions effectiveEmitOptions = emitOptions?.WithPdbFilePath(codeViewPath)
+                ?? new EmitOptions(
+                    debugInformationFormat: DebugInformationFormat.PortablePdb,
+                    pdbFilePath: codeViewPath);
             using MemoryStream peStream = new();
             using MemoryStream pdbStream = new();
             using MemoryStream? sourceLinkStream = sourceLink == null
@@ -605,15 +607,24 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             EmitResult result = compilation.Emit(
                 peStream,
                 pdbStream,
-                options: emitOptions,
+                options: effectiveEmitOptions,
                 sourceLinkStream: sourceLinkStream);
             Assert.True(result.Success, string.Join(Environment.NewLine, result.Diagnostics));
             byte[] peImage = peStream.ToArray();
             byte[] pdbImage = pdbStream.ToArray();
+            ExternalPeDebugDirectoryDescriptor debugDescriptor =
+                compilationOptions.OutputKind == OutputKind.NetModule
+                    ? new ExternalPeDebugDirectoryDescriptor(
+                        new ExternalModuleIdentity(assemblyName + ".netmodule", Guid.Empty),
+                        isDeterministic: compilationOptions.Deterministic,
+                        ImmutableArray<ExternalCodeViewPdbReference>.Empty,
+                        ImmutableArray.Create(ReadPdbId(pdbImage)),
+                        ImmutableArray<ExternalPdbChecksum>.Empty)
+                    : CreateP4ADebugDescriptor(peImage);
             return new PortablePdbTestData(
                 peImage,
                 pdbImage,
-                CreateP4ADebugDescriptor(peImage));
+                debugDescriptor);
         }
 
         /// <summary>
@@ -646,7 +657,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Reads one required P5A descriptor from real Roslyn test data.
         /// </summary>
-        private static ExternalCompilationProvenanceDescriptor ReadRequiredDescriptor(
+        internal static ExternalCompilationProvenanceDescriptor ReadRequiredDescriptor(
             PortablePdbTestData testData)
         {
             using MemoryStream stream = new(testData.PdbImage, writable: false);
@@ -880,9 +891,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
-        /// Represents real Roslyn test output and its P4A descriptor.
+        /// Represents real Roslyn test output and matching PDB debug provenance.
         /// </summary>
-        private sealed record PortablePdbTestData(
+        internal sealed record PortablePdbTestData(
             byte[] PeImage,
             byte[] PdbImage,
             ExternalPeDebugDirectoryDescriptor DebugDescriptor);
