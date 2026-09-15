@@ -21,25 +21,25 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// The standardized Portable PDB SHA-1 document hash identifier.
         /// </summary>
-        private static readonly Guid Sha1DocumentHashAlgorithm =
+        internal static readonly Guid Sha1DocumentHashAlgorithm =
             new("ff1816ec-aa5e-4d10-87f7-6f4963833460");
 
         /// <summary>
         /// The standardized Portable PDB SHA-256 document hash identifier.
         /// </summary>
-        private static readonly Guid Sha256DocumentHashAlgorithm =
+        internal static readonly Guid Sha256DocumentHashAlgorithm =
             new("8829d00f-11b8-4213-878b-770e8597ac16");
 
         /// <summary>
         /// The standardized Portable PDB SHA-384 document hash identifier.
         /// </summary>
-        private static readonly Guid Sha384DocumentHashAlgorithm =
+        internal static readonly Guid Sha384DocumentHashAlgorithm =
             new("d99cfeb1-8c43-444a-8a6c-b61269d2a0bf");
 
         /// <summary>
         /// The standardized Portable PDB SHA-512 document hash identifier.
         /// </summary>
-        private static readonly Guid Sha512DocumentHashAlgorithm =
+        internal static readonly Guid Sha512DocumentHashAlgorithm =
             new("ef2d1afc-6550-46d6-b14b-d70afe9a5566");
 
         /// <summary>
@@ -508,7 +508,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
 
         /// <summary>
         /// Preserves coexisting Source Link and checksum-validated raw and
-        /// compressed Embedded Source provenance without retaining source bytes.
+        /// compressed Embedded Source provenance with exact source snapshots.
         /// </summary>
         [Fact]
         public void EmbeddedSources_RawAndCompressedCanCoexistWithSourceLink()
@@ -546,9 +546,13 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.True(small.EmbeddedSource.HasValue);
             Assert.False(small.EmbeddedSource.Value.IsCompressed);
             Assert.True(small.EmbeddedSource.Value.IsDocumentChecksumValidated);
+            Assert.Equal(
+                Encoding.UTF8.GetBytes("public sealed class SmallType { }"),
+                small.EmbeddedSource.Value.Image);
             Assert.True(large.EmbeddedSource.HasValue);
             Assert.True(large.EmbeddedSource.Value.IsCompressed);
             Assert.True(large.EmbeddedSource.Value.IsDocumentChecksumValidated);
+            Assert.Equal(Encoding.UTF8.GetBytes(largeSource), large.EmbeddedSource.Value.Image);
             Assert.True(large.EmbeddedSource.Value.UncompressedSize >
                 small.EmbeddedSource.Value.UncompressedSize);
             Assert.NotNull(descriptor.SourceLink);
@@ -591,6 +595,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.True(provenance.IsDocumentChecksumValidated);
             Assert.False(provenance.IsCompressed);
             Assert.Equal(sourceBytes.Length, provenance.UncompressedSize);
+            Assert.Equal(sourceBytes, provenance.Image);
         }
 
         /// <summary>
@@ -609,6 +614,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 out ExternalEmbeddedSourceProvenance provenance));
             Assert.False(provenance.IsDocumentChecksumValidated);
             Assert.Equal(sourceBytes.Length, provenance.UncompressedSize);
+            Assert.Equal(sourceBytes, provenance.Image);
         }
 
         /// <summary>
@@ -677,7 +683,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <param name="sources">The source documents.</param>
         /// <param name="sourceLinkJson">The optional Source Link JSON.</param>
         /// <returns>The emitted bytes and P4A debug provenance.</returns>
-        private static PortablePdbTestData EmitPortablePdb(
+        internal static PortablePdbTestData EmitPortablePdb(
             string assemblyName,
             IReadOnlyCollection<TestSource> sources,
             string? sourceLinkJson = null)
@@ -772,7 +778,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <param name="expected">The P4A debug provenance.</param>
         /// <param name="pdbImage">The candidate Portable PDB bytes.</param>
         /// <returns>The validated P4B descriptor.</returns>
-        private static ExternalPortablePdbDescriptor ReadRequiredDescriptor(
+        internal static ExternalPortablePdbDescriptor ReadRequiredDescriptor(
             ExternalPeDebugDirectoryDescriptor expected,
             byte[] pdbImage)
         {
@@ -944,7 +950,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Describes one source document used by a Roslyn emit test.
         /// </summary>
-        private sealed class TestSource
+        internal sealed class TestSource
         {
             /// <summary>
             /// Initializes a test source document.
@@ -960,7 +966,14 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 bool embed)
             {
                 Path = path;
-                Text = SourceText.From(content, Encoding.UTF8, hashAlgorithm);
+                Image = Encoding.UTF8.GetBytes(content);
+                Text = SourceText.From(
+                    Image,
+                    Image.Length,
+                    Encoding.UTF8,
+                    hashAlgorithm,
+                    throwIfBinaryDetected: false,
+                    canBeEmbedded: true);
                 Embed = embed;
             }
 
@@ -977,6 +990,12 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             public SourceText Text { get; }
 
             /// <summary>
+            /// Gets the exact source bytes supplied to Roslyn.
+            /// </summary>
+            /// <value>The original encoded source image.</value>
+            public byte[] Image { get; }
+
+            /// <summary>
             /// Gets whether the source is embedded.
             /// </summary>
             /// <value>Whether Roslyn should emit Embedded Source CDI.</value>
@@ -986,7 +1005,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Stores emitted PE/PDB bytes and their validated P4A provenance.
         /// </summary>
-        private sealed class PortablePdbTestData
+        internal sealed class PortablePdbTestData
         {
             /// <summary>
             /// Initializes Portable PDB test data.

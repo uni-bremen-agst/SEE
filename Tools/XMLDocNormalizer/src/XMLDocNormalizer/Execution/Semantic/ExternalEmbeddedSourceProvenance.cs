@@ -1,40 +1,43 @@
+using System.Collections.Immutable;
+
 namespace XMLDocNormalizer.Execution.Semantic
 {
     /// <summary>
-    /// Describes validated provenance for source embedded in a Portable PDB.
+    /// Describes embedded-source provenance and retains the exact immutable
+    /// uncompressed bytes materialized while validating the Portable PDB.
     /// </summary>
     internal readonly record struct ExternalEmbeddedSourceProvenance
     {
         /// <summary>
         /// Initializes embedded-source provenance.
         /// </summary>
-        /// <param name="isCompressed">
-        /// Whether the embedded content uses Deflate compression.
+        /// <param name="image">
+        /// The exact immutable uncompressed embedded-source bytes.
         /// </param>
-        /// <param name="uncompressedSize">
-        /// The validated uncompressed source size in bytes.
+        /// <param name="isCompressed">
+        /// Whether the embedded content used Deflate compression.
         /// </param>
         /// <param name="isDocumentChecksumValidated">
         /// Whether a known document checksum was successfully validated.
         /// </param>
         private ExternalEmbeddedSourceProvenance(
+            ImmutableArray<byte> image,
             bool isCompressed,
-            int uncompressedSize,
             bool isDocumentChecksumValidated)
         {
+            Image = image;
             IsCompressed = isCompressed;
-            UncompressedSize = uncompressedSize;
             IsDocumentChecksumValidated = isDocumentChecksumValidated;
         }
 
         /// <summary>
         /// Tries to create validated embedded-source provenance.
         /// </summary>
-        /// <param name="isCompressed">
-        /// Whether the embedded content uses Deflate compression.
+        /// <param name="image">
+        /// The exact immutable uncompressed embedded-source bytes.
         /// </param>
-        /// <param name="uncompressedSize">
-        /// The validated uncompressed source size in bytes.
+        /// <param name="isCompressed">
+        /// Whether the embedded content used Deflate compression.
         /// </param>
         /// <param name="isDocumentChecksumValidated">
         /// Whether a known document checksum was successfully validated.
@@ -43,27 +46,36 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// The resulting provenance when the size is valid.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> when <paramref name="uncompressedSize"/> is
-        /// nonnegative; otherwise <see langword="false"/>.
+        /// <see langword="true"/> when <paramref name="image"/> is an
+        /// initialized immutable snapshot; otherwise <see langword="false"/>.
         /// </returns>
         internal static bool TryCreate(
+            ImmutableArray<byte> image,
             bool isCompressed,
-            int uncompressedSize,
             bool isDocumentChecksumValidated,
             out ExternalEmbeddedSourceProvenance provenance)
         {
-            if (uncompressedSize < 0)
+            if (image.IsDefault)
             {
                 provenance = default;
                 return false;
             }
 
             provenance = new ExternalEmbeddedSourceProvenance(
+                image,
                 isCompressed,
-                uncompressedSize,
                 isDocumentChecksumValidated);
             return true;
         }
+
+        /// <summary>
+        /// Gets the exact immutable uncompressed embedded-source bytes.
+        /// </summary>
+        /// <value>
+        /// The bytes materialized and, for a known algorithm, checksum
+        /// validated while reading the Portable PDB.
+        /// </value>
+        public ImmutableArray<byte> Image { get; }
 
         /// <summary>
         /// Gets whether the embedded source is compressed.
@@ -77,8 +89,8 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <summary>
         /// Gets the validated uncompressed source size.
         /// </summary>
-        /// <value>The uncompressed size in bytes.</value>
-        public int UncompressedSize { get; }
+        /// <value>The exact retained image length in bytes.</value>
+        public int UncompressedSize => Image.Length;
 
         /// <summary>
         /// Gets whether the uncompressed bytes matched the document checksum.
