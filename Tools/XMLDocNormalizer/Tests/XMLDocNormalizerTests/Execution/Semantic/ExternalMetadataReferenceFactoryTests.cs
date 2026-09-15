@@ -484,7 +484,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Creates validated material from one in-memory image.
         /// </summary>
-        private static ValidatedExternalMetadataReferenceMaterial CreateMaterial(
+        internal static ValidatedExternalMetadataReferenceMaterial CreateMaterial(
             ExternalCompilationMetadataReferenceDescriptor expected,
             byte[] image)
         {
@@ -540,7 +540,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Emits an assembly manifest that links one separately emitted
         /// managed netmodule.
         /// </summary>
-        private static byte[] EmitMultiModuleAssembly()
+        internal static byte[] EmitMultiModuleAssembly()
         {
             byte[] moduleImage = P5BTests.EmitPe(
                 "LinkedModule",
@@ -622,7 +622,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Reads the manifest or standalone module MVID through the Roslyn
         /// reference product.
         /// </summary>
-        private static Guid ReadMvid(PortableExecutableReference reference)
+        internal static Guid ReadMvid(PortableExecutableReference reference)
         {
             MetadataReader reader = GetManifestModule(reference).GetMetadataReader();
             return reader.GetGuid(reader.GetModuleDefinition().Mvid);
