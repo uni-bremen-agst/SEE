@@ -190,6 +190,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 }
 
                 descriptor = new ExternalCompilationProvenanceDescriptor(
+                    expectedDebugDescriptor,
                     portablePdb,
                     compilationOptions,
                     metadataReferences);

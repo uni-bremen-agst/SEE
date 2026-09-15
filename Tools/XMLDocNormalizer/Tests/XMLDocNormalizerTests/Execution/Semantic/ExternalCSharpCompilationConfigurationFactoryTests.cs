@@ -33,10 +33,8 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         [Fact]
         public void MissingCompilationOptionsCdi_FailsClosed()
         {
-            ExternalCompilationProvenanceDescriptor provenance = new(
-                null!,
-                compilationOptions: null,
-                metadataReferences: null);
+            ExternalCompilationProvenanceDescriptor provenance =
+                CreateProvenance(compilationOptions: null);
 
             Assert.False(ExternalCSharpCompilationConfigurationFactory.TryCreate(
                 provenance,
@@ -571,10 +569,8 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         {
             ExternalCompilationOptionsDescriptor options = new(
                 CreateBaseOptions().Reverse().ToImmutableArray());
-            ExternalCompilationProvenanceDescriptor provenance = new(
-                null!,
-                options,
-                metadataReferences: null);
+            ExternalCompilationProvenanceDescriptor provenance =
+                CreateProvenance(options);
 
             Assert.True(ExternalCSharpCompilationConfigurationFactory.TryCreate(
                 provenance,
@@ -831,13 +827,37 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 }
             }
 
-            ExternalCompilationProvenanceDescriptor provenance = new(
-                null!,
-                new ExternalCompilationOptionsDescriptor(options.ToImmutableArray()),
-                metadataReferences: null);
+            ExternalCompilationProvenanceDescriptor provenance = CreateProvenance(
+                new ExternalCompilationOptionsDescriptor(options.ToImmutableArray()));
             return ExternalCSharpCompilationConfigurationFactory.TryCreate(
                 provenance,
                 out configuration!);
+        }
+
+        /// <summary>
+        /// Creates a valid P4A/P4B shell around explicit P5A options.
+        /// </summary>
+        /// <param name="compilationOptions">The optional compilation options.</param>
+        /// <returns>The synthetic but structurally valid provenance.</returns>
+        private static ExternalCompilationProvenanceDescriptor CreateProvenance(
+            ExternalCompilationOptionsDescriptor? compilationOptions)
+        {
+            ExternalPeDebugDirectoryDescriptor debugDirectory = new(
+                new ExternalModuleIdentity("synthetic.dll", Guid.Empty),
+                isDeterministic: false,
+                ImmutableArray<ExternalCodeViewPdbReference>.Empty,
+                ImmutableArray<System.Reflection.Metadata.BlobContentId>.Empty,
+                ImmutableArray<ExternalPdbChecksum>.Empty);
+            ExternalPortablePdbDescriptor portablePdb = new(
+                default,
+                PortablePdbValidationKind.Identity,
+                ImmutableArray<ExternalSourceDocumentDescriptor>.Empty,
+                sourceLink: null);
+            return new ExternalCompilationProvenanceDescriptor(
+                debugDirectory,
+                portablePdb,
+                compilationOptions,
+                metadataReferences: null);
         }
 
         /// <summary>

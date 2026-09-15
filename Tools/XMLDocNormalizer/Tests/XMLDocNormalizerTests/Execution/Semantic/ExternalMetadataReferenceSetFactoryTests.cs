@@ -564,10 +564,17 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 PortablePdbValidationKind.Identity,
                 ImmutableArray<ExternalSourceDocumentDescriptor>.Empty,
                 sourceLink: null);
+            ExternalPeDebugDirectoryDescriptor debugDirectory = new(
+                new ExternalModuleIdentity("synthetic.dll", Guid.Empty),
+                isDeterministic: false,
+                ImmutableArray<ExternalCodeViewPdbReference>.Empty,
+                ImmutableArray<System.Reflection.Metadata.BlobContentId>.Empty,
+                ImmutableArray<ExternalPdbChecksum>.Empty);
             ExternalCompilationMetadataReferencesDescriptor? metadataReferences = expected == null
                 ? null
                 : new ExternalCompilationMetadataReferencesDescriptor(expected.ToImmutableArray());
             return new ExternalCompilationProvenanceDescriptor(
+                debugDirectory,
                 portablePdb,
                 compilationOptions: null,
                 metadataReferences);

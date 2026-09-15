@@ -665,6 +665,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 testData.DebugDescriptor,
                 stream,
                 out ExternalCompilationProvenanceDescriptor descriptor));
+            Assert.Same(testData.DebugDescriptor, descriptor.DebugDirectory);
             Assert.Equal(ReadPdbId(testData.PdbImage), descriptor.PortablePdb.Id);
             return descriptor;
         }
@@ -680,6 +681,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 testData.DebugDescriptor,
                 stream,
                 out ExternalCompilationProvenanceDescriptor descriptor));
+            Assert.Same(testData.DebugDescriptor, descriptor.DebugDirectory);
             return descriptor;
         }
 
