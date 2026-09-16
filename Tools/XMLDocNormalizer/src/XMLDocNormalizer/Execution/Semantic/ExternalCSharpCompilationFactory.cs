@@ -69,18 +69,12 @@ namespace XMLDocNormalizer.Execution.Semantic
             ArgumentNullException.ThrowIfNull(syntaxTreeSet);
             ArgumentNullException.ThrowIfNull(referenceSet);
 
-            if (configuration.CompilationOptions.OutputKind == OutputKind.NetModule
-                || targetAssembly.Modules.IsDefaultOrEmpty
-                || targetAssembly.Modules[0]
-                    != compilationProvenance.DebugDirectory.ManifestModule
-                || !HaveExpectedTargetModules(
-                    targetAssembly.Modules,
-                    compilationProvenance.MetadataReferences)
-                || syntaxTreeSet.Trees.Length != configuration.SourceFileCount
-                || !HaveExpectedTrees(syntaxTreeSet.Trees, configuration.ParseOptions)
-                || !HaveExpectedReferences(
-                    compilationProvenance.MetadataReferences,
-                    referenceSet.References))
+            if (!HaveValidInputs(
+                    targetAssembly,
+                    compilationProvenance,
+                    configuration,
+                    syntaxTreeSet,
+                    referenceSet))
             {
                 compilation = null!;
                 return false;
@@ -100,26 +94,135 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
-            if (!ReferenceEquals(compilation.Options, configuration.CompilationOptions)
-                || !string.Equals(
-                    compilation.AssemblyName,
-                    targetAssembly.AssemblyIdentity.Name,
-                    StringComparison.Ordinal)
-                || !compilation.Assembly.Identity.Equals(targetAssembly.AssemblyIdentity)
-                || !string.Equals(
-                    compilation.SourceModule.Name,
-                    targetAssembly.Modules[0].Name,
-                    StringComparison.Ordinal)
-                || !HaveSameTreeInstances(compilation.SyntaxTrees, syntaxTreeSet.Trees)
-                || !HaveSameReferenceInstances(
-                    compilation.References,
-                    referenceSet.References))
+            if (!HaveExpectedComposition(
+                    targetAssembly,
+                    configuration,
+                    syntaxTreeSet,
+                    referenceSet,
+                    compilation))
             {
                 compilation = null!;
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Validates that an existing compilation is the exact structural
+        /// result accepted by P5K for the supplied P3/P5 inputs.
+        /// </summary>
+        /// <param name="targetAssembly">The P3-validated target identity.</param>
+        /// <param name="compilationProvenance">The P5A provenance.</param>
+        /// <param name="configuration">The P5G configuration.</param>
+        /// <param name="syntaxTreeSet">The complete P5J tree set.</param>
+        /// <param name="referenceSet">The complete P5E reference set.</param>
+        /// <param name="compilation">The existing P5K compilation.</param>
+        /// <returns>
+        /// <see langword="true"/> when all P5K input and output invariants
+        /// hold for the exact supplied instances; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any input is <see langword="null"/>.
+        /// </exception>
+        internal static bool IsValidComposition(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCompilationProvenanceDescriptor compilationProvenance,
+            ExternalCSharpCompilationConfiguration configuration,
+            ExternalCSharpSyntaxTreeSet syntaxTreeSet,
+            ExternalMetadataReferenceSet referenceSet,
+            CSharpCompilation compilation)
+        {
+            ArgumentNullException.ThrowIfNull(targetAssembly);
+            ArgumentNullException.ThrowIfNull(compilationProvenance);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(syntaxTreeSet);
+            ArgumentNullException.ThrowIfNull(referenceSet);
+            ArgumentNullException.ThrowIfNull(compilation);
+
+            return HaveValidInputs(
+                    targetAssembly,
+                    compilationProvenance,
+                    configuration,
+                    syntaxTreeSet,
+                    referenceSet)
+                && HaveExpectedComposition(
+                    targetAssembly,
+                    configuration,
+                    syntaxTreeSet,
+                    referenceSet,
+                    compilation);
+        }
+
+        /// <summary>
+        /// Checks all P3/P5 invariants that must hold before composition.
+        /// </summary>
+        /// <param name="targetAssembly">The P3-validated target identity.</param>
+        /// <param name="compilationProvenance">The P5A provenance.</param>
+        /// <param name="configuration">The P5G configuration.</param>
+        /// <param name="syntaxTreeSet">The complete P5J tree set.</param>
+        /// <param name="referenceSet">The complete P5E reference set.</param>
+        /// <returns>
+        /// <see langword="true"/> when every pre-composition invariant holds;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HaveValidInputs(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCompilationProvenanceDescriptor compilationProvenance,
+            ExternalCSharpCompilationConfiguration configuration,
+            ExternalCSharpSyntaxTreeSet syntaxTreeSet,
+            ExternalMetadataReferenceSet referenceSet)
+        {
+            return configuration.CompilationOptions.OutputKind != OutputKind.NetModule
+                && !targetAssembly.Modules.IsDefaultOrEmpty
+                && targetAssembly.Modules[0]
+                    == compilationProvenance.DebugDirectory.ManifestModule
+                && HaveExpectedTargetModules(
+                    targetAssembly.Modules,
+                    compilationProvenance.MetadataReferences)
+                && syntaxTreeSet.Trees.Length == configuration.SourceFileCount
+                && HaveExpectedTrees(syntaxTreeSet.Trees, configuration.ParseOptions)
+                && HaveExpectedReferences(
+                    compilationProvenance.MetadataReferences,
+                    referenceSet.References);
+        }
+
+        /// <summary>
+        /// Checks the exact P5K composition result without creating or
+        /// transforming another compilation.
+        /// </summary>
+        /// <param name="targetAssembly">The P3-validated target identity.</param>
+        /// <param name="configuration">The P5G configuration.</param>
+        /// <param name="syntaxTreeSet">The complete P5J tree set.</param>
+        /// <param name="referenceSet">The complete P5E reference set.</param>
+        /// <param name="compilation">The composition result to validate.</param>
+        /// <returns>
+        /// <see langword="true"/> when the exact options, assembly identity,
+        /// module name, trees, and references are preserved; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool HaveExpectedComposition(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCSharpCompilationConfiguration configuration,
+            ExternalCSharpSyntaxTreeSet syntaxTreeSet,
+            ExternalMetadataReferenceSet referenceSet,
+            CSharpCompilation compilation)
+        {
+            return ReferenceEquals(compilation.Options, configuration.CompilationOptions)
+                && string.Equals(
+                    compilation.AssemblyName,
+                    targetAssembly.AssemblyIdentity.Name,
+                    StringComparison.Ordinal)
+                && compilation.Assembly.Identity.Equals(targetAssembly.AssemblyIdentity)
+                && string.Equals(
+                    compilation.SourceModule.Name,
+                    targetAssembly.Modules[0].Name,
+                    StringComparison.Ordinal)
+                && HaveSameTreeInstances(compilation.SyntaxTrees, syntaxTreeSet.Trees)
+                && HaveSameReferenceInstances(
+                    compilation.References,
+                    referenceSet.References);
         }
 
         /// <summary>

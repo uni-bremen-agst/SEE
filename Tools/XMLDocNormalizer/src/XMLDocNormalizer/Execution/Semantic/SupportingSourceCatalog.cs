@@ -21,6 +21,14 @@ namespace XMLDocNormalizer.Execution.Semantic
             new();
 
         /// <summary>
+        /// Maps exact original external binary identities to their registered
+        /// source-backed scopes.
+        /// </summary>
+        private readonly Dictionary<
+            ExternalAssemblyReferenceDescriptor,
+            SemanticCompilationScope> externalScopesByBinaryIdentity = new();
+
+        /// <summary>
         /// Maps supporting syntax trees to their semantic compilation scopes.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticCompilationScope> scopesBySyntaxTree =
@@ -30,6 +38,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Stores supporting scopes in registration order.
         /// </summary>
         private readonly List<SemanticCompilationScope> scopes = new();
+
+        /// <summary>
+        /// Stores supporting scopes that the current analyzer traversal is
+        /// already allowed to enumerate.
+        /// </summary>
+        private readonly List<SemanticCompilationScope> analysisScopes = new();
 
         /// <summary>
         /// Gets the monotonically increasing catalog version.
@@ -86,6 +100,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             scopesByCompilation.Add(compilation, scope);
             scopesByAssemblyIdentity.Add(assemblyIdentity, scope);
             scopes.Add(scope);
+            analysisScopes.Add(scope);
 
             foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
             {
@@ -97,12 +112,93 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Tries to register a validated external supporting-source
+        /// compilation without activating analyzer traversal for it.
+        /// </summary>
+        /// <param name="supportingSource">
+        /// The validated external binary identity and exact P5K compilation.
+        /// </param>
+        /// <param name="scope">
+        /// The registered supporting-source scope when successful.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a new registration or an idempotent
+        /// registration of the same binary identity and compilation instance;
+        /// otherwise <see langword="false"/>. Conflicts never replace an
+        /// existing registration.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="supportingSource"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public bool TryRegisterExternal(
+            ExternalSupportingSourceCompilation supportingSource,
+            out SemanticCompilationScope scope)
+        {
+            ArgumentNullException.ThrowIfNull(supportingSource);
+
+            ExternalAssemblyReferenceDescriptor binaryIdentity =
+                supportingSource.TargetAssembly;
+            Compilation compilation = supportingSource.Compilation;
+
+            if (externalScopesByBinaryIdentity.TryGetValue(
+                    binaryIdentity,
+                    out SemanticCompilationScope? existingBinaryScope))
+            {
+                scope = existingBinaryScope;
+                return ReferenceEquals(existingBinaryScope.Compilation, compilation);
+            }
+
+            if (scopesByCompilation.ContainsKey(compilation))
+            {
+                scope = null!;
+                return false;
+            }
+
+            foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
+            {
+                if (scopesBySyntaxTree.ContainsKey(syntaxTree))
+                {
+                    scope = null!;
+                    return false;
+                }
+            }
+
+            scope = SemanticCompilationScope.CreateSupportingSourceDependency(
+                compilation);
+            externalScopesByBinaryIdentity.Add(binaryIdentity, scope);
+            scopesByCompilation.Add(compilation, scope);
+            scopes.Add(scope);
+
+            foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
+            {
+                scopesBySyntaxTree.Add(syntaxTree, scope);
+            }
+
+            Version++;
+            return true;
+        }
+
+        /// <summary>
         /// Gets a snapshot of all registered supporting scopes.
         /// </summary>
         /// <returns>The scopes in deterministic registration order.</returns>
         public IReadOnlyList<SemanticCompilationScope> GetScopes()
         {
             return scopes.ToArray();
+        }
+
+        /// <summary>
+        /// Gets supporting scopes enabled for the current analyzer traversal.
+        /// </summary>
+        /// <returns>
+        /// The legacy supporting scopes in deterministic registration order.
+        /// External P6A registrations are excluded until their explicit
+        /// callable-resolution integration is introduced.
+        /// </returns>
+        public IReadOnlyList<SemanticCompilationScope> GetAnalysisScopes()
+        {
+            return analysisScopes.ToArray();
         }
 
         /// <summary>
@@ -172,6 +268,40 @@ namespace XMLDocNormalizer.Execution.Semantic
         {
             if (scopesByAssemblyIdentity.TryGetValue(
                     assemblyIdentity,
+                    out SemanticCompilationScope? registeredScope))
+            {
+                scope = registeredScope;
+                return true;
+            }
+
+            scope = null!;
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to locate an external supporting scope by the exact original
+        /// binary identity.
+        /// </summary>
+        /// <param name="binaryIdentity">
+        /// The full P3 identity. Its file path does not participate in equality.
+        /// </param>
+        /// <param name="scope">The exact registered scope when found.</param>
+        /// <returns>
+        /// <see langword="true"/> when an equal external binary identity is
+        /// registered; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="binaryIdentity"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public bool TryGetExternalScope(
+            ExternalAssemblyReferenceDescriptor binaryIdentity,
+            out SemanticCompilationScope scope)
+        {
+            ArgumentNullException.ThrowIfNull(binaryIdentity);
+
+            if (externalScopesByBinaryIdentity.TryGetValue(
+                    binaryIdentity,
                     out SemanticCompilationScope? registeredScope))
             {
                 scope = registeredScope;

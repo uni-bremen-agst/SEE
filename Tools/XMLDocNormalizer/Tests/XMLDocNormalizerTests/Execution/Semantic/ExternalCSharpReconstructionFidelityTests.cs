@@ -926,22 +926,24 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// One controlled source path and content snapshot.
         /// </summary>
-        private sealed record SourceInput(string Path, string Source);
+        internal sealed record SourceInput(string Path, string Source);
 
         /// <summary>
         /// Stores the original and completely reconstructed compilations.
         /// </summary>
-        private sealed record ReconstructionPair(
+        internal sealed record ReconstructionPair(
             CSharpCompilation Original,
             CSharpCompilation Reconstructed,
             ExternalCSharpCompilationConfiguration Configuration,
-            byte[] PeImage);
+            byte[] PeImage,
+            ExternalSupportingSourceCompilation? SupportingSource,
+            ExternalSupportingSourceCompilation? ConflictingSupportingSource);
 
         /// <summary>
         /// Owns explicit candidate files and executes the complete P3/P4/P5
         /// reconstruction pipeline for controlled test compilations.
         /// </summary>
-        private sealed class FidelityWorkspace : IDisposable
+        internal sealed class FidelityWorkspace : IDisposable
         {
             /// <summary>
             /// Retains controlled candidate images for in-memory multi-module
@@ -1022,7 +1024,8 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 CSharpParseOptions? parseOptions = null,
                 CSharpCompilationOptions? compilationOptions = null,
                 IReadOnlyList<PortableExecutableReference>? additionalReferences = null,
-                bool expectCompositionSuccess = true)
+                bool expectCompositionSuccess = true,
+                bool createConflictingSupportingSource = false)
             {
                 CSharpParseOptions actualParseOptions = parseOptions
                     ?? new CSharpParseOptions(
@@ -1168,11 +1171,48 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                     out CSharpCompilation reconstructedCompilation);
                 Assert.Equal(expectCompositionSuccess, compositionSucceeded);
 
+                ExternalSupportingSourceCompilation? supportingSource = null;
+                ExternalSupportingSourceCompilation? conflictingSupportingSource = null;
+
+                if (compositionSucceeded)
+                {
+                    Assert.True(ExternalSupportingSourceCompilation.TryCreate(
+                        targetDescriptor,
+                        provenance,
+                        configuration,
+                        treeSet,
+                        referenceSet,
+                        reconstructedCompilation,
+                        out supportingSource));
+
+                    if (createConflictingSupportingSource)
+                    {
+                        Assert.True(ExternalCSharpCompilationFactory.TryCreate(
+                            targetDescriptor,
+                            provenance,
+                            configuration,
+                            treeSet,
+                            referenceSet,
+                            out CSharpCompilation conflictingCompilation));
+                        Assert.NotSame(reconstructedCompilation, conflictingCompilation);
+                        Assert.True(ExternalSupportingSourceCompilation.TryCreate(
+                            targetDescriptor,
+                            provenance,
+                            configuration,
+                            treeSet,
+                            referenceSet,
+                            conflictingCompilation,
+                            out conflictingSupportingSource));
+                    }
+                }
+
                 return new ReconstructionPair(
                     original,
                     compositionSucceeded ? reconstructedCompilation : null!,
                     configuration,
-                    peImage);
+                    peImage,
+                    supportingSource,
+                    conflictingSupportingSource);
             }
 
             /// <summary>

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -125,6 +126,61 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Tries to register one validated external compilation as a
+        /// context-local supporting source dependency.
+        /// </summary>
+        /// <param name="supportingSource">
+        /// The exact P3 binary identity coupled to the unchanged P5K
+        /// compilation instance.
+        /// </param>
+        /// <param name="scope">
+        /// The supporting-source scope when registration succeeds.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a new or idempotent exact registration;
+        /// otherwise <see langword="false"/>. Conflicting identity,
+        /// compilation, or syntax-tree ownership fails closed.
+        /// </returns>
+        /// <remarks>
+        /// The registration provides source-backed semantic information but
+        /// does not activate exception-summary traversal. The compilation is
+        /// not an analysis target and independently produces no XML-
+        /// documentation findings. Generator-output completeness and
+        /// historical compiler fidelity remain caller preconditions.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="supportingSource"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public bool TryRegisterExternalSupportingSource(
+            ExternalSupportingSourceCompilation supportingSource,
+            out SemanticCompilationScope scope)
+        {
+            ArgumentNullException.ThrowIfNull(supportingSource);
+
+            CSharpCompilation compilation = supportingSource.Compilation;
+
+            if (projectScopesByCompilation.ContainsKey(compilation))
+            {
+                scope = null!;
+                return false;
+            }
+
+            foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
+            {
+                if (projectScopesBySyntaxTree.ContainsKey(syntaxTree))
+                {
+                    scope = null!;
+                    return false;
+                }
+            }
+
+            return SupportingSources.TryRegisterExternal(
+                supportingSource,
+                out scope);
+        }
+
+        /// <summary>
         /// Tries to locate a registered supporting source scope by its exact
         /// assembly identity.
         /// </summary>
@@ -139,6 +195,73 @@ namespace XMLDocNormalizer.Execution.Semantic
             out SemanticCompilationScope scope)
         {
             return SupportingSources.TryGetScope(assemblyIdentity, out scope);
+        }
+
+        /// <summary>
+        /// Tries to locate an external supporting source by the exact P3
+        /// identity of its original binary.
+        /// </summary>
+        /// <param name="binaryIdentity">
+        /// The full assembly identity, ordered module identities, and
+        /// reference-assembly classification to match. Paths are ignored.
+        /// </param>
+        /// <param name="scope">The registered supporting scope when found.</param>
+        /// <returns>
+        /// <see langword="true"/> only for an exact binary-identity match;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="binaryIdentity"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public bool TryGetExternalSupportingSourceScope(
+            ExternalAssemblyReferenceDescriptor binaryIdentity,
+            out SemanticCompilationScope scope)
+        {
+            return SupportingSources.TryGetExternalScope(
+                binaryIdentity,
+                out scope);
+        }
+
+        /// <summary>
+        /// Tries to locate external supporting source for an assembly symbol
+        /// bound by a compilation owned by this context.
+        /// </summary>
+        /// <param name="bindingCompilation">
+        /// The owned compilation that bound <paramref name="assemblySymbol"/>.
+        /// </param>
+        /// <param name="assemblySymbol">The metadata assembly symbol.</param>
+        /// <param name="scope">The exact registered supporting scope.</param>
+        /// <returns>
+        /// <see langword="true"/> when the existing external-reference catalog
+        /// produces a descriptor whose complete P3 binary identity is
+        /// registered; otherwise <see langword="false"/>. No assembly-name,
+        /// assembly-identity-only, or path fallback is used.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="bindingCompilation"/> or
+        /// <paramref name="assemblySymbol"/> is <see langword="null"/>.
+        /// </exception>
+        public bool TryGetExternalSupportingSourceScope(
+            Compilation bindingCompilation,
+            IAssemblySymbol assemblySymbol,
+            out SemanticCompilationScope scope)
+        {
+            ArgumentNullException.ThrowIfNull(bindingCompilation);
+            ArgumentNullException.ThrowIfNull(assemblySymbol);
+
+            if (!TryGetExternalAssemblyReferenceDescriptor(
+                    bindingCompilation,
+                    assemblySymbol,
+                    out ExternalAssemblyReferenceDescriptor binaryIdentity))
+            {
+                scope = null!;
+                return false;
+            }
+
+            return SupportingSources.TryGetExternalScope(
+                binaryIdentity,
+                out scope);
         }
 
         /// <summary>
@@ -298,7 +421,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             }
 
             analysisCompilationScopes = projectCompilationScopes
-                .Concat(SupportingSources.GetScopes())
+                .Concat(SupportingSources.GetAnalysisScopes())
                 .OrderBy(
                     static scope => scope.Compilation.AssemblyName ?? string.Empty,
                     StringComparer.Ordinal)
