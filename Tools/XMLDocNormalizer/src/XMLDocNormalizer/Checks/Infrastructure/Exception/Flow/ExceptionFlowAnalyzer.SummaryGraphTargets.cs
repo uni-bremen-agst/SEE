@@ -47,6 +47,49 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Registers a method target while allowing exact external supporting
+        /// source resolution through the compilation that bound the target.
+        /// </summary>
+        /// <param name="requestedTarget">The method target selected at the call site.</param>
+        /// <param name="requestedContext">The call context created for that target.</param>
+        /// <param name="semanticContext">The semantic context containing supporting sources.</param>
+        /// <param name="graph">The graph receiving the canonical target node.</param>
+        /// <param name="bindingCompilation">
+        /// The compilation that bound <paramref name="requestedTarget"/>.
+        /// </param>
+        /// <returns>The canonical graph key used by the target node and call edge.</returns>
+        private static ExceptionFlowCallableKey RegisterSummaryMethodTarget(
+            IMethodSymbol requestedTarget,
+            ExceptionFlowCallContext requestedContext,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSummaryGraph graph,
+            Compilation bindingCompilation)
+        {
+            if (requestedTarget.DeclaringSyntaxReferences.Length == 0
+                && SupportingSourceSymbolResolver.TryResolveMethod(
+                    requestedTarget,
+                    bindingCompilation,
+                    semanticContext,
+                    out IMethodSymbol supportingSourceTarget,
+                    out SemanticCompilationScope supportingSourceScope))
+            {
+                return RegisterSummaryMethodTarget(
+                    requestedTarget,
+                    requestedContext,
+                    semanticContext,
+                    graph,
+                    supportingSourceTarget,
+                    supportingSourceScope);
+            }
+
+            return RegisterSummaryMethodTarget(
+                requestedTarget,
+                requestedContext,
+                semanticContext,
+                graph);
+        }
+
+        /// <summary>
         /// Registers a method target using a supporting source method and
         /// scope obtained from one successful resolver operation.
         /// </summary>

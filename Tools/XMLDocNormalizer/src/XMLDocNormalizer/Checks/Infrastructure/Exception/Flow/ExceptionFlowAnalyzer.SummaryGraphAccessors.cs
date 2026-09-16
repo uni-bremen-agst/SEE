@@ -311,6 +311,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IsSummaryBaseAccessorAccess(
                     sourceNode),
                 omitImplicitTargets: false,
+                semanticModel.Compilation,
                 semanticContext,
                 graph,
                 fragment);
@@ -465,6 +466,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IsSummaryBaseAccessorAccess(
                     accessExpression),
                 omitImplicitTargets: false,
+                semanticModel.Compilation,
                 semanticContext,
                 graph,
                 fragment);
@@ -656,6 +658,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IsSummaryBaseAccessorAccess(
                     assignment.Left),
                 omitImplicitTargets: true,
+                semanticModel.Compilation,
                 semanticContext,
                 graph,
                 fragment);

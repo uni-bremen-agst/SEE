@@ -186,6 +186,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowCallContext callerContext)
         {
+            IMethodSymbol assemblyMethod = methodSymbol.ReducedFrom ?? methodSymbol;
+
             if (semanticModel.GetOperation(invocation)
                     is IInvocationOperation invocationOperation
                 && invocationOperation.IsVirtual)
@@ -199,13 +201,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callerContext);
             }
 
-            IMethodSymbol assemblyMethod = methodSymbol.ReducedFrom ?? methodSymbol;
-
-            if (assemblyMethod.DeclaringSyntaxReferences.Length != 0
-                || assemblyMethod.ContainingAssembly == null
-                || !semanticContext.TryGetSupportingSourceScope(
-                    assemblyMethod.ContainingAssembly.Identity,
-                    out _))
+            if (assemblyMethod.DeclaringSyntaxReferences.Length != 0)
             {
                 return null;
             }
@@ -213,7 +209,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SummaryInvocationTargetPlan directTarget =
                 CreateSummaryDirectInvocationTargetPlan(
                     methodSymbol,
+                    semanticModel.Compilation,
                     semanticContext);
+
+            if (directTarget.AnalysisTarget.DeclaringSyntaxReferences.Length == 0)
+            {
+                return null;
+            }
 
             SummaryInvocationTargetPlan[] targets = [directTarget];
 
@@ -255,12 +257,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ITypeSymbol? receiverType = invocationOperation.Instance?.Type;
             INamedTypeSymbol? exactReceiverType =
                 GetSummaryExactReceiverType(invocationOperation.Instance);
+            IMethodSymbol assemblyMethod = methodSymbol.ReducedFrom ?? methodSymbol;
+            SemanticCompilationScope? externalSupportingScope = null;
+
+            if (assemblyMethod.DeclaringSyntaxReferences.Length == 0
+                && assemblyMethod.ContainingAssembly != null)
+            {
+                SupportingSourceSymbolResolver.TryGetExternalSupportingSourceScope(
+                    semanticModel.Compilation,
+                    assemblyMethod.ContainingAssembly,
+                    semanticContext,
+                    out externalSupportingScope);
+            }
+
             IReadOnlyList<SummaryRuntimeTargetCandidate> runtimeTargets =
                 ResolveSummaryRuntimeTargetCandidates(
                     methodSymbol,
                     receiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    externalSupportingScope);
             bool targetSetComplete = IsSummaryDispatchTargetSetComplete(
                 methodSymbol,
                 receiverType,
@@ -274,6 +290,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (runtimeTarget.MetadataTarget != null
                     && SupportingSourceSymbolResolver.TryResolveMethod(
                         runtimeTarget.MetadataTarget,
+                        semanticModel.Compilation,
                         semanticContext,
                         out IMethodSymbol supportingSourceTarget,
                         out SemanticCompilationScope supportingSourceScope))
@@ -307,6 +324,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 [
                     CreateSummaryDirectInvocationTargetPlan(
                         methodSymbol,
+                        semanticModel.Compilation,
                         semanticContext)
                 ];
                 isRuntimeDispatch = false;
@@ -343,14 +361,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// scope needed for canonical graph registration.
         /// </summary>
         /// <param name="methodSymbol">The compile-time selected method.</param>
+        /// <param name="bindingCompilation">
+        /// The compilation that bound <paramref name="methodSymbol"/>.
+        /// </param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <returns>The resolved direct target plan.</returns>
         private static SummaryInvocationTargetPlan CreateSummaryDirectInvocationTargetPlan(
             IMethodSymbol methodSymbol,
+            Compilation bindingCompilation,
             ProjectClosureSemanticContext semanticContext)
         {
             IMethodSymbol requestedTarget = GetSummaryInvocationAnalysisTarget(
                 methodSymbol,
+                bindingCompilation,
                 semanticContext,
                 out IMethodSymbol? supportingSourceTarget,
                 out SemanticCompilationScope? supportingSourceScope);
@@ -359,6 +382,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 && requestedTarget.DeclaringSyntaxReferences.Length == 0
                 && SupportingSourceSymbolResolver.TryResolveMethod(
                     requestedTarget,
+                    bindingCompilation,
                     semanticContext,
                     out IMethodSymbol resolvedSourceTarget,
                     out SemanticCompilationScope resolvedSourceScope))
@@ -630,6 +654,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol targetMethod =
                 GetSummaryInvocationAnalysisTarget(
                     methodSymbol,
+                    semanticModel.Compilation,
                     semanticContext,
                     out IMethodSymbol? resolvedSupportingSourceTarget,
                     out SemanticCompilationScope? resolvedSupportingSourceScope);
@@ -653,7 +678,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         resolvedSupportingSourceTarget,
                         resolvedSupportingSourceScope)
                     : RegisterSummaryMethodTarget(
-                        targetMethod, targetContext, semanticContext, graph);
+                        targetMethod,
+                        targetContext,
+                        semanticContext,
+                        graph,
+                        semanticModel.Compilation);
 
             ExceptionFlowPathStepKind stepKind =
                 targetMethod.MethodKind ==
@@ -776,6 +805,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticContext">
         /// The project-closure semantic context.
         /// </param>
+        /// <param name="additionalScope">
+        /// One exact, demand-selected external supporting scope to include in
+        /// addition to the normal analysis scopes.
+        /// </param>
         /// <returns>
         /// The distinct effective targets observed in one runtime-type
         /// traversal.
@@ -785,14 +818,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IMethodSymbol methodSymbol,
                 ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
-                ProjectClosureSemanticContext semanticContext)
+                ProjectClosureSemanticContext semanticContext,
+                SemanticCompilationScope? additionalScope = null)
         {
             Dictionary<string, SummaryRuntimeTargetCandidate> runtimeTargets =
                 new(StringComparer.Ordinal);
 
+            HashSet<Compilation> inspectedCompilations =
+                new(ReferenceEqualityComparer.Instance);
+
             foreach (SemanticCompilationScope scope
-                     in semanticContext.GetAnalysisCompilationScopes())
+                     in semanticContext.GetAnalysisCompilationScopes().Concat(
+                         additionalScope == null
+                            ? Array.Empty<SemanticCompilationScope>()
+                            : new[] { additionalScope }))
             {
+                if (!inspectedCompilations.Add(scope.Compilation))
+                {
+                    continue;
+                }
+
                 IMethodSymbol? scopedMethod =
                     CrossCompilationSymbolResolver.ResolveMethod(
                         methodSymbol,

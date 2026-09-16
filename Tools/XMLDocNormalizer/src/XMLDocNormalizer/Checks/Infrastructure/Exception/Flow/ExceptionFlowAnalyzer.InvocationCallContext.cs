@@ -49,6 +49,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="selectedMethod">
         /// The method symbol selected by Roslyn at the invocation.
         /// </param>
+        /// <param name="bindingCompilation">
+        /// The compilation that bound <paramref name="selectedMethod"/>.
+        /// </param>
         /// <param name="semanticContext">
         /// The semantic context containing registered supporting sources.
         /// </param>
@@ -66,6 +69,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static IMethodSymbol GetSummaryInvocationAnalysisTarget(
             IMethodSymbol selectedMethod,
+            Compilation bindingCompilation,
             ProjectClosureSemanticContext semanticContext,
             out IMethodSymbol? resolvedSupportingSourceTarget,
             out SemanticCompilationScope? resolvedSupportingSourceScope)
@@ -87,6 +91,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (SupportingSourceSymbolResolver.TryResolveMethod(
                     unreducedMethod,
+                    bindingCompilation,
                     semanticContext,
                     out IMethodSymbol sourceMethod,
                     out SemanticCompilationScope supportingScope))

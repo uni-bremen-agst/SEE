@@ -46,6 +46,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Whether compiler-generated accessor implementations without user
         /// code should be omitted.
         /// </param>
+        /// <param name="bindingCompilation">
+        /// The compilation that bound <paramref name="selectedAccessor"/>.
+        /// </param>
         /// <param name="semanticContext">
         /// The project-closure semantic context.
         /// </param>
@@ -65,6 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             INamedTypeSymbol? exactReceiverType,
             bool staticallyBound,
             bool omitImplicitTargets,
+            Compilation bindingCompilation,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
@@ -83,6 +87,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    bindingCompilation,
                     semanticContext,
                     graph,
                     fragment);
@@ -121,6 +126,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    bindingCompilation,
                     semanticContext,
                     graph,
                     fragment);
@@ -142,6 +148,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    bindingCompilation,
                     semanticContext,
                     graph,
                     fragment);
@@ -166,6 +173,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="sourceNode">
         /// The source syntax responsible for the access.
         /// </param>
+        /// <param name="bindingCompilation">
+        /// The compilation that bound <paramref name="targetAccessor"/>.
+        /// </param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target summary.
@@ -179,12 +189,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowPathStepKind stepKind,
             ISymbol accessedSymbol,
             SyntaxNode sourceNode,
+            Compilation bindingCompilation,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
             ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
-                targetAccessor, targetContext, semanticContext, graph);
+                targetAccessor,
+                targetContext,
+                semanticContext,
+                graph,
+                bindingCompilation);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

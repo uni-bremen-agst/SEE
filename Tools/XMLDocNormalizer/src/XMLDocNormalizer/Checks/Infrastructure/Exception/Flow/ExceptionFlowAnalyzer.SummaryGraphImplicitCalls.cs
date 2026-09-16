@@ -90,7 +90,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callerContext);
 
             ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
-                targetMethod, targetContext, semanticContext, graph);
+                targetMethod,
+                targetContext,
+                semanticContext,
+                graph,
+                semanticModel.Compilation);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

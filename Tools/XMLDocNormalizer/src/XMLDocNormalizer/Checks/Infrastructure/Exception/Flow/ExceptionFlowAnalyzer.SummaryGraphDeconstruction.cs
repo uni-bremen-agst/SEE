@@ -499,7 +499,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callContext);
 
             ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
-                conversionMethod, targetContext, semanticContext, graph);
+                conversionMethod,
+                targetContext,
+                semanticContext,
+                graph,
+                semanticModel.Compilation);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
