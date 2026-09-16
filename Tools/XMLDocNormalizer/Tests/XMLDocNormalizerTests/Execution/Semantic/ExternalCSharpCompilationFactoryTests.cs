@@ -1044,9 +1044,22 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             ExternalModuleIdentity manifestModule = new(
                 expected.SourceModule.Name,
                 Guid.NewGuid());
+            ImmutableArray<ExternalModuleIdentity>.Builder targetModules =
+                ImmutableArray.CreateBuilder<ExternalModuleIdentity>();
+            targetModules.Add(manifestModule);
+
+            foreach (PortableExecutableReference reference in actualReferences.Where(
+                         reference => reference.Properties.Kind == MetadataImageKind.Module))
+            {
+                ModuleMetadata module = Assert.IsType<ModuleMetadata>(reference.GetMetadata());
+                targetModules.Add(new ExternalModuleIdentity(
+                    module.Name,
+                    module.GetModuleVersionId()));
+            }
+
             ExternalAssemblyReferenceDescriptor target = new(
                 expected.Assembly.Identity,
-                [manifestModule],
+                targetModules.ToImmutable(),
                 "renamed-candidate.unrelated",
                 isReferenceAssembly: false);
             ExternalCSharpCompilationConfiguration configuration = CreateConfiguration(

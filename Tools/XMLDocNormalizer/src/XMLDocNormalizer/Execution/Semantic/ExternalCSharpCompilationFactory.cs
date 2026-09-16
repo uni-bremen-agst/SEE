@@ -47,9 +47,10 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <remarks>
         /// Netmodule targets are unsupported because the current P3 provenance
         /// models assembly targets and P5G intentionally does not reconstruct
-        /// an original module name. Metadata references are checked in memory;
-        /// no candidate file or Portable PDB is opened. Diagnostics are not an
-        /// acceptance condition.
+        /// an original module name. Additional target modules require aligned
+        /// P5A standalone-module provenance and otherwise fail closed. Metadata
+        /// references are checked in memory; no candidate file or Portable PDB
+        /// is opened. Diagnostics are not an acceptance condition.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// Thrown when any input is <see langword="null"/>.
@@ -72,6 +73,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 || targetAssembly.Modules.IsDefaultOrEmpty
                 || targetAssembly.Modules[0]
                     != compilationProvenance.DebugDirectory.ManifestModule
+                || !HaveExpectedTargetModules(
+                    targetAssembly.Modules,
+                    compilationProvenance.MetadataReferences)
                 || syntaxTreeSet.Trees.Length != configuration.SourceFileCount
                 || !HaveExpectedTrees(syntaxTreeSet.Trees, configuration.ParseOptions)
                 || !HaveExpectedReferences(
@@ -116,6 +120,50 @@ namespace XMLDocNormalizer.Execution.Semantic
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Requires every P3 additional target module to be represented by a
+        /// P5A standalone-module reference with the same MVID and ordinal.
+        /// </summary>
+        /// <param name="targetModules">
+        /// The P3 target modules beginning with the manifest module.
+        /// </param>
+        /// <param name="metadataReferences">The P5A reference provenance.</param>
+        /// <returns>
+        /// <see langword="true"/> when the additional-module counts and MVIDs
+        /// agree; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HaveExpectedTargetModules(
+            ImmutableArray<ExternalModuleIdentity> targetModules,
+            ExternalCompilationMetadataReferencesDescriptor? metadataReferences)
+        {
+            if (metadataReferences == null)
+            {
+                return false;
+            }
+
+            int targetModuleIndex = 1;
+
+            foreach (ExternalCompilationMetadataReferenceDescriptor? reference in
+                     metadataReferences.References)
+            {
+                if (reference?.Kind != MetadataImageKind.Module)
+                {
+                    continue;
+                }
+
+                if (targetModuleIndex >= targetModules.Length
+                    || targetModules[targetModuleIndex].ModuleVersionId
+                        != reference.ModuleVersionId)
+                {
+                    return false;
+                }
+
+                targetModuleIndex++;
+            }
+
+            return targetModuleIndex == targetModules.Length;
         }
 
         /// <summary>
