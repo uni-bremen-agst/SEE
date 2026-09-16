@@ -355,36 +355,34 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Ensures that mutually exclusive capitalization styles do not overlap.
+        /// Deselects capitalization styles that are mutually exclusive with
+        /// the selected font style.
         /// </summary>
-        /// <param name="selectedStyle">The selected font-style label.</param>
+        /// <param name="selectedStyle">
+        /// The label of the selected font style.
+        /// </param>
         private void MutuallyExclusiveStyles(string selectedStyle)
         {
-            switch (selectedStyle)
+            FontStyles excludedStyles =
+                GetMutuallyExclusiveFontStyles(
+                    GetFontStyleOfKey(selectedStyle));
+
+            if ((excludedStyles & FontStyles.LowerCase) != 0)
             {
-                case LowerCase:
-                    styles[UpperCase] = false;
-                    controls.UpperCaseButton.colors = notSelectedBlock;
+                styles[LowerCase] = false;
+                controls.LowerCaseButton.colors = notSelectedBlock;
+            }
 
-                    styles[SmallCaps] = false;
-                    controls.SmallCapsButton.colors = notSelectedBlock;
-                    break;
+            if ((excludedStyles & FontStyles.UpperCase) != 0)
+            {
+                styles[UpperCase] = false;
+                controls.UpperCaseButton.colors = notSelectedBlock;
+            }
 
-                case UpperCase:
-                    styles[LowerCase] = false;
-                    controls.LowerCaseButton.colors = notSelectedBlock;
-
-                    styles[SmallCaps] = false;
-                    controls.SmallCapsButton.colors = notSelectedBlock;
-                    break;
-
-                case SmallCaps:
-                    styles[LowerCase] = false;
-                    controls.LowerCaseButton.colors = notSelectedBlock;
-
-                    styles[UpperCase] = false;
-                    controls.UpperCaseButton.colors = notSelectedBlock;
-                    break;
+            if ((excludedStyles & FontStyles.SmallCaps) != 0)
+            {
+                styles[SmallCaps] = false;
+                controls.SmallCapsButton.colors = notSelectedBlock;
             }
         }
 
@@ -459,7 +457,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         /// <param name="key">The font-style label.</param>
         /// <returns>The corresponding font style.</returns>
-        private static FontStyles GetFontStyleOfKey(string key)
+        internal static FontStyles GetFontStyleOfKey(string key)
         {
             return key switch
             {
@@ -500,6 +498,32 @@ namespace SEE.UI.Menu.Drawable.Text
         internal bool IsOutlineEnabled()
         {
             return controls.OutlineSwitch.isOn;
+        }
+
+        /// <summary>
+        /// Returns the font styles that must be deselected when the given
+        /// capitalization style is selected.
+        /// </summary>
+        /// <param name="selectedStyle">
+        /// The font style that has been selected.
+        /// </param>
+        /// <returns>
+        /// The mutually exclusive font styles that must be deselected.
+        /// Returns <see cref="FontStyles.Normal"/> if the selected style has
+        /// no mutually exclusive alternatives.
+        /// </returns>
+        internal static FontStyles GetMutuallyExclusiveFontStyles(FontStyles selectedStyle)
+        {
+            return selectedStyle switch
+            {
+                FontStyles.LowerCase => FontStyles.UpperCase | FontStyles.SmallCaps,
+
+                FontStyles.UpperCase => FontStyles.LowerCase | FontStyles.SmallCaps,
+
+                FontStyles.SmallCaps => FontStyles.LowerCase | FontStyles.UpperCase,
+
+                _ => FontStyles.Normal
+            };
         }
     }
 }
