@@ -1,20 +1,13 @@
-﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls;
-using SEE.Game.Drawable;
+﻿using SEE.Controls;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Text;
-using SEE.UI.Notification;
-using SEE.UI.PropertyDialog.Drawable;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -76,6 +69,11 @@ namespace SEE.UI.Menu.Drawable
         private readonly WriteTextMenu writeTextMenu;
 
         /// <summary>
+        /// Manages editing-specific text-menu behavior.
+        /// </summary>
+        private readonly EditTextMenu editTextMenu;
+
+        /// <summary>
         /// The action invoked when the selected font style changes.
         /// </summary>
         private UnityAction<FontStyles> fontStyleAction;
@@ -128,6 +126,15 @@ namespace SEE.UI.Menu.Drawable
                 AssignColorArea,
                 AssignOutlineThickness,
                 AssignFontSize);
+
+            editTextMenu = new EditTextMenu(
+                gameObject,
+                controls,
+                EnableTextMenu,
+                AssignColorArea,
+                AssignOutlineThickness,
+                AssignFontSize,
+                AssignFontStyles);
         }
 
         /// <summary>
@@ -379,197 +386,24 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Provides the text menu for editing, adding the necessary handlers to the respective components.
+        /// Configures the text menu for editing an existing text object.
         /// </summary>
-        /// <param name="selectedText">The selected text object for editing.</param>
-        /// <param name="newValueHolder">The <see cref="TextConf"/> value holder. If differnt
-        /// from this type, nothing happens.</param>
-        /// <param name="returnCall">The return call action to return to the parent menu.</param>
+        /// <param name="selectedText">The selected text object.</param>
+        /// <param name="newValueHolder">
+        /// The configuration containing the editable text values.
+        /// </param>
+        /// <param name="returnCall">
+        /// An optional callback returning to the parent menu.
+        /// </param>
         public void EnableForEditing(
             GameObject selectedText,
             DrawableType newValueHolder,
             UnityAction returnCall = null)
         {
-            if (newValueHolder is TextConf textHolder)
-            {
-                GameObject surface = GameFinder.GetDrawableSurface(selectedText);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                /// Enables the text menu in edit mode.
-                EnableTextMenu(color =>
-                {
-                    GameEdit.ChangeFontColor(selectedText, color);
-                    textHolder.FontColor = color;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontColor, true, true);
-
-                /// Adds the handler for the return button, if <paramref name="returnCall"/> not null.
-                AddReturnCall(returnCall);
-
-                /// Adds the handler for the font color button.
-                AddFontColorButtonForEdit(selectedText, textHolder, surface, surfaceParentName);
-
-                /// Adds the handler for the outline color button.
-                AddOutlineColorButtonForEdit(selectedText, textHolder, surface, surfaceParentName);
-
-                /// Adds the handler for the outline thickness slider.
-                /// Changes are saved in the configuration.
-                AssignOutlineThickness(thickness =>
-                {
-                    GameEdit.ChangeOutlineThickness(selectedText, thickness);
-                    textHolder.OutlineThickness = thickness;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OutlineThickness);
-
-                /// Adds the handler for the outline color status.
-                /// Changes are saved in the configuration.
-                AssignOutlineStatus(selectedText, textHolder, surface, surfaceParentName);
-
-                /// Assigns the current status to the switch and updates the UI.
-                controls.OutlineSwitch.isOn = textHolder.IsOutlined;
-                controls.OutlineSwitch.UpdateUI();
-
-                /// Adds the handler for the font size component.
-                /// Changes are saved in the configuration.
-                AssignFontSize(size =>
-                {
-                    GameEdit.ChangeFontSize(selectedText, size);
-                    textHolder.FontSize = size;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontSize);
-
-                /// Adds the handler to the font style buttons.
-                /// Changes are saved in the configuration.
-                AssignFontStyles(style =>
-                {
-                    GameEdit.ChangeFontStyles(selectedText, style);
-                    textHolder.FontStyles = style;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontStyles);
-
-                /// Adds the handler to the edit text button.
-                /// Changes are saved in the configuration.
-                AssignEditTextButton(() =>
-                {
-                    WriteEditTextDialog writeTextDialog = new();
-                    writeTextDialog.SetStringInit(textHolder.Text);
-                    UnityAction<string> stringAction = textOut =>
-                    {
-                        if (textOut != null && textOut != "")
-                        {
-                            /// The size of the new text is calculated, and the object is adjusted accordingly.
-                            TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                            tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font,
-                                textHolder.FontSize, textHolder.FontStyles);
-                            GameEdit.ChangeText(selectedText, textOut);
-                            textHolder.Text = textOut;
-                            new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                        }
-                        else
-                        {
-                            ShowNotification.Warn("Empty text", "The text to write is empty. Please add one.");
-                        }
-                    };
-
-                    writeTextDialog.Open(stringAction);
-                });
-                controls.OrderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
-                /// Adds the handler to the order in layer slider.
-                /// Changes are saved in the configuration.
-                AssignOrderInLayer(order =>
-                {
-                    GameEdit.ChangeLayer(selectedText, order);
-                    textHolder.OrderInLayer = order;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OrderInLayer);
-
-                /// Re-calculate the menus height.
-                MenuHelper.CalculateHeight(gameObject);
-            }
-        }
-
-        /// <summary>
-        /// Registers the action used to return to the parent menu.
-        /// </summary>
-        /// <param name="returnCall">
-        /// The callback used to return to the parent menu.
-        /// </param>
-        private void AddReturnCall(UnityAction returnCall)
-        {
-            if (returnCall == null)
-            {
-                return;
-            }
-
-            controls.ReturnButtonObject.SetActive(true);
-
-            controls.ReturnButtonManager.clickEvent.RemoveAllListeners();
-            controls.ReturnButtonManager.clickEvent.AddListener(returnCall);
-
-            controls.OrderInLayerUnitySlider.interactable = false;
-        }
-
-        /// <summary>
-        /// Adds the handler for the font color button.
-        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the font color of the text.
-        /// Changes are saved in the configuration.
-        /// </summary>
-        /// <param name="selectedText">The text to be edited.</param>
-        /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed.</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
-        private void AddFontColorButtonForEdit(GameObject selectedText, TextConf textHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            controls.FontColorButtonManager.clickEvent.AddListener(() =>
-            {
-                AssignColorArea(color =>
-                {
-                    GameEdit.ChangeFontColor(selectedText, color);
-                    textHolder.FontColor = color;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontColor);
-                MenuHelper.CalculateHeight(gameObject);
-            });
-        }
-
-        /// <summary>
-        /// Adds the handler for the outline color button.
-        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the outline color of the text.
-        /// Changes are saved in the configuration.
-        /// </summary>
-        /// <param name="selectedText">The text to be edited.</param>
-        /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed.</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
-        private void AddOutlineColorButtonForEdit(GameObject selectedText, TextConf textHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            controls.OutlineColorButtonManager.clickEvent.AddListener(() =>
-            {
-                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before,
-                /// the secondary color is clear.
-                /// Therefore, a random color is added first,
-                /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (textHolder.OutlineColor == Color.clear)
-                {
-                    textHolder.OutlineColor = Random.ColorHSV();
-                }
-
-                if (textHolder.OutlineColor.a == 0)
-                {
-                    textHolder.OutlineColor = new Color(textHolder.OutlineColor.r, textHolder.OutlineColor.g,
-                        textHolder.OutlineColor.b, 255);
-                }
-
-                AssignColorArea(color =>
-                {
-                    GameEdit.ChangeOutlineColor(selectedText, color);
-                    textHolder.OutlineColor = color;
-                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OutlineColor);
-                MenuHelper.CalculateHeight(gameObject);
-            });
+            editTextMenu.Enable(
+                selectedText,
+                newValueHolder,
+                returnCall);
         }
 
         /// <summary>
@@ -627,38 +461,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns the action to edit the outline color status.
-        /// </summary>
-        /// <param name="selectedText">The chosen text to be edited.</param>
-        /// <param name="textHolder">The configuration which holds the new value.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed.</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
-        public void AssignOutlineStatus(GameObject selectedText, TextConf textHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            controls.OutlineSwitch.OffEvents.AddListener(() =>
-            {
-                GameTexter.ChangeOutlineStatus(selectedText, false);
-                textHolder.IsOutlined = false;
-                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-            });
-
-            controls.OutlineSwitch.OnEvents.AddListener(() =>
-            {
-                GameTexter.ChangeOutlineStatus(selectedText, true);
-                textHolder.IsOutlined = true;
-                /// Changes the outline color if the outline was clear.
-                TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                if (textHolder.OutlineColor != tmp.outlineColor
-                    && tmp.outlineColor == Color.clear)
-                {
-                    GameEdit.ChangeOutlineColor(selectedText, textHolder.OutlineColor);
-                }
-                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
-            });
-        }
-
-        /// <summary>
         /// Assigns an action and a font size to the font size input field.
         /// </summary>
         /// <param name="fontSizeAction">The float action that should be assigned.</param>
@@ -668,28 +470,6 @@ namespace SEE.UI.Menu.Drawable
             controls.FontSizeInput.OnValueChanged.RemoveAllListeners();
             controls.FontSizeInput.AssignValue(fontSize);
             controls.FontSizeInput.OnValueChanged.AddListener(fontSizeAction);
-        }
-
-        /// <summary>
-        /// Assigns an action and an order to the order in layer slider.
-        /// </summary>
-        /// <param name="orderInLayerAction">The action that should be assigned.</param>
-        /// <param name="order">The order that should be assigned.</param>
-        public void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
-        {
-            controls.OrderInLayerSlider.OnValueChanged.RemoveAllListeners();
-            controls.OrderInLayerSlider.AssignValue(order);
-            controls.OrderInLayerSlider.OnValueChanged.AddListener(orderInLayerAction);
-        }
-
-        /// <summary>
-        /// Assigns an action to the edit text button.
-        /// </summary>
-        /// <param name="action">The action that should be assigned.</param>
-        public void AssignEditTextButton(UnityAction action)
-        {
-            controls.EditTextButtonManager.clickEvent.RemoveAllListeners();
-            controls.EditTextButtonManager.clickEvent.AddListener(action);
         }
 
         /// <summary>
