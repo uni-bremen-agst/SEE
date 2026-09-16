@@ -71,6 +71,11 @@ namespace SEE.UI.Menu.Drawable
         private readonly TextMenuControls controls;
 
         /// <summary>
+        /// Manages writing-specific text-menu behavior.
+        /// </summary>
+        private readonly WriteTextMenu writeTextMenu;
+
+        /// <summary>
         /// The action invoked when the selected font style changes.
         /// </summary>
         private UnityAction<FontStyles> fontStyleAction;
@@ -115,6 +120,14 @@ namespace SEE.UI.Menu.Drawable
             controls = new TextMenuControls(gameObject);
 
             Initialize();
+
+            writeTextMenu = new WriteTextMenu(
+                gameObject,
+                controls,
+                EnableTextMenu,
+                AssignColorArea,
+                AssignOutlineThickness,
+                AssignFontSize);
         }
 
         /// <summary>
@@ -358,75 +371,11 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Provides the text menu for writing action. It adds the needed handlers to the respective components.
+        /// Configures the text menu for writing new text.
         /// </summary>
         public void EnableForWriting()
         {
-            /// Enables the text menu in writing mode.
-            EnableTextMenu(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor, true);
-
-            /// Disables the return button.
-            controls.ReturnButtonObject.SetActive(false);
-
-            /// Adds the handler for the font color button.
-            /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
-            controls.FontColorButtonManager.clickEvent.AddListener(() =>
-            {
-                AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
-                MenuHelper.CalculateHeight(gameObject);
-            });
-
-            /// Adds the handler for the outline color button.
-            AssignOutlineThicknessForWriting();
-
-            /// Adds the handler for the outline thickness slider.
-            /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.CurrentOutlineThickness"/>.
-            AssignOutlineThickness(thickness => ValueHolder.CurrentOutlineThickness = thickness,
-                ValueHolder.CurrentOutlineThickness);
-
-            /// Disables the outline color.
-            controls.OutlineSwitch.isOn = false;
-            controls.OutlineSwitch.UpdateUI();
-
-            /// Adds the handler for the font size component.
-            AssignFontSize(size => ValueHolder.CurrentFontSize = size, ValueHolder.CurrentFontSize);
-
-            /// Re-calculate the menu height.
-            MenuHelper.CalculateHeight(gameObject);
-        }
-
-        /// <summary>
-        /// Adds the handler for the outline color button.
-        /// It saves the changes in the global value for the secondary color
-        /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
-        ///
-        /// Checks the current secondary color before assigning it.
-        /// If it is clear (completely transparent), a new random color is chosen.
-        /// Subsequently, the alpha value is checked, which also indicates transparency.
-        /// If it is set to 0, the color would also be fully transparent.
-        /// In this case, the alpha would be set to full visibility.
-        /// </summary>
-        private void AssignOutlineThicknessForWriting()
-        {
-            controls.OutlineColorButtonManager.clickEvent.AddListener(() =>
-            {
-                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before,
-                /// the secondary color is clear.
-                /// Therefore, a random color is added first,
-                /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (ValueHolder.CurrentSecondaryColor == Color.clear)
-                {
-                    ValueHolder.CurrentSecondaryColor = Random.ColorHSV();
-                }
-
-                if (ValueHolder.CurrentSecondaryColor.a == 0)
-                {
-                    ValueHolder.CurrentSecondaryColor = new Color(ValueHolder.CurrentSecondaryColor.r,
-                        ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
-                }
-                AssignColorArea(color => ValueHolder.CurrentSecondaryColor = color, ValueHolder.CurrentSecondaryColor);
-                MenuHelper.CalculateHeight(gameObject);
-            });
+            writeTextMenu.Enable();
         }
 
         /// <summary>
