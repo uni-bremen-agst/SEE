@@ -30,49 +30,41 @@ namespace SEE.UI.Menu.Drawable.Text
         private readonly System.Action<UnityAction<Color>, Color, bool, bool> enableTextMenu;
 
         /// <summary>
-        /// Assigns an action and initial color to the shared color picker.
+        /// Manages the shared text-style behavior.
         /// </summary>
-        private readonly System.Action<UnityAction<Color>, Color> assignColorArea;
-
-        /// <summary>
-        /// Assigns an action and initial value to the outline-thickness control.
-        /// </summary>
-        private readonly System.Action<UnityAction<float>, float> assignOutlineThickness;
-
-        /// <summary>
-        /// Assigns an action and initial value to the font-size control.
-        /// </summary>
-        private readonly System.Action<UnityAction<float>, float> assignFontSize;
+        private readonly TextStyleMenu textStyleMenu;
 
         /// <summary>
         /// Initializes the writing-specific part of the text menu.
         /// </summary>
-        /// <param name="textMenu">The root object of the complete text menu.</param>
-        /// <param name="controls">The shared text-menu controls.</param>
-        /// <param name="enableTextMenu">Enables and prepares the shared text menu.</param>
-        /// <param name="assignColorArea">Assigns the color-picker action and initial color.</param>
-        /// <param name="assignOutlineThickness">
-        /// Assigns the outline-thickness action and initial value.
+        /// <param name="textMenu">
+        /// The root object of the complete text menu.
         /// </param>
-        /// <param name="assignFontSize">Assigns the font-size action and initial value.</param>
+        /// <param name="controls">
+        /// The shared UI controls of the text menu.
+        /// </param>
+        /// <param name="enableTextMenu">
+        /// Enables and prepares the shared text menu for the requested mode.
+        /// </param>
+        /// <param name="textStyleMenu">
+        /// Manages the shared text-style behavior used by writing and editing.
+        /// </param>
         internal WriteTextMenu(
             GameObject textMenu,
             TextMenuControls controls,
             System.Action<UnityAction<Color>, Color, bool, bool> enableTextMenu,
-            System.Action<UnityAction<Color>, Color> assignColorArea,
-            System.Action<UnityAction<float>, float> assignOutlineThickness,
-            System.Action<UnityAction<float>, float> assignFontSize)
+            TextStyleMenu textStyleMenu)
         {
             this.textMenu = textMenu;
             this.controls = controls;
             this.enableTextMenu = enableTextMenu;
-            this.assignColorArea = assignColorArea;
-            this.assignOutlineThickness = assignOutlineThickness;
-            this.assignFontSize = assignFontSize;
+            this.textStyleMenu = textStyleMenu;
         }
 
         /// <summary>
         /// Configures the shared text menu for writing new text.
+        /// The selected style values are stored in <see cref="ValueHolder"/>
+        /// and are reused by subsequently created text objects.
         /// </summary>
         internal void Enable()
         {
@@ -86,7 +78,7 @@ namespace SEE.UI.Menu.Drawable.Text
 
             controls.FontColorButtonManager.clickEvent.AddListener(() =>
             {
-                assignColorArea(
+                textStyleMenu.AssignColorArea(
                     color => ValueHolder.CurrentPrimaryColor = color,
                     ValueHolder.CurrentPrimaryColor);
 
@@ -95,14 +87,14 @@ namespace SEE.UI.Menu.Drawable.Text
 
             SetUpOutlineColorButton();
 
-            assignOutlineThickness(
+            textStyleMenu.AssignOutlineThickness(
                 thickness => ValueHolder.CurrentOutlineThickness = thickness,
                 ValueHolder.CurrentOutlineThickness);
 
             controls.OutlineSwitch.isOn = false;
             controls.OutlineSwitch.UpdateUI();
 
-            assignFontSize(
+            textStyleMenu.AssignFontSize(
                 size => ValueHolder.CurrentFontSize = size,
                 ValueHolder.CurrentFontSize);
 
@@ -111,6 +103,8 @@ namespace SEE.UI.Menu.Drawable.Text
 
         /// <summary>
         /// Configures the outline-color button for writing new text.
+        /// A valid secondary color is ensured before the shared color picker
+        /// is configured to update <see cref="ValueHolder.CurrentSecondaryColor"/>.
         /// </summary>
         private void SetUpOutlineColorButton()
         {
@@ -130,7 +124,7 @@ namespace SEE.UI.Menu.Drawable.Text
                         255);
                 }
 
-                assignColorArea(
+                textStyleMenu.AssignColorArea(
                     color => ValueHolder.CurrentSecondaryColor = color,
                     ValueHolder.CurrentSecondaryColor);
 

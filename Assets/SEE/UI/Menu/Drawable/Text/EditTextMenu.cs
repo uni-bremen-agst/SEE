@@ -35,63 +35,49 @@ namespace SEE.UI.Menu.Drawable.Text
         private readonly System.Action<UnityAction<Color>, Color, bool, bool> enableTextMenu;
 
         /// <summary>
-        /// Assigns an action and initial color to the shared color picker.
+        /// Manages the shared text-style behavior used by writing and editing.
         /// </summary>
-        private readonly System.Action<UnityAction<Color>, Color> assignColorArea;
-
-        /// <summary>
-        /// Assigns an action and initial value to the outline-thickness control.
-        /// </summary>
-        private readonly System.Action<UnityAction<float>, float> assignOutlineThickness;
-
-        /// <summary>
-        /// Assigns an action and initial value to the font-size control.
-        /// </summary>
-        private readonly System.Action<UnityAction<float>, float> assignFontSize;
-
-        /// <summary>
-        /// Assigns the active font styles and the action reacting to style changes.
-        /// </summary>
-        private readonly System.Action<UnityAction<FontStyles>, FontStyles> assignFontStyles;
+        private readonly TextStyleMenu textStyleMenu;
 
         /// <summary>
         /// Initializes the editing-specific part of the text menu.
         /// </summary>
-        /// <param name="textMenu">The root object of the complete text menu.</param>
-        /// <param name="controls">The shared text-menu controls.</param>
-        /// <param name="enableTextMenu">Enables and prepares the shared text menu.</param>
-        /// <param name="assignColorArea">Assigns the color-picker action and initial color.</param>
-        /// <param name="assignOutlineThickness">
-        /// Assigns the outline-thickness action and initial value.
+        /// <param name="textMenu">
+        /// The root object of the complete text menu.
         /// </param>
-        /// <param name="assignFontSize">Assigns the font-size action and initial value.</param>
-        /// <param name="assignFontStyles">
-        /// Assigns the active font styles and style-change action.
+        /// <param name="controls">
+        /// The shared UI controls of the text menu.
+        /// </param>
+        /// <param name="enableTextMenu">
+        /// Enables and prepares the shared text menu for the requested mode.
+        /// </param>
+        /// <param name="textStyleMenu">
+        /// Manages the shared text-style behavior used by writing and editing.
         /// </param>
         internal EditTextMenu(
             GameObject textMenu,
             TextMenuControls controls,
             System.Action<UnityAction<Color>, Color, bool, bool> enableTextMenu,
-            System.Action<UnityAction<Color>, Color> assignColorArea,
-            System.Action<UnityAction<float>, float> assignOutlineThickness,
-            System.Action<UnityAction<float>, float> assignFontSize,
-            System.Action<UnityAction<FontStyles>, FontStyles> assignFontStyles)
+            TextStyleMenu textStyleMenu)
         {
             this.textMenu = textMenu;
             this.controls = controls;
             this.enableTextMenu = enableTextMenu;
-            this.assignColorArea = assignColorArea;
-            this.assignOutlineThickness = assignOutlineThickness;
-            this.assignFontSize = assignFontSize;
-            this.assignFontStyles = assignFontStyles;
+            this.textStyleMenu = textStyleMenu;
         }
 
         /// <summary>
         /// Configures the text menu for editing an existing text object.
+        /// The current configuration is assigned to the shared controls and
+        /// subsequent user changes are applied to the selected text object,
+        /// stored in its configuration, and synchronized through network actions.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
         /// <param name="newValueHolder">
         /// The configuration containing the editable text values.
+        /// If it is not a <see cref="TextConf"/>, no editing controls are configured.
         /// </param>
         /// <param name="returnCall">
         /// An optional callback returning to the parent menu.
@@ -139,7 +125,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 surface,
                 surfaceParentName);
 
-            assignOutlineThickness(
+            textStyleMenu.AssignOutlineThickness(
                 thickness =>
                 {
                     GameEdit.ChangeOutlineThickness(selectedText, thickness);
@@ -161,7 +147,7 @@ namespace SEE.UI.Menu.Drawable.Text
             controls.OutlineSwitch.isOn = textHolder.IsOutlined;
             controls.OutlineSwitch.UpdateUI();
 
-            assignFontSize(
+            textStyleMenu.AssignFontSize(
                 size =>
                 {
                     GameEdit.ChangeFontSize(selectedText, size);
@@ -174,7 +160,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 },
                 textHolder.FontSize);
 
-            assignFontStyles(
+            textStyleMenu.AssignFontStyles(
                 style =>
                 {
                     GameEdit.ChangeFontStyles(selectedText, style);
@@ -206,10 +192,12 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures the optional return button.
+        /// Configures the optional return button used to leave the text-editing
+        /// menu and return to its parent menu.
         /// </summary>
         /// <param name="returnCall">
-        /// The callback returning to the parent menu.
+        /// The callback invoked when the return button is pressed.
+        /// If it is null, the return button is not configured.
         /// </param>
         private void SetUpReturnButton(UnityAction returnCall)
         {
@@ -226,12 +214,22 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures font-color editing.
+        /// Configures the font-color button for editing the selected text object.
+        /// When the color picker value changes, the new font color is applied to
+        /// the text object, stored in its configuration, and synchronized.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
-        /// <param name="textHolder">The configuration containing the edited values.</param>
-        /// <param name="surface">The drawable surface containing the text.</param>
-        /// <param name="surfaceParentName">The drawable surface parent's name.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
+        /// <param name="textHolder">
+        /// The configuration containing the edited text values.
+        /// </param>
+        /// <param name="surface">
+        /// The drawable surface containing the selected text object.
+        /// </param>
+        /// <param name="surfaceParentName">
+        /// The name of the drawable surface's parent.
+        /// </param>
         private void SetUpFontColorButton(
             GameObject selectedText,
             TextConf textHolder,
@@ -240,7 +238,7 @@ namespace SEE.UI.Menu.Drawable.Text
         {
             controls.FontColorButtonManager.clickEvent.AddListener(() =>
             {
-                assignColorArea(
+                textStyleMenu.AssignColorArea(
                     color =>
                     {
                         GameEdit.ChangeFontColor(selectedText, color);
@@ -258,12 +256,23 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures outline-color editing.
+        /// Configures the outline-color button for editing the selected text object.
+        /// A visible outline color is ensured before the color picker is configured.
+        /// Subsequent color changes are applied to the text object, stored in its
+        /// configuration, and synchronized.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
-        /// <param name="textHolder">The configuration containing the edited values.</param>
-        /// <param name="surface">The drawable surface containing the text.</param>
-        /// <param name="surfaceParentName">The drawable surface parent's name.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
+        /// <param name="textHolder">
+        /// The configuration containing the edited text values.
+        /// </param>
+        /// <param name="surface">
+        /// The drawable surface containing the selected text object.
+        /// </param>
+        /// <param name="surfaceParentName">
+        /// The name of the drawable surface's parent.
+        /// </param>
         private void SetUpOutlineColorButton(
             GameObject selectedText,
             TextConf textHolder,
@@ -286,7 +295,7 @@ namespace SEE.UI.Menu.Drawable.Text
                         255);
                 }
 
-                assignColorArea(
+                textStyleMenu.AssignColorArea(
                     color =>
                     {
                         GameEdit.ChangeOutlineColor(selectedText, color);
@@ -304,12 +313,22 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures the outline enabled state.
+        /// Configures the outline switch for the selected text object.
+        /// Changes to the outline state are applied to the object, stored in its
+        /// configuration, and synchronized.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
-        /// <param name="textHolder">The configuration containing the edited values.</param>
-        /// <param name="surface">The drawable surface containing the text.</param>
-        /// <param name="surfaceParentName">The drawable surface parent's name.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
+        /// <param name="textHolder">
+        /// The configuration containing the edited text values.
+        /// </param>
+        /// <param name="surface">
+        /// The drawable surface containing the selected text object.
+        /// </param>
+        /// <param name="surfaceParentName">
+        /// The name of the drawable surface's parent.
+        /// </param>
         private void SetUpOutlineStatus(
             GameObject selectedText,
             TextConf textHolder,
@@ -350,12 +369,22 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures the button for editing the text content.
+        /// Configures the button used to edit the textual content of the selected
+        /// text object. The dialog is initialized with the current text and valid
+        /// changes are applied to the object, stored, and synchronized.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
-        /// <param name="textHolder">The configuration containing the edited values.</param>
-        /// <param name="surface">The drawable surface containing the text.</param>
-        /// <param name="surfaceParentName">The drawable surface parent's name.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
+        /// <param name="textHolder">
+        /// The configuration containing the edited text values.
+        /// </param>
+        /// <param name="surface">
+        /// The drawable surface containing the selected text object.
+        /// </param>
+        /// <param name="surfaceParentName">
+        /// The name of the drawable surface's parent.
+        /// </param>
         private void SetUpEditTextButton(
             GameObject selectedText,
             TextConf textHolder,
@@ -404,12 +433,22 @@ namespace SEE.UI.Menu.Drawable.Text
         }
 
         /// <summary>
-        /// Configures editing of the text object's order in layer.
+        /// Configures the order-in-layer control for the selected text object.
+        /// Changes are applied to the text object, stored in its configuration,
+        /// and synchronized.
         /// </summary>
-        /// <param name="selectedText">The selected text object.</param>
-        /// <param name="textHolder">The configuration containing the edited values.</param>
-        /// <param name="surface">The drawable surface containing the text.</param>
-        /// <param name="surfaceParentName">The drawable surface parent's name.</param>
+        /// <param name="selectedText">
+        /// The selected text object to be edited.
+        /// </param>
+        /// <param name="textHolder">
+        /// The configuration containing the edited text values.
+        /// </param>
+        /// <param name="surface">
+        /// The drawable surface containing the selected text object.
+        /// </param>
+        /// <param name="surfaceParentName">
+        /// The name of the drawable surface's parent.
+        /// </param>
         private void SetUpOrderInLayer(
             GameObject selectedText,
             TextConf textHolder,
