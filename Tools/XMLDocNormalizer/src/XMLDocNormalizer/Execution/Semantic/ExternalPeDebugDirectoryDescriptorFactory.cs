@@ -107,10 +107,47 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
+            return TryCreateFromFile(
+                expectedDescriptor,
+                expectedDescriptor.FilePath,
+                out descriptor);
+        }
+
+        /// <summary>
+        /// Tries to read debug provenance from one explicitly selected PE
+        /// candidate while validating it against an existing P3 identity.
+        /// </summary>
+        /// <param name="expectedDescriptor">
+        /// The binary descriptor established from Roslyn's actual binding.
+        /// </param>
+        /// <param name="candidatePath">
+        /// The exact caller-selected PE path. It is input provenance and does
+        /// not participate in binary identity.
+        /// </param>
+        /// <param name="descriptor">
+        /// The validated debug-directory descriptor when available.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the candidate is readable, has the
+        /// exact expected binary identity, and contains supported debug
+        /// provenance; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="expectedDescriptor"/> or
+        /// <paramref name="candidatePath"/> is <see langword="null"/>.
+        /// </exception>
+        public static bool TryCreateFromFile(
+            ExternalAssemblyReferenceDescriptor expectedDescriptor,
+            string candidatePath,
+            out ExternalPeDebugDirectoryDescriptor descriptor)
+        {
+            ArgumentNullException.ThrowIfNull(expectedDescriptor);
+            ArgumentNullException.ThrowIfNull(candidatePath);
+
             try
             {
                 using FileStream stream = new(
-                    expectedDescriptor.FilePath,
+                    candidatePath,
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read);

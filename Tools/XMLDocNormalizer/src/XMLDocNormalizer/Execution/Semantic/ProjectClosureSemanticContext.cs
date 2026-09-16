@@ -38,6 +38,13 @@ namespace XMLDocNormalizer.Execution.Semantic
         private ExternalAssemblyReferenceCatalog ExternalAssemblyReferences { get; } = new();
 
         /// <summary>
+        /// Gets the context-local prepared reconstruction plans and attempt states.
+        /// </summary>
+        /// <value>The demand-driven reconstruction catalog.</value>
+        private ExternalSupportingSourceReconstructionCatalog ExternalReconstructions { get; } =
+            new();
+
+        /// <summary>
         /// Caches semantic models per syntax tree to avoid repeated lookup.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticModel> semanticModelCache =
@@ -181,6 +188,28 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Registers explicitly prepared reconstruction inputs for one exact
+        /// external binary without opening any candidate file.
+        /// </summary>
+        /// <param name="plan">
+        /// The immutable, complete-P3-identity-bound reconstruction plan.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a new or semantically idempotent plan;
+        /// otherwise <see langword="false"/> for a conflicting plan.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="plan"/> is <see langword="null"/>.
+        /// </exception>
+        public bool TryRegisterExternalSupportingSourceReconstructionPlan(
+            ExternalSupportingSourceReconstructionPlan plan)
+        {
+            ArgumentNullException.ThrowIfNull(plan);
+
+            return ExternalReconstructions.TryRegister(plan);
+        }
+
+        /// <summary>
         /// Tries to locate a registered supporting source scope by its exact
         /// assembly identity.
         /// </summary>
@@ -218,9 +247,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             ExternalAssemblyReferenceDescriptor binaryIdentity,
             out SemanticCompilationScope scope)
         {
-            return SupportingSources.TryGetExternalScope(
-                binaryIdentity,
-                out scope);
+            return SupportingSources.TryGetExternalScope(binaryIdentity, out scope);
         }
 
         /// <summary>
@@ -259,9 +286,60 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
-            return SupportingSources.TryGetExternalScope(
-                binaryIdentity,
-                out scope);
+            return TryEnsureExternalSupportingSourceScope(binaryIdentity, out scope);
+        }
+
+        /// <summary>
+        /// Uses the P6A fast path or performs the single prepared P6C attempt
+        /// before retrying the same exact supporting-source lookup.
+        /// </summary>
+        /// <param name="binaryIdentity">The complete P3 binary identity.</param>
+        /// <param name="scope">The exact P6A scope when available.</param>
+        /// <returns>
+        /// <see langword="true"/> when an existing or newly reconstructed
+        /// supporting source is registered; otherwise <see langword="false"/>.
+        /// </returns>
+        private bool TryEnsureExternalSupportingSourceScope(
+            ExternalAssemblyReferenceDescriptor binaryIdentity,
+            out SemanticCompilationScope scope)
+        {
+            if (binaryIdentity == null)
+            {
+                scope = null!;
+                return false;
+            }
+
+            if (SupportingSources.TryGetExternalScope(binaryIdentity, out scope))
+            {
+                return true;
+            }
+
+            if (!ExternalReconstructions.TryBegin(binaryIdentity, out var plan))
+            {
+                scope = null!;
+                return false;
+            }
+
+            bool succeeded = false;
+
+            try
+            {
+                succeeded = ExternalSupportingSourceReconstructionOrchestrator.TryReconstruct(
+                        plan,
+                        out ExternalSupportingSourceCompilation supportingSource)
+                    && TryRegisterExternalSupportingSource(supportingSource, out _);
+            }
+            catch (ArgumentNullException)
+            {
+                succeeded = false;
+            }
+            finally
+            {
+                ExternalReconstructions.Complete(binaryIdentity, succeeded);
+            }
+
+            return succeeded
+                && SupportingSources.TryGetExternalScope(binaryIdentity, out scope);
         }
 
         /// <summary>
