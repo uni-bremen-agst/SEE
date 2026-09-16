@@ -11,6 +11,7 @@ using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI.Menu.Drawable.Text;
 
 namespace SEE.Controls.Actions.Drawable
 {

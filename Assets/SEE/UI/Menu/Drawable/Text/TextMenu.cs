@@ -1,12 +1,11 @@
 ﻿using SEE.Controls;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Text
 {
     /// <summary>
     /// This class holds the instance for the text menu.

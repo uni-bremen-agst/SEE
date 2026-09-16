@@ -1,6 +1,7 @@
-﻿using SEE.UI.Menu.Drawable.Line;
-using SEE.Controls.Actions;
+﻿using SEE.Controls.Actions;
+using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Shapes;
+using SEE.UI.Menu.Drawable.Text;
 
 namespace SEE.UI.Menu.Drawable
 {

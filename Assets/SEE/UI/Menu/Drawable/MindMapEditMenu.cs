@@ -7,6 +7,7 @@ using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Menu.Drawable.Line;
+using SEE.UI.Menu.Drawable.Text;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;

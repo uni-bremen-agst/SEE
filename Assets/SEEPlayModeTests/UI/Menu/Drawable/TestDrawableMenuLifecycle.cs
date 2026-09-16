@@ -2,6 +2,7 @@
 using SEE.Controls.Actions;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Shapes;
+using SEE.UI.Menu.Drawable.Text;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
