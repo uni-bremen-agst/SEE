@@ -108,9 +108,15 @@ namespace SEE.UI
         private static StatusIndicator bodyAnimator;
 
         /// <summary>
-        /// Status indicator for the LiveKit system.
+        /// Status indicator for the LiveKit video system.
         /// </summary>
-        private static StatusIndicator liveKit;
+        private static StatusIndicator livekitVideo;
+
+        /// <summary>
+        /// Status indicator for the LiveKit audio system.
+        /// </summary>
+        private static StatusIndicator livekitAudio;
+
 
         /// <summary>
         /// The main webcam status icon. Its color reflects whether the webcam is active.
@@ -162,12 +168,21 @@ namespace SEE.UI
             };
 
             GameObject livekitObj = webcamOverlay.FindDescendant("LiveKitStatus");
-            liveKit = new StatusIndicator
+            livekitVideo = new StatusIndicator
             {
                 Container = livekitObj,
                 Text = livekitObj.GetComponent<TextMeshProUGUI>(),
                 Tooltip = livekitObj.GetComponent<UIHoverTooltip>(),
                 Label = "LiveKit"
+            };
+
+            GameObject livekitAudioObj = webcamOverlay.FindDescendant("LiveKitMicrophoneStatus");
+            livekitAudio = new StatusIndicator
+            {
+                Container = livekitAudioObj,
+                Text = livekitAudioObj.GetComponent<TextMeshProUGUI>(),
+                Tooltip = livekitAudioObj.GetComponent<UIHoverTooltip>(),
+                Label = "Livekit Audio"
             };
 
             webcamSlashOverlay.GetComponent<TextMeshProUGUI>().color = inactiveColor;
@@ -186,7 +201,7 @@ namespace SEE.UI
             webcamStatus.color = inactiveColor;
             webcamSlashOverlay.SetActive(true);
             bodyAnimator.ShowContainer(false);
-            liveKit.ShowContainer(false);
+            livekitVideo.ShowContainer(false);
         }
 
         /// <summary>
@@ -198,7 +213,7 @@ namespace SEE.UI
             webcamStatus.color = activeColor;
             webcamSlashOverlay.SetActive(false);
             bodyAnimator.ShowContainer(true);
-            liveKit.ShowContainer(true);
+            livekitVideo.ShowContainer(true);
         }
 
         /// <summary>
@@ -214,7 +229,7 @@ namespace SEE.UI
         /// </summary>
         private static void SetLiveKitActive(bool active)
         {
-            liveKit.SetActive(active, activeColor, inactiveColor);
+            livekitVideo.SetActive(active, activeColor, inactiveColor);
         }
 
         /// <summary>
@@ -235,8 +250,14 @@ namespace SEE.UI
         /// </summary>
         public static void ToggleLiveKit()
         {
-            bool isActive = liveKit.Text.color == activeColor;
-            liveKit.SetActive(!isActive, activeColor, inactiveColor);
+            bool isActive = livekitVideo.Text.color == activeColor;
+            livekitVideo.SetActive(!isActive, activeColor, inactiveColor);
+        }
+
+        public static void ToggleLiveKitAudio()
+        {
+            bool isActive = livekitAudio.Text.color == activeColor;
+            livekitAudio.SetActive(!isActive, activeColor, inactiveColor);
         }
         #endregion
     }
