@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable.StickyNoteRotation;
 using UnityEngine;
 using UnityEngine.Events;
 

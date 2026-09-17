@@ -1,8 +1,7 @@
-﻿using SEE.UI.Menu.Drawable.StickyNoteRotation;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 {
     /// <summary>
     /// Provides the rotation menus for the sticky notes.
