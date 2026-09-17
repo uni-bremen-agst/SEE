@@ -12,17 +12,26 @@ namespace SEE.Game.Drawable
     public class TestGameMindMap
     {
         /// <summary>
-        /// The root containing all test nodes.
+        /// The root object containing the Mind Map hierarchy used by the tests.
         /// </summary>
         private GameObject root;
 
         /// <summary>
-        /// Creates the hierarchy required by each test.
+        /// The container holding the Mind Map nodes used by the tests.
+        /// </summary>
+        private GameObject attachedObjects;
+
+        /// <summary>
+        /// Creates the Mind Map hierarchy required by each test.
         /// </summary>
         [SetUp]
         public void SetUp()
         {
             root = new GameObject("MindMap");
+
+            attachedObjects = new GameObject("AttachedObjects");
+            attachedObjects.tag = Tags.AttachedObjects;
+            attachedObjects.transform.SetParent(root.transform);
         }
 
         /// <summary>
@@ -136,16 +145,83 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates and initializes a Mind Map node.
+        /// Verifies that a theme cannot become a subtheme if no other theme can act
+        /// as its new parent.
+        /// </summary>
+        [Test]
+        public void TestThemeCannotBecomeSubthemeWithoutAnotherTheme()
+        {
+            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
+
+            bool result = GameMindMap.CheckValidNodeKindChange(
+                node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
+
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that a theme can become a subtheme if another theme can act as
+        /// its new parent.
+        /// </summary>
+        [Test]
+        public void TestThemeCanBecomeSubthemeWithAnotherTheme()
+        {
+            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
+            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+
+            bool result = GameMindMap.CheckValidNodeKindChange(
+                node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
+
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Verifies that a theme without children can become a leaf if another theme
+        /// can act as its new parent.
+        /// </summary>
+        [Test]
+        public void TestThemeWithoutChildrenCanBecomeLeafWithAnotherTheme()
+        {
+            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
+            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+
+            bool result = GameMindMap.CheckValidNodeKindChange(
+                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
+
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Verifies that a theme with children cannot become a leaf even if another
+        /// theme is available as a parent.
+        /// </summary>
+        [Test]
+        public void TestThemeWithChildrenCannotBecomeLeaf()
+        {
+            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
+            GameObject child = CreateNode("Child", GameMindMap.NodeKind.Subtheme);
+            GameObject branchLine = CreateBranchLine("Branch");
+            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+
+            node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
+
+            bool result = GameMindMap.CheckValidNodeKindChange(
+                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
+
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Creates and initializes a Mind Map node with the given name and node kind.
         /// </summary>
         /// <param name="name">The name of the node.</param>
         /// <param name="nodeKind">The kind of the node.</param>
-        /// <returns>The created node.</returns>
+        /// <returns>The created Mind Map node.</returns>
         private GameObject CreateNode(string name, GameMindMap.NodeKind nodeKind)
         {
             GameObject node = new GameObject(name);
             node.tag = Tags.MindMapNode;
-            node.transform.SetParent(root.transform);
+            node.transform.SetParent(attachedObjects.transform);
 
             MMNodeValueHolder valueHolder = node.AddComponent<MMNodeValueHolder>();
             InitializeValueHolder(valueHolder);
@@ -155,14 +231,14 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates a branch line owned by the test hierarchy.
+        /// Creates a branch line owned by the test Mind Map hierarchy.
         /// </summary>
         /// <param name="name">The name of the branch line.</param>
         /// <returns>The created branch line.</returns>
         private GameObject CreateBranchLine(string name)
         {
             GameObject branchLine = new GameObject(name);
-            branchLine.transform.SetParent(root.transform);
+            branchLine.transform.SetParent(attachedObjects.transform);
             return branchLine;
         }
 
