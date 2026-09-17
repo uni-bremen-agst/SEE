@@ -44,8 +44,18 @@ namespace SEE.Game.Drawable
                 stickyNote.transform.rotation = surface.transform.rotation;
             }
 
+            /// Ensures that the visible side of the sticky note faces away from
+            /// the surface, even if the hit object's forward axis points in the
+            /// opposite direction.
+            EnsureFrontFacesAwayFromSurface(
+                stickyNote,
+                raycastHit.normal);
+
             /// Adopt the position of the hit object, but preserve the distance.
-            stickyNote.transform.position = raycastHit.point - ValueHolder.MaxOrderInLayer * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
+            stickyNote.transform.position = raycastHit.point
+                - ValueHolder.MaxOrderInLayer
+                * ValueHolder.DistanceToDrawable.z
+                * stickyNote.transform.forward;
 
             /// Sets the initial scale for sticky notes
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
@@ -60,6 +70,55 @@ namespace SEE.Game.Drawable
 
             ValueHolder.MaxOrderInLayer++;
             return stickyNote;
+        }
+
+        /// <summary>
+        /// Aligns the sticky note with the surface on which it was placed while
+        /// preserving its existing orientation around the surface normal as far
+        /// as possible.
+        /// </summary>
+        /// <param name="stickyNote">
+        /// The sticky note whose orientation should be aligned.
+        /// </param>
+        /// <param name="surfaceNormal">
+        /// The normal of the surface on which the sticky note was placed.
+        /// </param>
+        private static void EnsureFrontFacesAwayFromSurface(
+            GameObject stickyNote,
+            Vector3 surfaceNormal)
+        {
+            Transform transform = stickyNote.transform;
+
+            Vector3 desiredForward = -surfaceNormal.normalized;
+
+            if (Vector3.Dot(transform.forward, desiredForward) > 0.999f)
+            {
+                return;
+            }
+
+            Vector3 desiredUp = Vector3.ProjectOnPlane(transform.up, desiredForward);
+
+            if (desiredUp.sqrMagnitude < Mathf.Epsilon)
+            {
+                Vector3 desiredRight = Vector3.ProjectOnPlane(transform.right, desiredForward);
+
+                if (desiredRight.sqrMagnitude >= Mathf.Epsilon)
+                {
+                    desiredUp = Vector3.Cross(desiredForward, desiredRight.normalized);
+                }
+            }
+
+            if (desiredUp.sqrMagnitude < Mathf.Epsilon)
+            {
+                desiredUp = Vector3.up;
+
+                if (Mathf.Abs(Vector3.Dot(desiredUp, desiredForward)) > 0.999f)
+                {
+                    desiredUp = Vector3.forward;
+                }
+            }
+
+            transform.rotation = Quaternion.LookRotation(desiredForward, desiredUp.normalized);
         }
 
         /// <summary>
