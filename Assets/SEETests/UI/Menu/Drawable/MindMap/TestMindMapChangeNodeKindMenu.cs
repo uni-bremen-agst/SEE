@@ -111,6 +111,52 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that the currently selected selector index is returned as the
+        /// corresponding Mind Map node kind.
+        /// </summary>
+        [Test]
+        public void TestGetSelectedNodeKindUsesCurrentSelectorIndex()
+        {
+            MindMapNodeConf configuration = new MindMapNodeConf
+            {
+                NodeKind = GameMindMap.NodeKind.Theme
+            };
+
+            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+
+            HorizontalSelector selector = FindNodeKindSelector();
+            selector.index = 2;
+
+            Assert.That(
+                MindMapChangeNodeKindMenu.GetSelectedNodeKind(),
+                Is.EqualTo(GameMindMap.NodeKind.Leaf));
+        }
+
+        /// <summary>
+        /// Verifies that pressing the return button invokes the provided callback.
+        /// </summary>
+        [Test]
+        public void TestReturnButtonInvokesCallback()
+        {
+            bool callbackInvoked = false;
+
+            MindMapNodeConf configuration = new MindMapNodeConf
+            {
+                NodeKind = GameMindMap.NodeKind.Theme
+            };
+
+            MindMapChangeNodeKindMenu.Enable(
+                node,
+                configuration,
+                () => callbackInvoked = true);
+
+            ButtonManagerBasic returnButton = FindReturnButton();
+            returnButton.clickEvent.Invoke();
+
+            Assert.That(callbackInvoked, Is.True);
+        }
+
+        /// <summary>
         /// Finds the node kind selector of the currently instantiated menu.
         /// </summary>
         /// <returns>The node kind selector.</returns>
@@ -126,6 +172,25 @@ namespace SEE.UI.Menu.Drawable
             }
 
             Assert.Fail("Could not find the Mind Map node kind selector.");
+            return null;
+        }
+
+        /// <summary>
+        /// Finds the return button manager of the currently instantiated menu.
+        /// </summary>
+        /// <returns>The return button manager.</returns>
+        private static ButtonManagerBasic FindReturnButton()
+        {
+            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (candidate.gameObject.name == "ReturnBtn")
+                {
+                    return candidate;
+                }
+            }
+
+            Assert.Fail("Could not find the return button of the Mind Map node kind menu.");
             return null;
         }
     }
