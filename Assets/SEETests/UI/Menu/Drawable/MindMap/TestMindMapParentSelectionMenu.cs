@@ -2,7 +2,9 @@
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 
@@ -174,6 +176,87 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that inactive Mind Map nodes are not offered as parent
+        /// candidates while editing an existing node.
+        /// </summary>
+        [Test]
+        public void TestInactiveParentIsExcludedForEditing()
+        {
+            MindMapNodeConf configuration =
+                ConfigureExistingParent(
+                    addedNode,
+                    secondParent);
+
+            firstParent.SetActive(false);
+
+            MindMapParentSelectionMenu.EnableForEditing(
+                attachedObjects,
+                addedNode,
+                configuration,
+                () => { });
+
+            HorizontalSelector selector =
+                FindParentSelector();
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == firstParent.name),
+                Is.False);
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == secondParent.name),
+                Is.True);
+        }
+
+        /// <summary>
+        /// Verifies that a descendant of the edited node cannot be selected as its
+        /// new parent because doing so would create a cycle.
+        /// </summary>
+        [Test]
+        public void TestDescendantIsExcludedForEditing()
+        {
+            MindMapNodeConf configuration =
+                ConfigureExistingParent(
+                    addedNode,
+                    firstParent);
+
+            GameObject descendant =
+                CreateNode(
+                    "Descendant",
+                    GameMindMap.NodeKind.Subtheme);
+
+            GameObject descendantBranchLine =
+                new GameObject("DescendantBranchLine");
+            descendantBranchLine.transform.SetParent(
+                attachedObjects.transform);
+
+            descendant.GetComponent<MMNodeValueHolder>()
+                .SetParent(
+                    addedNode,
+                    descendantBranchLine);
+
+            MindMapParentSelectionMenu.EnableForEditing(
+                attachedObjects,
+                addedNode,
+                configuration,
+                () => { });
+
+            HorizontalSelector selector =
+                FindParentSelector();
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == descendant.name),
+                Is.False);
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == firstParent.name),
+                Is.True);
+        }
+
+        /// <summary>
         /// Finds the parent selector of the currently instantiated parent
         /// selection menu.
         /// </summary>
@@ -198,17 +281,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Creates a Mind Map node with the given name and node kind.
+        /// Creates and initializes a Mind Map node with the given name and node kind.
         /// </summary>
         /// <param name="name">The name of the node.</param>
         /// <param name="nodeKind">The kind of the node.</param>
         /// <returns>The created Mind Map node.</returns>
-        private GameObject CreateNode(
-            string name,
-            GameMindMap.NodeKind nodeKind)
+        private GameObject CreateNode(string name, GameMindMap.NodeKind nodeKind)
         {
-            GameObject node =
-                new GameObject(name);
+            GameObject node = new GameObject(name);
 
             node.tag = Tags.MindMapNode;
             node.transform.SetParent(
@@ -216,6 +296,9 @@ namespace SEE.UI.Menu.Drawable
 
             MMNodeValueHolder valueHolder =
                 node.AddComponent<MMNodeValueHolder>();
+
+            InitializeValueHolder(valueHolder);
+
             valueHolder.NodeKind = nodeKind;
 
             TextMeshPro text =
@@ -223,6 +306,65 @@ namespace SEE.UI.Menu.Drawable
             text.text = name;
 
             return node;
+        }
+
+        /// <summary>
+        /// Invokes the Unity initialization of the given Mind Map node value holder.
+        /// EditMode tests do not execute the regular MonoBehaviour lifecycle used
+        /// during normal gameplay.
+        /// </summary>
+        /// <param name="valueHolder">
+        /// The value holder that should be initialized.
+        /// </param>
+        private static void InitializeValueHolder(MMNodeValueHolder valueHolder)
+        {
+            MethodInfo awake =
+                typeof(MMNodeValueHolder).GetMethod(
+                    "Awake",
+                    BindingFlags.Instance
+                    | BindingFlags.NonPublic);
+
+            Assert.That(
+                awake,
+                Is.Not.Null,
+                "Could not find MMNodeValueHolder.Awake().");
+
+            awake.Invoke(
+                valueHolder,
+                null);
+        }
+
+        /// <summary>
+        /// Configures the given node with an existing parent and branch line so that
+        /// opening the editing parent selection does not immediately change its
+        /// parent.
+        /// </summary>
+        /// <param name="node">The node whose existing parent should be configured.</param>
+        /// <param name="parent">The existing parent of the node.</param>
+        /// <returns>The configuration representing the current parent.</returns>
+        private MindMapNodeConf ConfigureExistingParent(
+            GameObject node,
+            GameObject parent)
+        {
+            GameObject branchLine =
+                new GameObject("ParentBranchLine");
+            branchLine.transform.SetParent(
+                attachedObjects.transform);
+
+            MMNodeValueHolder valueHolder =
+                node.GetComponent<MMNodeValueHolder>();
+
+            valueHolder.NodeKind =
+                GameMindMap.NodeKind.Subtheme;
+
+            valueHolder.SetParent(
+                parent,
+                branchLine);
+
+            return new MindMapNodeConf
+            {
+                ParentNode = parent.name
+            };
         }
     }
 }
