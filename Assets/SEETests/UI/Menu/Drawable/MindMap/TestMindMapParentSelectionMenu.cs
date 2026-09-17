@@ -109,6 +109,71 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that leaf nodes are not offered as possible parents.
+        /// </summary>
+        [Test]
+        public void TestLeafNodeIsExcludedFromParentCandidates()
+        {
+            GameObject leaf = CreateNode(
+                "Leaf",
+                GameMindMap.NodeKind.Leaf);
+
+            MindMapParentSelectionMenu.Enable(
+                attachedObjects,
+                addedNode);
+
+            HorizontalSelector selector =
+                FindParentSelector();
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == leaf.name),
+                Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that the node for which a parent is selected cannot be selected
+        /// as its own parent.
+        /// </summary>
+        [Test]
+        public void TestAddedNodeIsExcludedFromParentCandidates()
+        {
+            MindMapParentSelectionMenu.Enable(
+                attachedObjects,
+                addedNode);
+
+            HorizontalSelector selector =
+                FindParentSelector();
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == addedNode.name),
+                Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that inactive nodes are included when selecting a parent for a
+        /// newly created Mind Map node.
+        /// </summary>
+        [Test]
+        public void TestInactiveParentIsIncludedForNormalSelection()
+        {
+            firstParent.SetActive(false);
+
+            MindMapParentSelectionMenu.Enable(
+                attachedObjects,
+                addedNode);
+
+            HorizontalSelector selector =
+                FindParentSelector();
+
+            Assert.That(
+                selector.itemList.Exists(
+                    item => item.itemTitle == firstParent.name),
+                Is.True);
+        }
+
+        /// <summary>
         /// Finds the parent selector of the currently instantiated parent
         /// selection menu.
         /// </summary>
