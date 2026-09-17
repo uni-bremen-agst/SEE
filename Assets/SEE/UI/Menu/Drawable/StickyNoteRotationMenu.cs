@@ -2,6 +2,7 @@
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable.StickyNoteRotation;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,14 +15,9 @@ namespace SEE.UI.Menu.Drawable
     public class StickyNoteRotationMenu
     {
         /// <summary>
-        /// The prefab of the sticky note for the x rotation menu.
+        /// Manages the sticky note x rotation menu.
         /// </summary>
-        private const string xRotationMenuPrefab = "Prefabs/UI/Drawable/StickyNoteXRotation";
-
-        /// <summary>
-        /// The instance for the sticky note for the x rotation menu.
-        /// </summary>
-        private static GameObject xRotationMenu;
+        private static readonly StickyNoteXRotationMenu xRotationMenu = new();
 
         /// <summary>
         /// The prefab of the sticky note for the y rotation menu.
@@ -39,7 +35,7 @@ namespace SEE.UI.Menu.Drawable
         private static bool isFinished;
 
         /// <summary>
-        /// Method to destroy the rotation menus.
+        /// Destroys the sticky note rotation menus.
         /// </summary>
         public static void Destroy()
         {
@@ -47,105 +43,42 @@ namespace SEE.UI.Menu.Drawable
             {
                 Destroyer.Destroy(yRotationMenu);
             }
-            if (xRotationMenu != null)
-            {
-                Destroyer.Destroy(xRotationMenu);
-            }
+
+            xRotationMenu.Destroy();
         }
 
         /// <summary>
-        /// Enables the rotation menu. It beginns with the x-rotation menu.
+        /// Enables the sticky note rotation menu.
+        /// The rotation configuration starts with the x rotation menu.
         /// </summary>
-        /// <param name="stickyNoteHolder">The sticky note that should be rotated.</param>
-        /// <param name="hitObject">The object where the sticky note was placed. Only necessary for spawning.</param>
-        public static void Enable(GameObject stickyNoteHolder, GameObject hitObject = null,
+        /// <param name="stickyNoteHolder">
+        /// The sticky note that should be rotated.
+        /// </param>
+        /// <param name="hitObject">
+        /// The object on which the sticky note was placed.
+        /// This is only required while spawning a sticky note.
+        /// </param>
+        /// <param name="returnCall">
+        /// An optional action returning to the parent menu.
+        /// </param>
+        public static void Enable(
+            GameObject stickyNoteHolder,
+            GameObject hitObject = null,
             UnityAction returnCall = null)
         {
-            xRotationMenu = Menu.InstantiatePrefab(xRotationMenuPrefab);
-            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
-            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-            /// Initialize the button for laying.
-            LayingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
-
-            /// Initialize the button for hanging.
-            HangingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
-
-            /// Initialize the next button, it opens the menu for the Y-rotation.
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Next").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
-            {
-                xRotationMenu.SetActive(false);
-                EnableYRotation(stickyNoteHolder, hitObject != null, returnCall);
-            });
-
-            /// Initialize or disables the return button.
-            XReturnButton(returnCall);
-        }
-
-        /// <summary>
-        /// Initializes the laying button for the x rotation.
-        /// It sets the x Euler angle to 90°.
-        /// </summary>
-        /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
-        /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="surface">The drawable surface of the sticky note holder.</param>
-        /// <param name="surfaceParentName">The id of the sticky note parent.</param>
-        private static void LayingButton(GameObject stickyNoteHolder, GameObject hitObject,
-            GameObject surface, string surfaceParentName)
-        {
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            xRotationMenu.Enable(
+                stickyNoteHolder,
+                hitObject,
+                returnCall,
+                () =>
                 {
-                    if (hitObject != null)
-                    {
-                        GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90, stickyNoteHolder.transform.position,
-                            hitObject.name.Equals("Floor"));
-                    }
-                    else
-                    {
-                        GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90);
-                        new StickyNoteRotateXNetAction(surface.name, surfaceParentName, 90).Execute();
-                    }
+                    xRotationMenu.Hide();
+
+                    EnableYRotation(
+                        stickyNoteHolder,
+                        hitObject != null,
+                        returnCall);
                 });
-        }
-
-        /// <summary>
-        /// Initializes the hanging button for the x rotation.
-        /// It sets the x Euler angle to 0°.
-        /// </summary>
-        /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
-        /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="surface">The drawable surface of the sticky note holder.</param>
-        /// <param name="surfaceParentName">The id of the sticky note parent.</param>
-        private static void HangingButton(GameObject stickyNoteHolder, GameObject hitObject,
-            GameObject surface, string surfaceParentName)
-        {
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Hanging").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
-            {
-                GameStickyNoteManager.SetRotateX(stickyNoteHolder, 0);
-                if (hitObject == null)
-                {
-                    new StickyNoteRotateXNetAction(surface.name, surfaceParentName, 0).Execute();
-                }
-            });
-        }
-
-        /// <summary>
-        /// Sets up the return button for the xRotation menu if the <paramref name="returnCall"/> is not null.
-        /// Otherwise the button will disabled.
-        /// </summary>
-        /// <param name="returnCall">The return call action to return to the parent menu.</param>
-        private static void XReturnButton(UnityAction returnCall)
-        {
-            if (returnCall != null)
-            {
-                GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
-            }
-            else
-            {
-                GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "ReturnBtn").SetActive(false);
-            }
         }
 
         /// <summary>
@@ -170,19 +103,22 @@ namespace SEE.UI.Menu.Drawable
             TwoHundredSeventy(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
 
             /// Initialize the back button, it returns to the xRotation menu.
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Back").GetComponent<ButtonManagerBasic>()
+            GameFinder.FindAttachedOrLocalDescendant(
+                    yRotationMenu,
+                    "Back")
+                .GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
-            {
-                yRotationMenu.SetActive(false);
-                xRotationMenu.SetActive(true);
-            });
+                {
+                    yRotationMenu.SetActive(false);
+                    xRotationMenu.Show();
+                });
 
             /// Initalize the finish button. It closes the rotation menus.
             /// And set <see cref="isFinished"/> to true.
             GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Finish").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
             {
-                Destroyer.Destroy(xRotationMenu);
+                xRotationMenu.Destroy();
                 Destroyer.Destroy(yRotationMenu);
                 isFinished = true;
             });
