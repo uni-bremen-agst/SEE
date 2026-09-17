@@ -5,6 +5,8 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using UnityEngine;
+using System.Reflection;
+using TMPro;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -64,6 +66,7 @@ namespace SEE.UI.Menu.Drawable
         public void TearDown()
         {
             MindMapChangeNodeKindMenu.Instance.Destroy();
+            MindMapParentSelectionMenu.Instance.Destroy();
 
             if (root != null)
             {
@@ -157,6 +160,40 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that changing a Theme to a node kind that requires a parent does not
+        /// modify the node until a valid parent has been explicitly confirmed.
+        /// </summary>
+        /// <param name="newNodeKind">The node kind that requires a parent.</param>
+        [TestCase(GameMindMap.NodeKind.Subtheme)]
+        [TestCase(GameMindMap.NodeKind.Leaf)]
+        public void TestParentRequiredNodeKindChangeRemainsPendingUntilConfirmation(
+            GameMindMap.NodeKind newNodeKind)
+        {
+            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
+            InitializeValueHolder(nodeValueHolder);
+            nodeValueHolder.NodeKind = GameMindMap.NodeKind.Theme;
+
+            CreateParentCandidate();
+
+            MindMapNodeConf configuration = new MindMapNodeConf
+            {
+                NodeKind = GameMindMap.NodeKind.Theme
+            };
+
+            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+
+            HorizontalSelector selector = FindNodeKindSelector();
+            int index = GameMindMap.GetNodeKinds().IndexOf(newNodeKind);
+
+            selector.index = index;
+            selector.selectorEvent.Invoke(index);
+
+            Assert.That(nodeValueHolder.NodeKind, Is.EqualTo(GameMindMap.NodeKind.Theme));
+            Assert.That(configuration.NodeKind, Is.EqualTo(GameMindMap.NodeKind.Theme));
+            Assert.That(nodeValueHolder.GetParent(), Is.Null);
+        }
+
+        /// <summary>
         /// Finds the node kind selector of the currently instantiated menu.
         /// </summary>
         /// <returns>The node kind selector.</returns>
@@ -192,6 +229,41 @@ namespace SEE.UI.Menu.Drawable
 
             Assert.Fail("Could not find the return button of the Mind Map node kind menu.");
             return null;
+        }
+
+        /// <summary>
+        /// Creates a valid Theme that can be selected as the parent of the node under test.
+        /// </summary>
+        /// <returns>The created parent candidate.</returns>
+        private GameObject CreateParentCandidate()
+        {
+            GameObject parent = new GameObject("Parent");
+            parent.tag = Tags.MindMapNode;
+            parent.transform.SetParent(attachedObjects.transform);
+
+            MMNodeValueHolder valueHolder = parent.AddComponent<MMNodeValueHolder>();
+            InitializeValueHolder(valueHolder);
+            valueHolder.NodeKind = GameMindMap.NodeKind.Theme;
+
+            TextMeshPro text = parent.AddComponent<TextMeshPro>();
+            text.text = parent.name;
+
+            return parent;
+        }
+
+        /// <summary>
+        /// Invokes the Unity initialization of the given Mind Map node value holder.
+        /// EditMode tests do not execute the regular MonoBehaviour lifecycle reliably
+        /// for this component.
+        /// </summary>
+        /// <param name="valueHolder">The value holder that should be initialized.</param>
+        private static void InitializeValueHolder(MMNodeValueHolder valueHolder)
+        {
+            MethodInfo awake = typeof(MMNodeValueHolder).GetMethod(
+                "Awake", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(awake, Is.Not.Null, "Could not find MMNodeValueHolder.Awake().");
+            awake.Invoke(valueHolder, null);
         }
     }
 }

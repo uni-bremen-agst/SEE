@@ -202,15 +202,22 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Creates the parent selection menu for mind maps for editing mode.
-        /// It adds the necessary Handler to the selector and to the finish button.
+        /// Creates the parent selection menu for Mind Maps in editing mode.
+        /// It initializes the available parent candidates and applies parent changes
+        /// directly while editing.
         /// </summary>
-        /// <param name="attachedObjects">The attached objects object of the chosen drawable.</param>
-        /// <param name="addedNode">The node for that a parent should be chosen.</param>
-        /// <param name="valueHolder">The new configuration in which the changes are saved.</param>
-        /// <param name="returnCall">The call which should be executed, if the return button is pressed.</param>
-        /// <param name="cutCopyMode">Indicates that this method was called by CutCopyPaste Action.</param>
-        /// <returns>The instance of the menu. Can be null if the <see cref="DrawableType"/> isn't a <see cref="MindMapNodeConf"/>.</returns>
+        /// <param name="attachedObjects">The attached objects object of the chosen Drawable.</param>
+        /// <param name="addedNode">The node for which a parent should be chosen.</param>
+        /// <param name="valueHolder">The configuration in which the changes are saved.</param>
+        /// <param name="returnCall">The callback that should be executed when the return button is pressed.</param>
+        /// <param name="cutCopyMode">
+        /// Whether the menu is used by the CutCopyPaste action and therefore provides
+        /// a Finish button for consuming the selected parent.
+        /// </param>
+        /// <returns>
+        /// The instantiated menu, or null if the provided configuration is not a
+        /// <see cref="MindMapNodeConf"/> or no valid parent can be selected.
+        /// </returns>
         public static GameObject EnableForEditing(GameObject attachedObjects, GameObject addedNode,
             DrawableType valueHolder, UnityAction returnCall, bool cutCopyMode = false)
         {
@@ -223,24 +230,16 @@ namespace SEE.UI.Menu.Drawable
                 /// <see cref="GameMindMap.NodeKind.Subtheme"/>
                 /// that qualify as a new parent.
                 /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
-                List<GameObject> nodes =
-                    CollectParentCandidates(
-                        attachedObjects,
-                        addedNode,
-                        false);
+                List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
 
                 /// Nodes are prohibited as a parent if selecting them would create a cycle.
-                nodes.RemoveAll(
-                    node => !GameMindMap.ParentChangeIsValid(
-                        addedNode,
-                        node));
+                nodes.RemoveAll(node => !GameMindMap.ParentChangeIsValid(addedNode, node));
 
-                /// If the user try to change the parent for a <see cref="GameMindMap.NodeKind.Theme"/>,
-                /// then show an error and close the menu.
+                /// A Theme cannot have a parent.
                 if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
                 {
                     ShowNotification.Warn("Unauthorized action", "A theme can't have a parent.");
-                    returnCall.Invoke();
+                    returnCall?.Invoke();
                     Instance.Destroy();
                     return null;
                 }
@@ -257,9 +256,10 @@ namespace SEE.UI.Menu.Drawable
                 PopulateParentSelector(parentSelector, nodes);
 
                 /// Get the index of the current parent.
-                int index = nodes.IndexOf(GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newConf.ParentNode));
+                int index = nodes.IndexOf(
+                    GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newConf.ParentNode));
 
-                /// If the index can't be found, take the default index 0.
+                /// If the current parent cannot be found, display the first valid candidate.
                 index = index < 0 ? 0 : index;
 
                 /// Initialize the chosen parent with the currently displayed selector item.
@@ -267,22 +267,24 @@ namespace SEE.UI.Menu.Drawable
 
                 GameObject surface = GameFinder.GetDrawableSurface(addedNode);
 
-                /// If the node has no parent branch line, initially create a branch line to the index.
+                /// If the node has no parent branch line, initially create a branch line
+                /// to the displayed parent.
                 if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() == null)
                 {
                     ChangeParent(addedNode, newConf, surface);
                 }
 
-                /// Adds the handler for changing the parent to the parent selector.
-                parentSelector.selectorEvent.AddListener(index =>
+                /// Apply regular parent changes immediately when the selector changes.
+                parentSelector.selectorEvent.AddListener(selectedIndex =>
                 {
-                    chosenObject = nodes[index];
+                    chosenObject = nodes[selectedIndex];
                     ChangeParent(addedNode, newConf, surface);
                 });
+
                 parentSelector.defaultIndex = index;
 
-                /// For the <paramref name="cutCopyMode", provide a Finish Button.
-                /// Disable it for all others.
+                /// CutCopyPaste confirms its selection through Finish.
+                /// Regular editing applies changes immediately and therefore hides Finish.
                 GameObject finish = GetFinishButton();
 
                 if (!cutCopyMode)
@@ -291,13 +293,75 @@ namespace SEE.UI.Menu.Drawable
                 }
                 else
                 {
-                    finish.GetComponent<ButtonManagerBasic>()
-                        .clickEvent.AddListener(() =>
-                        {
-                            gotSelection = true;
-                        });
+                    finish.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+                    {
+                        gotSelection = true;
+                    });
                 }
             }
+
+            return Instance.gameObject;
+        }
+
+        /// <summary>
+        /// Creates a parent selection menu for a node that requires a parent before a
+        /// pending operation can be applied. Selecting an item only changes the pending
+        /// selection. The node hierarchy itself is not modified until Finish is pressed.
+        /// </summary>
+        /// <param name="attachedObjects">
+        /// The attached objects object containing the available Mind Map nodes.
+        /// </param>
+        /// <param name="addedNode">
+        /// The node for which a parent must be selected.
+        /// </param>
+        /// <param name="confirmCall">
+        /// The callback invoked with the explicitly confirmed parent.
+        /// </param>
+        /// <returns>
+        /// The instantiated parent selection menu, or null if no valid parent exists.
+        /// </returns>
+        public static GameObject EnableForRequiredParentSelection(GameObject attachedObjects,
+            GameObject addedNode, UnityAction<GameObject> confirmCall)
+        {
+            HorizontalSelector parentSelector = InitializeMenu(null);
+
+            /// Collect all nodes that can generally serve as parents.
+            List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
+
+            /// Exclude candidates that would introduce a cycle.
+            nodes.RemoveAll(node => !GameMindMap.ParentChangeIsValid(addedNode, node));
+
+            if (nodes.Count == 0)
+            {
+                ShowNotification.Warn(
+                    "Add a Theme",
+                    "You need a theme for the mind map. First add one");
+
+                Instance.Destroy();
+                return null;
+            }
+
+            /// Populate the selector without modifying the actual hierarchy.
+            PopulateParentSelector(parentSelector, nodes);
+
+            parentSelector.defaultIndex = 0;
+            chosenObject = nodes[0];
+
+            /// Changing the selector only changes the pending selection.
+            parentSelector.selectorEvent.AddListener(index =>
+            {
+                chosenObject = nodes[index];
+            });
+
+            /// Only Finish turns the displayed candidate into a confirmed selection.
+            ButtonManagerBasic finish = GetFinishButton().GetComponent<ButtonManagerBasic>();
+            finish.clickEvent.AddListener(() =>
+            {
+                chosenObject = nodes[parentSelector.index];
+                confirmCall?.Invoke(chosenObject);
+                Instance.Destroy();
+            });
+
             return Instance.gameObject;
         }
 

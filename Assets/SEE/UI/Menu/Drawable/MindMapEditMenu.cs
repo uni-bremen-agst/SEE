@@ -16,17 +16,17 @@ using UnityEngine.UI;
 namespace SEE.Game.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides the edit menu for mind map nodes.
+    /// Provides the edit menu for Mind Map nodes.
     /// </summary>
     public class MindMapEditMenu : SingletonMenu
     {
         /// <summary>
-        /// The location where the menu prefeb is placed.
+        /// The location of the Mind Map edit menu prefab.
         /// </summary>
         private const string mmEditPrefab = "Prefabs/UI/Drawable/MMEdit";
 
         /// <summary>
-        /// We do not want to create an instance of this singleton class outside of this class.
+        /// Prevents instances of this singleton class from being created outside this class.
         /// </summary>
         private MindMapEditMenu() { }
 
@@ -35,20 +35,24 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         public static MindMapEditMenu Instance { get; private set; }
 
+        /// <summary>
+        /// Initializes the singleton instance.
+        /// </summary>
         static MindMapEditMenu()
         {
             Instance = new MindMapEditMenu();
         }
 
         /// <summary>
-        /// Creates the edit menu for the given mind map node.
-        /// It adds the necessary handler to the different buttons.
-        /// If the node is a theme, the branch line button will be inactive.
+        /// Creates the edit menu for the given Mind Map node and initializes all
+        /// available editing options.
         /// </summary>
-        /// <param name="node">The node that should be edit.</param>
-        /// <param name="newValueHolder">The configuration which holds the changes.</param>
-        /// <param name="returned">Specifies whether the return was from the parent selection menu
-        /// or the child menu of the change node.</param>
+        /// <param name="node">The Mind Map node that should be edited.</param>
+        /// <param name="newValueHolder">The configuration that holds the changes.</param>
+        /// <param name="returned">
+        /// Whether the menu is reopened after returning from the parent selection
+        /// or node kind selection menu.
+        /// </param>
         public static void Enable(GameObject node, DrawableType newValueHolder, bool returned = false)
         {
             if (newValueHolder is MindMapNodeConf conf)
@@ -56,15 +60,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 /// Apply the changes from ChangeParent and ChangeNodeKind if returned.
                 if (returned)
                 {
-                    MindMapNodeConf confOfReturn = (MindMapNodeConf)DrawableType.Get(node);
-                    conf.ParentNode = confOfReturn.ParentNode;
-                    conf.BranchLineToParent = confOfReturn.BranchLineToParent;
-                    conf.BranchLineConf = confOfReturn.BranchLineConf;
-                    conf.NodeKind = confOfReturn.NodeKind;
-                    conf.ID = confOfReturn.ID;
-                    conf.TextConf = confOfReturn.TextConf;
-                    conf.BorderConf = confOfReturn.BorderConf;
-                    conf.OrderInLayer = confOfReturn.OrderInLayer;
+                    RefreshConfiguration(node, conf);
                 }
 
                 Instance = new MindMapEditMenu();
@@ -73,29 +69,15 @@ namespace SEE.Game.UI.Menu.Drawable
                 GameObject surface = GameFinder.GetDrawableSurface(node);
                 GameObject attached = GameFinder.GetAttachedObjectsObject(surface);
 
-                /// The return call back, to return to the (this) parent menu.
-                UnityAction callback = () =>
-                {
-                    Instance.gameObject.SetActive(true);
-                    LineMenu.Instance.Disable();
-                    TextMenu.Instance.Disable();
-                    MindMapParentSelectionMenu.Instance.Destroy();
-                    MindMapChangeNodeKindMenu.Instance.Destroy();
-                };
+                /// The return callback to return to this parent menu.
+                UnityAction callback = CreateReturnCallback();
 
-                /// The return call back with destroying. Will be needed to get the changes of parent and node kind change.
-                UnityAction callBackWithDestroy = () =>
-                {
-                    Enable(node, conf, true);
-                    LineMenu.Instance.Disable();
-                    TextMenu.Instance.Disable();
-                    MindMapParentSelectionMenu.Instance.Destroy();
-                    MindMapChangeNodeKindMenu.Instance.Destroy();
-                };
+                /// The return callback that recreates this menu to adopt parent or node kind changes.
+                UnityAction callbackWithRefresh = CreateReturnCallback(node, conf);
 
                 /// Initialize the buttons for the modification options.
-                InitializeChangeParent(attached, node, conf, callBackWithDestroy);
-                InitializeChangeNodeKind(attached, node, conf, callBackWithDestroy);
+                InitializeChangeParent(attached, node, conf, callbackWithRefresh);
+                InitializeChangeNodeKind(node, conf, callbackWithRefresh);
                 InitializeChangeBorder(node, conf, callback);
                 InitializeChangeText(node, conf, callback);
                 InitializeChangeBranchLine(attached, conf, callback);
@@ -104,18 +86,90 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the parent.
-        /// It calls the <see cref="MindMapParentSelectionMenu"/>.
+        /// Refreshes the editable configuration with the current state of the given
+        /// Mind Map node.
         /// </summary>
-        /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
-        /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
+        /// <param name="node">The Mind Map node whose current configuration should be used.</param>
+        /// <param name="configuration">The configuration that should receive the current values.</param>
+        private static void RefreshConfiguration(GameObject node, MindMapNodeConf configuration)
+        {
+            MindMapNodeConf currentConfiguration = (MindMapNodeConf)DrawableType.Get(node);
+
+            configuration.ParentNode = currentConfiguration.ParentNode;
+            configuration.BranchLineToParent = currentConfiguration.BranchLineToParent;
+            configuration.BranchLineConf = currentConfiguration.BranchLineConf;
+            configuration.NodeKind = currentConfiguration.NodeKind;
+            configuration.ID = currentConfiguration.ID;
+            configuration.TextConf = currentConfiguration.TextConf;
+            configuration.BorderConf = currentConfiguration.BorderConf;
+            configuration.OrderInLayer = currentConfiguration.OrderInLayer;
+        }
+
+        /// <summary>
+        /// Creates the callback used when returning from an editing submenu that does
+        /// not require the Mind Map edit menu to be recreated.
+        /// </summary>
+        /// <returns>The callback for returning to the existing edit menu.</returns>
+        private static UnityAction CreateReturnCallback()
+        {
+            return () =>
+            {
+                Instance.gameObject.SetActive(true);
+                CloseChildMenus();
+            };
+        }
+
+        /// <summary>
+        /// Creates the callback used when returning from an editing submenu whose
+        /// changes require the Mind Map edit menu and its configuration to be refreshed.
+        /// </summary>
+        /// <param name="node">The edited Mind Map node.</param>
+        /// <param name="configuration">The configuration that holds the current changes.</param>
+        /// <returns>The callback for recreating the edit menu.</returns>
+        private static UnityAction CreateReturnCallback(GameObject node, MindMapNodeConf configuration)
+        {
+            return () =>
+            {
+                Enable(node, configuration, true);
+                CloseChildMenus();
+            };
+        }
+
+        /// <summary>
+        /// Closes all child menus that can be opened from the Mind Map edit menu.
+        /// </summary>
+        private static void CloseChildMenus()
+        {
+            LineMenu.Instance.Disable();
+            TextMenu.Instance.Disable();
+            MindMapParentSelectionMenu.Instance.Destroy();
+            MindMapChangeNodeKindMenu.Instance.Destroy();
+        }
+
+        /// <summary>
+        /// Returns the button with the given name from the currently instantiated
+        /// Mind Map edit menu.
+        /// </summary>
+        /// <param name="name">The name of the requested button.</param>
+        /// <returns>The requested button manager.</returns>
+        private static ButtonManagerBasic GetButton(string name)
+        {
+            return GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, name)
+                .GetComponent<ButtonManagerBasic>();
+        }
+
+        /// <summary>
+        /// Initializes the button for changing the parent and opens the
+        /// <see cref="MindMapParentSelectionMenu"/> when selected.
+        /// </summary>
+        /// <param name="attached">The object containing the attached Drawable objects.</param>
+        /// <param name="node">The selected Mind Map node.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
+        /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeParent = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Parent")
-                    .GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic changeParent = GetButton("Parent");
             changeParent.clickEvent.AddListener(() =>
             {
                 /// At this point, immediately is required because Destroyer.Destroy() does not
@@ -126,18 +180,15 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the node kind.
-        /// It calls the <see cref="MindMapChangeNodeKindMenu"/>.
+        /// Initializes the button for changing the node kind and opens the
+        /// <see cref="MindMapChangeNodeKindMenu"/> when selected.
         /// </summary>
-        /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
-        /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
-        private static void InitializeChangeNodeKind(GameObject attached, GameObject node,
-            MindMapNodeConf conf, UnityAction callback)
+        /// <param name="node">The selected Mind Map node.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
+        /// <param name="callback">The callback used to return to the edit menu.</param>
+        private static void InitializeChangeNodeKind(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeNodeKind = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "NodeKind")
-                    .GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic changeNodeKind = GetButton("NodeKind");
             changeNodeKind.clickEvent.AddListener(() =>
             {
                 Destroyer.Destroy(Instance.gameObject);
@@ -146,17 +197,15 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the border.
-        /// It calls the <see cref="LineMenu"/>.
+        /// Initializes the button for changing the node border and opens the
+        /// <see cref="LineMenu"/> when selected.
         /// </summary>
-        /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
-        /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
+        /// <param name="node">The selected Mind Map node.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
+        /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeBorder(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeBorder = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Border")
-                    .GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic changeBorder = GetButton("Border");
             changeBorder.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
@@ -165,17 +214,15 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the text.
-        /// It calls the <see cref="TextMenu"/>.
+        /// Initializes the button for changing the node text and opens the
+        /// <see cref="TextMenu"/> when selected.
         /// </summary>
-        /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
-        /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
+        /// <param name="node">The selected Mind Map node.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
+        /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeText(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeText = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "NodeText")
-                    .GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic changeText = GetButton("NodeText");
             changeText.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
@@ -184,65 +231,64 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the branch line.
-        /// It calls the <see cref="LineMenu"/>, if a branch line exist.
-        /// Otherwise the branch line button will be inactive.
+        /// Initializes the button for changing the branch line to the parent.
+        /// The button is disabled if the node has no parent branch line.
         /// </summary>
-        /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
-        /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
+        /// <param name="attached">The object containing the attached Drawable objects.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
+        /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeBranchLine(GameObject attached, MindMapNodeConf conf, UnityAction callback)
         {
             GameObject branchLineButtonArea = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "BranchLine");
+
             if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
                 branchButton.clickEvent.AddListener(() =>
                 {
                     Instance.gameObject.SetActive(false);
-                    GameObject bLine = GameFinder.FindAttachedOrLocalDescendant(attached, conf.BranchLineToParent);
-                    LineMenu.Instance.EnableForEditing(bLine, conf.BranchLineConf, callback);
+                    GameObject branchLine = GameFinder.FindAttachedOrLocalDescendant(attached, conf.BranchLineToParent);
+                    LineMenu.Instance.EnableForEditing(branchLine, conf.BranchLineConf, callback);
                 });
             }
             else
             {
-                /// If no parent branch line exist for this node, deactivate the button.
+                /// If no parent branch line exists for this node, deactivate the button.
                 branchLineButtonArea.GetComponent<ButtonManagerBasic>().enabled = false;
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
         }
 
         /// <summary>
-        /// Init the order in layer slider for the mind-map menu.
+        /// Initializes the order in layer slider of the Mind Map edit menu.
         /// </summary>
-        /// <param name="node">The selected mind-map node.</param>
-        /// <param name="conf">The configuration which holds the changes.</param>
+        /// <param name="node">The selected Mind Map node.</param>
+        /// <param name="conf">The configuration that holds the changes.</param>
         private static void InitializeChangeOrderInLayer(GameObject node, MindMapNodeConf conf)
         {
             LayerSliderController layerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
 
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(conf.OrderInLayer);
+
             GameObject surface = GameFinder.GetDrawableSurface(node);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
-            /// Adds the handler for changing.
+
+            /// Adds the handler for changing the order in layer.
             layerSlider.OnValueChanged.AddListener(layerOrder =>
             {
                 GameEdit.ChangeLayer(node, layerOrder);
                 conf.OrderInLayer = layerOrder;
-                new EditLayerNetAction(surface.name, surfaceParentName,
-                    node.name, layerOrder).Execute();
+                new EditLayerNetAction(surface.name, surfaceParentName, node.name, layerOrder).Execute();
                 GameMindMap.ReDrawBranchLines(node);
-                new MindMapRefreshBranchLinesNetAction(surface.name, surfaceParentName,
-                    MindMapNodeConf.GetNodeConf(node)).Execute();
+                new MindMapRefreshBranchLinesNetAction(
+                    surface.name, surfaceParentName, MindMapNodeConf.GetNodeConf(node)).Execute();
             });
         }
 
         /// <summary>
-        /// Destroys the edit menu and disables the parent selection and
-        /// node kind menu.
+        /// Destroys the edit menu and the parent selection and node kind child menus.
         /// </summary>
         public override void Destroy()
         {

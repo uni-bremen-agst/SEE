@@ -264,6 +264,37 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that selecting a required parent does not modify the actual Mind Map
+        /// hierarchy before the selection is explicitly confirmed.
+        /// </summary>
+        [Test]
+        public void TestRequiredParentSelectionDoesNotApplyParentBeforeFinish()
+        {
+            addedNode.GetComponent<MMNodeValueHolder>().NodeKind = GameMindMap.NodeKind.Theme;
+            GameObject confirmedParent = null;
+
+            MindMapParentSelectionMenu.EnableForRequiredParentSelection(
+                attachedObjects, addedNode, parent => confirmedParent = parent);
+
+            HorizontalSelector selector = FindParentSelector();
+
+            /// Merely changing the displayed candidate must not change the hierarchy.
+            SelectItem(selector, 1);
+
+            Assert.That(addedNode.GetComponent<MMNodeValueHolder>().GetParent(), Is.Null);
+            Assert.That(confirmedParent, Is.Null);
+
+            /// Only Finish confirms the selected candidate.
+            FindFinishButton().clickEvent.Invoke();
+
+            Assert.That(confirmedParent, Is.SameAs(secondParent));
+
+            /// The selection menu itself only provides the confirmed parent.
+            /// Applying it remains the responsibility of the calling operation.
+            Assert.That(addedNode.GetComponent<MMNodeValueHolder>().GetParent(), Is.Null);
+        }
+
+        /// <summary>
         /// Finds the parent selector of the currently instantiated parent selection menu.
         /// </summary>
         /// <returns>The parent selector.</returns>
