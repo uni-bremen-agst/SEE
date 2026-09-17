@@ -49,6 +49,117 @@ namespace SEE.UI.Menu.Drawable
         private static GameObject chosenObject;
 
         /// <summary>
+        /// Instantiates the parent selection menu, configures its return button,
+        /// and returns the parent selector.
+        /// </summary>
+        /// <param name="returnCall">
+        /// The callback to execute when the return button is pressed.
+        /// If no callback is provided, the return button is disabled.
+        /// </param>
+        /// <returns>The parent selector of the instantiated menu.</returns>
+        private static HorizontalSelector InitializeMenu(UnityAction returnCall)
+        {
+            Instance.Instantiate(parentSelectionMenuPrefab);
+
+            GameObject returnButton =
+                GameFinder.FindAttachedOrLocalDescendant(
+                    Instance.gameObject,
+                    "ReturnBtn");
+
+            if (returnCall != null)
+            {
+                returnButton.GetComponent<ButtonManagerBasic>()
+                    .clickEvent.AddListener(returnCall);
+            }
+            else
+            {
+                returnButton.SetActive(false);
+            }
+
+            return GameFinder.FindAttachedOrLocalDescendant(
+                    Instance.gameObject,
+                    "ParentSelection")
+                .GetComponent<HorizontalSelector>();
+        }
+
+        /// <summary>
+        /// Collects all Mind Map nodes that qualify as general parent candidates
+        /// for the given node.
+        /// </summary>
+        /// <param name="attachedObjects">
+        /// The attached objects object containing the Mind Map nodes.
+        /// </param>
+        /// <param name="addedNode">
+        /// The node for which a parent should be chosen.
+        /// </param>
+        /// <param name="includeInactive">
+        /// Whether inactive Mind Map nodes should be included.
+        /// </param>
+        /// <returns>
+        /// All Mind Map nodes that can generally be used as parents.
+        /// </returns>
+        private static List<GameObject> CollectParentCandidates(
+            GameObject attachedObjects,
+            GameObject addedNode,
+            bool includeInactive)
+        {
+            /// Gets all Mind Map Nodes of the given attached objects object.
+            IList<GameObject> allNodes =
+                attachedObjects.FindAllDescendantsWithTag(
+                    Tags.MindMapNode,
+                    includeInactive);
+
+            /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
+            /// <see cref="GameMindMap.NodeKind.Theme"/> or
+            /// <see cref="GameMindMap.NodeKind.Subtheme"/>.
+            /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
+            List<GameObject> nodes = new();
+            foreach (GameObject node in allNodes)
+            {
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind
+                        != GameMindMap.NodeKind.Leaf
+                    && node != addedNode)
+                {
+                    nodes.Add(node);
+                }
+            }
+
+            return nodes;
+        }
+
+        /// <summary>
+        /// Creates an item in the parent selector for each provided Mind Map node.
+        /// </summary>
+        /// <param name="parentSelector">
+        /// The selector in which the parent candidates should be displayed.
+        /// </param>
+        /// <param name="nodes">
+        /// The Mind Map nodes that should be available for selection.
+        /// </param>
+        private static void PopulateParentSelector(
+            HorizontalSelector parentSelector,
+            IEnumerable<GameObject> nodes)
+        {
+            /// Create an item in the parent selector for each collected node.
+            foreach (GameObject node in nodes)
+            {
+                parentSelector.CreateNewItem(
+                    node.GetComponentInChildren<TextMeshPro>().text);
+            }
+        }
+
+        /// <summary>
+        /// Returns the finish button of the parent selection menu.
+        /// </summary>
+        /// <returns>The finish button of the instantiated menu.</returns>
+        private static GameObject GetFinishButton()
+        {
+            return GameFinder.FindAttachedOrLocalDescendant(
+                Instance.gameObject,
+                "Finish");
+        }
+
+        /// <summary>
         /// Creates the parent selection menu for mind maps.
         /// It adds the necessary Handler to the selector and to the finish button.
         /// </summary>
@@ -56,39 +167,17 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="addedNode">The node for that a parent should be chosen.</param>
         public static void Enable(GameObject attachedObjects, GameObject addedNode)
         {
-            Instance.Instantiate(parentSelectionMenuPrefab);
+            HorizontalSelector parentSelector = InitializeMenu(null);
 
-            /// Disable the return button.
-            GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").SetActive(false);
-
-            /// Initialize the parent selector.
-            HorizontalSelector parentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ParentSelection")
-                .GetComponent<HorizontalSelector>();
-
-            /// Gets all Mind Map Nodes of the given attached object - object.
-            IList<GameObject> allNodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode);
-
-            /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
-            /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>.
-            /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
-            List<GameObject> nodes = new();
-            foreach (GameObject node in allNodes)
-            {
-                if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
-                    && node != addedNode)
-                {
-                    nodes.Add(node);
-                }
-            }
+            /// Gather all Mind Map Nodes that qualify as possible parents.
+            List<GameObject> nodes =
+                CollectParentCandidates(
+                    attachedObjects,
+                    addedNode,
+                    true);
 
             /// Create an item in the parent selector for the collected nodes.
-            foreach (GameObject node in nodes)
-            {
-                parentSelector.CreateNewItem(node.GetComponentInChildren<TextMeshPro>().text);
-            }
-
-            GameObject surface = GameFinder.GetDrawableSurface(attachedObjects);
-            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+            PopulateParentSelector(parentSelector, nodes);
 
             /// Adds a handler to the parent selector so that the selected node is set as the chosen node.
             parentSelector.selectorEvent.AddListener(index =>
@@ -99,7 +188,7 @@ namespace SEE.UI.Menu.Drawable
             parentSelector.defaultIndex = 0;
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic finish = GetFinishButton().GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
                 gotSelection = true;
@@ -127,42 +216,25 @@ namespace SEE.UI.Menu.Drawable
         {
             if (valueHolder is MindMapNodeConf newConf)
             {
-                Instance.Instantiate(parentSelectionMenuPrefab);
-
-                if (returnCall != null)
-                {
-                    /// Adds the return call back to the return button.
-                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                        .clickEvent.AddListener(returnCall);
-                }
-                else
-                {
-                    /// Disables the return button.
-                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").SetActive(false);
-                }
-
-                /// Initalize the parent selector.
-                HorizontalSelector parentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ParentSelection")
-                    .GetComponent<HorizontalSelector>();
-
-                /// Gets all Mind Map Nodes of the given attached object - object.
-                IList<GameObject> allNodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode, false);
+                HorizontalSelector parentSelector = InitializeMenu(returnCall);
 
                 /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
-                /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>
-                /// that qualify as a new (valid) parent.
-                /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent
-                ///     and nodes are prohibited as a parent if selecting them would create a cycle.
-                List<GameObject> nodes = new();
-                foreach (GameObject node in allNodes)
-                {
-                    if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
-                        && node != addedNode
-                        && GameMindMap.ParentChangeIsValid(addedNode, node))
-                    {
-                        nodes.Add(node);
-                    }
-                }
+                /// <see cref="GameMindMap.NodeKind.Theme"/> or
+                /// <see cref="GameMindMap.NodeKind.Subtheme"/>
+                /// that qualify as a new parent.
+                /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
+                List<GameObject> nodes =
+                    CollectParentCandidates(
+                        attachedObjects,
+                        addedNode,
+                        false);
+
+                /// Nodes are prohibited as a parent if selecting them would create a cycle.
+                nodes.RemoveAll(
+                    node => !GameMindMap.ParentChangeIsValid(
+                        addedNode,
+                        node));
+
                 /// If the user try to change the parent for a <see cref="GameMindMap.NodeKind.Theme"/>,
                 /// then show an error and close the menu.
                 if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
@@ -182,10 +254,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// For all valid parents, create an item in the parent selector.
-                foreach (GameObject node in nodes)
-                {
-                    parentSelector.CreateNewItem(node.GetComponentInChildren<TextMeshPro>().text);
-                }
+                PopulateParentSelector(parentSelector, nodes);
 
                 /// Get the index of the current parent.
                 int index = nodes.IndexOf(GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newConf.ParentNode));
@@ -194,7 +263,6 @@ namespace SEE.UI.Menu.Drawable
                 index = index < 0 ? 0 : index;
 
                 GameObject surface = GameFinder.GetDrawableSurface(addedNode);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// If the node has no parent branch line, initially create a branch line to the index.
                 if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() == null)
@@ -213,18 +281,19 @@ namespace SEE.UI.Menu.Drawable
 
                 /// For the <paramref name="cutCopyMode", provide a Finish Button.
                 /// Disable it for all others.
+                GameObject finish = GetFinishButton();
+
                 if (!cutCopyMode)
                 {
-                    GameObject finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish");
                     finish.SetActive(false);
                 }
                 else
                 {
-                    ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
-                    finish.clickEvent.AddListener(() =>
-                    {
-                        gotSelection = true;
-                    });
+                    finish.GetComponent<ButtonManagerBasic>()
+                        .clickEvent.AddListener(() =>
+                        {
+                            gotSelection = true;
+                        });
                 }
             }
             return Instance.gameObject;
