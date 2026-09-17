@@ -11,11 +11,13 @@ using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UserSettings;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Categorization;
 using RoomOptions = LiveKit.RoomOptions;
 
 namespace SEE.Tools.LiveKit
@@ -42,7 +44,9 @@ namespace SEE.Tools.LiveKit
         /// <summary>
         /// The local video track being published to the LiveKit server.
         /// </summary>
-        private LocalVideoTrack publishedTrack = null;
+        private LocalVideoTrack publishedVideoTrack = null;
+
+        private LocalAudioTrack publishedAudioTrack = null;
 
         /// <summary>
         /// The WebCamTexture used to capture the video stream from the selected camera.
@@ -53,6 +57,8 @@ namespace SEE.Tools.LiveKit
         /// A list of video sources created from the local webcam that are currently being published to the room.
         /// </summary>
         private readonly List<RtcVideoSource> rtcVideoSources = new();
+
+        private readonly List<RtcAudioSource> rtcAudioSources = new();
 
         /// <summary>
         /// A list of video streams from remote participants in the LiveKit room.
@@ -119,7 +125,7 @@ namespace SEE.Tools.LiveKit
         {
             if (SEEInput.ToggleFaceCam())
             {
-                if (publishedTrack == null)
+                if (publishedVideoTrack == null)
                 {
                     if (room == null || !room.IsConnected)
                     {
@@ -134,6 +140,47 @@ namespace SEE.Tools.LiveKit
                 {
                     StartCoroutine(UnpublishVideo());
                 }
+            }
+
+            if (SEEInput.ToggleVoiceChat())
+            {
+                if (publishedAudioTrack == null)
+                {
+                    if (room == null || !room.IsConnected)
+                    {
+                        StartCoroutine(ConnectAndPublish());
+                    }
+                    else
+                    {
+                        StartCoroutine(PublishAudio());
+                    }
+                }
+                else
+                {
+                    StartCoroutine(UnpublishAudio());
+                }
+            }
+        }
+
+        private IEnumerator UnpublishAudio()
+        {
+            foreach (RtcAudioSource source in rtcAudioSources)
+            {
+                source.Stop();
+            }
+            rtcAudioSources.Clear();
+            yield return null;
+
+            // Unpublish the audio track from the room.
+            UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedAudioTrack, true);
+            yield return unpublish;
+
+            // Check if the unpublishing was successful.
+            if (!unpublish.IsError)
+            {
+                publishedAudioTrack = null;
+
+                UIOverlay.ToggleLiveKit();
             }
         }
 
@@ -208,7 +255,7 @@ namespace SEE.Tools.LiveKit
                 return;
             }
 
-            if (publishedTrack != null)
+            if (publishedVideoTrack != null)
             {
                 StartCoroutine(UnpublishVideo());
             }
@@ -344,7 +391,7 @@ namespace SEE.Tools.LiveKit
         {
             ConnectionState = ConnectionStatus.Disconnected;
 
-            if (publishedTrack != null)
+            if (publishedVideoTrack != null)
             {
                 StartCoroutine(UnpublishVideo());
             }
@@ -409,7 +456,7 @@ namespace SEE.Tools.LiveKit
             // Check if the publishing was successful.
             if (!publish.IsError)
             {
-                publishedTrack = track;
+                publishedVideoTrack = track;
 
                 // Get the LiveKitVideo instance from the registry.
                 if (!LiveKitVideoRegistry.TryGet(NetworkManager.Singleton.LocalClientId, out LiveKitVideo liveKitVideo))
@@ -434,6 +481,32 @@ namespace SEE.Tools.LiveKit
             }
         }
 
+        private IEnumerator PublishAudio()
+        {
+            Debug.Log("Publishing microphone using Unity Audio");
+            GameObject microphoneObject = new GameObject("my-audio-source");
+            var rtcSource = new MicrophoneSource(Microphone.devices[0], microphoneObject);
+            publishedAudioTrack = LocalAudioTrack.CreateAudioTrack("my-audio-track", rtcSource, room);
+
+            var options = new TrackPublishOptions();
+            options.AudioEncoding = new AudioEncoding();
+            options.AudioEncoding.MaxBitrate = 64000;
+            options.Source = TrackSource.SourceMicrophone;
+
+            var publish = room.LocalParticipant.PublishTrack(publishedAudioTrack, options);
+            yield return publish;
+
+            if (!publish.IsError)
+            {
+                Debug.Log("Track published!");
+            }
+
+            rtcAudioSources.Add(rtcSource);
+
+            rtcSource.Start();
+            UIOverlay.ToggleLiveKitAudio();
+        }
+
         /// <summary>
         /// Establishes a connection to the LiveKit room if not already connected
         /// and publishes the local video track.
@@ -455,6 +528,7 @@ namespace SEE.Tools.LiveKit
                 if (IsConnected())
                 {
                     yield return StartCoroutine(PublishVideo());
+                    yield return StartCoroutine(PublishAudio());
                 }
             }
         }
@@ -480,13 +554,13 @@ namespace SEE.Tools.LiveKit
             }
 
             // Unpublish the video track from the room.
-            UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedTrack, true);
+            UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedVideoTrack, true);
             yield return unpublish;
 
             // Check if the unpublishing was successful.
             if (!unpublish.IsError)
             {
-                publishedTrack = null;
+                publishedVideoTrack = null;
 
                 // Get the LiveKitVideo instance from the registry.
                 if (LiveKitVideoRegistry.TryGet(NetworkManager.Singleton.LocalClientId, out LiveKitVideo liveKitVideo)
@@ -542,6 +616,12 @@ namespace SEE.Tools.LiveKit
                 stream.Start(); // Start the video stream.
                 StartCoroutine(stream.Update()); // Continuously update the video stream.
                 videoStreams.Add(stream); // Add the stream to the list of active video streams.
+            }
+            else if (track is RemoteAudioTrack audioTrack)
+            {
+                GameObject audioOutputObject = new GameObject(audioTrack.Sid);
+                var source = audioOutputObject.AddComponent<AudioSource>();
+                var stream = new AudioStream(audioTrack, source);
             }
         }
 
