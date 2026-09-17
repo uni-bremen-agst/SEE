@@ -224,6 +224,46 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that the finish button is disabled during regular editing.
+        /// </summary>
+        [Test]
+        public void TestFinishButtonIsDisabledForRegularEditing()
+        {
+            MindMapNodeConf configuration = ConfigureExistingParent(addedNode, firstParent);
+
+            MindMapParentSelectionMenu.EnableForEditing(
+                attachedObjects, addedNode, configuration, () => { });
+
+            ButtonManagerBasic finish = FindFinishButton();
+
+            Assert.That(finish.gameObject.activeSelf, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that cut copy mode provides a finish button that confirms the
+        /// currently selected parent.
+        /// </summary>
+        [Test]
+        public void TestCutCopyModeFinishConfirmsParent()
+        {
+            MindMapNodeConf configuration = ConfigureExistingParent(addedNode, firstParent);
+
+            MindMapParentSelectionMenu.EnableForEditing(
+                attachedObjects, addedNode, configuration, () => { }, true);
+
+            ButtonManagerBasic finish = FindFinishButton();
+
+            Assert.That(finish.gameObject.activeSelf, Is.True);
+
+            finish.clickEvent.Invoke();
+
+            bool hasParent = MindMapParentSelectionMenu.TryGetParent(out GameObject parent);
+
+            Assert.That(hasParent, Is.True);
+            Assert.That(parent, Is.SameAs(firstParent));
+        }
+
+        /// <summary>
         /// Finds the parent selector of the currently instantiated parent selection menu.
         /// </summary>
         /// <returns>The parent selector.</returns>
