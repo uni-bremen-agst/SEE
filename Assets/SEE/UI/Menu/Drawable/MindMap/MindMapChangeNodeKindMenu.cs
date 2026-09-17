@@ -7,7 +7,7 @@ using SEE.Net.Actions.Drawable;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
     /// This class provides the node kind selection menu for the mind map.

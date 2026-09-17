@@ -1,17 +1,17 @@
 ﻿using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.UI.Notification;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Menu.Drawable.Line;
+using SEE.UI.Menu.Drawable.MindMap;
+using SEE.UI.Menu.Drawable.Text;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI.Menu.Drawable.Text;
 
 namespace SEE.Controls.Actions.Drawable
 {

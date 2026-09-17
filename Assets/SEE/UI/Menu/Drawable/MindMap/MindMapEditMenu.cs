@@ -1,11 +1,11 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Text;
 using SEE.Utils;
@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
     /// Provides the edit menu for Mind Map nodes.

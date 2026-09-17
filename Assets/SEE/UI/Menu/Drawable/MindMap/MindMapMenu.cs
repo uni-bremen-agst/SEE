@@ -2,7 +2,7 @@
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
     /// This class provides the mind-map menu.

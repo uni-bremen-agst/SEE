@@ -8,7 +8,7 @@ using System.Reflection;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
     /// Tests the parent selection behavior of

@@ -5,14 +5,14 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.MindMap;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.UI.Menu.Drawable.MindMapMenu;
+using static SEE.UI.Menu.Drawable.MindMap.MindMapMenu;
 
 namespace SEE.Controls.Actions.Drawable
 {

@@ -8,7 +8,7 @@ using UnityEngine;
 using System.Reflection;
 using TMPro;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
     /// Tests the node kind selection behavior of
