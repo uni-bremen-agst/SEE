@@ -187,17 +187,17 @@ namespace SEE.UI.Menu.Drawable
 
             parentSelector.defaultIndex = 0;
 
+            /// Initialize the chosen parent with the currently displayed selector item.
+            chosenObject = nodes[0];
+
             /// The parent selection can be completed through the Finish button.
             ButtonManagerBasic finish = GetFinishButton().GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
+                /// Ensure that the chosen parent corresponds to the currently displayed
+                /// selector item, even if no selector event was raised.
+                chosenObject = nodes[parentSelector.index];
                 gotSelection = true;
-
-                /// In case it is not selected, but 'Finish' is clicked directly.
-                if (chosenObject == null)
-                {
-                    chosenObject = nodes[parentSelector.index];
-                }
             });
         }
 
@@ -262,12 +262,14 @@ namespace SEE.UI.Menu.Drawable
                 /// If the index can't be found, take the default index 0.
                 index = index < 0 ? 0 : index;
 
+                /// Initialize the chosen parent with the currently displayed selector item.
+                chosenObject = nodes[index];
+
                 GameObject surface = GameFinder.GetDrawableSurface(addedNode);
 
                 /// If the node has no parent branch line, initially create a branch line to the index.
                 if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() == null)
                 {
-                    chosenObject = nodes[index];
                     ChangeParent(addedNode, newConf, surface);
                 }
 
