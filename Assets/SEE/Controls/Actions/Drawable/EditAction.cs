@@ -303,7 +303,7 @@ namespace SEE.Controls.Actions.Drawable
                 case Tags.Image:
                     if (!ImageMenu.Instance.IsOpen())
                     {
-                        ImageMenu.Enable(selectedObj, newValueHolder);
+                        ImageMenu.Instance.Enable(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.MindMapNode:

@@ -13,16 +13,13 @@ namespace SEE.UI.Drawable
     public class LayerSliderController : MonoBehaviour
     {
         /// <summary>
-        /// The slider manager.
-        /// It contains the slider in manager.mainSlider.
-        /// When the value of the main slider changes (meaning the player moved the slider), the value
-        /// will be set to the value of this slider.
+        /// The slider manager containing the actual slider.
         /// </summary>
         [SerializeField]
         private SliderManager manager;
 
         /// <summary>
-        /// The tmp text that show's the value of the slider.
+        /// The text displaying the current slider value.
         /// </summary>
         [SerializeField]
         private TMP_Text tmpText;
@@ -35,36 +32,94 @@ namespace SEE.UI.Drawable
         public UnityEvent<int> OnValueChanged = new();
 
         /// <summary>
+        /// Whether this controller has already initialized its UI references
+        /// and event handlers.
+        /// </summary>
+        private bool initialized;
+
+        /// <summary>
         /// Initializes the slider controller.
         /// </summary>
         private void Awake()
         {
-            manager = GetComponentInChildren<SliderManager>();
-            tmpText = GetComponentsInChildren<TMP_Text>()[1];
-            manager.mainSlider.onValueChanged.AddListener(SliderChanged);
-            manager.mainSlider.minValue = 0;
+            Initialize();
         }
 
         /// <summary>
-        /// Sets the slider maximum to the current maximum order in layer value.
+        /// Initializes the UI references and event handlers of this slider controller.
+        /// This method is idempotent so that the controller can also be used before
+        /// Unity invokes <see cref="Awake"/>.
+        /// </summary>
+        /// <exception cref="MissingComponentException">
+        /// Thrown if one of the required slider controls cannot be found.
+        /// </exception>
+        private void Initialize()
+        {
+            if (initialized)
+            {
+                return;
+            }
+
+            manager = GetComponentInChildren<SliderManager>(true);
+            TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
+
+            if (manager == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(LayerSliderController)} requires a {nameof(SliderManager)}.");
+            }
+
+            if (manager.mainSlider == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(SliderManager)} requires a slider.");
+            }
+
+            if (texts.Length < 2)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(LayerSliderController)} requires the text displaying the layer value.");
+            }
+
+            tmpText = texts[1];
+
+            manager.mainSlider.onValueChanged.AddListener(SliderChanged);
+            manager.mainSlider.minValue = 0;
+
+            initialized = true;
+        }
+
+        /// <summary>
+        /// Sets the default maximum order in layer after initialization.
         /// </summary>
         private void Start()
         {
+            Initialize();
             manager.mainSlider.maxValue = ValueHolder.MaxOrderInLayer;
         }
 
         /// <summary>
-        /// Removes the handler of the slider.
+        /// Removes the slider handler when this controller is destroyed.
         /// </summary>
         private void OnDestroy()
         {
-            manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
+            if (!initialized)
+            {
+                return;
+            }
+
+            if (manager != null && manager.mainSlider != null)
+            {
+                manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
+            }
+
+            initialized = false;
         }
 
         /// <summary>
-        /// Handler method for changing the slider value.
+        /// Handles changes of the slider value.
         /// </summary>
-        /// <param name="newValue">The new selected value.</param>
+        /// <param name="newValue">The newly selected value.</param>
         private void SliderChanged(float newValue)
         {
             newValue = manager.mainSlider.value;
@@ -73,21 +128,25 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Assigns a value to the slider and to the text.
+        /// Assigns a value to the slider and its displayed text.
         /// </summary>
         /// <param name="value">The value that should be assigned.</param>
         public void AssignValue(int value)
         {
+            Initialize();
+
             tmpText.text = value.ToString();
             manager.mainSlider.value = value;
         }
 
         /// <summary>
-        /// Assigns a new max value to the slider.
+        /// Assigns a new maximum value to the slider.
         /// </summary>
-        /// <param name="value">The new maximum value that should be assigned.</param>
+        /// <param name="value">The new maximum value.</param>
         public void AssignMaxOrder(int value)
         {
+            Initialize();
+
             manager.mainSlider.maxValue = value;
             manager.UpdateUI();
         }

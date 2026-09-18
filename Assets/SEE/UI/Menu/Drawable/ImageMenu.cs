@@ -11,12 +11,12 @@ using UnityEngine.UI;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu for editing an image.
+    /// Provides the menu for editing drawable images.
     /// </summary>
     public class ImageMenu : SingletonMenu
     {
         /// <summary>
-        /// The location where the image menu prefeb is placed.
+        /// The location where the image menu prefab is placed.
         /// </summary>
         private const string imageMenuPrefab = "Prefabs/UI/Drawable/ImageMenu";
 
@@ -30,110 +30,120 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static ImageMenu Instance { get; private set; }
 
+        /// <summary>
+        /// The additional action registered at the HSV color picker.
+        /// </summary>
+        private UnityAction<Color> pickerAction;
+
+        /// <summary>
+        /// The slider controller for the order in layer.
+        /// </summary>
+        private LayerSliderController orderInLayerSlider;
+
+        /// <summary>
+        /// The HSV color picker.
+        /// </summary>
+        private HSVPicker.ColorPicker picker;
+
+        /// <summary>
+        /// The switch used to mirror the image around the y axis.
+        /// </summary>
+        private SwitchManager mirrorSwitch;
+
+        /// <summary>
+        /// The thumbnail displaying the selected image.
+        /// </summary>
+        private Image thumbnail;
+
+        /// <summary>
+        /// Initializes the singleton instance.
+        /// </summary>
         static ImageMenu()
         {
             Instance = new ImageMenu();
         }
 
         /// <summary>
-        /// The action for the HSV Color Picker that should also be carried out.
+        /// Enables the image menu and registers the handlers required for editing
+        /// the given image.
         /// </summary>
-        private static UnityAction<Color> pickerAction;
-
-        /// <summary>
-        /// The slider controller for the order in layer.
-        /// </summary>
-        private static LayerSliderController orderInLayerSlider;
-
-        /// <summary>
-        /// The HSV color picker.
-        /// </summary>
-        private static HSVPicker.ColorPicker picker;
-
-        /// <summary>
-        /// The mirror switch. It will be needed to mirror the image on the y axis at 180°.
-        /// </summary>
-        private static SwitchManager mirrorSwitch;
-
-        /// <summary>
-        /// The thumbnail image of the chosen image.
-        /// </summary>
-        private static Image thumbnail;
-
-        /// <summary>
-        /// Enables the image menu and register the necessary Handler to the components.
-        /// </summary>
-        /// <param name="imageObj">The image object which should be changed.</param>
-        /// <param name="newValueHolder">The configuration file which should be changed.</param>
-        public static void Enable(GameObject imageObj, DrawableType newValueHolder)
+        /// <param name="imageObj">The image object that should be changed.</param>
+        /// <param name="newValueHolder">The configuration that stores the changed values.</param>
+        public void Enable(GameObject imageObj, DrawableType newValueHolder)
         {
-            if (newValueHolder is ImageConf imageConf)
+            if (newValueHolder is not ImageConf imageConf)
             {
-                Instantiate();
-                GameObject surface = GameFinder.GetDrawableSurface(imageObj);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                orderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
-
-                /// Assigns an action to the slider that should be executed
-                /// along with the current order in layer value
-                AssignOrderInLayer(order =>
-                {
-                    GameEdit.ChangeLayer(imageObj, order);
-                    imageConf.OrderInLayer = order;
-                    ImageConf conf = ImageConf.GetImageConf(imageObj);
-                    conf.FileData = null;
-                    new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
-                }, imageConf.OrderInLayer);
-
-                /// Assigns an action to the color picker that should be executed
-                /// along with the current color.
-                AssignColorArea(color =>
-                {
-                    GameEdit.ChangeImageColor(imageObj, color);
-                    imageConf.ImageColor = color;
-                    ImageConf conf = ImageConf.GetImageConf(imageObj);
-                    conf.FileData = null;
-                    new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
-                }, imageConf.ImageColor);
-
-                /// Initialize the switch for mirror the image.
-                InitMirrorSwitch(imageObj, imageConf, surface, surfaceParentName);
-
-                /// Sets the thumbnail of the original image.
-                thumbnail.sprite = imageObj.GetComponent<Image>().sprite;
+                return;
             }
+
+            InitializeMenu();
+
+            GameObject surface = GameFinder.GetDrawableSurface(imageObj);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
+            orderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
+
+            /// Assigns an action to the slider that is executed together with
+            /// the current order-in-layer value.
+            AssignOrderInLayer(order =>
+            {
+                GameEdit.ChangeLayer(imageObj, order);
+                imageConf.OrderInLayer = order;
+
+                ImageConf conf = ImageConf.GetImageConf(imageObj);
+                conf.FileData = null;
+
+                new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
+            }, imageConf.OrderInLayer);
+
+            /// Assigns an action to the color picker that is executed together
+            /// with the currently selected color.
+            AssignColorArea(color =>
+            {
+                GameEdit.ChangeImageColor(imageObj, color);
+                imageConf.ImageColor = color;
+
+                ImageConf conf = ImageConf.GetImageConf(imageObj);
+                conf.FileData = null;
+
+                new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
+            }, imageConf.ImageColor);
+
+            /// Initializes the switch for mirroring the image.
+            InitializeMirrorSwitch(imageObj, imageConf, surface, surfaceParentName);
+
+            /// Displays the original image as thumbnail.
+            thumbnail.sprite = imageObj.GetComponent<Image>().sprite;
         }
 
         /// <summary>
-        /// Creates the instance for the image menu and initializes the GUI elements.
+        /// Instantiates the image menu and resolves its UI controls.
         /// </summary>
-        private static void Instantiate()
+        private void InitializeMenu()
         {
-            Instance.Instantiate(imageMenuPrefab);
-            orderInLayerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
-            picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
-            mirrorSwitch = Instance.gameObject.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Image").GetComponent<Image>();
+            Instantiate(imageMenuPrefab);
+
+            orderInLayerSlider = gameObject.GetComponentInChildren<LayerSliderController>(true);
+            picker = gameObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
+            mirrorSwitch = gameObject.GetComponentInChildren<SwitchManager>(true);
+            thumbnail = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Image").GetComponent<Image>();
         }
 
         /// <summary>
         /// Initializes the mirror switch.
-        /// It mirrors an image.
-        /// Off is normal and on is mirrored.
+        /// An enabled switch mirrors the image around the y axis by 180 degrees.
         /// </summary>
         /// <param name="imageObj">The image object.</param>
-        /// <param name="imageConf">The configuration which holds the new values.</param>
-        /// <param name="surface">The drawable surface on which the image is displayed.</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
-        private static void InitMirrorSwitch(GameObject imageObj, ImageConf imageConf,
+        /// <param name="imageConf">The configuration storing the changed values.</param>
+        /// <param name="surface">The drawable surface containing the image.</param>
+        /// <param name="surfaceParentName">The ID of the drawable surface parent.</param>
+        private void InitializeMirrorSwitch(GameObject imageObj, ImageConf imageConf,
             GameObject surface, string surfaceParentName)
         {
-            /// Removes the old handler.
             mirrorSwitch.OnEvents.RemoveAllListeners();
             mirrorSwitch.OffEvents.RemoveAllListeners();
 
-            /// Mirrored display
+            /// Mirrored display.
             mirrorSwitch.OnEvents.AddListener(() =>
             {
                 GameMoveRotator.SetRotateY(imageObj, 180f);
@@ -141,7 +151,7 @@ namespace SEE.UI.Menu.Drawable
                 new RotatorYNetAction(surface.name, surfaceParentName, imageObj.name, 180f).Execute();
             });
 
-            /// Normal display
+            /// Normal display.
             mirrorSwitch.OffEvents.AddListener(() =>
             {
                 GameMoveRotator.SetRotateY(imageObj, 0);
@@ -149,16 +159,16 @@ namespace SEE.UI.Menu.Drawable
                 new RotatorYNetAction(surface.name, surfaceParentName, imageObj.name, 0).Execute();
             });
 
-            /// Sets the state of the switch.
             mirrorSwitch.isOn = imageConf.EulerAngles.y == 180;
+            mirrorSwitch.UpdateUI();
         }
 
         /// <summary>
-        /// Assigns an action and an order within the layer-slider order.
+        /// Assigns an action and an order to the order-in-layer slider.
         /// </summary>
         /// <param name="orderInLayerAction">The action that should be assigned.</param>
         /// <param name="order">The order that should be assigned.</param>
-        private static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
+        private void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
             orderInLayerSlider.OnValueChanged.RemoveAllListeners();
             orderInLayerSlider.AssignValue(order);
@@ -166,20 +176,35 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns an action and a color to the HSV Color Picker.
-        /// It removes the previous additional action, if there was one.
+        /// Assigns an action and a color to the HSV color picker.
+        /// The previously registered image-menu action is removed first.
         /// </summary>
         /// <param name="colorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
-        private static void AssignColorArea(UnityAction<Color> colorAction, Color color)
+        private void AssignColorArea(UnityAction<Color> colorAction, Color color)
         {
             if (pickerAction != null)
             {
                 picker.onValueChanged.RemoveListener(pickerAction);
             }
+
             pickerAction = colorAction;
             picker.AssignColor(color);
-            picker.onValueChanged.AddListener(colorAction);
+            picker.onValueChanged.AddListener(pickerAction);
+        }
+
+        /// <summary>
+        /// Destroys the image menu and clears its cached UI references and callbacks.
+        /// </summary>
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            pickerAction = null;
+            orderInLayerSlider = null;
+            picker = null;
+            mirrorSwitch = null;
+            thumbnail = null;
         }
     }
 }
