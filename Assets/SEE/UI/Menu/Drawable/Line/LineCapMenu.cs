@@ -469,7 +469,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         /// <param name="selectedLine">The edited line.</param>
         /// <param name="line">The edited line configuration.</param>
-        private static void SynchronizeShapeMenuLineCapsForPreview(
+        private void SynchronizeShapeMenuLineCapsForPreview(
             GameObject selectedLine, LineConf line)
         {
             if (!DrawShapesAction.IsCurrentPreviewShape(selectedLine) || line == null)
@@ -477,9 +477,14 @@ namespace SEE.UI.Menu.Drawable.Line
                 return;
             }
 
-            ShapeMenu.SetLineCaps(
-                line.LineCapStart,
-                line.LineCapEnd);
+            if (IsStartCapSelected)
+            {
+                ShapeMenu.SetLineStartCap(line.LineCapStart);
+            }
+            else if (IsEndCapSelected)
+            {
+                ShapeMenu.SetLineEndCap(line.LineCapEnd);
+            }
         }
 
         /// <summary>

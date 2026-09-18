@@ -641,6 +641,24 @@ namespace SEE.UI.Menu.Drawable.Shapes
                 startCapConf,
                 endCapConf);
         }
+
+        /// <summary>
+        /// Sets the selected start line-cap configuration.
+        /// </summary>
+        /// <param name="startCapConf">The start line-cap configuration.</param>
+        internal static void SetLineStartCap(LineCapConf startCapConf)
+        {
+            layout.SetLineStartCap(startCapConf);
+        }
+
+        /// <summary>
+        /// Sets the selected end line-cap configuration.
+        /// </summary>
+        /// <param name="endCapConf">The end line-cap configuration.</param>
+        internal static void SetLineEndCap(LineCapConf endCapConf)
+        {
+            layout.SetLineEndCap(endCapConf);
+        }
         #endregion
     }
 }
