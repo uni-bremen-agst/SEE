@@ -15,7 +15,6 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
     /// </summary>
-    [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]
     internal class TestGraphIO
     {
         /// <summary>
@@ -72,7 +71,7 @@ namespace SEE.DataModel.DG.IO
         /// </remarks>
         /// <returns>Task.</returns>
         [Test]
-        public async Task TestReadingRealBigGraph()
+        public async Task TestReadingRealBigGraphAsync()
         {
             DataPath path = new(Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz");
             Performance p = Performance.Begin("Loading big GXL file " + path);
@@ -84,19 +83,19 @@ namespace SEE.DataModel.DG.IO
         }
 
         [Test]
-        public async Task TestReadingArchitecture()
+        public async Task TestReadingArchitectureAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl"));
         }
 
         [Test]
-        public async Task TestReadingMapping()
+        public async Task TestReadingMappingAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl"));
         }
 
         [Test]
-        public async Task TestReadingCodeFacts()
+        public async Task TestReadingCodeFactsAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz"));
         }
@@ -118,7 +117,7 @@ namespace SEE.DataModel.DG.IO
         /// Test for a simple artificially created graph.
         /// </summary>
         [Test, Sequential]
-        public async Task TestGraphWriter([Values(true, false)] bool compress)
+        public async Task TestGraphWriterAsync([Values(true, false)] bool compress)
         {
             const string basename = "test";
 
