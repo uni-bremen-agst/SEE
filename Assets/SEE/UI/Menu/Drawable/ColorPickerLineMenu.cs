@@ -10,32 +10,32 @@ using UnityEngine.UI;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu for the color picking of lines.
+    /// Provides a menu for picking colors from lines.
     /// </summary>
     public static class ColorPickerLineMenu
     {
         /// <summary>
-        /// The location where the menu prefeb is placed.
+        /// The location where the menu prefab is placed.
         /// </summary>
         private const string menuPrefab = "Prefabs/UI/Drawable/ColorPickerLine";
 
         /// <summary>
-        /// The instance for the line menu.
+        /// The current line color picker menu instance.
         /// </summary>
         private static GameObject instance;
 
         /// <summary>
-        /// Whether this class has an color in store that wasn't yet fetched.
+        /// Whether a selected color is waiting to be consumed.
         /// </summary>
         private static bool gotColor;
 
         /// <summary>
-        /// If <see cref="gotColor"/> is true, this contains the button kind which the player selected.
+        /// The selected color if <see cref="gotColor"/> is true.
         /// </summary>
         private static Color chosenColor;
 
         /// <summary>
-        /// Creates the menu and register the needed handler.
+        /// Creates the menu for the selected line and registers the required handlers.
         /// </summary>
         /// <param name="line">The selected line.</param>
         public static void Enable(GameObject line)
@@ -44,6 +44,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 LineConf conf = LineConf.GetLine(line);
                 instance = PrefabInstantiator.InstantiatePrefab(menuPrefab, UICanvas.Canvas.transform, false);
+
                 /// Initializes the buttons.
                 InitializePrimaryButton(conf);
                 InitializeSecondaryButton(conf);
@@ -52,15 +53,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the primary button.
+        /// Initializes the primary color button.
         /// </summary>
         /// <param name="conf">The line configuration.</param>
         private static void InitializePrimaryButton(LineConf conf)
         {
             GameObject primary = GameFinder.FindAttachedOrLocalDescendant(instance, "Primary");
             SetImageColor(primary, conf.PrimaryColor);
-            ButtonManagerBasic bmb = primary.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+
+            ButtonManagerBasic button = primary.GetComponent<ButtonManagerBasic>();
+            button.clickEvent.AddListener(() =>
             {
                 chosenColor = conf.PrimaryColor;
                 gotColor = true;
@@ -68,15 +70,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the secondary button.
+        /// Initializes the secondary color button.
         /// </summary>
         /// <param name="conf">The line configuration.</param>
         private static void InitializeSecondaryButton(LineConf conf)
         {
             GameObject secondary = GameFinder.FindAttachedOrLocalDescendant(instance, "Secondary");
             SetImageColor(secondary, conf.SecondaryColor);
-            ButtonManagerBasic bmb = secondary.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+
+            ButtonManagerBasic button = secondary.GetComponent<ButtonManagerBasic>();
+            button.clickEvent.AddListener(() =>
             {
                 chosenColor = conf.SecondaryColor;
                 gotColor = true;
@@ -84,15 +87,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the fill-out button.
+        /// Initializes the fill-out color button.
         /// </summary>
         /// <param name="conf">The line configuration.</param>
         private static void InitializeFillOutButton(LineConf conf)
         {
             GameObject fillOut = GameFinder.FindAttachedOrLocalDescendant(instance, "FillOut");
             SetImageColor(fillOut, conf.FillOutColor);
-            ButtonManagerBasic bmb = fillOut.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+
+            ButtonManagerBasic button = fillOut.GetComponent<ButtonManagerBasic>();
+            button.clickEvent.AddListener(() =>
             {
                 chosenColor = conf.FillOutColor;
                 gotColor = true;
@@ -100,10 +104,10 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets the <paramref name="buttonHolder"/>'s background color to <paramref name="color"/>
-        /// and button text's color to the complementary color of <paramref name="color"/>.
+        /// Sets the background color of <paramref name="buttonHolder"/> to <paramref name="color"/>
+        /// and its text color to the complementary color.
         /// </summary>
-        /// <param name="buttonHolder">The object which holds the button.</param>
+        /// <param name="buttonHolder">The object holding the button.</param>
         /// <param name="color">The background color.</param>
         private static void SetImageColor(GameObject buttonHolder, Color color)
         {
@@ -112,7 +116,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Destroy's the menu.
+        /// Destroys the menu and clears any pending color selection.
         /// </summary>
         public static void Disable()
         {
@@ -120,21 +124,24 @@ namespace SEE.UI.Menu.Drawable
             {
                 Destroyer.Destroy(instance);
             }
+
+            instance = null;
+            gotColor = false;
+            chosenColor = Color.clear;
         }
 
         /// <summary>
-        /// If <see cref="gotColor"/> is true, the <paramref name="color"/> will be the chosen color by the
-        /// player. Otherwise it will be some dummy value.
+        /// Tries to consume the color selected by the player.
         /// </summary>
-        /// <param name="color">The chosen color the player confirmed; if that doesn't exist,
-        /// some dummy value <see cref="Color.clear"/> is used instead.</param>
-        /// <returns><see cref="gotColor"/>.</returns>
+        /// <param name="color">
+        /// The selected color if one is available; otherwise <see cref="Color.clear"/>.
+        /// </param>
+        /// <returns>True if a selected color was available; otherwise false.</returns>
         public static bool TryGetColor(out Color color)
         {
             if (gotColor)
             {
                 color = chosenColor;
-                gotColor = false;
                 Disable();
                 return true;
             }

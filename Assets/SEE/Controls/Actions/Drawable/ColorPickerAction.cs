@@ -3,8 +3,6 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
-using SEE.UI;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -232,14 +230,8 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// At the beginning of this action, it saves the current color values
-        /// (<see cref="ValueHolder.CurrentPrimaryColor>"/> and <see cref="ValueHolder.CurrentSecondaryColor"/>)
-        /// of the <see cref="ValueHolder"/>.
-        /// It also adds to the UICanvas a <see cref="ColorPickerMenuDisabler"/> component.
-        /// This is required to prevent a display error when displaying the color picker menu.
-        /// (When it is displayed, the switch status is initialized once.
-        ///     It is activated once and then returns to its original position.)
-        /// Then it enables the color picker menu.
+        /// Saves the current primary and secondary colors when this action starts.
+        /// These values are required to undo a completed color pick later.
         /// </summary>
         public override void Awake()
         {
@@ -247,31 +239,6 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            UICanvas.Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
-        }
-
-        /// <summary>
-        /// Enables the color picker menu on action start.
-        /// </summary>
-        public override void Start()
-        {
-            base.Start();
-            ColorPickerMenu.Instance.Enable();
-        }
-
-        /// <summary>
-        /// Disables the color picker menu on action stop.
-        /// </summary>
-        public override void Stop()
-        {
-            base.Stop();
-            ColorPickerMenu.Instance.Disable();
-            ColorPickerMindMapMenu.Instance.Destroy();
-        }
-
-        ~ColorPickerAction()
-        {
-            ColorPickerMenu.Instance.Destroy();
         }
 
         /// <summary>

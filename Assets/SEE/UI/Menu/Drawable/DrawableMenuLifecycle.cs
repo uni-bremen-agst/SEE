@@ -42,9 +42,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Disables the menu associated with <paramref name="actionState"/>.
+        /// Disables or destroys the menu associated with <paramref name="actionState"/>.
         /// </summary>
-        /// <param name="actionState">The action state whose menu should be disabled.</param>
+        /// <param name="actionState">The action state whose menu should be closed.</param>
         private static void DisableMenu(ActionStateType actionState)
         {
             if (actionState == ActionStateTypes.DrawFreehand)
@@ -58,6 +58,12 @@ namespace SEE.UI.Menu.Drawable
             else if (actionState == ActionStateTypes.WriteText)
             {
                 TextMenu.Instance.Disable();
+            }
+            else if (actionState == ActionStateTypes.ColorPicker)
+            {
+                ColorPickerMindMapMenu.Instance.Destroy();
+                ColorPickerLineMenu.Disable();
+                ColorPickerMenu.Instance.Destroy();
             }
         }
 
@@ -78,6 +84,10 @@ namespace SEE.UI.Menu.Drawable
             else if (actionState == ActionStateTypes.WriteText)
             {
                 TextMenu.Instance.EnableForWriting();
+            }
+            else if (actionState == ActionStateTypes.ColorPicker)
+            {
+                ColorPickerMenu.Instance.Enable();
             }
         }
     }
