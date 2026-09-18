@@ -246,7 +246,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Initiates scaling by opening the menu and switching to the corresponding state.
             if (SEEInput.MouseUp(MouseButton.Left) && selectedObj != null)
             {
-                ScaleMenu.Enable(selectedObj);
+                ScaleMenu.Instance.Enable(selectedObj);
                 progressState = ProgressState.Scale;
             }
         }
@@ -302,7 +302,7 @@ namespace SEE.Controls.Actions.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             newScale = GameScaler.Scale(selectedObj, scaleFactor);
-            ScaleMenu.AssignValue(selectedObj);
+            ScaleMenu.Instance.AssignValue(selectedObj);
             bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
             new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, newScale).Execute();
             if (refresh)

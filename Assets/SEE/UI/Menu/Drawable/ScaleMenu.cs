@@ -8,8 +8,7 @@ using UnityEngine.Events;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// The class for the scale menu. It delivers an instance.
-    /// Use ScaleMenu.Enable(GameObject objectToScale) and ScaleMenu().Destroy()
+    /// Provides the menu for scaling drawable objects.
     /// </summary>
     public class ScaleMenu : SingletonMenu
     {
@@ -19,24 +18,29 @@ namespace SEE.UI.Menu.Drawable
         private const string drawableScalePrefab = "Prefabs/UI/Drawable/ScaleMenu";
 
         /// <summary>
-        /// The input field with up and down button component for the x-scale.
+        /// The input field with buttons for the x scale.
         /// </summary>
-        private static InputFieldWithButtons xScale;
+        private InputFieldWithButtons xScale;
 
         /// <summary>
-        /// The input field with up and down button component for the x-scale.
+        /// The input field with buttons for the y scale.
         /// </summary>
-        private static InputFieldWithButtons yScale;
+        private InputFieldWithButtons yScale;
 
         /// <summary>
-        /// The switch for scaling proportionally or unproportionally.
+        /// The switch controlling proportional scaling.
         /// </summary>
-        private static SwitchManager switchManager;
+        private SwitchManager switchManager;
 
         /// <summary>
-        /// The object which contains the button done.
+        /// The object containing the finish button.
         /// </summary>
-        private static GameObject doneObject;
+        private GameObject doneObject;
+
+        /// <summary>
+        /// Whether this menu has a finished scaling operation that has not yet been consumed.
+        /// </summary>
+        private bool isFinish;
 
         /// <summary>
         /// We do not want to create an instance of this singleton class outside of this class.
@@ -48,68 +52,69 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static ScaleMenu Instance { get; private set; }
 
+        /// <summary>
+        /// Initializes the singleton instance.
+        /// </summary>
         static ScaleMenu()
         {
             Instance = new ScaleMenu();
         }
 
         /// <summary>
-        /// Whether this class has a finished rotation in store that hasn't been fetched yet.
+        /// Enables the scale menu and sets up the handlers for its controls.
         /// </summary>
-        private static bool isFinish;
-
-        /// <summary>
-        /// Enables the scale menu and sets up the handler for the menu components.
-        /// </summary>
-        /// <param name="objToScale">Is the drawable type object that should be scaled.</param>
-        /// <param name="stickyNoteMode">Enables the menu for the sticky notes.</param>
+        /// <param name="objToScale">The drawable object that should be scaled.</param>
+        /// <param name="stickyNoteMode">Whether the menu is used for editing a sticky note.</param>
         /// <param name="returnCall">
-        /// An optional callback that is invoked when the return button of the scale menu is pressed.
+        /// An optional callback that is invoked when the return button is pressed.
         /// </param>
-        public static void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
+        public void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
         {
-            Instance.Instantiate(drawableScalePrefab);
+            Instantiate(drawableScalePrefab);
+            isFinish = false;
 
             /// Initialize the GUI elements of the menu.
-            xScale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "XScale").GetComponent<InputFieldWithButtons>();
-            yScale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "YScale").GetComponent<InputFieldWithButtons>();
-            switchManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Switch").GetComponent<SwitchManager>();
-            doneObject = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Done");
+            xScale = GameFinder.FindAttachedOrLocalDescendant(gameObject, "XScale").GetComponent<InputFieldWithButtons>();
+            yScale = GameFinder.FindAttachedOrLocalDescendant(gameObject, "YScale").GetComponent<InputFieldWithButtons>();
+            switchManager = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Switch").GetComponent<SwitchManager>();
+            doneObject = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Done");
 
             /// Sets up the x scale component.
-            XScale(objToScale);
+            SetUpXScale(objToScale);
 
             /// Sets up the y scale component.
-            YScale(objToScale);
+            SetUpYScale(objToScale);
 
-            /// Enables the proportional scaling.
+            /// Enables proportional scaling.
             EnableProportionalScaling();
 
-            /// Sets up the switch for turning on / off proportional scaling.
+            /// Sets up the switch for turning proportional scaling on and off.
             SetUpSwitch();
 
-            /// Sets up the done button.
+            /// Sets up the finish button.
             SetUpDone(stickyNoteMode);
 
             /// Sets up the return button.
             SetUpReturn(returnCall);
 
-            Instance.Enable();
+            base.Enable();
         }
 
         /// <summary>
         /// Sets up the x scale component.
         /// </summary>
-        /// <param name="objToScale">Is the object to be scaled.</param>
-        private static void XScale(GameObject objToScale)
+        /// <param name="objToScale">The object to be scaled.</param>
+        private void SetUpXScale(GameObject objToScale)
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
-            xScale.OnValueChanged.AddListener(xScale =>
+            xScale.OnValueChanged.AddListener(value =>
             {
-                Vector3 newScale = new(xScale, yScale.GetValue(), 1);
+                Vector3 newScale = new(value, yScale.GetValue(), 1);
                 GameScaler.SetScale(objToScale, newScale);
+
                 GameObject surface = GameFinder.GetDrawableSurface(objToScale);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
                 new ScaleNetAction(surface.name, surfaceParentName, objToScale.name, newScale).Execute();
             });
         }
@@ -117,31 +122,34 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Sets up the y scale component.
         /// </summary>
-        /// <param name="objToScale">Is the object to be scaled.</param>
-        private static void YScale(GameObject objToScale)
+        /// <param name="objToScale">The object to be scaled.</param>
+        private void SetUpYScale(GameObject objToScale)
         {
             yScale.AssignValue(objToScale.transform.localScale.y);
-            yScale.OnValueChanged.AddListener(yScale =>
+            yScale.OnValueChanged.AddListener(value =>
             {
-                Vector3 newScale = new(xScale.GetValue(), yScale, 1);
+                Vector3 newScale = new(xScale.GetValue(), value, 1);
                 GameScaler.SetScale(objToScale, newScale);
+
                 GameObject surface = GameFinder.GetDrawableSurface(objToScale);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
                 new ScaleNetAction(surface.name, surfaceParentName, objToScale.name, newScale).Execute();
             });
         }
 
         /// <summary>
-        /// Enables the proportional scaling for the x and y scale component.
-        /// To prevent floating-point errors, rounding is applied to a maximum of 6 decimal places.
+        /// Enables proportional scaling for the x and y scale components.
+        /// To prevent floating-point errors, values are rounded to a maximum of six decimal places.
         /// </summary>
-        private static void EnableProportionalScaling()
+        private void EnableProportionalScaling()
         {
             xScale.OnProportionalValueChanged = new UnityEvent<float>();
             xScale.OnProportionalValueChanged.AddListener(diff =>
             {
                 yScale.AssignValue((float)decimal.Round((decimal)(yScale.GetValue() + diff), 6));
             });
+
             yScale.OnProportionalValueChanged = new UnityEvent<float>();
             yScale.OnProportionalValueChanged.AddListener(diff =>
             {
@@ -150,16 +158,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the switch to turning on/off the proportional scaling.
+        /// Sets up the switch for turning proportional scaling on and off.
         /// </summary>
-        private static void SetUpSwitch()
+        private void SetUpSwitch()
         {
             switchManager.isOn = true;
+
             /// Turns on proportional scaling.
-            switchManager.OnEvents.AddListener(() =>
-            {
-                EnableProportionalScaling();
-            });
+            switchManager.OnEvents.AddListener(EnableProportionalScaling);
 
             /// Turns off proportional scaling.
             switchManager.OffEvents.AddListener(() =>
@@ -170,19 +176,21 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the done button, if the <paramref name="stickyNoteMode"/> is true.
-        /// Otherwise, the button will be disable.
+        /// Sets up the finish button for sticky-note editing.
+        /// The button is hidden outside sticky-note mode.
         /// </summary>
-        /// <param name="stickyNoteMode">True, if the menu was called from edit of a sticky note.</param>
-        private static void SetUpDone(bool stickyNoteMode)
+        /// <param name="stickyNoteMode">Whether the menu was opened while editing a sticky note.</param>
+        private void SetUpDone(bool stickyNoteMode)
         {
             if (stickyNoteMode)
             {
                 doneObject.SetActive(true);
-                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.RemoveAllListeners();
-                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+
+                ButtonManagerBasic doneButton = doneObject.GetComponent<ButtonManagerBasic>();
+                doneButton.clickEvent.RemoveAllListeners();
+                doneButton.clickEvent.AddListener(() =>
                 {
-                    Instance.Destroy();
+                    Destroy();
                     isFinish = true;
                 });
             }
@@ -193,45 +201,48 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the return button, if <paramref name="returnCall"/> is not null.
-        /// Otherwise, the button will be disable.
+        /// Sets up the return button if a return callback is provided.
+        /// The button is hidden otherwise.
         /// </summary>
-        /// <param name="returnCall">The return call action.</param>
-        private static void SetUpReturn(UnityAction returnCall)
+        /// <param name="returnCall">The callback invoked when the return button is pressed.</param>
+        private void SetUpReturn(UnityAction returnCall)
         {
+            GameObject returnButtonObject = gameObject.transform.Find("ReturnBtn").gameObject;
+
             if (returnCall != null)
             {
-                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                returnButtonObject.SetActive(true);
+
+                ButtonManagerBasic returnButton = returnButtonObject.GetComponent<ButtonManagerBasic>();
+                returnButton.clickEvent.RemoveAllListeners();
+                returnButton.clickEvent.AddListener(returnCall);
             }
             else
             {
-                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
+                returnButtonObject.SetActive(false);
             }
         }
 
         /// <summary>
-        /// Assigns the x and y scale value of the selected object to the input fields of this menu.
+        /// Assigns the x and y scale of the selected object to the scale controls.
         /// </summary>
-        /// <param name="objToScale">The drawable type object that should be scaled.</param>
-        public static void AssignValue(GameObject objToScale)
+        /// <param name="objToScale">The drawable object whose scale should be displayed.</param>
+        public void AssignValue(GameObject objToScale)
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
             yScale.AssignValue(objToScale.transform.localScale.y);
         }
 
         /// <summary>
-        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state.
-        /// Otherwise it will be false.
+        /// Tries to consume a previously completed scaling operation.
         /// </summary>
-        /// <param name="finish">The finish state.</param>
-        /// <returns><see cref="isFinish"/>.</returns>
-        public static bool TryGetFinish(out bool finish)
+        /// <param name="finish">Whether a completed scaling operation was available.</param>
+        /// <returns>True if a completed scaling operation was available; otherwise, false.</returns>
+        public bool TryGetFinish(out bool finish)
         {
             if (isFinish)
             {
-                finish = isFinish;
+                finish = true;
                 isFinish = false;
                 return true;
             }

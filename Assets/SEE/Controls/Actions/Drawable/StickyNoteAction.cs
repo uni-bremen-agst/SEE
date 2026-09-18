@@ -760,7 +760,7 @@ namespace SEE.Controls.Actions.Drawable
                 RotateByWheel(stickyNoteHolder, true);
             }
 
-            if (ScaleMenu.TryGetFinish(out bool isScaleFinished))
+            if (ScaleMenu.Instance.TryGetFinish(out bool isScaleFinished))
             {
                 finish = isScaleFinished;
             }
@@ -845,7 +845,7 @@ namespace SEE.Controls.Actions.Drawable
             if (WheelInteraction(WheelInteractionType.Scale, out float scaleFactor))
             {
                 memento.ChangedConfig.Scale = GameScaler.Scale(stickyNote, scaleFactor);
-                ScaleMenu.AssignValue(stickyNote);
+                ScaleMenu.Instance.AssignValue(stickyNote);
                 GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
                 new ScaleNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), stickyNote.name,
                     memento.ChangedConfig.Scale).Execute();

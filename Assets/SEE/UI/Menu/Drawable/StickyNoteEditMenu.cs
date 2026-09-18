@@ -162,7 +162,7 @@ namespace SEE.UI.Menu.Drawable
             scale.clickEvent.AddListener(() =>
             {
                 Instance.Disable();
-                ScaleMenu.Enable(stickyNote, true, callback);
+                ScaleMenu.Instance.Enable(stickyNote, true, callback);
             });
         }
     }
