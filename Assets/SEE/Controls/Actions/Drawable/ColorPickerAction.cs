@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
             /// of <see cref="ColorPickerMindMapMenu"/>.
             /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
             /// that the input can be immediately detected.
-            if (waitForHelperMenu && ColorPickerMindMapMenu.TryGetColor(out Color color))
+            if (waitForHelperMenu && ColorPickerMindMapMenu.Instance.TryGetColor(out Color color))
             {
                 pickedColor = color;
                 waitForHelperMenu = false;
@@ -166,7 +166,7 @@ namespace SEE.Controls.Actions.Drawable
                         pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hitObject, true);
+                        ColorPickerMindMapMenu.Instance.Enable(hitObject, true);
                         waitForHelperMenu = true;
                         break;
                     case Tags.Drawable:
@@ -220,7 +220,7 @@ namespace SEE.Controls.Actions.Drawable
                         pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hitObject, false);
+                        ColorPickerMindMapMenu.Instance.Enable(hitObject, false);
                         waitForHelperMenu = true;
                         break;
                     case Tags.Drawable:
