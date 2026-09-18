@@ -188,9 +188,9 @@ namespace SEE.Controls.Actions.Drawable
                 if (progressState == ProgressState.Rotate)
                 {
                     GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
-                        RotationMenu.includeChildren);
+                        RotationMenu.Instance.IncludeChildren);
                     new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
+                        oldObjectLocalEulerAngles.z, RotationMenu.Instance.IncludeChildren).Execute();
                 }
             }
             RotationMenu.Instance.Destroy();
@@ -264,9 +264,9 @@ namespace SEE.Controls.Actions.Drawable
                     if (progressState == ProgressState.Rotate)
                     {
                         GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
-                            RotationMenu.includeChildren);
+                            RotationMenu.Instance.IncludeChildren);
                         new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
-                            oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
+                            oldObjectLocalEulerAngles.z, RotationMenu.Instance.IncludeChildren).Execute();
                     }
                 }
                 RotationMenu.Instance.Destroy();
@@ -522,7 +522,7 @@ namespace SEE.Controls.Actions.Drawable
             if (selectedObject.GetComponent<BlinkEffect>() != null)
             {
                 /// Enables the rotation menu and provides the rotation via menu.
-                RotationMenu.Enable(selectedObject);
+                RotationMenu.Instance.Enable(selectedObject);
 
                 /// Checks for mouse wheel movement and sets the required data for rotation via wheel.
                 RotateByWheel();
@@ -600,13 +600,13 @@ namespace SEE.Controls.Actions.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             newObjectLocalEulerAngles = GameMoveRotator.RotateObject(selectedObject, direction,
-                degree, RotationMenu.includeChildren);
+                degree, RotationMenu.Instance.IncludeChildren);
             if (Tags.DrawableTypes.Contains(selectedObject.tag))
             {
                 newObjectPosition = selectedObject.transform.localPosition;
             }
             new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, direction,
-                degree, RotationMenu.includeChildren).Execute();
+                degree, RotationMenu.Instance.IncludeChildren).Execute();
         }
 
         /// <summary>
@@ -642,7 +642,7 @@ namespace SEE.Controls.Actions.Drawable
                     && !selectedObject.GetComponent<CollisionController>().IsInCollision() && !childInCollision)
                 {
                     float degree = selectedObject.transform.localEulerAngles.z;
-                    bool includeChildren = RotationMenu.includeChildren
+                    bool includeChildren = RotationMenu.Instance.IncludeChildren
                         && executedOperation == ProgressState.Rotate ||
                         MoveMenu.Instance.IncludeChildren && executedOperation == ProgressState.Move;
                     memento = new Memento(selectedObject, GameFinder.GetDrawableSurface(selectedObject), selectedObject.name,
