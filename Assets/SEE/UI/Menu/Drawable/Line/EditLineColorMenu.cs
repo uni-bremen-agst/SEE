@@ -165,7 +165,15 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 visualConf.ColorKind = newKind;
 
-                if (visualConf.ColorKind != ColorKind.Monochrome)
+                if (visualConf.ColorKind == ColorKind.Monochrome)
+                {
+                    SelectPrimaryColor(
+                        selectedLine,
+                        lineHolder,
+                        surface,
+                        surfaceParentName);
+                }
+                else
                 {
                     visualConf.SecondaryColor =
                         ensureValidSecondaryColor(visualConf.SecondaryColor);
@@ -235,42 +243,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
             controls.PrimaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
-
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                if (IsMainSegment)
-                {
-                    AssignColorArea(color =>
-                    {
-                        GameEdit.ChangePrimaryColor(selectedLine, color);
-                        lineHolder.PrimaryColor = color;
-
-                        new EditLinePrimaryColorNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            color).Execute();
-                    }, lineHolder.PrimaryColor);
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    AssignColorArea(color =>
-                    {
-                        capConf.PrimaryColor = color;
-                        lineCapMenu.ApplySelectedCapStyle(
-                            selectedLine,
-                            lineHolder,
-                            surface);
-                    }, capConf.PrimaryColor);
-                }
-            });
+                () => SelectPrimaryColor(selectedLine, lineHolder, surface, surfaceParentName));
 
             controls.PrimaryColorButtonManager.buttonVar.interactable = false;
         }
@@ -290,48 +263,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
             controls.SecondaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
-
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                if (IsMainSegment)
-                {
-                    lineHolder.SecondaryColor =
-                        ensureValidSecondaryColor(lineHolder.SecondaryColor);
-
-                    AssignColorArea(color =>
-                    {
-                        GameEdit.ChangeSecondaryColor(selectedLine, color);
-                        lineHolder.SecondaryColor = color;
-
-                        new EditLineSecondaryColorNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            color).Execute();
-                    }, lineHolder.SecondaryColor);
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.SecondaryColor =
-                        ensureValidSecondaryColor(capConf.SecondaryColor);
-
-                    AssignColorArea(color =>
-                    {
-                        capConf.SecondaryColor = color;
-                        lineCapMenu.ApplySelectedCapStyle(
-                            selectedLine,
-                            lineHolder,
-                            surface);
-                    }, capConf.SecondaryColor);
-                }
-            });
+                () => SelectSecondaryColor(selectedLine, lineHolder, surface, surfaceParentName));
 
             controls.SecondaryColorButtonManager.buttonVar.interactable = true;
         }
@@ -349,70 +281,11 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject surface,
             string surfaceParentName)
         {
-            if (colorAction != null)
-            {
-                controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
-            }
-
-            if (IsMainSegment)
-            {
-                LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-
-                switch (lineHolder.ColorKind)
-                {
-                    case ColorKind.Monochrome:
-                        controls.ColorPicker.AssignColor(renderer.material.color);
-                        break;
-
-                    case ColorKind.Gradient:
-                        controls.ColorPicker.AssignColor(renderer.startColor);
-                        break;
-
-                    case ColorKind.TwoDashed:
-                        controls.ColorPicker.AssignColor(renderer.material.color);
-                        break;
-                }
-
-                colorAction = color =>
-                {
-                    GameEdit.ChangePrimaryColor(selectedLine, color);
-                    lineHolder.PrimaryColor = color;
-
-                    new EditLinePrimaryColorNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        selectedLine.name,
-                        color).Execute();
-                };
-            }
-            else
-            {
-                LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                if (capConf == null || capConf.CapKind == LineCap.None)
-                {
-                    return;
-                }
-
-                controls.ColorPicker.AssignColor(capConf.PrimaryColor);
-
-                colorAction = color =>
-                {
-                    LineCapConf currentCapConf = GetSelectedCapConf(lineHolder);
-                    if (currentCapConf == null
-                        || currentCapConf.CapKind == LineCap.None)
-                    {
-                        return;
-                    }
-
-                    currentCapConf.PrimaryColor = color;
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
-                };
-            }
-
-            controls.ColorPicker.onValueChanged.AddListener(colorAction);
+            SelectPrimaryColor(
+                selectedLine,
+                lineHolder,
+                surface,
+                surfaceParentName);
         }
 
         /// <summary>
@@ -437,73 +310,29 @@ namespace SEE.UI.Menu.Drawable.Line
                 HideFillOut();
                 ShowColorKind();
 
-                if (IsMainSegment)
+                ILineVisualConf visualConf = GetSelectedVisualConf(lineHolder);
+
+                if (visualConf == null)
                 {
-                    if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
-                    {
-                        AssignColorArea(color =>
-                        {
-                            GameEdit.ChangePrimaryColor(selectedLine, color);
-                            lineHolder.PrimaryColor = color;
+                    return;
+                }
 
-                            new EditLinePrimaryColorNetAction(
-                                surface.name,
-                                surfaceParentName,
-                                selectedLine.name,
-                                color).Execute();
-                        }, lineHolder.PrimaryColor);
-                    }
-                    else
-                    {
-                        lineHolder.SecondaryColor =
-                            ensureValidSecondaryColor(lineHolder.SecondaryColor);
-
-                        AssignColorArea(color =>
-                        {
-                            GameEdit.ChangeSecondaryColor(selectedLine, color);
-                            lineHolder.SecondaryColor = color;
-
-                            new EditLineSecondaryColorNetAction(
-                                surface.name,
-                                surfaceParentName,
-                                selectedLine.name,
-                                color).Execute();
-                        }, lineHolder.SecondaryColor);
-                    }
+                if (visualConf.ColorKind == ColorKind.Monochrome
+                    || !controls.PrimaryColorButtonManager.buttonVar.interactable)
+                {
+                    SelectPrimaryColor(
+                        selectedLine,
+                        lineHolder,
+                        surface,
+                        surfaceParentName);
                 }
                 else
                 {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
-                    {
-                        AssignColorArea(color =>
-                        {
-                            capConf.PrimaryColor = color;
-                            lineCapMenu.ApplySelectedCapStyle(
-                                selectedLine,
-                                lineHolder,
-                                surface);
-                        }, capConf.PrimaryColor);
-                    }
-                    else
-                    {
-                        capConf.SecondaryColor =
-                            ensureValidSecondaryColor(capConf.SecondaryColor);
-
-                        AssignColorArea(color =>
-                        {
-                            capConf.SecondaryColor = color;
-                            lineCapMenu.ApplySelectedCapStyle(
-                                selectedLine,
-                                lineHolder,
-                                surface);
-                        }, capConf.SecondaryColor);
-                    }
+                    SelectSecondaryColor(
+                        selectedLine,
+                        lineHolder,
+                        surface,
+                        surfaceParentName);
                 }
 
                 MenuHelper.CalculateHeight(lineMenu, true);
@@ -780,6 +609,161 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
+        /// Selects the primary color of the currently edited line segment and binds
+        /// the shared color picker to it.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The edited line configuration.</param>
+        /// <param name="surface">The drawable surface.</param>
+        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
+        internal void SelectPrimaryColor(
+            GameObject selectedLine,
+            LineConf lineHolder,
+            GameObject surface,
+            string surfaceParentName)
+        {
+            SetPrimaryColorButtonState();
+
+            if (IsMainSegment)
+            {
+                AssignColorArea(color =>
+                {
+                    GameEdit.ChangePrimaryColor(selectedLine, color);
+                    lineHolder.PrimaryColor = color;
+
+                    new EditLinePrimaryColorNetAction(
+                        surface.name,
+                        surfaceParentName,
+                        selectedLine.name,
+                        color).Execute();
+                }, lineHolder.PrimaryColor);
+            }
+            else
+            {
+                LineCapConf capConf = GetSelectedCapConf(lineHolder);
+
+                if (capConf == null || capConf.CapKind == LineCap.None)
+                {
+                    return;
+                }
+
+                AssignColorArea(color =>
+                {
+                    capConf.PrimaryColor = color;
+
+                    lineCapMenu.ApplySelectedCapStyle(
+                        selectedLine,
+                        lineHolder,
+                        surface);
+                }, capConf.PrimaryColor);
+            }
+        }
+
+        /// <summary>
+        /// Selects the secondary color of the currently edited line segment and binds
+        /// the shared color picker to it.
+        /// Monochrome configurations always use their primary color.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The edited line configuration.</param>
+        /// <param name="surface">The drawable surface.</param>
+        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
+        private void SelectSecondaryColor(
+            GameObject selectedLine,
+            LineConf lineHolder,
+            GameObject surface,
+            string surfaceParentName)
+        {
+            ILineVisualConf visualConf = GetSelectedVisualConf(lineHolder);
+
+            if (visualConf == null)
+            {
+                return;
+            }
+
+            if (visualConf.ColorKind == ColorKind.Monochrome)
+            {
+                SelectPrimaryColor(
+                    selectedLine,
+                    lineHolder,
+                    surface,
+                    surfaceParentName);
+                return;
+            }
+
+            visualConf.SecondaryColor =
+                ensureValidSecondaryColor(visualConf.SecondaryColor);
+
+            SetSecondaryColorButtonState();
+
+            if (IsMainSegment)
+            {
+                AssignColorArea(color =>
+                {
+                    GameEdit.ChangeSecondaryColor(selectedLine, color);
+                    lineHolder.SecondaryColor = color;
+
+                    new EditLineSecondaryColorNetAction(
+                        surface.name,
+                        surfaceParentName,
+                        selectedLine.name,
+                        color).Execute();
+                }, lineHolder.SecondaryColor);
+            }
+            else
+            {
+                LineCapConf capConf = GetSelectedCapConf(lineHolder);
+
+                if (capConf == null || capConf.CapKind == LineCap.None)
+                {
+                    return;
+                }
+
+                AssignColorArea(color =>
+                {
+                    capConf.SecondaryColor = color;
+
+                    lineCapMenu.ApplySelectedCapStyle(
+                        selectedLine,
+                        lineHolder,
+                        surface);
+                }, capConf.SecondaryColor);
+            }
+        }
+
+        /// <summary>
+        /// Returns the visual configuration of the currently selected line segment.
+        /// </summary>
+        /// <param name="lineHolder">The edited line configuration.</param>
+        /// <returns>
+        /// The main line configuration or the selected line-cap configuration.
+        /// </returns>
+        private ILineVisualConf GetSelectedVisualConf(LineConf lineHolder)
+        {
+            return IsMainSegment
+                ? lineHolder
+                : GetSelectedCapConf(lineHolder);
+        }
+
+        /// <summary>
+        /// Updates the color buttons so that the primary color is selected.
+        /// </summary>
+        private void SetPrimaryColorButtonState()
+        {
+            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
+            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
+        }
+
+        /// <summary>
+        /// Updates the color buttons so that the secondary color is selected.
+        /// </summary>
+        private void SetSecondaryColorButtonState()
+        {
+            controls.PrimaryColorButtonManager.buttonVar.interactable = true;
+            controls.SecondaryColorButtonManager.buttonVar.interactable = false;
+        }
+
+        /// <summary>
         /// Assigns an action and a color to the HSV color picker while editing.
         /// The previously assigned editing action is removed first.
         /// </summary>
@@ -813,14 +797,16 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Refreshes the color-kind selector and color picker for the given
-        /// visual configuration.
+        /// Refreshes the color controls for the given visual configuration.
+        /// The primary color becomes the active color whenever a segment is refreshed.
         /// </summary>
-        /// <param name="visualConf">The visual configuration to display.</param>
+        /// <param name="visualConf">The visual configuration whose colors should be displayed.</param>
         internal void RefreshColor(ILineVisualConf visualConf)
         {
             assignColorKind(visualConf.ColorKind);
             RefreshColorKindSelectorUI();
+
+            SetPrimaryColorButtonState();
             controls.ColorPicker.AssignColor(visualConf.PrimaryColor);
         }
 
@@ -930,18 +916,6 @@ namespace SEE.UI.Menu.Drawable.Line
             controls.ColorKindSelector.index =
                 GetColorKinds(true).IndexOf(getSelectedColorKind());
             controls.ColorKindSelector.UpdateUI();
-        }
-
-        /// <summary>
-        /// Makes the primary and secondary color buttons mutually exclusive.
-        /// </summary>
-        private void MutuallyExclusiveColorButtons()
-        {
-            controls.PrimaryColorButtonManager.buttonVar.interactable =
-                !controls.PrimaryColorButtonManager.buttonVar.IsInteractable();
-
-            controls.SecondaryColorButtonManager.buttonVar.interactable =
-                !controls.SecondaryColorButtonManager.buttonVar.IsInteractable();
         }
 
         /// <summary>

@@ -1,8 +1,12 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
+using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Shapes;
 using SEE.UI.Menu.Drawable.Text;
+using SEE.Utils.History;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
@@ -207,6 +211,40 @@ namespace SEE.UI.Menu.Drawable
                 Is.False);
 
             Assert.That(TextMenu.Instance.IsOpen(), Is.True);
+        }
+
+        /// <summary>
+        /// Verifies that stopping a color-picker action discards a pending line helper
+        /// even when no action-state transition occurs.
+        /// </summary>
+        [Test]
+        public void TestStoppingColorPickerDestroysLineHelperMenu()
+        {
+            LineConf configuration = new LineConf
+            {
+                PrimaryColor = Color.red,
+                SecondaryColor = Color.blue,
+                ColorKind = GameDrawer.ColorKind.Monochrome,
+                FillOutStatus = true,
+                FillOutColor = Color.green,
+                LineCapStart = LineCapConf.CreateNone(),
+                LineCapEnd = LineCapConf.CreateNone()
+            };
+
+            ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
+
+            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.True);
+
+            IReversibleAction action =
+                ColorPickerAction.CreateReversibleAction();
+
+            action.Stop();
+
+            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.False);
+            Assert.That(
+                ColorPickerLineMenu.Instance.TryGetColor(out Color color),
+                Is.False);
+            Assert.That(color, Is.EqualTo(Color.clear));
         }
 
         /// <summary>

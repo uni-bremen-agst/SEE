@@ -136,7 +136,17 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-            styleMenu.SetUpLineKindSelector(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+            styleMenu.SetUpLineKindSelector(
+                selectedLine,
+                renderer,
+                lineHolder,
+                surface,
+                surfaceParentName,
+                () => colorMenu.SelectPrimaryColor(
+                    selectedLine,
+                    lineHolder,
+                    surface,
+                    surfaceParentName));
 
             colorMenu.SetUpColorKindSelector(selectedLine, lineHolder, surface, surfaceParentName);
 

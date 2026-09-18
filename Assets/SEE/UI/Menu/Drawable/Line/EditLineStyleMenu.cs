@@ -5,7 +5,6 @@ using SEE.Net.Actions.Drawable;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
@@ -92,12 +91,16 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="lineHolder">The edited line configuration.</param>
         /// <param name="surface">The drawable surface containing the line.</param>
         /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
+        /// <param name="selectPrimaryColor">
+        /// Selects the primary color when changing the line kind requires monochrome coloring.
+        /// </param>
         internal void SetUpLineKindSelector(
             GameObject selectedLine,
             LineRenderer renderer,
             LineConf lineHolder,
             GameObject surface,
-            string surfaceParentName)
+            string surfaceParentName,
+            UnityAction selectPrimaryColor)
         {
             assignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
 
@@ -139,6 +142,8 @@ namespace SEE.UI.Menu.Drawable.Line
                             surfaceParentName,
                             LineConf.GetLineWithoutRenderPos(selectedLine),
                             lineHolder.ColorKind).Execute();
+
+                        selectPrimaryColor?.Invoke();
                     }
 
                     ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
@@ -164,6 +169,7 @@ namespace SEE.UI.Menu.Drawable.Line
                         && capConf.ColorKind == ColorKind.TwoDashed)
                     {
                         capConf.ColorKind = ColorKind.Monochrome;
+                        selectPrimaryColor?.Invoke();
                     }
 
                     lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);

@@ -62,7 +62,7 @@ namespace SEE.UI.Menu.Drawable
             else if (actionState == ActionStateTypes.ColorPicker)
             {
                 ColorPickerMindMapMenu.Instance.Destroy();
-                ColorPickerLineMenu.Disable();
+                ColorPickerLineMenu.Instance.Destroy();
                 ColorPickerMenu.Instance.Destroy();
             }
         }

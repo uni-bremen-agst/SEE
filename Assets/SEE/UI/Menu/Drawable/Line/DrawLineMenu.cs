@@ -62,6 +62,11 @@ namespace SEE.UI.Menu.Drawable.Line
         private UnityAction<int> colorKindAction;
 
         /// <summary>
+        /// The additional action registered at the thickness slider while drawing.
+        /// </summary>
+        private UnityAction<float> thicknessAction;
+
+        /// <summary>
         /// Initializes the drawing-specific part of the line menu.
         /// </summary>
         /// <param name="lineMenu">The game object containing the complete line menu.</param>
@@ -108,12 +113,7 @@ namespace SEE.UI.Menu.Drawable.Line
             SetUpFillOutTypeButton();
             SetUpFillOutSwitch();
 
-            controls.ColorPicker.AssignColor(ValueHolder.CurrentPrimaryColor);
-            controls.ColorPicker.onValueChanged.AddListener(
-                colorAction = color =>
-                {
-                    ValueHolder.CurrentPrimaryColor = color;
-                });
+            SelectPrimaryColor();
 
             MenuHelper.CalculateHeight(lineMenu, true);
         }
@@ -145,6 +145,12 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
                 colorAction = null;
+            }
+
+            if (thicknessAction != null)
+            {
+                controls.ThicknessSlider.OnValueChanged.RemoveListener(thicknessAction);
+                thicknessAction = null;
             }
         }
 
@@ -185,6 +191,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     && ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
                 {
                     ValueHolder.CurrentColorKind = ColorKind.Monochrome;
+                    SelectPrimaryColor();
                 }
             };
 
@@ -211,8 +218,11 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 ValueHolder.CurrentColorKind = GetColorKinds(true)[index];
 
-                if (ValueHolder.CurrentColorKind != ColorKind.Monochrome
-                    && ValueHolder.CurrentSecondaryColor == Color.clear)
+                if (ValueHolder.CurrentColorKind == ColorKind.Monochrome)
+                {
+                    SelectPrimaryColor();
+                }
+                else if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
                     ValueHolder.CurrentSecondaryColor =
                         ValueHolder.CurrentPrimaryColor;
@@ -228,15 +238,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SetUpPrimaryColorButton()
         {
             controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
-
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                AssignColorArea(
-                    color => ValueHolder.CurrentPrimaryColor = color,
-                    ValueHolder.CurrentPrimaryColor);
-            });
+            controls.PrimaryColorButtonManager.clickEvent.AddListener(SelectPrimaryColor);
 
             controls.PrimaryColorButtonManager.buttonVar.interactable = false;
         }
@@ -247,18 +249,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SetUpSecondaryColorButton()
         {
             controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
-
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                ValueHolder.CurrentSecondaryColor =
-                    ensureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
-
-                AssignColorArea(
-                    color => ValueHolder.CurrentSecondaryColor = color,
-                    ValueHolder.CurrentSecondaryColor);
-            });
+            controls.SecondaryColorButtonManager.clickEvent.AddListener(SelectSecondaryColor);
 
             controls.SecondaryColorButtonManager.buttonVar.interactable = true;
         }
@@ -270,10 +261,11 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.ThicknessSlider.AssignValue(ValueHolder.CurrentThickness);
 
-            controls.ThicknessSlider.OnValueChanged.AddListener(thickness =>
-            {
-                ValueHolder.CurrentThickness = thickness;
-            });
+            controls.ThicknessSlider.OnValueChanged.AddListener(
+                thicknessAction = thickness =>
+                {
+                    ValueHolder.CurrentThickness = thickness;
+                });
         }
 
         /// <summary>
@@ -291,20 +283,14 @@ namespace SEE.UI.Menu.Drawable.Line
                 ShowColorKind();
                 MenuHelper.CalculateHeight(lineMenu, true);
 
-                if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
+                if (ValueHolder.CurrentColorKind == ColorKind.Monochrome
+                    || !controls.PrimaryColorButtonManager.buttonVar.interactable)
                 {
-                    AssignColorArea(
-                        color => ValueHolder.CurrentPrimaryColor = color,
-                        ValueHolder.CurrentPrimaryColor);
+                    SelectPrimaryColor();
                 }
                 else
                 {
-                    ValueHolder.CurrentSecondaryColor =
-                        ensureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
-
-                    AssignColorArea(
-                        color => ValueHolder.CurrentSecondaryColor = color,
-                        ValueHolder.CurrentSecondaryColor);
+                    SelectSecondaryColor();
                 }
             });
 
@@ -379,15 +365,55 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Makes the primary and secondary color buttons mutually exclusive.
+        /// Selects the primary line color and binds the shared color picker to it.
         /// </summary>
-        private void MutuallyExclusiveColorButtons()
+        private void SelectPrimaryColor()
         {
-            controls.PrimaryColorButtonManager.buttonVar.interactable =
-                !controls.PrimaryColorButtonManager.buttonVar.IsInteractable();
+            SetPrimaryColorButtonState();
 
-            controls.SecondaryColorButtonManager.buttonVar.interactable =
-                !controls.SecondaryColorButtonManager.buttonVar.IsInteractable();
+            AssignColorArea(
+                color => ValueHolder.CurrentPrimaryColor = color,
+                ValueHolder.CurrentPrimaryColor);
+        }
+
+        /// <summary>
+        /// Selects the secondary line color and binds the shared color picker to it.
+        /// Monochrome coloring always falls back to the primary color.
+        /// </summary>
+        private void SelectSecondaryColor()
+        {
+            if (ValueHolder.CurrentColorKind == ColorKind.Monochrome)
+            {
+                SelectPrimaryColor();
+                return;
+            }
+
+            ValueHolder.CurrentSecondaryColor =
+                ensureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
+
+            SetSecondaryColorButtonState();
+
+            AssignColorArea(
+                color => ValueHolder.CurrentSecondaryColor = color,
+                ValueHolder.CurrentSecondaryColor);
+        }
+
+        /// <summary>
+        /// Updates the color buttons so that the primary color is selected.
+        /// </summary>
+        private void SetPrimaryColorButtonState()
+        {
+            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
+            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
+        }
+
+        /// <summary>
+        /// Updates the color buttons so that the secondary color is selected.
+        /// </summary>
+        private void SetSecondaryColorButtonState()
+        {
+            controls.PrimaryColorButtonManager.buttonVar.interactable = true;
+            controls.SecondaryColorButtonManager.buttonVar.interactable = false;
         }
 
         /// <summary>

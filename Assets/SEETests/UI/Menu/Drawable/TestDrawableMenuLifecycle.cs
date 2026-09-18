@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using System.Reflection;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace SEE.UI.Menu.Drawable
         {
             ColorPickerMenu.Instance.Destroy();
             ColorPickerMindMapMenu.Instance.Destroy();
-            ColorPickerLineMenu.Disable();
+            ColorPickerLineMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -65,21 +66,31 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Verifies that leaving the color picker action clears a pending line helper selection.
+        /// Verifies that leaving the color picker action destroys an open line helper menu
+        /// and discards its unfinished selection.
         /// </summary>
         [Test]
-        public void TestLeavingColorPickerClearsLineHelperState()
+        public void TestLeavingColorPickerDestroysLineHelperMenu()
         {
-            GameObject lineMenu = new GameObject("ColorPickerLine");
+            LineConf configuration = new LineConf
+            {
+                PrimaryColor = Color.red,
+                SecondaryColor = Color.blue,
+                ColorKind = GameDrawer.ColorKind.Monochrome,
+                FillOutStatus = true,
+                FillOutColor = Color.green,
+                LineCapStart = LineCapConf.CreateNone(),
+                LineCapEnd = LineCapConf.CreateNone()
+            };
 
-            SetPrivateStaticField(typeof(ColorPickerLineMenu), "instance", lineMenu);
-            SetPrivateStaticField(typeof(ColorPickerLineMenu), "gotColor", true);
-            SetPrivateStaticField(typeof(ColorPickerLineMenu), "chosenColor", Color.red);
+            ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
+
+            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.True);
 
             InvokeLifecycle(ActionStateTypes.ColorPicker, ActionStateTypes.Edit);
 
-            Assert.That(lineMenu == null, Is.True);
-            Assert.That(ColorPickerLineMenu.TryGetColor(out Color color), Is.False);
+            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.False);
+            Assert.That(ColorPickerLineMenu.Instance.TryGetColor(out Color color), Is.False);
             Assert.That(color, Is.EqualTo(Color.clear));
         }
 

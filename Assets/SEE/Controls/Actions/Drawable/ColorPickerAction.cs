@@ -116,7 +116,7 @@ namespace SEE.Controls.Actions.Drawable
             /// of <see cref="ColorPickerLineMenu"/>.
             /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
             /// that the input can be immediately detected.
-            if (waitForHelperMenu && ColorPickerLineMenu.TryGetColor(out Color color1))
+            if (waitForHelperMenu && ColorPickerLineMenu.Instance.TryGetColor(out Color color1))
             {
                 pickedColor = color1;
                 waitForHelperMenu = false;
@@ -137,6 +137,14 @@ namespace SEE.Controls.Actions.Drawable
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
 
+                /// Lines and their nested line-cap objects require their own resolution,
+                /// because a cap can use visual properties that differ from the main line.
+                if (ColorPickerLineMenu.Instance.TryBeginSelection(hitObject, true))
+                {
+                    waitForHelperMenu = true;
+                    return;
+                }
+
                 /// Check for the case that a child object of a drawable type object was clicked.
                 if (!Tags.DrawableTypes.Contains(hitObject.tag)
                     && !hitObject.CompareTag(Tags.Drawable)
@@ -147,26 +155,20 @@ namespace SEE.Controls.Actions.Drawable
 
                 switch (hitObject.tag)
                 {
-                    case Tags.Line:
-                        LineConf line = LineConf.GetLine(hitObject);
-                        pickedColor = line.PrimaryColor;
-                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
-                        {
-                            ColorPickerLineMenu.Enable(hitObject);
-                            waitForHelperMenu = true;
-                        }
-                        break;
                     case Tags.DText:
                         pickedColor = hitObject.GetComponent<TextMeshPro>().color;
                         break;
+
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
+
                     case Tags.MindMapNode:
                         ColorPickerMindMapMenu.Instance.Enable(hitObject, true);
                         waitForHelperMenu = true;
                         break;
+
                     case Tags.Drawable:
                         DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
@@ -187,6 +189,14 @@ namespace SEE.Controls.Actions.Drawable
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
 
+                /// Lines and their nested line-cap objects require their own resolution,
+                /// because a cap can use visual properties that differ from the main line.
+                if (ColorPickerLineMenu.Instance.TryBeginSelection(hitObject, false))
+                {
+                    waitForHelperMenu = true;
+                    return;
+                }
+
                 /// Check for the case that a child object of a drawable type object was clicked.
                 if (!Tags.DrawableTypes.Contains(hitObject.tag)
                     && !hitObject.CompareTag(Tags.Drawable)
@@ -197,30 +207,20 @@ namespace SEE.Controls.Actions.Drawable
 
                 switch (hitObject.tag)
                 {
-                    case Tags.Line:
-                        LineConf line = LineConf.GetLine(hitObject);
-                        pickedColor = line.SecondaryColor;
-                        if (line.ColorKind == GameDrawer.ColorKind.Monochrome)
-                        {
-                            pickedColor = line.PrimaryColor;
-                        }
-                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
-                        {
-                            ColorPickerLineMenu.Enable(hitObject);
-                            waitForHelperMenu = true;
-                        }
-                        break;
                     case Tags.DText:
                         pickedColor = hitObject.GetComponent<TextMeshPro>().outlineColor;
                         break;
+
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
+
                     case Tags.MindMapNode:
                         ColorPickerMindMapMenu.Instance.Enable(hitObject, false);
                         waitForHelperMenu = true;
                         break;
+
                     case Tags.Drawable:
                         DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
@@ -239,6 +239,24 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
+        }
+
+        /// <summary>
+        /// Stops the current color-picking interaction and clears any transient helper
+        /// menu state belonging to this action instance.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+
+            ColorPickerMindMapMenu.Instance.Destroy();
+            ColorPickerLineMenu.Instance.Destroy();
+
+            isInAction = false;
+            waitForHelperMenu = false;
+            finishChosingColor = false;
+            pickForSecondColor = false;
+            pickedColor = Color.clear;
         }
 
         /// <summary>
