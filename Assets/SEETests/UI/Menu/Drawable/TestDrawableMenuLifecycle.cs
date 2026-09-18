@@ -122,21 +122,5 @@ namespace SEE.UI.Menu.Drawable
                 BranchLineToParent = ""
             };
         }
-
-        /// <summary>
-        /// Sets a private static field for lifecycle test preparation.
-        /// </summary>
-        /// <typeparam name="T">The type of the field value.</typeparam>
-        /// <param name="type">The type declaring the field.</param>
-        /// <param name="fieldName">The name of the field.</param>
-        /// <param name="value">The value to assign.</param>
-        private static void SetPrivateStaticField<T>(System.Type type, string fieldName, T value)
-        {
-            FieldInfo field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-
-            Assert.That(field, Is.Not.Null);
-
-            field.SetValue(null, value);
-        }
     }
 }

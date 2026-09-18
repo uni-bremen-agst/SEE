@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Stops the <see cref="DrawFreehandAction"/> and hides the line menu.
+        /// Stops the <see cref="DrawFreehandAction"/> and removes an unfinished line.
         /// </summary>
         public override void Stop()
         {

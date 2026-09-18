@@ -152,7 +152,7 @@ namespace SEE.Controls.Actions.Drawable
 
         #region Lifecycle
         /// <summary>
-        /// Enables the shape menu.
+        /// Registers the finish-button callback for the current action instance.
         /// </summary>
         public override void Awake()
         {
@@ -168,8 +168,8 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Stops the action. It disables the shape menu and
-        /// destroys the line shape if it is not successfully completed.
+        /// Stops the action, resets action-specific menu state and
+        /// destroys an unfinished shape preview.
         /// </summary>
         public override void Stop()
         {
