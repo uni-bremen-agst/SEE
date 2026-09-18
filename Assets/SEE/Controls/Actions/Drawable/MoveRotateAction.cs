@@ -180,9 +180,9 @@ namespace SEE.Controls.Actions.Drawable
                 if (progressState == ProgressState.Move)
                 {
                     GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
-                        MoveMenu.includeChildren);
+                        MoveMenu.Instance.IncludeChildren);
                     new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        oldObjectPosition, MoveMenu.includeChildren).Execute();
+                        oldObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
                 }
 
                 if (progressState == ProgressState.Rotate)
@@ -256,9 +256,9 @@ namespace SEE.Controls.Actions.Drawable
                     if (progressState == ProgressState.Move)
                     {
                         GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
-                            MoveMenu.includeChildren);
+                            MoveMenu.Instance.IncludeChildren);
                         new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                            oldObjectPosition, MoveMenu.includeChildren).Execute();
+                            oldObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
                     }
 
                     if (progressState == ProgressState.Rotate)
@@ -394,9 +394,9 @@ namespace SEE.Controls.Actions.Drawable
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-                MoveMenu.Enable(selectedObject);
-                SwitchManager speedUp = MoveMenu.GetSpeedUpManager();
-                SwitchManager moveByMouse = MoveMenu.GetMoveByMouseManager();
+                MoveMenu.Instance.Enable(selectedObject);
+                SwitchManager speedUp = MoveMenu.Instance.GetSpeedUpManager();
+                SwitchManager moveByMouse = MoveMenu.Instance.GetMoveByMouseManager();
                 /// For switching the speed.
                 if (Input.GetKeyDown(KeyCode.LeftControl))
                 {
@@ -453,9 +453,9 @@ namespace SEE.Controls.Actions.Drawable
                 moveByMouse.isOn = false;
                 moveByMouse.UpdateUI();
                 newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, direction,
-                    speedUp.isOn, MoveMenu.includeChildren);
+                    speedUp.isOn, MoveMenu.Instance.IncludeChildren);
                 new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                    newObjectPosition, MoveMenu.includeChildren).Execute();
+                    newObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
             }
         }
 
@@ -503,9 +503,9 @@ namespace SEE.Controls.Actions.Drawable
                         && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(surface)))
                 {
                     newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject,
-                        hit.point, MoveMenu.includeChildren);
+                        hit.point, MoveMenu.Instance.IncludeChildren);
                     new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        newObjectPosition, MoveMenu.includeChildren).Execute();
+                        newObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
                 }
             }
         }
@@ -644,7 +644,7 @@ namespace SEE.Controls.Actions.Drawable
                     float degree = selectedObject.transform.localEulerAngles.z;
                     bool includeChildren = RotationMenu.includeChildren
                         && executedOperation == ProgressState.Rotate ||
-                        MoveMenu.includeChildren && executedOperation == ProgressState.Move;
+                        MoveMenu.Instance.IncludeChildren && executedOperation == ProgressState.Move;
                     memento = new Memento(selectedObject, GameFinder.GetDrawableSurface(selectedObject), selectedObject.name,
                         oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation,
                         includeChildren);
