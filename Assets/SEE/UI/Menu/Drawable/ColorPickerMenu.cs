@@ -7,12 +7,12 @@ using UnityEngine;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This singleton class provides the color picker menu for the <see cref="ColorPickerAction"/>.
+    /// Provides the color picker menu for the <see cref="ColorPickerAction"/>.
     /// </summary>
     public class ColorPickerMenu : SingletonMenu
     {
         /// <summary>
-        /// The location where the color picker menu prefeb is placed.
+        /// The location where the color picker menu prefab is placed.
         /// </summary>
         private const string colorPickerMenuPrefab = "Prefabs/UI/Drawable/ColorPickerMenu";
 
@@ -27,70 +27,123 @@ namespace SEE.UI.Menu.Drawable
         public static ColorPickerMenu Instance { get; private set; }
 
         /// <summary>
-        /// The selection for which color the picker should pick the color.
-        /// Primary or secondary color.
+        /// The switch selecting whether a picked color should become the primary
+        /// or secondary color.
         /// </summary>
-        private static readonly SwitchManager switchManager;
+        private SwitchManager switchManager;
 
         /// <summary>
-        /// The HSV color picker to show the selected primary color.
+        /// The HSV color picker displaying the current primary color.
         /// </summary>
-        private static readonly ColorPicker pickerForPrimaryColor;
+        private ColorPicker pickerForPrimaryColor;
 
         /// <summary>
-        /// The HSV color picker to show the selected second color.
+        /// The HSV color picker displaying the current secondary color.
         /// </summary>
-        private static readonly ColorPicker pickerForSecondColor;
+        private ColorPicker pickerForSecondaryColor;
 
         /// <summary>
-        /// The init constructor that create the instance for the color picker menu.
-        /// It hides the text menu by default.
+        /// The color currently displayed by the primary color picker.
+        /// </summary>
+        internal Color PrimaryColor
+        {
+            get
+            {
+                return pickerForPrimaryColor != null ? pickerForPrimaryColor.CurrentColor : Color.clear;
+            }
+        }
+
+        /// <summary>
+        /// The color currently displayed by the secondary color picker.
+        /// </summary>
+        internal Color SecondaryColor
+        {
+            get
+            {
+                return pickerForSecondaryColor != null ? pickerForSecondaryColor.CurrentColor : Color.clear;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the singleton instance.
         /// </summary>
         static ColorPickerMenu()
         {
             Instance = new ColorPickerMenu();
+        }
 
-            Instance.Instantiate(colorPickerMenuPrefab);
+        /// <summary>
+        /// Enables the color picker menu.
+        /// The menu is created when necessary and its displayed colors are synchronized
+        /// with the current drawable color settings.
+        /// </summary>
+        public override void Enable()
+        {
+            if (gameObject == null)
+            {
+                Instantiate(colorPickerMenuPrefab);
+                ResolveControls();
+            }
 
-            switchManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Switch").GetComponent<SwitchManager>();
-
-            /// Gets and assign the color picker for the primary color.
-            pickerForPrimaryColor = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Primary").GetComponent<ColorPicker>();
             pickerForPrimaryColor.AssignColor(ValueHolder.CurrentPrimaryColor);
+            pickerForSecondaryColor.AssignColor(ValueHolder.CurrentSecondaryColor);
 
-            /// Gets and assign the color picker for the secondary color.
-            pickerForSecondColor = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Second").GetComponent<ColorPicker>();
-            pickerForSecondColor.AssignColor(ValueHolder.CurrentSecondaryColor);
-
-            /// Hides the menu.
-            Instance.Enable();
+            base.Enable();
         }
 
         /// <summary>
-        /// Assigns a color to the primary HSV color picker.
+        /// Resolves the UI controls of the currently instantiated color picker menu.
+        /// </summary>
+        private void ResolveControls()
+        {
+            switchManager = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Switch").GetComponent<SwitchManager>();
+            pickerForPrimaryColor = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Primary").GetComponent<ColorPicker>();
+            pickerForSecondaryColor = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Second").GetComponent<ColorPicker>();
+        }
+
+        /// <summary>
+        /// Assigns a color to the primary HSV color picker if the menu currently exists.
         /// </summary>
         /// <param name="color">The color that should be assigned.</param>
-        public static void AssignPrimaryColor(Color color)
+        public void AssignPrimaryColor(Color color)
         {
-            pickerForPrimaryColor.AssignColor(color);
+            if (pickerForPrimaryColor != null)
+            {
+                pickerForPrimaryColor.AssignColor(color);
+            }
         }
 
         /// <summary>
-        /// Assigns a color to the secondary HSV color picker.
+        /// Assigns a color to the secondary HSV color picker if the menu currently exists.
         /// </summary>
         /// <param name="color">The color that should be assigned.</param>
-        public static void AssignSecondaryColor(Color color)
+        public void AssignSecondaryColor(Color color)
         {
-            pickerForSecondColor.AssignColor(color);
+            if (pickerForSecondaryColor != null)
+            {
+                pickerForSecondaryColor.AssignColor(color);
+            }
         }
 
         /// <summary>
-        /// Returns the state of the switch.
+        /// Returns whether picked colors should be assigned as secondary colors.
         /// </summary>
-        /// <returns>The switch status.</returns>
-        public static bool GetSwitchStatus()
+        /// <returns>True if secondary-color selection is active; otherwise false.</returns>
+        public bool GetSwitchStatus()
         {
-            return switchManager.isOn;
+            return switchManager != null && switchManager.isOn;
+        }
+
+        /// <summary>
+        /// Destroys the color picker menu and clears its cached UI references.
+        /// </summary>
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            switchManager = null;
+            pickerForPrimaryColor = null;
+            pickerForSecondaryColor = null;
         }
     }
 }

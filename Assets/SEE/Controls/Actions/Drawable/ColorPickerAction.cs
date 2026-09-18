@@ -86,15 +86,15 @@ namespace SEE.Controls.Actions.Drawable
                     && isInAction && !waitForHelperMenu)
                     || finishChosingColor)
                 {
-                    if (!ColorPickerMenu.GetSwitchStatus())
+                    if (!ColorPickerMenu.Instance.GetSwitchStatus())
                     {
                         ValueHolder.CurrentPrimaryColor = pickedColor;
-                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
+                        ColorPickerMenu.Instance.AssignPrimaryColor(pickedColor);
                     }
                     else
                     {
                         pickForSecondColor = true;
-                        ColorPickerMenu.AssignSecondaryColor(pickedColor);
+                        ColorPickerMenu.Instance.AssignSecondaryColor(pickedColor);
                         ValueHolder.CurrentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
@@ -326,9 +326,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             ValueHolder.CurrentPrimaryColor = memento.OldChosenPrimaryColor;
-            ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
+            ColorPickerMenu.Instance.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
             ValueHolder.CurrentSecondaryColor = memento.OldChosenSecondColor;
-            ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
+            ColorPickerMenu.Instance.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
         }
 
         /// <summary>
@@ -340,12 +340,12 @@ namespace SEE.Controls.Actions.Drawable
             if (!memento.PickForSecondColor)
             {
                 ValueHolder.CurrentPrimaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
+                ColorPickerMenu.Instance.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
             }
             else
             {
                 ValueHolder.CurrentSecondaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
+                ColorPickerMenu.Instance.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
             }
         }
 
