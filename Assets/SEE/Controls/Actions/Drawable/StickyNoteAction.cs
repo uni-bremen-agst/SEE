@@ -323,7 +323,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// Block for selecting the rotation and the right position.
                     StickyNoteMenu.Instance.Destroy();
                     StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
-                    StickyNoteMoveMenu.Enable(stickyNote.GetRootParent(), true);
+                    StickyNoteMoveMenu.Instance.Enable(stickyNote.GetRootParent(), true);
                 }
             }
         }
@@ -335,7 +335,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SetPositionAndRotation(bool spawnMode)
         {
-            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
+            if (StickyNoteMoveMenu.Instance.TryGetFinish(out bool isFinished))
             {
                 finish = isFinished;
             }
@@ -508,7 +508,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameFinder.GetDrawableSurface(stickyNoteHolder).GetComponent<Collider>().enabled = true;
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
-                    StickyNoteMoveMenu.Enable(stickyNoteHolder);
+                    StickyNoteMoveMenu.Instance.Enable(stickyNoteHolder);
                     moveMenuOpened = true;
                 }
             }
@@ -528,7 +528,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ValueHolder.MoveDirection direction = GetDirection();
                 GameObject holder = stickyNote.GetRootParent();
-                Vector3 newPos = GameStickyNoteManager.MoveByMenu(holder, direction, StickyNoteMoveMenu.GetSpeed());
+                Vector3 newPos = GameStickyNoteManager.MoveByMenu(holder, direction, StickyNoteMoveMenu.Instance.GetSpeed());
                 if (!spawnMode)
                 {
                     GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
@@ -705,7 +705,7 @@ namespace SEE.Controls.Actions.Drawable
                         ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
                     };
                     StickyNoteMenu.Instance.Destroy();
-                    StickyNoteEditMenu.Enable(surface.transform.parent.gameObject, memento.ChangedConfig);
+                    StickyNoteEditMenu.Instance.Enable(surface.transform.parent.gameObject, memento.ChangedConfig);
                 }
                 else
                 {

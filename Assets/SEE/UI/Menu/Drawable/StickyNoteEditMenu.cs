@@ -11,7 +11,7 @@ using UnityEngine.Events;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides the edit menu for sticky notes.
+    /// Provides the edit menu for sticky notes.
     /// </summary>
     public class StickyNoteEditMenu : SingletonMenu
     {
@@ -30,79 +30,88 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static StickyNoteEditMenu Instance { get; private set; }
 
+        /// <summary>
+        /// Initializes the singleton instance.
+        /// </summary>
         static StickyNoteEditMenu()
         {
             Instance = new StickyNoteEditMenu();
         }
 
         /// <summary>
-        /// Create and enables the edit menu.
-        /// It add's the necessary Handler to the GUI areas.
+        /// Creates and enables the edit menu and registers the required handlers.
         /// </summary>
-        public static void Enable(GameObject stickyNote, DrawableConfig newConfig)
+        /// <param name="stickyNote">The sticky note that should be edited.</param>
+        /// <param name="newConfig">The configuration storing the changed values.</param>
+        public void Enable(GameObject stickyNote, DrawableConfig newConfig)
         {
             /// Instantiate the menu.
-            Instance.Instantiate(editMenuPrefab);
+            Instantiate(editMenuPrefab);
 
-            /// Initialize the oder in layer slider.
-            LayerSlider(stickyNote, newConfig);
+            /// Initialize the order-in-layer slider.
+            InitializeLayerSlider(stickyNote, newConfig);
 
             /// Initialize the color picker for the sticky note color.
-            ColorPicker(stickyNote, newConfig);
+            InitializeColorPicker(stickyNote, newConfig);
 
-            UnityAction callback = () =>
+            UnityAction returnCall = () =>
             {
-                Instance.Enable();
+                Enable();
                 StickyNoteRotationMenu.Destroy();
                 ScaleMenu.Instance.Destroy();
             };
 
             /// Initialize the edit rotation button.
-            Rotation(stickyNote, callback);
+            InitializeRotation(stickyNote, returnCall);
 
             /// Initialize the edit scale button.
-            Scale(stickyNote, callback);
+            InitializeScale(stickyNote, returnCall);
 
-            /// Initialize the lighting switch manager.
-            Lighting(stickyNote, newConfig);
+            /// Initialize the lighting switch.
+            InitializeLighting(stickyNote, newConfig);
         }
 
         /// <summary>
-        /// Initializes the order in layer slider and adds the required handler.
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLayer"/>
-        /// and saves the new order in the layer in the configuration.
+        /// Initializes the order-in-layer slider and registers its change handler.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which order in layer should be changed.</param>
-        /// <param name="newConfig">The configuration which holds the new values.</param>
-        private static void LayerSlider(GameObject stickyNote, DrawableConfig newConfig)
+        /// <param name="stickyNote">The sticky note whose order should be changed.</param>
+        /// <param name="newConfig">The configuration storing the changed order.</param>
+        private void InitializeLayerSlider(GameObject stickyNote, DrawableConfig newConfig)
         {
-            LayerSliderController orderInLayerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
+            LayerSliderController orderInLayerSlider =
+                gameObject.GetComponentInChildren<LayerSliderController>(true);
+
             orderInLayerSlider.AssignValue(newConfig.Order);
             orderInLayerSlider.OnValueChanged.AddListener(order =>
             {
                 newConfig.Order = order;
                 GameStickyNoteManager.ChangeLayer(stickyNote, order);
-                new EditLayerNetAction(GameFinder.GetDrawableSurface(stickyNote).name, stickyNote.name, "",
-                    order).Execute();
+
+                new EditLayerNetAction(GameFinder.GetDrawableSurface(stickyNote).name,
+                    stickyNote.name, "", order).Execute();
             });
         }
 
         /// <summary>
-        /// Initializes the lighting switch manager and adds the required handler.
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLighting"/>
-        /// and saves the new lighting state in the configuration.
+        /// Initializes the lighting switch and registers its change handlers.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which lighting should be changed.</param>
-        /// <param name="newConfig">The configuration which holds the new values.</param>
-        private static void Lighting(GameObject stickyNote, DrawableConfig newConfig)
+        /// <param name="stickyNote">The sticky note whose lighting should be changed.</param>
+        /// <param name="newConfig">The configuration storing the changed lighting state.</param>
+        private void InitializeLighting(GameObject stickyNote, DrawableConfig newConfig)
         {
-            SwitchManager lightingManager = Instance.gameObject.GetComponentInChildren<SwitchManager>();
+            SwitchManager lightingManager = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "LightningSwitch").GetComponent<SwitchManager>();
+
+            lightingManager.OffEvents.RemoveAllListeners();
+            lightingManager.OnEvents.RemoveAllListeners();
+
             lightingManager.OffEvents.AddListener(() =>
             {
                 newConfig.Lighting = false;
                 GameDrawableManager.ChangeLighting(stickyNote, false);
                 new DrawableChangeLightingNetAction(newConfig).Execute();
             });
+
             lightingManager.OnEvents.AddListener(() =>
             {
                 newConfig.Lighting = true;
@@ -110,21 +119,21 @@ namespace SEE.UI.Menu.Drawable
                 new DrawableChangeLightingNetAction(newConfig).Execute();
             });
 
-            /// Assigns the current status to the switch and updates the UI.
+            /// Assign the current state to the switch and update its UI.
             lightingManager.isOn = newConfig.Lighting;
             lightingManager.UpdateUI();
         }
 
         /// <summary>
-        /// Initializes the color picker and adds the required handler.
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeColor"/>
-        /// and saves the new color in the configuration.
+        /// Initializes the color picker and registers its change handler.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which color should be changed.</param>
-        /// <param name="newConfig">The configuration which holds the new values.</param>
-        private static void ColorPicker(GameObject stickyNote, DrawableConfig newConfig)
+        /// <param name="stickyNote">The sticky note whose color should be changed.</param>
+        /// <param name="newConfig">The configuration storing the changed color.</param>
+        private void InitializeColorPicker(GameObject stickyNote, DrawableConfig newConfig)
         {
-            HSVPicker.ColorPicker picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
+            HSVPicker.ColorPicker picker =
+                gameObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
+
             picker.AssignColor(newConfig.Color);
             picker.onValueChanged.AddListener(color =>
             {
@@ -135,34 +144,40 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the rotation button and adds the required handler.
-        /// The handler opens the <see cref="StickyNoteRotationMenu"/>.
+        /// Initializes the rotation button.
+        /// The button opens the sticky note rotation menu.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which rotation should be changed.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
-        private static void Rotation(GameObject stickyNote, UnityAction callback)
+        /// <param name="stickyNote">The sticky note whose rotation should be changed.</param>
+        /// <param name="returnCall">The callback used to return to this edit menu.</param>
+        private void InitializeRotation(GameObject stickyNote, UnityAction returnCall)
         {
-            ButtonManagerBasic rotation = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
-            rotation.clickEvent.AddListener(() =>
+            ButtonManagerBasic rotationButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
+
+            rotationButton.clickEvent.RemoveAllListeners();
+            rotationButton.clickEvent.AddListener(() =>
             {
-                Instance.Disable();
-                StickyNoteRotationMenu.Enable(stickyNote.GetRootParent(), null, callback);
+                Disable();
+                StickyNoteRotationMenu.Enable(stickyNote.GetRootParent(), null, returnCall);
             });
         }
 
         /// <summary>
-        /// Initializes the scale button and adds the required handler.
-        /// The handler opens the <see cref="ScaleMenu"/>.
+        /// Initializes the scale button.
+        /// The button opens the scale menu.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which scale should be changed.</param>
-        /// <param name="callback">The call back to return to the parent menu.</param>
-        private static void Scale(GameObject stickyNote, UnityAction callback)
+        /// <param name="stickyNote">The sticky note whose scale should be changed.</param>
+        /// <param name="returnCall">The callback used to return to this edit menu.</param>
+        private void InitializeScale(GameObject stickyNote, UnityAction returnCall)
         {
-            ButtonManagerBasic scale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Scale").GetComponent<ButtonManagerBasic>();
-            scale.clickEvent.AddListener(() =>
+            ButtonManagerBasic scaleButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Scale").GetComponent<ButtonManagerBasic>();
+
+            scaleButton.clickEvent.RemoveAllListeners();
+            scaleButton.clickEvent.AddListener(() =>
             {
-                Instance.Disable();
-                ScaleMenu.Instance.Enable(stickyNote, true, callback);
+                Disable();
+                ScaleMenu.Instance.Enable(stickyNote, true, returnCall);
             });
         }
     }
