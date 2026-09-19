@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 using SEE.Cinemachines;
 using SEE.Cinemachines.Utility;
 using SEE.Utils;
+using System.Linq;
+
 
 
 // Only use UnityEditor-Namespaces when inside the Unity-Editor.
@@ -23,7 +25,7 @@ using UnityEditor;
 namespace SEEEditor.Cinemachines.Utility
 {
     /// <summary>
-    /// Class for Restoring GameObjects related to the Cinemachines.
+    /// Class for restoring GameObjects related to the Cinemachines.
     /// Based on work done by inkle Studios: https://github.com/inkle/Unity-Save-Play-Mode-Changes
     /// under MIT License.
     /// </summary>
@@ -31,7 +33,7 @@ namespace SEEEditor.Cinemachines.Utility
     internal static class CinemachinesStateRestorer
     {
         /// <summary>
-        /// Structure-Class for storing References of Components in a serializable form.
+        /// For storing references of components in a serializable form.
         /// </summary>
         [Serializable]
         internal class StoredReference
@@ -41,7 +43,7 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Structure-Class for storing Components inside GameObjects in a serializable form.
+        /// For storing components inside GameObjects in a serializable form.
         /// </summary>
         [Serializable]
         internal class StoredComponent
@@ -57,7 +59,7 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Structure-Class for storing GameObjects in a serializable form.
+        /// For storing GameObjects in a serializable form.
         /// </summary>
         [Serializable]
         internal class StoredGameObject
@@ -67,7 +69,7 @@ namespace SEEEditor.Cinemachines.Utility
             public string JSONGameObject;
             public readonly List<StoredComponent> ListComponents = new();
 
-            // List of Children inside this GameObject
+            // List of children inside this GameObject
             [SerializeReference]
             public List<StoredGameObject> ChildGameObjects = new();
         }
@@ -78,10 +80,10 @@ namespace SEEEditor.Cinemachines.Utility
         internal class Serializer
         {
             /// <summary>
-            /// Helper-Function to Serialize References inside Components.
+            /// Helper function to serialize references inside components.
             /// </summary>
-            /// <param name="component">The Component to be serialized.</param>
-            /// <returns>List of StoredReferences, that will be included to the respective Component.</returns>
+            /// <param name="component">The component to be serialized.</param>
+            /// <returns>List of StoredReferences that will be included to the respective component.</returns>
             private List<StoredReference> SerializeReference(Component component)
             {
                 // List for storing required References, that can not be applied normally
@@ -91,18 +93,18 @@ namespace SEEEditor.Cinemachines.Utility
                 SerializedObject serializedObject = new(component);
                 SerializedProperty propertyIterator = serializedObject.GetIterator();
 
-                // while there still are properties
+                // while there are still properties
                 while (propertyIterator.NextVisible(true))
                 {
-                    // check, if the type of property is relevant to us
+                    // check whether the type of property is relevant to us
                     if (propertyIterator.propertyType == SerializedPropertyType.ObjectReference)
                     {
                         StoredReference storedReference = new();
 
-                        // get Object referenced in Property
+                        // get object referenced in property
                         UnityEngine.Object objectReference = propertyIterator.objectReferenceValue;
 
-                        // setup StoredReference appropriatly, based on if its null or not
+                        // setup StoredReference appropriatly, based on wether it is null or not
                         switch (objectReference)
                         {
                             case null:
@@ -122,10 +124,10 @@ namespace SEEEditor.Cinemachines.Utility
             }
 
             /// <summary>
-            /// Serializing Function for Transforms and their associated Data.
+            /// Serializing function for Transforms and their associated data.
             /// </summary>
             /// <param name="rootObject">The GameObject to be serialized.</param>
-            /// <returns>Returns a StoredGameObject, that can be serialized into JSON.</returns>
+            /// <returns>Returns a StoredGameObject that can be serialized into JSON.</returns>
             internal StoredGameObject Serialize(Transform rootObject)
             {
                 StoredGameObject storedGameObject = new();
@@ -170,7 +172,7 @@ namespace SEEEditor.Cinemachines.Utility
         internal class Deserializer
         {
             /// <summary>
-            /// Temporary Dictionary for storing InstanceIDs of Objects with their respective StoredProperties.
+            /// Temporary Dictionary for storing InstanceIDs of objects with their respective StoredProperties.
             /// </summary>
             private Dictionary<int, List<StoredReference>> storedReferences = new();
 
@@ -180,27 +182,26 @@ namespace SEEEditor.Cinemachines.Utility
             private Dictionary<int, int> referenceList = new();
 
             /// <summary>
-            /// Helper-Function to Deserialize References inside Components, like Transform, UnityEvents, etc.
+            /// Helper-Function to Deserialize References inside components, like Transform, UnityEvents, etc.
             /// </summary>
             private void DeserializeReferences()
             {
-                // Loop through every KeyValuePair in the storedReferences
                 foreach (var kvp in storedReferences)
                 {
-                    // Find the Object/Component, you want to apply the References to
+                    // Find the Object/Component you want to apply the references to
                     UnityEngine.Object restoredObject = Resources.InstanceIDToObject(kvp.Key);
 
-                    // create SerializedObject and Property
+                    // create SerializedObject and property
                     SerializedObject serializedObject = new(restoredObject);
                     SerializedProperty propertyIterator = serializedObject.GetIterator();
 
                     // get the stored References list from the KeyValuePair
                     List<StoredReference> storedReferencesList = kvp.Value;
 
-                    // local Counter for iterating through the storedReferences for this Object
+                    // local counter for iterating through the storedReferences for this object
                     int index = 0;
 
-                    // check, if there is still a Property accessable
+                    // check if there is still a Property accessable
                     while (propertyIterator.NextVisible(true))
                     {
                         // check, if the type of the Property is relevant to us
@@ -214,11 +215,10 @@ namespace SEEEditor.Cinemachines.Utility
                             {
                                 // ... else get the Object by InstanceID and apply it
                                 int objectInstanceID;
-                                if (referenceList.ContainsKey(storedReference.InstanceID))
+                                if (referenceList.TryGetValue(index, out objectInstanceID))
                                 {
                                     // This part is not working correctly, since Unity differentiates InstanceIDs
-                                    // from actual Objects and References
-                                    objectInstanceID = referenceList[storedReference.InstanceID];
+                                    // from actual objects and references
                                 }
                                 else
                                 {
@@ -229,19 +229,19 @@ namespace SEEEditor.Cinemachines.Utility
 
                                 if (objectReference == null)
                                 {
-                                    Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the Object was created during Runtime, which must then be manually recreated and reapplied.\n");
+                                    Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the object was created during runtime, which must then be manually recreated and re-applied.\n");
                                 }
 
                                 propertyIterator.objectReferenceValue = objectReference;
                             }
 
-                            // Increment Index for next Reference
+                            // Increment index for next reference.
                             index++;
                         }
                     }
 
-                    // Apply all modified Properties to the SerializedObject, which applies the
-                    // changes to the regular Objects/Components
+                    // Apply all modified properties to the SerializedObject, which applies the
+                    // changes to the regular objects/components
                     serializedObject.ApplyModifiedProperties();
                 }
             }
@@ -249,15 +249,15 @@ namespace SEEEditor.Cinemachines.Utility
             /// <summary>
             /// Actual Deserializing Method, which returns the root transform.
             /// </summary>
-            /// <param name="storedGameObject">The StoredGameObject, that will be restored to actual GameObjects.</param>
-            /// <returns>The Transform reconstructed from the StoredGameObject, including their Children.</returns>
+            /// <param name="storedGameObject">The StoredGameObject that will be restored to actual GameObjects.</param>
+            /// <returns>The Transform reconstructed from the StoredGameObject, including their children.</returns>
             private Transform Deserialize(StoredGameObject storedGameObject)
             {
-                // Find Object as Child of rootTransform
+                // Find object as child of rootTransform
                 GameObject restoredGameObject = new();
                 EditorJsonUtility.FromJsonOverwrite(storedGameObject.JSONGameObject, restoredGameObject);
 
-                // Iterate through all Components for this GameObject
+                // Iterate through all components for this GameObject
                 foreach (StoredComponent storedComponent in storedGameObject.ListComponents)
                 {
                     Type ComponentType = Assembly.Load(storedComponent.AssemblyName).GetType(storedComponent.TypeName);
@@ -294,14 +294,14 @@ namespace SEEEditor.Cinemachines.Utility
                     // apply Data onto the component
                     EditorJsonUtility.FromJsonOverwrite(storedComponent.JSONContent, readComponent);
 
-                    // store References, that might need to be applied after everything has been applied
+                    // store references that might need to be applied after everything has been applied
                     try
                     {
                         storedReferences.Add(readComponent.GetInstanceID(), storedComponent.ListReferences);
                     }
                     catch (Exception)
                     {
-                        Debug.LogWarning($"Attempted to Map '{readComponent.GetInstanceID()}' to a References List, while already having one accosiated to it.\n");
+                        Debug.LogWarning($"Attempted to map '{readComponent.GetInstanceID()}' to a references list, while already having one associated to it.\n");
                     }
 
                     // store mapping of old InstanceID to new InstanceID for Components
@@ -311,11 +311,11 @@ namespace SEEEditor.Cinemachines.Utility
                     }
                     catch (Exception)
                     {
-                        Debug.LogWarning($"Attempted to Map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'\n");
+                        Debug.LogWarning($"Attempted to map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'\n");
                     }
                 }
 
-                // Iterate depth-first through all child GameObjects
+                // Iterate depth first through all child GameObjects
                 foreach (StoredGameObject childStoredGameObject in storedGameObject.ChildGameObjects)
                 {
                     Transform child = Deserialize(childStoredGameObject);
@@ -328,9 +328,9 @@ namespace SEEEditor.Cinemachines.Utility
             }
 
             /// <summary>
-            /// Primer Deserializer Function for GameObjects, initialized by inputing serialized Data.
+            /// Main Deserializer function for GameObjects, initialized by inputing serialized data.
             /// </summary>
-            /// <param name="jsonData">The serialized data, that will be restored from.</param>
+            /// <param name="jsonData">The serialized data that will be restored from.</param>
             /// <returns>The restored Transform, including restored components and children.</returns>
             internal Transform Deserialize(string jsonData)
             {
@@ -348,19 +348,19 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Constructor for the Cinemachines State Restorer, which enables an Event to restore changes
+        /// Constructor for the Cinemachines State Restorer, which enables an event to restore changes
         /// made inside CinemachinesRoot to be re-applied after exiting PlayMode.
         /// </summary>
         static CinemachinesStateRestorer()
         {
-            // Register new Event for restoring changes made in PlayMode
+            // Register new event for restoring changes made in PlayMode
             EditorApplication.playModeStateChanged += StoreCinemachinesChanges;
         }
 
         /// <summary>
-        /// Save function, utilizing the custom Serializer Class for Cinemachines.
+        /// Save function, utilizing the custom Serializer class for Cinemachines.
         /// </summary>
-        /// <param name="UnitySceneName">The Name of the Unity-Scene, that the Object will be stored from.</param>
+        /// <param name="unitySceneName">The name of the Unity scene that the object will be stored from.</param>
         private static void Save(string unitySceneName)
         {
             // Locating CinemachinesRoot
@@ -380,9 +380,9 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Load function, utilizing the custom Deserializer Class for Cinemachines.
+        /// Load function, utilizing the custom Deserializer class for Cinemachines.
         /// </summary>
-        /// <param name="UnityScene">The Unity-Scene to reconstruct the serialized GameObjects.</param>
+        /// <param name="unityScene">The Unity scene to reconstruct the serialized GameObjects.</param>
         private static void Load(Scene unityScene)
         {
             string serializedDataKeyName = $"{unityScene.name}.{CinemachinesUtility.CinemachinesPersistanceKeyName}";
@@ -395,17 +395,17 @@ namespace SEEEditor.Cinemachines.Utility
             // prepare deserializer
             Deserializer deserializer = new();
 
-            // get stored scenes-data with deserializer
+            // get stored scene data with deserializer
             deserializer.Deserialize(EditorPrefs.GetString(serializedDataKeyName));
 
-            // Display warning about referencing original Objects
+            // Display warning about referencing original objects.
             EditorUtility.DisplayDialog(
                 "Restoration of Cinemachines",
-                "Warning! The restored backup is using parts of the original Cinemachine Structure.\nPlease check the Timelines and other Objects and update these components to their restored equivalents before continuing.",
+                "Warning! The restored backup is using parts of the original Cinemachine Structure.\nPlease check the Timelines and other objects and update these components to their restored equivalents before continuing.",
                 "Okay"
             );
 
-            // Reset PersistanceKey
+            // Reset persistance key
             if (EditorPrefs.HasKey(serializedDataKeyName))
             {
                 EditorPrefs.DeleteKey(serializedDataKeyName);
@@ -413,12 +413,12 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Helper-Function to get Unity-Scene names with CinemachineRoot-Backups.
+        /// Helper function to get unity scene names with CinemachineRoot backups.
         /// </summary>
-        /// <returns>Name of Unity-Scenes, that have GameObject backups.</returns>
+        /// <returns>Name of Unity scenes that have GameObject backups.</returns>
         private static string[] GetRestorableScenes()
         {
-            // find all Unity-Scenes in Project
+            // find all Unity scenes in Project
             string[] scenesGUIDs = AssetDatabase.FindAssets("t:Scene");
             List<string> scenesPaths = new();
 
@@ -431,14 +431,14 @@ namespace SEEEditor.Cinemachines.Utility
 
             foreach (string scenePath in scenesPaths)
             {
-                // check, if scene-path starts at the correct location
-                // doing so will exclude every example scene from Extensions
+                // check wether scene path starts at the correct location;
+                // doing so will exclude every example scene from extensions
                 if (!scenePath.StartsWith("Assets/Scenes"))
                 {
                     continue;
                 }
 
-                // Logic for trimming the path down to the File-name of the Scene
+                // Logic for trimming the path down to the file name of the scene
                 int ToDeleteSuffixLength = ".unity".Length;
                 string[] UnitySceneNameSplit = scenePath.Remove(scenePath.Length - ToDeleteSuffixLength, ToDeleteSuffixLength).Split('/');
                 string UnitySceneName = UnitySceneNameSplit[UnitySceneNameSplit.Length - 1];
@@ -455,25 +455,22 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Display Function to get list of restorable scenes.
+        /// Display function to get list of restorable scenes.
         /// </summary>
         [MenuItem("SEE/Cinemachines/Get restorable Cinemachine Roots", false, 12)]
         internal static void GetRestorableRoots()
         {
-            // String Builder for Dialog Body, which includes the names of the Scenes, that can restore a CinemachinesRoot
-            StringBuilder stringBuilder = new("The CinemachineRoots of the following Unity-Scenes have been backed up.\n");
+            // String Builder for dialog body, which includes the names of the scenes, that can restore a CinemachinesRoot
+            StringBuilder stringBuilder = new("The CinemachineRoots of the following Unity scenes have been backed up.\n");
             string[] restorableScenes = GetRestorableScenes();
 
-            // Format Scene Names
-            foreach (string scene in restorableScenes)
+            // Format scene names
+            foreach (string scene in restorableScenes.Where(s => s != ""))
             {
-                if (scene != "")
-                {
-                    stringBuilder.AppendFormat("* {0}\n", scene);
-                }
+                stringBuilder.AppendFormat("* {0}\n", scene);
             }
 
-            stringBuilder.Append("\nTo restore a CinemachineRoot, enter Unity-Scene and select SEE > Cinemachines > Restore Cinemachine Root");
+            stringBuilder.Append("\nTo restore a CinemachineRoot, enter Unity scene and select SEE > Cinemachines > Restore Cinemachine Root");
 
             EditorUtility.DisplayDialog(
                 "Restoration of Cinemachines",
@@ -483,9 +480,9 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Checker function, to see if current Unity-Scene has a restoreable CinemachinesRoot.
+        /// Checker function, to see if current Unity scene has a restorable CinemachinesRoot.
         /// </summary>
-        /// <returns>True, if the current Scene has a backup, else false.</returns>
+        /// <returns>True, if the current scene has a backup, else false.</returns>
         [MenuItem("SEE/Cinemachines/Restore Cinemachines Root", true, 10)]
         private static bool HasUnitySceneBackup()
         {
@@ -493,12 +490,12 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Menu Entry for restoring the CinemachinesRoot at current Scene.
+        /// Menu Entry for restoring the CinemachinesRoot at current scene.
         /// </summary>
         [MenuItem("SEE/Cinemachines/Restore Cinemachines Root", false, 10)]
         internal static void RestoreCinemachinesRoot()
         {
-            // Get Current Scenes Name
+            // Get current scene's name
             string UnitySceneName = SceneManager.GetActiveScene().name;
             string prefKeyName = $"{UnitySceneName}.{CinemachinesUtility.CinemachinesPersistanceKeyName}";
 
@@ -512,8 +509,8 @@ namespace SEEEditor.Cinemachines.Utility
                 return;
             }
 
-            // Confirm, if the user wants to restore to the last PlayTime State
-            if (!EditorUtility.DisplayDialog("Restoration of Cinemachines", "The Editor is in the process of restoring the Cinemachines, like they where at the time of exiting PlayTime.\n Do you want to restore to this Point?\n A Backup of the old Cinemachines will be created.", "Yes, restore", "No, don't restore"))
+            // Confirm whether the user wants to restore to the last PlayTime state.
+            if (!EditorUtility.DisplayDialog("Restoration of Cinemachines", "The Editor is in the process of restoring the Cinemachines like they were at the time of exiting PlayTime.\n Do you want to restore to this point?\n A backup of the old Cinemachines will be created.", "Yes, restore", "No, don't restore"))
             {
                 // // Reset PersistanceKey and abort
                 // if (EditorPrefs.HasKey(prefKeyName))
@@ -535,8 +532,8 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Event Function to be called when the Play-State changes from PlayMode to EditMode.
-        /// Specific for restoring the Cinemachine-Scenes.
+        /// Event function to be called when the play-state changes from PlayMode to EditMode.
+        /// Specific for restoring the Cinemachine scenes.
         /// </summary>
         /// <param name="state">The current state of the Editor.</param>
         private static void StoreCinemachinesChanges(PlayModeStateChange state)
@@ -544,13 +541,13 @@ namespace SEEEditor.Cinemachines.Utility
             switch (state)
             {
                 case PlayModeStateChange.ExitingPlayMode:   // Editor is exiting Play-Mode, proceed to save changes made
-                    // Iterate through all Scenes inside the Project
+                    // Iterate through all scenes inside the project
                     for (int i = 0; i < SceneManager.sceneCount; i++)
                     {
-                        // currently selected Scene
+                        // currently selected scene
                         Scene currScene = SceneManager.GetSceneAt(i);
 
-                        // Save serialized Data
+                        // Save serialized data
                         Save(currScene.name);
                     }
 
@@ -562,10 +559,10 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Helper Function to handle old GameObject on load.
+        /// Helper function to handle old GameObject on load.
         /// </summary>
-        /// <param name="oldRoot">The GameObject, that will be deactivated or removed.</param>
-        /// <param name="backupOldRoot">Parameter that determines, if the <paramref name="oldRoot"> gets removed or deactivated.</param>
+        /// <param name="oldRoot">The GameObject that will be deactivated or removed.</param>
+        /// <param name="backupOldRoot">Parameter that determines whether the <paramref name="oldRoot"/> gets removed or deactivated.</param>
         private static void HandleOldGameObject(GameObject oldRoot, bool backupOldRoot)
         {
             // if the Scenes root doesn't exist, don't try to create a backup
