@@ -11,6 +11,13 @@ namespace SEE.Cinemachines.Dolly
     /// Class for a simple implementation of a speed controller, based on which
     /// section of the spline the object is.
     /// </summary>
+    /// <remarks>This class it is selected by hand in the Inspector, from the
+    /// "Automatic Dolly" dropdown on a CinemachineSplineDolly or CinemachineSplineCart.
+    /// Cinemachine's SplineAutoDollyPropertyDrawer builds that dropdown by reflection
+    /// over all non-abstract, non-obsolete ISplineAutoDolly implementations.
+    /// It shows up as "Simple Speed Controller" next to Cinemachine's own "Fixed Speed"
+    /// and "Nearest Point To Target". Picking it would then store it into the scene as
+    /// a SerializeReference object.</remarks>
     [Serializable]
     internal class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
     {
