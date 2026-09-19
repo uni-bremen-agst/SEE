@@ -12,7 +12,7 @@ using UnityEditor;
 namespace SEE.Cinemachines.Utility
 {
     /// <summary>
-    /// Utility class for general functions shared between the custom Cinemachines Components.
+    /// Utility class for general functions shared between the custom Cinemachines components.
     /// </summary>
     internal static class CinemachinesUtility
     {
@@ -109,7 +109,7 @@ namespace SEE.Cinemachines.Utility
         internal static void GenerateCinemachinesPrefabFolder()
         {
             // If the Directory doesn't exist, create it.
-            if(!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/Scenes"))
+            if (!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/Scenes"))
             {
                 // Check and create Sub-Directories, if they don't exist
                 if (!AssetDatabase.IsValidFolder("Assets/Resources"))
@@ -133,7 +133,6 @@ namespace SEE.Cinemachines.Utility
                 }
 
                 Debug.Log($"Created Folder Structure: {CinemachinesPrefabsRoot}/Scenes.\n");
-                return;
             }
         }
 
@@ -159,7 +158,7 @@ namespace SEE.Cinemachines.Utility
         {
             if (string.IsNullOrEmpty(objectType))
             {
-                throw new ArgumentException($"{nameof(objectType)} string must neither be empty nor null");
+                throw new ArgumentException($"{nameof(objectType)} string must neither be empty nor null.");
             }
 
             // Form name based on type and count
@@ -183,12 +182,21 @@ namespace SEE.Cinemachines.Utility
         /// </summary>
         /// <param name="objectType">Type of object the name should be constructed.</param>
         /// <param name="objectCount">Amount of objects already created.</param>
-        /// <param name="rootGameObject">The root GameObject, that the new GameObject should be attached to.</param>
-        /// <param name="componentToAdd">The component to add to the newly created GameObject. By default, it will not add any components.</param>
-        /// <param name="shouldBeFocused">Whether the newly created GameObject should be selected or not. By default, it will get selected.</param>
-        /// <exception cref="ArgumentException">Thrown if the objectType or rootGameObject are not defined or invalid.</exception>
-        internal static void CreateGameObject(string objectType, ref int objectCount, ref string suffixText,
-                                             GameObject rootGameObject, System.Type componentToAdd = null, bool shouldBeFocused = true)
+        /// <param name="rootGameObject">The root GameObject, that the new
+        /// GameObject should be attached to.</param>
+        /// <param name="componentToAdd">The component to add to the newly created
+        /// GameObject. By default, it will not add any components.</param>
+        /// <param name="shouldBeFocused">Whether the newly created GameObject
+        /// should be selected or not. By default, it will get selected.</param>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="objectType"/> or
+        /// <paramref name="rootGameObject"/> are not defined or invalid.</exception>
+        internal static void CreateGameObject
+            (string objectType,
+             ref int objectCount,
+             ref string suffixText,
+             GameObject rootGameObject,
+             System.Type componentToAdd = null,
+             bool shouldBeFocused = true)
         {
             // Throw exception, if objectType is empty or null
             if (string.IsNullOrEmpty(objectType))
