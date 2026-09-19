@@ -93,12 +93,12 @@ namespace SEE.Cinemachines.Dolly
             // NullReference and index checks
             if (SpeedList == null)
             {
-                throw new NullReferenceException("Spline speed list needs to be initialized");
+                throw new NullReferenceException("Spline speed list needs to be initialized.");
             }
 
             if (SpeedList != null && SpeedList.Length <= 0)
             {
-                throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list");
+                throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list.");
             }
 
             for (int i = 0; i < SpeedList.Length; i++)
@@ -119,8 +119,6 @@ namespace SEE.Cinemachines.Dolly
                     throw new ArgumentException(String.Format("Speed should not be zero; At Entry {0}", i), "SectorSpeed");
                 }
             }
-
-            return;
         }
     }
 }
