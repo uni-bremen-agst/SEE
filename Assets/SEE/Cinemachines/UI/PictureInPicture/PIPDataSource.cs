@@ -2,11 +2,8 @@ using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
-
 using UnityEditor;
-
 #endif
 
 namespace SEE.Cinemachines.UI.PictureInPicture
@@ -17,7 +14,8 @@ namespace SEE.Cinemachines.UI.PictureInPicture
     [CreateAssetMenu(menuName = "SEE/UI/Picture-in-Picture/Data Source")]
     internal class PIPDataSource : ScriptableObject
     {
-        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that these Components only activly work inside the Unity-Editor.
+        // Enclosing class content inside the UNITY_EDITOR directive to ensure
+        // that these components work actively only inside the Unity editor.
         #if UNITY_EDITOR
 
         [Header("Render Images")]

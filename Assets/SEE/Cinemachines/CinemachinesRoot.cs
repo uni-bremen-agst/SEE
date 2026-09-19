@@ -10,6 +10,8 @@ using UnityEngine.Timeline;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
+using SEE.Game;
+
 
 // Only use UnityEditor-Namespaces when inside the Unity-Editor
 #if UNITY_EDITOR
@@ -127,7 +129,7 @@ namespace SEE.Cinemachines
             isInitialized = true;
 
             // Make sure, that this Object doesn't get put into a build
-            tag = "EditorOnly";
+            tag = Tags.EditorOnly;
         }
 
         /// <summary>
@@ -307,12 +309,11 @@ namespace SEE.Cinemachines
             cinemachineControlCameraGameObject.name = $"{CinemachinesUtility.CinemachinesControlCameraName}";
 
             // Dont Save these GameObjects into the Build by marking these as EditorOnly
-            cinemachineBrainsGameObject.tag = "EditorOnly";
+            cinemachineBrainsGameObject.tag = Tags.EditorOnly;
 
-            cinemachineScenesGameObject.tag = "EditorOnly";
+            cinemachineScenesGameObject.tag = Tags.EditorOnly;
 
-            cinemachineControlCameraGameObject.tag = "EditorOnly";
-
+            cinemachineControlCameraGameObject.tag = Tags.EditorOnly;
             return true;
         }
 
@@ -372,7 +373,7 @@ namespace SEE.Cinemachines
                 controlDataSource.PIPImage = AssetDatabase.LoadAssetByGUID<RenderTexture>(mainOutputGUID);
             }
 
-            // Find the Cinemachine-Brains in the Child-GameObjects
+            // Find the Cinemachine brains in the child GameObjects.
             foreach (Transform child in cinemachineBrainsGameObject.transform)
             {
                 switch (child.name)

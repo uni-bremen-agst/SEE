@@ -6,7 +6,6 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 
-// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
 using UnityEditor;
@@ -24,11 +23,12 @@ using UnityEngine.Events;
 using Unity.Properties;
 using Unity.Cinemachine;
 using Debug = UnityEngine.Debug;
+using SEE.Game;
 
 namespace SEE.Cinemachines
 {
     /// <summary>
-    /// Scene Component, that controls and handles GameObjects and Assets specific to a Cinemachines-Scene.
+    /// Scene component that controls and handles GameObjects and Assets specific to a Cinemachines scene.
     /// </summary>
     [Serializable]
     [ExecuteInEditMode]
@@ -36,70 +36,70 @@ namespace SEE.Cinemachines
     [RequireComponent(typeof(SignalReceiver))]
     internal class CinemachinesScene : SerializedMonoBehaviour
     {
-        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that these Components only activly work inside the Unity-Editor.
         #if UNITY_EDITOR
 
         /// <summary>
-        /// Incremental Counter for Cinemachines Camera. Counter not decremented on Camera deletion to avoid duplication.
+        /// Incremental counter for Cinemachines camera. Counter not decremented on camera deletion to avoid duplication.
         /// </summary>
         [HideInInspector, SerializeField]
         private int cinemachinesCameraCount;
 
         /// <summary>
-        /// Incremental Counter for Splines. Counter not decremented on Spline deletion to avoid duplication.
+        /// Incremental counter for splines. Counter not decremented on spline deletion to avoid duplication.
         /// </summary>
         [HideInInspector, SerializeField]
         private int splineCount;
 
         /// <summary>
-        /// Incremental Counter for Signals. Counter not decremented on Signal deletion to avoid duplication.
+        /// Incremental counter for signals. Counter not decremented on signal deletion to avoid duplication.
         /// </summary>
         [HideInInspector, SerializeField]
         private int signalCount;
 
         /// <summary>
-        /// Incremental Counter for Focus Objects. Counter not decremented on Object deletion to avoid duplication.
+        /// Incremental counter for focus objects. Counter not decremented on object deletion to avoid duplication.
         /// </summary>
         [HideInInspector, SerializeField]
         private int focusObjectCount;
 
         /// <summary>
-        /// The GameObject, that points to the Cinemachines-Cameras Root of the Scene.
+        /// The GameObject that points to the Cinemachines cameras' root of the scene.
         /// </summary>
         [HideInInspector]
         private GameObject? cinemachinesCamerasGameObject;
 
         /// <summary>
-        /// The GameObject, that points to the Splines Root of the Scene.
+        /// The GameObject that points to the splines root of the scene.
         /// </summary>
         [HideInInspector]
         private GameObject? cinemachinesSplinesGameObject;
 
         /// <summary>
-        /// The GameObject, that points to the Focus-Object Root of the Scene.
+        /// The GameObject that points to the focus objects' root of the scene.
         /// </summary>
         [HideInInspector]
         private GameObject? cinemachinesFocusObjectGameObject;
 
         /// <summary>
-        /// The GameObject, that points to the Miscellaneous root of the Scene.
+        /// The GameObject that points to the miscellaneous root of the scene.
         /// </summary>
         [HideInInspector]
         private GameObject? cinemachinesOtherObjectGameObject;
 
         /// <summary>
-        /// The Start Function to the Component, that initializes every Variable for the Scenes.
+        /// Initializes all variables for the scenes.
         /// </summary>
         protected void Start()
         {
-            // Find relevant GameObject and remember them
+            // Find relevant GameObject and remember them.
             cinemachinesCamerasGameObject = transform.Find("Cameras")?.gameObject;
             cinemachinesSplinesGameObject = transform.Find("Splines")?.gameObject;
             cinemachinesFocusObjectGameObject = transform.Find("FocusObjects")?.gameObject;
             cinemachinesOtherObjectGameObject = transform.Find("OtherObjects")?.gameObject;
 
             // create gameobjects, if they are not found
-            if (!cinemachinesCamerasGameObject || !cinemachinesSplinesGameObject || !cinemachinesFocusObjectGameObject || !cinemachinesOtherObjectGameObject)
+            if (!cinemachinesCamerasGameObject || !cinemachinesSplinesGameObject
+                || !cinemachinesFocusObjectGameObject || !cinemachinesOtherObjectGameObject)
             {
                 if (!cinemachinesCamerasGameObject)
                 {
@@ -107,7 +107,7 @@ namespace SEE.Cinemachines
                     cinemachinesCamerasGameObject.transform.SetParent(transform);
 
                     // Dont Save in Build
-                    cinemachinesCamerasGameObject.tag = "EditorOnly";
+                    cinemachinesCamerasGameObject.tag = Tags.EditorOnly;
                 }
 
                 if (!cinemachinesSplinesGameObject)
@@ -116,7 +116,7 @@ namespace SEE.Cinemachines
                     cinemachinesSplinesGameObject.transform.SetParent(transform);
 
                     // Dont Save in Build
-                    cinemachinesSplinesGameObject.tag = "EditorOnly";
+                    cinemachinesSplinesGameObject.tag = Tags.EditorOnly;
                 }
 
                 if (!cinemachinesFocusObjectGameObject)
@@ -125,7 +125,7 @@ namespace SEE.Cinemachines
                     cinemachinesFocusObjectGameObject.transform.SetParent(transform);
 
                     // Dont Save in Build
-                    cinemachinesFocusObjectGameObject.tag = "EditorOnly";
+                    cinemachinesFocusObjectGameObject.tag = Tags.EditorOnly;
                 }
 
                 if (!cinemachinesOtherObjectGameObject)
@@ -134,12 +134,12 @@ namespace SEE.Cinemachines
                     cinemachinesOtherObjectGameObject.transform.SetParent(transform);
 
                     // Dont Save in Build
-                    cinemachinesOtherObjectGameObject.tag = "EditorOnly";
+                    cinemachinesOtherObjectGameObject.tag = Tags.EditorOnly;
                 }
             }
 
-            // Dont Save in Build
-            tag = "EditorOnly";
+            // Dont save in build
+            tag = Tags.EditorOnly;
         }
 
         /// <summary>

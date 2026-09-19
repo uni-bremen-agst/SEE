@@ -1,5 +1,5 @@
 ﻿/// <summary>
-/// SEE.UI contains code for the user interface in SEE.
+/// Contains classes for the user interface for cinemachine recording.
 /// </summary>
 namespace SEE.Cinemachines.UI
 {

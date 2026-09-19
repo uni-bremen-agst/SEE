@@ -2,22 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SEE.Game;
 
-// Only use UnityEditor-Namespaces when inside the Unity-Editor.
+
 #if UNITY_EDITOR
-
 using UnityEditor;
-
 #endif
 
 namespace SEE.Cinemachines.Utility
 {
     /// <summary>
-    /// Static Utility-Class for general functions shared between the custom Cinemachines Components.
+    /// Utility class for general functions shared between the custom Cinemachines Components.
     /// </summary>
     internal static class CinemachinesUtility
     {
-        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that this Utility-Class only activly works inside the Unity-Editor.
         #if UNITY_EDITOR
 
         #region Constant String names
@@ -40,9 +38,9 @@ namespace SEE.Cinemachines.Utility
         #endregion Constant String names
 
         /// <summary>
-        /// Returns the active CinemachineRoots-Transform, if one exists in the current Scene.
+        /// Returns the active CinemachineRoots-Transform if one exists in the current scene.
         /// </summary>
-        /// <returns>Returns the active Transform, that includes the Cinemachines-Root Component, or null, of none is found.</returns>
+        /// <returns>Returns the active Transform that includes the Cinemachines root component, or null if none is found.</returns>
         internal static Transform GetCinemachinesRootInScene()
         {
             CinemachinesRoot[] CinemachinesRootComponents = FindAllCinemachinesRootsInScene();
@@ -56,17 +54,17 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Function that finds all active <see cref="CinemachinesRoot">-Components in the current Unity-Scene.
+        /// Returns all active <see cref="CinemachinesRoot"> components in the current Unity scene.
         /// </summary>
-        /// <remarks>There should only be one active <see cref="CinemachinesRoot">-Component in a Unity-Scene.</remarks>
-        /// <returns>List of <see cref="CinemachinesRoot">-Components in the current Unity-Scene.</returns>
+        /// <remarks>There should only be one active <see cref="CinemachinesRoot"> component in a Unity scene.</remarks>
+        /// <returns>List of <see cref="CinemachinesRoot"> components in the current Unity scene.</returns>
         internal static CinemachinesRoot[] FindAllCinemachinesRootsInScene()
         {
             return UnityEngine.Object.FindObjectsByType<CinemachinesRoot>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         }
 
         /// <summary>
-        /// Menu Entry for creating the CinemachinesRoot easily.
+        /// Menu entry for creating the CinemachinesRoot easily.
         /// </summary>
         [MenuItem("SEE/Cinemachines/Create Cinemachines Root", false, 10)]
         [MenuItem("GameObject/SEE/Cinemachines/Create Cinemachines Root", false, 10)]
@@ -77,25 +75,26 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Helper Function to generate the "Scene Deletion Warning"-Message, including the Path to the respective Folder.
+        /// Helper Function to generate the "Scene Deletion Warning" message,
+        /// including the path to the respective folder.
         /// </summary>
-        /// <param name="guid">The GUID of the Folder for the corresponding Cinemachines-Scene.</param>
-        /// <returns>The Message generated for the Cinemachines-Scene.</returns>
+        /// <param name="guid">The GUID of the folder for the corresponding Cinemachines scene.</param>
+        /// <returns>The message generated for the Cinemachines scene.</returns>
         internal static string GetSceneDeletionWarningMessage(string guid)
         {
-            return $"Deleting the Scene will also delete its associated Scene Folder, which is \"{AssetDatabase.GUIDToAssetPath(guid)}\"";
+            return $"Deleting the scene will also delete its associated scene folder, which is \"{AssetDatabase.GUIDToAssetPath(guid)}\"";
         }
 
         /// <summary>
-        /// Helper Function to generate the Scene Folder, based on the current active UnityScene.
+        /// Helper Function to generate the scene folder based on the currently active Unity scene.
         /// </summary>
-        /// <param name="sceneName">The Name of the Cinemachines-Scene.</param>
-        /// <returns>The GUID of the Cinemachines-Scene folder.</returns>
+        /// <param name="sceneName">The name of the Cinemachines scene.</param>
+        /// <returns>The GUID of the Cinemachines scene folder.</returns>
         internal static string GenerateSceneFolder(string sceneName)
         {
-            // create new Folder for Scene in Assets/Cinemachines/Scenes
+            // create new folder for Scene in Assets/Cinemachines/Scenes
             string SceneGUID = AssetDatabase.CreateFolder($"{CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}", $"{sceneName}");
-            // create Signals folder to store Timeline Signals
+            // create signals folder to store timeline signals
             if (!AssetDatabase.IsValidFolder($"{AssetDatabase.GUIDToAssetPath(SceneGUID)}/Signals"))
             {
                 AssetDatabase.CreateFolder(AssetDatabase.GUIDToAssetPath(SceneGUID), "Signals");
@@ -105,11 +104,11 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Generator-Function to create the Cinemachines-Prefab Structure.
+        /// Creates the Cinemachines prefab structure.
         /// </summary>
         internal static void GenerateCinemachinesPrefabFolder()
         {
-            // If the Directory doesn't exists, create it
+            // If the Directory doesn't exist, create it.
             if(!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/Scenes"))
             {
                 // Check and create Sub-Directories, if they don't exist
@@ -139,31 +138,31 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Generator-Function to create the Scene Structure.
+        /// Creates the scene structure.
         /// </summary>
-        /// <param name="scene">The Cinemachine-Scene GameObject.</param>
-        /// <param name="sceneName">The Name of the Cinemachines-Scene.</param>
+        /// <param name="scene">The Cinemachine scene GameObject.</param>
+        /// <param name="sceneName">The name of the Cinemachines scene.</param>
         internal static void GenerateSceneStructure(GameObject scene, string sceneName)
         {
-            // Add the CinemachinesScenes Component to the newly created Scene GameObject
+            // Add the CinemachinesScenes Component to the newly created scene GameObject
             scene.GetComponent<CinemachinesScene>().SceneGUID = GenerateSceneFolder(sceneName);
         }
 
         /// <summary>
-        /// Helper-Function to construct the Name of the Object.
+        /// Constructs the name of the object.
         /// </summary>
-        /// <param name="objectType">Type of Object the Name should be constructed.</param>
+        /// <param name="objectType">Type of Object the name should be constructed.</param>
         /// <param name="objectCount">Amount of Objects already created.</param>
         /// <exception cref="ArgumentException">Gets thrown, if the objectType is not defined or invalid.</exception>
-        /// <returns>Fully constructed Name for the Object.</returns>
+        /// <returns>Fully constructed name for the object.</returns>
         internal static string GetNewObjectName(string objectType, ref int objectCount, ref string suffixText)
         {
             if (string.IsNullOrEmpty(objectType))
             {
-                throw new ArgumentException("objectType string cannot be empty or null");
+                throw new ArgumentException($"{nameof(objectType)} string must neither be empty nor null");
             }
 
-            // Form Name based on Type and Count
+            // Form name based on type and count
             string newName = $"{objectType}{objectCount}";
 
             // add optional suffix to name, if one is defined
@@ -172,7 +171,7 @@ namespace SEE.Cinemachines.Utility
                 newName += $" - {suffixText}";
             }
 
-            // Reset the Text-Field and increment the counter
+            // Reset the text field and increment the counter
             suffixText = "";
             objectCount += 1;
 
@@ -180,27 +179,27 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// General Helper-Function to construct any GameObject with only one component added.
+        /// Constructs any GameObject with only one component added.
         /// </summary>
-        /// <param name="objectType">Type of Object the Name should be constructed.</param>
-        /// <param name="objectCount">Amount of Objects already created.</param>
-        /// <param name="rootGameObject">The Root GameObject, that the new GameObject should be attached to.</param>
-        /// <param name="componentToAdd">The Component to add to the newly created GameObject. By default, it will not add any components.</param>
+        /// <param name="objectType">Type of object the name should be constructed.</param>
+        /// <param name="objectCount">Amount of objects already created.</param>
+        /// <param name="rootGameObject">The root GameObject, that the new GameObject should be attached to.</param>
+        /// <param name="componentToAdd">The component to add to the newly created GameObject. By default, it will not add any components.</param>
         /// <param name="shouldBeFocused">Whether the newly created GameObject should be selected or not. By default, it will get selected.</param>
-        /// <exception cref="ArgumentException">Gets thrown, if either the objectType and/or rootGameObject are not defined or invalid.</exception>
+        /// <exception cref="ArgumentException">Thrown if the objectType or rootGameObject are not defined or invalid.</exception>
         internal static void CreateGameObject(string objectType, ref int objectCount, ref string suffixText,
                                              GameObject rootGameObject, System.Type componentToAdd = null, bool shouldBeFocused = true)
         {
             // Throw exception, if objectType is empty or null
             if (string.IsNullOrEmpty(objectType))
             {
-                throw new ArgumentException("objectType string cannot be empty or null.");
+                throw new ArgumentException($"{nameof(objectType)} string must neither be empty nor null");
             }
 
             // Throw exception, if rootGameObject is null
             if (rootGameObject == null)
             {
-                throw new ArgumentNullException("rootGameObject cannot be null.");
+                throw new ArgumentNullException(nameof(rootGameObject), $"{nameof(rootGameObject)} cannot be null.");
             }
 
             string objectName = GetNewObjectName(objectType, ref objectCount, ref suffixText);
@@ -216,7 +215,7 @@ namespace SEE.Cinemachines.Utility
             }
 
             // Sets the new Objects hideFlags to not Save into a build
-            newObject.tag = "EditorOnly";
+            newObject.tag = Tags.EditorOnly;
         }
 
         #endif
