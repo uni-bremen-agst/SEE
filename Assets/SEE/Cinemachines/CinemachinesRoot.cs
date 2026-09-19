@@ -12,12 +12,8 @@ using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 using SEE.Game;
 
-
-// Only use UnityEditor-Namespaces when inside the Unity-Editor
 #if UNITY_EDITOR
-
 using UnityEditor;
-
 #endif
 
 namespace SEE.Cinemachines
@@ -30,11 +26,10 @@ namespace SEE.Cinemachines
     [ExecuteInEditMode]
     internal class CinemachinesRoot : SerializedMonoBehaviour
     {
-        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that these Components only activly work inside the Unity-Editor
         #if UNITY_EDITOR
 
         /// <summary>
-        /// Boolean value to keep track, if the Root of the Cinemachines is fully initialized.
+        /// True if the root of the Cinemachines is fully initialized.
         /// </summary>
         [SerializeField, DisableInPlayMode, DisableInEditorMode]
         [Title("Cinemachines-Root Mainenance", horizontalLine: true)]
@@ -44,19 +39,19 @@ namespace SEE.Cinemachines
         private bool isInitialized = false;
 
         /// <summary>
-        /// Amount of Scenes inside this CinemachinesRoot. Doesn't decrement on scene-deletion to prevent duplicates.
+        /// Number of scenes inside this CinemachinesRoot. Doesn't decrement on scene deletion to prevent duplicates.
         /// </summary>
         [HideInInspector, SerializeField]
         private int sceneCounter;
 
         /// <summary>
-        /// The GUID of the RenderTexture assign with capturing the Cinemachine-Output.
+        /// The GUID of the RenderTexture assign with capturing the Cinemachine output.
         /// </summary>
         [HideInInspector, SerializeField]
         private GUID mainOutputGUID;
 
         /// <summary>
-        /// The GUID of the RenderTexture associated with the Picture-In-Picture Option.
+        /// The GUID of the RenderTexture associated with the Picture-In-Picture option.
         /// </summary>
         [HideInInspector, SerializeField]
         private GUID pictureInPictureGUID;
@@ -77,7 +72,8 @@ namespace SEE.Cinemachines
         private GameObject cinemachineScenesGameObject;
 
         /// <summary>
-        /// Function to be run once on creation/startup of the Component.
+        /// Ensures that only one CinemachinesRoot exists per scene and
+        /// initializes the CinemachinesRoot if it has not been initialized yet.
         /// </summary>
         protected void Start()
         {
@@ -105,7 +101,7 @@ namespace SEE.Cinemachines
         #region Root Maintenance
 
         /// <summary>
-        /// Sets-up the CinemachinesRoot Prefab.
+        /// Sets up the CinemachinesRoot prefab.
         /// </summary>
         [Button("Setup Cinemachines-Root", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Setup Cinemachines-Root")]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
@@ -114,7 +110,7 @@ namespace SEE.Cinemachines
         [Tooltip("Sets up the Root for the Cinemachines. Generates the Structure for crucial Elements and Organization.")]
         internal void SetupCinemachinesRoot()
         {
-            // Create the Structure of the CinemachinesRoot. It fails, if the Prefabs are not awailable.
+            // Create the Structure of the CinemachinesRoot. It fails, if the Prefabs are not available.
             if (!CreateCinemachinesRootStructure())
             {
                 return;
@@ -128,7 +124,7 @@ namespace SEE.Cinemachines
 
             isInitialized = true;
 
-            // Make sure, that this Object doesn't get put into a build
+            // Make sure, that this Object doesn't get put into a build.
             tag = Tags.EditorOnly;
         }
 
@@ -169,7 +165,8 @@ namespace SEE.Cinemachines
             }
 
             // Remove every Scene-Folder from Assets/Cinemachines/Scenes
-            string[] sceneFolders = AssetDatabase.GetSubFolders($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}");
+            string[] sceneFolders = AssetDatabase.GetSubFolders
+                                          ($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}");
             foreach (string sceneFolder in sceneFolders)
             {
                 if (sceneFolder == $"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}/general")
@@ -177,14 +174,12 @@ namespace SEE.Cinemachines
                     continue;
                 }
 
-                Debug.Log($"Removing {sceneFolder} from Project\n");
+                Debug.Log($"Removing {sceneFolder} from project.\n");
                 AssetDatabase.DeleteAsset(sceneFolder);
             }
 
-            // Reset Scene Counter
             sceneCounter = 0;
 
-            // Create CinemachinesRoot
             SetupCinemachinesRoot();
         }
 
@@ -268,30 +263,30 @@ namespace SEE.Cinemachines
         #region Helper-Functions
 
         /// <summary>
-        /// Checks for missing Prefabs and generates the CinemachinesRoot Structure.
+        /// Checks for missing prefabs and generates the CinemachinesRoot structure.
         /// </summary>
-        /// <returns> True, if creation of the Structure was successful, false otherwise. </returns>
+        /// <returns> True, if creation of the structure was successful, false otherwise. </returns>
         private bool CreateCinemachinesRootStructure()
         {
-            // Pre-Load any of the required sub-Prefabs
+            // Pre-load any of the required sub-prefabs
             GameObject brains = Resources.Load<GameObject>($"{CinemachinesUtility.CinemachinesRootPrefabsRoot}/{CinemachinesUtility.CinemachinesBrainsName}");
             GameObject controlCamera = Resources.Load<GameObject>($"{CinemachinesUtility.CinemachinesRootPrefabsRoot}/{CinemachinesUtility.CinemachinesControlCameraName}");
 
-            // check for missing Prefabs
+            // check for missing prefabs
             if (!brains || !controlCamera)
             {
                 // report with error
-                Debug.LogError("Unable to reconstruct the CinemachinesRoot. Missing Prefabs.\n");
+                Debug.LogError("Unable to reconstruct the CinemachinesRoot. Missing prefabs.\n");
 
                 // Log, which Prefabs are missing
                 if (!brains)
                 {
-                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesBrainsName} Prefab.\n");
+                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesBrainsName} prefab.\n");
                 }
 
                 if (!controlCamera)
                 {
-                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesControlCameraName} Prefab.\n");
+                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesControlCameraName} prefab.\n");
                 }
 
                 return false;
@@ -318,8 +313,8 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Checks, if the required Folder-Structure exists.
-        /// If not, it will create the Folder Structure.
+        /// Checks whether the required folder structure exists.
+        /// If not, it will create the folder structure.
         /// </summary>
         private void CreateCinemachineFolderStructure()
         {
