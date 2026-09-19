@@ -26,8 +26,13 @@ namespace SEE.Cinemachines.Dolly
 
         bool SplineAutoDolly.ISplineAutoDolly.RequiresTrackingTarget => false;
 
+        /// <summary>
+        /// List of sections on a spline, with its corresponding speeds, in which that
+        /// section needs to be paced with.
+        /// </summary>
+        /// <remarks>Cannot be made readonly because it needs to be serialized by Unity.</remarks>
         [Tooltip("List of sections on a spline, with its corresponding speeds, in which that section needs to be paced with.")]
-        private SplineSector[] SpeedList = {};
+        public SplineSector[] SpeedList = {};
 
         /// <summary>
         /// Calculates the new spline position.
