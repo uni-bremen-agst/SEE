@@ -8,13 +8,14 @@ using Unity.Cinemachine;
 namespace SEE.Cinemachines.Dolly
 {
     /// <summary>
-    /// Class for a simple implementation of a Speed Controller, based on which section of the Spline the Object is.
+    /// Class for a simple implementation of a speed controller, based on which
+    /// section of the spline the object is.
     /// </summary>
     [Serializable]
     internal class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
     {
         /// <summary>
-        /// Structure for storing Sector-Data, specificly Start-Point on a Line [0,1), and its Speed on that sector.
+        /// Structure for storing sector data, specifically start point on a line [0,1), and its speed on that sector.
         /// </summary>
         [Serializable]
         internal struct SplineSector
@@ -25,23 +26,23 @@ namespace SEE.Cinemachines.Dolly
 
         bool SplineAutoDolly.ISplineAutoDolly.RequiresTrackingTarget => false;
 
-        [Tooltip("List of Sections on a Spline, with its corresponding Speeds, inwhich that section needs to be paced with.")]
+        [Tooltip("List of sections on a spline, with its corresponding speeds, in which that section needs to be paced with.")]
         private SplineSector[] SpeedList = {};
 
         /// <summary>
-        /// Calculation Function to get new Spline Position.
+        /// Calculates the new spline position.
         /// </summary>
-        /// <param name="_sender">(Unused) Behaviour-Script, that triggered the function.</param>
-        /// <param name="_target">(Unused) The Transform to apply the changes to.</param>
-        /// <param name="_spline">(Unused) The Spline, where the Object should be moved on.</param>
-        /// <param name="currentPosition">The Current Position on the <paramref name="_spline">.</param>
-        /// <param name="_positionUnit">(Unused) Units used for the Splines.</param>
-        /// <param name="deltaTime">Delta-Time between the current and last Frame.</param>
-        /// <exception cref="IndexOutOfRangeException">Gets thrown, if the Speed-List has less than one Entries.</exception>
+        /// <param name="sender">(Unused) Behaviour-Script, that triggered the function.</param>
+        /// <param name="target">(Unused) The Transform to apply the changes to.</param>
+        /// <param name="spline">(Unused) The spline where the object should be moved on.</param>
+        /// <param name="currentPosition">The current position on the <paramref name="spline">.</param>
+        /// <param name="positionUnit">(Unused) Units used for the splines.</param>
+        /// <param name="deltaTime">Delta time between the current and last frame.</param>
+        /// <exception cref="IndexOutOfRangeException">Gets thrown, if the speed list has less than one entry.</exception>
         /// <returns>Either the unmodified <paramref name="currentPosition">, if the Editor is in EditMode and the component is paused, or <paramref name="currentPosition"> + SectorSpeed, when in PlayMode.</returns>
-        float SplineAutoDolly.ISplineAutoDolly.GetSplinePosition(MonoBehaviour _sender, Transform _target, SplineContainer _spline, float currentPosition, PathIndexUnit _positionUnit, float deltaTime)
+        float SplineAutoDolly.ISplineAutoDolly.GetSplinePosition(MonoBehaviour sender, Transform target, SplineContainer spline, float currentPosition, PathIndexUnit positionUnit, float deltaTime)
         {
-            // Dont Progress inside Editor; Credit https://gist.github.com/adammyhre/b81eb6e1d07ebe24a49844fbbddf368b
+            // Don't Progress inside Editor; Credit https://gist.github.com/adammyhre/b81eb6e1d07ebe24a49844fbbddf368b
             if (deltaTime <= 0)
             {
                 return currentPosition;
@@ -72,12 +73,11 @@ namespace SEE.Cinemachines.Dolly
             }
 
             // Progress in Preview/Export
-
             return currentPosition + (selectedSector.SectorSpeed * deltaTime);
         }
 
         /// <summary>
-        /// Reset Data that needs to be reset before Scene Start (Dynamic Data).
+        /// Resets data that needs to be reset before scene start (dynamic data).
         /// </summary>
         void SplineAutoDolly.ISplineAutoDolly.Reset()
         {
@@ -85,22 +85,22 @@ namespace SEE.Cinemachines.Dolly
         }
 
         /// <summary>
-        /// Validation Function, to make sure that all values are validly set.
+        /// Validation function to make sure that all values are validly set.
         /// </summary>
-        /// <exception cref="NullReferenceException">Thrown, if the Speed-List is not initialized.</exception>
-        /// <exception cref="IndexOutOfRangeException">Thrown, if the Speed-List has less than one Entry.</exception>
-        /// <exception cref="ArgumentException">Thrown, if the Speed is zero or the Sectors are out of range in an Entry.</exception>
+        /// <exception cref="NullReferenceException">Thrown, if the speed list is not initialized.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown, if the speed list has less than one entry.</exception>
+        /// <exception cref="ArgumentException">Thrown, if the speed is zero or the sectors are out of range in an entry.</exception>
         void SplineAutoDolly.ISplineAutoDolly.Validate()
         {
             // NullReference and Index Checks
             if (SpeedList == null)
             {
-                throw new NullReferenceException("Spline Speed-List needs to be initialized");
+                throw new NullReferenceException("Spline speed list needs to be initialized");
             }
 
             if (SpeedList != null && SpeedList.Length <= 0)
             {
-                throw new IndexOutOfRangeException("Spline SpeedController needs at least one Entry in the Speed-List");
+                throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list");
             }
 
             for (int i = 0; i < SpeedList.Length; i++)
