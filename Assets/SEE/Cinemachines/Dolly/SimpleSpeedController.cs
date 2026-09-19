@@ -46,7 +46,13 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="deltaTime">Delta time between the current and last frame.</param>
         /// <exception cref="IndexOutOfRangeException">Gets thrown, if the speed list has less than one entry.</exception>
         /// <returns>Either the unmodified <paramref name="currentPosition">, if the Editor is in EditMode and the component is paused, or <paramref name="currentPosition"> + SectorSpeed, when in PlayMode.</returns>
-        float SplineAutoDolly.ISplineAutoDolly.GetSplinePosition(MonoBehaviour sender, Transform target, SplineContainer spline, float currentPosition, PathIndexUnit positionUnit, float deltaTime)
+        float SplineAutoDolly.ISplineAutoDolly.GetSplinePosition
+            (MonoBehaviour sender,
+            Transform target,
+            SplineContainer spline,
+            float currentPosition,
+            PathIndexUnit positionUnit,
+            float deltaTime)
         {
             // Don't Progress inside Editor; Credit https://gist.github.com/adammyhre/b81eb6e1d07ebe24a49844fbbddf368b
             if (deltaTime <= 0)
