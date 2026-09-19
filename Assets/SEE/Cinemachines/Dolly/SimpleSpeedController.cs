@@ -63,12 +63,10 @@ namespace SEE.Cinemachines.Dolly
             {
                 SplineSector tmpSector = SpeedList[i];
 
-                if (tmpSector.SectorStart >= selectedSector.SectorStart)
+                if (tmpSector.SectorStart >= selectedSector.SectorStart
+                    && tmpSector.SectorStart <= currentPosition)
                 {
-                    if (tmpSector.SectorStart <= currentPosition)
-                    {
-                        selectedSector = tmpSector;
-                    }
+                    selectedSector = tmpSector;
                 }
             }
 
@@ -92,7 +90,7 @@ namespace SEE.Cinemachines.Dolly
         /// <exception cref="ArgumentException">Thrown, if the speed is zero or the sectors are out of range in an entry.</exception>
         void SplineAutoDolly.ISplineAutoDolly.Validate()
         {
-            // NullReference and Index Checks
+            // NullReference and index checks
             if (SpeedList == null)
             {
                 throw new NullReferenceException("Spline speed list needs to be initialized");
