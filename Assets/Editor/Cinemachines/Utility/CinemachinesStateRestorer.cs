@@ -299,17 +299,17 @@ namespace SEEEditor.Cinemachines.Utility
                     {
                         storedReferences.Add(readComponent.GetInstanceID(), storedComponent.ListReferences);
                     }
-                    catch (Exception)
+                    catch (ArgumentException)
                     {
                         Debug.LogWarning($"Attempted to map '{readComponent.GetInstanceID()}' to a references list, while already having one associated to it.\n");
                     }
 
-                    // store mapping of old InstanceID to new InstanceID for Components
+                    // store mapping of old InstanceID to new InstanceID for components
                     try
                     {
                         referenceList.Add(storedComponent.InstanceID, readComponent.GetInstanceID());
                     }
-                    catch (Exception)
+                    catch (ArgumentException)
                     {
                         Debug.LogWarning($"Attempted to map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'\n");
                     }
