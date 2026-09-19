@@ -35,7 +35,8 @@ namespace SEE.Cinemachines.Dolly
         public SplineSector[] SpeedList = {};
 
         /// <summary>
-        /// Calculates the new spline position.
+        /// Compute the desired position on the spline as requested by
+        /// <see cref="SplineAutoDolly.ISplineAutoDolly.GetSplinePosition"/>.
         /// </summary>
         /// <param name="sender">(Unused) Behaviour-Script, that triggered the function.</param>
         /// <param name="target">(Unused) The Transform to apply the changes to.</param>
@@ -82,6 +83,8 @@ namespace SEE.Cinemachines.Dolly
         /// <summary>
         /// Resets data that needs to be reset before scene start (dynamic data).
         /// </summary>
+        /// <remarks>Implements <see cref="SplineAutoDolly.ISplineAutoDolly.Reset"/>.
+        /// Does not do anything at the moment.</remarks>
         void SplineAutoDolly.ISplineAutoDolly.Reset()
         {
             // Intentionally left blank
@@ -89,10 +92,12 @@ namespace SEE.Cinemachines.Dolly
 
         /// <summary>
         /// Validation function to make sure that all values are validly set.
+        /// Called from OnValidate() to validate the settings.
         /// </summary>
         /// <exception cref="NullReferenceException">Thrown, if the speed list is not initialized.</exception>
         /// <exception cref="IndexOutOfRangeException">Thrown, if the speed list has less than one entry.</exception>
         /// <exception cref="ArgumentException">Thrown, if the speed is zero or the sectors are out of range in an entry.</exception>
+        /// <remarks>Implements <see cref="SplineAutoDolly.ISplineAutoDolly.Validate"/>.</remarks>
         void SplineAutoDolly.ISplineAutoDolly.Validate()
         {
             // NullReference and index checks
