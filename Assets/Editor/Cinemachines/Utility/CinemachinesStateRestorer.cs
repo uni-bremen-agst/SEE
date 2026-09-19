@@ -6,15 +6,11 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
-
 using SEE.Cinemachines;
 using SEE.Cinemachines.Utility;
 using SEE.Utils;
 using System.Linq;
 
-
-
-// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
 /// Required for <see cref="UnityEditor.InitializeOnLoadAttribute"/>.
