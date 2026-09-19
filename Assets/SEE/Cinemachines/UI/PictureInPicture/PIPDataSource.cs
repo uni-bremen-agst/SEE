@@ -1,0 +1,31 @@
+using Unity.Properties;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace SEE.Cinemachines.UI.PictureInPicture
+{
+    /// <summary>
+    /// The Data Source Structure for the Picture-In-Picture UI-Element.
+    /// </summary>
+    [CreateAssetMenu(menuName = "SEE/UI/Picture-in-Picture/Data Source")]
+    internal class PIPDataSource : ScriptableObject
+    {
+        // Enclosing class content inside the UNITY_EDITOR directive to ensure
+        // that these components work actively only inside the Unity editor.
+        #if UNITY_EDITOR
+
+        [Header("Render Images")]
+        /// <summary>
+        /// The <see cref="RenderTexture"/> that is currently being displayed.
+        /// </summary>
+        [field: SerializeField, DontCreateProperty]
+        [CreateProperty]
+        public RenderTexture PIPImage { get; set; }
+
+        #endif
+    }
+}
