@@ -27,7 +27,24 @@ namespace SEE.Cinemachines.Dolly
         [Serializable]
         internal struct SplineSector
         {
+            /// <summary>
+            /// The position on the spline at which this sector begins. Its
+            /// <see cref="SectorSpeed"/> applies from here on until the next sector starts.
+            /// </summary>
+            /// <remarks>The value is compared against the current spline position and must,
+            /// therefore, be given in the same unit, that is, in the
+            /// <see cref="PathIndexUnit"/> configured on the dolly. Because the validation
+            /// restricts the value to [0, 1), only <see cref="PathIndexUnit.Normalized"/> is
+            /// actually supported, where 0 is the start and 1 the end of the spline.</remarks>
             public float SectorStart;
+
+            /// <summary>
+            /// The speed at which the object travels while it is within this sector,
+            /// in spline position units per second.
+            /// </summary>
+            /// <remarks>Must be greater than zero, which the validation enforces. Because the
+            /// speed is added to a normalized position (see <see cref="SectorStart"/>), a
+            /// value of 1 traverses the whole spline in one second, independent of its length.</remarks>
             public float SectorSpeed;
         }
 
@@ -37,9 +54,13 @@ namespace SEE.Cinemachines.Dolly
         /// List of sections on a spline, with its corresponding speeds, in which that
         /// section needs to be paced with.
         /// </summary>
-        /// <remarks>Cannot be made readonly because it needs to be serialized by Unity.</remarks>
+        /// <remarks>Cannot be made readonly because it needs to be serialized by Unity.
+        /// The <see cref="SerializeField"/> attribute is required for the same reason: Unity
+        /// serializes non-public fields only if they are marked with it, and a field that is
+        /// not serialized would neither be shown in the Inspector nor retain its values.</remarks>
+        [SerializeField]
         [Tooltip("List of sections on a spline, with its corresponding speeds, in which that section needs to be paced with.")]
-        public SplineSector[] SpeedList = {};
+        private SplineSector[] speedList = {};
 
         /// <summary>
         /// Compute the desired position on the spline as requested by
@@ -69,18 +90,18 @@ namespace SEE.Cinemachines.Dolly
 
             SplineSector selectedSector;
 
-            if (SpeedList.Length > 0)
+            if (speedList.Length > 0)
             {
-                selectedSector = SpeedList[0];
+                selectedSector = speedList[0];
             }
             else
             {
                 throw new IndexOutOfRangeException("Speed-List must be longer than one (1) entry");
             }
 
-            for (int i = 1; i < SpeedList.Length; i++)
+            for (int i = 1; i < speedList.Length; i++)
             {
-                SplineSector tmpSector = SpeedList[i];
+                SplineSector tmpSector = speedList[i];
 
                 if (tmpSector.SectorStart >= selectedSector.SectorStart
                     && tmpSector.SectorStart <= currentPosition)
@@ -114,19 +135,19 @@ namespace SEE.Cinemachines.Dolly
         void SplineAutoDolly.ISplineAutoDolly.Validate()
         {
             // NullReference and index checks
-            if (SpeedList == null)
+            if (speedList == null)
             {
                 throw new NullReferenceException("Spline speed list needs to be initialized.");
             }
 
-            if (SpeedList != null && SpeedList.Length <= 0)
+            if (speedList != null && speedList.Length <= 0)
             {
                 throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list.");
             }
 
-            for (int i = 0; i < SpeedList.Length; i++)
+            for (int i = 0; i < speedList.Length; i++)
             {
-                SplineSector currentEntry = SpeedList[i];
+                SplineSector currentEntry = speedList[i];
                 if (currentEntry.SectorStart < 0)
                 {
                     throw new ArgumentException(String.Format("Sector can only start at '0'; At Entry {0}", i), "SectorRange");
