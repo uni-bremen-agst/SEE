@@ -164,7 +164,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 position = raycastHit.point;
-                ImageSourceMenu.EnableMenu();
+                ImageSourceMenu.Instance.Enable();
             }
         }
 
@@ -175,7 +175,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectSource()
         {
-            if (ImageSourceMenu.TryGetSource(out ImageSourceMenu.Source source))
+            if (ImageSourceMenu.Instance.TryGetSource(out ImageSourceMenu.Source source))
             {
                 switch (source)
                 {
