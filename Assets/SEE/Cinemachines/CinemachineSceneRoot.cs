@@ -133,7 +133,7 @@ namespace SEE.Cinemachines
                     cinemachinesOtherObjectGameObject = new GameObject("OtherObjects");
                     cinemachinesOtherObjectGameObject.transform.SetParent(transform);
 
-                    // Dont Save in Build
+                    // Dont save in build
                     cinemachinesOtherObjectGameObject.tag = Tags.EditorOnly;
                 }
             }
@@ -152,35 +152,37 @@ namespace SEE.Cinemachines
         private string sceneGUID = "";
 
         /// <summary>
-        /// AssetGUID of the Folder associated with this Scene. (Property).
+        /// Asset GUID of the folder associated with this scene.
         /// </summary>
+        /// <remarks>Can be assigned only once, namely when the scene folder is created.
+        /// Re-assignment would orphan the previous folder and make <see cref="DestroyObject"/>
+        /// delete the folder of a different scene.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown if the GUID is already set.</exception>
         public string SceneGUID
         {
-            get
-            {
-                return sceneGUID;
-            }
+            get => sceneGUID;
             set
             {
-                if (String.IsNullOrWhiteSpace(sceneGUID))
+                if (!String.IsNullOrWhiteSpace(sceneGUID))
                 {
-                    sceneGUID = value;
+                    throw new InvalidOperationException($"The scene folder GUID is already set to {sceneGUID}.");
                 }
+                sceneGUID = value;
             }
         }
 
         /// <summary>
-        /// Deletes this CinemachineScene from the Scenes.
+        /// Deletes this CinemachineScene from the scenes.
         /// </summary>
-        [Button("Delete selected Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]
+        [Button("Delete selected scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderDeletion), RuntimeGroupOrder(CinemachineSceneConfigOrderDeletion)]
         [InfoBox("@CinemachinesUtility.GetSceneDeletionWarningMessage(SceneGUID)", InfoMessageType.Warning)]
-        [Tooltip("Removes the currently selected Cinemachine Scene and its associated Timeline and other Assets.")]
+        [Tooltip("Removes the currently selected Cinemachine scene and its associated Timeline and other assets.")]
         internal void DestroyObject()
         {
             // Confirm, if the user wants to delete the Scene, permanently
-            if (!EditorUtility.DisplayDialog("Deletion Confirmation", "Are you sure, you want to remove this Scene?\n This will also permanently remove any associated files?", "Yes, delete", "No, keep Scene"))
+            if (!EditorUtility.DisplayDialog("Deletion Confirmation", "Are you sure, you want to remove this scene?\n This will also permanently remove any associated files?", "Yes, delete", "No, keep scene"))
             {
                 return;
             }
@@ -189,11 +191,11 @@ namespace SEE.Cinemachines
             foreach (Transform Child in transform)
             {
                 #if UNITY_EDITOR
-                Debug.Log("Immediate Destroying Scene-Children within Editor\n", Child.gameObject);
+                Debug.Log("Immediate destroying scene children within editor\n", Child.gameObject);
                 DestroyImmediate(Child.gameObject);
                 #else
-                Debug.Log("Destroying Scene-Children during Runtime\n", Child.gameObject);
-                Destroyer.Destroy(child.gameObject);
+                Debug.Log("Destroying scene children during runtime\n", Child.gameObject);
+                Destroyer.Destroy(Child.gameObject);
                 #endif
             }
 
@@ -201,38 +203,38 @@ namespace SEE.Cinemachines
             if (!String.IsNullOrWhiteSpace(SceneGUID))
             {
                 string PathToSceneFolder = AssetDatabase.GUIDToAssetPath(SceneGUID);
-                Debug.Log($"Attempting to remove associated Scenes Folder from Project. Path: {PathToSceneFolder}\n", this);
+                Debug.Log($"Attempting to remove associated scenes folder from project. Path: {PathToSceneFolder}\n", this);
                 if (!String.IsNullOrWhiteSpace(PathToSceneFolder))
                 {
                     AssetDatabase.DeleteAsset(PathToSceneFolder);
                 }
                 else
                 {
-                    Debug.LogWarning("Failed to find Scene-Folder. Assuming it never existed.\n", this);
+                    Debug.LogWarning("Failed to find scene folder. Assuming it never existed.\n", this);
                 }
             }
             else
             {
-                Debug.LogWarning("GUID of Scene-Folder not set. Assuming it never existed.\n", this);
+                Debug.LogWarning("GUID of scene folder not set. Assuming it never existed.\n", this);
             }
 
             // Remove self
             #if UNITY_EDITOR
-            Debug.Log("Immediate Destroying Scene-Root from Editor\n", transform.gameObject);
+            Debug.Log("Immediate destroying scene root from editor\n", transform.gameObject);
             DestroyImmediate(transform.gameObject);
             #else
-            Debug.Log("Destroying Scene-Root during Runtime\n", transform.gameObject);
+            Debug.Log("Destroying scene root during runtime\n", transform.gameObject);
             Destroyer.Destroy(transform.gameObject);
             #endif
         }
 
         /// <summary>
-        /// Stores this CinemachineScene as a Prefab.
+        /// Stores this CinemachineScene as a prefab.
         /// </summary>
         [Button("Backup Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Backup Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderStore), RuntimeGroupOrder(CinemachineSceneConfigOrderStore)]
-        [Tooltip("Stores the current Scene as a Prefab for loading in a different Unity-Scene or in the same in a different spot. This does not carry over References specific to a Scene.")]
+        [Tooltip("Stores the current scene as a prefab for loading in a different Unity scene or in the same in a different spot. This does not carry over references specific to a scene.")]
         internal void SaveScene()
         {
             // Generate the Prefabs Structure, if it doesn't exist yet
@@ -252,7 +254,7 @@ namespace SEE.Cinemachines
             if (prefabCreationSuccess)
                 Debug.Log($"Scene has been successfully stored under {assetPathOfScene}.\n");
             else
-                Debug.LogError($"Failed to store Scene under {assetPathOfScene}.\n");
+                Debug.LogError($"Failed to store scene under {assetPathOfScene}.\n");
         }
 
         /// <summary>
@@ -261,7 +263,7 @@ namespace SEE.Cinemachines
         [Title("Scene Object Creation", horizontalLine: true)]
         [LabelText("Suffix for Object")]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSpline), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSpline)]
-        [Tooltip("Name to be added as a Suffix to the Spline or Cinemachines Camera.")]
+        [Tooltip("Name to be added as a suffix to the Spline or Cinemachines Camera.")]
         public string ObjectNameSuffix = "";
 
         /// <summary>
@@ -270,7 +272,7 @@ namespace SEE.Cinemachines
         [Button("Create Spline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Spline")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSpline), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSpline)]
-        [Tooltip("Creates a GameObject, including an empty SplineContainer-Component. Note that the Positions inside the SplineContainer are relative to the root of the GameObject and its always placed at Scene Origin.")]
+        [Tooltip("Creates a GameObject, including an empty SplineContainer component. Note that the positions inside the SplineContainer are relative to the root of the GameObject and it is always placed at scene origin.")]
         internal void CreateEmptySpline()
         {
             CinemachinesUtility.CreateGameObject("CinemachinesSpline", ref splineCount, ref ObjectNameSuffix, cinemachinesSplinesGameObject, typeof(SplineContainer), true);
@@ -283,12 +285,12 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Creates a Signal inside the Scene-Folder, which can be used on the Scenes Timeline to trigger or invoke Functions of certain Objects or Scripts.
+        /// Creates a Signal inside the scene folder, which can be used on the scenes timeline to trigger or invoke functions of certain objects or scripts.
         /// </summary>
         [Button("Create Signal", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Signal")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSignal), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSignal)]
-        [Tooltip("Creates a Signal inside the current Scenes Folder. This Signal then can be used on the current Scenes Timeline for triggering or accessing specific Functions")]
+        [Tooltip("Creates a Signal inside the current scenes folder. This Signal then can be used on the current scenes timeline for triggering or accessing specific functions")]
         internal void CreateNewSignal()
         {
             string signalName = $"{transform.name} - {CinemachinesUtility.GetNewObjectName("Signal", ref signalCount, ref ObjectNameSuffix)}";
@@ -305,34 +307,34 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a new Cinemachines Camera, that can be assigned to a Timeline.
         /// </summary>
-        [Button("Add Camera", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Cinemachine-Camera")]
+        [Button("Add Camera", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Cinemachine Camera")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateCamera), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateCamera)]
-        [Tooltip("Creates a GameObject, including the Cinemachines Camera Component.")]
+        [Tooltip("Creates a GameObject, including the Cinemachines Camera component.")]
         internal void CreateNewCamera()
         {
             CinemachinesUtility.CreateGameObject("CinemachinesCamera", ref cinemachinesCameraCount, ref ObjectNameSuffix, cinemachinesCamerasGameObject, typeof(CinemachineCamera), true);
         }
 
         /// <summary>
-        /// Creates a new GameObject, that can used to focus a Cinemachine-Camera on.
+        /// Creates a new GameObject that can be used to focus a Cinemachine Camera on.
         /// </summary>
-        [Button("Create Focus-Object", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Focus-Object")]
+        [Button("Create Focus Object", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Focus Object")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateFocus), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateFocus)]
-        [Tooltip("Creates a GameObject, which can be used to focus a Cinemachine-Camera onto.")]
+        [Tooltip("Creates a GameObject that can be used to focus a Cinemachine Camera onto.")]
         internal void CreateNewFocusObject()
         {
             CinemachinesUtility.CreateGameObject("FocusObject", ref focusObjectCount, ref ObjectNameSuffix, cinemachinesFocusObjectGameObject, null, false);
         }
 
         /// <summary>
-        /// Creates a new Spline, that can be assigned inside Cinemachine-Cameras with SplineDolly-Component.
+        /// Creates a new Spline, that can be assigned inside Cinemachine-Cameras with SplineDolly component.
         /// </summary>
         [Button("Open Timeline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootActions, "Open Timeline")]
         [ButtonGroup(CinemachinesSceneRootActions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderOpenTimeline), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderOpenTimeline)]
-        [Tooltip("Open Timeline of the current Scene.")]
+        [Tooltip("Open Timeline of the current scene.")]
         internal void OpenTimelineWindow()
         {
             // Get or Create the Timeline Window and lock it to current Scene
