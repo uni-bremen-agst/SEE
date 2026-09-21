@@ -187,18 +187,6 @@ namespace SEE.Cinemachines
                 return;
             }
 
-            // Delete Children before destroying the Object
-            foreach (Transform Child in transform)
-            {
-                #if UNITY_EDITOR
-                Debug.Log("Immediate destroying scene children within editor\n", Child.gameObject);
-                DestroyImmediate(Child.gameObject);
-                #else
-                Debug.Log("Destroying scene children during runtime\n", Child.gameObject);
-                Destroyer.Destroy(Child.gameObject);
-                #endif
-            }
-
             // Remove SceneFolder inside Assets/Cinemachines/Scenes, if one is assigned to this scene
             if (!String.IsNullOrWhiteSpace(SceneGUID))
             {
@@ -218,14 +206,9 @@ namespace SEE.Cinemachines
                 Debug.LogWarning("GUID of scene folder not set. Assuming it never existed.\n", this);
             }
 
-            // Remove self
-            #if UNITY_EDITOR
-            Debug.Log("Immediate destroying scene root from editor\n", transform.gameObject);
-            DestroyImmediate(transform.gameObject);
-            #else
-            Debug.Log("Destroying scene root during runtime\n", transform.gameObject);
-            Destroyer.Destroy(transform.gameObject);
-            #endif
+            // Remove self along with all children
+            Debug.Log("Destroying scene root and its children\n", gameObject);
+            Destroyer.Destroy(gameObject, recurseIntoChildren: true);
         }
 
         /// <summary>
