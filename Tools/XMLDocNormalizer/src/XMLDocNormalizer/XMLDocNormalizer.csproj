@@ -41,6 +41,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>XMLDocNormalizerTests</_Parameter1>
     </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>XMLDocNormalizer.Evaluation</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

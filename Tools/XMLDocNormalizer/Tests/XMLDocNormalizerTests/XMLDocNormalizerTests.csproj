@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\XMLDocNormalizer\XMLDocNormalizer.csproj" />
+    <ProjectReference Include="..\..\Evaluation\XMLDocNormalizer.Evaluation\XMLDocNormalizer.Evaluation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

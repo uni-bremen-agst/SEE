@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "artifacts": [
+    {
+      "id": "dapper-2.1.35-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/dapper/2.1.35/dapper.2.1.35.nupkg",
+      "sha256": "CDEAE8C92C7B94ED722ED6E12A1150F3B7625973AAF603E7BF7A8572635CB3D3",
+      "extractTo": "packages/dapper.2.1.35"
+    },
+    {
+      "id": "netstandard-library-2.0.3-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg",
+      "sha256": "3EB87644F79BCFFB3C0331DBDAC3C7837265F2CDF58A7BFD93E431776F77C9BA",
+      "extractTo": "packages/netstandard.library.2.0.3"
+    },
+    {
+      "id": "newtonsoft-json-13.0.3-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg",
+      "sha256": "872FC189E638AB1056555B03AAA38F68BCB54286E221AA646EB1129BABF63C77",
+      "extractTo": "packages/newtonsoft.json.13.0.3"
+    },
+    {
+      "id": "newtonsoft-json-13.0.3-symbols",
+      "url": "https://www.nuget.org/api/v2/symbolpackage/Newtonsoft.Json/13.0.3",
+      "sha256": "CE64180876A15CEA73E35FE90592C4C5A04F8D370C2A4D5B3D2D9BD600D6E426",
+      "extractTo": "packages/newtonsoft.json.13.0.3"
+    },
+    {
+      "id": "oneof-3.0.263-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/oneof/3.0.263/oneof.3.0.263.nupkg",
+      "sha256": "21E64478103197FA67B7A4827A50B67E01B5B363381E15EB5AA35BE35CF15122",
+      "extractTo": "packages/oneof.3.0.263"
+    },
+    {
+      "id": "polly-7.2.4-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/polly/7.2.4/polly.7.2.4.nupkg",
+      "sha256": "C10BCADD799096997223F76E56484CFA24618A41812F0AD0F1CA5C1494887053",
+      "extractTo": "packages/polly.7.2.4"
+    },
+    {
+      "id": "polly-7.2.4-symbols",
+      "url": "https://www.nuget.org/api/v2/symbolpackage/Polly/7.2.4",
+      "sha256": "F71A0DEDB22715D62230BF0A8A17E4E4833DD1776110B6DF4154EBFD6ADC7037",
+      "extractTo": "packages/polly.7.2.4"
+    },
+    {
+      "id": "scrutor-4.2.2-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/scrutor/4.2.2/scrutor.4.2.2.nupkg",
+      "sha256": "C53EA29D36A89A375A4CBA382177F4157E3CE9A501BE6DBE1C94B146D2F9FD9B",
+      "extractTo": "packages/scrutor.4.2.2"
+    },
+    {
+      "id": "scrutor-4.2.2-symbols",
+      "url": "https://www.nuget.org/api/v2/symbolpackage/Scrutor/4.2.2",
+      "sha256": "C26388E8B4600E11C8F9748DABEBA6DC19AA83CA32A69DDD1647BFA50BD3B7A2",
+      "extractTo": "packages/scrutor.4.2.2"
+    },
+    {
+      "id": "semver-2.3.0-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/semver/2.3.0/semver.2.3.0.nupkg",
+      "sha256": "EFBFC9FF0E353CB10C231039523E3BE537917811B0F10C29B50B1B403B5DB0C2",
+      "extractTo": "packages/semver.2.3.0"
+    },
+    {
+      "id": "semver-2.3.0-symbols",
+      "url": "https://www.nuget.org/api/v2/symbolpackage/Semver/2.3.0",
+      "sha256": "FAE71FEEEA47FBD88CFDF607FDDBCCC4C3CDC8ACDA9C808B6231E211FFD009F4",
+      "extractTo": "packages/semver.2.3.0"
+    },
+    {
+      "id": "serilog-3.1.1-package",
+      "url": "https://api.nuget.org/v3-flatcontainer/serilog/3.1.1/serilog.3.1.1.nupkg",
+      "sha256": "2F6EB7CBC8E49FB74D143DA30142BA9A0BF2453A857B7F62D6D461559B0D6532",
+      "extractTo": "packages/serilog.3.1.1"
+    },
+    {
+      "id": "serilog-3.1.1-symbols",
+      "url": "https://www.nuget.org/api/v2/symbolpackage/Serilog/3.1.1",
+      "sha256": "AEE3D837DB49E65685A1DF458A319DD8FD30CC4DE9679BD249A799BD7AD507E5",
+      "extractTo": "packages/serilog.3.1.1"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "dapper-2.1.35-net7.0",
+      "package": "Dapper",
+      "version": "2.1.35",
+      "targetFramework": "net7.0",
+      "assemblyPath": "packages/dapper.2.1.35/lib/net7.0/Dapper.dll",
+      "pdbPath": null,
+      "referenceRoots": [],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Known unsigned data-access library with async and generic APIs; published package has no reproducible PDB artifact.",
+      "categories": ["Async", "Generics", "MissingPortablePdb"]
+    },
+    {
+      "id": "newtonsoft-json-13.0.3-net6.0",
+      "package": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "targetFramework": "net6.0",
+      "assemblyPath": "packages/newtonsoft.json.13.0.3/lib/net6.0/Newtonsoft.Json.dll",
+      "pdbPath": "packages/newtonsoft.json.13.0.3/lib/net6.0/Newtonsoft.Json.pdb",
+      "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Widely used multi-source library with real Source Link symbols and a signed target boundary.",
+      "categories": ["PortablePdb", "SourceLink", "MultipleSources", "SignedTarget"]
+    },
+    {
+      "id": "oneof-3.0.263-netstandard2.0",
+      "package": "OneOf",
+      "version": "3.0.263",
+      "targetFramework": "netstandard2.0",
+      "assemblyPath": "packages/oneof.3.0.263/lib/netstandard2.0/OneOf.dll",
+      "pdbPath": null,
+      "referenceRoots": [],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Small unsigned generic library whose release has no reproducible PDB artifact.",
+      "categories": ["Generics", "MissingPortablePdb"]
+    },
+    {
+      "id": "polly-7.2.4-netstandard2.0",
+      "package": "Polly",
+      "version": "7.2.4",
+      "targetFramework": "netstandard2.0",
+      "assemblyPath": "packages/polly.7.2.4/lib/netstandard2.0/Polly.dll",
+      "pdbPath": "packages/polly.7.2.4/lib/netstandard2.0/Polly.pdb",
+      "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Established async/generic resilience library with real Source Link symbols and a signed target boundary.",
+      "categories": ["PortablePdb", "SourceLink", "Async", "Generics", "SignedTarget"]
+    },
+    {
+      "id": "scrutor-4.2.2-netstandard2.0",
+      "package": "Scrutor",
+      "version": "4.2.2",
+      "targetFramework": "netstandard2.0",
+      "assemblyPath": "packages/scrutor.4.2.2/lib/netstandard2.0/Scrutor.dll",
+      "pdbPath": "packages/scrutor.4.2.2/lib/netstandard2.0/Scrutor.pdb",
+      "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Dependency-bearing DI library for observing exact-reference failure before its signed target boundary.",
+      "categories": ["PortablePdb", "SourceLink", "ExternalDependency", "SignedTarget"]
+    },
+    {
+      "id": "semver-2.3.0-netstandard2.0",
+      "package": "Semver",
+      "version": "2.3.0",
+      "targetFramework": "netstandard2.0",
+      "assemblyPath": "packages/semver.2.3.0/lib/netstandard2.0/Semver.dll",
+      "pdbPath": "packages/semver.2.3.0/lib/netstandard2.0/Semver.pdb",
+      "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "expectedOutcome": "Success",
+      "selectionReason": "Small unsigned multi-source library with Portable PDB, two embedded generated sources, Source Link, and exact stable reference-pack provenance.",
+      "categories": ["PortablePdb", "SourceLink", "EmbeddedSource", "MultipleSources", "Generics"],
+      "probe": {
+        "source": "using System;\nusing Semver;\npublic static class Consumer\n{\n    /// <summary>Checks a predicate.</summary>\n    public static bool M(SemVersion version)\n    {\n        if (version is null)\n        {\n            return false;\n        }\n\n        return version.Satisfies((Predicate<SemVersion>)null!);\n    }\n}",
+        "methodName": "M",
+        "expectedExceptionType": "ArgumentNullException",
+        "verifiedFlow": "Consumer.M -> SemVersion.Satisfies(Predicate<SemVersion>) -> throw ArgumentNullException (SemVersion.cs:1698-1701 at Source Link commit 4585eb6)"
+      }
+    },
+    {
+      "id": "serilog-3.1.1-netstandard2.0",
+      "package": "Serilog",
+      "version": "3.1.1",
+      "targetFramework": "netstandard2.0",
+      "assemblyPath": "packages/serilog.3.1.1/lib/netstandard2.0/Serilog.dll",
+      "pdbPath": "packages/serilog.3.1.1/lib/netstandard2.0/Serilog.pdb",
+      "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "expectedOutcome": "ExpectedFailClosed",
+      "selectionReason": "Widely used interface-heavy logging library with real Source Link symbols and a signed target boundary.",
+      "categories": ["PortablePdb", "SourceLink", "InterfaceDispatch", "SignedTarget"]
+    }
+  ]
+}

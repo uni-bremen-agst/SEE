@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMLDocNormalizer", "src\XML
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMLDocNormalizerTests", "Tests\XMLDocNormalizerTests\XMLDocNormalizerTests.csproj", "{385E4C33-1E78-493B-95B2-6ED33F9602E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMLDocNormalizer.Evaluation", "Evaluation\XMLDocNormalizer.Evaluation\XMLDocNormalizer.Evaluation.csproj", "{CC98C478-9B24-49EF-93D9-89C75203FD86}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,8 +50,21 @@ Global
 		{385E4C33-1E78-493B-95B2-6ED33F9602E1}.Release|x64.Build.0 = Release|Any CPU
 		{385E4C33-1E78-493B-95B2-6ED33F9602E1}.Release|x86.ActiveCfg = Release|Any CPU
 		{385E4C33-1E78-493B-95B2-6ED33F9602E1}.Release|x86.Build.0 = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|x64.Build.0 = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC98C478-9B24-49EF-93D9-89C75203FD86}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F0D94575-DF7F-4255-B0A2-18205B9EBCF2} = {F4398E77-DA3F-4A81-BBD9-D9BE8901DD18}
+		{CC98C478-9B24-49EF-93D9-89C75203FD86} = {F4398E77-DA3F-4A81-BBD9-D9BE8901DD18}
 	EndGlobalSection
 EndGlobal

@@ -479,3 +479,15 @@ dotnet test .\XMLDocNormalizer.sln --no-build
 
 The expensive solution-transitive self-analysis is intentionally excluded from the default
 test run and is started explicitly as documented in the test README.
+
+## Opt-in real-world evaluation
+
+The pinned, opt-in E1 harness and its explicit package preparation and Source Link run
+commands are documented in:
+
+```text
+Evaluation/README.md
+```
+
+Generated inputs and reports remain below the ignored `artifacts/real-world-evaluation`
+workspace and are not part of the normal CLI or test execution.
