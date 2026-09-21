@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             };
 
-            LoadMenu.Enable(loadButtonCall, loadSpecificButtonCall, loadSpecificCurrentPageButtonCall);
+            LoadMenu.Instance.Enable(loadButtonCall, loadSpecificButtonCall, loadSpecificCurrentPageButtonCall);
         }
 
         /// <summary>
