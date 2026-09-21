@@ -206,7 +206,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             };
 
-            SaveMenu.Enable(saveButtonCall, saveCurrentPageButtonCall, saveAllButtonCall);
+            SaveMenu.Instance.Enable(saveButtonCall, saveCurrentPageButtonCall, saveAllButtonCall);
         }
 
         /// <summary>
