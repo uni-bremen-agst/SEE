@@ -106,7 +106,7 @@ namespace SEE.Cinemachines
                     cinemachinesCamerasGameObject = new GameObject("Cameras");
                     cinemachinesCamerasGameObject.transform.SetParent(transform);
 
-                    // Dont Save in Build
+                    // Don't save in build.
                     cinemachinesCamerasGameObject.tag = Tags.EditorOnly;
                 }
 
@@ -115,7 +115,7 @@ namespace SEE.Cinemachines
                     cinemachinesSplinesGameObject = new GameObject("Splines");
                     cinemachinesSplinesGameObject.transform.SetParent(transform);
 
-                    // Dont Save in Build
+                    // Don't save in build.
                     cinemachinesSplinesGameObject.tag = Tags.EditorOnly;
                 }
 
@@ -124,7 +124,7 @@ namespace SEE.Cinemachines
                     cinemachinesFocusObjectGameObject = new GameObject("FocusObjects");
                     cinemachinesFocusObjectGameObject.transform.SetParent(transform);
 
-                    // Dont Save in Build
+                    // Don't save in build.
                     cinemachinesFocusObjectGameObject.tag = Tags.EditorOnly;
                 }
 
@@ -133,12 +133,12 @@ namespace SEE.Cinemachines
                     cinemachinesOtherObjectGameObject = new GameObject("OtherObjects");
                     cinemachinesOtherObjectGameObject.transform.SetParent(transform);
 
-                    // Dont save in build
+                    // Don't save in build.
                     cinemachinesOtherObjectGameObject.tag = Tags.EditorOnly;
                 }
             }
 
-            // Dont save in build
+            // Don't save in build.
             tag = Tags.EditorOnly;
         }
 
