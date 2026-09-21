@@ -15,12 +15,12 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Whether this class has a file path in store that wasn't yet fetched.
         /// </summary>
-        private static bool gotFilePath;
+        private bool gotFilePath;
 
         /// <summary>
         /// If <see cref="gotFilePath"/> is true, this contains the file path which the player selected.
         /// </summary>
-        private static string path;
+        private string path;
 
         /// <summary>
         /// The init file path for the file browser
@@ -178,6 +178,18 @@ namespace SEE.UI.Drawable
 
             filePath = "";
             return false;
+        }
+
+        /// <summary>
+        /// Closes the currently open file browser and discards any file path
+        /// that has not yet been consumed.
+        /// </summary>
+        public void Close()
+        {
+            PathPicker.Close();
+
+            gotFilePath = false;
+            path = "";
         }
     }
 }

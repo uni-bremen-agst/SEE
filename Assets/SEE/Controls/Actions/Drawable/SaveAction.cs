@@ -111,16 +111,21 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableFileBrowser browser;
 
         /// <summary>
-        /// Stops the <see cref="SaveAction"/>.
-        /// Destroys the save menu and if there are still highlight effect.
+        /// Stops the <see cref="SaveAction"/>, closes an open file browser,
+        /// removes all selection highlights, and destroys the save menu.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
+
+            browser?.Close();
+            browser = null;
+
             foreach (GameObject surface in selectedSurfaces)
             {
                 surface.Destroy<HighlightEffect>();
             }
+
             SaveMenu.Instance.Destroy();
         }
 

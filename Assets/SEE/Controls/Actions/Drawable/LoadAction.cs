@@ -182,13 +182,16 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Stops the <see cref="LoadAction"/>.
-        /// Destroys the load menu and if there are still an activ
-        /// highlight effect
+        /// Stops the <see cref="LoadAction"/>, closes an open file browser,
+        /// destroys the load menu, and removes the current surface highlight.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
+
+            browser?.Close();
+            browser = null;
+
             LoadMenu.Instance.Destroy();
             selectedSurface?.Destroy<HighlightEffect>();
         }

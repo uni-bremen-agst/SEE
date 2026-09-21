@@ -77,5 +77,19 @@ namespace SEE.UI.FilePicker
         {
             return FileBrowser.IsOpen;
         }
+
+
+        /// <summary>
+        /// Closes the currently open file browser, if any.
+        /// The registered cancel callback is invoked so that associated UI state
+        /// such as keyboard-shortcut handling is restored.
+        /// </summary>
+        internal static void Close()
+        {
+            if (FileBrowser.IsOpen)
+            {
+                FileBrowser.HideDialog(true);
+            }
+        }
     }
 }

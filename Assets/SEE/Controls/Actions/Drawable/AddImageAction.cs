@@ -102,12 +102,27 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Destroys the image source menu if it's still active.
+        /// Stops the action and closes all UI elements and transient state
+        /// belonging to the current image-selection workflow.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
+
             ImageSourceMenu.Instance.Destroy();
+
+            browser?.Close();
+            browser = null;
+
+            webImageDialog?.CloseDialog();
+            webImageDialog = null;
+            isDialogOpen = false;
+
+            if (download != null)
+            {
+                Destroyer.Destroy(download);
+                download = null;
+            }
         }
 
         /// <summary>
