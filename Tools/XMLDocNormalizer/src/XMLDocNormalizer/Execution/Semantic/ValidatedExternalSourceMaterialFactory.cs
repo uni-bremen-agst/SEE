@@ -166,6 +166,57 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Validates an already acquired immutable source snapshot without
+        /// decoding, newline normalization, or additional source I/O.
+        /// </summary>
+        /// <param name="document">The Portable PDB document provenance.</param>
+        /// <param name="image">The exact candidate source bytes.</param>
+        /// <param name="origin">The controlled acquisition origin.</param>
+        /// <param name="filePath">Optional local path provenance.</param>
+        /// <param name="material">The checksum-validated P5H material.</param>
+        /// <returns>
+        /// <see langword="true"/> only when the existing Portable PDB checksum
+        /// validator accepts the exact supplied bytes.
+        /// </returns>
+        /// <remarks>
+        /// Acquisition locates candidate source bytes. Portable PDB checksum
+        /// validation alone establishes whether they belong to the document.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="document"/> is <see langword="null"/>.
+        /// </exception>
+        internal static bool TryCreateFromAcquiredImage(
+            ExternalSourceDocumentDescriptor document,
+            ImmutableArray<byte> image,
+            ExternalSourceMaterialOrigin origin,
+            string? filePath,
+            out ValidatedExternalSourceMaterial material)
+        {
+            ArgumentNullException.ThrowIfNull(document);
+
+            if (image.IsDefault
+                || (origin != ExternalSourceMaterialOrigin.LocalMapping
+                    && origin != ExternalSourceMaterialOrigin.SourceLink)
+                || !ExternalSourceDocumentChecksumValidator.TryValidate(
+                    image.AsSpan(),
+                    document.HashAlgorithm,
+                    document.Hash,
+                    out bool isChecksumValidated)
+                || !isChecksumValidated)
+            {
+                material = null!;
+                return false;
+            }
+
+            material = new ValidatedExternalSourceMaterial(
+                document,
+                image,
+                origin,
+                filePath);
+            return true;
+        }
+
+        /// <summary>
         /// Reads one complete candidate snapshot and validates those same bytes.
         /// </summary>
         /// <param name="document">The Portable PDB document provenance.</param>

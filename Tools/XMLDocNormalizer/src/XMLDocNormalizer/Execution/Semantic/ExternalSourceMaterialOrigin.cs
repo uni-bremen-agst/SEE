@@ -20,6 +20,17 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <summary>
         /// The bytes came from an explicitly selected caller path.
         /// </summary>
-        ExplicitFile
+        ExplicitFile,
+
+        /// <summary>
+        /// The bytes came from a candidate projected inside an explicitly
+        /// configured local source root.
+        /// </summary>
+        LocalMapping,
+
+        /// <summary>
+        /// The bytes came from an explicitly enabled Source Link request.
+        /// </summary>
+        SourceLink
     }
 }

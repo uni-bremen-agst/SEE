@@ -22,11 +22,51 @@ namespace XMLDocNormalizer.Execution.Semantic
         public ExternalSourceReconstructionInput(
             int documentOrdinal,
             string? candidatePath)
+            : this(documentOrdinal, candidatePath, allowAcquisition: false)
+        {
+        }
+
+        /// <summary>
+        /// Creates an input that uses Embedded Source first and otherwise
+        /// permits context-configured P7B acquisition.
+        /// </summary>
+        /// <param name="documentOrdinal">
+        /// The zero-based ordinal in the validated Portable PDB document table.
+        /// </param>
+        /// <returns>An acquisition-enabled source reconstruction input.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="documentOrdinal"/> is negative.
+        /// </exception>
+        public static ExternalSourceReconstructionInput CreateAcquirable(
+            int documentOrdinal)
+        {
+            return new ExternalSourceReconstructionInput(
+                documentOrdinal,
+                candidatePath: null,
+                allowAcquisition: true);
+        }
+
+        /// <summary>
+        /// Initializes one explicit, embedded-only, or acquisition-enabled input.
+        /// </summary>
+        /// <param name="documentOrdinal">The Portable PDB document ordinal.</param>
+        /// <param name="candidatePath">The authoritative explicit path.</param>
+        /// <param name="allowAcquisition">
+        /// Whether configured acquisition may follow an unavailable Embedded Source.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="documentOrdinal"/> is negative.
+        /// </exception>
+        private ExternalSourceReconstructionInput(
+            int documentOrdinal,
+            string? candidatePath,
+            bool allowAcquisition)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(documentOrdinal);
 
             DocumentOrdinal = documentOrdinal;
             CandidatePath = candidatePath;
+            AllowAcquisition = allowAcquisition;
         }
 
         /// <summary>
@@ -44,5 +84,14 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// name.
         /// </value>
         public string? CandidatePath { get; }
+
+        /// <summary>
+        /// Gets whether context-configured acquisition may run after the
+        /// Embedded Source fast path is unavailable.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> only for an explicit P7B acquisition opt-in.
+        /// </value>
+        public bool AllowAcquisition { get; }
     }
 }

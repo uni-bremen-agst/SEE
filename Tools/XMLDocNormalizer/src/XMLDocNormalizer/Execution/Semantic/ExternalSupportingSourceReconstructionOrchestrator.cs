@@ -15,6 +15,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="candidateDiscovery">
         /// The context-local binary candidate discovery catalog.
         /// </param>
+        /// <param name="sourceAcquisition">
+        /// The context-local controlled source acquisition catalog.
+        /// </param>
         /// <param name="supportingSource">The P6A handoff when successful.</param>
         /// <returns>
         /// <see langword="true"/> only when every existing P4/P5 factory
@@ -23,9 +26,10 @@ namespace XMLDocNormalizer.Execution.Semantic
         public static bool TryReconstruct(
             ExternalSupportingSourceReconstructionPlan plan,
             ExternalBinaryCandidateDiscovery candidateDiscovery,
+            ExternalSourceAcquisition sourceAcquisition,
             out ExternalSupportingSourceCompilation supportingSource)
         {
-            if (plan == null || candidateDiscovery == null)
+            if (plan == null || candidateDiscovery == null || sourceAcquisition == null)
             {
                 supportingSource = null!;
                 return false;
@@ -48,6 +52,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                         plan,
                         provenance,
                         configuration,
+                        sourceAcquisition,
                         out ExternalCSharpSyntaxTreeSet syntaxTreeSet)
                     || !TryCreateReferenceMaterials(
                         plan,
@@ -153,6 +158,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="plan">The immutable explicit candidate plan.</param>
         /// <param name="provenance">The validated P5A provenance.</param>
         /// <param name="configuration">The reconstructed P5G configuration.</param>
+        /// <param name="sourceAcquisition">The context-local P7B acquisition.</param>
         /// <param name="syntaxTreeSet">The complete P5J result when successful.</param>
         /// <returns>
         /// <see langword="true"/> when every explicit source ordinal succeeds
@@ -162,6 +168,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             ExternalSupportingSourceReconstructionPlan plan,
             ExternalCompilationProvenanceDescriptor provenance,
             ExternalCSharpCompilationConfiguration configuration,
+            ExternalSourceAcquisition sourceAcquisition,
             out ExternalCSharpSyntaxTreeSet syntaxTreeSet)
         {
             try
@@ -180,14 +187,28 @@ namespace XMLDocNormalizer.Execution.Semantic
 
                     ExternalSourceDocumentDescriptor document =
                         provenance.PortablePdb.Documents[input.DocumentOrdinal];
-                    bool materialCreated = input.CandidatePath == null
-                        ? ValidatedExternalSourceMaterialFactory.TryCreateFromEmbeddedSource(
-                            document,
-                            out ValidatedExternalSourceMaterial material)
-                        : ValidatedExternalSourceMaterialFactory.TryCreateFromFile(
+                    bool materialCreated;
+                    ValidatedExternalSourceMaterial material;
+
+                    if (input.CandidatePath != null)
+                    {
+                        materialCreated = ValidatedExternalSourceMaterialFactory.TryCreateFromFile(
                             document,
                             input.CandidatePath,
                             out material);
+                    }
+                    else
+                    {
+                        materialCreated =
+                            ValidatedExternalSourceMaterialFactory.TryCreateFromEmbeddedSource(
+                                document,
+                                out material)
+                            || (input.AllowAcquisition
+                                && sourceAcquisition.TryAcquire(
+                                    document,
+                                    provenance.PortablePdb.SourceLink,
+                                    out material));
+                    }
 
                     if (!materialCreated
                         || !ExternalCSharpSyntaxTreeFactory.TryCreate(

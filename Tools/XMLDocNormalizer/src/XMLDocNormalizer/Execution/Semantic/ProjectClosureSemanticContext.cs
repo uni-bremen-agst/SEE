@@ -51,6 +51,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         private ExternalBinaryCandidateDiscovery ExternalBinaryCandidates { get; } = new();
 
         /// <summary>
+        /// Gets the context-local controlled external source acquisition.
+        /// </summary>
+        /// <value>The local-mapping and optional Source Link acquisition cache.</value>
+        private ExternalSourceAcquisition ExternalSources { get; } = new();
+
+        /// <summary>
         /// Caches semantic models per syntax tree to avoid repeated lookup.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticModel> semanticModelCache =
@@ -244,6 +250,76 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures all context-local document-prefix projections permitted
+        /// for acquisition-enabled external source inputs.
+        /// </summary>
+        /// <param name="sourceMappings">
+        /// The complete local mapping set. Roots must be fully qualified.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for new or idempotent configuration;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="sourceMappings"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        /// <remarks>
+        /// Configuration performs no source-file or network I/O. Document
+        /// names are projected only inside the explicitly permitted roots and
+        /// P5H remains the source-identity boundary.
+        /// </remarks>
+        public bool TryConfigureExternalSourceMappings(
+            IEnumerable<ExternalSourcePathMapping> sourceMappings)
+        {
+            ArgumentNullException.ThrowIfNull(sourceMappings);
+
+            return ExternalSources.TryConfigureMappings(sourceMappings);
+        }
+
+        /// <summary>
+        /// Explicitly enables bounded HTTPS Source Link acquisition for this
+        /// semantic context using the production network policy.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> when the policy is newly configured;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown transitively if runtime HTTP policy construction fails.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown transitively if a built-in positive network limit is invalid.
+        /// </exception>
+        /// <remarks>
+        /// Source Link is disabled by default. Its URI is a retrieval hint,
+        /// not a trust boundary; downloaded bytes must still pass P5H.
+        /// </remarks>
+        public bool TryEnableExternalSourceLink()
+        {
+            return ExternalSources.TryConfigureSourceLink(
+                ExternalSourceLinkClient.CreateDefault());
+        }
+
+        /// <summary>
+        /// Explicitly configures a testable context-local Source Link client.
+        /// </summary>
+        /// <param name="client">The bounded HTTPS client.</param>
+        /// <returns>
+        /// <see langword="true"/> for new or reference-idempotent
+        /// configuration; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="client"/> is <see langword="null"/>.
+        /// </exception>
+        internal bool TryEnableExternalSourceLink(ExternalSourceLinkClient client)
+        {
+            ArgumentNullException.ThrowIfNull(client);
+
+            return ExternalSources.TryConfigureSourceLink(client);
+        }
+
+        /// <summary>
         /// Tries to locate a registered supporting source scope by its exact
         /// assembly identity.
         /// </summary>
@@ -361,6 +437,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 succeeded = ExternalSupportingSourceReconstructionOrchestrator.TryReconstruct(
                         plan,
                         ExternalBinaryCandidates,
+                        ExternalSources,
                         out ExternalSupportingSourceCompilation supportingSource)
                     && TryRegisterExternalSupportingSource(supportingSource, out _);
             }

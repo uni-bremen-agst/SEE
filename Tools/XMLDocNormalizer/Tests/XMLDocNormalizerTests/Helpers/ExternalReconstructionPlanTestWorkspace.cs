@@ -42,7 +42,9 @@ namespace XMLDocNormalizerTests.Helpers
             CSharpCompilationOptions? compilationOptions = null,
             bool embedSources = false,
             CSharpParseOptions? parseOptions = null,
-            Encoding? sourceEncoding = null)
+            Encoding? sourceEncoding = null,
+            string? sourceLinkJson = null,
+            IReadOnlyCollection<int>? embeddedSourceOrdinals = null)
         {
             string candidatePrefix = assemblyName + "." + Guid.NewGuid().ToString("N");
             CSharpParseOptions actualParseOptions = parseOptions ?? new CSharpParseOptions(
@@ -79,17 +81,23 @@ namespace XMLDocNormalizerTests.Helpers
 
             using MemoryStream peStream = new();
             using MemoryStream pdbStream = new();
-            ImmutableArray<EmbeddedText> embeddedTexts = embedSources
-                ? trees.Select(static tree => EmbeddedText.FromSource(
+            ImmutableArray<EmbeddedText> embeddedTexts = trees
+                .Where((_, index) => embedSources
+                    || embeddedSourceOrdinals?.Contains(index) == true)
+                .Select(static tree => EmbeddedText.FromSource(
                     tree.FilePath,
-                    tree.GetText())).ToImmutableArray()
-                : ImmutableArray<EmbeddedText>.Empty;
+                    tree.GetText()))
+                .ToImmutableArray();
+            using MemoryStream? sourceLinkStream = sourceLinkJson == null
+                ? null
+                : new MemoryStream(Encoding.UTF8.GetBytes(sourceLinkJson), writable: false);
             EmitResult emit = compilation.Emit(
                 peStream,
                 pdbStream,
                 options: new EmitOptions(
                     debugInformationFormat: DebugInformationFormat.PortablePdb,
                     pdbFilePath: Path.Combine(DirectoryPath, candidatePrefix + ".pdb")),
+                sourceLinkStream: sourceLinkStream,
                 embeddedTexts: embeddedTexts);
             Assert.True(emit.Success, string.Join(Environment.NewLine, emit.Diagnostics));
 
@@ -225,6 +233,22 @@ namespace XMLDocNormalizerTests.Helpers
                             new ExternalSourceReconstructionInput(
                                 index,
                                 UsesEmbeddedSources ? null : path)));
+            }
+
+            /// <summary>
+            /// Creates a P7A/P7B plan that discovers references and permits
+            /// controlled acquisition for every source-tree ordinal.
+            /// </summary>
+            public ExternalSupportingSourceReconstructionPlan CreateAcquisitionPlan(
+                ExternalAssemblyReferenceDescriptor descriptor)
+            {
+                return ExternalSupportingSourceReconstructionPlan
+                    .CreateWithLocalReferenceDiscovery(
+                        descriptor,
+                        TargetPath,
+                        PdbPath,
+                        Enumerable.Range(0, SourcePaths.Length)
+                            .Select(ExternalSourceReconstructionInput.CreateAcquirable));
             }
         }
     }
