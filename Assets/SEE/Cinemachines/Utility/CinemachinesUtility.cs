@@ -93,14 +93,13 @@ namespace SEE.Cinemachines.Utility
         internal static string GenerateSceneFolder(string sceneName)
         {
             // create new folder for Scene in Assets/Cinemachines/Scenes
-            string SceneGUID = AssetDatabase.CreateFolder($"{CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}", $"{sceneName}");
-            // create signals folder to store timeline signals
-            if (!AssetDatabase.IsValidFolder($"{AssetDatabase.GUIDToAssetPath(SceneGUID)}/Signals"))
+            string sceneGUID = AssetDatabase.CreateFolder($"{CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}", $"{sceneName}");
+            // Create signals folder to store timeline signals.
+            if (!AssetDatabase.IsValidFolder($"{AssetDatabase.GUIDToAssetPath(sceneGUID)}/Signals"))
             {
-                AssetDatabase.CreateFolder(AssetDatabase.GUIDToAssetPath(SceneGUID), "Signals");
+                AssetDatabase.CreateFolder(AssetDatabase.GUIDToAssetPath(sceneGUID), "Signals");
             }
-
-            return SceneGUID;
+            return sceneGUID;
         }
 
         /// <summary>
