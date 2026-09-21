@@ -45,6 +45,12 @@ namespace XMLDocNormalizer.Execution.Semantic
             new();
 
         /// <summary>
+        /// Gets the context-local explicit-root binary candidate discovery.
+        /// </summary>
+        /// <value>The local non-recursive discovery catalog.</value>
+        private ExternalBinaryCandidateDiscovery ExternalBinaryCandidates { get; } = new();
+
+        /// <summary>
         /// Caches semantic models per syntax tree to avoid repeated lookup.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticModel> semanticModelCache =
@@ -210,6 +216,34 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures all local roots that discovery-enabled reconstruction
+        /// plans may search for P5A metadata-reference candidates.
+        /// </summary>
+        /// <param name="searchRoots">
+        /// Fully qualified directory paths. Roots are normalized,
+        /// deduplicated, and captured without filesystem access.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a new or idempotent root set; otherwise
+        /// <see langword="false"/>. Roots cannot change after discovery starts.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="searchRoots"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        /// <remarks>
+        /// Enumeration is non-recursive and demand-driven. Discovery finds
+        /// candidates only; existing P5 validation establishes usability.
+        /// </remarks>
+        public bool TryConfigureExternalBinarySearchRoots(
+            IEnumerable<string> searchRoots)
+        {
+            ArgumentNullException.ThrowIfNull(searchRoots);
+
+            return ExternalBinaryCandidates.TryConfigure(searchRoots);
+        }
+
+        /// <summary>
         /// Tries to locate a registered supporting source scope by its exact
         /// assembly identity.
         /// </summary>
@@ -326,6 +360,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             {
                 succeeded = ExternalSupportingSourceReconstructionOrchestrator.TryReconstruct(
                         plan,
+                        ExternalBinaryCandidates,
                         out ExternalSupportingSourceCompilation supportingSource)
                     && TryRegisterExternalSupportingSource(supportingSource, out _);
             }

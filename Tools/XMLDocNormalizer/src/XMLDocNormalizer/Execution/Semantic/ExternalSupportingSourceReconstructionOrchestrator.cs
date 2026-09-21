@@ -12,6 +12,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Tries to reconstruct a P5K compilation and create its P6A handoff.
         /// </summary>
         /// <param name="plan">The exact immutable reconstruction plan.</param>
+        /// <param name="candidateDiscovery">
+        /// The context-local binary candidate discovery catalog.
+        /// </param>
         /// <param name="supportingSource">The P6A handoff when successful.</param>
         /// <returns>
         /// <see langword="true"/> only when every existing P4/P5 factory
@@ -19,9 +22,10 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </returns>
         public static bool TryReconstruct(
             ExternalSupportingSourceReconstructionPlan plan,
+            ExternalBinaryCandidateDiscovery candidateDiscovery,
             out ExternalSupportingSourceCompilation supportingSource)
         {
-            if (plan == null)
+            if (plan == null || candidateDiscovery == null)
             {
                 supportingSource = null!;
                 return false;
@@ -45,9 +49,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                         provenance,
                         configuration,
                         out ExternalCSharpSyntaxTreeSet syntaxTreeSet)
-                    || !ExternalMetadataReferenceMaterialSetFactory.TryCreate(
+                    || !TryCreateReferenceMaterials(
+                        plan,
                         provenance,
-                        plan.ReferenceCandidatePaths,
+                        candidateDiscovery,
                         out ExternalMetadataReferenceMaterialSet materialSet)
                     || !ExternalMetadataReferenceSetFactory.TryCreate(
                         provenance,
@@ -79,6 +84,67 @@ namespace XMLDocNormalizer.Execution.Semantic
                 supportingSource = null!;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Uses authoritative explicit paths or discovers a complete ordinal
+        /// path sequence before delegating materialization to P5F.
+        /// </summary>
+        /// <param name="plan">The immutable reconstruction plan.</param>
+        /// <param name="provenance">The validated P5A provenance.</param>
+        /// <param name="candidateDiscovery">The context-local discovery catalog.</param>
+        /// <param name="materialSet">The complete P5F result when successful.</param>
+        /// <returns>
+        /// <see langword="true"/> only when every required reference ordinal
+        /// has an exact candidate and P5F validates the complete sequence.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown transitively when invalid provenance reaches the existing
+        /// P5 validation boundary.
+        /// </exception>
+        private static bool TryCreateReferenceMaterials(
+            ExternalSupportingSourceReconstructionPlan plan,
+            ExternalCompilationProvenanceDescriptor provenance,
+            ExternalBinaryCandidateDiscovery candidateDiscovery,
+            out ExternalMetadataReferenceMaterialSet materialSet)
+        {
+            if (!plan.DiscoverReferenceCandidatesLocally)
+            {
+                return ExternalMetadataReferenceMaterialSetFactory.TryCreate(
+                    provenance,
+                    plan.ReferenceCandidatePaths,
+                    out materialSet);
+            }
+
+            ExternalCompilationMetadataReferencesDescriptor? metadataReferences =
+                provenance.MetadataReferences;
+
+            if (metadataReferences == null)
+            {
+                materialSet = null!;
+                return false;
+            }
+
+            List<string> candidatePaths = new(metadataReferences.References.Length);
+
+            foreach (ExternalCompilationMetadataReferenceDescriptor expectedReference in
+                     metadataReferences.References)
+            {
+                if (!candidateDiscovery.TryFindReferenceCandidate(
+                        expectedReference,
+                        out string candidatePath))
+                {
+                    materialSet = null!;
+                    return false;
+                }
+
+                candidatePaths.Add(candidatePath);
+            }
+
+            return ExternalMetadataReferenceMaterialSetFactory.TryCreate(
+                provenance,
+                candidatePaths,
+                out materialSet);
         }
 
         /// <summary>

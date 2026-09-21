@@ -35,6 +35,80 @@ namespace XMLDocNormalizer.Execution.Semantic
             string portablePdbCandidatePath,
             IEnumerable<string> referenceCandidatePaths,
             IEnumerable<ExternalSourceReconstructionInput> sourceInputs)
+            : this(
+                targetAssembly,
+                targetPeCandidatePath,
+                portablePdbCandidatePath,
+                referenceCandidatePaths,
+                sourceInputs,
+                discoverReferenceCandidatesLocally: false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a plan that explicitly opts into demand-driven local
+        /// discovery for every P5A metadata-reference ordinal.
+        /// </summary>
+        /// <param name="targetAssembly">The complete P3 binary identity.</param>
+        /// <param name="targetPeCandidatePath">The explicit target PE path.</param>
+        /// <param name="portablePdbCandidatePath">The explicit Portable PDB path.</param>
+        /// <param name="sourceInputs">The explicit source-tree input sequence.</param>
+        /// <returns>
+        /// An immutable plan whose reference candidates must be discovered
+        /// within search roots configured on its semantic context.
+        /// </returns>
+        /// <remarks>
+        /// Discovery only finds local candidate files. A candidate becomes
+        /// usable only after the existing P5B/P5C validation succeeds.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any required input is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="sourceInputs"/> contains a null element.
+        /// </exception>
+        public static ExternalSupportingSourceReconstructionPlan
+            CreateWithLocalReferenceDiscovery(
+                ExternalAssemblyReferenceDescriptor targetAssembly,
+                string targetPeCandidatePath,
+                string portablePdbCandidatePath,
+                IEnumerable<ExternalSourceReconstructionInput> sourceInputs)
+        {
+            return new ExternalSupportingSourceReconstructionPlan(
+                targetAssembly,
+                targetPeCandidatePath,
+                portablePdbCandidatePath,
+                ImmutableArray<string>.Empty,
+                sourceInputs,
+                discoverReferenceCandidatesLocally: true);
+        }
+
+        /// <summary>
+        /// Initializes one explicit or discovery-enabled immutable plan.
+        /// </summary>
+        /// <param name="targetAssembly">The complete P3 binary identity.</param>
+        /// <param name="targetPeCandidatePath">The explicit target PE path.</param>
+        /// <param name="portablePdbCandidatePath">The explicit Portable PDB path.</param>
+        /// <param name="referenceCandidatePaths">
+        /// The explicit reference candidates, or an empty sequence for discovery.
+        /// </param>
+        /// <param name="sourceInputs">The explicit source-tree input sequence.</param>
+        /// <param name="discoverReferenceCandidatesLocally">
+        /// Whether P5A reference candidates must be discovered locally.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any required input is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input sequence contains a null element.
+        /// </exception>
+        private ExternalSupportingSourceReconstructionPlan(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            string targetPeCandidatePath,
+            string portablePdbCandidatePath,
+            IEnumerable<string> referenceCandidatePaths,
+            IEnumerable<ExternalSourceReconstructionInput> sourceInputs,
+            bool discoverReferenceCandidatesLocally)
         {
             ArgumentNullException.ThrowIfNull(targetAssembly);
             ArgumentNullException.ThrowIfNull(targetPeCandidatePath);
@@ -58,6 +132,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             PortablePdbCandidatePath = portablePdbCandidatePath;
             ReferenceCandidatePaths = references;
             SourceInputs = sources;
+            DiscoverReferenceCandidatesLocally = discoverReferenceCandidatesLocally;
         }
 
         /// <summary>
@@ -85,6 +160,16 @@ namespace XMLDocNormalizer.Execution.Semantic
         public ImmutableArray<string> ReferenceCandidatePaths { get; }
 
         /// <summary>
+        /// Gets whether every P5A reference candidate must be discovered from
+        /// explicitly configured local search roots.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> for explicit local discovery; otherwise
+        /// <see langword="false"/> for authoritative explicit paths.
+        /// </value>
+        public bool DiscoverReferenceCandidatesLocally { get; }
+
+        /// <summary>
         /// Gets the immutable source-tree input sequence.
         /// </summary>
         /// <value>The source inputs in original compilation tree order.</value>
@@ -107,7 +192,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                     && ReferenceCandidatePaths.SequenceEqual(
                         other.ReferenceCandidatePaths,
                         StringComparer.Ordinal)
-                    && SourceInputs.SequenceEqual(other.SourceInputs));
+                    && SourceInputs.SequenceEqual(other.SourceInputs)
+                    && DiscoverReferenceCandidatesLocally
+                        == other.DiscoverReferenceCandidatesLocally);
         }
 
         /// <inheritdoc/>
@@ -133,6 +220,8 @@ namespace XMLDocNormalizer.Execution.Semantic
             {
                 hash.Add(source);
             }
+
+            hash.Add(DiscoverReferenceCandidatesLocally);
 
             return hash.ToHashCode();
         }

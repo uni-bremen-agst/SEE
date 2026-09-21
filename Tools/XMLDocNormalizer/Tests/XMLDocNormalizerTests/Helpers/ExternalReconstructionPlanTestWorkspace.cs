@@ -208,6 +208,24 @@ namespace XMLDocNormalizerTests.Helpers
                             index,
                             UsesEmbeddedSources ? null : path)));
             }
+
+            /// <summary>
+            /// Creates a plan that keeps target, PDB, and source candidates
+            /// explicit while opting reference ordinals into P7A discovery.
+            /// </summary>
+            public ExternalSupportingSourceReconstructionPlan CreateDiscoveryPlan(
+                ExternalAssemblyReferenceDescriptor descriptor)
+            {
+                return ExternalSupportingSourceReconstructionPlan
+                    .CreateWithLocalReferenceDiscovery(
+                        descriptor,
+                        TargetPath,
+                        PdbPath,
+                        SourcePaths.Select((path, index) =>
+                            new ExternalSourceReconstructionInput(
+                                index,
+                                UsesEmbeddedSources ? null : path)));
+            }
         }
     }
 }
