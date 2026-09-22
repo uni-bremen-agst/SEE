@@ -194,7 +194,7 @@ namespace SEE.Game.Drawable
                     break;
             }
             /// Convert the hit point to a local position of the drawable.
-            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(surface, position);
+            Vector3 convertedHitPoint = GameLineGeometry.GetConvertedPosition(surface, position);
             /// Gets the shape positions.
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
             /// Draws the border.

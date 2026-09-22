@@ -425,12 +425,12 @@ namespace SEE.Controls.Actions.Drawable
             Vector3 convertedHitPoint;
             if (!shapePreviewFix)
             {
-                convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, raycastHit.point);
+                convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, raycastHit.point);
                 GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
             }
             else
             {
-                convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, shapePreviewFixPosition);
+                convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, shapePreviewFixPosition);
             }
 
             /// This block draws and completes the action for all shapes except lines.
@@ -660,7 +660,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="position">The position where the preview should be drawn.</param>
         private void ShapePreview(Vector3 position)
         {
-            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, position);
+            Vector3 convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, position);
             GetSelectedShapePosition(convertedHitPoint, position);
             currentPreviewPositions = positions;
 

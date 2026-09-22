@@ -444,5 +444,25 @@ namespace SEE.Game.Drawable
 
             return 0;
         }
+
+        /// <summary>
+        /// Converts a world-space position into the local coordinate system used
+        /// by drawable lines on the given surface.
+        /// </summary>
+        /// <param name="surface">The targeted drawable surface.</param>
+        /// <param name="position">The world-space position to convert.</param>
+        /// <returns>The converted local position.</returns>
+        public static Vector3 GetConvertedPosition(
+            GameObject surface,
+            Vector3 position)
+        {
+            DrawableSetupManager.Setup(
+                surface,
+                out GameObject _,
+                out GameObject attachedObjects);
+
+            return attachedObjects.transform.InverseTransformPoint(position)
+                   - ValueHolder.DistanceToDrawable;
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Calculates the pivot point for the marker.
             Vector3 position = hitObject.transform.TransformPoint(splitPos);
             GameObject surface = GameFinder.GetDrawableSurface(hitObject);
-            position = GameDrawer.GetConvertedPosition(surface, position);
+            position = GameLineGeometry.GetConvertedPosition(surface, position);
 
             /// Calculates the negativ color for the marker.
             Color color = GetColor(hitObject);

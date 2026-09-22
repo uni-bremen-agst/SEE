@@ -9,11 +9,10 @@ using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides the creation of <see cref="LineConf"/>.
+    /// Provides creation, drawing, updating, and restoration of drawable lines.
     /// </summary>
     public static class GameDrawer
     {
-        #region Core Line Creation
         /// <summary>
         /// Sets up a line object based on the parameters.
         /// It creates the initial line.
@@ -489,27 +488,5 @@ namespace SEE.Game.Drawable
 
             return line;
         }
-        #endregion
-
-        #region Geometry Helpers
-        /// <summary>
-        /// Converts a world space coordinate to a local space coordinate
-        /// as if it were a line originating from that point.
-        /// A line is created for the calculation and then deleted afterward.
-        /// </summary>
-        /// <param name="surface">The targeted drawable surface.</param>
-        /// <param name="position">The position to be transformed.</param>
-        /// <returns>The converted position.</returns>
-        public static Vector3 GetConvertedPosition(GameObject surface, Vector3 position)
-        {
-            Vector3 convertedPosition;
-            Setup(surface, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.CurrentPrimaryColor,
-                Color.clear, ValueHolder.CurrentThickness, 0, ValueHolder.CurrentLineKind, 1, 0,
-                out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
-            convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;
-            Destroyer.Destroy(line);
-            return convertedPosition;
-        }
-        #endregion
     }
 }
