@@ -67,3 +67,18 @@ dotnet test .\Tests\XMLDocNormalizerTests\XMLDocNormalizerTests.csproj `
 ```
 
 They use no package host, GitHub, or Source Link network access. The normal unfiltered test suite likewise remains network-independent.
+
+## G1 standard local reference candidates
+
+The evaluation harness opts P7A into the same context-local G1 sources that are
+available to production orchestration: loaded file-backed references, installed
+.NET reference packs and shared frameworks, and the NuGet global-packages
+folder resolved from `NUGET_PACKAGES`, the applicable `NuGet.Config` hierarchy,
+or the platform default. These locations provide candidate paths only; every
+candidate still passes unchanged P5B/P5C validation.
+
+Search is fixed-depth and expected-filename-directed. The NuGet fallback lazily
+indexes only known package asset directories and never recursively enumerates
+all files. JSON candidate entries record each P5A ordinal, exact provenance,
+selected artifact source, and bounded discovery counters. The observed Scrutor
+and Serilog root cause is documented in `G1-reference-acquisition.md`.

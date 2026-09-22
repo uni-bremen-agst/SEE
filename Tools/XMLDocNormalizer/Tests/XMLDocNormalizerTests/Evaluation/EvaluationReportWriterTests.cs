@@ -29,6 +29,14 @@ namespace XMLDocNormalizerTests.Evaluation
                 Assert.Equal(
                     nameof(EvaluationFailureCategory.MissingArtifact),
                     candidates[0].GetProperty("FallbackCategory").GetString());
+                Assert.Equal(
+                    "LoadedReference",
+                    candidates[0].GetProperty("References")[0]
+                        .GetProperty("ArtifactSource").GetString());
+                Assert.Equal(
+                    1,
+                    candidates[0].GetProperty("ReferenceDiscovery")
+                        .GetProperty("ValidationAttempts").GetInt64());
             }
             finally
             {
@@ -90,7 +98,23 @@ namespace XMLDocNormalizerTests.Evaluation
                         TargetFramework = "net8.0",
                         FallbackStage = "PdbValidated",
                         FallbackCategory = EvaluationFailureCategory.MissingArtifact,
-                        ExpectedOutcomeObserved = true
+                        ExpectedOutcomeObserved = true,
+                        References =
+                        [
+                            new EvaluationReferenceResult
+                            {
+                                Ordinal = 0,
+                                Name = "PackageA.Dependency.dll",
+                                ExactMatchFound = true,
+                                ArtifactSource = "LoadedReference"
+                            }
+                        ],
+                        ReferenceDiscovery = new EvaluationReferenceDiscoveryStatistics
+                        {
+                            CandidateFilesConsidered = 1,
+                            CandidateFilesOpened = 1,
+                            ValidationAttempts = 1
+                        }
                     }
                 ]
             };

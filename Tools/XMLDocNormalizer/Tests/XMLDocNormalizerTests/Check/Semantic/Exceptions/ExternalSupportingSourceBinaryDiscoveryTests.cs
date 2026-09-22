@@ -72,6 +72,33 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         }
 
         /// <summary>
+        /// Reconstructs through already loaded exact metadata-reference paths.
+        /// </summary>
+        [Fact]
+        public void LoadedMetadataReferences_EnableSourceBackedResolution()
+        {
+            using ExternalReconstructionPlanTestWorkspace workspace = new();
+            PreparedDependency dependency = Prepare(workspace, "G1.Loaded.Success");
+            ConsumerFixture fixture = CreateCallingConsumer(
+                dependency,
+                "G1.Loaded.Success.Consumer");
+            Assert.True(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                dependency.ReferencePaths,
+                nuGetGlobalPackagesFolder: null,
+                dotNetRoots: [],
+                out ExternalReferenceArtifactSourceConfiguration configuration));
+            Assert.True(fixture.Context.TryConfigureExternalBinaryArtifactSources(
+                configuration));
+            ExternalAssemblyReferenceDescriptor descriptor = RegisterDiscoveryPlan(
+                fixture,
+                dependency,
+                roots: null);
+
+            Assert.True(TryResolve(fixture, dependency.Reference, out _));
+            Assert.True(fixture.Context.TryGetExternalSupportingSourceScope(descriptor, out _));
+        }
+
+        /// <summary>
         /// Finds one renamed reference through fallback while preserving every ordinal.
         /// </summary>
         [Fact]
@@ -143,6 +170,13 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             candidates[0] = dependency.TargetPath;
             Assert.True(fixture.Context.TryConfigureExternalBinarySearchRoots(
                 GetReferenceRoots(dependency)));
+            Assert.True(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                dependency.ReferencePaths,
+                nuGetGlobalPackagesFolder: null,
+                dotNetRoots: [],
+                out ExternalReferenceArtifactSourceConfiguration artifactSources));
+            Assert.True(fixture.Context.TryConfigureExternalBinaryArtifactSources(
+                artifactSources));
             Assert.True(fixture.Context.TryRegisterExternalSupportingSourceReconstructionPlan(
                 dependency.CreatePlan(descriptor, referencePaths: candidates)));
 

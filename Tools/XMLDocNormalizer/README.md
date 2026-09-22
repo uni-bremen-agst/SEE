@@ -491,3 +491,8 @@ Evaluation/README.md
 
 Generated inputs and reports remain below the ignored `artifacts/real-world-evaluation`
 workspace and are not part of the normal CLI or test execution.
+
+G1 additionally permits explicitly enabled, bounded candidate lookup in loaded
+metadata references, local .NET packs/shared frameworks, and the resolved NuGet
+global-packages folder. These sources never establish identity: unchanged P5
+validation must accept every exact reference binary, or reconstruction fails closed.

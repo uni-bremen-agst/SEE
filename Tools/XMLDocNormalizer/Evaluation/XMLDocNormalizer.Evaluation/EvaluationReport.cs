@@ -124,6 +124,12 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets the validated P5E reference count.</summary>
         public int ReferenceCount { get; set; }
 
+        /// <summary>Gets or sets every expected reference and its explicit-root result.</summary>
+        public List<EvaluationReferenceResult> References { get; set; } = new();
+
+        /// <summary>Gets or sets bounded local reference-discovery cost counters.</summary>
+        public EvaluationReferenceDiscoveryStatistics ReferenceDiscovery { get; set; } = new();
+
         /// <summary>Gets or sets the P5A source-file count.</summary>
         public int ExpectedSourceFileCount { get; set; }
 
@@ -187,6 +193,66 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets elapsed candidate milliseconds.</summary>
         public long DurationMs { get; set; }
+    }
+
+    /// <summary>
+    /// Captures one authoritative P5A reference and the existing P7A result.
+    /// </summary>
+    public sealed class EvaluationReferenceResult
+    {
+        /// <summary>Gets or sets the P5A ordinal.</summary>
+        public int Ordinal { get; set; }
+
+        /// <summary>Gets or sets the serialized expected-name hint.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the expected metadata image kind.</summary>
+        public string MetadataImageKind { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the expected module version identifier.</summary>
+        public Guid ModuleVersionId { get; set; }
+
+        /// <summary>Gets or sets the expected PE timestamp.</summary>
+        public int Timestamp { get; set; }
+
+        /// <summary>Gets or sets the expected PE SizeOfImage.</summary>
+        public int ImageSize { get; set; }
+
+        /// <summary>Gets or sets the exact serialized aliases.</summary>
+        public List<string> Aliases { get; set; } = new();
+
+        /// <summary>Gets or sets the exact EmbedInteropTypes property.</summary>
+        public bool EmbedInteropTypes { get; set; }
+
+        /// <summary>Gets or sets whether existing explicit-root P7A found an exact match.</summary>
+        public bool ExactMatchFound { get; set; }
+
+        /// <summary>Gets or sets the normalized workspace-relative exact path.</summary>
+        public string? CandidatePath { get; set; }
+
+        /// <summary>Gets or sets the local source of the exact candidate.</summary>
+        public string? ArtifactSource { get; set; }
+    }
+
+    /// <summary>
+    /// Captures descriptive P7A/G1 local search work without performance claims.
+    /// </summary>
+    public sealed class EvaluationReferenceDiscoveryStatistics
+    {
+        /// <summary>Gets or sets the number of source roots examined.</summary>
+        public long ArtifactRootsExamined { get; set; }
+
+        /// <summary>Gets or sets the number of bounded directory enumerations.</summary>
+        public long DirectoriesEnumerated { get; set; }
+
+        /// <summary>Gets or sets the number of deduplicated candidate files considered.</summary>
+        public long CandidateFilesConsidered { get; set; }
+
+        /// <summary>Gets or sets the number of candidate-open attempts.</summary>
+        public long CandidateFilesOpened { get; set; }
+
+        /// <summary>Gets or sets the number of existing P5 validation attempts.</summary>
+        public long ValidationAttempts { get; set; }
     }
 
     /// <summary>

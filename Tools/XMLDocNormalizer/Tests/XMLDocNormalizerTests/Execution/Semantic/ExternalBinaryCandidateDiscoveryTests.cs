@@ -491,11 +491,375 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.False(discovery.TryFindReferenceCandidate(fixture.Expected, out _));
         }
 
+        /// <summary>
+        /// Keeps standard artifact-source configuration free of artifact I/O.
+        /// </summary>
+        [Fact]
+        public void StandardSourceConfiguration_PerformsNoArtifactIo()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard(
+                [Path.Combine(fixture.Root, "loaded.dll")],
+                Path.Combine(fixture.Root, "nuget"),
+                Path.Combine(fixture.Root, "dotnet"));
+
+            ExternalBinaryCandidateDiscoveryStatistics statistics = discovery.GetStatistics();
+
+            Assert.Equal(0, statistics.ArtifactRootsExamined);
+            Assert.Equal(0, statistics.DirectoriesEnumerated);
+            Assert.Equal(0, statistics.CandidateFilesConsidered);
+            Assert.Equal(0, statistics.CandidateFilesOpened);
+            Assert.Equal(0, statistics.ValidationAttempts);
+        }
+
+        /// <summary>
+        /// Rejects relative source paths and defensively snapshots caller collections.
+        /// </summary>
+        [Fact]
+        public void StandardSourceConfiguration_RequiresAbsoluteImmutablePaths()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            List<string> loaded = [Path.Combine(fixture.Root, "loaded.dll")];
+            List<string> dotNet = [Path.Combine(fixture.Root, "dotnet")];
+            Assert.True(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                loaded,
+                Path.Combine(fixture.Root, "nuget"),
+                dotNet,
+                out ExternalReferenceArtifactSourceConfiguration configuration));
+            loaded.Clear();
+            dotNet.Clear();
+
+            Assert.Single(configuration.LoadedReferencePaths);
+            Assert.Single(configuration.DotNetRoots);
+            Assert.False(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                ["relative.dll"],
+                nuGetGlobalPackagesFolder: null,
+                dotNetRoots: [],
+                out _));
+        }
+
+        /// <summary>
+        /// Uses an already loaded exact reference without broader directory enumeration.
+        /// </summary>
+        [Fact]
+        public void LoadedReferenceExactMatch_AvoidsBroaderSearch()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string exact = fixture.Write(fixture.Expected.Name, fixture.Image);
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard(
+                [exact],
+                nuGetRoot: null);
+
+            Assert.True(discovery.TryFindReferenceCandidate(
+                fixture.Expected,
+                out string path,
+                out ExternalReferenceArtifactSourceKind sourceKind));
+            Assert.Equal(exact, path);
+            Assert.Equal(ExternalReferenceArtifactSourceKind.LoadedReference, sourceKind);
+            Assert.Equal(0, discovery.GetStatistics().DirectoriesEnumerated);
+        }
+
+        /// <summary>
+        /// Checks every installed package version and TFM while accepting only the exact build.
+        /// </summary>
+        [Fact]
+        public void NuGetMultipleVersionsAndFrameworks_SelectOnlyExactBuild()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string nuGetRoot = fixture.CreateRoot("nuget");
+            PreparedDependency wrong = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Wrong.cs", "public sealed class WrongNuGetBuild { }")]);
+            _ = WriteNuGetAsset(fixture, nuGetRoot, "expected", "1.0.0", "net8.0", wrong.PeImage);
+            string exact = WriteNuGetAsset(
+                fixture,
+                nuGetRoot,
+                "expected",
+                "2.0.0",
+                "netstandard2.0",
+                fixture.Image);
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard([], nuGetRoot);
+
+            Assert.True(discovery.TryFindReferenceCandidate(
+                fixture.Expected,
+                out string path,
+                out ExternalReferenceArtifactSourceKind sourceKind));
+            Assert.Equal(exact, path);
+            Assert.Equal(ExternalReferenceArtifactSourceKind.NuGetGlobalPackages, sourceKind);
+        }
+
+        /// <summary>
+        /// Fails closed when the NuGet cache contains only other binary builds.
+        /// </summary>
+        [Fact]
+        public void NuGetWrongVersionsOnly_FailsClosed()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string nuGetRoot = fixture.CreateRoot("nuget");
+            PreparedDependency wrong = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Wrong.cs", "public sealed class WrongOnly { }")]);
+            _ = WriteNuGetAsset(fixture, nuGetRoot, "expected", "9.0.0", "net8.0", wrong.PeImage);
+
+            Assert.False(ConfigureStandard([], nuGetRoot).TryFindReferenceCandidate(
+                fixture.Expected,
+                out _));
+        }
+
+        /// <summary>
+        /// Uses a bounded package-asset fallback when another package contains the filename.
+        /// </summary>
+        [Fact]
+        public void SameFilenameAcrossPackages_StillRequiresExactBuild()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string nuGetRoot = fixture.CreateRoot("nuget");
+            PreparedDependency wrong = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Wrong.cs", "public sealed class SameNameWrong { }")]);
+            _ = WriteNuGetAsset(fixture, nuGetRoot, "first.package", "1.0.0", "net8.0", wrong.PeImage);
+            string exact = WriteNuGetAsset(
+                fixture,
+                nuGetRoot,
+                "second.package",
+                "1.0.0",
+                "netstandard2.0",
+                fixture.Image);
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard([], nuGetRoot);
+
+            Assert.True(discovery.TryFindReferenceCandidate(fixture.Expected, out string path));
+            Assert.Equal(exact, path);
+        }
+
+        /// <summary>
+        /// Finds an exact reference-assembly build inside a bounded .NET pack layout.
+        /// </summary>
+        [Fact]
+        public void DotNetReferencePack_ExactReferenceAssemblyIsFound()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create(
+                candidateSource: "using System.Runtime.CompilerServices; "
+                    + "[assembly: ReferenceAssembly] public sealed class Api { }");
+            string dotNetRoot = fixture.CreateRoot("dotnet");
+            string packDirectory = fixture.CreateRoot(
+                Path.Combine("dotnet", "packs", "Test.Ref", "1.0.0", "ref", "net8.0"));
+            string exact = fixture.Write(packDirectory, fixture.Expected.Name, fixture.Image);
+            string sharedDirectory = fixture.CreateRoot(
+                Path.Combine("dotnet", "shared", "Test.Runtime", "1.0.0"));
+            PreparedDependency implementation = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Implementation.cs", "public sealed class Api { }")]);
+            _ = fixture.Write(sharedDirectory, fixture.Expected.Name, implementation.PeImage);
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard(
+                [],
+                nuGetRoot: null,
+                dotNetRoot);
+
+            Assert.True(discovery.TryFindReferenceCandidate(
+                fixture.Expected,
+                out string path,
+                out ExternalReferenceArtifactSourceKind sourceKind));
+            Assert.Equal(exact, path);
+            Assert.Equal(ExternalReferenceArtifactSourceKind.DotNetReferencePack, sourceKind);
+        }
+
+        /// <summary>
+        /// Does not substitute a same-name runtime implementation for an expected reference build.
+        /// </summary>
+        [Fact]
+        public void RuntimeImplementation_DoesNotReplaceExpectedReferenceAssembly()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create(
+                candidateSource: "using System.Runtime.CompilerServices; "
+                    + "[assembly: ReferenceAssembly] public sealed class Api { }");
+            string dotNetRoot = fixture.CreateRoot("dotnet");
+            string sharedDirectory = fixture.CreateRoot(
+                Path.Combine("dotnet", "shared", "Test.Runtime", "9.0.0"));
+            PreparedDependency implementation = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Implementation.cs", "public sealed class Api { }")]);
+            _ = fixture.Write(sharedDirectory, fixture.Expected.Name, implementation.PeImage);
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard(
+                [],
+                nuGetRoot: null,
+                dotNetRoot);
+
+            Assert.False(discovery.TryFindReferenceCandidate(fixture.Expected, out _));
+        }
+
+        /// <summary>
+        /// Does not use a current runtime build when the recorded historical build is absent.
+        /// </summary>
+        [Fact]
+        public void HistoricalBuildMissing_CurrentRuntimeBuildFailsClosed()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string dotNetRoot = fixture.CreateRoot("dotnet");
+            string sharedDirectory = fixture.CreateRoot(
+                Path.Combine("dotnet", "shared", "Test.Runtime", "9.0.0"));
+            PreparedDependency current = fixture.Workspace.Prepare(
+                fixture.CandidateAssemblyName,
+                [new SourceInput("/_/Current.cs", "public sealed class CurrentRuntime { }")]);
+            _ = fixture.Write(sharedDirectory, fixture.Expected.Name, current.PeImage);
+
+            Assert.False(ConfigureStandard(
+                [],
+                nuGetRoot: null,
+                dotNetRoot).TryFindReferenceCandidate(fixture.Expected, out _));
+        }
+
+        /// <summary>
+        /// Uses the first exact source tier without treating a lower duplicate as conflict.
+        /// </summary>
+        [Fact]
+        public void DuplicateExactBinaryAcrossSources_UsesFirstExactSource()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string loaded = fixture.Write(fixture.Expected.Name, fixture.Image);
+            string nuGetRoot = fixture.CreateRoot("nuget");
+            _ = WriteNuGetAsset(
+                fixture,
+                nuGetRoot,
+                "expected",
+                "1.0.0",
+                "netstandard2.0",
+                fixture.Image);
+
+            Assert.True(ConfigureStandard([loaded], nuGetRoot).TryFindReferenceCandidate(
+                fixture.Expected,
+                out _));
+        }
+
+        /// <summary>
+        /// Treats absent NuGet and .NET roots as empty bounded sources.
+        /// </summary>
+        [Fact]
+        public void MissingStandardRoots_FailClosedWithoutCrash()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string missingNuGet = Path.Combine(fixture.Root, "missing-nuget");
+            string missingDotNet = Path.Combine(fixture.Root, "missing-dotnet");
+
+            Assert.False(ConfigureStandard(
+                [],
+                missingNuGet,
+                missingDotNet).TryFindReferenceCandidate(fixture.Expected, out _));
+        }
+
+        /// <summary>
+        /// Reuses a negative standard-source result without repeating enumeration.
+        /// </summary>
+        [Fact]
+        public void StandardSourceNegativeResult_IsCached()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string nuGetRoot = fixture.CreateRoot("nuget");
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard([], nuGetRoot);
+            Assert.False(discovery.TryFindReferenceCandidate(fixture.Expected, out _));
+            ExternalBinaryCandidateDiscoveryStatistics first = discovery.GetStatistics();
+            _ = WriteNuGetAsset(
+                fixture,
+                nuGetRoot,
+                "expected",
+                "1.0.0",
+                "net8.0",
+                fixture.Image);
+
+            Assert.False(discovery.TryFindReferenceCandidate(fixture.Expected, out _));
+            Assert.Equal(first, discovery.GetStatistics());
+        }
+
+        /// <summary>
+        /// Keeps standard source snapshots isolated between discovery contexts.
+        /// </summary>
+        [Fact]
+        public void StandardSources_AreContextLocal()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string exact = fixture.Write(fixture.Expected.Name, fixture.Image);
+            ExternalBinaryCandidateDiscovery configured = ConfigureStandard(
+                [exact],
+                nuGetRoot: null);
+            ExternalBinaryCandidateDiscovery empty = ConfigureStandard(
+                [],
+                nuGetRoot: null);
+
+            Assert.True(configured.TryFindReferenceCandidate(fixture.Expected, out _));
+            Assert.False(empty.TryFindReferenceCandidate(fixture.Expected, out _));
+        }
+
+        /// <summary>
+        /// Freezes standard artifact-source configuration when discovery starts.
+        /// </summary>
+        [Fact]
+        public void StandardSourceConfiguration_IsImmutableAfterLookup()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            ExternalBinaryCandidateDiscovery discovery = ConfigureStandard(
+                [],
+                nuGetRoot: null);
+            Assert.False(discovery.TryFindReferenceCandidate(fixture.Expected, out _));
+            Assert.True(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                [fixture.Root],
+                nuGetGlobalPackagesFolder: null,
+                dotNetRoots: [],
+                out ExternalReferenceArtifactSourceConfiguration changed));
+
+            Assert.False(discovery.TryConfigureStandardArtifactSources(changed));
+        }
+
+        /// <summary>
+        /// Skips an inaccessible already loaded candidate without throwing.
+        /// </summary>
+        [Fact]
+        public void InaccessibleLoadedReference_IsSkipped()
+        {
+            using CandidateFixture fixture = CandidateFixture.Create();
+            string path = fixture.Write(fixture.Expected.Name, fixture.Image);
+            using FileStream exclusive = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            Assert.False(ConfigureStandard(
+                [path],
+                nuGetRoot: null).TryFindReferenceCandidate(fixture.Expected, out _));
+        }
+
         private static ExternalBinaryCandidateDiscovery Configure(params string[] roots)
         {
             ExternalBinaryCandidateDiscovery discovery = new();
             Assert.True(discovery.TryConfigure(roots));
             return discovery;
+        }
+
+        private static ExternalBinaryCandidateDiscovery ConfigureStandard(
+            IEnumerable<string> loadedReferences,
+            string? nuGetRoot,
+            params string[] dotNetRoots)
+        {
+            Assert.True(ExternalReferenceArtifactSourceConfiguration.TryCreate(
+                loadedReferences,
+                nuGetRoot,
+                dotNetRoots,
+                out ExternalReferenceArtifactSourceConfiguration configuration));
+            ExternalBinaryCandidateDiscovery discovery = new();
+            Assert.True(discovery.TryConfigureStandardArtifactSources(configuration));
+            return discovery;
+        }
+
+        private static string WriteNuGetAsset(
+            CandidateFixture fixture,
+            string nuGetRoot,
+            string packageId,
+            string version,
+            string targetFramework,
+            byte[] image)
+        {
+            string directory = fixture.CreateRoot(Path.Combine(
+                Path.GetRelativePath(fixture.Workspace.DirectoryPath, nuGetRoot),
+                packageId,
+                version,
+                "lib",
+                targetFramework));
+            return fixture.Write(directory, fixture.Expected.Name, image);
         }
 
         private static ExternalCompilationMetadataReferenceDescriptor GetLastExpected(

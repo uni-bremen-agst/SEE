@@ -97,6 +97,15 @@ namespace XMLDocNormalizer.Evaluation
                 builder.AppendLine($"- Reason: {candidate.FallbackReason ?? "none"}");
                 builder.AppendLine($"- Findings: {candidate.BaselineFindings.Count} baseline, {candidate.SourceBackedFindings.Count} source-backed, {candidate.AddedFindings.Count} added, {candidate.RemovedFindings.Count} removed, {candidate.ChangedExceptionEvidence.Count} changed exception evidence");
                 builder.AppendLine($"- Trees/references: {candidate.SourceTreeCount}/{candidate.ReferenceCount}");
+                string referenceSources = string.Join(
+                    ", ",
+                    candidate.References
+                        .Where(static reference => reference.ExactMatchFound)
+                        .GroupBy(static reference => reference.ArtifactSource ?? "Unknown")
+                        .OrderBy(static group => group.Key, StringComparer.Ordinal)
+                        .Select(static group => $"{group.Key}={group.Count()}"));
+                builder.AppendLine($"- Reference sources: {(referenceSources.Length == 0 ? "none" : referenceSources)}");
+                builder.AppendLine($"- Reference search: {candidate.ReferenceDiscovery.ArtifactRootsExamined} roots, {candidate.ReferenceDiscovery.DirectoriesEnumerated} directory enumerations, {candidate.ReferenceDiscovery.CandidateFilesConsidered} candidates, {candidate.ReferenceDiscovery.CandidateFilesOpened} opens, {candidate.ReferenceDiscovery.ValidationAttempts} P5 attempts");
                 builder.AppendLine($"- Diagnostics: {candidate.CompilerErrorCount} errors, {candidate.CompilerWarningCount} warnings");
                 builder.AppendLine($"- Manual flow: {candidate.ManualVerification ?? "not applicable"}");
                 builder.AppendLine($"- Duration: {candidate.DurationMs} ms");

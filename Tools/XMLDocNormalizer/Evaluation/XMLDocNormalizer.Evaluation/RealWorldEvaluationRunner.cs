@@ -315,19 +315,75 @@ namespace XMLDocNormalizer.Evaluation
                 return false;
             }
 
-            List<string> paths = new(references.References.Length);
-            foreach (ExternalCompilationMetadataReferenceDescriptor reference in references.References)
+            IEnumerable<string> loadedReferences = platformReferences
+                .OfType<PortableExecutableReference>()
+                .Select(static reference => reference.FilePath)
+                .Where(static path => path != null)
+                .Select(static path => path!);
+            if (!ExternalReferenceArtifactSourceConfiguration.TryCreateForCurrentProcess(
+                    loadedReferences,
+                    Environment.CurrentDirectory,
+                    out ExternalReferenceArtifactSourceConfiguration artifactSources)
+                || !discovery.TryConfigureStandardArtifactSources(artifactSources))
             {
-                if (!discovery.TryFindReferenceCandidate(reference, out string path))
-                {
-                    referenceSet = null!;
-                    return false;
-                }
-
-                paths.Add(path);
+                referenceSet = null!;
+                return false;
             }
 
-            result.BinaryDiscoverySucceeded = true;
+            List<string> paths = new(references.References.Length);
+            bool complete = true;
+
+            for (int ordinal = 0; ordinal < references.References.Length; ordinal++)
+            {
+                ExternalCompilationMetadataReferenceDescriptor reference = references.References[ordinal];
+                bool found = discovery.TryFindReferenceCandidate(
+                    reference,
+                    out string path,
+                    out ExternalReferenceArtifactSourceKind sourceKind);
+                result.References.Add(new EvaluationReferenceResult
+                {
+                    Ordinal = ordinal,
+                    Name = reference.Name,
+                    MetadataImageKind = reference.Kind.ToString(),
+                    ModuleVersionId = reference.ModuleVersionId,
+                    Timestamp = reference.Timestamp,
+                    ImageSize = reference.ImageSize,
+                    Aliases = reference.Aliases.ToList(),
+                    EmbedInteropTypes = reference.EmbedInteropTypes,
+                    ExactMatchFound = found,
+                    CandidatePath = found
+                        ? Path.GetRelativePath(options.WorkspacePath, path).Replace('\\', '/')
+                        : null,
+                    ArtifactSource = found ? sourceKind.ToString() : null
+                });
+
+                if (found)
+                {
+                    paths.Add(path);
+                }
+                else
+                {
+                    complete = false;
+                }
+            }
+
+            ExternalBinaryCandidateDiscoveryStatistics statistics = discovery.GetStatistics();
+            result.ReferenceDiscovery = new EvaluationReferenceDiscoveryStatistics
+            {
+                ArtifactRootsExamined = statistics.ArtifactRootsExamined,
+                DirectoriesEnumerated = statistics.DirectoriesEnumerated,
+                CandidateFilesConsidered = statistics.CandidateFilesConsidered,
+                CandidateFilesOpened = statistics.CandidateFilesOpened,
+                ValidationAttempts = statistics.ValidationAttempts
+            };
+
+            result.BinaryDiscoverySucceeded = complete;
+            if (!complete)
+            {
+                referenceSet = null!;
+                return false;
+            }
+
             if (!ExternalMetadataReferenceMaterialSetFactory.TryCreate(provenance, paths, out ExternalMetadataReferenceMaterialSet materials))
             {
                 referenceSet = null!;

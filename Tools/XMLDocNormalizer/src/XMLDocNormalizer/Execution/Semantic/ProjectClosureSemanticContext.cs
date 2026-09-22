@@ -250,6 +250,31 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures optional standard local artifact sources for discovery-enabled plans.
+        /// </summary>
+        /// <param name="configuration">
+        /// The immutable loaded-reference, .NET, and NuGet source snapshot.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a new or idempotent configuration; otherwise
+        /// <see langword="false"/> after discovery begins or for a conflicting snapshot.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="configuration"/> is <see langword="null"/>.
+        /// </exception>
+        /// <remarks>
+        /// Configuration performs no artifact enumeration. Explicit-reference plans
+        /// continue to bypass discovery and never consult these sources.
+        /// </remarks>
+        public bool TryConfigureExternalBinaryArtifactSources(
+            ExternalReferenceArtifactSourceConfiguration configuration)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            return ExternalBinaryCandidates.TryConfigureStandardArtifactSources(
+                configuration);
+        }
+
+        /// <summary>
         /// Configures all context-local document-prefix projections permitted
         /// for acquisition-enabled external source inputs.
         /// </summary>
@@ -424,7 +449,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return true;
             }
 
-            if (!ExternalReconstructions.TryBegin(binaryIdentity, out var plan))
+            if (!ExternalReconstructions.TryBegin(
+                    binaryIdentity,
+                    out ExternalSupportingSourceReconstructionPlan plan))
             {
                 scope = null!;
                 return false;
