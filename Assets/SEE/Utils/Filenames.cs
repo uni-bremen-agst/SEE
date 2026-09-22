@@ -117,13 +117,23 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Returns the file extension of the given <paramref name="filePath"/> without the leading period.
+        /// </summary>
+        /// <param name="filePath">The file path string.</param>
+        /// <returns>The file extension without the leading period.</returns>
+        internal static string Extension(string filePath)
+        {
+            return Path.GetExtension(filePath).TrimStart('.');
+        }
+
+        /// <summary>
         /// True if <paramref name="filename"/> has <paramref name="extension"/>.
         /// If <paramref name="filename"/> is null or if it has no extension
         /// separated by a period, false is returned.
         /// </summary>
         /// <param name="filename">Filename to be checked for the extension.</param>
-        /// <param name="extension">The extension the filename should have.</param>
-        /// <returns>.</returns>
+        /// <param name="extension">The extension the filename should have (including the period).</param>
+        /// <returns>True if the filename has the specified extension, false otherwise.</returns>
         public static bool HasExtension(string filename, string extension)
         {
             string extensionOfFilename = Path.GetExtension(filename);
