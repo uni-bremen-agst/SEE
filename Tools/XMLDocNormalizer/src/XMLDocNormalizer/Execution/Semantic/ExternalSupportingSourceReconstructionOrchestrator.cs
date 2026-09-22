@@ -15,6 +15,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="candidateDiscovery">
         /// The context-local binary candidate discovery catalog.
         /// </param>
+        /// <param name="pdbAcquisition">
+        /// The context-local exact Portable PDB acquisition catalog.
+        /// </param>
         /// <param name="sourceAcquisition">
         /// The context-local controlled source acquisition catalog.
         /// </param>
@@ -26,10 +29,14 @@ namespace XMLDocNormalizer.Execution.Semantic
         public static bool TryReconstruct(
             ExternalSupportingSourceReconstructionPlan plan,
             ExternalBinaryCandidateDiscovery candidateDiscovery,
+            ExternalPortablePdbAcquisition pdbAcquisition,
             ExternalSourceAcquisition sourceAcquisition,
             out ExternalSupportingSourceCompilation supportingSource)
         {
-            if (plan == null || candidateDiscovery == null || sourceAcquisition == null)
+            if (plan == null
+                || candidateDiscovery == null
+                || pdbAcquisition == null
+                || sourceAcquisition == null)
             {
                 supportingSource = null!;
                 return false;
@@ -41,9 +48,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                         plan.TargetAssembly,
                         plan.TargetPeCandidatePath,
                         out ExternalPeDebugDirectoryDescriptor debugDirectory)
-                    || !ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(
+                    || !TryCreateCompilationProvenance(
+                        plan,
                         debugDirectory,
-                        plan.PortablePdbCandidatePath,
+                        pdbAcquisition,
                         out ExternalCompilationProvenanceDescriptor provenance)
                     || !ExternalCSharpCompilationConfigurationFactory.TryCreate(
                         provenance,
@@ -89,6 +97,46 @@ namespace XMLDocNormalizer.Execution.Semantic
                 supportingSource = null!;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Preserves authoritative explicit PDB semantics or invokes explicitly
+        /// enabled local acquisition when no explicit candidate exists.
+        /// </summary>
+        /// <param name="plan">The immutable reconstruction plan.</param>
+        /// <param name="debugDirectory">The authoritative P4A provenance.</param>
+        /// <param name="pdbAcquisition">The context-local acquisition catalog.</param>
+        /// <param name="provenance">The P4B/P5A result when successful.</param>
+        /// <returns><see langword="true"/> only for exact validated provenance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown transitively when an explicit candidate reaches P4B with
+        /// malformed validated provenance.
+        /// </exception>
+        private static bool TryCreateCompilationProvenance(
+            ExternalSupportingSourceReconstructionPlan plan,
+            ExternalPeDebugDirectoryDescriptor debugDirectory,
+            ExternalPortablePdbAcquisition pdbAcquisition,
+            out ExternalCompilationProvenanceDescriptor provenance)
+        {
+            if (plan.PortablePdbCandidatePath != null)
+            {
+                return ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(
+                    debugDirectory,
+                    plan.PortablePdbCandidatePath,
+                    out provenance);
+            }
+
+            if (!plan.DiscoverPortablePdbLocally)
+            {
+                provenance = null!;
+                return false;
+            }
+
+            return pdbAcquisition.TryAcquire(
+                    debugDirectory,
+                    plan.TargetPeCandidatePath,
+                    out provenance,
+                    out _);
         }
 
         /// <summary>

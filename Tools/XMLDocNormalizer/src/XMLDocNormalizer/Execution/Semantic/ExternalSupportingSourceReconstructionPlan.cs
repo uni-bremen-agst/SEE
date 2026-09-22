@@ -84,6 +84,68 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Creates a plan that opts into demand-driven local Portable PDB and
+        /// metadata-reference candidate discovery.
+        /// </summary>
+        /// <param name="targetAssembly">The complete P3 binary identity.</param>
+        /// <param name="targetPeCandidatePath">The explicit target PE path.</param>
+        /// <param name="sourceInputs">The explicit source-tree input sequence.</param>
+        /// <returns>A plan without an authoritative explicit PDB candidate.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any required input is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="sourceInputs"/> contains a null element.
+        /// </exception>
+        public static ExternalSupportingSourceReconstructionPlan
+            CreateWithLocalArtifactDiscovery(
+                ExternalAssemblyReferenceDescriptor targetAssembly,
+                string targetPeCandidatePath,
+                IEnumerable<ExternalSourceReconstructionInput> sourceInputs)
+        {
+            return new ExternalSupportingSourceReconstructionPlan(
+                targetAssembly,
+                targetPeCandidatePath,
+                portablePdbCandidatePath: null,
+                ImmutableArray<string>.Empty,
+                sourceInputs,
+                discoverReferenceCandidatesLocally: true,
+                discoverPortablePdbLocally: true);
+        }
+
+        /// <summary>
+        /// Creates a plan with explicit reference candidates and demand-driven
+        /// local Portable PDB discovery.
+        /// </summary>
+        /// <param name="targetAssembly">The complete P3 binary identity.</param>
+        /// <param name="targetPeCandidatePath">The explicit target PE path.</param>
+        /// <param name="referenceCandidatePaths">The explicit ordinal reference paths.</param>
+        /// <param name="sourceInputs">The explicit source-tree input sequence.</param>
+        /// <returns>A plan without an authoritative explicit PDB candidate.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any required input is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input sequence contains a null element.
+        /// </exception>
+        public static ExternalSupportingSourceReconstructionPlan
+            CreateWithLocalPortablePdbDiscovery(
+                ExternalAssemblyReferenceDescriptor targetAssembly,
+                string targetPeCandidatePath,
+                IEnumerable<string> referenceCandidatePaths,
+                IEnumerable<ExternalSourceReconstructionInput> sourceInputs)
+        {
+            return new ExternalSupportingSourceReconstructionPlan(
+                targetAssembly,
+                targetPeCandidatePath,
+                portablePdbCandidatePath: null,
+                referenceCandidatePaths,
+                sourceInputs,
+                discoverReferenceCandidatesLocally: false,
+                discoverPortablePdbLocally: true);
+        }
+
+        /// <summary>
         /// Initializes one explicit or discovery-enabled immutable plan.
         /// </summary>
         /// <param name="targetAssembly">The complete P3 binary identity.</param>
@@ -109,12 +171,51 @@ namespace XMLDocNormalizer.Execution.Semantic
             IEnumerable<string> referenceCandidatePaths,
             IEnumerable<ExternalSourceReconstructionInput> sourceInputs,
             bool discoverReferenceCandidatesLocally)
+            : this(
+                targetAssembly,
+                targetPeCandidatePath,
+                portablePdbCandidatePath,
+                referenceCandidatePaths,
+                sourceInputs,
+                discoverReferenceCandidatesLocally,
+                discoverPortablePdbLocally: false)
+        {
+        }
+
+        /// <summary>Initializes the complete immutable plan state.</summary>
+        /// <param name="targetAssembly">The complete P3 binary identity.</param>
+        /// <param name="targetPeCandidatePath">The explicit target PE path.</param>
+        /// <param name="portablePdbCandidatePath">The optional authoritative PDB path.</param>
+        /// <param name="referenceCandidatePaths">The explicit reference paths.</param>
+        /// <param name="sourceInputs">The explicit source-tree inputs.</param>
+        /// <param name="discoverReferenceCandidatesLocally">Whether references are discovered.</param>
+        /// <param name="discoverPortablePdbLocally">Whether a missing PDB is discovered.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any required input is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the PDB policy is inconsistent or an input sequence
+        /// contains a null element.
+        /// </exception>
+        private ExternalSupportingSourceReconstructionPlan(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            string targetPeCandidatePath,
+            string? portablePdbCandidatePath,
+            IEnumerable<string> referenceCandidatePaths,
+            IEnumerable<ExternalSourceReconstructionInput> sourceInputs,
+            bool discoverReferenceCandidatesLocally,
+            bool discoverPortablePdbLocally)
         {
             ArgumentNullException.ThrowIfNull(targetAssembly);
             ArgumentNullException.ThrowIfNull(targetPeCandidatePath);
-            ArgumentNullException.ThrowIfNull(portablePdbCandidatePath);
             ArgumentNullException.ThrowIfNull(referenceCandidatePaths);
             ArgumentNullException.ThrowIfNull(sourceInputs);
+
+            if ((portablePdbCandidatePath == null) != discoverPortablePdbLocally)
+            {
+                throw new ArgumentException(
+                    "Exactly one explicit or locally discovered Portable PDB policy is required.");
+            }
 
             ImmutableArray<string> references = referenceCandidatePaths.ToImmutableArray();
             ImmutableArray<ExternalSourceReconstructionInput> sources =
@@ -133,6 +234,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             ReferenceCandidatePaths = references;
             SourceInputs = sources;
             DiscoverReferenceCandidatesLocally = discoverReferenceCandidatesLocally;
+            DiscoverPortablePdbLocally = discoverPortablePdbLocally;
         }
 
         /// <summary>
@@ -151,7 +253,14 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Gets the explicitly selected Portable PDB candidate path.
         /// </summary>
         /// <value>The Portable PDB path.</value>
-        public string PortablePdbCandidatePath { get; }
+        public string? PortablePdbCandidatePath { get; }
+
+        /// <summary>
+        /// Gets whether a missing authoritative PDB path is resolved through
+        /// context-local candidate acquisition.
+        /// </summary>
+        /// <value><see langword="true"/> only for explicit local opt-in.</value>
+        public bool DiscoverPortablePdbLocally { get; }
 
         /// <summary>
         /// Gets the immutable reference candidate sequence.
@@ -194,7 +303,8 @@ namespace XMLDocNormalizer.Execution.Semantic
                         StringComparer.Ordinal)
                     && SourceInputs.SequenceEqual(other.SourceInputs)
                     && DiscoverReferenceCandidatesLocally
-                        == other.DiscoverReferenceCandidatesLocally);
+                        == other.DiscoverReferenceCandidatesLocally
+                    && DiscoverPortablePdbLocally == other.DiscoverPortablePdbLocally);
         }
 
         /// <inheritdoc/>
@@ -222,6 +332,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             }
 
             hash.Add(DiscoverReferenceCandidatesLocally);
+            hash.Add(DiscoverPortablePdbLocally);
 
             return hash.ToHashCode();
         }

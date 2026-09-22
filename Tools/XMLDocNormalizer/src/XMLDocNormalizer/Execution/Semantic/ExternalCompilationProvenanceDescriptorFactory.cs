@@ -160,7 +160,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Thrown when <paramref name="expectedDebugDescriptor"/> is
         /// <see langword="null"/>.
         /// </exception>
-        private static bool TryCreate(
+        internal static bool TryCreate(
             ExternalPeDebugDirectoryDescriptor expectedDebugDescriptor,
             ImmutableArray<byte> portablePdbImage,
             out ExternalCompilationProvenanceDescriptor descriptor)

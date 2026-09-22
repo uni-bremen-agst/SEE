@@ -496,3 +496,11 @@ G1 additionally permits explicitly enabled, bounded candidate lookup in loaded
 metadata references, local .NET packs/shared frameworks, and the resolved NuGet
 global-packages folder. These sources never establish identity: unchanged P5
 validation must accept every exact reference binary, or reconstruction fails closed.
+
+G2 adds an independent, explicitly enabled Portable PDB candidate pipeline for
+embedded symbols, known local paths, safe sibling/root probes, and configured
+`.nupkg`/`.snupkg` archives. Every candidate must pass the unchanged P4B exact
+identity and checksum validation. Explicit PDB paths remain authoritative, and
+the local G2 pipeline performs no network access, restore, build, global scan,
+or persistent caching. See `Evaluation/G2-portable-pdb-acquisition.md` for the
+artifact analysis and security boundary.

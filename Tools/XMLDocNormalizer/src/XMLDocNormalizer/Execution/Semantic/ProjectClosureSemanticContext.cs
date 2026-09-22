@@ -51,6 +51,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         private ExternalBinaryCandidateDiscovery ExternalBinaryCandidates { get; } = new();
 
         /// <summary>
+        /// Gets the context-local exact Portable PDB acquisition catalog.
+        /// </summary>
+        /// <value>The demand-driven bounded local PDB acquisition cache.</value>
+        private ExternalPortablePdbAcquisition ExternalPortablePdbs { get; } = new();
+
+        /// <summary>
         /// Gets the context-local controlled external source acquisition.
         /// </summary>
         /// <value>The local-mapping and optional Source Link acquisition cache.</value>
@@ -275,6 +281,24 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures immutable local Portable PDB candidate sources before analysis.
+        /// </summary>
+        /// <param name="configuration">The context-local source snapshot.</param>
+        /// <returns>
+        /// <see langword="true"/> for a new or idempotent configuration;
+        /// otherwise <see langword="false"/> after acquisition starts.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="configuration"/> is <see langword="null"/>.
+        /// </exception>
+        public bool TryConfigureExternalPortablePdbSources(
+            ExternalPortablePdbAcquisitionConfiguration configuration)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            return ExternalPortablePdbs.TryConfigure(configuration);
+        }
+
+        /// <summary>
         /// Configures all context-local document-prefix projections permitted
         /// for acquisition-enabled external source inputs.
         /// </summary>
@@ -464,6 +488,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 succeeded = ExternalSupportingSourceReconstructionOrchestrator.TryReconstruct(
                         plan,
                         ExternalBinaryCandidates,
+                        ExternalPortablePdbs,
                         ExternalSources,
                         out ExternalSupportingSourceCompilation supportingSource)
                     && TryRegisterExternalSupportingSource(supportingSource, out _);

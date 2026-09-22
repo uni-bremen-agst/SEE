@@ -39,9 +39,9 @@ The harness never treats foreign package content as executable build logic. XMLD
 
 | Package | Version | TFM | Evaluation role |
 | --- | --- | --- | --- |
-| Dapper | 2.1.35 | net7.0 | Unsigned async/generic library; expected missing-PDB fallback |
+| Dapper | 2.1.35 | net7.0 | Embedded exact Portable PDB and next-boundary case |
 | Newtonsoft.Json | 13.0.3 | net6.0 | Large multi-source Portable-PDB/Source-Link case |
-| OneOf | 3.0.263 | netstandard2.0 | Small generic library; expected missing-PDB fallback |
+| OneOf | 3.0.263 | netstandard2.0 | Small generic library; no published matching PDB |
 | Polly | 7.2.4 | netstandard2.0 | Async/generic Portable-PDB/Source-Link case |
 | Scrutor | 4.2.2 | netstandard2.0 | External-dependency and exact-reference case |
 | Semver | 2.3.0 | netstandard2.0 | Unsigned complete reconstruction, embedded + Source Link, and exception probe |
@@ -82,3 +82,18 @@ indexes only known package asset directories and never recursively enumerates
 all files. JSON candidate entries record each P5A ordinal, exact provenance,
 selected artifact source, and bounded discovery counters. The observed Scrutor
 and Serilog root cause is documented in `G1-reference-acquisition.md`.
+
+## G2 exact Portable PDB candidates
+
+The evaluation harness also opts missing manifest PDB paths into the bounded,
+local G2 candidate pipeline. It checks an embedded Portable PDB first, then
+explicitly configured local paths, safe sibling/root probes, and explicitly
+configured `.nupkg`/`.snupkg` archives. Candidate location never establishes
+identity: every image must pass the unchanged P4B identity and checksum
+validation before P5A metadata is consumed. Explicit manifest PDB paths remain
+authoritative and never fall back after a mismatch.
+
+G2 performs no network request, restore, build, global filesystem scan, or
+persistent caching. The Dapper and OneOf artifact analysis, source order,
+archive safeguards, cache boundary, and E1 outcome are documented in
+`G2-portable-pdb-acquisition.md`.

@@ -97,6 +97,8 @@ namespace XMLDocNormalizer.Evaluation
                 builder.AppendLine($"- Reason: {candidate.FallbackReason ?? "none"}");
                 builder.AppendLine($"- Findings: {candidate.BaselineFindings.Count} baseline, {candidate.SourceBackedFindings.Count} source-backed, {candidate.AddedFindings.Count} added, {candidate.RemovedFindings.Count} removed, {candidate.ChangedExceptionEvidence.Count} changed exception evidence");
                 builder.AppendLine($"- Trees/references: {candidate.SourceTreeCount}/{candidate.ReferenceCount}");
+                builder.AppendLine($"- PDB origin: {candidate.PdbOrigin ?? "none"}");
+                builder.AppendLine($"- PDB acquisition: {candidate.PdbAcquisition.CandidatesConsidered} candidates, {candidate.PdbAcquisition.CandidatesOpened} opens, {candidate.PdbAcquisition.LocalSymbolPackagesInspected} packages, {candidate.PdbAcquisition.RemoteSymbolRequests} requests, {candidate.PdbAcquisition.DownloadedPdbBytes} downloaded bytes, {candidate.PdbAcquisition.ValidationAttempts} P4B attempts, {candidate.PdbAcquisition.PositiveCacheHits} positive cache hits, {candidate.PdbAcquisition.NegativeCacheHits} negative cache hits");
                 string referenceSources = string.Join(
                     ", ",
                     candidate.References

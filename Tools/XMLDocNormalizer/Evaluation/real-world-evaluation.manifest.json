@@ -90,8 +90,8 @@
       "pdbPath": null,
       "referenceRoots": [],
       "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Known unsigned data-access library with async and generic APIs; published package has no reproducible PDB artifact.",
-      "categories": ["Async", "Generics", "MissingPortablePdb"]
+      "selectionReason": "Known unsigned data-access library with async and generic APIs; the PE has an embedded exact Portable PDB but the package has no standalone PDB.",
+      "categories": ["Async", "Generics", "EmbeddedPortablePdb"]
     },
     {
       "id": "newtonsoft-json-13.0.3-net6.0",
@@ -114,7 +114,7 @@
       "pdbPath": null,
       "referenceRoots": [],
       "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Small unsigned generic library whose release has no reproducible PDB artifact.",
+      "selectionReason": "Small unsigned generic library whose release has no published matching Portable PDB artifact.",
       "categories": ["Generics", "MissingPortablePdb"]
     },
     {

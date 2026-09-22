@@ -167,10 +167,49 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             ExternalAssemblyReferenceDescriptor descriptor = GetDescriptor(
                 fixture,
                 expected.Reference);
+            Assert.True(ExternalPortablePdbAcquisitionConfiguration.TryCreate(
+                [expected.PdbPath],
+                [],
+                [],
+                out ExternalPortablePdbAcquisitionConfiguration pdbSources));
+            Assert.True(fixture.Context.TryConfigureExternalPortablePdbSources(pdbSources));
 
             Assert.True(fixture.Context.TryRegisterExternalSupportingSourceReconstructionPlan(
                 expected.CreatePlan(descriptor, pdbPath: wrong.PdbPath)));
             Assert.False(TryResolve(fixture, expected.Reference, out _));
+        }
+
+        /// <summary>
+        /// Uses an exact embedded Portable PDB only when a reached callable
+        /// triggers its explicitly acquisition-enabled plan.
+        /// </summary>
+        [Fact]
+        public void EmbeddedPortablePdb_ReconstructsOnDemand()
+        {
+            using ExternalReconstructionPlanTestWorkspace workspace = new();
+            PreparedDependency dependency = workspace.Prepare(
+                "P6C.EmbeddedPdb",
+                [Source("EmbeddedPdb.cs")],
+                embedSources: true,
+                embedPortablePdb: true);
+            ConsumerFixture fixture = CreateCallingConsumer(
+                dependency,
+                "P6C.EmbeddedPdb.Consumer");
+            ExternalAssemblyReferenceDescriptor descriptor = GetDescriptor(
+                fixture,
+                dependency.Reference);
+            ExternalSupportingSourceReconstructionPlan plan =
+                ExternalSupportingSourceReconstructionPlan
+                    .CreateWithLocalPortablePdbDiscovery(
+                        descriptor,
+                        dependency.TargetPath,
+                        dependency.ReferencePaths,
+                        [new ExternalSourceReconstructionInput(0, candidatePath: null)]);
+            Assert.True(fixture.Context.TryRegisterExternalSupportingSourceReconstructionPlan(plan));
+            Assert.False(fixture.Context.TryGetExternalSupportingSourceScope(descriptor, out _));
+
+            Assert.True(TryResolve(fixture, dependency.Reference, out _));
+            Assert.True(fixture.Context.TryGetExternalSupportingSourceScope(descriptor, out _));
         }
 
         /// <summary>

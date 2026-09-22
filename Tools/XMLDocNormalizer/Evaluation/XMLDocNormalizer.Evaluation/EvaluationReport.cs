@@ -106,6 +106,12 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets the observed PDB type.</summary>
         public string PdbType { get; set; } = "None";
 
+        /// <summary>Gets or sets the exact validated PDB candidate origin.</summary>
+        public string? PdbOrigin { get; set; }
+
+        /// <summary>Gets or sets bounded G2 Portable PDB acquisition counters.</summary>
+        public EvaluationPdbAcquisitionStatistics PdbAcquisition { get; set; } = new();
+
         /// <summary>Gets or sets whether Source Link provenance was present.</summary>
         public bool SourceLinkAvailable { get; set; }
 
@@ -253,6 +259,34 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets the number of existing P5 validation attempts.</summary>
         public long ValidationAttempts { get; set; }
+    }
+
+    /// <summary>Captures bounded G2 Portable PDB acquisition work.</summary>
+    public sealed class EvaluationPdbAcquisitionStatistics
+    {
+        /// <summary>Gets or sets the number of candidate images considered.</summary>
+        public long CandidatesConsidered { get; set; }
+
+        /// <summary>Gets or sets the number of candidate open attempts.</summary>
+        public long CandidatesOpened { get; set; }
+
+        /// <summary>Gets or sets the number of local package archives inspected.</summary>
+        public long LocalSymbolPackagesInspected { get; set; }
+
+        /// <summary>Gets or sets the number of remote symbol requests.</summary>
+        public long RemoteSymbolRequests { get; set; }
+
+        /// <summary>Gets or sets the number of remotely downloaded PDB bytes.</summary>
+        public long DownloadedPdbBytes { get; set; }
+
+        /// <summary>Gets or sets the number of P4B validation attempts.</summary>
+        public long ValidationAttempts { get; set; }
+
+        /// <summary>Gets or sets the number of positive cache hits.</summary>
+        public long PositiveCacheHits { get; set; }
+
+        /// <summary>Gets or sets the number of negative cache hits.</summary>
+        public long NegativeCacheHits { get; set; }
     }
 
     /// <summary>

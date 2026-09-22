@@ -37,6 +37,13 @@ namespace XMLDocNormalizerTests.Evaluation
                     1,
                     candidates[0].GetProperty("ReferenceDiscovery")
                         .GetProperty("ValidationAttempts").GetInt64());
+                Assert.Equal(
+                    "Embedded",
+                    candidates[0].GetProperty("PdbOrigin").GetString());
+                Assert.Equal(
+                    1,
+                    candidates[0].GetProperty("PdbAcquisition")
+                        .GetProperty("ValidationAttempts").GetInt64());
             }
             finally
             {
@@ -56,6 +63,8 @@ namespace XMLDocNormalizerTests.Evaluation
             Assert.Contains("- Candidates evaluated: 2", markdown, StringComparison.Ordinal);
             Assert.Contains("## PackageA 1.0.0 (net8.0)", markdown, StringComparison.Ordinal);
             Assert.Contains("MissingArtifact", markdown, StringComparison.Ordinal);
+            Assert.Contains("- PDB origin: Embedded", markdown, StringComparison.Ordinal);
+            Assert.Contains("1 P4B attempts", markdown, StringComparison.Ordinal);
         }
 
         private static EvaluationReport CreateReport()
@@ -99,6 +108,11 @@ namespace XMLDocNormalizerTests.Evaluation
                         FallbackStage = "PdbValidated",
                         FallbackCategory = EvaluationFailureCategory.MissingArtifact,
                         ExpectedOutcomeObserved = true,
+                        PdbOrigin = "Embedded",
+                        PdbAcquisition = new EvaluationPdbAcquisitionStatistics
+                        {
+                            ValidationAttempts = 1
+                        },
                         References =
                         [
                             new EvaluationReferenceResult

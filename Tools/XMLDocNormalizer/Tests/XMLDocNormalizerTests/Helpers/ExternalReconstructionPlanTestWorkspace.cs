@@ -44,7 +44,8 @@ namespace XMLDocNormalizerTests.Helpers
             CSharpParseOptions? parseOptions = null,
             Encoding? sourceEncoding = null,
             string? sourceLinkJson = null,
-            IReadOnlyCollection<int>? embeddedSourceOrdinals = null)
+            IReadOnlyCollection<int>? embeddedSourceOrdinals = null,
+            bool embedPortablePdb = false)
         {
             string candidatePrefix = assemblyName + "." + Guid.NewGuid().ToString("N");
             CSharpParseOptions actualParseOptions = parseOptions ?? new CSharpParseOptions(
@@ -80,7 +81,7 @@ namespace XMLDocNormalizerTests.Helpers
             Assert.Empty(errors);
 
             using MemoryStream peStream = new();
-            using MemoryStream pdbStream = new();
+            using MemoryStream? pdbStream = embedPortablePdb ? null : new MemoryStream();
             ImmutableArray<EmbeddedText> embeddedTexts = trees
                 .Where((_, index) => embedSources
                     || embeddedSourceOrdinals?.Contains(index) == true)
@@ -95,7 +96,9 @@ namespace XMLDocNormalizerTests.Helpers
                 peStream,
                 pdbStream,
                 options: new EmitOptions(
-                    debugInformationFormat: DebugInformationFormat.PortablePdb,
+                    debugInformationFormat: embedPortablePdb
+                        ? DebugInformationFormat.Embedded
+                        : DebugInformationFormat.PortablePdb,
                     pdbFilePath: Path.Combine(DirectoryPath, candidatePrefix + ".pdb")),
                 sourceLinkStream: sourceLinkStream,
                 embeddedTexts: embeddedTexts);
@@ -106,7 +109,10 @@ namespace XMLDocNormalizerTests.Helpers
                 candidatePrefix + ".target-candidate");
             string pdbPath = Path.Combine(DirectoryPath, candidatePrefix + ".pdb-candidate");
             File.WriteAllBytes(targetPath, peStream.ToArray());
-            File.WriteAllBytes(pdbPath, pdbStream.ToArray());
+            if (pdbStream != null)
+            {
+                File.WriteAllBytes(pdbPath, pdbStream.ToArray());
+            }
             ImmutableArray<string>.Builder sourcePaths =
                 ImmutableArray.CreateBuilder<string>(sources.Count);
 

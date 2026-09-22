@@ -96,36 +96,50 @@ namespace XMLDocNormalizer.Evaluation
                 AddStage(result, "BinaryValidated", true, fixture.Target.AssemblyIdentity.ToString());
                 result.BaselineFindings = Analyze(fixture, supportingSource: null);
 
-                if (candidate.PdbPath == null)
-                {
-                    return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.MissingArtifact, "Manifest intentionally supplies no Portable PDB.", stopwatch);
-                }
-
-                string pdbPath = Resolve(candidate.PdbPath);
-                result.PdbAvailable = File.Exists(pdbPath);
-                if (!result.PdbAvailable)
-                {
-                    return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.MissingArtifact, "Portable PDB is absent.", stopwatch);
-                }
-
-                result.PdbSha256 = HashFile(pdbPath);
-                result.PdbType = DetectPdbType(pdbPath);
                 if (!ExternalPeDebugDirectoryDescriptorFactory.TryCreateFromFile(
                         fixture.Target,
                         assemblyPath,
-                        out ExternalPeDebugDirectoryDescriptor debugDirectory)
-                    || !ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(
-                        debugDirectory,
-                        pdbPath,
-                        out ExternalCompilationProvenanceDescriptor provenance))
+                        out ExternalPeDebugDirectoryDescriptor debugDirectory))
                 {
-                    return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.ProvenanceMismatch, "PE/PDB identity or Portable-PDB provenance validation failed.", stopwatch);
+                    return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.ProvenanceMismatch, "PE debug provenance validation failed.", stopwatch);
                 }
 
+                ExternalCompilationProvenanceDescriptor provenance;
+                if (candidate.PdbPath != null)
+                {
+                    string pdbPath = Resolve(candidate.PdbPath);
+                    result.PdbAvailable = File.Exists(pdbPath);
+                    if (!result.PdbAvailable)
+                    {
+                        return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.MissingArtifact, "Portable PDB is absent.", stopwatch);
+                    }
+
+                    result.PdbSha256 = HashFile(pdbPath);
+                    result.PdbType = DetectPdbType(pdbPath);
+                    result.PdbOrigin = ExternalPortablePdbOrigin.Explicit.ToString();
+                    result.PdbAcquisition.ValidationAttempts = 1;
+                    if (!ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(
+                            debugDirectory,
+                            pdbPath,
+                            out provenance))
+                    {
+                        return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.ProvenanceMismatch, "PE/PDB identity or Portable-PDB provenance validation failed.", stopwatch);
+                    }
+                }
+                else if (!TryAcquirePortablePdb(
+                        debugDirectory,
+                        assemblyPath,
+                        result,
+                        out provenance))
+                {
+                    return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.MissingArtifact, "No exact Portable PDB was available from permitted local sources.", stopwatch);
+                }
+
+                result.PdbAvailable = true;
                 result.PdbType = "Portable";
                 result.SourceLinkAvailable = provenance.PortablePdb.SourceLink != null;
                 result.EmbeddedSourceCount = provenance.PortablePdb.Documents.Count(static document => document.EmbeddedSource != null);
-                AddStage(result, "PdbValidated", true, $"{provenance.PortablePdb.ValidationKind}; {provenance.PortablePdb.Documents.Length} documents.");
+                AddStage(result, "PdbValidated", true, $"{result.PdbOrigin}; {provenance.PortablePdb.ValidationKind}; {provenance.PortablePdb.Documents.Length} documents.");
                 if (provenance.CompilationOptions == null || provenance.MetadataReferences == null)
                 {
                     return Fail(result, candidate, "CompilationProvenanceRead", EvaluationFailureCategory.ProvenanceMismatch, "Compilation options or metadata-reference provenance is absent.", stopwatch);
@@ -137,7 +151,7 @@ namespace XMLDocNormalizer.Evaluation
                     provenance,
                     out ExternalCSharpCompilationConfiguration configuration))
                 {
-                    return Fail(result, candidate, "ConfigurationReconstructed", EvaluationFailureCategory.ConfigurationUnsupported, "Recorded compiler configuration is outside the supported P5G shape.", stopwatch);
+                    return Fail(result, candidate, "ConfigurationReconstructed", EvaluationFailureCategory.ConfigurationUnsupported, "Recorded compiler configuration is outside the supported P5G shape: " + FormatCompilationOptions(provenance.CompilationOptions), stopwatch);
                 }
 
                 result.ExpectedSourceFileCount = configuration.SourceFileCount;
@@ -391,6 +405,66 @@ namespace XMLDocNormalizer.Evaluation
             }
 
             return ExternalMetadataReferenceSetFactory.TryCreate(provenance, materials.Materials, out referenceSet);
+        }
+
+        /// <summary>
+        /// Acquires an exact embedded or local sibling Portable PDB and records G2 work.
+        /// </summary>
+        /// <param name="debugDirectory">The authoritative P4A provenance.</param>
+        /// <param name="assemblyPath">The exact target PE path.</param>
+        /// <param name="result">The mutable local evaluation result.</param>
+        /// <param name="provenance">The P4B/P5A result when successful.</param>
+        /// <returns><see langword="true"/> only for an exact local candidate.</returns>
+        private static bool TryAcquirePortablePdb(
+            ExternalPeDebugDirectoryDescriptor debugDirectory,
+            string assemblyPath,
+            EvaluationCandidateResult result,
+            out ExternalCompilationProvenanceDescriptor provenance)
+        {
+            ExternalPortablePdbAcquisition acquisition = new();
+            if (!ExternalPortablePdbAcquisitionConfiguration.TryCreate(
+                    [],
+                    [],
+                    [],
+                    out ExternalPortablePdbAcquisitionConfiguration configuration)
+                || !acquisition.TryConfigure(configuration))
+            {
+                provenance = null!;
+                return false;
+            }
+
+            bool acquired = acquisition.TryAcquire(
+                debugDirectory,
+                assemblyPath,
+                out provenance,
+                out ExternalPortablePdbOrigin origin);
+            ExternalPortablePdbAcquisitionStatistics statistics = acquisition.GetStatistics();
+            result.PdbAcquisition = new EvaluationPdbAcquisitionStatistics
+            {
+                CandidatesConsidered = statistics.CandidatesConsidered,
+                CandidatesOpened = statistics.CandidatesOpened,
+                LocalSymbolPackagesInspected = statistics.LocalSymbolPackagesInspected,
+                RemoteSymbolRequests = statistics.RemoteSymbolRequests,
+                DownloadedPdbBytes = statistics.DownloadedPdbBytes,
+                ValidationAttempts = statistics.ValidationAttempts,
+                PositiveCacheHits = statistics.PositiveCacheHits,
+                NegativeCacheHits = statistics.NegativeCacheHits
+            };
+            result.PdbOrigin = acquired ? origin.ToString() : null;
+            return acquired;
+        }
+
+        /// <summary>Formats exact P5A compilation options for fail-closed diagnosis.</summary>
+        /// <param name="options">The validated compilation options.</param>
+        /// <returns>The deterministic key/value summary.</returns>
+        private static string FormatCompilationOptions(
+            ExternalCompilationOptionsDescriptor? options)
+        {
+            return options == null
+                ? "absent"
+                : string.Join(
+                    ", ",
+                    options.Options.Select(static option => $"{option.Key}={option.Value}"));
         }
 
         private List<string> Analyze(
