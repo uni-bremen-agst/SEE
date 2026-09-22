@@ -681,7 +681,7 @@ namespace SEE.Controls.Actions.Drawable
                 LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
                 {
                     shapeFillOut = color;
-                    GameEdit.ChangeFillOutColor(shape, color);
+                    GameLineFillOut.ChangeFillOutColor(shape, color);
                     new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
                 }, () => shapeFillOut = null);
                 if (shapeFillOut != null && BlinkEffect.CanFillOutBeAdded(shape))
@@ -828,7 +828,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
                             shapeFillOut = color;
-                            GameEdit.ChangeFillOutColor(shape, color);
+                            GameLineFillOut.ChangeFillOutColor(shape, color);
                             new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                 shape.name, color).Execute();
                         }, () => shapeFillOut = null);
@@ -878,7 +878,7 @@ namespace SEE.Controls.Actions.Drawable
                         if (shapeFillOut != null)
                         {
                             LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
-                                shapeFillOut = color; GameEdit.ChangeFillOutColor(shape, color);
+                                shapeFillOut = color; GameLineFillOut.ChangeFillOutColor(shape, color);
                                 new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                     shape.name, color).Execute();
                             }, () => shapeFillOut = null);
@@ -926,7 +926,7 @@ namespace SEE.Controls.Actions.Drawable
             LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
             {
                 shapeFillOut = color;
-                GameEdit.ChangeFillOutColor(Shape, color);
+                GameLineFillOut.ChangeFillOutColor(Shape, color);
 
                 new EditLineFillOutColorNetAction(
                     Surface.name,

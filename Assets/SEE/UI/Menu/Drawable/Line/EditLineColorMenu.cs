@@ -365,9 +365,9 @@ namespace SEE.UI.Menu.Drawable.Line
                 if (IsMainSegment)
                 {
                     if (lineHolder.FillOutStatus
-                        && GameDrawer.GetOwnFillOutObject(selectedLine) == null)
+                        && GameLineFillOut.GetOwnFillOutObject(selectedLine) == null)
                     {
-                        if (GameDrawer.FillOut(selectedLine, lineHolder.FillOutColor))
+                        if (GameLineFillOut.FillOut(selectedLine, lineHolder.FillOutColor))
                         {
                             new DrawingFillOutNetAction(
                                 surface.name,
@@ -379,7 +379,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     AssignColorArea(color =>
                     {
-                        GameEdit.ChangeFillOutColor(selectedLine, color);
+                        GameLineFillOut.ChangeFillOutColor(selectedLine, color);
                         lineHolder.FillOutColor = color;
 
                         new EditLineFillOutColorNetAction(
@@ -446,7 +446,7 @@ namespace SEE.UI.Menu.Drawable.Line
                         lineHolder.FillOutColor = lineHolder.PrimaryColor;
                     }
 
-                    if (GameDrawer.FillOut(selectedLine, lineHolder.FillOutColor))
+                    if (GameLineFillOut.FillOut(selectedLine, lineHolder.FillOutColor))
                     {
                         new DrawingFillOutNetAction(
                             surface.name,
@@ -462,7 +462,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     AssignColorArea(color =>
                     {
-                        GameEdit.ChangeFillOutColor(selectedLine, color);
+                        GameLineFillOut.ChangeFillOutColor(selectedLine, color);
                         lineHolder.FillOutColor = color;
 
                         new EditLineFillOutColorNetAction(
@@ -516,7 +516,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     BlinkEffect.RemoveFillOutFromEffect(selectedLine);
 
-                    GameObject mainFillOut = GameDrawer.GetOwnFillOutObject(selectedLine);
+                    GameObject mainFillOut = GameLineFillOut.GetOwnFillOutObject(selectedLine);
                     if (mainFillOut != null)
                     {
                         UnityEngine.Object.DestroyImmediate(mainFillOut);
@@ -577,7 +577,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 controls.FillOutManager.isOn = true;
 
-                if (GameDrawer.FillOut(DrawShapesAction.currentShape, fillOut))
+                if (GameLineFillOut.FillOut(DrawShapesAction.currentShape, fillOut))
                 {
                     GameObject surface =
                         GameFinder.GetDrawableSurface(DrawShapesAction.currentShape);

@@ -1,5 +1,4 @@
-﻿using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using System.Collections.Generic;
@@ -44,46 +43,6 @@ namespace SEE.Game.Drawable
                 LineRenderer renderer = line.GetComponent<LineRenderer>();
                 renderer.loop = loop;
                 GameLineGeometry.RefreshCollider(line);
-            }
-        }
-
-        /// <summary>
-        /// Changes the fill out object.
-        /// </summary>
-        /// <param name="shape">The shape object.</param>
-        /// <param name="status">Whether the fill out is active.</param>
-        /// <param name="color">The color of the fill out.</param>
-        private static void ChangeFillOut(GameObject shape, bool status, Color color)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                GameObject fillout = GameDrawer.GetOwnFillOutObject(shape);
-
-                if (!status)
-                {
-                    GameObject.DestroyImmediate(fillout);
-                }
-                else
-                {
-                    GameDrawer.FillOut(shape, color);
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method changes the fill out color of a shape.
-        /// </summary>
-        /// <param name="shape">The shape whose color should be changed.</param>
-        /// <param name="color">The new color.</param>
-        public static void ChangeFillOutColor(GameObject shape, Color color)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                GameObject fillout = GameDrawer.GetOwnFillOutObject(shape);
-                if (fillout != null)
-                {
-                    fillout.SetColor(color);
-                }
             }
         }
 
@@ -213,8 +172,7 @@ namespace SEE.Game.Drawable
                 GameLineAppearance.ChangeLineKind(capGO, capConf.LineKind, capConf.Tiling);
                 GameLineAppearance.ChangePrimaryColor(capGO, capConf.PrimaryColor);
                 GameLineAppearance.ChangeSecondaryColor(capGO, capConf.SecondaryColor);
-                ChangeFillOut(capGO, capConf.FillOutStatus, capConf.FillOutColor);
-                ChangeFillOutColor(capGO, capConf.FillOutColor);
+                GameLineFillOut.ChangeFillOut(capGO, capConf.FillOutStatus, capConf.FillOutColor);
             }
         }
 
@@ -232,8 +190,7 @@ namespace SEE.Game.Drawable
                 GameLineAppearance.ChangeColorKind(lineObj, line.ColorKind, line);
                 GameLineAppearance.ChangePrimaryColor(lineObj, line.PrimaryColor);
                 GameLineAppearance.ChangeSecondaryColor(lineObj, line.SecondaryColor);
-                ChangeFillOut(lineObj, line.FillOutStatus, line.FillOutColor);
-                ChangeFillOutColor(lineObj, line.FillOutColor);
+                GameLineFillOut.ChangeFillOut(lineObj, line.FillOutStatus, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
                 GameLineAppearance.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
                 ChangeLineCaps(lineObj, line, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);

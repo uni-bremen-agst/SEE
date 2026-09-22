@@ -42,7 +42,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (!string.IsNullOrWhiteSpace(LineID))
             {
-                GameDrawer.FillOut(FindChild(LineID), FillOutColor);
+                GameLineFillOut.FillOut(FindChild(LineID), FillOutColor);
             }
             else
             {

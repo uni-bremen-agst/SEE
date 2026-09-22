@@ -29,7 +29,7 @@ namespace SEE.Game.Drawable
             renderer.positionCount = 4;
             renderer.SetPositions(GetPositions());
 
-            Assert.That(GameDrawer.FillOut(line, Color.red), Is.True);
+            Assert.That(GameLineFillOut.FillOut(line, Color.red), Is.True);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace SEE.Game.Drawable
         /// <returns>The fill-out mesh collider.</returns>
         private MeshCollider GetFillOutCollider()
         {
-            GameObject fillOut = GameDrawer.GetOwnFillOutObject(line);
+            GameObject fillOut = GameLineFillOut.GetOwnFillOutObject(line);
 
             Assert.That(fillOut, Is.Not.Null);
 

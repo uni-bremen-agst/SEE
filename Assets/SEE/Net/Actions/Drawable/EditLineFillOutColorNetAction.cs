@@ -41,7 +41,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeFillOutColor(FindChild(LineName), Color);
+            GameLineFillOut.ChangeFillOutColor(FindChild(LineName), Color);
         }
     }
 }
