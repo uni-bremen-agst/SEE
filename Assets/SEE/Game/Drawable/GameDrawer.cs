@@ -163,7 +163,7 @@ namespace SEE.Game.Drawable
         /// To add further points to the created line, the <see cref="Drawing"/> method must be
         /// subsequently called with the new points.
         /// To complete the drawing, <see cref="FinishDrawing"/> should be executed at the end.
-        /// If desired, <see cref="SetPivot"/> can then be called to set the correct pivot.
+        /// If desired, <see cref="GameLineGeometry.SetPivot"/> can then be called to set the correct pivot.
         /// </summary>
         /// <param name="surface">The drawable surface on which the line should be displayed.</param>
         /// <param name="positions">The start positions for the line.</param>
