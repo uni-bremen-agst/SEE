@@ -4,7 +4,7 @@ using SEE.Utils;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Provides functionality for creating, updating, and managing fill-out

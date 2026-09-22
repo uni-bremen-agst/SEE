@@ -4,7 +4,7 @@ using SEE.Game.Drawable.ValueHolders;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Tests the integration of line-cap application, rendering, and line geometry.

@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Provides rendering and management of line-cap objects.

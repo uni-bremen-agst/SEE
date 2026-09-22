@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SEE.Game.Drawable;
+using SEE.Game.Drawable.Line;
 
 namespace SEE.Controls.Actions.Drawable
 {

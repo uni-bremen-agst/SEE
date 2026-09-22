@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Provides functionality for configuring the visual appearance of drawable lines.

@@ -2,6 +2,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;

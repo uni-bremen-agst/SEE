@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Provides creation, drawing, updating, and restoration of drawable lines.

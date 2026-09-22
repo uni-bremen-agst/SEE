@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Line;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;

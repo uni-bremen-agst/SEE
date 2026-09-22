@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.ValueHolders;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;

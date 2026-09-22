@@ -1,11 +1,12 @@
 ﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Provides geometry-related functionality for drawable lines, including

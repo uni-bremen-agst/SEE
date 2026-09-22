@@ -1,8 +1,7 @@
 ﻿using NUnit.Framework;
-using SEE.Game.Drawable.ValueHolders;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Tests management of generated line-cap objects.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// The available color modes of a drawable line.

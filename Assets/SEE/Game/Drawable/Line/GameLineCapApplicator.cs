@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Applies line-cap configurations to lines and adjusts their geometry.

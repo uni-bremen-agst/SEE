@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Linq;

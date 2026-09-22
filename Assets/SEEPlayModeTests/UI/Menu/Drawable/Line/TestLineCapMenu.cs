@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Utils;
 using System.Collections;
 using UnityEngine;

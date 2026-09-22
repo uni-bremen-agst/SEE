@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Tests the visual appearance functionality for drawable lines.

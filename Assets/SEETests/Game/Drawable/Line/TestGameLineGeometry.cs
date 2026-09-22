@@ -2,7 +2,7 @@
 using SEE.Game.Drawable.ValueHolders;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Tests the geometry-related functionality for drawable lines.

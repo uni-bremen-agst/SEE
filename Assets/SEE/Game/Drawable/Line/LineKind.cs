@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// The available visual styles of a drawable line.

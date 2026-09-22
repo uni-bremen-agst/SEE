@@ -3,7 +3,7 @@ using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Line
 {
     /// <summary>
     /// Tests creation and initialization of line-cap configurations.

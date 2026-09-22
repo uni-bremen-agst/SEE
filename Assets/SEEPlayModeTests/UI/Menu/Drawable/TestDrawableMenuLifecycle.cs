@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using SEE.Game.Drawable.Line;
+using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
