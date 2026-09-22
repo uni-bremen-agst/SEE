@@ -17,18 +17,7 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class GameDrawer
     {
-        #region Types
-        /// <summary>
-        /// The different color kinds.
-        /// </summary>
-        [Serializable]
-        public enum ColorKind
-        {
-            Monochrome,
-            Gradient,
-            TwoDashed
-        }
-
+        #region Line Style Options
         /// <summary>
         /// Gets a list with the color kinds.
         /// If <paramref name="isDashedLineKind"/> is true, the list contains <see cref="ColorKind.TwoDashed"/>.
@@ -46,20 +35,6 @@ namespace SEE.Game.Drawable
             {
                 return new List<ColorKind>() { ColorKind.Monochrome, ColorKind.Gradient };
             }
-        }
-
-        /// <summary>
-        /// The different line kinds.
-        /// </summary>
-        [Serializable]
-        public enum LineKind
-        {
-            Solid,
-            Dashed,
-            Dashed25,
-            Dashed50,
-            Dashed75,
-            Dashed100
         }
 
         /// <summary>

@@ -61,15 +61,15 @@ namespace SEE.Game.Drawable.Configurations
         {
             switch (target.ColorKind)
             {
-                case GameDrawer.ColorKind.Monochrome:
+                case ColorKind.Monochrome:
                     target.PrimaryColor = renderer.material.color;
                     target.SecondaryColor = Color.clear;
                     break;
-                case GameDrawer.ColorKind.Gradient:
+                case ColorKind.Gradient:
                     target.PrimaryColor = renderer.startColor;
                     target.SecondaryColor = renderer.endColor;
                     break;
-                case GameDrawer.ColorKind.TwoDashed:
+                case ColorKind.TwoDashed:
                     target.PrimaryColor = renderer.materials[0].color;
                     target.SecondaryColor = renderer.materials[1].color;
                     break;

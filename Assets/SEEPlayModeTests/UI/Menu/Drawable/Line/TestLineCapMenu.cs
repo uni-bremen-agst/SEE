@@ -7,7 +7,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
 {

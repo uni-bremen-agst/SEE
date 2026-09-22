@@ -59,15 +59,15 @@ namespace SEE.Game.Drawable
                 LineRenderer renderer = shape.GetComponent<LineRenderer>();
                 switch (shape.GetComponent<LineValueHolder>().ColorKind)
                 {
-                    case GameDrawer.ColorKind.Monochrome:
+                    case ColorKind.Monochrome:
                         renderer.startColor = renderer.endColor = Color.white;
                         renderer.material.color = color;
                         break;
-                    case GameDrawer.ColorKind.Gradient:
+                    case ColorKind.Gradient:
                         renderer.material.color = Color.white;
                         renderer.startColor = color;
                         break;
-                    case GameDrawer.ColorKind.TwoDashed:
+                    case ColorKind.TwoDashed:
                         renderer.material.color = color;
                         break;
                 }
@@ -86,14 +86,14 @@ namespace SEE.Game.Drawable
                 LineRenderer renderer = shape.GetComponent<LineRenderer>();
                 switch (shape.GetComponent<LineValueHolder>().ColorKind)
                 {
-                    case GameDrawer.ColorKind.Gradient:
+                    case ColorKind.Gradient:
                         renderer.material.color = Color.white;
                         renderer.endColor = color;
                         break;
-                    case GameDrawer.ColorKind.TwoDashed:
+                    case ColorKind.TwoDashed:
                         renderer.materials[1].color = color;
                         break;
-                    case GameDrawer.ColorKind.Monochrome:
+                    case ColorKind.Monochrome:
                         renderer.startColor = renderer.endColor = Color.white;
                         break;
                 }

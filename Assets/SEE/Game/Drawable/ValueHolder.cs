@@ -42,12 +42,12 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The current chosen line kind for drawing.
         /// </summary>
-        public static GameDrawer.LineKind CurrentLineKind { get; set; }
+        public static LineKind CurrentLineKind { get; set; }
 
         /// <summary>
         /// The current chosen color kind for drawing.
         /// </summary>
-        public static GameDrawer.ColorKind CurrentColorKind { get; set; }
+        public static ColorKind CurrentColorKind { get; set; }
 
         /// <summary>
         /// The current chosen tiling for drawing a dashed line kind.
@@ -280,8 +280,8 @@ namespace SEE.Game.Drawable
             CurrentOutlineThickness = 0.4f;
             CurrentFontSize = 0.5f;
             CurrentThickness = 0.01f;
-            CurrentLineKind = GameDrawer.LineKind.Solid;
-            CurrentColorKind = GameDrawer.ColorKind.Monochrome;
+            CurrentLineKind = LineKind.Solid;
+            CurrentColorKind = ColorKind.Monochrome;
             CurrentTiling = 1f;
             MaxOrderInLayer = 1;
             CurrentFillOutStatus = false;

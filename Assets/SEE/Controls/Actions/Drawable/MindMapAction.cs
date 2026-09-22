@@ -310,8 +310,8 @@ namespace SEE.Controls.Actions.Drawable
                     "To select, click on the specific parent node or choose it from the menu.", 3);
                 /// The following block is for a branch line preview.
                 branchLine = GameDrawer.StartDrawing(Surface, new Vector3[] { position },
-                    GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
-                    ValueHolder.StandardLineThickness, GameDrawer.LineKind.Solid,
+                    ColorKind.Monochrome, Color.black, Color.clear,
+                    ValueHolder.StandardLineThickness, LineKind.Solid,
                     ValueHolder.StandardLineTiling);
                 branchLine.transform.SetParent(node.transform);
                 branchLineRenderer = branchLine.GetComponent<LineRenderer>();

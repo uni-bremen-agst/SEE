@@ -67,12 +67,12 @@ namespace SEE.Game.Drawable.Configurations
         /// Serialized backing field for <see cref="ColorKind"/>.
         /// </summary>
         [SerializeField]
-        private GameDrawer.ColorKind colorKind;
+        private ColorKind colorKind;
 
         /// <summary>
         /// The color kind of the line (Monochrome/Gradient/Two-color dashed).
         /// </summary>
-        public GameDrawer.ColorKind ColorKind
+        public ColorKind ColorKind
         {
             get => colorKind;
             set => colorKind = value;
@@ -97,12 +97,12 @@ namespace SEE.Game.Drawable.Configurations
         /// Serialized backing field for <see cref="LineKind"/>.
         /// </summary>
         [SerializeField]
-        private GameDrawer.LineKind lineKind;
+        private LineKind lineKind;
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
         /// </summary>
-        public GameDrawer.LineKind LineKind
+        public LineKind LineKind
         {
             get => lineKind;
             set => lineKind = value;
@@ -396,13 +396,13 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the color kind
             if (attributes.TryGetValue(colorKindLabel, out object cKind)
-                && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
+                && Enum.TryParse((string)cKind, out ColorKind colorResult))
             {
                 ColorKind = colorResult;
             }
             else
             {
-                ColorKind = GameDrawer.ColorKind.Monochrome;
+                ColorKind = ColorKind.Monochrome;
                 errors = true;
             }
 
@@ -528,13 +528,13 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the line kind.
             if (attributes.TryGetValue(lineKindLabel, out object kind)
-                && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
+                && Enum.TryParse<LineKind>((string)kind, out LineKind result))
             {
                 LineKind = result;
             }
             else
             {
-                LineKind = GameDrawer.LineKind.Solid;
+                LineKind = LineKind.Solid;
                 errors = true;
             }
 

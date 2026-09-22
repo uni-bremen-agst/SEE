@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestMonochromeBorderUsesPrimaryColorForSecondarySelection()
         {
             MindMapNodeConf configuration = CreateConfiguration();
-            configuration.BorderConf.ColorKind = GameDrawer.ColorKind.Monochrome;
+            configuration.BorderConf.ColorKind = ColorKind.Monochrome;
 
             ColorPickerMindMapMenu.Instance.Enable(configuration, false);
             FindButton("Border").clickEvent.Invoke();
@@ -127,7 +127,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     PrimaryColor = Color.red,
                     SecondaryColor = Color.blue,
-                    ColorKind = GameDrawer.ColorKind.Gradient
+                    ColorKind = ColorKind.Gradient
                 },
                 TextConf = new TextConf
                 {
@@ -139,7 +139,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     PrimaryColor = Color.magenta,
                     SecondaryColor = Color.cyan,
-                    ColorKind = GameDrawer.ColorKind.Gradient
+                    ColorKind = ColorKind.Gradient
                 }
             };
         }

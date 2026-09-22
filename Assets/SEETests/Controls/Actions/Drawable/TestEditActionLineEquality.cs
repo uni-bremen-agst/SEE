@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using System.Reflection;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Controls.Actions.Drawable
 {

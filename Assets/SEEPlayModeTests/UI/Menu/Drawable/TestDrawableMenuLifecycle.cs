@@ -224,7 +224,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 PrimaryColor = Color.red,
                 SecondaryColor = Color.blue,
-                ColorKind = GameDrawer.ColorKind.Monochrome,
+                ColorKind = ColorKind.Monochrome,
                 FillOutStatus = true,
                 FillOutColor = Color.green,
                 LineCapStart = LineCapConf.CreateNone(),

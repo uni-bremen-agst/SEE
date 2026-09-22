@@ -165,7 +165,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The requested line color.</returns>
         private static Color GetLineColor(LineConf conf, bool primaryColor)
         {
-            if (primaryColor || conf.ColorKind == GameDrawer.ColorKind.Monochrome)
+            if (primaryColor || conf.ColorKind == ColorKind.Monochrome)
             {
                 return conf.PrimaryColor;
             }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {

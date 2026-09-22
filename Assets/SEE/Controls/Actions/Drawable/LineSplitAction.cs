@@ -98,9 +98,9 @@ namespace SEE.Controls.Actions.Drawable
                 ValueHolder.LineSplitMarkerRadius, ValueHolder.LineSplitMarkerVertices);
             /// Creates the marker polygon.
             GameObject point = GameDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
-                GameDrawer.ColorKind.Monochrome,
+                ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
-                false, GameDrawer.LineKind.Solid, 1f, increaseCurrentOrder: false);
+                false, LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
             GameDrawer.SetPivotShape(point, position);
             /// Adds the point on all clients.
@@ -116,9 +116,9 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Delivers the color for the complementary color calculation.
-        /// For <see cref="GameDrawer.ColorKind.Monochrome"/>, it is the normal line color.
-        /// For <see cref="GameDrawer.ColorKind.Gradient"/>, it is a mix of the start and the end color.
-        /// For <see cref="GameDrawer.ColorKind.TwoDashed"/>, it is a mix of the two material colors.
+        /// For <see cref="ColorKind.Monochrome"/>, it is the normal line color.
+        /// For <see cref="ColorKind.Gradient"/>, it is a mix of the start and the end color.
+        /// For <see cref="ColorKind.TwoDashed"/>, it is a mix of the two material colors.
         /// </summary>
         /// <param name="line">The split line.</param>
         /// <returns>The color for the complementary color calculation.</returns>
@@ -129,13 +129,13 @@ namespace SEE.Controls.Actions.Drawable
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             switch (holder.ColorKind)
             {
-                case GameDrawer.ColorKind.Monochrome:
+                case ColorKind.Monochrome:
                     color = line.GetColor();
                     break;
-                case GameDrawer.ColorKind.Gradient:
+                case ColorKind.Gradient:
                     color = (renderer.startColor + renderer.endColor) / 2;
                     break;
-                case GameDrawer.ColorKind.TwoDashed:
+                case ColorKind.TwoDashed:
                     color = (renderer.materials[0].color + renderer.materials[1].color) / 2;
                     break;
             }

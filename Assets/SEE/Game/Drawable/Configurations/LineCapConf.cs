@@ -4,7 +4,6 @@ using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -304,7 +303,7 @@ namespace SEE.Game.Drawable.Configurations
                 return CreateNone();
             }
 
-            List<GameObject> caps = GetLineCapObjects(line, startCap);
+            List<GameObject> caps = GameDrawer.GetLineCapObjects(line, startCap);
             if (caps.Count == 0)
             {
                 return CreateNone();

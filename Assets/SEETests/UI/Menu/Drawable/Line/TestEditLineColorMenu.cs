@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using static SEE.Game.Drawable.GameDrawer;
+using SEE.Game.Drawable;
 
 namespace SEE.UI.Menu.Drawable.Line
 {

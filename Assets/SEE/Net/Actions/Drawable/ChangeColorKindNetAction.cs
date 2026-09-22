@@ -14,7 +14,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The new color kind for the line.
         /// </summary>
-        public GameDrawer.ColorKind ColorKind;
+        public ColorKind ColorKind;
 
         /// <summary>
         /// The line configuration.
@@ -29,7 +29,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="line">The configuration of the line that should be changed.</param>
         /// <param name="colorKind">The new color kind for the line.</param>
         public ChangeColorKindNetAction(string drawableID, string parentDrawableID, LineConf line,
-            GameDrawer.ColorKind colorKind)
+            ColorKind colorKind)
             : base(drawableID, parentDrawableID)
         {
             Line = line;

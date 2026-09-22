@@ -10,12 +10,12 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// The line kind property.
         /// </summary>
-        public GameDrawer.LineKind LineKind { get; set; }
+        public LineKind LineKind { get; set; }
 
         /// <summary>
         /// The color kind property.
         /// </summary>
-        public GameDrawer.ColorKind ColorKind { get; set; }
+        public ColorKind ColorKind { get; set; }
 
         /// <summary>
         /// True if this line was created by the freehand drawing action.

@@ -70,7 +70,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestMonochromeLineUsesPrimaryColorForSecondarySelection()
         {
             LineConf configuration = CreateConfigurationWithoutCaps();
-            configuration.ColorKind = GameDrawer.ColorKind.Monochrome;
+            configuration.ColorKind = ColorKind.Monochrome;
 
             ColorPickerLineMenu.Instance.BeginSelection(configuration, false);
 
@@ -85,7 +85,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestMonochromeFilledLineOffersFillOutColor()
         {
             LineConf configuration = CreateConfigurationWithoutCaps();
-            configuration.ColorKind = GameDrawer.ColorKind.Monochrome;
+            configuration.ColorKind = ColorKind.Monochrome;
             configuration.FillOutStatus = true;
 
             ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
@@ -332,7 +332,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 PrimaryColor = Color.red,
                 SecondaryColor = Color.blue,
-                ColorKind = GameDrawer.ColorKind.Gradient,
+                ColorKind = ColorKind.Gradient,
                 FillOutStatus = false,
                 FillOutColor = Color.green,
                 LineCapStart = LineCapConf.CreateNone(),
@@ -351,7 +351,7 @@ namespace SEE.UI.Menu.Drawable
             configuration.LineCapStart = new LineCapConf
             {
                 CapKind = LineCapPointsCalculator.LineCap.Arrowhead,
-                ColorKind = GameDrawer.ColorKind.Gradient,
+                ColorKind = ColorKind.Gradient,
                 PrimaryColor = Color.magenta,
                 SecondaryColor = Color.cyan,
                 FillOutStatus = false,
@@ -362,7 +362,7 @@ namespace SEE.UI.Menu.Drawable
             configuration.LineCapEnd = new LineCapConf
             {
                 CapKind = LineCapPointsCalculator.LineCap.Arrow,
-                ColorKind = GameDrawer.ColorKind.Gradient,
+                ColorKind = ColorKind.Gradient,
                 PrimaryColor = Color.black,
                 SecondaryColor = Color.white,
                 FillOutStatus = false,

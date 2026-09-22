@@ -263,7 +263,7 @@ namespace SEE.UI.Menu.Drawable
         {
             EnsureMenu();
 
-            bool hasSecondaryColor = conf.ColorKind != GameDrawer.ColorKind.Monochrome;
+            bool hasSecondaryColor = conf.ColorKind != ColorKind.Monochrome;
 
             ConfigureButton(
                 "Primary",
@@ -371,7 +371,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The requested visible color.</returns>
         private static Color GetRequestedColor(ILineVisualConf conf, bool primaryColor)
         {
-            if (primaryColor || conf.ColorKind == GameDrawer.ColorKind.Monochrome)
+            if (primaryColor || conf.ColorKind == ColorKind.Monochrome)
             {
                 return conf.PrimaryColor;
             }
