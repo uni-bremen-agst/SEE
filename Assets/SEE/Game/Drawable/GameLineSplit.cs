@@ -225,10 +225,10 @@ namespace SEE.Game.Drawable
 
             GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);
 
-            GameDrawer.ChangePivot(newLine);
+            GameLineGeometry.ChangePivot(newLine);
 
             LineConf pivotAdjustedLine = LineConf.GetLine(newLine);
-            GameDrawer.UpdateOriginalAnchors(newLine, pivotAdjustedLine.RendererPositions);
+            GameLineGeometry.UpdateOriginalAnchors(newLine, pivotAdjustedLine.RendererPositions);
             pivotAdjustedLine = LineConf.GetLine(newLine);
 
             pivotAdjustedLine.LineCapStart = startCap;

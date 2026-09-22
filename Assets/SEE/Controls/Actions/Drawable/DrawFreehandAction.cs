@@ -2,7 +2,6 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Menu.Drawable;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -189,8 +188,8 @@ namespace SEE.Controls.Actions.Drawable
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
             Vector3 nPos = new(newPosition.x, newPosition.y, 0);
-            if (nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been
-                                          // executed (because of GameDrawer.UpdateZPositions()).
+            if (nPos != positions.Last()) /// This query is required if <see cref="GameDrawer.Drawing"/> has already been
+                                          /// executed (because of <see cref="GameLineGeometry.UpdateOriginalAnchors"/>).
             {
                 /// Add newPosition to the line renderer and and start drawing over the network.
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -219,10 +218,10 @@ namespace SEE.Controls.Actions.Drawable
 
             if (progressState == ProgressState.FinishDrawing)
             {
-                if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
+                if (GameLineGeometry.DifferentMeshVerticesCounter(line) >= 3)
                 {
                     finishDrawing = true;
-                    line = GameDrawer.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
+                    line = GameLineGeometry.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(Surface, currentLine);
                     new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name,

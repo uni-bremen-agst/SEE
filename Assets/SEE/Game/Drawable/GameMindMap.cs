@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable
 {
@@ -195,15 +194,15 @@ namespace SEE.Game.Drawable
                     break;
             }
             /// Convert the hit point to a local position of the drawable.
-            Vector3 convertedHitPoint = GetConvertedPosition(surface, position);
+            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(surface, position);
             /// Gets the shape positions.
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
             /// Draws the border.
-            shape = DrawLine(surface, "", positions, ColorKind.Monochrome,
+            shape = GameDrawer.DrawLine(surface, "", positions, ColorKind.Monochrome,
                         lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
                         lineKind, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
             /// Sets the pivot to the middle.
-            shape = SetPivotShape(shape, convertedHitPoint);
+            shape = GameLineGeometry.SetPivotShape(shape, convertedHitPoint);
             return shape;
         }
 
@@ -246,7 +245,7 @@ namespace SEE.Game.Drawable
                 /// Gets the new border positions.
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
                 /// Re-draws the border.
-                Drawing(node.FindDescendantWithTag(Tags.Line), positions);
+                GameDrawer.Drawing(node.FindDescendantWithTag(Tags.Line), positions);
                 /// Renew the size of the BoxCollider.
                 ChangeBoxSize(node);
                 /// Re-draws the branch lines, because changes to the border might necessitate adjustments.
@@ -384,7 +383,7 @@ namespace SEE.Game.Drawable
                 name = ValueHolder.MindMapBranchLine + "-" + GetIDofName(parent.name) + "-" + GetIDofName(child.name);
             }
             /// Creates the branch line.
-            GameObject branchLine = DrawLine(surface, name, positions, ColorKind.Monochrome,
+            GameObject branchLine = GameDrawer.DrawLine(surface, name, positions, ColorKind.Monochrome,
                         Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
                         LineKind.Solid, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
 
@@ -660,7 +659,7 @@ namespace SEE.Game.Drawable
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
 
                 /// Refreshes the border line.
-                Drawing(nodeBorder, positions);
+                GameDrawer.Drawing(nodeBorder, positions);
 
                 /// Renew the size of the BoxCollider.
                 ChangeBoxSize(node);
@@ -819,7 +818,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Restores the border.
-            GameObject border = ReDrawLine(surface, borderConf);
+            GameObject border = GameDrawer.ReDrawLine(surface, borderConf);
 
             /// Restores the text and sets the order.
             textConf.OrderInLayer = order;

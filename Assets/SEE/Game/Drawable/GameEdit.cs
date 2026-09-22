@@ -28,7 +28,7 @@ namespace SEE.Game.Drawable
                 LineRenderer renderer = shape.GetComponent<LineRenderer>();
                 renderer.startWidth = thickness;
                 renderer.endWidth = thickness;
-                GameDrawer.RefreshCollider(shape);
+                GameLineGeometry.RefreshCollider(shape);
             }
         }
 
@@ -43,7 +43,7 @@ namespace SEE.Game.Drawable
             {
                 LineRenderer renderer = line.GetComponent<LineRenderer>();
                 renderer.loop = loop;
-                GameDrawer.RefreshCollider(line);
+                GameLineGeometry.RefreshCollider(line);
             }
         }
 

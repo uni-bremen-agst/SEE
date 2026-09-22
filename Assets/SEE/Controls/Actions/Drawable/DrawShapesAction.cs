@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -207,7 +206,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && LineMenu.GetFillOutColorForDrawing() != null
-                    && GameDrawer.DifferentPositionCounter(Shape) < 3)
+                    && GameLineGeometry.DifferentPositionCounter(Shape) < 3)
                 {
                     needRefreshEditMode = true;
                 }
@@ -215,7 +214,7 @@ namespace SEE.Controls.Actions.Drawable
                 ShapeMenu.OpenLineMenuInCorrectMode();
                 RegisterLinePreviewFillOutCallbacks();
             }
-            else if (needRefreshEditMode && GameDrawer.DifferentPositionCounter(Shape) > 2)
+            else if (needRefreshEditMode && GameLineGeometry.DifferentPositionCounter(Shape) > 2)
             {
                 needRefreshEditMode = false;
                 ShapeMenu.OpenLineMenuInCorrectMode();
@@ -346,7 +345,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             GameDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
-            Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
+            Shape = GameLineGeometry.SetPivot(Shape, shapeFillOut);
             LineConf finalShape = ApplyLineCaps(LineConf.GetLine(Shape));
             memento = new Memento(Surface, finalShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, finalShape).Execute();
@@ -570,11 +569,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whatever the state of the shape creation is completed.</returns>
         private bool DrawShape(Vector3 convertedHitPoint)
         {
-            if (GameDrawer.DifferentPositionCounter(positions) > 1)
+            if (GameLineGeometry.DifferentPositionCounter(positions) > 1)
             {
                 BlinkEffect.Deactivate(Shape);
                 LineConf currentShape = LineConf.GetLine(Shape);
-                Shape = GameDrawer.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape), true);
+                Shape = GameLineGeometry.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape), true);
                 shapePreview = shapePreviewFix = false;
                 currentShape = LineConf.GetLine(Shape);
                 memento = new Memento(Surface, currentShape);
@@ -818,7 +817,7 @@ namespace SEE.Controls.Actions.Drawable
                 newPosition.z = 0;
                 newPositions[^1] = newPosition;
                 currentPreviewPositions = newPositions;
-                if (GameDrawer.DifferentPositionCounter(newPositions) > 2)
+                if (GameLineGeometry.DifferentPositionCounter(newPositions) > 2)
                 {
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
                     GameDrawer.Drawing(Shape, newPositions, shapeFillOut);
@@ -976,7 +975,7 @@ namespace SEE.Controls.Actions.Drawable
                 return;
             }
 
-            GameDrawer.UpdateOriginalAnchors(Shape, previewPositions);
+            GameLineGeometry.UpdateOriginalAnchors(Shape, previewPositions);
 
             LineConf currentShape = LineConf.GetLine(Shape);
             if (currentShape == null)
@@ -1105,7 +1104,7 @@ namespace SEE.Controls.Actions.Drawable
                     : null;
 
             LineCapConf capConf =
-                CreateLineCapConf(currentShapeConf, reusableCapConf, actualCap);
+                GameDrawer.CreateLineCapConf(currentShapeConf, reusableCapConf, actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);
             return capConf;

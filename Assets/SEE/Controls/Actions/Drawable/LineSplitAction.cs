@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions.Drawable
                 negativColor, negativColor, 0.01f,
                 false, LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
-            GameDrawer.SetPivotShape(point, position);
+            GameLineGeometry.SetPivotShape(point, position);
             /// Adds the point on all clients.
             new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), LineConf.GetLine(point)).Execute();
             /// Adds a blink effect.

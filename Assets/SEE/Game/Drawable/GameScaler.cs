@@ -26,7 +26,7 @@ namespace SEE.Game.Drawable
             /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {
-                GameDrawer.RefreshCollider(objectToScale);
+                GameLineGeometry.RefreshCollider(objectToScale);
             }
             return newScale;
         }
@@ -45,7 +45,7 @@ namespace SEE.Game.Drawable
             /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {
-                GameDrawer.RefreshCollider(objectToScale);
+                GameLineGeometry.RefreshCollider(objectToScale);
             }
         }
     }

@@ -27,7 +27,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </returns>
         public static Vector3[] GetSafeOriginalPositions(GameObject line)
         {
-            Vector3[] originalPositions = GameDrawer.GetOriginalLinePositions(line);
+            Vector3[] originalPositions = GameLineGeometry.GetOriginalLinePositions(line);
 
             if (originalPositions == null)
             {
