@@ -155,23 +155,20 @@ namespace SEE.GraphProviders.VCS
             /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
             HashSet<string> files = gitSession.AllFiles(commitID, token);
-
             changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
-
             token.ThrowIfCancellationRequested();
-
-            changePercentage?.Invoke(0.6f);
+            changePercentage?.Invoke(0.5f);
 
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
-
             Matcher matcher = repository.VCSFilter?.Matcher;
             gitSession.ForEachCommitBetween(baselineCommitID, commitID, UpdateMetricsForCommit);
+            token.ThrowIfCancellationRequested();
+            changePercentage?.Invoke(0.7f);
 
             Finalize(graph, simplifyGraph, gitSession, repositoryName, fileToMetrics);
-
             changePercentage?.Invoke(1f);
             return graph;
 
@@ -258,8 +255,10 @@ namespace SEE.GraphProviders.VCS
             /// The difference is that we consider all relevant files passing the repository
             /// filter and all commits after <paramref name="startDate"/>.
 
+            Performance p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: collect files");
             using GitRepositorySession gitSession = repositoryConfiguration.OpenGitSession();
             HashSet<string> files = gitSession.AllFiles(token);
+            p.End(true);
             if (files.Count == 0)
             {
                 Debug.LogWarning("No files were matched.\n");
@@ -268,15 +267,21 @@ namespace SEE.GraphProviders.VCS
             }
             changePercentage?.Invoke(0.3f);
 
+            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: prepare metrics");
             FileToMetrics fileToMetrics = Prepare(graph, files);
-
+            p.End(true);
+            changePercentage?.Invoke(0.5f);
             token.ThrowIfCancellationRequested();
 
+            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: update metrics");
             Matcher filterMatcher = repositoryConfiguration.VCSFilter?.Matcher;
             gitSession.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
+            p.End(true);
             changePercentage?.Invoke(0.6f);
 
+            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: finalize");
             Finalize(graph, simplifyGraph, gitSession, repositoryName, fileToMetrics);
+            p.End(true);
             changePercentage?.Invoke(1f);
 
             void UpdateMetricsForCommit(Repository repo, Commit commit)
@@ -419,7 +424,6 @@ namespace SEE.GraphProviders.VCS
                 // There may in fact be multiple parents.
                 foreach (Commit parent in commit.Parents)
                 {
-
                     if (gitSession.HasRelevantChanges(parent, commit, matcher, out IEnumerable<string> filePaths))
                     {
                         using Patch patch = gitSession.Diff(parent, commit, filePaths);
@@ -440,20 +444,21 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Retrieves the token stream for given file content from its repository and commit ID.
+        /// The programming language is guessed based on the file extension. If the file extension is not supported,
+        /// an empty token stream is returned.
         /// </summary>
         /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
         /// in the syntax of the repository regarding the directory separator.</param>
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
-        /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        private static ICollection<AntlrToken> RetrieveTokens
-            (string repositoryFilePath,
-             GitRepositorySession repositorySession,
-             AntlrLanguage language)
+        private static IEnumerable<AntlrToken> RetrieveTokens
+                                                 (string repositoryFilePath,
+                                                  GitRepositorySession repositorySession)
         {
             try
             {
-                return AntlrToken.FromString(repositorySession.GetFileContent(repositoryFilePath), language);
+                AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
+                return AntlrToken.FromStream(repositorySession.GetStream(repositoryFilePath), language);
             }
             catch (Exception e)
             {
@@ -478,33 +483,41 @@ namespace SEE.GraphProviders.VCS
                 if (node.Type == DataModel.DG.NodeTypes.File)
                 {
                     string repositoryFilePath = node.ID;
-                    AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
-                    if (language != AntlrLanguage.Plain)
+                    if (AntlrLanguage.HasLexer(Filenames.Extension(repositoryFilePath)))
                     {
-                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
-                        TokenMetrics.Gather(tokens,
-                                            out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
-                                            out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
+                        AntlrLanguage language = AntlrLanguage.FromFileExtension(Filenames.Extension(repositoryFilePath));
+                        if (language != AntlrLanguage.Plain)
+                        {
+                            //ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
+                            IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession);
+                            TokenMetrics.Gather(tokens,
+                                                out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
+                                                out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
 
 
-                        node.SetInt(Metrics.LOC, lineMetrics.LOC);
-                        node.SetInt(Metrics.Comments, lineMetrics.Comments);
-                        node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
+                            node.SetInt(Metrics.LOC, lineMetrics.LOC);
+                            node.SetInt(Metrics.Comments, lineMetrics.Comments);
+                            node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
 
-                        node.SetInt(Metrics.McCabe, mccabeComplexity);
+                            node.SetInt(Metrics.McCabe, mccabeComplexity);
 
-                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
-                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
-                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
-                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
-                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
-                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
-                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
-                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
-                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
-                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
+                            node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                            node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                            node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                            node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                            node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                            node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                            node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                            node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                            node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                            node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                            node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                            node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"File {repositoryFilePath} has no supported lexer for file extension {Filenames.Extension(repositoryFilePath)}. No code metrics will be calculated for this file.\n");
                     }
                 }
             }
