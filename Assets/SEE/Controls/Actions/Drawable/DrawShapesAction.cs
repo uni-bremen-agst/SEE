@@ -1043,7 +1043,7 @@ namespace SEE.Controls.Actions.Drawable
                 currentShapeConf.LineKind,
                 ValueHolder.CurrentLineKind);
 
-            ChangeLineKind(Shape, lineKind, currentShapeConf.Tiling);
+            GameLineAppearance.ChangeLineKind(Shape, lineKind, currentShapeConf.Tiling);
             currentShapeConf.LineKind = lineKind;
 
             if (hasReference && sendLineKindChange)

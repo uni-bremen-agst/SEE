@@ -624,9 +624,9 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
                         GameEdit.ChangeFontSize(nodeText, 1.0f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
-                        GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
-                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
+                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Subtheme"/>.
@@ -634,9 +634,9 @@ namespace SEE.Game.Drawable
                         /// Change the node appearance to the appearance of a Subtheme.
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
-                        GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
-                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
+                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Leaf"/>.
@@ -645,9 +645,9 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.5f);
-                        ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
-                        GameEdit.ChangePrimaryColor(nodeBorder, Color.clear);
-                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.clear);
+                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
+                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.clear);
+                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.clear);
                         break;
                 }
                 /// Changes the prefix of the node.

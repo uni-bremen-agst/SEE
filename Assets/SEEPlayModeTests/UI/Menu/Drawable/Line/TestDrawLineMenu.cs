@@ -3,7 +3,6 @@ using SEE.Game.Drawable;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -133,9 +132,9 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             yield return OpenDrawingMenu();
 
-            int dashedIndex = GetLineKinds().IndexOf(LineKind.Dashed);
-            int solidIndex = GetLineKinds().IndexOf(LineKind.Solid);
-            int twoDashedIndex = GetColorKinds(true).IndexOf(ColorKind.TwoDashed);
+            int dashedIndex = GameLineAppearance.GetLineKinds().IndexOf(LineKind.Dashed);
+            int solidIndex = GameLineAppearance.GetLineKinds().IndexOf(LineKind.Solid);
+            int twoDashedIndex = GameLineAppearance.GetColorKinds(true).IndexOf(ColorKind.TwoDashed);
 
             Assert.That(dashedIndex, Is.GreaterThanOrEqualTo(0));
             Assert.That(solidIndex, Is.GreaterThanOrEqualTo(0));
@@ -176,7 +175,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             yield return OpenDrawingMenu();
 
-            int gradientIndex = GetColorKinds(true).IndexOf(ColorKind.Gradient);
+            int gradientIndex = GameLineAppearance.GetColorKinds(true).IndexOf(ColorKind.Gradient);
 
             Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
 
@@ -343,8 +342,8 @@ namespace SEE.UI.Menu.Drawable.Line
 
             yield return OpenDrawingMenu();
 
-            int dashedIndex = GetLineKinds().IndexOf(LineKind.Dashed);
-            int gradientIndex = GetColorKinds(true).IndexOf(ColorKind.Gradient);
+            int dashedIndex = GameLineAppearance.GetLineKinds().IndexOf(LineKind.Dashed);
+            int gradientIndex = GameLineAppearance.GetColorKinds(true).IndexOf(ColorKind.Gradient);
 
             Assert.That(controls.LineKindSelector.index, Is.EqualTo(dashedIndex));
             Assert.That(controls.ColorKindSelector.index, Is.EqualTo(gradientIndex));

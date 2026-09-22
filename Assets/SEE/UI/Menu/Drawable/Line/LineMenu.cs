@@ -5,7 +5,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.Drawable.GameDrawer;
 using Random = UnityEngine.Random;
 
 namespace SEE.UI.Menu.Drawable.Line
@@ -167,14 +166,14 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             HorizontalSelector selector = controls.LineKindSelector;
 
-            foreach (LineKind kind in GetLineKinds())
+            foreach (LineKind kind in GameLineAppearance.GetLineKinds())
             {
                 selector.CreateNewItem(kind.ToString());
             }
 
             selector.selectorEvent.AddListener(index =>
             {
-                if (GetLineKinds()[index] == LineKind.Dashed)
+                if (GameLineAppearance.GetLineKinds()[index] == LineKind.Dashed)
                 {
                     EnableTilingFromLineMenu();
                 }
@@ -183,7 +182,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     DisableTilingFromLineMenu();
                 }
 
-                if (GetLineKinds()[index] == LineKind.Solid
+                if (GameLineAppearance.GetLineKinds()[index] == LineKind.Solid
                     && selectedColorKind == ColorKind.TwoDashed)
                 {
                     AssignColorKind(ColorKind.Monochrome);
@@ -194,7 +193,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     controls.ColorKindSelector.UpdateUI();
                 }
 
-                AssignLineKind(GetLineKinds()[index]);
+                AssignLineKind(GameLineAppearance.GetLineKinds()[index]);
             });
 
             selector.defaultIndex = 0;
@@ -207,7 +206,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             HorizontalSelector selector = controls.ColorKindSelector;
 
-            foreach (ColorKind kind in GetColorKinds(true))
+            foreach (ColorKind kind in GameLineAppearance.GetColorKinds(true))
             {
                 selector.CreateNewItem(kind.ToString());
             }
@@ -215,7 +214,7 @@ namespace SEE.UI.Menu.Drawable.Line
             selector.selectorEvent.AddListener(index =>
             {
                 bool isDashed = selectedLineKind != LineKind.Solid;
-                ColorKind newColorKind = GetColorKinds(true)[index];
+                ColorKind newColorKind = GameLineAppearance.GetColorKinds(true)[index];
 
                 if (!isDashed && newColorKind == ColorKind.TwoDashed)
                 {
@@ -508,7 +507,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <returns>The index of the selected line kind.</returns>
         private int GetIndexOfSelectedLineKind()
         {
-            return GetLineKinds().IndexOf(selectedLineKind);
+            return GameLineAppearance.GetLineKinds().IndexOf(selectedLineKind);
         }
 
         /// <summary>
@@ -558,7 +557,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <returns>Index of selected color kind.</returns>
         private int GetIndexOfSelectedColorKind()
         {
-            return GetColorKinds(true).IndexOf(selectedColorKind);
+            return GameLineAppearance.GetColorKinds(true).IndexOf(selectedColorKind);
         }
 
         /// <summary>

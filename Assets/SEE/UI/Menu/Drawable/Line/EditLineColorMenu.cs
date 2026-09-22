@@ -7,7 +7,6 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -123,7 +122,7 @@ namespace SEE.UI.Menu.Drawable.Line
             assignColorKind(lineHolder.ColorKind);
 
             controls.ColorKindSelector.index =
-                GetColorKinds(true).IndexOf(getSelectedColorKind());
+                GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
             controls.ColorKindSelector.UpdateUI();
 
             if (colorKindAction != null)
@@ -147,7 +146,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     return;
                 }
 
-                ColorKind requestedKind = GetColorKinds(true)[index];
+                ColorKind requestedKind = GameLineAppearance.GetColorKinds(true)[index];
 
                 ColorKind newKind = GetValidColorKind(
                     requestedKind,
@@ -161,7 +160,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 controls.ColorKindSelector.label.text = newKind.ToString();
                 controls.ColorKindSelector.index =
-                    GetColorKinds(true).IndexOf(newKind);
+                    GameLineAppearance.GetColorKinds(true).IndexOf(newKind);
 
                 visualConf.ColorKind = newKind;
 
@@ -181,7 +180,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 if (IsMainSegment)
                 {
-                    ChangeColorKind(
+                    GameLineAppearance.ChangeColorKind(
                         selectedLine,
                         lineHolder.ColorKind,
                         lineHolder);
@@ -366,9 +365,9 @@ namespace SEE.UI.Menu.Drawable.Line
                 if (IsMainSegment)
                 {
                     if (lineHolder.FillOutStatus
-                        && GetOwnFillOutObject(selectedLine) == null)
+                        && GameDrawer.GetOwnFillOutObject(selectedLine) == null)
                     {
-                        if (FillOut(selectedLine, lineHolder.FillOutColor))
+                        if (GameDrawer.FillOut(selectedLine, lineHolder.FillOutColor))
                         {
                             new DrawingFillOutNetAction(
                                 surface.name,
@@ -447,7 +446,7 @@ namespace SEE.UI.Menu.Drawable.Line
                         lineHolder.FillOutColor = lineHolder.PrimaryColor;
                     }
 
-                    if (FillOut(selectedLine, lineHolder.FillOutColor))
+                    if (GameDrawer.FillOut(selectedLine, lineHolder.FillOutColor))
                     {
                         new DrawingFillOutNetAction(
                             surface.name,
@@ -517,7 +516,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     BlinkEffect.RemoveFillOutFromEffect(selectedLine);
 
-                    GameObject mainFillOut = GetOwnFillOutObject(selectedLine);
+                    GameObject mainFillOut = GameDrawer.GetOwnFillOutObject(selectedLine);
                     if (mainFillOut != null)
                     {
                         UnityEngine.Object.DestroyImmediate(mainFillOut);
@@ -578,7 +577,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 controls.FillOutManager.isOn = true;
 
-                if (FillOut(DrawShapesAction.currentShape, fillOut))
+                if (GameDrawer.FillOut(DrawShapesAction.currentShape, fillOut))
                 {
                     GameObject surface =
                         GameFinder.GetDrawableSurface(DrawShapesAction.currentShape);
@@ -628,7 +627,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 AssignColorArea(color =>
                 {
-                    GameEdit.ChangePrimaryColor(selectedLine, color);
+                    GameLineAppearance.ChangePrimaryColor(selectedLine, color);
                     lineHolder.PrimaryColor = color;
 
                     new EditLinePrimaryColorNetAction(
@@ -700,7 +699,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 AssignColorArea(color =>
                 {
-                    GameEdit.ChangeSecondaryColor(selectedLine, color);
+                    GameLineAppearance.ChangeSecondaryColor(selectedLine, color);
                     lineHolder.SecondaryColor = color;
 
                     new EditLineSecondaryColorNetAction(
@@ -914,7 +913,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void RefreshColorKindSelectorUI()
         {
             controls.ColorKindSelector.index =
-                GetColorKinds(true).IndexOf(getSelectedColorKind());
+                GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
             controls.ColorKindSelector.UpdateUI();
         }
 

@@ -48,59 +48,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method changes the primary color of a shape.
-        /// </summary>
-        /// <param name="shape">The shape whose color should be changed.</param>
-        /// <param name="color">The new color.</param>
-        public static void ChangePrimaryColor(GameObject shape, Color color)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                LineRenderer renderer = shape.GetComponent<LineRenderer>();
-                switch (shape.GetComponent<LineValueHolder>().ColorKind)
-                {
-                    case ColorKind.Monochrome:
-                        renderer.startColor = renderer.endColor = Color.white;
-                        renderer.material.color = color;
-                        break;
-                    case ColorKind.Gradient:
-                        renderer.material.color = Color.white;
-                        renderer.startColor = color;
-                        break;
-                    case ColorKind.TwoDashed:
-                        renderer.material.color = color;
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method changes the secondary color of a shape.
-        /// </summary>
-        /// <param name="shape">The shape whose color should be changed.</param>
-        /// <param name="color">The new color.</param>
-        public static void ChangeSecondaryColor(GameObject shape, Color color)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                LineRenderer renderer = shape.GetComponent<LineRenderer>();
-                switch (shape.GetComponent<LineValueHolder>().ColorKind)
-                {
-                    case ColorKind.Gradient:
-                        renderer.material.color = Color.white;
-                        renderer.endColor = color;
-                        break;
-                    case ColorKind.TwoDashed:
-                        renderer.materials[1].color = color;
-                        break;
-                    case ColorKind.Monochrome:
-                        renderer.startColor = renderer.endColor = Color.white;
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
         /// Changes the fill out object.
         /// </summary>
         /// <param name="shape">The shape object.</param>
@@ -262,10 +209,10 @@ namespace SEE.Game.Drawable
             foreach (GameObject capGO in caps)
             {
                 ChangeThickness(capGO, capConf.Thickness);
-                GameDrawer.ChangeColorKind(capGO, capConf.ColorKind, capConf);
-                GameDrawer.ChangeLineKind(capGO, capConf.LineKind, capConf.Tiling);
-                ChangePrimaryColor(capGO, capConf.PrimaryColor);
-                ChangeSecondaryColor(capGO, capConf.SecondaryColor);
+                GameLineAppearance.ChangeColorKind(capGO, capConf.ColorKind, capConf);
+                GameLineAppearance.ChangeLineKind(capGO, capConf.LineKind, capConf.Tiling);
+                GameLineAppearance.ChangePrimaryColor(capGO, capConf.PrimaryColor);
+                GameLineAppearance.ChangeSecondaryColor(capGO, capConf.SecondaryColor);
                 ChangeFillOut(capGO, capConf.FillOutStatus, capConf.FillOutColor);
                 ChangeFillOutColor(capGO, capConf.FillOutColor);
             }
@@ -282,13 +229,13 @@ namespace SEE.Game.Drawable
             {
                 ChangeThickness(lineObj, line.Thickness);
                 ChangeLayer(lineObj, line.OrderInLayer);
-                GameDrawer.ChangeColorKind(lineObj, line.ColorKind, line);
-                ChangePrimaryColor(lineObj, line.PrimaryColor);
-                ChangeSecondaryColor(lineObj, line.SecondaryColor);
+                GameLineAppearance.ChangeColorKind(lineObj, line.ColorKind, line);
+                GameLineAppearance.ChangePrimaryColor(lineObj, line.PrimaryColor);
+                GameLineAppearance.ChangeSecondaryColor(lineObj, line.SecondaryColor);
                 ChangeFillOut(lineObj, line.FillOutStatus, line.FillOutColor);
                 ChangeFillOutColor(lineObj, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
-                GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
+                GameLineAppearance.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
                 ChangeLineCaps(lineObj, line, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
                 ChangeLineCapStyle(lineObj, true, line.LineCapStart);
                 ChangeLineCapStyle(lineObj, false, line.LineCapEnd);

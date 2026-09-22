@@ -5,7 +5,6 @@ using SEE.Net.Actions.Drawable;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -104,7 +103,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             assignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
 
-            controls.LineKindSelector.index = GetLineKinds().IndexOf(getSelectedLineKind());
+            controls.LineKindSelector.index = GameLineAppearance.GetLineKinds().IndexOf(getSelectedLineKind());
             controls.LineKindSelector.UpdateUI();
 
             if (lineKindAction != null)
@@ -119,12 +118,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     return;
                 }
 
-                LineKind newKind = GetLineKinds()[index];
-
-                if (newKind == LineKind.Dashed)
-                {
-                    return;
-                }
+                LineKind newKind = GameLineAppearance.GetLineKinds()[index];
 
                 if (IsMainSegment)
                 {
@@ -135,7 +129,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     {
                         lineHolder.ColorKind = ColorKind.Monochrome;
 
-                        ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
+                        GameLineAppearance.ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
 
                         new ChangeColorKindNetAction(
                             surface.name,
@@ -146,7 +140,7 @@ namespace SEE.UI.Menu.Drawable.Line
                         selectPrimaryColor?.Invoke();
                     }
 
-                    ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
+                    GameLineAppearance.ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
 
                     new ChangeLineKindNetAction(
                         surface.name,
@@ -204,7 +198,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     lineHolder.LineKind = LineKind.Dashed;
                     lineHolder.Tiling = tiling;
 
-                    ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
+                    GameLineAppearance.ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
 
                     new ChangeLineKindNetAction(
                         surface.name,
@@ -381,7 +375,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void RefreshLineKindSelectorUI()
         {
-            controls.LineKindSelector.index = GetLineKinds().IndexOf(getSelectedLineKind());
+            controls.LineKindSelector.index = GameLineAppearance.GetLineKinds().IndexOf(getSelectedLineKind());
             controls.LineKindSelector.UpdateUI();
         }
     }

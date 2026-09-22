@@ -43,7 +43,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameDrawer.ChangeColorKind(FindChild(Line.ID), ColorKind, Line);
+            GameLineAppearance.ChangeColorKind(FindChild(Line.ID), ColorKind, Line);
         }
     }
 }

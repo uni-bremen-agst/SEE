@@ -49,7 +49,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameDrawer.ChangeLineKind(FindChild(LineName), LineKind, Tiling);
+            GameLineAppearance.ChangeLineKind(FindChild(LineName), LineKind, Tiling);
         }
     }
 }

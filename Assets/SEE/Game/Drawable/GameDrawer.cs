@@ -1,7 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
-using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -17,36 +16,6 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class GameDrawer
     {
-        #region Line Style Options
-        /// <summary>
-        /// Gets a list with the color kinds.
-        /// If <paramref name="isDashedLineKind"/> is true, the list contains <see cref="ColorKind.TwoDashed"/>.
-        /// Otherwise, the list only contains <see cref="ColorKind.Monochrome"/> and <see cref="ColorKind.Gradient"/>.
-        /// </summary>
-        /// <param name="isDashedLineKind">Whether the line has a dashed line child.</param>
-        /// <returns>The color kind list depending on <paramref name="isDashedLineKind"/>.</returns>
-        public static IList<ColorKind> GetColorKinds(bool isDashedLineKind)
-        {
-            if (isDashedLineKind)
-            {
-                return Enum.GetValues(typeof(ColorKind)).Cast<ColorKind>().ToList();
-            }
-            else
-            {
-                return new List<ColorKind>() { ColorKind.Monochrome, ColorKind.Gradient };
-            }
-        }
-
-        /// <summary>
-        /// Gets a list with all the different line kinds.
-        /// </summary>
-        /// <returns>A list with all the line kinds.</returns>
-        public static IList<LineKind> GetLineKinds()
-        {
-            return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
-        }
-        #endregion
-
         #region Core Line Creation
         /// <summary>
         /// Sets up a line object based on the parameters.
@@ -111,7 +80,7 @@ namespace SEE.Game.Drawable
             /// Ensure that the line is represented in a flat (2D) manner.
             renderer.alignment = LineAlignment.TransformZ;
             /// Sets the correct material for the chosen line kind.
-            renderer.sharedMaterial = GetMaterial(primaryColor, lineKind);
+            renderer.sharedMaterial = GameLineAppearance.GetMaterial(primaryColor, lineKind);
             /// Adds the line value holder to the object and assign the color kind to it.
             line.AddComponent<LineValueHolder>().ColorKind = colorKind;
             /// Set the color(s) of the line depending on the chosen color kind.
@@ -127,7 +96,7 @@ namespace SEE.Game.Drawable
                 case ColorKind.TwoDashed:
                     Material[] materials = new Material[2];
                     materials[0] = renderer.materials[0];
-                    materials[1] = GetMaterial(Color.white, LineKind.Solid);
+                    materials[1] = GameLineAppearance.GetMaterial(Color.white, LineKind.Solid);
                     GetRenderer(line).materials = materials;
                     renderer.materials[1].color = secondaryColor;
                     break;
@@ -139,9 +108,9 @@ namespace SEE.Game.Drawable
                 line.AddComponent<LineAnchorValueHolder>();
             }
             /// Sets the texture mode of the renderer depending on the chosen line kind.
-            SetTextureMode(renderer, lineKind);
+            GameLineAppearance.SetTextureMode(renderer, lineKind);
             /// Sets the texture scale of the renderer depending on the chosen line kind.
-            SetRendererTextrueScale(renderer, lineKind, tiling);
+            GameLineAppearance.SetRendererTextureScale(renderer, lineKind, tiling);
             /// Sets the line thickness.
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
@@ -692,183 +661,6 @@ namespace SEE.Game.Drawable
         }
         #endregion
 
-        #region Line Appearance
-        /// <summary>
-        /// Changes the line kind of the given shape.
-        /// </summary>
-        /// <param name="shape">The shape whose line kind should be changed.</param>
-        /// <param name="lineKind">The new line kind.</param>
-        /// <param name="tiling">The tiling, if the new line kind is a dashed line kind.</param>
-        public static void ChangeLineKind(GameObject shape, LineKind lineKind, float tiling)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
-                LineRenderer renderer = GetRenderer(shape);
-                /// Changes the renderer material.
-                renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
-                /// Sets the correct texture mode for the renderer depending on the chosen line kind.
-                SetTextureMode(renderer, lineKind);
-                /// Sets the correct texture scale for the renderer depending on the chosen line kind.
-                SetRendererTextrueScale(renderer, lineKind, tiling);
-                /// Sets the new line kind to the line value holder.
-                holder.LineKind = lineKind;
-            }
-        }
-
-        /// <summary>
-        /// Changes the color kind of the given shape.
-        /// </summary>
-        /// <param name="shape">The shape whose color kind should be changed.</param>
-        /// <param name="colorKind">The new color kind for the shape.</param>
-        /// <param name="conf">The old shape configuration; will be needed for restore the colors.</param>
-        public static void ChangeColorKind(GameObject shape, ColorKind colorKind, ILineVisualConf conf)
-        {
-            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-            {
-                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
-                /// The initial color for deactivated color kinds is white.
-                /// If the new ColorKind is TwoDashed, another material must be
-                /// added to the line renderer for the second color.
-                if (colorKind == ColorKind.TwoDashed)
-                {
-                    GetRenderer(shape).startColor = Color.white;
-                    GetRenderer(shape).endColor = Color.white;
-                    if (GetRenderer(shape).materials.Length == 1)
-                    {
-                        Material[] materials = new Material[2];
-                        materials[0] = GetRenderer(shape).materials[0];
-                        materials[1] = GetMaterial(Color.white, LineKind.Solid);
-                        GetRenderer(shape).materials = materials;
-                    }
-                }
-                else
-                {
-                    /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>,
-                    /// then the additional material must be removed.
-                    if (GetRenderer(shape).materials.Length > 1)
-                    {
-                        Material[] materials = new Material[1];
-                        materials[0] = GetRenderer(shape).materials[0];
-                        GetRenderer(shape).materials = materials;
-                    }
-
-                    /// Block for initialing the initial color for the remaining <see cref="ColorKind"/>.
-                    if (colorKind == ColorKind.Gradient)
-                    {
-                        GetRenderer(shape).material.color = Color.white;
-                    }
-                    else
-                    {
-                        GetRenderer(shape).startColor = Color.white;
-                        GetRenderer(shape).endColor = Color.white;
-                    }
-                }
-                /// Updates the <see cref="LineValueHolder"/>.
-                holder.ColorKind = colorKind;
-
-                /// Restores the primary and secondary color of the line.
-                GameEdit.ChangePrimaryColor(shape, conf.PrimaryColor);
-                GameEdit.ChangeSecondaryColor(shape, conf.SecondaryColor);
-
-                /// If the secondary color is clear, use the primary.
-                /// It prevents it from looking like a part of the line has disappeared.
-                if (conf.SecondaryColor == Color.clear)
-                {
-                    GameEdit.ChangeSecondaryColor(shape, conf.PrimaryColor);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Sets the texture scale for the line renderer depending on the chosen <paramref name="kind"/>.
-        /// Required only for dashed line kinds.
-        /// The X-Scale value varies for different LineKinds.
-        /// It is multiplied by the material's tiling (15) to achieve the
-        /// correct tiling for the dashed line.
-        /// Tiling describes the spacing between the dashed lines.
-        /// </summary>
-        /// <param name="renderer">The line renderer that should be updated by his texture scale.</param>
-        /// <param name="kind">The chosen color kind.</param>
-        /// <param name="tiling">The tiling for a <see cref="LineKind.Dashed"/>.</param>
-        private static void SetRendererTextrueScale(LineRenderer renderer, LineKind kind, float tiling)
-        {
-            switch (kind)
-            {
-                case LineKind.Dashed:
-                    if (tiling == 0)
-                    {
-                        tiling = 0.05f;
-                    }
-                    renderer.textureScale = new Vector2(tiling, 0f);
-                    break;
-                case LineKind.Dashed25:
-                    renderer.textureScale = new Vector2(5f / 3f, 0f);
-                    break;
-                case LineKind.Dashed50:
-                    renderer.textureScale = new Vector2(10f / 3f, 0f);
-                    break;
-                case LineKind.Dashed75:
-                    renderer.textureScale = new Vector2(5f, 0f);
-                    break;
-                case LineKind.Dashed100:
-                    renderer.textureScale = new Vector2(20f / 3f, 0f);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Sets the appropriate texture mode for the given <see cref="LineRenderer"/>
-        /// depending on the selected <see cref="LineKind"/>.
-        /// </summary>
-        /// <param name="renderer">
-        /// The line renderer whose texture mode should be updated.
-        /// </param>
-        /// <param name="kind">
-        /// The visual style of the line.
-        /// Dashed line kinds use <see cref="LineTextureMode.Tile"/> so that the
-        /// dash pattern keeps a constant size independent of the line length.
-        /// All other line kinds use <see cref="LineTextureMode.Stretch"/>.
-        /// </param>
-        private static void SetTextureMode(LineRenderer renderer, LineKind kind)
-        {
-            switch (kind)
-            {
-                case LineKind.Dashed
-                  or LineKind.Dashed25
-                  or LineKind.Dashed50
-                  or LineKind.Dashed75
-                  or LineKind.Dashed100:
-                    renderer.textureMode = LineTextureMode.Tile;
-                    break;
-
-                default:
-                    renderer.textureMode = LineTextureMode.Stretch;
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Creates the material associated with the <paramref name="kind"/>.
-        /// </summary>
-        /// <param name="color">The color for the material.</param>
-        /// <param name="kind">The chosen line kind.</param>
-        /// <returns>The created material.</returns>
-        private static Material GetMaterial(Color color, LineKind kind)
-        {
-            /// Define the color range.
-            ColorRange colorRange = new(color, color, 1);
-            /// Select the correct shader type.
-            MaterialsFactory.ShaderType shaderType = kind == LineKind.Solid
-                ? MaterialsFactory.ShaderType.PortalFreeLine
-                : MaterialsFactory.ShaderType.DrawableDashedLine;
-            /// Gets the material of the shader type.
-            MaterialsFactory materials = new(shaderType, colorRange);
-            Material material = materials.Get(0);
-            return material;
-        }
-        #endregion
-
         #region Geometry Helpers
 
         /// <summary>
@@ -1125,7 +917,7 @@ namespace SEE.Game.Drawable
                     /// Set a default material if none is assigned
                     if (meshRenderer.sharedMaterial == null)
                     {
-                        meshRenderer.sharedMaterial = GetMaterial(fillColor, LineKind.Solid);
+                        meshRenderer.sharedMaterial = GameLineAppearance.GetMaterial(fillColor, LineKind.Solid);
                     }
                 }
                 else

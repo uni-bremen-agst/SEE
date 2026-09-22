@@ -1,11 +1,8 @@
 ﻿using SEE.Game.Drawable;
-using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Drawable;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -175,7 +172,7 @@ namespace SEE.UI.Menu.Drawable.Line
             assignLineKind(ValueHolder.CurrentLineKind);
 
             controls.LineKindSelector.index =
-                GetLineKinds().IndexOf(ValueHolder.CurrentLineKind);
+                GameLineAppearance.GetLineKinds().IndexOf(ValueHolder.CurrentLineKind);
             controls.LineKindSelector.UpdateUI();
 
             if (lineKindAction != null)
@@ -185,7 +182,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             lineKindAction = index =>
             {
-                ValueHolder.CurrentLineKind = GetLineKinds()[index];
+                ValueHolder.CurrentLineKind = GameLineAppearance.GetLineKinds()[index];
 
                 if (ValueHolder.CurrentLineKind == LineKind.Solid
                     && ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
@@ -206,7 +203,7 @@ namespace SEE.UI.Menu.Drawable.Line
             assignColorKind(ValueHolder.CurrentColorKind);
 
             controls.ColorKindSelector.index =
-                GetColorKinds(true).IndexOf(ValueHolder.CurrentColorKind);
+                GameLineAppearance.GetColorKinds(true).IndexOf(ValueHolder.CurrentColorKind);
             controls.ColorKindSelector.UpdateUI();
 
             if (colorKindAction != null)
@@ -216,7 +213,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             colorKindAction = index =>
             {
-                ValueHolder.CurrentColorKind = GetColorKinds(true)[index];
+                ValueHolder.CurrentColorKind = GameLineAppearance.GetColorKinds(true)[index];
 
                 if (ValueHolder.CurrentColorKind == ColorKind.Monochrome)
                 {
