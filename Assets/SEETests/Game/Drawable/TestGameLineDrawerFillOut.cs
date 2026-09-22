@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable
     /// Tests fill-out behavior while line geometry is updated.
     /// </summary>
     [TestFixture]
-    public class TestGameDrawerFillOut
+    public class TestGameLineDrawerFillOut
     {
         /// <summary>
         /// The line created for the current test.
@@ -54,7 +54,7 @@ namespace SEE.Game.Drawable
             MeshCollider collider = GetFillOutCollider();
             collider.enabled = true;
 
-            GameDrawer.Drawing(line, GetPositions(), Color.red);
+            GameLineDrawer.Drawing(line, GetPositions(), Color.red);
 
             Assert.That(collider.enabled, Is.False);
         }
@@ -69,7 +69,7 @@ namespace SEE.Game.Drawable
             MeshCollider collider = GetFillOutCollider();
             collider.enabled = true;
 
-            GameDrawer.Drawing(
+            GameLineDrawer.Drawing(
                 line,
                 GetPositions(),
                 Color.red,
@@ -88,7 +88,7 @@ namespace SEE.Game.Drawable
             MeshCollider collider = GetFillOutCollider();
             collider.enabled = false;
 
-            GameDrawer.Drawing(
+            GameLineDrawer.Drawing(
                 line,
                 GetPositions(),
                 Color.red,

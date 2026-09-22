@@ -273,7 +273,7 @@ namespace SEE.Controls.Actions.Drawable
                     newPositions[newPositions.Length - 1] = newPosition;
                     positions = newPositions;
 
-                    GameDrawer.Drawing(Shape, positions);
+                    GameLineDrawer.Drawing(Shape, positions);
                     new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                          Shape.name, newPosition, newPositions.Length - 1).Execute();
                     FinishDrawing();
@@ -343,7 +343,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void FinishDrawing()
         {
-            GameDrawer.Drawing(Shape, positions);
+            GameLineDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
             Shape = GameLineGeometry.SetPivot(Shape, shapeFillOut);
             LineConf finalShape = ApplyLineCaps(LineConf.GetLine(Shape));
@@ -376,7 +376,7 @@ namespace SEE.Controls.Actions.Drawable
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
                     if (positions.Length > 1)
                     {
-                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
+                        GameLineDrawer.Drawing(Shape, positions, shapeFillOut);
                     }
                     else
                     {
@@ -386,7 +386,7 @@ namespace SEE.Controls.Actions.Drawable
                             new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                             LineMenu.AssignFillOutForEditing(null, null, () => { });
                         }
-                        GameDrawer.Drawing(Shape, positions);
+                        GameLineDrawer.Drawing(Shape, positions);
                     }
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
                 }
@@ -455,7 +455,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 case ShapePointsCalculator.Shape.Line:
                     positions[0] = hitpoint;
-                    Shape = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
+                    Shape = GameLineDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
                         ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
                         ValueHolder.CurrentTiling);
@@ -666,7 +666,7 @@ namespace SEE.Controls.Actions.Drawable
 
             if (Shape == null)
             {
-                Shape = GameDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
+                Shape = GameLineDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
                     ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
                     ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, fillOutColor: LineMenu.GetFillOutColorForDrawing());
                 shapeFillOut = LineMenu.GetFillOutColorForDrawing();
@@ -688,7 +688,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     BlinkEffect.AddFillOutToEffect(shape);
                 }
-                GameDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
+                GameLineDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
                 ApplyPreviewLineCaps(positions);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
@@ -820,7 +820,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameLineGeometry.DifferentPositionCounter(newPositions) > 2)
                 {
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
-                    GameDrawer.Drawing(Shape, newPositions, shapeFillOut);
+                    GameLineDrawer.Drawing(Shape, newPositions, shapeFillOut);
                     ApplyPreviewLineCaps(newPositions);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         LineConf.GetLine(Shape)).Execute();
@@ -838,7 +838,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    GameDrawer.Drawing(Shape, newPositions);
+                    GameLineDrawer.Drawing(Shape, newPositions);
                     ApplyPreviewLineCaps(newPositions);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         LineConf.GetLine(Shape)).Execute();
@@ -871,7 +871,7 @@ namespace SEE.Controls.Actions.Drawable
                     if (positions.Length > 2)
                     {
                         shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
+                        GameLineDrawer.Drawing(Shape, positions, shapeFillOut);
                         ApplyPreviewLineCaps(positions);
                         new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                             LineConf.GetLine(Shape)).Execute();
@@ -888,7 +888,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     else
                     {
-                        GameDrawer.Drawing(Shape, positions);
+                        GameLineDrawer.Drawing(Shape, positions);
                         ApplyPreviewLineCaps(positions);
                         new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                             LineConf.GetLine(Shape)).Execute();
@@ -1183,7 +1183,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            Shape = GameDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Shape);
+            Shape = GameLineDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Shape);
             if (Shape != null)
             {
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, LineConf.GetLine(Shape)).Execute();

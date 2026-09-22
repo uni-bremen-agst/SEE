@@ -11,7 +11,7 @@ namespace SEE.Game.Drawable
     /// <summary>
     /// Provides creation, drawing, updating, and restoration of drawable lines.
     /// </summary>
-    public static class GameDrawer
+    public static class GameLineDrawer
     {
         /// <summary>
         /// Sets up a line object based on the parameters.

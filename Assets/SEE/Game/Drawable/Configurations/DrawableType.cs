@@ -205,7 +205,7 @@ namespace SEE.Game.Drawable.Configurations
             switch (type)
             {
                 case LineConf line:
-                    createdObject = GameDrawer.ReDrawLine(surface, line);
+                    createdObject = GameLineDrawer.ReDrawLine(surface, line);
                     EnsureValidity(type, createdObject);
                     new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         line).Execute();

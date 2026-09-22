@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameDrawer.ReDrawLine(surface, memento.OriginalLine);
+            GameLineDrawer.ReDrawLine(surface, memento.OriginalLine);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine).Execute();
 
             foreach (LineConf line in memento.Lines)
@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameDrawer.ReDrawLine(surface, line);
+                GameLineDrawer.ReDrawLine(surface, line);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, line).Execute();
             }
         }

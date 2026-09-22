@@ -109,7 +109,7 @@ namespace SEE.Game.Drawable
                 LineCapPosition.End,
                 useEndCapConfVisuals);
 
-            GameDrawer.Drawing(
+            GameLineDrawer.Drawing(
                 shape,
                 shortenedPositions,
                 fillOutColor,

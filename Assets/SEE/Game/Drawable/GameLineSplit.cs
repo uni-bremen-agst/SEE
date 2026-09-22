@@ -223,7 +223,7 @@ namespace SEE.Game.Drawable
             lineToCreate.LineCapStart = LineCapConf.CreateNone();
             lineToCreate.LineCapEnd = LineCapConf.CreateNone();
 
-            GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);
+            GameObject newLine = GameLineDrawer.ReDrawLine(surface, lineToCreate);
 
             GameLineGeometry.ChangePivot(newLine);
 

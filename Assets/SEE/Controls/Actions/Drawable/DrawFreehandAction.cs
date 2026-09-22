@@ -164,7 +164,7 @@ namespace SEE.Controls.Actions.Drawable
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;
             /// Create the line object.
-            line = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
+            line = GameLineDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                 ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
                 ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, freehandLine: true);
             /// Transform the first position in local space.
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
             Vector3 nPos = new(newPosition.x, newPosition.y, 0);
-            if (nPos != positions.Last()) /// This query is required if <see cref="GameDrawer.Drawing"/> has already been
+            if (nPos != positions.Last()) /// This query is required if <see cref="GameLineDrawer.Drawing"/> has already been
                                           /// executed (because of <see cref="GameLineGeometry.UpdateOriginalAnchors"/>).
             {
                 /// Add newPosition to the line renderer and and start drawing over the network.
@@ -197,7 +197,7 @@ namespace SEE.Controls.Actions.Drawable
                 newPositions[^1] = newPosition;
                 positions = newPositions;
 
-                GameDrawer.Drawing(line, positions);
+                GameLineDrawer.Drawing(line, positions);
                 new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, newPosition, newPositions.Length - 1).Execute();
             }
         }
@@ -264,7 +264,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
+            line = GameLineDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
             if (line != null)
             {
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,

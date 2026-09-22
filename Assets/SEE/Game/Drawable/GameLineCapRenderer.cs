@@ -127,7 +127,7 @@ namespace SEE.Game.Drawable
                     ? capConf.FillOutColor
                     : null;
 
-            GameObject capObject = GameDrawer.DrawLine(
+            GameObject capObject = GameLineDrawer.DrawLine(
                 drawableSurface,
                 name,
                 points,

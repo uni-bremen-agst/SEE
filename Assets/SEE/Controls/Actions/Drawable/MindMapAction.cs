@@ -309,7 +309,7 @@ namespace SEE.Controls.Actions.Drawable
                 ShowNotification.Info("Select a Parent Node", "Now select a parent node.\n" +
                     "To select, click on the specific parent node or choose it from the menu.", 3);
                 /// The following block is for a branch line preview.
-                branchLine = GameDrawer.StartDrawing(Surface, new Vector3[] { position },
+                branchLine = GameLineDrawer.StartDrawing(Surface, new Vector3[] { position },
                     ColorKind.Monochrome, Color.black, Color.clear,
                     ValueHolder.StandardLineThickness, LineKind.Solid,
                     ValueHolder.StandardLineTiling);

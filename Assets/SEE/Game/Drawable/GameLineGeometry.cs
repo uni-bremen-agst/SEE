@@ -65,9 +65,9 @@ namespace SEE.Game.Drawable
 
                 line.transform.InverseTransformPoints(convertedPositions);
 
-                GameDrawer.Drawing(line, convertedPositions);
+                GameLineDrawer.Drawing(line, convertedPositions);
 
-                GameDrawer.FinishDrawing(
+                GameLineDrawer.FinishDrawing(
                     line,
                     renderer.loop,
                     fillOutColor);
@@ -123,8 +123,8 @@ namespace SEE.Game.Drawable
 
                 line.transform.InverseTransformPoints(convertedPositions);
 
-                GameDrawer.Drawing(line, convertedPositions);
-                GameDrawer.FinishDrawing(line, renderer.loop);
+                GameLineDrawer.Drawing(line, convertedPositions);
+                GameLineDrawer.FinishDrawing(line, renderer.loop);
             }
 
             return line;
@@ -172,9 +172,9 @@ namespace SEE.Game.Drawable
 
                 line.transform.InverseTransformPoints(convertedPositions);
 
-                GameDrawer.Drawing(line, convertedPositions);
+                GameLineDrawer.Drawing(line, convertedPositions);
 
-                GameDrawer.FinishDrawing(
+                GameLineDrawer.FinishDrawing(
                     line,
                     renderer.loop,
                     fillOutColor);
@@ -316,7 +316,7 @@ namespace SEE.Game.Drawable
             Color? fillOutColor =
                 LineConf.GetFillOutColor(lineConf);
 
-            GameDrawer.Drawing(
+            GameLineDrawer.Drawing(
                 line,
                 positions,
                 fillOutColor,

@@ -66,11 +66,11 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (FillOutStatus)
                 {
-                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                    GameLineDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
                 }
                 else
                 {
-                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, null);
+                    GameLineDrawer.FinishDrawing(FindChild(LineID), Loop, null);
                 }
             }
             else

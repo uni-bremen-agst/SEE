@@ -48,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (LineID != null && LineID != "")
             {
-                GameDrawer.DrawPoint(FindChild(LineID), Position, Index);
+                GameLineDrawer.DrawPoint(FindChild(LineID), Position, Index);
             }
             else
             {
