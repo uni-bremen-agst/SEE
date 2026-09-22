@@ -234,7 +234,7 @@ namespace SEE.Game.Drawable
             pivotAdjustedLine.LineCapStart = startCap;
             pivotAdjustedLine.LineCapEnd = endCap;
 
-            GameDrawer.ApplyLineCaps(newLine, pivotAdjustedLine.LineCapStart,
+            GameLineCapApplicator.ApplyLineCaps(newLine, pivotAdjustedLine.LineCapStart,
                 pivotAdjustedLine.LineCapEnd, LineConf.GetFillOutColor(pivotAdjustedLine), true);
 
             LineConf result = LineConf.GetLine(newLine);

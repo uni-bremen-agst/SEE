@@ -276,7 +276,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 if (requiresUIRefresh || selectedCap == LineCap.None)
                 {
-                    GameDrawer.ApplyCapKindDefaults(line, newCapConf);
+                    GameLineCapConfiguration.ApplyCapKindDefaults(line, newCapConf);
                 }
 
                 if (selectedCap == LineCap.None)

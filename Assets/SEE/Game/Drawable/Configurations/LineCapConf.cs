@@ -303,7 +303,7 @@ namespace SEE.Game.Drawable.Configurations
                 return CreateNone();
             }
 
-            List<GameObject> caps = GameDrawer.GetLineCapObjects(line, startCap);
+            List<GameObject> caps = GameLineCapRenderer.GetLineCapObjects(line, startCap);
             if (caps.Count == 0)
             {
                 return CreateNone();

@@ -19,7 +19,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <remarks>
         /// If a newly added line cap defines its own fill-out default behavior,
         /// make sure to update:
-        /// - <see cref="GameDrawer.ApplyCapKindDefaults"/>
+        /// - <see cref="GameLineCapConfiguration.ApplyCapKindDefaults"/>
         /// - <see cref="LineCapPointsCalculator.HasOwnFillOutDefault"/>
         /// Otherwise, the fill-out state may not behave correctly during editing.
         /// </remarks>

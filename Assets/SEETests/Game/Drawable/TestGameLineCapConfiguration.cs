@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable
 {
@@ -10,7 +9,7 @@ namespace SEE.Game.Drawable
     /// Tests creation and initialization of line-cap configurations.
     /// </summary>
     [TestFixture]
-    public class TestGameDrawerLineCaps
+    public class TestGameLineCapConfiguration
     {
         /// <summary>
         /// Verifies that a new line cap without its own visual configuration
@@ -29,7 +28,7 @@ namespace SEE.Game.Drawable
                 Tiling = 4.0f
             };
 
-            LineCapConf cap = GameDrawer.CreateLineCapConf(
+            LineCapConf cap = GameLineCapConfiguration.CreateLineCapConf(
                 line,
                 LineCapConf.CreateNone(),
                 LineCap.Arrowhead);

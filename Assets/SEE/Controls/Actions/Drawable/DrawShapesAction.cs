@@ -953,7 +953,7 @@ namespace SEE.Controls.Actions.Drawable
             (LineCapConf startConf, LineCapConf endConf, bool hasReference)
                 = CreateSelectedLineCapConfs(currentShapeConf, sendLineKindChange: true);
 
-            GameDrawer.ApplyLineCaps(
+            GameLineCapApplicator.ApplyLineCaps(
                 Shape,
                 startConf,
                 endConf,
@@ -986,7 +986,7 @@ namespace SEE.Controls.Actions.Drawable
             (LineCapConf startConf, LineCapConf endConf, bool hasReference)
                 = CreateSelectedLineCapConfs(currentShape, sendLineKindChange: false);
 
-            GameDrawer.ApplyLineCaps(
+            GameLineCapApplicator.ApplyLineCaps(
                 Shape,
                 startConf,
                 endConf,
@@ -1104,7 +1104,7 @@ namespace SEE.Controls.Actions.Drawable
                     : null;
 
             LineCapConf capConf =
-                GameDrawer.CreateLineCapConf(currentShapeConf, reusableCapConf, actualCap);
+                GameLineCapConfiguration.CreateLineCapConf(currentShapeConf, reusableCapConf, actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);
             return capConf;

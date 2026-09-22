@@ -65,18 +65,18 @@ namespace SEE.Game.Drawable
             }
 
             currentConf.LineCapStart =
-                GameDrawer.CreateLineCapConf(
+                GameLineCapConfiguration.CreateLineCapConf(
                     currentConf,
                     currentConf.LineCapStart,
                     start);
 
             currentConf.LineCapEnd =
-                GameDrawer.CreateLineCapConf(
+                GameLineCapConfiguration.CreateLineCapConf(
                     currentConf,
                     currentConf.LineCapEnd,
                     end);
 
-            GameDrawer.ApplyLineCaps(
+            GameLineCapApplicator.ApplyLineCaps(
                 line,
                 currentConf.LineCapStart,
                 currentConf.LineCapEnd,
@@ -152,7 +152,7 @@ namespace SEE.Game.Drawable
                 bool useEndCapVisuals = !isStartCap
                     || holder.EndCapUsesOwnVisuals;
 
-                GameDrawer.ApplyLineCaps(
+                GameLineCapApplicator.ApplyLineCaps(
                     line,
                     currentLine.LineCapStart,
                     currentLine.LineCapEnd,
@@ -163,7 +163,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            List<GameObject> caps = GameDrawer.GetLineCapObjects(line, isStartCap);
+            List<GameObject> caps = GameLineCapRenderer.GetLineCapObjects(line, isStartCap);
 
             foreach (GameObject capGO in caps)
             {

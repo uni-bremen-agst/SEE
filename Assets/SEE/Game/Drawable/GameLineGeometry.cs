@@ -322,7 +322,7 @@ namespace SEE.Game.Drawable
                 fillOutColor,
                 preserveFillOutColliderState: true);
 
-            GameDrawer.ApplyLineCaps(
+            GameLineCapApplicator.ApplyLineCaps(
                 line,
                 lineConf.LineCapStart,
                 lineConf.LineCapEnd,
