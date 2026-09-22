@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.VCS
@@ -399,24 +401,54 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
         /// <returns>The content of the file.</returns>
-        /// <exception cref="Exception">Thrown if the file does not exist.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
         public string GetFileContent(string repositoryFilePath)
+        {
+           return GetBlob(repositoryFilePath).GetContentText();
+        }
+
+        /// <summary>
+        /// Returns the content of the file at <paramref name="repositoryFilePath"/> (as a stream)
+        /// present in the repository in any of the branches passing the filter.
+        ///
+        /// Note: A file may exist in multiple branches, but this method will
+        /// return the content of the first file found in the branches.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <returns>The content of the file as a stream.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
+        public Stream GetStream(string repositoryFilePath)
+        {
+            return GetBlob(repositoryFilePath).GetContentStream();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="Blob"/> object representing the file at <paramref name="repositoryFilePath"/>
+        /// in any of <see cref="RelevantBranches"/>. The file can exist in multiple branches, but this method
+        /// will return the first one found.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <returns>The <see cref="Blob"/> object representing the file.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
+        private Blob GetBlob(string repositoryFilePath)
         {
             if (string.IsNullOrWhiteSpace(repositoryFilePath))
             {
                 throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
             }
-
             foreach (Branch branch in RelevantBranches())
             {
                 Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
                 if (blob != null)
                 {
-                    return blob.GetContentText();
+                    return blob;
                 }
             }
             // Blob does not exist.
-            throw new Exception($"File {repositoryFilePath} does not exist.\n");
+            throw new FileNotFoundException($"File {repositoryFilePath} does not exist.\n");
         }
 
         /// <summary>
