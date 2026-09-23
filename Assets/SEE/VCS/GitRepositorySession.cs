@@ -579,7 +579,7 @@ namespace SEE.VCS
         /// <summary>
         /// Adds the distinct filenames in the given <paramref name="tree"/> passing
         /// the criteria <see cref="Filter.RepositoryPaths"/> and <see cref="Filter.Matcher"/>
-        /// of the given <paramref name="filter"/>.
+        /// to given set of <paramref name="paths"/>.
         ///
         /// If <see cref="Filter.RepositoryPaths"/> is null or empty, all files in the entire
         /// <paramref name="tree"/> are retrieved. Otherwise, only the files in the subtrees
