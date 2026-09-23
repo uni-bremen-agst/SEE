@@ -212,7 +212,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             GameMindMap.NodeKind newNodeKind, LineConf borderConf,
             GameObject surface, string surfaceParentName)
         {
-            GameMindMap.ChangeNodeKind(addedNode, newNodeKind, borderConf);
+            GameMindMapNode.ChangeNodeKind(addedNode, newNodeKind, borderConf);
 
             new MindMapChangeNodeKindNetAction(
                 surface.name,

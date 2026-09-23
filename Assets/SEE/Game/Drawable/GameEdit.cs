@@ -262,8 +262,8 @@ namespace SEE.Game.Drawable
             if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
             {
                 GameObject node = textObj.transform.parent.gameObject;
-                GameMindMap.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
+                GameMindMapNode.DisableTextAndBorderCollider(node);
+                GameMindMapNode.ReDrawBorder(node);
             }
         }
 
@@ -288,8 +288,8 @@ namespace SEE.Game.Drawable
             if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
             {
                 GameObject node = textObj.transform.parent.gameObject;
-                GameMindMap.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
+                GameMindMapNode.DisableTextAndBorderCollider(node);
+                GameMindMapNode.ReDrawBorder(node);
             }
         }
 
@@ -314,8 +314,8 @@ namespace SEE.Game.Drawable
             if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
             {
                 GameObject node = textObj.transform.parent.gameObject;
-                GameMindMap.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
+                GameMindMapNode.DisableTextAndBorderCollider(node);
+                GameMindMapNode.ReDrawBorder(node);
             }
         }
 
@@ -398,7 +398,7 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
+                GameMindMapNode.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
                 ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
                 ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
@@ -406,7 +406,7 @@ namespace SEE.Game.Drawable
                 GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
                 GameMindMapBranch.ChangeParent(node, parent);
 
-                GameMindMap.ChangeBoxSize(node);
+                GameMindMapNode.ChangeBoxSize(node);
 
                 node.FindDescendantWithTag(Tags.Line).GetComponent<MeshCollider>().enabled = false;
                 node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;

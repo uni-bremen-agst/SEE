@@ -300,7 +300,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void AddNode()
         {
-            node = GameMindMap.Create(Surface, GetPrefix(), writtenText, position);
+            node = GameMindMapNode.Create(Surface, GetPrefix(), writtenText, position);
             if (chosenOperation == Operation.Theme)
             {
                 progress = ProgressState.Finish;
@@ -494,7 +494,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            GameMindMap.ReCreate(memento.Surface.GetDrawableSurface(), memento.Conf);
+            GameMindMapNode.ReCreate(memento.Surface.GetDrawableSurface(), memento.Conf);
             new MindMapCreateNodeNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
         }
 

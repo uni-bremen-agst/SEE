@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
 using System;
@@ -224,7 +225,7 @@ namespace SEE.Game.Drawable.Configurations
                         image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    createdObject = GameMindMap.ReCreate(surface, node);
+                    createdObject = GameMindMapNode.ReCreate(surface, node);
                     EnsureValidity(type, createdObject);
                     new MindMapCreateNodeNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         node).Execute();

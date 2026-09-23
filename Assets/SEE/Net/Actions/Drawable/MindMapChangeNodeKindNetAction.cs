@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -42,7 +43,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Node != null && Node.ID != "")
             {
-                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
+                GameMindMapNode.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
                     NodeKind, Node.BorderConf);
             }
             else
