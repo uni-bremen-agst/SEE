@@ -80,7 +80,7 @@ namespace SEE.VCS
         /// Name every case: with none, all that tells two of them apart in the
         /// test runner is <c>System.String[]</c> three times over.
         /// </remarks>
-        /// <returns>one test case per configuration</returns>
+        /// <returns>One test case per configuration.</returns>
         private static IEnumerable<TestCaseData> Configurations()
         {
             // The beginning of the period to be reported on; commits authored at
@@ -230,9 +230,9 @@ namespace SEE.VCS
         /// branch selected by more than one of those expressions occurs only
         /// once.
         /// </summary>
-        /// <param name="repository">the repository whose branches are to be selected</param>
-        /// <param name="criteria">states the expressions selecting the branches</param>
-        /// <returns>the selected branches, keyed by their name</returns>
+        /// <param name="repository">The repository whose branches are to be selected.</param>
+        /// <param name="criteria">States the expressions selecting the branches.</param>
+        /// <returns>The selected branches, keyed by their name.</returns>
         private static ICollection<KeyValuePair<string, Branch>> SelectedBranches
               (Repository repository, Criteria criteria)
         {
@@ -266,9 +266,9 @@ namespace SEE.VCS
         /// <paramref name="criteria"/> selecting far more branches than intended
         /// shows at once rather than only once all of them have been walked.
         /// </summary>
-        /// <param name="selected">the branches selected, keyed by their name</param>
-        /// <param name="criteria">states the expressions the branches were selected by</param>
-        /// <returns>the announcement</returns>
+        /// <param name="selected">The branches selected, keyed by their name.</param>
+        /// <param name="criteria">States the expressions the branches were selected by.</param>
+        /// <returns>The announcement.</returns>
         private static string Selection(ICollection<KeyValuePair<string, Branch>> selected,
                                         Criteria criteria)
         {
@@ -286,8 +286,8 @@ namespace SEE.VCS
         /// The name of <paramref name="branch"/> as <c>git branch -a</c> prints
         /// it, which is its canonical name without the leading <c>refs/</c>.
         /// </summary>
-        /// <param name="branch">the branch whose name is asked for</param>
-        /// <returns>the name of the branch</returns>
+        /// <param name="branch">The branch whose name is asked for.</param>
+        /// <returns>The name of the branch.</returns>
         private static string NameOf(Branch branch)
         {
             const string prefix = "refs/";
@@ -303,8 +303,8 @@ namespace SEE.VCS
         /// around <paramref name="pattern"/> keeps them from binding to only
         /// the first and the last alternative of an alternation.
         /// </summary>
-        /// <param name="pattern">the regular expression</param>
-        /// <returns>the anchored regular expression</returns>
+        /// <param name="pattern">The regular expression.</param>
+        /// <returns>The anchored regular expression.</returns>
         private static Regex Expression(string pattern)
         {
             try
@@ -323,12 +323,12 @@ namespace SEE.VCS
         /// all commits reachable from <paramref name="branch"/>, keyed by the
         /// name the file carries at the tip of that branch.
         /// </summary>
-        /// <param name="repository">the repository to be walked</param>
-        /// <param name="branch">the branch whose commits are to be taken into account</param>
-        /// <param name="examined">what is known of the commits examined so far; will be extended</param>
-        /// <param name="criteria">states which files are reported on</param>
+        /// <param name="repository">The repository to be walked.</param>
+        /// <param name="branch">The branch whose commits are to be taken into account.</param>
+        /// <param name="examined">What is known of the commits examined so far; will be extended.</param>
+        /// <param name="criteria">States which files are reported on.</param>
         /// <param name="token">Cancellation token.</param>
-        /// <returns>the churn per file</returns>
+        /// <returns>The churn per file.</returns>
         private static IDictionary<string, Churn> ChurnOf(Repository repository, Branch branch,
                                                           Examination examined, Criteria criteria,
                                                           CancellationToken token)
@@ -386,10 +386,10 @@ namespace SEE.VCS
         /// having been made to the file named <paramref name="path"/> by
         /// <paramref name="examination"/>'s commit.
         /// </summary>
-        /// <param name="churn">the churn accumulated so far; will be extended</param>
-        /// <param name="path">the name the changed file carries at the tip of the branch</param>
-        /// <param name="change">the change to be accounted for</param>
-        /// <param name="examination">what is known of the commit making the change</param>
+        /// <param name="churn">The churn accumulated so far; will be extended.</param>
+        /// <param name="path">The name the changed file carries at the tip of the branch.</param>
+        /// <param name="change">The change to be accounted for.</param>
+        /// <param name="examination">What is known of the commit making the change.</param>
         private static void Record(IDictionary<string, Churn> churn, string path, FileChange change,
                                    Examined examination)
         {
@@ -407,9 +407,9 @@ namespace SEE.VCS
         /// Notes in <paramref name="renamedTo"/> that the file once named
         /// <paramref name="oldPath"/> is named <paramref name="target"/> later on.
         /// </summary>
-        /// <param name="renamedTo">the renames noted so far; will be extended</param>
-        /// <param name="oldPath">the former name of the file</param>
-        /// <param name="target">the name the file carries later on</param>
+        /// <param name="renamedTo">The renames noted so far; will be extended.</param>
+        /// <param name="oldPath">The former name of the file.</param>
+        /// <param name="target">The name the file carries later on.</param>
         private static void Note(IDictionary<string, string> renamedTo, string oldPath, string target)
         {
             // The condition keeps a file renamed away and later renamed back from
@@ -424,9 +424,9 @@ namespace SEE.VCS
         /// The name <paramref name="path"/> has after all renames noted in
         /// <paramref name="renamedTo"/> have been applied to it.
         /// </summary>
-        /// <param name="renamedTo">the renames noted so far</param>
-        /// <param name="path">the name to start from</param>
-        /// <returns>the name at the end of the chain of renames</returns>
+        /// <param name="renamedTo">The renames noted so far.</param>
+        /// <param name="path">The name to start from.</param>
+        /// <returns>The name at the end of the chain of renames.</returns>
         private static string Follow(IDictionary<string, string> renamedTo, string path)
         {
             // The bound guards against a cycle; see the note in Note.
@@ -443,10 +443,10 @@ namespace SEE.VCS
         /// The report on <paramref name="churn"/> as a table, one line per file,
         /// the file with the most added lines first.
         /// </summary>
-        /// <param name="branchName">the branch the report is on</param>
-        /// <param name="churn">the churn to be reported</param>
-        /// <param name="criteria">states the period reported on</param>
-        /// <returns>the report</returns>
+        /// <param name="branchName">The branch the report is on.</param>
+        /// <param name="churn">The churn to be reported.</param>
+        /// <param name="criteria">States the period reported on.</param>
+        /// <returns>The report.</returns>
         private static string Report(string branchName, IDictionary<string, Churn> churn,
                                      Criteria criteria)
         {
@@ -511,10 +511,10 @@ namespace SEE.VCS
             /// Constructor setting all properties from the parameters of the
             /// same name.
             /// </summary>
-            /// <param name="since">the beginning of the period reported on</param>
-            /// <param name="directories">the directories whose files are reported on</param>
-            /// <param name="extensions">the extensions a file must have to be reported on</param>
-            /// <param name="branches">the expressions selecting the branches reported on</param>
+            /// <param name="since">The beginning of the period reported on.</param>
+            /// <param name="directories">The directories whose files are reported on.</param>
+            /// <param name="extensions">The extensions a file must have to be reported on.</param>
+            /// <param name="branches">The expressions selecting the branches reported on.</param>
             internal Criteria(DateTimeOffset since, IReadOnlyList<string> directories,
                               IReadOnlyList<string> extensions, IReadOnlyList<string> branches)
             {
@@ -529,9 +529,9 @@ namespace SEE.VCS
             /// is, one located in one of the <see cref="Directories"/> and having
             /// one of the <see cref="Extensions"/>.
             /// </summary>
-            /// <param name="path">the path to be checked, relative to the root of
-            /// the repository and separated by <c>/</c>; may be null</param>
-            /// <returns>true if and only if the file is reported on</returns>
+            /// <param name="path">The path to be checked, relative to the root of
+            /// the repository and separated by <c>/</c>; may be null.</param>
+            /// <returns>True if and only if the file is reported on.</returns>
             internal bool InScope(string path)
             {
                 return !string.IsNullOrEmpty(path)
@@ -576,11 +576,11 @@ namespace SEE.VCS
             /// Constructor setting all properties from the parameters of the
             /// same name.
             /// </summary>
-            /// <param name="path">the name of the file after the change</param>
-            /// <param name="oldPath">the name of the file before the change</param>
-            /// <param name="isRename">whether the change renames the file</param>
-            /// <param name="linesAdded">the number of lines the change adds</param>
-            /// <param name="linesDeleted">the number of lines the change deletes</param>
+            /// <param name="path">The name of the file after the change.</param>
+            /// <param name="oldPath">The name of the file before the change.</param>
+            /// <param name="isRename">Whether the change renames the file.</param>
+            /// <param name="linesAdded">The number of lines the change adds.</param>
+            /// <param name="linesDeleted">The number of lines the change deletes.</param>
             internal FileChange(string path, string oldPath, bool isRename,
                                 int linesAdded, int linesDeleted)
             {
@@ -631,11 +631,11 @@ namespace SEE.VCS
             /// Constructor setting all properties from the parameters of the
             /// same name.
             /// </summary>
-            /// <param name="isMerge">whether the commit is a merge</param>
-            /// <param name="within">whether the commit falls in the period reported on</param>
-            /// <param name="sha">the SHA of the commit</param>
-            /// <param name="author">the canonical name of the author of the commit</param>
-            /// <param name="changes">the changes the commit makes</param>
+            /// <param name="isMerge">Whether the commit is a merge.</param>
+            /// <param name="within">Whether the commit falls in the period reported on.</param>
+            /// <param name="sha">The SHA of the commit.</param>
+            /// <param name="author">The canonical name of the author of the commit.</param>
+            /// <param name="changes">The changes the commit makes.</param>
             internal Examined(bool isMerge, bool within, string sha, string author,
                               IList<FileChange> changes)
             {
@@ -700,9 +700,9 @@ namespace SEE.VCS
             /// Constructor setting all fields from the parameters of the same
             /// name.
             /// </summary>
-            /// <param name="repository">the repository whose commits are examined</param>
-            /// <param name="mailmap">used to map an author onto their canonical name</param>
-            /// <param name="criteria">states the period and the files reported on</param>
+            /// <param name="repository">The repository whose commits are examined.</param>
+            /// <param name="mailmap">Used to map an author onto their canonical name.</param>
+            /// <param name="criteria">States the period and the files reported on.</param>
             internal Examination(Repository repository, Mailmap mailmap, Criteria criteria)
             {
                 this.repository = repository;
@@ -719,8 +719,8 @@ namespace SEE.VCS
             /// What is to be known about <paramref name="commit"/>, examining it
             /// unless that has been done already.
             /// </summary>
-            /// <param name="commit">the commit to be examined</param>
-            /// <returns>what is known about the commit</returns>
+            /// <param name="commit">The commit to be examined.</param>
+            /// <returns>What is known about the commit.</returns>
             internal Examined Of(Commit commit)
             {
                 if (!examined.TryGetValue(commit.Id, out Examined result))
@@ -735,8 +735,8 @@ namespace SEE.VCS
             /// What is to be known about <paramref name="commit"/>, found out by
             /// comparing it against its first parent.
             /// </summary>
-            /// <param name="commit">the commit to be examined</param>
-            /// <returns>what is known about the commit</returns>
+            /// <param name="commit">The commit to be examined.</param>
+            /// <returns>What is known about the commit.</returns>
             private Examined Examine(Commit commit)
             {
                 List<FileChange> changes = new();
@@ -829,10 +829,10 @@ namespace SEE.VCS
             /// <summary>
             /// Accounts for one change of the file.
             /// </summary>
-            /// <param name="linesAdded">the number of lines the change adds</param>
-            /// <param name="linesDeleted">the number of lines the change deletes</param>
-            /// <param name="sha">the SHA of the commit the change belongs to</param>
-            /// <param name="author">the author of that commit</param>
+            /// <param name="linesAdded">The number of lines the change adds.</param>
+            /// <param name="linesDeleted">The number of lines the change deletes.</param>
+            /// <param name="sha">The SHA of the commit the change belongs to.</param>
+            /// <param name="author">The author of that commit.</param>
             internal void Add(int linesAdded, int linesDeleted, string sha, string author)
             {
                 LinesAdded += linesAdded;
@@ -878,8 +878,8 @@ namespace SEE.VCS
             /// If there is no such file, the result maps nothing, which leaves
             /// every author named as their commits name them.
             /// </summary>
-            /// <param name="path">the path of the .mailmap file</param>
-            /// <returns>the mapping</returns>
+            /// <param name="path">The path of the .mailmap file.</param>
+            /// <returns>The mapping.</returns>
             internal static Mailmap Read(string path)
             {
                 Mailmap result = new();
@@ -898,7 +898,7 @@ namespace SEE.VCS
             /// Adds the entry <paramref name="line"/> states, if it states one.
             /// Comments and blank lines are ignored.
             /// </summary>
-            /// <param name="line">the line of a .mailmap file to be added</param>
+            /// <param name="line">The line of a .mailmap file to be added.</param>
             private void Add(string line)
             {
                 int comment = line.IndexOf('#');
@@ -954,8 +954,8 @@ namespace SEE.VCS
             /// The canonical name of <paramref name="author"/>, or the name their
             /// commit records if this mapping has nothing to say about them.
             /// </summary>
-            /// <param name="author">the author whose name is asked for</param>
-            /// <returns>the canonical name</returns>
+            /// <param name="author">The author whose name is asked for.</param>
+            /// <returns>The canonical name.</returns>
             internal string NameOf(Signature author)
             {
                 if (byNameAndEmail.TryGetValue(Key(author.Name, author.Email), out string byBoth))
@@ -973,9 +973,9 @@ namespace SEE.VCS
             /// The key under which <see cref="byNameAndEmail"/> stores an entry
             /// for <paramref name="name"/> and <paramref name="email"/>.
             /// </summary>
-            /// <param name="name">the name recorded in a commit</param>
-            /// <param name="email">the address recorded in a commit</param>
-            /// <returns>the key</returns>
+            /// <param name="name">The name recorded in a commit.</param>
+            /// <param name="email">The address recorded in a commit.</param>
+            /// <returns>The key.</returns>
             private static string Key(string name, string email)
             {
                 return $"{name} <{email}>";
