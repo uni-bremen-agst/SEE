@@ -125,6 +125,45 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Empty(descriptor.EmbeddedPortablePdbIds);
             Assert.Empty(descriptor.PdbChecksums);
             Assert.Equal(expected.Modules[0], descriptor.ManifestModule);
+            Assert.Equal(
+                ExternalAssemblySigningState.Unsigned,
+                descriptor.SigningProvenance.State);
+            Assert.Empty(descriptor.SigningProvenance.PublicKey);
+            Assert.Empty(descriptor.SigningProvenance.PublicKeyToken);
+        }
+
+        /// <summary>
+        /// Distinguishes observable delay-sign and public-sign PE shapes and
+        /// retains both outside the supported semantic reconstruction path.
+        /// </summary>
+        /// <param name="delaySign">Whether the controlled emit uses delay signing.</param>
+        /// <param name="publicSign">Whether the controlled emit uses public signing.</param>
+        /// <param name="expectedStateName">The expected signing-state name.</param>
+        [Theory]
+        [InlineData(true, false, "DelaySigned")]
+        [InlineData(false, true, "PublicSigned")]
+        public void EmitOnlySigningVariants_AreClassifiedAndRemainDistinct(
+            bool delaySign,
+            bool publicSign,
+            string expectedStateName)
+        {
+            byte[] peImage = EmitSigningVariant(delaySign, publicSign);
+            ExternalAssemblyReferenceDescriptor expected =
+                CreateExpectedDescriptor(peImage);
+
+            ExternalPeDebugDirectoryDescriptor descriptor =
+                ReadRequiredDescriptor(expected, peImage);
+
+            Assert.Equal(expectedStateName, descriptor.SigningProvenance.State.ToString());
+            Assert.Equal(
+                expected.AssemblyIdentity.PublicKey,
+                descriptor.SigningProvenance.PublicKey);
+            Assert.Equal(
+                expected.AssemblyIdentity.PublicKeyToken,
+                descriptor.SigningProvenance.PublicKeyToken);
+            Assert.True(descriptor.SigningProvenance.StrongNameSignatureSize > 0);
+            Assert.Equal(32, descriptor.SigningProvenance.StrongNameSignatureSha256.Length);
+            Assert.False(descriptor.SigningProvenance.HasStrongNameSignature);
         }
 
         /// <summary>
@@ -366,15 +405,14 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// file-backed framework binary before reading its debug directory.
         /// </summary>
         [Fact]
-        public void FileBackedFrameworkAssembly_RevalidatesStrongNameIdentity()
+        public void FileBackedSignedAssembly_RevalidatesStrongNameIdentity()
         {
-            PortableExecutableReference reference =
-                Assert.IsAssignableFrom<PortableExecutableReference>(
-                    MetadataReferences.Default[0]);
+            PortableExecutableReference reference = MetadataReference.CreateFromFile(
+                typeof(CSharpCompilation).Assembly.Location);
             CSharpCompilation compilation = CreateCompilation(
-                "FrameworkConsumer",
-                "public sealed class FrameworkConsumerType { }",
-                references: Array.Empty<MetadataReference>());
+                "SignedAssemblyConsumer",
+                "public sealed class SignedAssemblyConsumerType { }",
+                references: new[] { reference });
             IAssemblySymbol assemblySymbol = Assert.IsAssignableFrom<IAssemblySymbol>(
                 compilation.GetAssemblyOrModuleSymbol(reference));
             Assert.True(ExternalAssemblyReferenceDescriptorFactory.TryCreate(
@@ -387,6 +425,18 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 expected,
                 out ExternalPeDebugDirectoryDescriptor descriptor));
             Assert.Equal(expected.Modules[0], descriptor.ManifestModule);
+            Assert.Equal(
+                ExternalAssemblySigningState.FullySigned,
+                descriptor.SigningProvenance.State);
+            Assert.Equal(
+                expected.AssemblyIdentity.PublicKey,
+                descriptor.SigningProvenance.PublicKey);
+            Assert.Equal(
+                expected.AssemblyIdentity.PublicKeyToken,
+                descriptor.SigningProvenance.PublicKeyToken);
+            Assert.True(descriptor.SigningProvenance.HasStrongNameSignature);
+            Assert.True(descriptor.SigningProvenance.StrongNameSignatureSize > 0);
+            Assert.Equal(32, descriptor.SigningProvenance.StrongNameSignatureSha256.Length);
         }
 
         /// <summary>
@@ -490,6 +540,32 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             EmitResult result = compilation.Emit(peStream);
             Assert.True(result.Success, string.Join(Environment.NewLine, result.Diagnostics));
             return new EmittedAssembly(peStream.ToArray(), pdbImage: null);
+        }
+
+        /// <summary>Emits one controlled non-production signing shape.</summary>
+        private static byte[] EmitSigningVariant(bool delaySign, bool publicSign)
+        {
+            ImmutableArray<byte> publicKey = ImmutableArray.Create(
+                typeof(object).Assembly.GetName().GetPublicKey()!);
+            CSharpCompilationOptions options = new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                deterministic: true)
+                .WithCryptoPublicKey(publicKey)
+                .WithDelaySign(delaySign)
+                .WithPublicSign(publicSign);
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
+                Microsoft.CodeAnalysis.Text.SourceText.From(
+                    "public sealed class SigningVariant { }",
+                    Encoding.UTF8));
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                "Signing.Variant",
+                [syntaxTree],
+                MetadataReferences.Default,
+                options);
+            using MemoryStream peStream = new();
+            EmitResult result = compilation.Emit(peStream);
+            Assert.True(result.Success, string.Join(Environment.NewLine, result.Diagnostics));
+            return peStream.ToArray();
         }
 
         /// <summary>

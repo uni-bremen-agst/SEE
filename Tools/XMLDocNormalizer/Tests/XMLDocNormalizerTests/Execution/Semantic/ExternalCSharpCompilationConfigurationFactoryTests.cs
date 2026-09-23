@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -809,6 +810,54 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
+        /// Reconstructs only the complete public key for a fully signed target.
+        /// Emit signing inputs remain absent from the semantic configuration.
+        /// </summary>
+        [Fact]
+        public void FullySignedTarget_ReconstructsOnlyExactSemanticPublicKey()
+        {
+            ExternalAssemblySigningProvenance signing = CreateSigningProvenance(
+                ExternalAssemblySigningState.FullySigned);
+            ExternalCompilationProvenanceDescriptor provenance = CreateProvenance(
+                new ExternalCompilationOptionsDescriptor(CreateBaseOptions()),
+                signing);
+
+            ExternalCSharpCompilationConfiguration configuration =
+                CreateConfiguration(provenance);
+
+            Assert.Same(signing, configuration.SigningProvenance);
+            Assert.Equal(signing.PublicKey, configuration.CompilationOptions.CryptoPublicKey);
+            Assert.Null(configuration.CompilationOptions.CryptoKeyFile);
+            Assert.Null(configuration.CompilationOptions.CryptoKeyContainer);
+            Assert.Null(configuration.CompilationOptions.DelaySign);
+            Assert.False(configuration.CompilationOptions.PublicSign);
+            Assert.Null(configuration.CompilationOptions.StrongNameProvider);
+        }
+
+        /// <summary>
+        /// Keeps signing shapes whose semantic identity cannot be separated
+        /// soundly from their emit configuration outside the supported path.
+        /// </summary>
+        /// <param name="state">The unsupported observable PE signing state.</param>
+        [Theory]
+        [InlineData((int)ExternalAssemblySigningState.DelaySigned)]
+        [InlineData((int)ExternalAssemblySigningState.PublicSigned)]
+        [InlineData((int)ExternalAssemblySigningState.Unsupported)]
+        public void UnsupportedSigningShape_FailsClosed(
+            int stateValue)
+        {
+            ExternalAssemblySigningState state =
+                (ExternalAssemblySigningState)stateValue;
+            ExternalCompilationProvenanceDescriptor provenance = CreateProvenance(
+                new ExternalCompilationOptionsDescriptor(CreateBaseOptions()),
+                CreateSigningProvenance(state));
+
+            Assert.False(ExternalCSharpCompilationConfigurationFactory.TryCreate(
+                provenance,
+                out _));
+        }
+
+        /// <summary>
         /// Applies keyed replacements or removals to canonical valid options.
         /// </summary>
         private static bool TryCreate(
@@ -840,10 +889,12 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <param name="compilationOptions">The optional compilation options.</param>
         /// <returns>The synthetic but structurally valid provenance.</returns>
         private static ExternalCompilationProvenanceDescriptor CreateProvenance(
-            ExternalCompilationOptionsDescriptor? compilationOptions)
+            ExternalCompilationOptionsDescriptor? compilationOptions,
+            ExternalAssemblySigningProvenance? signingProvenance = null)
         {
             ExternalPeDebugDirectoryDescriptor debugDirectory = new(
                 new ExternalModuleIdentity("synthetic.dll", Guid.Empty),
+                signingProvenance ?? ExternalAssemblySigningProvenance.Unsigned,
                 isDeterministic: false,
                 ImmutableArray<ExternalCodeViewPdbReference>.Empty,
                 ImmutableArray<System.Reflection.Metadata.BlobContentId>.Empty,
@@ -858,6 +909,33 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 portablePdb,
                 compilationOptions,
                 metadataReferences: null);
+        }
+
+        /// <summary>Creates controlled signing provenance without any private key.</summary>
+        private static ExternalAssemblySigningProvenance CreateSigningProvenance(
+            ExternalAssemblySigningState state)
+        {
+            ImmutableArray<byte> publicKey = ImmutableArray.Create(
+                typeof(object).Assembly.GetName().GetPublicKey()!);
+            CSharpCompilation identityCompilation = CSharpCompilation.Create(
+                "Signing.Identity",
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithCryptoPublicKey(publicKey));
+            ImmutableArray<byte> publicKeyToken =
+                identityCompilation.Assembly.Identity.PublicKeyToken;
+            CorFlags corFlags = state == ExternalAssemblySigningState.DelaySigned
+                ? CorFlags.ILOnly
+                : CorFlags.ILOnly | CorFlags.StrongNameSigned;
+            return new ExternalAssemblySigningProvenance(
+                state,
+                System.Reflection.AssemblyFlags.PublicKey,
+                corFlags,
+                publicKey,
+                publicKeyToken,
+                strongNameSignatureSize: 128,
+                ImmutableArray.Create(new byte[32] { 1, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0 }));
         }
 
         /// <summary>

@@ -106,6 +106,8 @@ namespace XMLDocNormalizer.Evaluation
                     return Fail(result, candidate, "PdbValidated", EvaluationFailureCategory.ProvenanceMismatch, "PE debug provenance validation failed.", stopwatch);
                 }
 
+                CaptureTargetSigning(result, fixture.Target, debugDirectory.SigningProvenance);
+
                 ExternalCompilationProvenanceDescriptor provenance;
                 if (candidate.PdbPath != null)
                 {
@@ -155,6 +157,8 @@ namespace XMLDocNormalizer.Evaluation
                 {
                     return Fail(result, candidate, "ConfigurationReconstructed", EvaluationFailureCategory.ConfigurationUnsupported, "Recorded compiler configuration is outside the supported P5G shape: " + FormatCompilationOptions(provenance.CompilationOptions), stopwatch);
                 }
+
+                CaptureSigningConfiguration(result, configuration.CompilationOptions);
 
                 result.ExpectedSourceFileCount = configuration.SourceFileCount;
                 AddStage(result, "ConfigurationReconstructed", true, $"Compiler {configuration.CompilerVersion}; {configuration.SourceFileCount} sources.");
@@ -209,9 +213,10 @@ namespace XMLDocNormalizer.Evaluation
                     referenceSet,
                     out CSharpCompilation compilation))
                 {
-                    return Fail(result, candidate, "CompilationCreated", EvaluationFailureCategory.ExpectedUnsupported, "P5K rejected the final composition; signed targets are intentionally unsupported.", stopwatch);
+                    return Fail(result, candidate, "CompilationCreated", EvaluationFailureCategory.ExpectedUnsupported, "P5K rejected the final composition because target, provenance, semantic options, or complete assembly identity did not agree.", stopwatch);
                 }
 
+                CaptureSigningFidelity(result, fixture.Target, compilation);
                 result.CompilerErrorCount = compilation.GetDiagnostics().Count(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
                 result.CompilerWarningCount = compilation.GetDiagnostics().Count(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Warning);
                 AddStage(result, "CompilationCreated", true, compilation.Assembly.Identity.ToString());
@@ -240,7 +245,9 @@ namespace XMLDocNormalizer.Evaluation
                 AddStage(result, "SupportingSourceRegistered", true, "Exact P6A external scope registered.");
                 AddStage(result, "SourceBodyUsed", fixture.SourceMethodResolved, fixture.SourceMethodResolved
                     ? "P6B resolved the invoked metadata method to a source declaration."
-                    : "No source-backed invoked method was resolved.");
+                    : candidate.Probe == null
+                        ? "Not exercised because this candidate has no configured callable probe."
+                        : "The configured invoked metadata method was not resolved to source.");
                 stopwatch.Stop();
                 result.DurationMs = stopwatch.ElapsedMilliseconds;
                 return result;
@@ -253,6 +260,66 @@ namespace XMLDocNormalizer.Evaluation
             {
                 return Fail(result, candidate, "UnhandledCandidateBoundary", EvaluationFailureCategory.PotentialBug, exception.Message, stopwatch, potentialBug: true);
             }
+        }
+
+        /// <summary>Captures exact target-PE signing and complete identity evidence.</summary>
+        private static void CaptureTargetSigning(
+            EvaluationCandidateResult result,
+            ExternalAssemblyReferenceDescriptor target,
+            ExternalAssemblySigningProvenance signing)
+        {
+            AssemblyIdentity identity = target.AssemblyIdentity;
+            result.Signing.TargetState = signing.State.ToString();
+            result.Signing.OriginalAssemblyIdentity = identity.ToString();
+            result.Signing.AssemblyName = identity.Name;
+            result.Signing.AssemblyVersion = identity.Version.ToString();
+            result.Signing.Culture = identity.CultureName ?? string.Empty;
+            result.Signing.PublicKey = Convert.ToHexString(signing.PublicKey.AsSpan());
+            result.Signing.PublicKeySha256 = signing.PublicKey.IsEmpty
+                ? string.Empty
+                : Convert.ToHexString(SHA256.HashData(signing.PublicKey.AsSpan()));
+            result.Signing.PublicKeyToken = Convert.ToHexString(
+                signing.PublicKeyToken.AsSpan());
+            result.Signing.AssemblyFlags = $"0x{(int)signing.AssemblyFlags:X8} {signing.AssemblyFlags}";
+            result.Signing.CorFlags = $"0x{(int)signing.CorFlags:X8} {signing.CorFlags}";
+            result.Signing.StrongNameSignatureSize = signing.StrongNameSignatureSize;
+            result.Signing.StrongNameSignatureSha256 = Convert.ToHexString(
+                signing.StrongNameSignatureSha256.AsSpan());
+            result.Signing.HasStrongNameSignature = signing.HasStrongNameSignature;
+            result.Signing.SemanticReconstructionSupported =
+                signing.IsSemanticReconstructionSupported;
+        }
+
+        /// <summary>Captures public Roslyn signing options used for semantic analysis.</summary>
+        private static void CaptureSigningConfiguration(
+            EvaluationCandidateResult result,
+            CSharpCompilationOptions compilationOptions)
+        {
+            result.Signing.ReconstructedCryptoPublicKey = Convert.ToHexString(
+                compilationOptions.CryptoPublicKey.AsSpan());
+            result.Signing.CryptoKeyFile = compilationOptions.CryptoKeyFile;
+            result.Signing.CryptoKeyContainer = compilationOptions.CryptoKeyContainer;
+            result.Signing.DelaySign = compilationOptions.DelaySign;
+            result.Signing.PublicSign = compilationOptions.PublicSign;
+            result.Signing.StrongNameProviderConfigured =
+                compilationOptions.StrongNameProvider != null;
+        }
+
+        /// <summary>Captures P5L exact identity fidelity after P5K composition.</summary>
+        private static void CaptureSigningFidelity(
+            EvaluationCandidateResult result,
+            ExternalAssemblyReferenceDescriptor target,
+            CSharpCompilation compilation)
+        {
+            result.Signing.ReconstructedAssemblyIdentity =
+                compilation.Assembly.Identity.ToString();
+            result.Signing.AssemblyIdentityMatches =
+                target.AssemblyIdentity.Equals(compilation.Assembly.Identity);
+            result.Signing.FidelityResult = result.Signing.AssemblyIdentityMatches == true
+                ? result.Signing.TargetState == ExternalAssemblySigningState.Unsigned.ToString()
+                    ? "UnsignedUnchanged"
+                    : "ExactIdentityReconstructed; EmitSigningNotReconstructed"
+                : "RejectedIdentityMismatch";
         }
 
         private ConsumerFixture? CreateConsumerFixture(EvaluationCandidate candidate, string assemblyPath)
@@ -651,6 +718,7 @@ namespace XMLDocNormalizer.Evaluation
                 AnalyzerMode = nameof(ExceptionAnalysisMode.SolutionTransitive),
                 AssemblyPath = candidate.AssemblyPath.Replace('\\', '/'),
                 PdbPath = candidate.PdbPath?.Replace('\\', '/'),
+                SourceBodyProbeConfigured = candidate.Probe != null,
                 ManualVerification = candidate.Probe?.VerifiedFlow
             };
         }

@@ -200,7 +200,8 @@ namespace XMLDocNormalizer.Execution.Semantic
             if (!TryValidateManifestPe(
                     expectedDescriptor,
                     peReader,
-                    out ExternalModuleIdentity manifestModule))
+                    out ExternalModuleIdentity manifestModule,
+                    out ExternalAssemblySigningProvenance signingProvenance))
             {
                 descriptor = null!;
                 return false;
@@ -279,6 +280,7 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             descriptor = new ExternalPeDebugDirectoryDescriptor(
                 manifestModule,
+                signingProvenance,
                 isDeterministic,
                 codeViews,
                 embeddedIds,
@@ -292,6 +294,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="expectedDescriptor">The expected P3 binary descriptor.</param>
         /// <param name="peReader">The PE reader.</param>
         /// <param name="manifestModule">The validated manifest module.</param>
+        /// <param name="signingProvenance">The exact target PE signing provenance.</param>
         /// <returns>
         /// <see langword="true"/> when all manifest identity fields match;
         /// otherwise <see langword="false"/>.
@@ -303,7 +306,8 @@ namespace XMLDocNormalizer.Execution.Semantic
         private static bool TryValidateManifestPe(
             ExternalAssemblyReferenceDescriptor expectedDescriptor,
             PEReader peReader,
-            out ExternalModuleIdentity manifestModule)
+            out ExternalModuleIdentity manifestModule,
+            out ExternalAssemblySigningProvenance signingProvenance)
         {
             ArgumentNullException.ThrowIfNull(expectedDescriptor);
             ArgumentNullException.ThrowIfNull(peReader);
@@ -311,6 +315,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             if (expectedDescriptor.Modules.IsDefaultOrEmpty || !peReader.HasMetadata)
             {
                 manifestModule = default;
+                signingProvenance = null!;
                 return false;
             }
 
@@ -319,6 +324,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             if (!metadataReader.IsAssembly)
             {
                 manifestModule = default;
+                signingProvenance = null!;
                 return false;
             }
 
@@ -327,6 +333,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                     out AssemblyIdentity assemblyIdentity))
             {
                 manifestModule = default;
+                signingProvenance = null!;
                 return false;
             }
 
@@ -334,9 +341,15 @@ namespace XMLDocNormalizer.Execution.Semantic
             manifestModule = new ExternalModuleIdentity(
                 metadataReader.GetString(moduleDefinition.Name),
                 metadataReader.GetGuid(moduleDefinition.Mvid));
+            signingProvenance = null!;
 
             return expectedDescriptor.AssemblyIdentity.Equals(assemblyIdentity)
-                && expectedDescriptor.Modules[0].Equals(manifestModule);
+                && expectedDescriptor.Modules[0].Equals(manifestModule)
+                && ExternalAssemblySigningProvenanceFactory.TryCreate(
+                    peReader,
+                    metadataReader,
+                    assemblyIdentity,
+                    out signingProvenance);
         }
 
         /// <summary>

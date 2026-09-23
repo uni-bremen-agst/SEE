@@ -661,6 +661,249 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
+        /// Reconstructs the exact signed semantic identity from the complete
+        /// public key without configuring a private key, provider, or emit mode.
+        /// </summary>
+        [Fact]
+        public void FullySignedTargetWithExactPublicKey_ReconstructsSemanticIdentity()
+        {
+            CompositionFixture fixture = CreateFullySignedFixture(CreateFixture(
+                sources:
+                [
+                    "public static class SignedHelper { "
+                    + "public static T Echo<T>(T value) => value; }",
+                    "public sealed class SignedConsumer { "
+                    + "public string Read(string value) => SignedHelper.Echo(value); }",
+                ],
+                references: CreateInMemoryDefaultReferences()));
+
+            Assert.True(TryCreate(fixture, out CSharpCompilation compilation));
+            Assert.Equal(fixture.TargetAssembly.AssemblyIdentity, compilation.Assembly.Identity);
+            Assert.Equal(
+                fixture.TargetAssembly.AssemblyIdentity.PublicKey,
+                compilation.Assembly.Identity.PublicKey);
+            Assert.Equal(
+                fixture.TargetAssembly.AssemblyIdentity.PublicKeyToken,
+                compilation.Assembly.Identity.PublicKeyToken);
+            Assert.Equal(
+                fixture.Configuration.SigningProvenance.PublicKey,
+                compilation.Options.CryptoPublicKey);
+            Assert.Null(compilation.Options.CryptoKeyFile);
+            Assert.Null(compilation.Options.CryptoKeyContainer);
+            Assert.Null(compilation.Options.DelaySign);
+            Assert.False(compilation.Options.PublicSign);
+            Assert.Null(compilation.Options.StrongNameProvider);
+
+            InvocationExpressionSyntax invocation = compilation.SyntaxTrees[1]
+                .GetRoot()
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Single();
+            IMethodSymbol symbol = Assert.IsAssignableFrom<IMethodSymbol>(
+                compilation.GetSemanticModel(compilation.SyntaxTrees[1])
+                    .GetSymbolInfo(invocation).Symbol);
+            Assert.Equal("Echo", symbol.Name);
+            Assert.Equal(SpecialType.System_String, symbol.ReturnType.SpecialType);
+            Assert.Same(
+                compilation.SyntaxTrees[0],
+                Assert.Single(symbol.OriginalDefinition.DeclaringSyntaxReferences).SyntaxTree);
+        }
+
+        /// <summary>
+        /// Rejects a different full public key even when name, version,
+        /// culture, trees, references, and all nonsigning options agree.
+        /// </summary>
+        [Fact]
+        public void FullySignedTargetWithWrongPublicKey_FailsClosed()
+        {
+            CompositionFixture unsigned = CreateFixture(
+                references: CreateInMemoryDefaultReferences());
+            CompositionFixture expected = CreateFullySignedFixture(
+                unsigned,
+                GetSigningPublicKey());
+            CompositionFixture wrong = CreateFullySignedFixture(
+                unsigned,
+                GetDifferentSigningPublicKey());
+
+            Assert.NotEqual(
+                expected.TargetAssembly.AssemblyIdentity.PublicKeyToken,
+                wrong.TargetAssembly.AssemblyIdentity.PublicKeyToken);
+            Assert.False(TryCreate(
+                wrong with { TargetAssembly = expected.TargetAssembly },
+                out _));
+        }
+
+        /// <summary>
+        /// Rejects a signed target when P5G omitted its required complete key.
+        /// </summary>
+        [Fact]
+        public void FullySignedTargetWithMissingPublicKey_FailsClosed()
+        {
+            CompositionFixture unsigned = CreateFixture(
+                references: CreateInMemoryDefaultReferences());
+            CompositionFixture signed = CreateFullySignedFixture(unsigned);
+            ExternalAssemblySigningProvenance signing =
+                signed.Configuration.SigningProvenance;
+            ExternalCSharpCompilationConfiguration missingKey = CreateConfiguration(
+                unsigned.Configuration.ParseOptions,
+                unsigned.Configuration.CompilationOptions,
+                unsigned.Configuration.SourceFileCount,
+                signing);
+            ExternalCompilationProvenanceDescriptor provenance = CreateProvenance(
+                CreateDebugDirectory(signed.TargetAssembly.Modules[0], signing),
+                missingKey,
+                signed.References.References);
+
+            Assert.False(TryCreate(
+                signed with { Configuration = missingKey, Provenance = provenance },
+                out _));
+        }
+
+        /// <summary>
+        /// Applies the P5L composition postcondition to an already created
+        /// compilation and rejects a different signed assembly identity.
+        /// </summary>
+        [Fact]
+        public void P5L_DifferentSignedCompilationIdentity_FailsClosed()
+        {
+            CompositionFixture fixture = CreateFullySignedFixture(CreateFixture(
+                references: CreateInMemoryDefaultReferences()));
+            CSharpCompilation wrong = CSharpCompilation.Create(
+                fixture.TargetAssembly.AssemblyIdentity.Name,
+                fixture.Trees.Trees,
+                fixture.References.References,
+                fixture.Configuration.CompilationOptions.WithCryptoPublicKey(
+                    GetDifferentSigningPublicKey()));
+
+            Assert.NotEqual(
+                fixture.TargetAssembly.AssemblyIdentity,
+                wrong.Assembly.Identity);
+            Assert.False(ExternalCSharpCompilationFactory.IsValidComposition(
+                fixture.TargetAssembly,
+                fixture.Provenance,
+                fixture.Configuration,
+                fixture.Trees,
+                fixture.References,
+                wrong));
+        }
+
+        /// <summary>
+        /// Demonstrates that the full signed friend identity affects binding:
+        /// exact identity grants internal access while missing or wrong keys do not.
+        /// Public generic binding remains available in all three compilations.
+        /// </summary>
+        [Fact]
+        public void InternalsVisibleTo_RequiresExactSignedFriendIdentity()
+        {
+            ImmutableArray<byte> publicKey = GetSigningPublicKey();
+            string publicKeyHex = Convert.ToHexString(publicKey.AsSpan());
+            CSharpCompilation dependency = CSharpCompilation.Create(
+                "Friend.Dependency",
+                [Tree(
+                    "using System.Runtime.CompilerServices; "
+                    + $"[assembly: InternalsVisibleTo(\"Friend.Target, PublicKey={publicKeyHex}\")] "
+                    + "namespace FriendDependency { "
+                    + "internal static class Hidden { internal static int Read() => 7; } "
+                    + "public static class PublicApi { "
+                    + "public static T Echo<T>(T value) => value; } }",
+                    "/_/Dependency.cs")],
+                MetadataReferences.Default,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            Assert.DoesNotContain(
+                dependency.GetDiagnostics(),
+                diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+            MetadataReference dependencyReference = dependency.ToMetadataReference();
+            ImmutableArray<MetadataReference> references =
+                MetadataReferences.Default.Append(dependencyReference).ToImmutableArray();
+            SyntaxTree source = Tree(
+                "public static class FriendConsumer { "
+                + "public static int Internal() => FriendDependency.Hidden.Read(); "
+                + "public static string Public(string value) "
+                + "=> FriendDependency.PublicApi.Echo(value); }",
+                "/_/FriendConsumer.cs");
+
+            CSharpCompilation exact = CreateFriendCompilation(
+                source,
+                references,
+                publicKey);
+            CSharpCompilation missing = CreateFriendCompilation(
+                source,
+                references,
+                ImmutableArray<byte>.Empty);
+            CSharpCompilation wrong = CreateFriendCompilation(
+                source,
+                references,
+                GetDifferentSigningPublicKey());
+
+            Assert.DoesNotContain(
+                exact.GetDiagnostics(),
+                diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+            Assert.Contains(
+                missing.GetDiagnostics(),
+                diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+            Assert.Contains(
+                wrong.GetDiagnostics(),
+                diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+            AssertInvocationBindings(exact, expectInternalBinding: true);
+            AssertInvocationBindings(missing, expectInternalBinding: false);
+            AssertInvocationBindings(wrong, expectInternalBinding: false);
+        }
+
+        /// <summary>
+        /// Carries one exact signed P5K result through P6A registration and
+        /// P6B cross-compilation method resolution without emitting a binary.
+        /// </summary>
+        [Fact]
+        public void FullySignedTarget_P6ARegistrationAndP6BResolutionSucceed()
+        {
+            CompositionFixture fixture = CreateFullySignedFixture(CreateFixture(
+                assemblyName: "Signed.Navigation",
+                sources:
+                [
+                    "namespace SignedNavigation { public static class Api { "
+                    + "public static void Run() { } } }",
+                ],
+                references: CreateInMemoryDefaultReferences()));
+            Assert.True(TryCreate(fixture, out CSharpCompilation compilation));
+            Assert.True(ExternalSupportingSourceCompilation.TryCreate(
+                fixture.TargetAssembly,
+                fixture.Provenance,
+                fixture.Configuration,
+                fixture.Trees,
+                fixture.References,
+                compilation,
+                out ExternalSupportingSourceCompilation supportingSource));
+            SupportingSourceCatalog catalog = new();
+            Assert.True(catalog.TryRegisterExternal(
+                supportingSource,
+                out SemanticCompilationScope scope));
+
+            CSharpCompilation consumer = CSharpCompilation.Create(
+                "Signed.Navigation.Consumer",
+                references: MetadataReferences.Default.Append(
+                    compilation.ToMetadataReference()),
+                options: new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary));
+            IAssemblySymbol metadataAssembly = Assert.IsAssignableFrom<IAssemblySymbol>(
+                consumer.GetAssemblyOrModuleSymbol(consumer.References.Last()));
+            INamedTypeSymbol metadataType = Assert.IsAssignableFrom<INamedTypeSymbol>(
+                metadataAssembly.GetTypeByMetadataName("SignedNavigation.Api"));
+            IMethodSymbol metadataMethod = Assert.Single(
+                metadataType.GetMembers("Run").OfType<IMethodSymbol>());
+
+            IMethodSymbol sourceMethod = Assert.IsAssignableFrom<IMethodSymbol>(
+                CrossCompilationSymbolResolver.ResolveMethod(
+                    metadataMethod,
+                    scope.Compilation));
+            SyntaxReference declaration = Assert.Single(
+                sourceMethod.DeclaringSyntaxReferences);
+            Assert.Same(compilation.SyntaxTrees.Single(), declaration.SyntaxTree);
+            Assert.Equal(
+                fixture.TargetAssembly.AssemblyIdentity,
+                sourceMethod.ContainingAssembly.Identity);
+        }
+
+        /// <summary>
         /// Preserves a culture carried by source-level assembly identity and
         /// validates it as part of the complete identity postcondition.
         /// </summary>
@@ -1084,11 +1327,13 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         private static ExternalCSharpCompilationConfiguration CreateConfiguration(
             CSharpParseOptions parseOptions,
             CSharpCompilationOptions compilationOptions,
-            int sourceFileCount)
+            int sourceFileCount,
+            ExternalAssemblySigningProvenance? signingProvenance = null)
         {
             return new ExternalCSharpCompilationConfiguration(
                 parseOptions,
                 compilationOptions,
+                signingProvenance ?? ExternalAssemblySigningProvenance.Unsigned,
                 "5.0.0-test",
                 "test-runtime",
                 sourceFileCount,
@@ -1122,14 +1367,118 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Creates minimal P4A provenance for one target manifest module.
         /// </summary>
         private static ExternalPeDebugDirectoryDescriptor CreateDebugDirectory(
-            ExternalModuleIdentity manifestModule)
+            ExternalModuleIdentity manifestModule,
+            ExternalAssemblySigningProvenance? signingProvenance = null)
         {
             return new ExternalPeDebugDirectoryDescriptor(
                 manifestModule,
+                signingProvenance ?? ExternalAssemblySigningProvenance.Unsigned,
                 isDeterministic: false,
                 ImmutableArray<ExternalCodeViewPdbReference>.Empty,
                 ImmutableArray<BlobContentId>.Empty,
                 ImmutableArray<ExternalPdbChecksum>.Empty);
+        }
+
+        /// <summary>Applies exact fully signed semantic provenance to one fixture.</summary>
+        private static CompositionFixture CreateFullySignedFixture(
+            CompositionFixture fixture,
+            ImmutableArray<byte>? requestedPublicKey = null)
+        {
+            ImmutableArray<byte> publicKey = requestedPublicKey ?? GetSigningPublicKey();
+            CSharpCompilationOptions options = fixture.Configuration.CompilationOptions
+                .WithCryptoPublicKey(publicKey);
+            CSharpCompilation identity = CSharpCompilation.Create(
+                fixture.TargetAssembly.AssemblyIdentity.Name,
+                fixture.Trees.Trees,
+                fixture.References.References,
+                options);
+            ExternalAssemblySigningProvenance signing =
+                new ExternalAssemblySigningProvenance(
+                    ExternalAssemblySigningState.FullySigned,
+                    AssemblyFlags.PublicKey,
+                    CorFlags.ILOnly | CorFlags.StrongNameSigned,
+                    publicKey,
+                    identity.Assembly.Identity.PublicKeyToken,
+                    strongNameSignatureSize: 128,
+                    Enumerable.Repeat((byte)1, 32).ToImmutableArray());
+            ExternalCSharpCompilationConfiguration configuration = CreateConfiguration(
+                fixture.Configuration.ParseOptions,
+                options,
+                fixture.Configuration.SourceFileCount,
+                signing);
+            ExternalAssemblyReferenceDescriptor target = new(
+                identity.Assembly.Identity,
+                fixture.TargetAssembly.Modules,
+                fixture.TargetAssembly.FilePath,
+                fixture.TargetAssembly.IsReferenceAssembly);
+            ExternalCompilationProvenanceDescriptor provenance = CreateProvenance(
+                CreateDebugDirectory(target.Modules[0], signing),
+                configuration,
+                fixture.References.References);
+            return fixture with
+            {
+                TargetAssembly = target,
+                Provenance = provenance,
+                Configuration = configuration,
+            };
+        }
+
+        /// <summary>Gets a real complete public key without acquiring its private half.</summary>
+        private static ImmutableArray<byte> GetSigningPublicKey()
+        {
+            return ImmutableArray.Create(
+                typeof(object).Assembly.GetName().GetPublicKey()!);
+        }
+
+        /// <summary>Gets a distinct real complete public key for negative tests.</summary>
+        private static ImmutableArray<byte> GetDifferentSigningPublicKey()
+        {
+            ImmutableArray<byte> key = ImmutableArray.Create(
+                typeof(CSharpCompilation).Assembly.GetName().GetPublicKey()!);
+            Assert.NotEqual(GetSigningPublicKey(), key);
+            return key;
+        }
+
+        /// <summary>Creates one signed friend compilation without an emit key source.</summary>
+        private static CSharpCompilation CreateFriendCompilation(
+            SyntaxTree source,
+            ImmutableArray<MetadataReference> references,
+            ImmutableArray<byte> publicKey)
+        {
+            CSharpCompilationOptions options = new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary);
+            if (!publicKey.IsEmpty)
+            {
+                options = options.WithCryptoPublicKey(publicKey);
+            }
+
+            return CSharpCompilation.Create(
+                "Friend.Target",
+                [source],
+                references,
+                options);
+        }
+
+        /// <summary>Checks internal and public invocation binding independently.</summary>
+        private static void AssertInvocationBindings(
+            CSharpCompilation compilation,
+            bool expectInternalBinding)
+        {
+            InvocationExpressionSyntax[] invocations = compilation.SyntaxTrees.Single()
+                .GetRoot()
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .ToArray();
+            Assert.Equal(2, invocations.Length);
+            SemanticModel model = compilation.GetSemanticModel(
+                compilation.SyntaxTrees.Single());
+            Assert.Equal(
+                expectInternalBinding,
+                model.GetSymbolInfo(invocations[0]).Symbol != null);
+            IMethodSymbol publicSymbol = Assert.IsAssignableFrom<IMethodSymbol>(
+                model.GetSymbolInfo(invocations[1]).Symbol);
+            Assert.Equal("Echo", publicSymbol.Name);
+            Assert.Equal(SpecialType.System_String, publicSymbol.ReturnType.SpecialType);
         }
 
         /// <summary>

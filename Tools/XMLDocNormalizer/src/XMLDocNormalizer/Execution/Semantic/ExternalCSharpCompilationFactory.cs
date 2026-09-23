@@ -11,7 +11,7 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// <remarks>
     /// The result is a structural semantic reconstruction, not a bit-identical
     /// original compilation or reproducible build. Success does not guarantee
-    /// zero diagnostics, successful emit, identical warning or signing
+    /// zero diagnostics, successful emit, identical warning or emit-signing
     /// configuration, or analyzer and generator parity.
     /// </remarks>
     internal static class ExternalCSharpCompilationFactory
@@ -96,6 +96,7 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             if (!HaveExpectedComposition(
                     targetAssembly,
+                    compilationProvenance,
                     configuration,
                     syntaxTreeSet,
                     referenceSet,
@@ -149,6 +150,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                     referenceSet)
                 && HaveExpectedComposition(
                     targetAssembly,
+                    compilationProvenance,
                     configuration,
                     syntaxTreeSet,
                     referenceSet,
@@ -178,6 +180,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                 && !targetAssembly.Modules.IsDefaultOrEmpty
                 && targetAssembly.Modules[0]
                     == compilationProvenance.DebugDirectory.ManifestModule
+                && HaveExpectedSigningConfiguration(
+                    targetAssembly,
+                    compilationProvenance,
+                    configuration)
                 && HaveExpectedTargetModules(
                     targetAssembly.Modules,
                     compilationProvenance.MetadataReferences)
@@ -193,6 +199,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// transforming another compilation.
         /// </summary>
         /// <param name="targetAssembly">The P3-validated target identity.</param>
+        /// <param name="compilationProvenance">The P4A/P5A provenance.</param>
         /// <param name="configuration">The P5G configuration.</param>
         /// <param name="syntaxTreeSet">The complete P5J tree set.</param>
         /// <param name="referenceSet">The complete P5E reference set.</param>
@@ -204,6 +211,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </returns>
         private static bool HaveExpectedComposition(
             ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCompilationProvenanceDescriptor compilationProvenance,
             ExternalCSharpCompilationConfiguration configuration,
             ExternalCSharpSyntaxTreeSet syntaxTreeSet,
             ExternalMetadataReferenceSet referenceSet,
@@ -215,6 +223,11 @@ namespace XMLDocNormalizer.Execution.Semantic
                     targetAssembly.AssemblyIdentity.Name,
                     StringComparison.Ordinal)
                 && compilation.Assembly.Identity.Equals(targetAssembly.AssemblyIdentity)
+                && HaveExpectedSigningFidelity(
+                    targetAssembly,
+                    compilationProvenance,
+                    configuration,
+                    compilation)
                 && string.Equals(
                     compilation.SourceModule.Name,
                     targetAssembly.Modules[0].Name,
@@ -223,6 +236,79 @@ namespace XMLDocNormalizer.Execution.Semantic
                 && HaveSameReferenceInstances(
                     compilation.References,
                     referenceSet.References);
+        }
+
+        /// <summary>Validates exact P4A signing provenance and P5G semantic options.</summary>
+        /// <param name="targetAssembly">The original complete P3 identity.</param>
+        /// <param name="compilationProvenance">The P4A/P5A provenance.</param>
+        /// <param name="configuration">The reconstructed P5G configuration.</param>
+        /// <returns>
+        /// <see langword="true"/> when the supported target signing shape,
+        /// complete public key, token, and semantic options agree exactly.
+        /// </returns>
+        private static bool HaveExpectedSigningConfiguration(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCompilationProvenanceDescriptor compilationProvenance,
+            ExternalCSharpCompilationConfiguration configuration)
+        {
+            ExternalAssemblySigningProvenance signing =
+                compilationProvenance.DebugDirectory.SigningProvenance;
+            CSharpCompilationOptions options = configuration.CompilationOptions;
+            if (!ReferenceEquals(configuration.SigningProvenance, signing)
+                || !signing.IsSemanticReconstructionSupported
+                || options.CryptoKeyFile != null
+                || options.CryptoKeyContainer != null
+                || options.DelaySign != null
+                || options.PublicSign
+                || options.StrongNameProvider != null)
+            {
+                return false;
+            }
+
+            if (signing.State == ExternalAssemblySigningState.Unsigned)
+            {
+                return !targetAssembly.AssemblyIdentity.HasPublicKey
+                    && signing.PublicKey.IsEmpty
+                    && signing.PublicKeyToken.IsEmpty
+                    && options.CryptoPublicKey.IsDefaultOrEmpty;
+            }
+
+            return signing.State == ExternalAssemblySigningState.FullySigned
+                && signing.HasStrongNameSignature
+                && targetAssembly.AssemblyIdentity.HasPublicKey
+                && signing.PublicKey.AsSpan().SequenceEqual(
+                    targetAssembly.AssemblyIdentity.PublicKey.AsSpan())
+                && signing.PublicKeyToken.AsSpan().SequenceEqual(
+                    targetAssembly.AssemblyIdentity.PublicKeyToken.AsSpan())
+                && options.CryptoPublicKey.AsSpan().SequenceEqual(
+                    signing.PublicKey.AsSpan());
+        }
+
+        /// <summary>
+        /// Applies the P5L signing-fidelity postcondition to an existing P5K result.
+        /// </summary>
+        /// <param name="targetAssembly">The original complete P3 identity.</param>
+        /// <param name="compilationProvenance">The P4A/P5A provenance.</param>
+        /// <param name="configuration">The reconstructed P5G configuration.</param>
+        /// <param name="compilation">The source-backed P5K compilation.</param>
+        /// <returns>
+        /// <see langword="true"/> when full public key, token, and complete
+        /// semantic assembly identity equal the original target.
+        /// </returns>
+        private static bool HaveExpectedSigningFidelity(
+            ExternalAssemblyReferenceDescriptor targetAssembly,
+            ExternalCompilationProvenanceDescriptor compilationProvenance,
+            ExternalCSharpCompilationConfiguration configuration,
+            CSharpCompilation compilation)
+        {
+            return HaveExpectedSigningConfiguration(
+                    targetAssembly,
+                    compilationProvenance,
+                    configuration)
+                && compilation.Assembly.Identity.PublicKey.AsSpan().SequenceEqual(
+                    targetAssembly.AssemblyIdentity.PublicKey.AsSpan())
+                && compilation.Assembly.Identity.PublicKeyToken.AsSpan().SequenceEqual(
+                    targetAssembly.AssemblyIdentity.PublicKeyToken.AsSpan());
         }
 
         /// <summary>

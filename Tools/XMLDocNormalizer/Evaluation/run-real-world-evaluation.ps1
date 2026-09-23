@@ -5,7 +5,9 @@ param(
     [ValidateSet('enabled', 'disabled', 'both')]
     [string]$SourceLink = 'both',
     [ValidateSet('strict', 'verified-line-endings', 'both')]
-    [string]$SourceReconstruction = 'strict'
+    [string]$SourceReconstruction = 'strict',
+    [ValidateSet('local', 'bounded-remote')]
+    [string]$References = 'local'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,7 +22,8 @@ function Invoke-Evaluation(
         --workspace ([IO.Path]::GetFullPath($Workspace)) `
         --output ([IO.Path]::GetFullPath($ReportDirectory)) `
         --source-link $SourceLinkPolicy `
-        --source-reconstruction $ReconstructionPolicy
+        --source-reconstruction $ReconstructionPolicy `
+        --references $References
 
     if ($LASTEXITCODE -ne 0)
     {

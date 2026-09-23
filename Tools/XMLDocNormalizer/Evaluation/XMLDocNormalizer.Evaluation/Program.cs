@@ -32,6 +32,7 @@ namespace XMLDocNormalizer.Evaluation
                     options.OutputDirectory,
                     manifest,
                     report);
+                G5SigningMatrixWriter.Write(options.OutputDirectory, report);
                 Console.WriteLine(Path.Combine(options.OutputDirectory, "real-world-evaluation.json"));
                 Console.WriteLine(Path.Combine(options.OutputDirectory, "real-world-evaluation.md"));
                 return report.Summary.UnexpectedFailures == 0

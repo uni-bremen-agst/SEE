@@ -35,6 +35,9 @@ fixed LF-to-CRLF and CRLF-to-LF candidate set, or `both` to write separate
 strict and verified reports. Every reconstructed candidate is accepted only if
 the existing P5H validation matches its exact bytes to the checksum recorded in
 the validated Portable PDB; the transformation itself establishes no trust.
+Reference acquisition defaults to `-References local`; use
+`-References bounded-remote` only for the explicit G4B/G5 bounded artifact
+profile.
 
 ## Workspace and repository policy
 
@@ -58,11 +61,11 @@ Versions are immutable manifest entries. Testing a different release requires a 
 
 ## Evaluation semantics
 
-For each candidate the harness records pinned hashes, PDB/source provenance, every reached reconstruction gate, P7A discovery, P7B origin counts, direct/reconstructed/unavailable source counts, bounded line-ending reconstruction work, P5 source/reference counts, compiler diagnostics, fallback classification, duration, and canonical finding sets. It invokes the existing exception detector in `SolutionTransitive` mode; the harness does not implement exception semantics of its own.
+For each candidate the harness records pinned hashes, PDB/source provenance, every reached reconstruction gate, P7A discovery, P7B origin counts, direct/reconstructed/unavailable source counts, bounded line-ending reconstruction work, P5 source/reference counts, exact target signing provenance, reconstructed public identity, compiler diagnostics, fallback classification, duration, and canonical finding sets. It invokes the existing exception detector in `SolutionTransitive` mode; the harness does not implement exception semantics of its own.
 
 The Semver probe compares metadata-only analysis against registered P6A/P6B supporting source. Its manual note refers only to method/type/flow structure at the exact Source Link commit and does not reproduce third-party source text.
 
-`Direct` and `ProjectTransitiveDeclaredExceptions` remain covered by the existing P7B demand-driven regression tests and are not made to reconstruct external bodies by this eager diagnostic harness. Performance interpretation, persistent source caching, authenticated Source Link, signed-target reconstruction, source-package discovery, generators, and new analysis modes are out of scope for E1.
+`Direct` and `ProjectTransitiveDeclaredExceptions` remain covered by the existing P7B demand-driven regression tests and are not made to reconstruct external bodies by this eager diagnostic harness. Fully signed targets may reconstruct their exact public assembly identity for semantic analysis from validated PE provenance; private keys, historical signature reproduction, and target re-emission remain out of scope. Performance interpretation, persistent source caching, authenticated Source Link, source-package discovery, generators, and new analysis modes are also out of scope for E1.
 
 ## Offline unit tests
 

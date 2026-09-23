@@ -110,8 +110,8 @@
           "evidence": "net6.0 PDB compilation defines plus a bounded publication-era pack probe; the coordinate remains a discovery hint and P5 is authoritative"
         }
       ],
-      "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Widely used multi-source library with real Source Link symbols and a signed target boundary.",
+      "expectedOutcome": "Success",
+      "selectionReason": "Widely used multi-source library with real Source Link symbols and a fully signed target for exact semantic identity reconstruction.",
       "categories": ["PortablePdb", "SourceLink", "MultipleSources", "SignedTarget"]
     },
     {
@@ -134,8 +134,8 @@
       "assemblyPath": "packages/polly.7.2.4/lib/netstandard2.0/Polly.dll",
       "pdbPath": "packages/polly.7.2.4/lib/netstandard2.0/Polly.pdb",
       "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
-      "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Established async/generic resilience library with real Source Link symbols and a signed target boundary.",
+      "expectedOutcome": "Success",
+      "selectionReason": "Established async/generic resilience library with real Source Link symbols and a fully signed target; all exact references are local, independently controlling for remote acquisition.",
       "categories": ["PortablePdb", "SourceLink", "Async", "Generics", "SignedTarget"]
     },
     {
@@ -159,8 +159,8 @@
         { "assemblySimpleName": "System.Text.Json", "packageId": "System.Text.Json", "versions": ["4.7.2"], "provider": "NuGetPackage", "evidence": "Microsoft.Extensions.DependencyModel 3.1.25 nuspec lower-bound dependency" },
         { "assemblySimpleName": "System.Threading.Tasks.Extensions", "packageId": "System.Threading.Tasks.Extensions", "versions": ["4.5.4"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidate" }
       ],
-      "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Dependency-bearing DI library for observing exact-reference failure before its signed target boundary.",
+      "expectedOutcome": "Success",
+      "selectionReason": "Dependency-bearing DI library with real Source Link symbols and a fully signed target for exact semantic identity reconstruction after exact reference acquisition.",
       "categories": ["PortablePdb", "SourceLink", "ExternalDependency", "SignedTarget"]
     },
     {
@@ -196,8 +196,8 @@
         { "assemblySimpleName": "System.Numerics.Vectors", "packageId": "System.Numerics.Vectors", "versions": ["4.5.0"], "provider": "NuGetPackage", "evidence": "bounded System.Memory transitive dependency candidate" },
         { "assemblySimpleName": "System.Runtime.CompilerServices.Unsafe", "packageId": "System.Runtime.CompilerServices.Unsafe", "versions": ["6.0.0"], "provider": "NuGetPackage", "evidence": "System.Diagnostics.DiagnosticSource 7.0.2 nuspec lower-bound dependency" }
       ],
-      "expectedOutcome": "ExpectedFailClosed",
-      "selectionReason": "Widely used interface-heavy logging library with real Source Link symbols and a signed target boundary.",
+      "expectedOutcome": "Success",
+      "selectionReason": "Widely used interface-heavy logging library with real Source Link symbols and a fully signed target for exact semantic identity reconstruction.",
       "categories": ["PortablePdb", "SourceLink", "InterfaceDispatch", "SignedTarget"]
     }
   ]

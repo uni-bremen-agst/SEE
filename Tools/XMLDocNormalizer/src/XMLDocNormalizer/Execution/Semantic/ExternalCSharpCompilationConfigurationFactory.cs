@@ -107,7 +107,12 @@ namespace XMLDocNormalizer.Execution.Semantic
                 assemblyIdentityComparer: AssemblyIdentityComparer.Default,
                 nullableContextOptions: nullable);
 
-            if (!parseOptions.Errors.IsEmpty || !compilationOptions.Errors.IsEmpty)
+            if (!TryApplySemanticSigning(
+                    compilationProvenance.DebugDirectory.SigningProvenance,
+                    compilationOptions,
+                    out compilationOptions)
+                || !parseOptions.Errors.IsEmpty
+                || !compilationOptions.Errors.IsEmpty)
             {
                 configuration = null!;
                 return false;
@@ -116,12 +121,57 @@ namespace XMLDocNormalizer.Execution.Semantic
             configuration = new ExternalCSharpCompilationConfiguration(
                 parseOptions,
                 compilationOptions,
+                compilationProvenance.DebugDirectory.SigningProvenance,
                 compilerVersion,
                 runtimeVersion,
                 sourceFileCount,
                 defaultEncoding,
                 fallbackEncoding);
             return true;
+        }
+
+        /// <summary>
+        /// Reconstructs only the public key needed for semantic assembly identity.
+        /// </summary>
+        /// <param name="signing">The exact target PE signing provenance.</param>
+        /// <param name="options">The otherwise reconstructed compilation options.</param>
+        /// <param name="signedOptions">The semantic options when the shape is supported.</param>
+        /// <returns>
+        /// <see langword="true"/> for unsigned or fully signed targets. Delay-signed,
+        /// public-signed, and inconsistent shapes remain unsupported.
+        /// </returns>
+        private static bool TryApplySemanticSigning(
+            ExternalAssemblySigningProvenance signing,
+            CSharpCompilationOptions options,
+            out CSharpCompilationOptions signedOptions)
+        {
+            if (!signing.IsSemanticReconstructionSupported)
+            {
+                signedOptions = null!;
+                return false;
+            }
+
+            if (signing.State == ExternalAssemblySigningState.Unsigned)
+            {
+                signedOptions = options;
+                return signing.PublicKey.IsEmpty
+                    && signing.PublicKeyToken.IsEmpty;
+            }
+
+            if (signing.State != ExternalAssemblySigningState.FullySigned)
+            {
+                signedOptions = null!;
+                return false;
+            }
+
+            signedOptions = options.WithCryptoPublicKey(signing.PublicKey);
+            return signedOptions.CryptoPublicKey.AsSpan().SequenceEqual(
+                    signing.PublicKey.AsSpan())
+                && signedOptions.CryptoKeyFile == null
+                && signedOptions.CryptoKeyContainer == null
+                && signedOptions.DelaySign == null
+                && !signedOptions.PublicSign
+                && signedOptions.StrongNameProvider == null;
         }
 
         /// <summary>

@@ -169,6 +169,9 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets compiler warning count.</summary>
         public int CompilerWarningCount { get; set; }
 
+        /// <summary>Gets or sets exact target and reconstructed signing evidence.</summary>
+        public EvaluationSigningResult Signing { get; set; } = new();
+
         /// <summary>Gets or sets validated source-origin counts.</summary>
         public SortedDictionary<string, int> SourceOrigins { get; set; } = new(StringComparer.Ordinal);
 
@@ -212,6 +215,9 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets the semantic-model probe result.</summary>
         public bool SemanticModelProbeSucceeded { get; set; }
 
+        /// <summary>Gets or sets whether the manifest configured a callable probe.</summary>
+        public bool SourceBodyProbeConfigured { get; set; }
+
         /// <summary>Gets or sets the exception probe result.</summary>
         public bool ExceptionProbeSucceeded { get; set; }
 
@@ -220,6 +226,82 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets elapsed candidate milliseconds.</summary>
         public long DurationMs { get; set; }
+    }
+
+    /// <summary>
+    /// Captures observable target-PE signing provenance and the semantic-only
+    /// Roslyn reconstruction without claiming emit or signature fidelity.
+    /// </summary>
+    public sealed class EvaluationSigningResult
+    {
+        /// <summary>Gets or sets the P4A signing-state classification.</summary>
+        public string TargetState { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the complete original target identity.</summary>
+        public string OriginalAssemblyIdentity { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the assembly simple name.</summary>
+        public string AssemblyName { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the assembly version.</summary>
+        public string AssemblyVersion { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the neutral or explicit assembly culture.</summary>
+        public string Culture { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the complete manifest public key as hexadecimal.</summary>
+        public string PublicKey { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the SHA-256 digest of the complete public key.</summary>
+        public string PublicKeySha256 { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the public-key token as hexadecimal.</summary>
+        public string PublicKeyToken { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets exact manifest AssemblyFlags.</summary>
+        public string AssemblyFlags { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets exact PE CLI CorFlags.</summary>
+        public string CorFlags { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the original signature-directory size.</summary>
+        public int StrongNameSignatureSize { get; set; }
+
+        /// <summary>Gets or sets the SHA-256 digest of original signature bytes.</summary>
+        public string StrongNameSignatureSha256 { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets whether the signature directory contains nonzero bytes.</summary>
+        public bool HasStrongNameSignature { get; set; }
+
+        /// <summary>Gets or sets whether the semantic reconstruction supports the PE shape.</summary>
+        public bool SemanticReconstructionSupported { get; set; }
+
+        /// <summary>Gets or sets the reconstructed CryptoPublicKey as hexadecimal.</summary>
+        public string? ReconstructedCryptoPublicKey { get; set; }
+
+        /// <summary>Gets or sets the reconstructed CryptoKeyFile.</summary>
+        public string? CryptoKeyFile { get; set; }
+
+        /// <summary>Gets or sets the reconstructed CryptoKeyContainer.</summary>
+        public string? CryptoKeyContainer { get; set; }
+
+        /// <summary>Gets or sets the reconstructed nullable DelaySign option.</summary>
+        public bool? DelaySign { get; set; }
+
+        /// <summary>Gets or sets the reconstructed PublicSign option.</summary>
+        public bool PublicSign { get; set; }
+
+        /// <summary>Gets or sets whether a StrongNameProvider was configured.</summary>
+        public bool StrongNameProviderConfigured { get; set; }
+
+        /// <summary>Gets or sets the reconstructed compilation identity.</summary>
+        public string? ReconstructedAssemblyIdentity { get; set; }
+
+        /// <summary>Gets or sets whether original and reconstructed identities match.</summary>
+        public bool? AssemblyIdentityMatches { get; set; }
+
+        /// <summary>Gets or sets the explicit semantic/emit fidelity classification.</summary>
+        public string FidelityResult { get; set; } = "NotReached";
     }
 
     /// <summary>
