@@ -54,6 +54,7 @@ namespace XMLDocNormalizer.Evaluation
             builder.AppendLine($"- Runtime: `{report.Runtime}` ({report.ProcessArchitecture})");
             builder.AppendLine($"- Source Link enabled: `{report.SourceLinkEnabled}`");
             builder.AppendLine($"- Source reconstruction: `{report.SourceReconstructionPolicy}`");
+            builder.AppendLine($"- Reference acquisition: `{report.ReferenceAcquisitionPolicy}`");
             builder.AppendLine();
             builder.AppendLine("| Candidate | Version | PDB | Source | Reconstruction | Analysis | Result |");
             builder.AppendLine("| --- | --- | --- | --- | --- | --- | --- |");
@@ -112,6 +113,7 @@ namespace XMLDocNormalizer.Evaluation
                         .Select(static group => $"{group.Key}={group.Count()}"));
                 builder.AppendLine($"- Reference sources: {(referenceSources.Length == 0 ? "none" : referenceSources)}");
                 builder.AppendLine($"- Reference search: {candidate.ReferenceDiscovery.ArtifactRootsExamined} roots, {candidate.ReferenceDiscovery.DirectoriesEnumerated} directory enumerations, {candidate.ReferenceDiscovery.CandidateFilesConsidered} candidates, {candidate.ReferenceDiscovery.CandidateFilesOpened} opens, {candidate.ReferenceDiscovery.ValidationAttempts} P5 attempts");
+                builder.AppendLine($"- Remote references: {candidate.RemoteReferenceAcquisition.Searches} searches, {candidate.RemoteReferenceAcquisition.Requests} requests, {candidate.RemoteReferenceAcquisition.ArtifactRequests} artifacts, {candidate.RemoteReferenceAcquisition.DownloadedBytes} bytes, {candidate.RemoteReferenceAcquisition.BinaryCandidates} candidates, {candidate.RemoteReferenceAcquisition.P5ValidationAttempts} P5 attempts, {candidate.RemoteReferenceAcquisition.RemoteExact} exact, {candidate.RemoteReferenceAcquisition.Unavailable} unavailable, {candidate.RemoteReferenceAcquisition.LimitHits} limit hits");
                 builder.AppendLine($"- Diagnostics: {candidate.CompilerErrorCount} errors, {candidate.CompilerWarningCount} warnings");
                 builder.AppendLine($"- Manual flow: {candidate.ManualVerification ?? "not applicable"}");
                 builder.AppendLine($"- Duration: {candidate.DurationMs} ms");

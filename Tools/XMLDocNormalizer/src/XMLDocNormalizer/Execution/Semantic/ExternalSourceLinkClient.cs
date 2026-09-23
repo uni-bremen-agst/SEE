@@ -115,6 +115,29 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </exception>
         public static ExternalSourceLinkClient CreateDefault()
         {
+            return CreateDefault(
+                TimeSpan.FromSeconds(15),
+                DefaultMaximumResponseBytes);
+        }
+
+        /// <summary>
+        /// Creates the production HTTPS client with caller-selected positive
+        /// timeout and response bounds for another external artifact kind.
+        /// </summary>
+        /// <param name="timeout">The total timeout for one request chain.</param>
+        /// <param name="maximumResponseBytes">The decompressed response limit.</param>
+        /// <returns>A context-local production HTTPS client.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown transitively if the production handler or resolver is unavailable.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="timeout"/> or
+        /// <paramref name="maximumResponseBytes"/> is not positive.
+        /// </exception>
+        internal static ExternalSourceLinkClient CreateDefault(
+            TimeSpan timeout,
+            int maximumResponseBytes)
+        {
             SocketsHttpHandler handler = new()
             {
                 AllowAutoRedirect = false,
@@ -131,7 +154,8 @@ namespace XMLDocNormalizer.Execution.Semantic
             return new ExternalSourceLinkClient(
                 handler,
                 SystemHostResolver.Instance,
-                TimeSpan.FromSeconds(15));
+                timeout,
+                maximumResponseBytes);
         }
 
         /// <summary>
@@ -149,7 +173,23 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </remarks>
         public bool TryDownload(Uri sourceUri, out ImmutableArray<byte> image)
         {
-            if (sourceUri == null)
+            return TryDownload(sourceUri, maximumResponseBytes, out image);
+        }
+
+        /// <summary>
+        /// Tries to download bytes under a per-call bound no larger than the
+        /// client-wide response bound.
+        /// </summary>
+        /// <param name="sourceUri">The untrusted retrieval hint.</param>
+        /// <param name="responseLimit">The positive per-call byte limit.</param>
+        /// <param name="image">The bounded response bytes when successful.</param>
+        /// <returns><see langword="true"/> only for a safe complete response.</returns>
+        internal bool TryDownload(
+            Uri sourceUri,
+            int responseLimit,
+            out ImmutableArray<byte> image)
+        {
+            if (sourceUri == null || responseLimit <= 0)
             {
                 image = default;
                 return false;
@@ -158,7 +198,10 @@ namespace XMLDocNormalizer.Execution.Semantic
             try
             {
                 using CancellationTokenSource timeoutSource = new(timeout);
-                byte[]? bytes = TryDownloadAsync(sourceUri, timeoutSource.Token)
+                byte[]? bytes = TryDownloadAsync(
+                        sourceUri,
+                        Math.Min(responseLimit, maximumResponseBytes),
+                        timeoutSource.Token)
                     .GetAwaiter()
                     .GetResult();
 
@@ -202,10 +245,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Applies target policy, manual redirects, status checks, and bounded reads.
         /// </summary>
         /// <param name="initialUri">The initial Source Link URI.</param>
+        /// <param name="responseLimit">The positive per-call response limit.</param>
         /// <param name="cancellationToken">The total timeout token.</param>
         /// <returns>The exact response bytes, or <see langword="null"/>.</returns>
         private async Task<byte[]?> TryDownloadAsync(
             Uri initialUri,
+            int responseLimit,
             CancellationToken cancellationToken)
         {
             Uri currentUri = initialUri;
@@ -238,14 +283,19 @@ namespace XMLDocNormalizer.Execution.Semantic
                 }
 
                 if (!response.IsSuccessStatusCode
-                    || HasOversizedContentLength(response.Content.Headers))
+                    || HasOversizedContentLength(
+                        response.Content.Headers,
+                        responseLimit))
                 {
                     return null;
                 }
 
                 await using Stream stream = await response.Content.ReadAsStreamAsync(
                     cancellationToken);
-                return await ReadBoundedAsync(stream, cancellationToken);
+                return await ReadBoundedAsync(
+                    stream,
+                    responseLimit,
+                    cancellationToken);
             }
 
             return null;
@@ -328,20 +378,25 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Checks a declared content length without trusting it as a read boundary.
         /// </summary>
         /// <param name="headers">The response content headers.</param>
+        /// <param name="responseLimit">The positive per-call response limit.</param>
         /// <returns><see langword="true"/> when the declaration exceeds the limit.</returns>
-        private bool HasOversizedContentLength(HttpContentHeaders headers)
+        private static bool HasOversizedContentLength(
+            HttpContentHeaders headers,
+            int responseLimit)
         {
-            return headers.ContentLength > maximumResponseBytes;
+            return headers.ContentLength > responseLimit;
         }
 
         /// <summary>
         /// Reads decompressed response bytes while enforcing the streaming limit.
         /// </summary>
         /// <param name="stream">The response content stream.</param>
+        /// <param name="responseLimit">The positive per-call response limit.</param>
         /// <param name="cancellationToken">The total timeout token.</param>
         /// <returns>The complete bytes, or <see langword="null"/> when oversized.</returns>
         private async Task<byte[]?> ReadBoundedAsync(
             Stream stream,
+            int responseLimit,
             CancellationToken cancellationToken)
         {
             using MemoryStream buffer = new();
@@ -356,7 +411,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                     return buffer.ToArray();
                 }
 
-                if (buffer.Length + count > maximumResponseBytes)
+                if (buffer.Length + count > responseLimit)
                 {
                     return null;
                 }

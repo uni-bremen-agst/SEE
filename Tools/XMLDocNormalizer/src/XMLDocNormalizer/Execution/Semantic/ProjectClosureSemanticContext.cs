@@ -50,6 +50,10 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <value>The local non-recursive discovery catalog.</value>
         private ExternalBinaryCandidateDiscovery ExternalBinaryCandidates { get; } = new();
 
+        /// <summary>Gets context-local opt-in bounded remote reference acquisition.</summary>
+        /// <value>The context-local remote acquisition catalog.</value>
+        private ExternalRemoteReferenceAcquisition ExternalRemoteReferences { get; } = new();
+
         /// <summary>
         /// Gets the context-local exact Portable PDB acquisition catalog.
         /// </summary>
@@ -281,6 +285,52 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Explicitly enables the configured bounded remote reference policy
+        /// for this context using the production HTTPS transport.
+        /// </summary>
+        /// <param name="configuration">The validated immutable acquisition configuration.</param>
+        /// <returns><see langword="true"/> when the context accepts the configuration.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="configuration"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown transitively when a configured transport bound is not positive.
+        /// </exception>
+        public bool TryConfigureExternalRemoteReferenceAcquisition(
+            ExternalRemoteReferenceAcquisitionConfiguration configuration)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            return ExternalRemoteReferences.TryConfigure(
+                configuration,
+                ExternalSourceLinkClient.CreateDefault(
+                    configuration.Limits.Timeout,
+                    configuration.Limits.MaxArtifactBytes));
+        }
+
+        /// <summary>Configures a testable bounded remote reference transport.</summary>
+        /// <param name="configuration">The validated immutable acquisition configuration.</param>
+        /// <param name="client">The controlled bounded HTTPS transport.</param>
+        /// <returns><see langword="true"/> when the context accepts the configuration.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when an argument is <see langword="null"/>.
+        /// </exception>
+        internal bool TryConfigureExternalRemoteReferenceAcquisition(
+            ExternalRemoteReferenceAcquisitionConfiguration configuration,
+            ExternalSourceLinkClient client)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(client);
+            return ExternalRemoteReferences.TryConfigure(configuration, client);
+        }
+
+        /// <summary>Gets a snapshot of bounded remote reference work.</summary>
+        /// <returns>The atomic context-local acquisition statistics.</returns>
+        internal ExternalRemoteReferenceAcquisitionStatistics GetExternalRemoteReferenceStatistics()
+        {
+            return ExternalRemoteReferences.GetStatistics();
+        }
+
+        /// <summary>
         /// Configures immutable local Portable PDB candidate sources before analysis.
         /// </summary>
         /// <param name="configuration">The context-local source snapshot.</param>
@@ -507,6 +557,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 succeeded = ExternalSupportingSourceReconstructionOrchestrator.TryReconstruct(
                         plan,
                         ExternalBinaryCandidates,
+                        ExternalRemoteReferences,
                         ExternalPortablePdbs,
                         ExternalSources,
                         out ExternalSupportingSourceCompilation supportingSource)

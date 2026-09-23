@@ -17,7 +17,8 @@ namespace XMLDocNormalizer.Evaluation
                 Console.Error.WriteLine(
                     "Usage: --manifest <path> --workspace <path> --output <directory> "
                     + "[--source-link enabled|disabled] "
-                    + "[--source-reconstruction strict|verified-line-endings]");
+                    + "[--source-reconstruction strict|verified-line-endings] "
+                    + "[--references local|bounded-remote]");
                 return 1;
             }
 
@@ -27,6 +28,10 @@ namespace XMLDocNormalizer.Evaluation
                 RealWorldEvaluationRunner runner = new(manifest, options);
                 EvaluationReport report = runner.Run();
                 EvaluationReportWriter.Write(options.OutputDirectory, report);
+                G4BReferenceMatrixWriter.Write(
+                    options.OutputDirectory,
+                    manifest,
+                    report);
                 Console.WriteLine(Path.Combine(options.OutputDirectory, "real-world-evaluation.json"));
                 Console.WriteLine(Path.Combine(options.OutputDirectory, "real-world-evaluation.md"));
                 return report.Summary.UnexpectedFailures == 0

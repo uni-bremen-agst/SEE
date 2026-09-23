@@ -261,6 +261,63 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Materializes a local exact candidate first and only then consults
+        /// the explicitly configured bounded remote acquisition context.
+        /// </summary>
+        /// <param name="expectedReference">The authoritative expected P5 reference.</param>
+        /// <param name="expectedReferenceOrdinal">The expected reference ordinal.</param>
+        /// <param name="remoteAcquisition">The context-local opt-in remote acquisition.</param>
+        /// <param name="material">The exact P5-validated material when successful.</param>
+        /// <param name="sourceKind">The local or remote artifact source classification.</param>
+        /// <param name="remoteProvenance">The remote provenance, or <see langword="null"/> for local material.</param>
+        /// <returns><see langword="true"/> only when local or remote P5 validation succeeds.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="expectedReference"/> or
+        /// <paramref name="remoteAcquisition"/> is <see langword="null"/>.
+        /// </exception>
+        public bool TryAcquireReferenceMaterial(
+            ExternalCompilationMetadataReferenceDescriptor expectedReference,
+            int expectedReferenceOrdinal,
+            ExternalRemoteReferenceAcquisition remoteAcquisition,
+            out ValidatedExternalMetadataReferenceMaterial material,
+            out ExternalReferenceArtifactSourceKind sourceKind,
+            out ExternalRemoteReferenceProvenance? remoteProvenance)
+        {
+            ArgumentNullException.ThrowIfNull(expectedReference);
+            ArgumentNullException.ThrowIfNull(remoteAcquisition);
+
+            if (TryFindReferenceCandidate(
+                    expectedReference,
+                    out string candidatePath,
+                    out sourceKind)
+                && ValidatedExternalMetadataReferenceMaterialFactory.TryCreateFromFile(
+                    expectedReference,
+                    candidatePath,
+                    out material))
+            {
+                remoteProvenance = null;
+                return true;
+            }
+
+            if (remoteAcquisition.TryAcquire(
+                    expectedReference,
+                    expectedReferenceOrdinal,
+                    out material,
+                    out ExternalRemoteReferenceProvenance provenance))
+            {
+                sourceKind = provenance.ProviderKind == ExternalRemoteArtifactProviderKind.DotNetReferencePack
+                    ? ExternalReferenceArtifactSourceKind.RemoteDotNetReferencePack
+                    : ExternalReferenceArtifactSourceKind.RemoteNuGetPackage;
+                remoteProvenance = provenance;
+                return true;
+            }
+
+            sourceKind = default;
+            remoteProvenance = null;
+            return false;
+        }
+
+        /// <summary>
         /// Executes the expected-name fast path and then the non-recursive fallback.
         /// </summary>
         /// <param name="expectedReference">The authoritative P5A reference provenance.</param>

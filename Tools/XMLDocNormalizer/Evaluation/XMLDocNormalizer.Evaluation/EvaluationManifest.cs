@@ -61,6 +61,9 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets non-recursive P7A search roots.</summary>
         public List<string> ReferenceRoots { get; set; } = new();
 
+        /// <summary>Gets or sets non-authoritative bounded package discovery hints.</summary>
+        public List<EvaluationReferencePackageHint> ReferencePackages { get; set; } = new();
+
         /// <summary>Gets or sets the expected terminal classification.</summary>
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public EvaluationExpectedOutcome ExpectedOutcome { get; set; }
@@ -73,6 +76,25 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets an optional source-backed analysis probe.</summary>
         public EvaluationProbe? Probe { get; set; }
+    }
+
+    /// <summary>Describes one explicit bounded package container hint.</summary>
+    public sealed class EvaluationReferencePackageHint
+    {
+        /// <summary>Gets or sets the assembly simple name, or * for a pack container.</summary>
+        public string AssemblySimpleName { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the package identifier.</summary>
+        public string PackageId { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets deterministic candidate versions in inspection order.</summary>
+        public List<string> Versions { get; set; } = new();
+
+        /// <summary>Gets or sets NuGetPackage or DotNetReferencePack.</summary>
+        public string Provider { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the provenance evidence for the hint.</summary>
+        public string Evidence { get; set; } = string.Empty;
     }
 
     /// <summary>

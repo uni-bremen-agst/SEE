@@ -28,6 +28,9 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets the external-source reconstruction policy.</summary>
         public string SourceReconstructionPolicy { get; set; } = string.Empty;
 
+        /// <summary>Gets or sets the external-reference acquisition policy.</summary>
+        public string ReferenceAcquisitionPolicy { get; set; } = string.Empty;
+
         /// <summary>Gets or sets aggregate counts.</summary>
         public EvaluationSummary Summary { get; set; } = new();
 
@@ -138,6 +141,9 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets bounded local reference-discovery cost counters.</summary>
         public EvaluationReferenceDiscoveryStatistics ReferenceDiscovery { get; set; } = new();
+
+        /// <summary>Gets or sets bounded remote reference acquisition work.</summary>
+        public EvaluationRemoteReferenceAcquisitionStatistics RemoteReferenceAcquisition { get; set; } = new();
 
         /// <summary>Gets or sets the P5A source-file count.</summary>
         public int ExpectedSourceFileCount { get; set; }
@@ -253,6 +259,84 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets the local source of the exact candidate.</summary>
         public string? ArtifactSource { get; set; }
+
+        /// <summary>Gets or sets LocalExact, RemoteExact, or Unavailable.</summary>
+        public string AcquisitionResult { get; set; } = "Unavailable";
+
+        /// <summary>Gets or sets the remote package discovery hint.</summary>
+        public string? RemoteDiscoveryHint { get; set; }
+
+        /// <summary>Gets or sets the remote artifact identity.</summary>
+        public string? RemoteArtifactIdentity { get; set; }
+
+        /// <summary>Gets or sets the remote artifact version.</summary>
+        public string? RemoteArtifactVersion { get; set; }
+
+        /// <summary>Gets or sets the verified transport SHA-512.</summary>
+        public string? RemoteArtifactSha512 { get; set; }
+
+        /// <summary>Gets or sets the exact archive entry that passed P5.</summary>
+        public string? RemoteArchiveEntry { get; set; }
+    }
+
+    /// <summary>Captures aggregate bounded remote reference-provider work.</summary>
+    public sealed class EvaluationRemoteReferenceAcquisitionStatistics
+    {
+        /// <summary>Gets or sets bounded package searches.</summary>
+        public long Searches { get; set; }
+        /// <summary>Gets or sets all remote metadata and artifact requests.</summary>
+        public long Requests { get; set; }
+        /// <summary>Gets or sets package artifact requests.</summary>
+        public long ArtifactRequests { get; set; }
+        /// <summary>Gets or sets downloaded metadata and artifact bytes.</summary>
+        public long DownloadedBytes { get; set; }
+        /// <summary>Gets or sets inspected archive binary candidates.</summary>
+        public long BinaryCandidates { get; set; }
+        /// <summary>Gets or sets unchanged P5 validation attempts.</summary>
+        public long P5ValidationAttempts { get; set; }
+        /// <summary>Gets or sets exact remote reference successes.</summary>
+        public long RemoteExact { get; set; }
+        /// <summary>Gets or sets references unavailable after bounded acquisition.</summary>
+        public long Unavailable { get; set; }
+        /// <summary>Gets or sets hard-limit stops.</summary>
+        public long LimitHits { get; set; }
+        /// <summary>Gets or sets positive and negative context-cache hits.</summary>
+        public long CacheHits { get; set; }
+        /// <summary>Gets or sets acquisition stopwatch ticks.</summary>
+        public long DurationTicks { get; set; }
+        /// <summary>Gets or sets provider-specific counters.</summary>
+        public List<EvaluationRemoteReferenceProviderStatistics> Providers { get; set; } = new();
+    }
+
+    /// <summary>Captures one bounded remote provider's work.</summary>
+    public sealed class EvaluationRemoteReferenceProviderStatistics
+    {
+        /// <summary>Gets or sets the provider kind.</summary>
+        public string Provider { get; set; } = string.Empty;
+        /// <summary>Gets or sets bounded searches.</summary>
+        public long Searches { get; set; }
+        /// <summary>Gets or sets service-index, registration, catalog, and search requests.</summary>
+        public long MetadataRequests { get; set; }
+        /// <summary>Gets or sets package artifact requests.</summary>
+        public long ArtifactRequests { get; set; }
+        /// <summary>Gets or sets downloaded bytes.</summary>
+        public long DownloadedBytes { get; set; }
+        /// <summary>Gets or sets candidate binary entries inspected.</summary>
+        public long BinaryCandidates { get; set; }
+        /// <summary>Gets or sets unchanged P5 attempts.</summary>
+        public long P5ValidationAttempts { get; set; }
+        /// <summary>Gets or sets exact remote successes.</summary>
+        public long RemoteExact { get; set; }
+        /// <summary>Gets or sets rejected package or binary candidates.</summary>
+        public long Rejected { get; set; }
+        /// <summary>Gets or sets unavailable references.</summary>
+        public long Unavailable { get; set; }
+        /// <summary>Gets or sets provider cache hits.</summary>
+        public long CacheHits { get; set; }
+        /// <summary>Gets or sets hard-limit stops.</summary>
+        public long LimitHits { get; set; }
+        /// <summary>Gets or sets provider stopwatch ticks.</summary>
+        public long DurationTicks { get; set; }
     }
 
     /// <summary>

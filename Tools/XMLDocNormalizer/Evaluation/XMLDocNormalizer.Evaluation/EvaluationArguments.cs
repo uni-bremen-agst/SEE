@@ -10,7 +10,8 @@ namespace XMLDocNormalizer.Evaluation
         string WorkspacePath,
         string OutputDirectory,
         bool SourceLinkEnabled,
-        ExternalSourceReconstructionPolicy SourceReconstructionPolicy)
+        ExternalSourceReconstructionPolicy SourceReconstructionPolicy,
+        ExternalReferenceAcquisitionPolicy ReferenceAcquisitionPolicy)
     {
         /// <summary>
         /// Parses the small explicit evaluation command line.
@@ -50,12 +51,14 @@ namespace XMLDocNormalizer.Evaluation
             string reconstruction = values.GetValueOrDefault(
                 "--source-reconstruction",
                 "strict");
+            string references = values.GetValueOrDefault("--references", "local");
 
             if (policy is not ("enabled" or "disabled")
                 || reconstruction is not ("strict" or "verified-line-endings")
+                || references is not ("local" or "bounded-remote")
                 || values.Keys.Any(static key => key is not (
                     "--manifest" or "--workspace" or "--output" or "--source-link"
-                    or "--source-reconstruction")))
+                    or "--source-reconstruction" or "--references")))
             {
                 options = null!;
                 return false;
@@ -68,7 +71,10 @@ namespace XMLDocNormalizer.Evaluation
                 string.Equals(policy, "enabled", StringComparison.Ordinal),
                 reconstruction == "verified-line-endings"
                     ? ExternalSourceReconstructionPolicy.VerifiedLineEndings
-                    : ExternalSourceReconstructionPolicy.Strict);
+                    : ExternalSourceReconstructionPolicy.Strict,
+                references == "bounded-remote"
+                    ? ExternalReferenceAcquisitionPolicy.BoundedRemoteArtifacts
+                    : ExternalReferenceAcquisitionPolicy.LocalOnly);
             return true;
         }
     }

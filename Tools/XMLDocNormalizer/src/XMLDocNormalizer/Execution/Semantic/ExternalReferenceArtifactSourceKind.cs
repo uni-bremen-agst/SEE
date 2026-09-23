@@ -18,6 +18,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         DotNetSharedFramework,
 
         /// <summary>The candidate came from the local NuGet global-packages folder.</summary>
-        NuGetGlobalPackages
+        NuGetGlobalPackages,
+
+        /// <summary>The candidate came from a P5-validated remote NuGet package.</summary>
+        RemoteNuGetPackage,
+
+        /// <summary>The candidate came from a P5-validated remote .NET reference pack.</summary>
+        RemoteDotNetReferencePack
     }
 }

@@ -40,7 +40,7 @@ the validated Portable PDB; the transformation itself establishes no trust.
 
 All downloaded archives, extracted binaries, PDBs, optional manual-verification sources, and generated reports stay below `artifacts/real-world-evaluation`. The repository-level `.gitignore` excludes the complete `artifacts` directory. No third-party binary or source tree is versioned; only coordinates, hashes, relative paths, selection reasons, and concise flow notes are committed.
 
-The harness never treats foreign package content as executable build logic. XMLDocNormalizer runtime reconstruction receives only already prepared local DLL/PDB data and explicit opt-in Source Link. It never performs NuGet restore/download, Git operations, external builds, generators, or MSBuild execution.
+The harness never treats foreign package content as executable build logic. By default, XMLDocNormalizer runtime reconstruction receives only already prepared local DLL/PDB data and explicit opt-in Source Link. It never performs package restore, Git operations, external builds, generators, or MSBuild execution. The separate `--references bounded-remote` G4B profile may download bounded package archives as inert data after local exact-reference discovery fails; package hashes are verified from official NuGet catalog metadata and every binary still passes unchanged P5 validation.
 
 ## Candidate matrix
 
@@ -89,6 +89,23 @@ indexes only known package asset directories and never recursively enumerates
 all files. JSON candidate entries record each P5A ordinal, exact provenance,
 selected artifact source, and bounded discovery counters. The observed Scrutor
 and Serilog root cause is documented in `G1-reference-acquisition.md`.
+
+## G4B bounded remote reference candidates
+
+Reference acquisition defaults to `--references local`. The explicit
+`--references bounded-remote` profile adds context-local NuGet V3 package and
+historical .NET reference-pack candidates after all local sources fail. Feed
+service discovery, registration/catalog metadata, package downloads, search
+breadth, requests, bytes, archive entries, and time are hard-bounded. The
+existing P7B HTTPS/DNS implementation supplies HTTPS-only, public-address,
+manual-redirect, timeout, and response-size enforcement. Packages are streamed
+as ZIP data; paths, duplicates, expanded sizes, and entry sizes are validated.
+No package build content is loaded or executed.
+
+The report records `LocalExact`, `RemoteExact`, or `Unavailable` per ordinal,
+full RemoteExact provenance, provider counters, and the 175-entry G4B matrix.
+Source reconstruction remains an independent option, so the canonical profiles
+use the same `verified-line-endings` value and vary reference acquisition only.
 
 ## G2 exact Portable PDB candidates
 

@@ -97,7 +97,14 @@ namespace XMLDocNormalizer.Evaluation
                     || string.Equals(candidate.Version, "latest", StringComparison.OrdinalIgnoreCase)
                     || !IsSafeRelativePath(candidate.AssemblyPath)
                     || (candidate.PdbPath != null && !IsSafeRelativePath(candidate.PdbPath))
-                    || candidate.ReferenceRoots.Any(static path => !IsSafeRelativePath(path)))
+                    || candidate.ReferenceRoots.Any(static path => !IsSafeRelativePath(path))
+                    || candidate.ReferencePackages.Any(static hint =>
+                        string.IsNullOrWhiteSpace(hint.AssemblySimpleName)
+                        || string.IsNullOrWhiteSpace(hint.PackageId)
+                        || hint.Versions.Count == 0
+                        || hint.Versions.Any(string.IsNullOrWhiteSpace)
+                        || hint.Provider is not ("NuGetPackage" or "DotNetReferencePack")
+                        || string.IsNullOrWhiteSpace(hint.Evidence)))
                 {
                     throw new InvalidOperationException($"Invalid evaluation candidate '{candidate.Id}'.");
                 }

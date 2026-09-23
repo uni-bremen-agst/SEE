@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -15,6 +16,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="candidateDiscovery">
         /// The context-local binary candidate discovery catalog.
         /// </param>
+        /// <param name="remoteReferenceAcquisition">
+        /// The context-local bounded remote reference acquisition catalog.
+        /// </param>
         /// <param name="pdbAcquisition">
         /// The context-local exact Portable PDB acquisition catalog.
         /// </param>
@@ -29,12 +33,14 @@ namespace XMLDocNormalizer.Execution.Semantic
         public static bool TryReconstruct(
             ExternalSupportingSourceReconstructionPlan plan,
             ExternalBinaryCandidateDiscovery candidateDiscovery,
+            ExternalRemoteReferenceAcquisition remoteReferenceAcquisition,
             ExternalPortablePdbAcquisition pdbAcquisition,
             ExternalSourceAcquisition sourceAcquisition,
             out ExternalSupportingSourceCompilation supportingSource)
         {
             if (plan == null
                 || candidateDiscovery == null
+                || remoteReferenceAcquisition == null
                 || pdbAcquisition == null
                 || sourceAcquisition == null)
             {
@@ -66,6 +72,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                         plan,
                         provenance,
                         candidateDiscovery,
+                        remoteReferenceAcquisition,
                         out ExternalMetadataReferenceMaterialSet materialSet)
                     || !ExternalMetadataReferenceSetFactory.TryCreate(
                         provenance,
@@ -146,6 +153,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="plan">The immutable reconstruction plan.</param>
         /// <param name="provenance">The validated P5A provenance.</param>
         /// <param name="candidateDiscovery">The context-local discovery catalog.</param>
+        /// <param name="remoteReferenceAcquisition">
+        /// The context-local bounded remote acquisition catalog.
+        /// </param>
         /// <param name="materialSet">The complete P5F result when successful.</param>
         /// <returns>
         /// <see langword="true"/> only when every required reference ordinal
@@ -159,6 +169,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             ExternalSupportingSourceReconstructionPlan plan,
             ExternalCompilationProvenanceDescriptor provenance,
             ExternalBinaryCandidateDiscovery candidateDiscovery,
+            ExternalRemoteReferenceAcquisition remoteReferenceAcquisition,
             out ExternalMetadataReferenceMaterialSet materialSet)
         {
             if (!plan.DiscoverReferenceCandidatesLocally)
@@ -178,26 +189,33 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
-            List<string> candidatePaths = new(metadataReferences.References.Length);
+            ImmutableArray<ValidatedExternalMetadataReferenceMaterial>.Builder materials =
+                ImmutableArray.CreateBuilder<ValidatedExternalMetadataReferenceMaterial>(
+                    metadataReferences.References.Length);
 
-            foreach (ExternalCompilationMetadataReferenceDescriptor expectedReference in
-                     metadataReferences.References)
+            for (int expectedReferenceOrdinal = 0;
+                 expectedReferenceOrdinal < metadataReferences.References.Length;
+                 expectedReferenceOrdinal++)
             {
-                if (!candidateDiscovery.TryFindReferenceCandidate(
+                ExternalCompilationMetadataReferenceDescriptor expectedReference =
+                    metadataReferences.References[expectedReferenceOrdinal];
+                if (!candidateDiscovery.TryAcquireReferenceMaterial(
                         expectedReference,
-                        out string candidatePath))
+                        expectedReferenceOrdinal,
+                        remoteReferenceAcquisition,
+                        out ValidatedExternalMetadataReferenceMaterial acquiredMaterial,
+                        out _,
+                        out _))
                 {
                     materialSet = null!;
                     return false;
                 }
 
-                candidatePaths.Add(candidatePath);
+                materials.Add(acquiredMaterial);
             }
 
-            return ExternalMetadataReferenceMaterialSetFactory.TryCreate(
-                provenance,
-                candidatePaths,
-                out materialSet);
+            materialSet = new ExternalMetadataReferenceMaterialSet(materials.MoveToImmutable());
+            return true;
         }
 
         /// <summary>

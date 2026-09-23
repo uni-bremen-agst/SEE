@@ -101,6 +101,15 @@
       "assemblyPath": "packages/newtonsoft.json.13.0.3/lib/net6.0/Newtonsoft.Json.dll",
       "pdbPath": "packages/newtonsoft.json.13.0.3/lib/net6.0/Newtonsoft.Json.pdb",
       "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "referencePackages": [
+        {
+          "assemblySimpleName": "*",
+          "packageId": "Microsoft.NETCore.App.Ref",
+          "versions": ["6.0.14"],
+          "provider": "DotNetReferencePack",
+          "evidence": "net6.0 PDB compilation defines plus a bounded publication-era pack probe; the coordinate remains a discovery hint and P5 is authoritative"
+        }
+      ],
       "expectedOutcome": "ExpectedFailClosed",
       "selectionReason": "Widely used multi-source library with real Source Link symbols and a signed target boundary.",
       "categories": ["PortablePdb", "SourceLink", "MultipleSources", "SignedTarget"]
@@ -137,6 +146,19 @@
       "assemblyPath": "packages/scrutor.4.2.2/lib/netstandard2.0/Scrutor.dll",
       "pdbPath": "packages/scrutor.4.2.2/lib/netstandard2.0/Scrutor.pdb",
       "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "referencePackages": [
+        { "assemblySimpleName": "JetBrains.Annotations", "packageId": "JetBrains.Annotations", "versions": ["2021.3.0"], "provider": "NuGetPackage", "evidence": "exact PackageReference at the repository commit recorded in the pinned Scrutor nuspec" },
+        { "assemblySimpleName": "Microsoft.Bcl.AsyncInterfaces", "packageId": "Microsoft.Bcl.AsyncInterfaces", "versions": ["1.1.0", "1.1.1"], "provider": "NuGetPackage", "evidence": "System.Text.Json 4.7.2 official NuGet catalog lower-bound dependency plus one bounded later patch candidate" },
+        { "assemblySimpleName": "Microsoft.Extensions.DependencyInjection.Abstractions", "packageId": "Microsoft.Extensions.DependencyInjection.Abstractions", "versions": ["3.1.25"], "provider": "NuGetPackage", "evidence": "pinned Scrutor nuspec lower-bound dependency for netstandard2.0" },
+        { "assemblySimpleName": "Microsoft.Extensions.DependencyModel", "packageId": "Microsoft.Extensions.DependencyModel", "versions": ["3.1.25"], "provider": "NuGetPackage", "evidence": "pinned Scrutor nuspec lower-bound dependency for netstandard2.0" },
+        { "assemblySimpleName": "System.Buffers", "packageId": "System.Buffers", "versions": ["4.5.1"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidate" },
+        { "assemblySimpleName": "System.Memory", "packageId": "System.Memory", "versions": ["4.5.4", "4.5.5"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidates" },
+        { "assemblySimpleName": "System.Numerics.Vectors", "packageId": "System.Numerics.Vectors", "versions": ["4.5.0"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidate" },
+        { "assemblySimpleName": "System.Runtime.CompilerServices.Unsafe", "packageId": "System.Runtime.CompilerServices.Unsafe", "versions": ["4.7.1", "6.0.0"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidates" },
+        { "assemblySimpleName": "System.Text.Encodings.Web", "packageId": "System.Text.Encodings.Web", "versions": ["4.7.2"], "provider": "NuGetPackage", "evidence": "Microsoft.Extensions.DependencyModel 3.1.25 nuspec lower-bound dependency" },
+        { "assemblySimpleName": "System.Text.Json", "packageId": "System.Text.Json", "versions": ["4.7.2"], "provider": "NuGetPackage", "evidence": "Microsoft.Extensions.DependencyModel 3.1.25 nuspec lower-bound dependency" },
+        { "assemblySimpleName": "System.Threading.Tasks.Extensions", "packageId": "System.Threading.Tasks.Extensions", "versions": ["4.5.4"], "provider": "NuGetPackage", "evidence": "bounded transitive dependency candidate" }
+      ],
       "expectedOutcome": "ExpectedFailClosed",
       "selectionReason": "Dependency-bearing DI library for observing exact-reference failure before its signed target boundary.",
       "categories": ["PortablePdb", "SourceLink", "ExternalDependency", "SignedTarget"]
@@ -167,6 +189,13 @@
       "assemblyPath": "packages/serilog.3.1.1/lib/netstandard2.0/Serilog.dll",
       "pdbPath": "packages/serilog.3.1.1/lib/netstandard2.0/Serilog.pdb",
       "referenceRoots": ["packages/netstandard.library.2.0.3/build/netstandard2.0/ref"],
+      "referencePackages": [
+        { "assemblySimpleName": "System.Buffers", "packageId": "System.Buffers", "versions": ["4.5.1"], "provider": "NuGetPackage", "evidence": "bounded System.Memory transitive dependency candidate" },
+        { "assemblySimpleName": "System.Diagnostics.DiagnosticSource", "packageId": "System.Diagnostics.DiagnosticSource", "versions": ["7.0.2"], "provider": "NuGetPackage", "evidence": "pinned Serilog nuspec lower-bound dependency for netstandard2.0" },
+        { "assemblySimpleName": "System.Memory", "packageId": "System.Memory", "versions": ["4.5.5"], "provider": "NuGetPackage", "evidence": "System.Diagnostics.DiagnosticSource 7.0.2 nuspec lower-bound dependency" },
+        { "assemblySimpleName": "System.Numerics.Vectors", "packageId": "System.Numerics.Vectors", "versions": ["4.5.0"], "provider": "NuGetPackage", "evidence": "bounded System.Memory transitive dependency candidate" },
+        { "assemblySimpleName": "System.Runtime.CompilerServices.Unsafe", "packageId": "System.Runtime.CompilerServices.Unsafe", "versions": ["6.0.0"], "provider": "NuGetPackage", "evidence": "System.Diagnostics.DiagnosticSource 7.0.2 nuspec lower-bound dependency" }
+      ],
       "expectedOutcome": "ExpectedFailClosed",
       "selectionReason": "Widely used interface-heavy logging library with real Source Link symbols and a signed target boundary.",
       "categories": ["PortablePdb", "SourceLink", "InterfaceDispatch", "SignedTarget"]

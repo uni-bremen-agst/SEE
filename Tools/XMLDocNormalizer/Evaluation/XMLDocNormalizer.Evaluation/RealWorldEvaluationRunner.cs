@@ -68,6 +68,7 @@ namespace XMLDocNormalizer.Evaluation
                 ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString(),
                 SourceLinkEnabled = options.SourceLinkEnabled,
                 SourceReconstructionPolicy = options.SourceReconstructionPolicy.ToString(),
+                ReferenceAcquisitionPolicy = options.ReferenceAcquisitionPolicy.ToString(),
                 Summary = summary,
                 Candidates = results
             };
@@ -390,16 +391,22 @@ namespace XMLDocNormalizer.Evaluation
                 return false;
             }
 
-            List<string> paths = new(references.References.Length);
+            ImmutableArray<ValidatedExternalMetadataReferenceMaterial>.Builder materials =
+                ImmutableArray.CreateBuilder<ValidatedExternalMetadataReferenceMaterial>(
+                    references.References.Length);
+            ExternalRemoteReferenceAcquisition remote = CreateRemoteReferenceAcquisition(candidate);
             bool complete = true;
 
             for (int ordinal = 0; ordinal < references.References.Length; ordinal++)
             {
                 ExternalCompilationMetadataReferenceDescriptor reference = references.References[ordinal];
-                bool found = discovery.TryFindReferenceCandidate(
+                bool found = discovery.TryAcquireReferenceMaterial(
                     reference,
-                    out string path,
-                    out ExternalReferenceArtifactSourceKind sourceKind);
+                    ordinal,
+                    remote,
+                    out ValidatedExternalMetadataReferenceMaterial material,
+                    out ExternalReferenceArtifactSourceKind sourceKind,
+                    out ExternalRemoteReferenceProvenance? remoteProvenance);
                 result.References.Add(new EvaluationReferenceResult
                 {
                     Ordinal = ordinal,
@@ -411,15 +418,23 @@ namespace XMLDocNormalizer.Evaluation
                     Aliases = reference.Aliases.ToList(),
                     EmbedInteropTypes = reference.EmbedInteropTypes,
                     ExactMatchFound = found,
-                    CandidatePath = found
-                        ? Path.GetRelativePath(options.WorkspacePath, path).Replace('\\', '/')
+                    CandidatePath = found && material.Candidate.FilePath != null
+                        ? Path.GetRelativePath(options.WorkspacePath, material.Candidate.FilePath).Replace('\\', '/')
                         : null,
-                    ArtifactSource = found ? sourceKind.ToString() : null
+                    ArtifactSource = found ? sourceKind.ToString() : null,
+                    AcquisitionResult = !found
+                        ? "Unavailable"
+                        : remoteProvenance == null ? "LocalExact" : "RemoteExact",
+                    RemoteDiscoveryHint = remoteProvenance?.DiscoveryHint,
+                    RemoteArtifactIdentity = remoteProvenance?.ArtifactIdentity,
+                    RemoteArtifactVersion = remoteProvenance?.ArtifactVersion,
+                    RemoteArtifactSha512 = remoteProvenance?.ArtifactSha512,
+                    RemoteArchiveEntry = remoteProvenance?.ArchiveEntry
                 });
 
                 if (found)
                 {
-                    paths.Add(path);
+                    materials.Add(material);
                 }
                 else
                 {
@@ -436,6 +451,38 @@ namespace XMLDocNormalizer.Evaluation
                 CandidateFilesOpened = statistics.CandidateFilesOpened,
                 ValidationAttempts = statistics.ValidationAttempts
             };
+            ExternalRemoteReferenceAcquisitionStatistics remoteStatistics = remote.GetStatistics();
+            result.RemoteReferenceAcquisition = new EvaluationRemoteReferenceAcquisitionStatistics
+            {
+                Searches = remoteStatistics.RemoteSearchCount,
+                Requests = remoteStatistics.RemoteRequestCount,
+                ArtifactRequests = remoteStatistics.RemoteArtifactRequestCount,
+                DownloadedBytes = remoteStatistics.RemoteDownloadedBytes,
+                BinaryCandidates = remoteStatistics.RemoteBinaryCandidateCount,
+                P5ValidationAttempts = remoteStatistics.RemoteP5ValidationAttemptCount,
+                RemoteExact = remoteStatistics.RemoteExactCount,
+                Unavailable = remoteStatistics.UnavailableCount,
+                LimitHits = remoteStatistics.LimitHitCount,
+                CacheHits = remoteStatistics.CacheHits,
+                DurationTicks = remoteStatistics.DurationTicks,
+                Providers = remoteStatistics.Providers.Select(static provider =>
+                    new EvaluationRemoteReferenceProviderStatistics
+                    {
+                        Provider = provider.ProviderKind.ToString(),
+                        Searches = provider.SearchCount,
+                        MetadataRequests = provider.MetadataRequestCount,
+                        ArtifactRequests = provider.ArtifactRequestCount,
+                        DownloadedBytes = provider.DownloadedBytes,
+                        BinaryCandidates = provider.CandidateBinaryCount,
+                        P5ValidationAttempts = provider.P5ValidationAttemptCount,
+                        RemoteExact = provider.RemoteExactCount,
+                        Rejected = provider.RejectedCount,
+                        Unavailable = provider.UnavailableCount,
+                        CacheHits = provider.CacheHits,
+                        LimitHits = provider.LimitHits,
+                        DurationTicks = provider.DurationTicks
+                    }).ToList()
+            };
 
             result.BinaryDiscoverySucceeded = complete;
             if (!complete)
@@ -444,13 +491,47 @@ namespace XMLDocNormalizer.Evaluation
                 return false;
             }
 
-            if (!ExternalMetadataReferenceMaterialSetFactory.TryCreate(provenance, paths, out ExternalMetadataReferenceMaterialSet materials))
+            return ExternalMetadataReferenceSetFactory.TryCreate(
+                provenance,
+                materials.MoveToImmutable(),
+                out referenceSet);
+        }
+
+        private ExternalRemoteReferenceAcquisition CreateRemoteReferenceAcquisition(
+            EvaluationCandidate candidate)
+        {
+            ExternalRemoteReferenceAcquisition acquisition = new();
+            if (options.ReferenceAcquisitionPolicy != ExternalReferenceAcquisitionPolicy.BoundedRemoteArtifacts)
             {
-                referenceSet = null!;
-                return false;
+                return acquisition;
             }
 
-            return ExternalMetadataReferenceSetFactory.TryCreate(provenance, materials.Materials, out referenceSet);
+            ExternalRemoteReferencePackageHint[] hints = candidate.ReferencePackages
+                .Select(static hint => new ExternalRemoteReferencePackageHint(
+                    hint.AssemblySimpleName,
+                    hint.PackageId,
+                    hint.Versions,
+                    Enum.Parse<ExternalRemoteArtifactProviderKind>(hint.Provider),
+                    hint.Evidence))
+                .ToArray();
+            ExternalRemoteReferenceAcquisitionLimits limits = ExternalRemoteReferenceAcquisitionLimits.Default;
+            if (!ExternalRemoteReferenceAcquisitionConfiguration.TryCreate(
+                    options.ReferenceAcquisitionPolicy,
+                    new Uri("https://api.nuget.org/v3/index.json"),
+                    hints,
+                    enablePackageSearch: true,
+                    limits,
+                    out ExternalRemoteReferenceAcquisitionConfiguration configuration)
+                || !acquisition.TryConfigure(
+                    configuration,
+                    ExternalSourceLinkClient.CreateDefault(
+                        limits.Timeout,
+                        limits.MaxArtifactBytes)))
+            {
+                throw new InvalidOperationException("Bounded remote reference acquisition could not be configured.");
+            }
+
+            return acquisition;
         }
 
         /// <summary>
