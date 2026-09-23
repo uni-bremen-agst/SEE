@@ -179,8 +179,7 @@ namespace SEE.VCS
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
-            ICollection<KeyValuePair<string, Branch>> selected
-                = SelectedBranches(repository, criteria);
+            ICollection<KeyValuePair<string, Branch>> selected = SelectedBranches(repository, criteria);
             Debug.Log(Selection(selected, criteria));
 
             // Shared by all branches, because what a commit changes does not
