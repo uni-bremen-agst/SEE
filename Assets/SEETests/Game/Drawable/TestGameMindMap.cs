@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using System.Reflection;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace SEE.Game.Drawable
         {
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
 
-            Assert.That(GameMindMap.ParentChangeIsValid(node, node), Is.False);
+            Assert.That(GameMindMapHierarchy.ParentChangeIsValid(node, node), Is.False);
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace SEE.Game.Drawable
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
             GameObject parent = CreateNode("Parent", GameMindMap.NodeKind.Theme);
 
-            Assert.That(GameMindMap.ParentChangeIsValid(node, parent), Is.True);
+            Assert.That(GameMindMapHierarchy.ParentChangeIsValid(node, parent), Is.True);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace SEE.Game.Drawable
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
 
-            Assert.That(GameMindMap.ParentChangeIsValid(node, child), Is.False);
+            Assert.That(GameMindMapHierarchy.ParentChangeIsValid(node, child), Is.False);
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace SEE.Game.Drawable
         {
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Subtheme);
 
             Assert.That(result, Is.True);
@@ -110,7 +111,7 @@ namespace SEE.Game.Drawable
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Subtheme);
 
             Assert.That(result, Is.False);
@@ -124,7 +125,7 @@ namespace SEE.Game.Drawable
         {
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Theme, GameMindMap.NodeKind.Subtheme);
 
             Assert.That(result, Is.True);
@@ -138,7 +139,7 @@ namespace SEE.Game.Drawable
         {
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Leaf);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Theme, GameMindMap.NodeKind.Leaf);
 
             Assert.That(result, Is.True);
@@ -153,7 +154,7 @@ namespace SEE.Game.Drawable
         {
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
 
             Assert.That(result, Is.False);
@@ -169,7 +170,7 @@ namespace SEE.Game.Drawable
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
             CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
 
             Assert.That(result, Is.True);
@@ -185,7 +186,7 @@ namespace SEE.Game.Drawable
             GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
             CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
 
             Assert.That(result, Is.True);
@@ -205,7 +206,7 @@ namespace SEE.Game.Drawable
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
 
-            bool result = GameMindMap.CheckValidNodeKindChange(
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
                 node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
 
             Assert.That(result, Is.False);

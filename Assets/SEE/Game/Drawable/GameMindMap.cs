@@ -349,54 +349,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Recursively updates the layer of the given mind map node and all of its children.
-        /// Each child node's layer is set to its parent's layer + 1.
-        /// </summary>
-        /// <param name="holder">The node whose layer will be updated.</param>
-        /// <param name="parent">The parent node used to determine the new layer for <paramref name="holder"/>.</param>
-        internal static void UpdateMindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
-        {
-            int oldLayer = holder.Layer;
-            holder.Layer = parent.Layer + 1;
-
-            if (holder.Layer != oldLayer && holder.GetChildren().Count > 0)
-            {
-                foreach(GameObject child in holder.GetChildren().Keys)
-                {
-                    MMNodeValueHolder childHolder = child.GetComponent<MMNodeValueHolder>();
-                    UpdateMindMapLayer(childHolder, holder);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Validity check for the change of parent.
-        /// The check prevents the formation of a cycle.
-        /// </summary>
-        /// <param name="child">The child node.</param>
-        /// <param name="parent">The parent.</param>
-        /// <param name="result">Iteration variable, for the result.</param>
-        /// <returns>If the parent change is possible or not.</returns>
-        public static bool ParentChangeIsValid(GameObject child, GameObject parent, bool result = true)
-        {
-            if (child.CompareTag(Tags.MindMapNode) && parent.CompareTag(Tags.MindMapNode))
-            {
-                MMNodeValueHolder valueHolder = child.GetComponent<MMNodeValueHolder>();
-                if (child == parent)
-                {
-                    result = false;
-                }
-                /// Check to prevent cycles.
-                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetChildren())
-                {
-                    result = result && ParentChangeIsValid(pair.Key, parent, result);
-                }
-                return result;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Provides the changing of the node kind.
         /// If the newly chosen node kind is different from the previous one,
         /// and if the validity check returns a positive result, the following will happen:
@@ -418,7 +370,7 @@ namespace SEE.Game.Drawable
             GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);
 
             if (nodeValueHolder.NodeKind != newNodeKind
-                && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
+                && GameMindMapHierarchy.CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
             {
                 bool ellipse = false;
                 switch (newNodeKind)
@@ -530,55 +482,6 @@ namespace SEE.Game.Drawable
         {
             node.FindDescendantWithTag(Tags.Line).GetComponent<Collider>().enabled = false;
             node.FindDescendantWithTag(Tags.DText).GetComponent<Collider>().enabled = false;
-        }
-
-        /// <summary>
-        /// Checks the validity and possibility <see cref="ChangeIsPossible"/> of the node kind change.
-        /// - A leaf can be transformed into any other node kind at any time.
-        /// - A theme can only be transformed if a suitable parent is present.
-        ///     For the transformation into a leaf, it additionally must not have any child nodes.
-        /// - A subtheme can be transformed into a theme at any time.
-        ///     It can only be transformed into a leaf if it has no children.
-        /// </summary>
-        /// <param name="node">The node whose node kind should be changed.</param>
-        /// <param name="newNodeKind">The new node kind.</param>
-        /// <param name="oldNodeKind">The old node kind.</param>
-        /// <returns>The result of the check.</returns>
-        public static bool CheckValidNodeKindChange(GameObject node, NodeKind newNodeKind, NodeKind oldNodeKind)
-        {
-            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-            if (oldNodeKind == NodeKind.Theme)
-            {
-                return (newNodeKind == NodeKind.Leaf && valueHolder.GetChildren().Count == 0
-                            || newNodeKind == NodeKind.Subtheme) && ChangeIsPossible(node);
-            }
-            if (oldNodeKind == NodeKind.Subtheme)
-            {
-                return newNodeKind == NodeKind.Theme
-                    || newNodeKind == NodeKind.Leaf && valueHolder.GetChildren().Count == 0;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if a node kind change from theme to subtheme is possible.
-        /// For this, another theme node must exist on the drawable
-        /// that is considered as a new parent.
-        /// </summary>
-        /// <param name="selectedNode">The selected node.</param>
-        /// <returns>True if change is possible.</returns>
-        private static bool ChangeIsPossible(GameObject selectedNode)
-        {
-            GameObject attacheds = GameFinder.GetAttachedObjectsObject(selectedNode);
-            foreach (GameObject node in attacheds.FindAllDescendantsWithTag(Tags.MindMapNode))
-            {
-                if (node.GetComponent<MMNodeValueHolder>().NodeKind == NodeKind.Theme
-                    && ParentChangeIsValid(selectedNode, node))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         /// <summary>
@@ -817,40 +720,6 @@ namespace SEE.Game.Drawable
 
             /// Rename the branch line.
             conf.ID = prefix + "-" + newParentID + "-" + newChildID;
-        }
-
-        /// <summary>
-        /// Summerizes the selected node, including children and branch lines, into a DrawableConfig.
-        /// </summary>
-        /// <param name="node">The selected node.</param>
-        /// <returns>A drawable configuration that only contains the selected node with children and branch lines.</returns>
-        public static DrawableConfig SummarizeSelectedNodeIncChildren(GameObject node)
-        {
-            if (node.CompareTag(Tags.MindMapNode))
-            {
-                DrawableConfig conf = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(node));
-                conf.TextConfigs.Clear();
-                conf.ImageConfigs.Clear();
-                List<LineConf> selectedBranchLines = new();
-                List<MindMapNodeConf> selectedNodes = new()
-                {
-                    /// Adds the selected node to the list.
-                    MindMapNodeConf.GetNodeConf(node)
-                };
-                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                /// Adds the all children nodes and their branch lines to the list.
-                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
-                {
-                    selectedNodes.Add(MindMapNodeConf.GetNodeConf(pair.Key));
-                    selectedBranchLines.Add(LineConf.GetLine(pair.Value));
-                }
-                /// Sets the branch line list to the line configurations of the drawable configuration.
-                conf.LineConfigs = selectedBranchLines;
-                /// Sets the mind map nodes list to the mind map node configurations of the drawable configuration.
-                conf.MindMapNodeConfigs = selectedNodes;
-                return conf;
-            }
-            return null;
         }
     }
 }

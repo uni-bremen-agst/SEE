@@ -87,9 +87,7 @@ namespace SEE.Game.Drawable.MindMap
 
             childValueHolder.SetParent(parent, branchLine);
 
-            GameMindMap.UpdateMindMapLayer(
-                childValueHolder,
-                parentValueHolder);
+            GameMindMapHierarchy.UpdateMindMapLayer(childValueHolder, parentValueHolder);
 
             branchLine.GetComponent<MeshCollider>().enabled = false;
 
@@ -203,7 +201,7 @@ namespace SEE.Game.Drawable.MindMap
                 child.GetComponent<MMNodeValueHolder>();
 
             if (childValueHolder.GetParent() == parent
-                || !GameMindMap.ParentChangeIsValid(child, parent))
+                || !GameMindMapHierarchy.ParentChangeIsValid(child, parent))
             {
                 return;
             }

@@ -234,7 +234,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
 
                 /// Nodes are prohibited as a parent if selecting them would create a cycle.
-                nodes.RemoveAll(node => !GameMindMap.ParentChangeIsValid(addedNode, node));
+                nodes.RemoveAll(node => !GameMindMapHierarchy.ParentChangeIsValid(addedNode, node));
 
                 /// A Theme cannot have a parent.
                 if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
@@ -330,7 +330,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
 
             /// Exclude candidates that would introduce a cycle.
-            nodes.RemoveAll(node => !GameMindMap.ParentChangeIsValid(addedNode, node));
+            nodes.RemoveAll(node => !GameMindMapHierarchy.ParentChangeIsValid(addedNode, node));
 
             if (nodes.Count == 0)
             {

@@ -1,9 +1,10 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -115,7 +116,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 GameMindMap.NodeKind oldNodeKind = newConf.NodeKind;
 
                 /// Reject node kind changes that violate the structural Mind Map rules.
-                if (!GameMindMap.CheckValidNodeKindChange(addedNode, newNodeKind, oldNodeKind)
+                if (!GameMindMapHierarchy.CheckValidNodeKindChange(addedNode, newNodeKind, oldNodeKind)
                     && newNodeKind != oldNodeKind)
                 {
                     ShowNotification.Warn(
@@ -146,7 +147,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                                 surface,
                                 surfaceParentName);
 
-                            GameMindMap.ChangeParent(addedNode, parent);
+                            GameMindMapBranch.ChangeParent(addedNode, parent);
                             newConf.ParentNode = parent.name;
 
                             new MindMapChangeParentNetAction(

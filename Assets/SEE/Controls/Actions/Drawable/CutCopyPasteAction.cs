@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -317,8 +318,8 @@ namespace SEE.Controls.Actions.Drawable
                 oldValueHolder = DrawableType.Get(selectedObj);
                 if (selectedObj.CompareTag(Tags.MindMapNode))
                 {
-                    oldNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
-                    newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
+                    oldNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(selectedObj);
+                    newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(selectedObj);
                 }
                 cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
                                                                         UICanvas.Canvas.transform, false);
@@ -495,7 +496,7 @@ namespace SEE.Controls.Actions.Drawable
             newObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
             MoveWithWorldPosition(newPosition);
             /// Updating positions.
-            newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
+            newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
         }
 
         /// <summary>
@@ -536,7 +537,7 @@ namespace SEE.Controls.Actions.Drawable
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     }
-                    newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
+                    newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
                 }
                 progressState = ProgressState.Finish;
             }
