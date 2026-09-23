@@ -50,49 +50,6 @@ namespace SEE.VCS
     internal class TestGitFileChurn
     {
         /// <summary>
-        /// The beginning of the period to be reported on; commits authored at
-        /// this very instant are still taken into account. The UTC offset is
-        /// stated explicitly, because the instant denoted would otherwise depend
-        /// on the time zone of the machine running this test and would, around a
-        /// switch to or from daylight saving time, be ambiguous.
-        /// </summary>
-        private static readonly DateTimeOffset since
-            = new(2025, 1, 1, 0, 0, 0, TimeSpan.FromHours(1));
-
-        /// <summary>
-        /// The directories, relative to the root of the repository and separated
-        /// by <c>/</c>, whose files are to be reported on. Nested directories are
-        /// included.
-        /// </summary>
-        private static readonly string[] directories
-            = { "Assets/SEE", "Assets/SEETests" };
-
-        /// <summary>
-        /// The extensions, leading dot included, a file must have to be reported
-        /// on.
-        /// </summary>
-        private static readonly string[] extensions = { ".cs" };
-
-        /// <summary>
-        /// Regular expressions selecting the branches to be reported on, one
-        /// report for each branch selected. A branch is selected if one of these
-        /// expressions matches its name as a whole. That name is the one
-        /// <c>git branch -a</c> prints: <c>heads/master</c> for a local branch
-        /// and <c>remotes/origin/master</c> for a remote-tracking one. Hence
-        /// <c>remotes/origin/.*</c> selects every remote branch and
-        /// <c>.*/master</c> both the local and the remote master.
-        ///
-        /// Every expression must select at least one branch; one selecting none
-        /// fails this test rather than silently narrowing the report. A branch
-        /// selected by several expressions is still reported on only once.
-        ///
-        /// Mind that each selected branch costs a walk of its entire history, so
-        /// an expression selecting many branches makes for a long-running test.
-        /// </summary>
-        private static readonly string[] branches
-            = { "heads/master", "heads/996-add-better-support-for-profiling", "remotes/origin/.*" };
-
-        /// <summary>
         /// The similarity, in percent, at and above which a deletion and an
         /// addition are considered a rename. This is git's own default.
         /// </summary>
@@ -105,16 +62,103 @@ namespace SEE.VCS
         private const int maximalRenameChain = 1000;
 
         /// <summary>
+        /// The configurations <see cref="TestChurnPerBranch"/> is run on, one
+        /// test case each.
+        /// </summary>
+        /// <remarks>
+        /// A source rather than a <see cref="TestCaseAttribute"/>, because the
+        /// argument of an attribute must be a constant expression, and
+        /// <c>new DateTimeOffset(...)</c> is not one: an object creation never
+        /// is, and neither is the <c>TimeSpan.FromHours(1)</c> within it. The
+        /// arrays would have been allowed, an array of constants being a
+        /// constant expression, but the date alone rules the attribute out.
+        ///
+        /// Being a method, this is moreover evaluated when the test is
+        /// discovered rather than when this class is initialized, so it may
+        /// read the fields above whatever order those are declared in.
+        ///
+        /// Name every case: with none, all that tells two of them apart in the
+        /// test runner is <c>System.String[]</c> three times over.
+        /// </remarks>
+        /// <returns>one test case per configuration</returns>
+        private static IEnumerable<TestCaseData> Configurations()
+        {
+            /// <summary>
+            /// The beginning of the period to be reported on; commits authored at
+            /// this very instant are still taken into account. The UTC offset is
+            /// stated explicitly, because the instant denoted would otherwise depend
+            /// on the time zone of the machine running this test and would, around a
+            /// switch to or from daylight saving time, be ambiguous.
+            /// </summary>
+            DateTimeOffset since
+            = new(2025, 1, 1, 0, 0, 0, TimeSpan.FromHours(1));
+
+            /// <summary>
+            /// The directories, relative to the root of the repository and separated
+            /// by <c>/</c>, whose files are to be reported on. Nested directories are
+            /// included.
+            /// </summary>
+            string[] directories
+                = { "Assets/SEE", "Assets/SEETests" };
+
+            /// <summary>
+            /// The extensions, leading dot included, a file must have to be reported
+            /// on.
+            /// </summary>
+            string[] extensions = { ".cs" };
+
+            /// <summary>
+            /// Regular expressions selecting the branches to be reported on, one
+            /// report for each branch selected. A branch is selected if one of these
+            /// expressions matches its name as a whole. That name is the one
+            /// <c>git branch -a</c> prints: <c>heads/master</c> for a local branch
+            /// and <c>remotes/origin/master</c> for a remote-tracking one. Hence
+            /// <c>remotes/origin/.*</c> selects every remote branch and
+            /// <c>.*/master</c> both the local and the remote master.
+            ///
+            /// Every expression must select at least one branch; one selecting none
+            /// fails this test rather than silently narrowing the report. A branch
+            /// selected by several expressions is still reported on only once.
+            ///
+            /// Mind that each selected branch costs a walk of its entire history, so
+            /// an expression selecting many branches makes for a long-running test.
+            /// </summary>
+            string[] branches
+                = { "heads/master", "heads/996-add-better-support-for-profiling", "remotes/origin/.*" };
+
+            yield return new TestCaseData(since, directories, extensions, branches)
+                    .SetName("SEE sources and tests");
+        }
+
+        /// <summary>
         /// Emits the report announced for <see cref="TestGitFileChurn"/>, one
         /// section per branch, to the console.
         /// </summary>
-        [Test]
-        public void TestChurnPerBranch()
+        /// <param name="since">The beginning of the period to be reported on.</param>
+        /// <param name="directories">The directories whose files are to be reported on.</param>
+        /// <param name="extensions">The extensions a file must have to be reported on.</param>
+        /// <param name="branches">Regular expressions selecting the branches to be reported on.</param>
+        [TestCaseSource(nameof(Configurations))]
+        public void TestChurnPerBranch
+              (DateTimeOffset since,
+               string[] directories,
+               string[] extensions,
+               string[] branches)
         {
-            string repositoryPath = DataPath.ProjectFolder();
-            AddNodesAfterDate(repositoryPath, since, directories, extensions, branches, default, default);
+            AddNodesAfterDate(DataPath.ProjectFolder(), since, directories, extensions, branches, default, default);
         }
 
+        /// <summary>
+        /// Emits the report on the repository at <paramref name="repositoryPath"/>,
+        /// one section per branch, to the console.
+        /// </summary>
+        /// <param name="repositoryPath">the path of the repository to be reported on</param>
+        /// <param name="since">the beginning of the period to be reported on</param>
+        /// <param name="directories">the directories whose files are to be reported on</param>
+        /// <param name="extensions">the extensions a file must have to be reported on</param>
+        /// <param name="branches">regular expressions selecting the branches to be reported on</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
         private static void AddNodesAfterDate
               (string repositoryPath,
                DateTimeOffset since,
@@ -124,20 +168,26 @@ namespace SEE.VCS
                Action<float> changePercentage,
                CancellationToken token)
         {
+            Criteria criteria = new(since, directories, extensions, branches);
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
-            ICollection<KeyValuePair<string, Branch>> selected = SelectedBranches(repository);
-            Debug.Log(Selection(selected));
+            ICollection<KeyValuePair<string, Branch>> selected
+                = SelectedBranches(repository, criteria);
+            Debug.Log(Selection(selected, criteria));
 
             // Shared by all branches, because what a commit changes does not
             // depend on the branch it is reached from.
-            Examination examined = new(repository, mailmap);
+            Examination examined = new(repository, mailmap, criteria);
 
+            int processed = 0;
             foreach (KeyValuePair<string, Branch> branch in selected)
             {
-                IDictionary<string, Churn> churn = ChurnOf(repository, branch.Value, examined);
-                Debug.Log(Report(branch.Key, churn));
+                token.ThrowIfCancellationRequested();
+
+                IDictionary<string, Churn> churn
+                    = ChurnOf(repository, branch.Value, examined, criteria, token);
+                Debug.Log(Report(branch.Key, churn, criteria));
 
                 foreach (KeyValuePair<string, Churn> file in churn)
                 {
@@ -146,6 +196,10 @@ namespace SEE.VCS
                     Assert.That(file.Value.Authors, Is.Not.Empty,
                                 $"{file.Key} is reported without any author.");
                 }
+                processed++;
+                // The cast is needed: both operands being integers, the division
+                // would otherwise be an integer one and yield zero throughout.
+                changePercentage?.Invoke((float)processed / selected.Count);
             }
             Debug.Log($"{examined.Count} distinct commits were examined for "
                       + $"{selected.Count} branches.\n");
@@ -153,13 +207,15 @@ namespace SEE.VCS
 
         /// <summary>
         /// The branches of <paramref name="repository"/> selected by
-        /// <see cref="branches"/>, keyed by their name and ordered by it. A
+        /// <paramref name="criteria"/>, keyed by their name and ordered by it. A
         /// branch selected by more than one of those expressions occurs only
         /// once.
         /// </summary>
         /// <param name="repository">the repository whose branches are to be selected</param>
+        /// <param name="criteria">states the expressions selecting the branches</param>
         /// <returns>the selected branches, keyed by their name</returns>
-        private static ICollection<KeyValuePair<string, Branch>> SelectedBranches(Repository repository)
+        private static ICollection<KeyValuePair<string, Branch>> SelectedBranches
+              (Repository repository, Criteria criteria)
         {
             // A symbolic reference, remotes/origin/HEAD in particular, only
             // points at another branch. Reporting on it would repeat that
@@ -170,7 +226,7 @@ namespace SEE.VCS
                             .ToDictionary(NameOf, branch => branch);
 
             SortedDictionary<string, Branch> result = new(StringComparer.Ordinal);
-            foreach (string pattern in branches)
+            foreach (string pattern in criteria.Branches)
             {
                 Regex expression = Expression(pattern);
                 ICollection<string> selected
@@ -188,16 +244,18 @@ namespace SEE.VCS
         /// <summary>
         /// The announcement of the branches <paramref name="selected"/> to be
         /// walked. Emitted before the first walk, so that an expression in
-        /// <see cref="branches"/> selecting far more branches than intended
+        /// <paramref name="criteria"/> selecting far more branches than intended
         /// shows at once rather than only once all of them have been walked.
         /// </summary>
         /// <param name="selected">the branches selected, keyed by their name</param>
+        /// <param name="criteria">states the expressions the branches were selected by</param>
         /// <returns>the announcement</returns>
-        private static string Selection(ICollection<KeyValuePair<string, Branch>> selected)
+        private static string Selection(ICollection<KeyValuePair<string, Branch>> selected,
+                                        Criteria criteria)
         {
             StringBuilder result = new();
             result.AppendLine($"Reporting on {selected.Count} branches, selected by "
-                              + string.Join(", ", branches) + ":");
+                              + string.Join(", ", criteria.Branches) + ":");
             foreach (KeyValuePair<string, Branch> branch in selected)
             {
                 result.AppendLine($"  {branch.Key}");
@@ -249,9 +307,12 @@ namespace SEE.VCS
         /// <param name="repository">the repository to be walked</param>
         /// <param name="branch">the branch whose commits are to be taken into account</param>
         /// <param name="examined">what is known of the commits examined so far; will be extended</param>
+        /// <param name="criteria">states which files are reported on</param>
+        /// <param name="token">Cancellation token.</param>
         /// <returns>the churn per file</returns>
         private static IDictionary<string, Churn> ChurnOf(Repository repository, Branch branch,
-                                                          Examination examined)
+                                                          Examination examined, Criteria criteria,
+                                                          CancellationToken token)
         {
             Dictionary<string, Churn> result = new();
             // Maps the former name of a renamed file onto the name that file
@@ -271,6 +332,10 @@ namespace SEE.VCS
 
             foreach (Commit commit in repository.Commits.QueryBy(filter))
             {
+                // Checked per commit rather than per branch: walking one branch
+                // of a repository the size of SEE is itself a matter of seconds.
+                token.ThrowIfCancellationRequested();
+
                 Examined examination = examined.Of(commit);
                 if (examination.IsMerge)
                 {
@@ -293,7 +358,7 @@ namespace SEE.VCS
 
             // A file renamed out of the scope of this test is dropped, because it
             // no longer is a file this test reports on.
-            return result.Where(file => InScope(file.Key))
+            return result.Where(file => criteria.InScope(file.Key))
                          .ToDictionary(file => file.Key, file => file.Value);
         }
 
@@ -356,34 +421,21 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Whether <paramref name="path"/> denotes a file this test reports on,
-        /// that is, one located in one of the <see cref="directories"/> and
-        /// having one of the <see cref="extensions"/>.
-        /// </summary>
-        /// <param name="path">the path to be checked, relative to the root of the
-        /// repository and separated by <c>/</c>; may be null</param>
-        /// <returns>true if and only if the file is reported on</returns>
-        private static bool InScope(string path)
-        {
-            return !string.IsNullOrEmpty(path)
-                && extensions.Any(extension => path.EndsWith(extension, StringComparison.Ordinal))
-                && directories.Any(directory => path.StartsWith(directory + "/", StringComparison.Ordinal));
-        }
-
-        /// <summary>
         /// The report on <paramref name="churn"/> as a table, one line per file,
         /// the file with the most added lines first.
         /// </summary>
         /// <param name="branchName">the branch the report is on</param>
         /// <param name="churn">the churn to be reported</param>
+        /// <param name="criteria">states the period reported on</param>
         /// <returns>the report</returns>
-        private static string Report(string branchName, IDictionary<string, Churn> churn)
+        private static string Report(string branchName, IDictionary<string, Churn> churn,
+                                     Criteria criteria)
         {
             StringBuilder result = new();
             // The separators are quoted, because an unquoted '-' and ':' stand
             // for the date and the time separator of the current culture.
             result.AppendLine($"===== branch: {branchName} (author date >= "
-                              + since.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszzz")
+                              + criteria.Since.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszzz")
                               + ") =====");
             if (churn.Count == 0)
             {
@@ -402,6 +454,72 @@ namespace SEE.VCS
                                   + string.Join(", ", file.Value.Authors));
             }
             return result.ToString();
+        }
+
+        /// <summary>
+        /// What is reported on: which commits, which files, which branches.
+        /// Handed to everything needing to know, so that these four values are
+        /// stated in one place only.
+        /// </summary>
+        private class Criteria
+        {
+            /// <summary>
+            /// The beginning of the period reported on; commits authored at this
+            /// very instant are still taken into account.
+            /// </summary>
+            internal DateTimeOffset Since { get; }
+
+            /// <summary>
+            /// The directories, relative to the root of the repository and
+            /// separated by <c>/</c>, whose files are reported on. Nested
+            /// directories are included. Doubles as the pathspec narrowing every
+            /// comparison of a commit against its parent.
+            /// </summary>
+            internal IReadOnlyList<string> Directories { get; }
+
+            /// <summary>
+            /// The extensions, leading dot included, a file must have to be
+            /// reported on.
+            /// </summary>
+            internal IReadOnlyList<string> Extensions { get; }
+
+            /// <summary>
+            /// The regular expressions selecting the branches reported on.
+            /// </summary>
+            internal IReadOnlyList<string> Branches { get; }
+
+            /// <summary>
+            /// Constructor setting all properties from the parameters of the
+            /// same name.
+            /// </summary>
+            /// <param name="since">the beginning of the period reported on</param>
+            /// <param name="directories">the directories whose files are reported on</param>
+            /// <param name="extensions">the extensions a file must have to be reported on</param>
+            /// <param name="branches">the expressions selecting the branches reported on</param>
+            internal Criteria(DateTimeOffset since, IReadOnlyList<string> directories,
+                              IReadOnlyList<string> extensions, IReadOnlyList<string> branches)
+            {
+                Since = since;
+                Directories = directories;
+                Extensions = extensions;
+                Branches = branches;
+            }
+
+            /// <summary>
+            /// Whether <paramref name="path"/> denotes a file reported on, that
+            /// is, one located in one of the <see cref="Directories"/> and having
+            /// one of the <see cref="Extensions"/>.
+            /// </summary>
+            /// <param name="path">the path to be checked, relative to the root of
+            /// the repository and separated by <c>/</c>; may be null</param>
+            /// <returns>true if and only if the file is reported on</returns>
+            internal bool InScope(string path)
+            {
+                return !string.IsNullOrEmpty(path)
+                    && Extensions.Any(extension => path.EndsWith(extension, StringComparison.Ordinal))
+                    && Directories.Any(directory =>
+                                       path.StartsWith(directory + "/", StringComparison.Ordinal));
+            }
         }
 
         /// <summary>
@@ -536,6 +654,11 @@ namespace SEE.VCS
             private readonly Mailmap mailmap;
 
             /// <summary>
+            /// States the period and the files reported on.
+            /// </summary>
+            private readonly Criteria criteria;
+
+            /// <summary>
             /// The options of every comparison made here.
             /// </summary>
             private readonly CompareOptions compareOptions = new()
@@ -560,10 +683,12 @@ namespace SEE.VCS
             /// </summary>
             /// <param name="repository">the repository whose commits are examined</param>
             /// <param name="mailmap">used to map an author onto their canonical name</param>
-            internal Examination(Repository repository, Mailmap mailmap)
+            /// <param name="criteria">states the period and the files reported on</param>
+            internal Examination(Repository repository, Mailmap mailmap, Criteria criteria)
             {
                 this.repository = repository;
                 this.mailmap = mailmap;
+                this.criteria = criteria;
             }
 
             /// <summary>
@@ -604,15 +729,16 @@ namespace SEE.VCS
                 // against the empty tree, which a null tree denotes.
                 LibGit2Sharp.Tree parent = commit.Parents.FirstOrDefault()?.Tree;
                 Signature author = commit.Author;
-                bool within = author.When >= since;
+                bool within = author.When >= criteria.Since;
 
                 if (within)
                 {
-                    using Patch patch = repository.Diff.Compare<Patch>(parent, commit.Tree,
-                                                                       directories, compareOptions);
+                    using Patch patch
+                        = repository.Diff.Compare<Patch>(parent, commit.Tree,
+                                                         criteria.Directories, compareOptions);
                     foreach (PatchEntryChanges change in patch)
                     {
-                        if (InScope(change.Path) || InScope(change.OldPath))
+                        if (criteria.InScope(change.Path) || criteria.InScope(change.OldPath))
                         {
                             changes.Add(new FileChange(change.Path, change.OldPath,
                                                        change.Status == ChangeKind.Renamed,
@@ -629,11 +755,11 @@ namespace SEE.VCS
                     // cheaper than the line counts a patch would have to produce.
                     using TreeChanges treeChanges
                         = repository.Diff.Compare<TreeChanges>(parent, commit.Tree,
-                                                               directories, compareOptions);
+                                                               criteria.Directories, compareOptions);
                     foreach (TreeEntryChanges change in treeChanges)
                     {
                         if (change.Status == ChangeKind.Renamed
-                            && (InScope(change.Path) || InScope(change.OldPath)))
+                            && (criteria.InScope(change.Path) || criteria.InScope(change.OldPath)))
                         {
                             changes.Add(new FileChange(change.Path, change.OldPath, true, 0, 0));
                         }
