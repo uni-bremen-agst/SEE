@@ -16,23 +16,12 @@ namespace SEE.Game.Drawable
     public static class GameMindMap
     {
         /// <summary>
-        /// The different kinds of a mind map node.
-        /// </summary>
-        [Serializable]
-        public enum NodeKind
-        {
-            Theme,
-            Subtheme,
-            Leaf
-        }
-
-        /// <summary>
         /// Returns the list of the different node kinds.
         /// </summary>
         /// <returns>A list of the node kinds.</returns>
-        public static List<NodeKind> GetNodeKinds()
+        public static List<MindMapNodeKind> GetNodeKinds()
         {
-            return Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().ToList();
+            return Enum.GetValues(typeof(MindMapNodeKind)).Cast<MindMapNodeKind>().ToList();
         }
 
         /// <summary>

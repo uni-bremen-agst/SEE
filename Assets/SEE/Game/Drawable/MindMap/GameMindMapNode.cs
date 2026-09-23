@@ -7,7 +7,6 @@ using SEE.Utils;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using NodeKind = SEE.Game.Drawable.GameMindMap.NodeKind;
 
 namespace SEE.Game.Drawable.MindMap
 {
@@ -185,7 +184,7 @@ namespace SEE.Game.Drawable.MindMap
             if (node.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                bool ellipse = valueHolder.NodeKind != NodeKind.Subtheme;
+                bool ellipse = valueHolder.NodeKind != MindMapNodeKind.Subtheme;
                 GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
 
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
@@ -280,7 +279,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="newNodeKind">The new node kind.</param>
         /// <param name="borderConf">The previous border configuration that should be preserved when applicable.</param>
         /// <returns>The resulting node kind.</returns>
-        public static NodeKind ChangeNodeKind(GameObject node, NodeKind newNodeKind, LineConf borderConf = null)
+        public static MindMapNodeKind ChangeNodeKind(GameObject node, MindMapNodeKind newNodeKind, LineConf borderConf = null)
         {
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
@@ -292,7 +291,7 @@ namespace SEE.Game.Drawable.MindMap
                 bool ellipse = false;
                 switch (newNodeKind)
                 {
-                    case NodeKind.Theme:
+                    case MindMapNodeKind.Theme:
                         // Themes cannot have a parent.
                         if (nodeValueHolder.GetParent() != null)
                         {
@@ -309,7 +308,7 @@ namespace SEE.Game.Drawable.MindMap
                         GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
-                    case NodeKind.Subtheme:
+                    case MindMapNodeKind.Subtheme:
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
                         GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
@@ -317,7 +316,7 @@ namespace SEE.Game.Drawable.MindMap
                         GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
-                    case NodeKind.Leaf:
+                    case MindMapNodeKind.Leaf:
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.5f);
@@ -338,7 +337,7 @@ namespace SEE.Game.Drawable.MindMap
                 ChangeBoxSize(node);
 
                 // Preserve an existing visible border appearance where the new node kind permits it.
-                if (newNodeKind != NodeKind.Leaf && borderConf != null
+                if (newNodeKind != MindMapNodeKind.Leaf && borderConf != null
                     && borderConf.PrimaryColor != Color.clear)
                 {
                     GameEdit.ChangeLine(nodeBorder, borderConf);
@@ -355,9 +354,9 @@ namespace SEE.Game.Drawable.MindMap
         /// </summary>
         /// <param name="node">The node whose prefix should be changed.</param>
         /// <param name="newNodeKind">The new node kind determining the prefix.</param>
-        private static void ChangeName(GameObject node, NodeKind newNodeKind)
+        private static void ChangeName(GameObject node, MindMapNodeKind newNodeKind)
         {
-            NodeKind old = node.GetComponent<MMNodeValueHolder>().NodeKind;
+            MindMapNodeKind old = node.GetComponent<MMNodeValueHolder>().NodeKind;
             node.name = node.name.Replace(GetPrefix(old), GetPrefix(newNodeKind));
         }
 
@@ -366,13 +365,13 @@ namespace SEE.Game.Drawable.MindMap
         /// </summary>
         /// <param name="nodeKind">The node kind whose prefix should be returned.</param>
         /// <returns>The corresponding node prefix.</returns>
-        internal static string GetPrefix(NodeKind nodeKind)
+        internal static string GetPrefix(MindMapNodeKind nodeKind)
         {
             return nodeKind switch
             {
-                NodeKind.Theme => ValueHolder.MindMapThemePrefix,
-                NodeKind.Subtheme => ValueHolder.MindMapSubthemePrefix,
-                NodeKind.Leaf => ValueHolder.MindMapLeafPrefix,
+                MindMapNodeKind.Theme => ValueHolder.MindMapThemePrefix,
+                MindMapNodeKind.Subtheme => ValueHolder.MindMapSubthemePrefix,
+                MindMapNodeKind.Leaf => ValueHolder.MindMapLeafPrefix,
                 _ => "",
             };
         }
@@ -405,7 +404,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <returns>The recreated Mind Map node.</returns>
         private static GameObject ReCreate(GameObject surface, GameObject parent, string name,
             TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
-            Vector3 eulerAngles, int order, NodeKind nodeKind, string branchToParentName, int associatedPage)
+            Vector3 eulerAngles, int order, MindMapNodeKind nodeKind, string branchToParentName, int associatedPage)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             if (order >= holder.OrderInLayer && associatedPage == holder.CurrentPage)

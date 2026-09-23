@@ -53,7 +53,7 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestParentChangeRejectsNodeItself()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
 
             Assert.That(GameMindMapHierarchy.ParentChangeIsValid(node, node), Is.False);
         }
@@ -64,8 +64,8 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestParentChangeAcceptsUnrelatedNode()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
-            GameObject parent = CreateNode("Parent", GameMindMap.NodeKind.Theme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
+            GameObject parent = CreateNode("Parent", MindMapNodeKind.Theme);
 
             Assert.That(GameMindMapHierarchy.ParentChangeIsValid(node, parent), Is.True);
         }
@@ -76,8 +76,8 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestParentChangeRejectsDescendant()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
-            GameObject child = CreateNode("Child", GameMindMap.NodeKind.Subtheme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
+            GameObject child = CreateNode("Child", MindMapNodeKind.Subtheme);
             GameObject branchLine = CreateBranchLine("Branch");
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
@@ -91,10 +91,10 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestSubthemeWithoutChildrenCanBecomeLeaf()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Subtheme);
+                node, MindMapNodeKind.Leaf, MindMapNodeKind.Subtheme);
 
             Assert.That(result, Is.True);
         }
@@ -105,14 +105,14 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestSubthemeWithChildrenCannotBecomeLeaf()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
-            GameObject child = CreateNode("Child", GameMindMap.NodeKind.Leaf);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
+            GameObject child = CreateNode("Child", MindMapNodeKind.Leaf);
             GameObject branchLine = CreateBranchLine("Branch");
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Subtheme);
+                node, MindMapNodeKind.Leaf, MindMapNodeKind.Subtheme);
 
             Assert.That(result, Is.False);
         }
@@ -123,10 +123,10 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestSubthemeCanBecomeTheme()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Subtheme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Subtheme);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Theme, GameMindMap.NodeKind.Subtheme);
+                node, MindMapNodeKind.Theme, MindMapNodeKind.Subtheme);
 
             Assert.That(result, Is.True);
         }
@@ -137,10 +137,10 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestLeafCanBecomeTheme()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Leaf);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Leaf);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Theme, GameMindMap.NodeKind.Leaf);
+                node, MindMapNodeKind.Theme, MindMapNodeKind.Leaf);
 
             Assert.That(result, Is.True);
         }
@@ -152,10 +152,10 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestThemeCannotBecomeSubthemeWithoutAnotherTheme()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Theme);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
+                node, MindMapNodeKind.Subtheme, MindMapNodeKind.Theme);
 
             Assert.That(result, Is.False);
         }
@@ -167,11 +167,11 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestThemeCanBecomeSubthemeWithAnotherTheme()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
-            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Theme);
+            CreateNode("OtherTheme", MindMapNodeKind.Theme);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Subtheme, GameMindMap.NodeKind.Theme);
+                node, MindMapNodeKind.Subtheme, MindMapNodeKind.Theme);
 
             Assert.That(result, Is.True);
         }
@@ -183,11 +183,11 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestThemeWithoutChildrenCanBecomeLeafWithAnotherTheme()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
-            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Theme);
+            CreateNode("OtherTheme", MindMapNodeKind.Theme);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
+                node, MindMapNodeKind.Leaf, MindMapNodeKind.Theme);
 
             Assert.That(result, Is.True);
         }
@@ -199,15 +199,15 @@ namespace SEE.Game.Drawable
         [Test]
         public void TestThemeWithChildrenCannotBecomeLeaf()
         {
-            GameObject node = CreateNode("Node", GameMindMap.NodeKind.Theme);
-            GameObject child = CreateNode("Child", GameMindMap.NodeKind.Subtheme);
+            GameObject node = CreateNode("Node", MindMapNodeKind.Theme);
+            GameObject child = CreateNode("Child", MindMapNodeKind.Subtheme);
             GameObject branchLine = CreateBranchLine("Branch");
-            CreateNode("OtherTheme", GameMindMap.NodeKind.Theme);
+            CreateNode("OtherTheme", MindMapNodeKind.Theme);
 
             node.GetComponent<MMNodeValueHolder>().AddChild(child, branchLine);
 
             bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
-                node, GameMindMap.NodeKind.Leaf, GameMindMap.NodeKind.Theme);
+                node, MindMapNodeKind.Leaf, MindMapNodeKind.Theme);
 
             Assert.That(result, Is.False);
         }
@@ -218,7 +218,7 @@ namespace SEE.Game.Drawable
         /// <param name="name">The name of the node.</param>
         /// <param name="nodeKind">The kind of the node.</param>
         /// <returns>The created Mind Map node.</returns>
-        private GameObject CreateNode(string name, GameMindMap.NodeKind nodeKind)
+        private GameObject CreateNode(string name, MindMapNodeKind nodeKind)
         {
             GameObject node = new GameObject(name);
             node.tag = Tags.MindMapNode;

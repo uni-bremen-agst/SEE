@@ -151,7 +151,7 @@ namespace SEE.UI.Menu.Drawable
 
             MMNodeValueHolder valueHolder = node.AddComponent<MMNodeValueHolder>();
             InitializeValueHolder(valueHolder);
-            valueHolder.NodeKind = GameMindMap.NodeKind.Subtheme;
+            valueHolder.NodeKind = MindMapNodeKind.Subtheme;
 
             return node;
         }

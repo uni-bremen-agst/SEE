@@ -121,24 +121,24 @@ namespace SEE.Game.Drawable.MindMap
         /// </remarks>
         public static bool CheckValidNodeKindChange(
             GameObject node,
-            GameMindMap.NodeKind newNodeKind,
-            GameMindMap.NodeKind oldNodeKind)
+            MindMapNodeKind newNodeKind,
+            MindMapNodeKind oldNodeKind)
         {
             MMNodeValueHolder valueHolder =
                 node.GetComponent<MMNodeValueHolder>();
 
-            if (oldNodeKind == GameMindMap.NodeKind.Theme)
+            if (oldNodeKind == MindMapNodeKind.Theme)
             {
-                return (newNodeKind == GameMindMap.NodeKind.Leaf
+                return (newNodeKind == MindMapNodeKind.Leaf
                         && valueHolder.GetChildren().Count == 0
-                        || newNodeKind == GameMindMap.NodeKind.Subtheme)
+                        || newNodeKind == MindMapNodeKind.Subtheme)
                     && ChangeIsPossible(node);
             }
 
-            if (oldNodeKind == GameMindMap.NodeKind.Subtheme)
+            if (oldNodeKind == MindMapNodeKind.Subtheme)
             {
-                return newNodeKind == GameMindMap.NodeKind.Theme
-                    || newNodeKind == GameMindMap.NodeKind.Leaf
+                return newNodeKind == MindMapNodeKind.Theme
+                    || newNodeKind == MindMapNodeKind.Leaf
                     && valueHolder.GetChildren().Count == 0;
             }
 
@@ -164,7 +164,7 @@ namespace SEE.Game.Drawable.MindMap
                      in attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode))
             {
                 if (node.GetComponent<MMNodeValueHolder>().NodeKind
-                        == GameMindMap.NodeKind.Theme
+                        == MindMapNodeKind.Theme
                     && ParentChangeIsValid(selectedNode, node))
                 {
                     return true;

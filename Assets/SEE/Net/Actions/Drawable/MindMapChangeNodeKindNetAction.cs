@@ -6,7 +6,7 @@ using SEE.Game.Drawable.MindMap;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for change the <see cref="GameMindMap.NodeKind"/> <see cref="EditAction"/> of a mind map node on the given drawable on all clients.
+    /// This class is reponsible for change the <see cref="MindMapNodeKind"/> <see cref="EditAction"/> of a mind map node on the given drawable on all clients.
     /// </summary>
     public class MindMapChangeNodeKindNetAction : DrawableNetAction
     {
@@ -18,7 +18,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The new node kind for the node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind;
+        public MindMapNodeKind NodeKind;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="node">The node that should be change the node kind.</param>
         /// <param name="nodeKind">The new node kind.</param>
-        public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
+        public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, MindMapNodeKind nodeKind)
             : base (drawableID, parentDrawableID)
         {
             Node = node;

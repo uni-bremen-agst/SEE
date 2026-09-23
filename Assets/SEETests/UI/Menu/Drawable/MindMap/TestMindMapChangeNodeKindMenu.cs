@@ -7,6 +7,7 @@ using SEE.Game.Drawable.ValueHolders;
 using UnityEngine;
 using System.Reflection;
 using TMPro;
+using SEE.Game.Drawable.MindMap;
 
 namespace SEE.UI.Menu.Drawable.MindMap
 {
@@ -82,7 +83,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             MindMapNodeConf configuration = new MindMapNodeConf
             {
-                NodeKind = GameMindMap.NodeKind.Theme
+                NodeKind = MindMapNodeKind.Theme
             };
 
             MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
@@ -90,9 +91,9 @@ namespace SEE.UI.Menu.Drawable.MindMap
             HorizontalSelector selector = FindNodeKindSelector();
 
             Assert.That(selector.itemList.Count, Is.EqualTo(3));
-            Assert.That(selector.itemList[0].itemTitle, Is.EqualTo(GameMindMap.NodeKind.Theme.ToString()));
-            Assert.That(selector.itemList[1].itemTitle, Is.EqualTo(GameMindMap.NodeKind.Subtheme.ToString()));
-            Assert.That(selector.itemList[2].itemTitle, Is.EqualTo(GameMindMap.NodeKind.Leaf.ToString()));
+            Assert.That(selector.itemList[0].itemTitle, Is.EqualTo(MindMapNodeKind.Theme.ToString()));
+            Assert.That(selector.itemList[1].itemTitle, Is.EqualTo(MindMapNodeKind.Subtheme.ToString()));
+            Assert.That(selector.itemList[2].itemTitle, Is.EqualTo(MindMapNodeKind.Leaf.ToString()));
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             MindMapNodeConf configuration = new MindMapNodeConf
             {
-                NodeKind = GameMindMap.NodeKind.Subtheme
+                NodeKind = MindMapNodeKind.Subtheme
             };
 
             MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
@@ -122,7 +123,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             MindMapNodeConf configuration = new MindMapNodeConf
             {
-                NodeKind = GameMindMap.NodeKind.Theme
+                NodeKind = MindMapNodeKind.Theme
             };
 
             MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
@@ -132,7 +133,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             Assert.That(
                 MindMapChangeNodeKindMenu.GetSelectedNodeKind(),
-                Is.EqualTo(GameMindMap.NodeKind.Leaf));
+                Is.EqualTo(MindMapNodeKind.Leaf));
         }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             MindMapNodeConf configuration = new MindMapNodeConf
             {
-                NodeKind = GameMindMap.NodeKind.Theme
+                NodeKind = MindMapNodeKind.Theme
             };
 
             MindMapChangeNodeKindMenu.Enable(
@@ -164,20 +165,20 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// modify the node until a valid parent has been explicitly confirmed.
         /// </summary>
         /// <param name="newNodeKind">The node kind that requires a parent.</param>
-        [TestCase(GameMindMap.NodeKind.Subtheme)]
-        [TestCase(GameMindMap.NodeKind.Leaf)]
+        [TestCase(MindMapNodeKind.Subtheme)]
+        [TestCase(MindMapNodeKind.Leaf)]
         public void TestParentRequiredNodeKindChangeRemainsPendingUntilConfirmation(
-            GameMindMap.NodeKind newNodeKind)
+            MindMapNodeKind newNodeKind)
         {
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             InitializeValueHolder(nodeValueHolder);
-            nodeValueHolder.NodeKind = GameMindMap.NodeKind.Theme;
+            nodeValueHolder.NodeKind = MindMapNodeKind.Theme;
 
             CreateParentCandidate();
 
             MindMapNodeConf configuration = new MindMapNodeConf
             {
-                NodeKind = GameMindMap.NodeKind.Theme
+                NodeKind = MindMapNodeKind.Theme
             };
 
             MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
@@ -188,8 +189,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
             selector.index = index;
             selector.selectorEvent.Invoke(index);
 
-            Assert.That(nodeValueHolder.NodeKind, Is.EqualTo(GameMindMap.NodeKind.Theme));
-            Assert.That(configuration.NodeKind, Is.EqualTo(GameMindMap.NodeKind.Theme));
+            Assert.That(nodeValueHolder.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
+            Assert.That(configuration.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
             Assert.That(nodeValueHolder.GetParent(), Is.Null);
         }
 
@@ -243,7 +244,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             MMNodeValueHolder valueHolder = parent.AddComponent<MMNodeValueHolder>();
             InitializeValueHolder(valueHolder);
-            valueHolder.NodeKind = GameMindMap.NodeKind.Theme;
+            valueHolder.NodeKind = MindMapNodeKind.Theme;
 
             TextMeshPro text = parent.AddComponent<TextMeshPro>();
             text.text = parent.name;

@@ -110,15 +110,15 @@ namespace SEE.UI.Menu.Drawable.MindMap
                     Tags.MindMapNode,
                     includeInactive);
 
-            /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
-            /// <see cref="GameMindMap.NodeKind.Theme"/> or
-            /// <see cref="GameMindMap.NodeKind.Subtheme"/>.
-            /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
+            /// Gather all Mind Map Nodes with the <see cref="MindMapNodeKind"/>:
+            /// <see cref="MindMapNodeKind.Theme"/> or
+            /// <see cref="MindMapNodeKind.Subtheme"/>.
+            /// Note: A <see cref="MindMapNodeKind.Leaf"/> can not be a parent.
             List<GameObject> nodes = new();
             foreach (GameObject node in allNodes)
             {
                 if (node.GetComponent<MMNodeValueHolder>().NodeKind
-                        != GameMindMap.NodeKind.Leaf
+                        != MindMapNodeKind.Leaf
                     && node != addedNode)
                 {
                     nodes.Add(node);
@@ -226,18 +226,18 @@ namespace SEE.UI.Menu.Drawable.MindMap
             {
                 HorizontalSelector parentSelector = InitializeMenu(returnCall);
 
-                /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
-                /// <see cref="GameMindMap.NodeKind.Theme"/> or
-                /// <see cref="GameMindMap.NodeKind.Subtheme"/>
+                /// Collect all Mind Map Nodes with the <see cref="MindMapNodeKind"/>:
+                /// <see cref="MindMapNodeKind.Theme"/> or
+                /// <see cref="MindMapNodeKind.Subtheme"/>
                 /// that qualify as a new parent.
-                /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent.
+                /// Note: A <see cref="MindMapNodeKind.Leaf"/> can not be a parent.
                 List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
 
                 /// Nodes are prohibited as a parent if selecting them would create a cycle.
                 nodes.RemoveAll(node => !GameMindMapHierarchy.ParentChangeIsValid(addedNode, node));
 
                 /// A Theme cannot have a parent.
-                if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
+                if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == MindMapNodeKind.Theme)
                 {
                     ShowNotification.Warn("Unauthorized action", "A theme can't have a parent.");
                     returnCall?.Invoke();

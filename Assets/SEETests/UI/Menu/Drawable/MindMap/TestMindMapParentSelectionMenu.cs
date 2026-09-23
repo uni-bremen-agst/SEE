@@ -45,9 +45,9 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             attachedObjects = new GameObject("AttachedObjects");
 
-            addedNode = CreateNode("AddedNode", GameMindMap.NodeKind.Leaf);
-            firstParent = CreateNode("FirstParent", GameMindMap.NodeKind.Theme);
-            secondParent = CreateNode("SecondParent", GameMindMap.NodeKind.Subtheme);
+            addedNode = CreateNode("AddedNode", MindMapNodeKind.Leaf);
+            firstParent = CreateNode("FirstParent", MindMapNodeKind.Theme);
+            secondParent = CreateNode("SecondParent", MindMapNodeKind.Subtheme);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         [Test]
         public void TestLeafNodeIsExcludedFromParentCandidates()
         {
-            GameObject leaf = CreateNode("Leaf", GameMindMap.NodeKind.Leaf);
+            GameObject leaf = CreateNode("Leaf", MindMapNodeKind.Leaf);
 
             MindMapParentSelectionMenu.Enable(attachedObjects, addedNode);
 
@@ -164,7 +164,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         public void TestDescendantIsExcludedForEditing()
         {
             MindMapNodeConf configuration = ConfigureExistingParent(addedNode, firstParent);
-            GameObject descendant = CreateNode("Descendant", GameMindMap.NodeKind.Subtheme);
+            GameObject descendant = CreateNode("Descendant", MindMapNodeKind.Subtheme);
 
             GameObject descendantBranchLine = new GameObject("DescendantBranchLine");
             descendantBranchLine.transform.SetParent(attachedObjects.transform);
@@ -270,7 +270,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         [Test]
         public void TestRequiredParentSelectionDoesNotApplyParentBeforeFinish()
         {
-            addedNode.GetComponent<MMNodeValueHolder>().NodeKind = GameMindMap.NodeKind.Theme;
+            addedNode.GetComponent<MMNodeValueHolder>().NodeKind = MindMapNodeKind.Theme;
             GameObject confirmedParent = null;
 
             MindMapParentSelectionMenu.EnableForRequiredParentSelection(
@@ -349,7 +349,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="name">The name of the node.</param>
         /// <param name="nodeKind">The kind of the node.</param>
         /// <returns>The created Mind Map node.</returns>
-        private GameObject CreateNode(string name, GameMindMap.NodeKind nodeKind)
+        private GameObject CreateNode(string name, MindMapNodeKind nodeKind)
         {
             GameObject node = new GameObject(name);
             node.tag = Tags.MindMapNode;
@@ -394,7 +394,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             branchLine.transform.SetParent(attachedObjects.transform);
 
             MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-            valueHolder.NodeKind = GameMindMap.NodeKind.Subtheme;
+            valueHolder.NodeKind = MindMapNodeKind.Subtheme;
             valueHolder.SetParent(parent, branchLine);
 
             return new MindMapNodeConf

@@ -63,7 +63,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 {
                     MMNodeValueHolder nodeValueHolder = addedNode.GetComponent<MMNodeValueHolder>();
 
-                    if (nodeValueHolder.NodeKind != GameMindMap.NodeKind.Theme
+                    if (nodeValueHolder.NodeKind != MindMapNodeKind.Theme
                         && nodeValueHolder.GetParent() == null)
                     {
                         ShowNotification.Warn("Select parent",
@@ -78,12 +78,12 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 nodeKindSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Selection").GetComponent<HorizontalSelector>();
 
                 /// Creates the items for them.
-                foreach (GameMindMap.NodeKind kind in GameMindMap.GetNodeKinds())
+                foreach (MindMapNodeKind kind in GameMindMap.GetNodeKinds())
                 {
                     nodeKindSelector.CreateNewItem(kind.ToString());
                 }
 
-                /// Gets the index of the current chosen <see cref="GameMindMap.NodeKind"/>.
+                /// Gets the index of the current chosen <see cref="MindMapNodeKind"/>.
                 int index = GameMindMap.GetNodeKinds().IndexOf(newConf.NodeKind);
 
                 /// Adds the handler for the node kind change.
@@ -112,8 +112,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             nodeKindSelector.selectorEvent.AddListener(index =>
             {
-                GameMindMap.NodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];
-                GameMindMap.NodeKind oldNodeKind = newConf.NodeKind;
+                MindMapNodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];
+                MindMapNodeKind oldNodeKind = newConf.NodeKind;
 
                 /// Reject node kind changes that violate the structural Mind Map rules.
                 if (!GameMindMapHierarchy.CheckValidNodeKindChange(addedNode, newNodeKind, oldNodeKind)
@@ -129,7 +129,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
                 /// A transition from Theme to Subtheme or Leaf requires a parent.
                 /// Do not apply the node kind change before that parent was explicitly confirmed.
-                if (newNodeKind != GameMindMap.NodeKind.Theme
+                if (newNodeKind != MindMapNodeKind.Theme
                     && nodeValueHolder.GetParent() == null)
                 {
                     MindMapParentSelectionMenu.Instance.Destroy();
@@ -209,7 +209,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="surface">The Drawable surface containing the Mind Map node.</param>
         /// <param name="surfaceParentName">The name of the Drawable surface parent.</param>
         private static void ApplyNodeKindChange(GameObject addedNode, MindMapNodeConf newConf,
-            GameMindMap.NodeKind newNodeKind, LineConf borderConf,
+            MindMapNodeKind newNodeKind, LineConf borderConf,
             GameObject surface, string surfaceParentName)
         {
             GameMindMapNode.ChangeNodeKind(addedNode, newNodeKind, borderConf);
@@ -223,7 +223,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             newConf.NodeKind = newNodeKind;
             newConf.TextConf = ((MindMapNodeConf)DrawableType.Get(addedNode)).TextConf;
 
-            if (newNodeKind == GameMindMap.NodeKind.Theme)
+            if (newNodeKind == MindMapNodeKind.Theme)
             {
                 newConf.ParentNode = "";
                 newConf.BranchLineToParent = "";
@@ -234,7 +234,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// Get the currently selected node kind.
         /// </summary>
         /// <returns>The selected node kind.</returns>
-        public static GameMindMap.NodeKind GetSelectedNodeKind()
+        public static MindMapNodeKind GetSelectedNodeKind()
         {
             return GameMindMap.GetNodeKinds()[nodeKindSelector.index];
         }

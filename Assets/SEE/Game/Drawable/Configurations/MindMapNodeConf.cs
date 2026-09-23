@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.ValueHolders;
+﻿using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils.Config;
 using System;
@@ -31,7 +32,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The node kind of the node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind;
+        public MindMapNodeKind NodeKind;
 
         /// <summary>
         /// The configuration of the mind map border (line).
@@ -240,13 +241,13 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the node kind.
             if (attributes.TryGetValue(nodeKindLabel, out object kind)
-                && Enum.TryParse<GameMindMap.NodeKind>((string)kind, out GameMindMap.NodeKind result))
+                && Enum.TryParse<MindMapNodeKind>((string)kind, out MindMapNodeKind result))
             {
                 NodeKind = result;
             }
             else
             {
-                NodeKind = GameMindMap.NodeKind.Theme;
+                NodeKind = MindMapNodeKind.Theme;
                 errors = true;
             }
 
