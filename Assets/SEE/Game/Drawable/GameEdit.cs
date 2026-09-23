@@ -263,7 +263,7 @@ namespace SEE.Game.Drawable
             {
                 GameObject node = textObj.transform.parent.gameObject;
                 GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMapNode.ReDrawBorder(node);
+                GameMindMap.ReDrawBorder(node);
             }
         }
 
@@ -289,7 +289,7 @@ namespace SEE.Game.Drawable
             {
                 GameObject node = textObj.transform.parent.gameObject;
                 GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMapNode.ReDrawBorder(node);
+                GameMindMap.ReDrawBorder(node);
             }
         }
 
@@ -315,7 +315,7 @@ namespace SEE.Game.Drawable
             {
                 GameObject node = textObj.transform.parent.gameObject;
                 GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMapNode.ReDrawBorder(node);
+                GameMindMap.ReDrawBorder(node);
             }
         }
 
@@ -398,7 +398,7 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                GameMindMapNode.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
+                GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
                 ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
                 ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(

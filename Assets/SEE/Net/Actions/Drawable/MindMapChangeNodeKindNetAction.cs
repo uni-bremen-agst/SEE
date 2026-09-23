@@ -43,7 +43,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Node != null && Node.ID != "")
             {
-                GameMindMapNode.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
+                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
                     NodeKind, Node.BorderConf);
             }
             else

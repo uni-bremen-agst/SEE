@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using System.Reflection;
 using UnityEngine;

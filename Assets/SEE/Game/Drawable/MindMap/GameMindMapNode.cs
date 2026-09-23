@@ -12,7 +12,7 @@ namespace SEE.Game.Drawable.MindMap
 {
     /// <summary>
     /// Provides creation, recreation, appearance, and collider handling
-    /// for Mind Map nodes.
+    /// for individual Mind Map nodes.
     /// </summary>
     public static class GameMindMapNode
     {
@@ -72,7 +72,6 @@ namespace SEE.Game.Drawable.MindMap
                 node.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
             // Text and border must only be editable through the Mind Map node.
-            // This also prevents line operations such as LineSplitAction from affecting the border.
             text.GetComponent<MeshCollider>().enabled = false;
             border.GetComponent<MeshCollider>().enabled = false;
 
@@ -121,7 +120,8 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="text">The text object used to determine the border dimensions.</param>
         /// <param name="prefix">The ID prefix determining the border appearance.</param>
         /// <returns>The created border.</returns>
-        private static GameObject CreateMindMapBorder(GameObject surface, Vector3 position, GameObject text, string prefix)
+        private static GameObject CreateMindMapBorder(GameObject surface, Vector3 position, GameObject text,
+            string prefix)
         {
             GameObject shape;
             LineKind lineKind = LineKind.Solid;
@@ -175,24 +175,19 @@ namespace SEE.Game.Drawable.MindMap
         }
 
         /// <summary>
-        /// Redraws the border of the given Mind Map node and updates its collider
-        /// and connected branch lines.
+        /// Redraws the border of the given Mind Map node and updates its collider.
         /// </summary>
         /// <param name="node">The node whose border should be redrawn.</param>
-        public static void ReDrawBorder(GameObject node)
+        internal static void UpdateBorder(GameObject node)
         {
-            if (node.CompareTag(Tags.MindMapNode))
-            {
-                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                bool ellipse = valueHolder.NodeKind != MindMapNodeKind.Subtheme;
-                GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
+            bool ellipse = valueHolder.NodeKind != MindMapNodeKind.Subtheme;
+            GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
 
-                Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
-                GameLineDrawer.Drawing(node.FindDescendantWithTag(Tags.Line), positions);
+            Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
+            GameLineDrawer.Drawing(node.FindDescendantWithTag(Tags.Line), positions);
 
-                ChangeBoxSize(node);
-                GameMindMapBranch.ReDrawBranchLines(node);
-            }
+            ChangeBoxSize(node);
         }
 
         /// <summary>
@@ -234,7 +229,9 @@ namespace SEE.Game.Drawable.MindMap
         /// Converts either the x or y coordinates of the given positions to a float array.
         /// </summary>
         /// <param name="positions">The positions whose coordinates should be converted.</param>
-        /// <param name="xValue">Whether the x coordinates should be returned instead of the y coordinates.</param>
+        /// <param name="xValue">
+        /// Whether the x coordinates should be returned instead of the y coordinates.
+        /// </param>
         /// <returns>The selected coordinates as a float array.</returns>
         private static float[] ConvertVector3ArrayToFloatArray(Vector3[] positions, bool xValue)
         {
@@ -267,86 +264,76 @@ namespace SEE.Game.Drawable.MindMap
         /// <returns>The created node.</returns>
         public static GameObject Create(GameObject surface, string prefix, string writtenText, Vector3 position)
         {
-            Setup(surface, "", prefix, writtenText, position, surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject node);
+            Setup(surface, "", prefix, writtenText, position,
+                surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject node);
+
             return node;
         }
 
         /// <summary>
-        /// Changes the kind and corresponding appearance of the given Mind Map node
-        /// if the requested transition is structurally valid.
+        /// Applies the appearance associated with the given node kind to a Mind Map node.
         /// </summary>
-        /// <param name="node">The node whose kind should be changed.</param>
-        /// <param name="newNodeKind">The new node kind.</param>
-        /// <param name="borderConf">The previous border configuration that should be preserved when applicable.</param>
-        /// <returns>The resulting node kind.</returns>
-        public static MindMapNodeKind ChangeNodeKind(GameObject node, MindMapNodeKind newNodeKind, LineConf borderConf = null)
+        /// <param name="node">The node whose appearance should be changed.</param>
+        /// <param name="newNodeKind">The node kind whose appearance should be applied.</param>
+        /// <param name="borderConf">
+        /// The previous border configuration that should be preserved when applicable.
+        /// </param>
+        internal static void ApplyNodeKindAppearance(GameObject node, MindMapNodeKind newNodeKind,
+            LineConf borderConf = null)
         {
-            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
             GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);
 
-            if (nodeValueHolder.NodeKind != newNodeKind
-                && GameMindMapHierarchy.CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
+            bool ellipse = false;
+
+            switch (newNodeKind)
             {
-                bool ellipse = false;
-                switch (newNodeKind)
-                {
-                    case MindMapNodeKind.Theme:
-                        // Themes cannot have a parent.
-                        if (nodeValueHolder.GetParent() != null)
-                        {
-                            nodeValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
-                        }
-                        Destroyer.Destroy(nodeValueHolder.GetParentBranchLine());
-                        nodeValueHolder.SetParent(null, null);
+                case MindMapNodeKind.Theme:
+                    ellipse = true;
+                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
+                    GameEdit.ChangeFontSize(nodeText, 1.0f);
+                    GameLineAppearance.ChangeLineKind(
+                        nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
+                    GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
+                    break;
 
-                        ellipse = true;
-                        GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
-                        GameEdit.ChangeFontSize(nodeText, 1.0f);
-                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
-                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
-                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
-                        break;
+                case MindMapNodeKind.Subtheme:
+                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
+                    GameEdit.ChangeFontSize(nodeText, 0.7f);
+                    GameLineAppearance.ChangeLineKind(
+                        nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
+                    GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
+                    break;
 
-                    case MindMapNodeKind.Subtheme:
-                        GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
-                        GameEdit.ChangeFontSize(nodeText, 0.7f);
-                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
-                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
-                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
-                        break;
-
-                    case MindMapNodeKind.Leaf:
-                        ellipse = true;
-                        GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
-                        GameEdit.ChangeFontSize(nodeText, 0.5f);
-                        GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
-                        GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.clear);
-                        GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.clear);
-                        break;
-                }
-
-                ChangeName(node, newNodeKind);
-
-                // Appearance changes may reactivate the child colliders.
-                DisableTextAndBorderCollider(node);
-
-                Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
-                GameLineDrawer.Drawing(nodeBorder, positions);
-
-                ChangeBoxSize(node);
-
-                // Preserve an existing visible border appearance where the new node kind permits it.
-                if (newNodeKind != MindMapNodeKind.Leaf && borderConf != null
-                    && borderConf.PrimaryColor != Color.clear)
-                {
-                    GameEdit.ChangeLine(nodeBorder, borderConf);
-                }
-
-                nodeValueHolder.NodeKind = newNodeKind;
-                GameMindMapBranch.ReDrawBranchLines(node);
+                case MindMapNodeKind.Leaf:
+                    ellipse = true;
+                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
+                    GameEdit.ChangeFontSize(nodeText, 0.5f);
+                    GameLineAppearance.ChangeLineKind(
+                        nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.clear);
+                    GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.clear);
+                    break;
             }
-            return nodeValueHolder.NodeKind;
+
+            ChangeName(node, newNodeKind);
+
+            // Appearance changes may reactivate the child colliders.
+            DisableTextAndBorderCollider(node);
+
+            Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
+            GameLineDrawer.Drawing(nodeBorder, positions);
+
+            ChangeBoxSize(node);
+
+            // Preserve an existing visible border appearance where the target kind permits it.
+            if (newNodeKind != MindMapNodeKind.Leaf && borderConf != null
+                && borderConf.PrimaryColor != Color.clear)
+            {
+                GameEdit.ChangeLine(nodeBorder, borderConf);
+            }
         }
 
         /// <summary>
@@ -356,8 +343,10 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="newNodeKind">The new node kind determining the prefix.</param>
         private static void ChangeName(GameObject node, MindMapNodeKind newNodeKind)
         {
-            MindMapNodeKind old = node.GetComponent<MMNodeValueHolder>().NodeKind;
-            node.name = node.name.Replace(GetPrefix(old), GetPrefix(newNodeKind));
+            MindMapNodeKind oldNodeKind = node.GetComponent<MMNodeValueHolder>().NodeKind;
+            node.name = node.name.Replace(
+                GetPrefix(oldNodeKind),
+                GetPrefix(newNodeKind));
         }
 
         /// <summary>
@@ -377,7 +366,7 @@ namespace SEE.Game.Drawable.MindMap
         }
 
         /// <summary>
-        /// Disables the mesh colliders of the text and border belonging to the given Mind Map node.
+        /// Disables the colliders of the text and border belonging to the given Mind Map node.
         /// </summary>
         /// <param name="node">The node whose child colliders should be disabled.</param>
         public static void DisableTextAndBorderCollider(GameObject node)
@@ -387,59 +376,51 @@ namespace SEE.Game.Drawable.MindMap
         }
 
         /// <summary>
-        /// Recreates a Mind Map node using the given configuration values.
+        /// Recreates a Mind Map node based on the given configuration.
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-        /// <param name="parent">The parent Mind Map node.</param>
-        /// <param name="name">The ID of the node.</param>
-        /// <param name="textConf">The text configuration of the node.</param>
-        /// <param name="borderConf">The border configuration of the node.</param>
-        /// <param name="position">The position of the node.</param>
-        /// <param name="scale">The scale of the node.</param>
-        /// <param name="eulerAngles">The Euler angles of the node.</param>
-        /// <param name="order">The order in layer of the node.</param>
-        /// <param name="nodeKind">The kind of the node.</param>
-        /// <param name="branchToParentName">The name of the branch line to the parent.</param>
-        /// <param name="associatedPage">The associated surface page of the node.</param>
+        /// <param name="conf">The node configuration to restore.</param>
         /// <returns>The recreated Mind Map node.</returns>
-        private static GameObject ReCreate(GameObject surface, GameObject parent, string name,
-            TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
-            Vector3 eulerAngles, int order, MindMapNodeKind nodeKind, string branchToParentName, int associatedPage)
+        internal static GameObject Restore(GameObject surface, MindMapNodeConf conf)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-            if (order >= holder.OrderInLayer && associatedPage == holder.CurrentPage)
+            if (conf.OrderInLayer >= holder.OrderInLayer
+                && conf.AssociatedPage == holder.CurrentPage)
             {
-                holder.OrderInLayer = order + 1;
+                holder.OrderInLayer = conf.OrderInLayer + 1;
             }
-            if (associatedPage >= holder.MaxPageSize)
+            if (conf.AssociatedPage >= holder.MaxPageSize)
             {
-                holder.MaxPageSize = associatedPage + 1;
+                holder.MaxPageSize = conf.AssociatedPage + 1;
             }
-            if (order >= ValueHolder.MaxOrderInLayer)
+            if (conf.OrderInLayer >= ValueHolder.MaxOrderInLayer)
             {
-                ValueHolder.MaxOrderInLayer = order + 1;
+                ValueHolder.MaxOrderInLayer = conf.OrderInLayer + 1;
             }
+
             GameObject createdNode;
 
-            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, conf.ID) != null)
             {
-                createdNode = GameFinder.FindAttachedOrLocalDescendant(surface, name);
+                createdNode = GameFinder.FindAttachedOrLocalDescendant(surface, conf.ID);
             }
             else
             {
-                Setup(surface, name, GetPrefix(nodeKind), textConf.Text,
-                    surface.transform.TransformPoint(position), associatedPage, out GameObject node);
+                Setup(surface, conf.ID, GetPrefix(conf.NodeKind), conf.TextConf.Text,
+                    surface.transform.TransformPoint(conf.Position), conf.AssociatedPage,
+                    out GameObject node);
 
-                // Setup creates default children that are replaced by the restored configuration below.
+                // Setup creates default children that are replaced by the restored configuration.
                 Destroyer.Destroy(node.FindDescendantWithTag(Tags.Line));
                 Destroyer.Destroy(node.FindDescendantWithTag(Tags.DText));
+
                 createdNode = node;
             }
 
-            GameObject border = GameLineDrawer.ReDrawLine(surface, borderConf);
+            GameObject border = GameLineDrawer.ReDrawLine(surface, conf.BorderConf);
 
-            textConf.OrderInLayer = order;
-            GameObject text = GameTexter.ReWriteText(surface, textConf);
+            conf.TextConf.OrderInLayer = conf.OrderInLayer;
+            GameObject text = GameTexter.ReWriteText(surface, conf.TextConf);
             text.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
 
             border.transform.SetParent(createdNode.transform);
@@ -455,55 +436,21 @@ namespace SEE.Game.Drawable.MindMap
             BoxCollider box = createdNode.GetComponent<BoxCollider>();
             box.size = GetBoxSize(border);
 
-            createdNode.transform.localScale = scale;
-            createdNode.transform.localEulerAngles = eulerAngles;
-            createdNode.transform.localPosition = position;
-            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
+            createdNode.transform.localScale = conf.Scale;
+            createdNode.transform.localEulerAngles = conf.EulerAngles;
+            createdNode.transform.localPosition = conf.Position;
+            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer = conf.OrderInLayer;
 
-            createdNode.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
-            border.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
-            text.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            createdNode.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
+            border.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
+            text.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
 
-            if (associatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
+            if (conf.AssociatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
             {
                 createdNode.SetActive(false);
             }
 
-            if (parent != null)
-            {
-                GameMindMapBranch.CreateBranchLine(createdNode, parent, branchToParentName);
-            }
             return createdNode;
-        }
-
-        /// <summary>
-        /// Recreates a Mind Map node based on the given configuration.
-        /// </summary>
-        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-        /// <param name="conf">The node configuration to restore.</param>
-        /// <returns>The recreated Mind Map node.</returns>
-        public static GameObject ReCreate(GameObject surface, MindMapNodeConf conf)
-        {
-            GameObject parent = null;
-
-            if (GameFinder.GetAttachedObjectsObject(surface) != null)
-            {
-                parent = GameFinder.FindAttachedOrLocalDescendant(GameFinder.GetAttachedObjectsObject(surface),
-                    conf.ParentNode);
-            }
-
-            return ReCreate(surface,
-                parent,
-                conf.ID,
-                conf.TextConf,
-                conf.BorderConf,
-                conf.Position,
-                conf.Scale,
-                conf.EulerAngles,
-                conf.OrderInLayer,
-                conf.NodeKind,
-                conf.BranchLineToParent,
-                conf.AssociatedPage);
         }
     }
 }

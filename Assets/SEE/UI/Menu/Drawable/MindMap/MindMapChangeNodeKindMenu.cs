@@ -119,6 +119,9 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 if (!GameMindMapHierarchy.CheckValidNodeKindChange(addedNode, newNodeKind, oldNodeKind)
                     && newNodeKind != oldNodeKind)
                 {
+                    nodeKindSelector.index = GameMindMap.GetNodeKinds().IndexOf(oldNodeKind);
+                    nodeKindSelector.UpdateUI();
+
                     ShowNotification.Warn(
                         "Cannot transform",
                         "The newly chosen node kind cannot be applied to this node.");
@@ -212,7 +215,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             MindMapNodeKind newNodeKind, LineConf borderConf,
             GameObject surface, string surfaceParentName)
         {
-            GameMindMapNode.ChangeNodeKind(addedNode, newNodeKind, borderConf);
+            GameMindMap.ChangeNodeKind(addedNode, newNodeKind, borderConf);
 
             new MindMapChangeNodeKindNetAction(
                 surface.name,

@@ -225,7 +225,7 @@ namespace SEE.Game.Drawable.Configurations
                         image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    createdObject = GameMindMapNode.ReCreate(surface, node);
+                    createdObject = GameMindMap.ReCreate(surface, node);
                     EnsureValidity(type, createdObject);
                     new MindMapCreateNodeNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         node).Execute();

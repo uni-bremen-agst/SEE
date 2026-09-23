@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Node != null && Node.ID != "")
             {
-                GameMindMapNode.ReCreate(Surface, Node);
+                GameMindMap.ReCreate(Surface, Node);
             }
             else
             {

@@ -494,7 +494,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            GameMindMapNode.ReCreate(memento.Surface.GetDrawableSurface(), memento.Conf);
+            GameMindMap.ReCreate(memento.Surface.GetDrawableSurface(), memento.Conf);
             new MindMapCreateNodeNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
         }
 
