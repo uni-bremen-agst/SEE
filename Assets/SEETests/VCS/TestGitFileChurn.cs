@@ -14,11 +14,11 @@ using UnityEngine;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Reports, for every branch selected by <see cref="branches"/> and every file having
-    /// an extension in <see cref="extensions"/> and located in one of the
-    /// <see cref="directories"/>, the number of lines added, the number of lines
-    /// deleted, the number of commits, and the list of authors, taking only
-    /// commits into account that were authored at or after <see cref="since"/>.
+    /// Reports, for every selected branch and every file having a certain
+    /// extension and located in one of a set of directories, the number of
+    /// lines added, the number of lines deleted, the number of commits,
+    /// and the list of authors, taking only commits into account that were
+    /// authored at or after a chosen date.
     /// </summary>
     /// <remarks>
     /// This is the LibGit2Sharp counterpart of the following query, run once per
@@ -83,46 +83,35 @@ namespace SEE.VCS
         /// <returns>one test case per configuration</returns>
         private static IEnumerable<TestCaseData> Configurations()
         {
-            /// <summary>
-            /// The beginning of the period to be reported on; commits authored at
-            /// this very instant are still taken into account. The UTC offset is
-            /// stated explicitly, because the instant denoted would otherwise depend
-            /// on the time zone of the machine running this test and would, around a
-            /// switch to or from daylight saving time, be ambiguous.
-            /// </summary>
-            DateTimeOffset since
-            = new(2025, 1, 1, 0, 0, 0, TimeSpan.FromHours(1));
+            // The beginning of the period to be reported on; commits authored at
+            // this very instant are still taken into account. The UTC offset is
+            // stated explicitly, because the instant denoted would otherwise depend
+            // on the time zone of the machine running this test and would, around a
+            // switch to or from daylight saving time, be ambiguous.
+            DateTimeOffset since = new(2025, 1, 1, 0, 0, 0, TimeSpan.FromHours(1));
 
-            /// <summary>
-            /// The directories, relative to the root of the repository and separated
-            /// by <c>/</c>, whose files are to be reported on. Nested directories are
-            /// included.
-            /// </summary>
-            string[] directories
-                = { "Assets/SEE", "Assets/SEETests" };
+            // The directories, relative to the root of the repository and separated
+            // by <c>/</c>, whose files are to be reported on. Nested directories are
+            // included.
+            string[] directories = { "Assets/SEE", "Assets/SEETests" };
 
-            /// <summary>
-            /// The extensions, leading dot included, a file must have to be reported
-            /// on.
-            /// </summary>
+            // The extensions, leading dot included, a file must have to be reported on.
             string[] extensions = { ".cs" };
 
-            /// <summary>
-            /// Regular expressions selecting the branches to be reported on, one
-            /// report for each branch selected. A branch is selected if one of these
-            /// expressions matches its name as a whole. That name is the one
-            /// <c>git branch -a</c> prints: <c>heads/master</c> for a local branch
-            /// and <c>remotes/origin/master</c> for a remote-tracking one. Hence
-            /// <c>remotes/origin/.*</c> selects every remote branch and
-            /// <c>.*/master</c> both the local and the remote master.
-            ///
-            /// Every expression must select at least one branch; one selecting none
-            /// fails this test rather than silently narrowing the report. A branch
-            /// selected by several expressions is still reported on only once.
-            ///
-            /// Mind that each selected branch costs a walk of its entire history, so
-            /// an expression selecting many branches makes for a long-running test.
-            /// </summary>
+            // Regular expressions selecting the branches to be reported on, one
+            // report for each branch selected. A branch is selected if one of these
+            // expressions matches its name as a whole. That name is the one
+            // <c>git branch -a</c> prints: <c>heads/master</c> for a local branch
+            // and <c>remotes/origin/master</c> for a remote-tracking one. Hence
+            // <c>remotes/origin/.*</c> selects every remote branch and
+            // <c>.*/master</c> both the local and the remote master.
+            //
+            // Every expression must select at least one branch; one selecting none
+            // fails this test rather than silently narrowing the report. A branch
+            // selected by several expressions is still reported on only once.
+            //
+            // Mind that each selected branch costs a walk of its entire history, so
+            // an expression selecting many branches makes for a long-running test.
             string[] branches
                 = { "heads/master", "heads/996-add-better-support-for-profiling", "remotes/origin/.*" };
 
@@ -151,12 +140,42 @@ namespace SEE.VCS
         /// <summary>
         /// Emits the report on the repository at <paramref name="repositoryPath"/>,
         /// one section per branch, to the console.
+        ///
+        /// <paramref name="since"/> is the beginning of the period to be reported on;
+        /// commits authored at this very instant are still taken into account. The UTC offset is
+        /// stated explicitly, because the instant denoted would otherwise depend
+        /// on the time zone of the machine running this test and would, around a
+        /// switch to or from daylight saving time, be ambiguous.
+        ///
+        /// <paramref name="directories"/> is the set of directories, relative to the root
+        /// of the repository and separated by <c>/</c>, whose files are to be reported on.
+        /// Nested directories are included.
+        ///
+        /// <paramref name="extensions"/> is the set of file extensions, leading dot included,
+        /// a file must have to be reported on.
+        ///
+        /// <paramref name="branches"/> is a set of regular expressions selecting
+        /// the branches to be reported on, one report for each branch selected.
+        /// A branch is selected if one of these expressions matches its name as
+        /// a whole. That name is the one <c>git branch -a</c> prints:
+        /// <c>heads/master</c> for a local branch
+        /// and <c>remotes/origin/master</c> for a remote-tracking one. Hence
+        /// <c>remotes/origin/.*</c> selects every remote branch and
+        /// <c>.*/master</c> both the local and the remote master.
+        ///
+        /// Every expression must select at least one branch; one selecting none
+        /// fails this test rather than silently narrowing the report. A branch
+        /// selected by several expressions is still reported on only once.
+        ///
+        /// Mind that each selected branch costs a walk of its entire history, so
+        /// an expression selecting many branches makes for a long-running function
+        /// call.
         /// </summary>
-        /// <param name="repositoryPath">the path of the repository to be reported on</param>
-        /// <param name="since">the beginning of the period to be reported on</param>
-        /// <param name="directories">the directories whose files are to be reported on</param>
-        /// <param name="extensions">the extensions a file must have to be reported on</param>
-        /// <param name="branches">regular expressions selecting the branches to be reported on</param>
+        /// <param name="repositoryPath">The path of the repository to be reported on.</param>
+        /// <param name="since">The beginning of the period to be reported on.</param>
+        /// <param name="directories">The directories whose files are to be reported on.</param>
+        /// <param name="extensions">The extensions a file must have to be reported on.</param>
+        /// <param name="branches">Regular expressions selecting the branches to be reported on.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         private static void AddNodesAfterDate
@@ -284,7 +303,7 @@ namespace SEE.VCS
         /// around <paramref name="pattern"/> keeps them from binding to only
         /// the first and the last alternative of an alternation.
         /// </summary>
-        /// <param name="pattern">the regular expression as stated in <see cref="branches"/></param>
+        /// <param name="pattern">the regular expression</param>
         /// <returns>the anchored regular expression</returns>
         private static Regex Expression(string pattern)
         {
