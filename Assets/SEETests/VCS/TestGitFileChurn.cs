@@ -113,7 +113,10 @@ namespace SEE.VCS
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
-            foreach (KeyValuePair<string, Branch> branch in SelectedBranches(repository))
+            ICollection<KeyValuePair<string, Branch>> selected = SelectedBranches(repository);
+            Debug.Log(Selection(selected));
+
+            foreach (KeyValuePair<string, Branch> branch in selected)
             {
                 IDictionary<string, Churn> churn = ChurnOf(repository, branch.Value, mailmap);
                 Debug.Log(Report(branch.Key, churn));
@@ -136,7 +139,7 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repository">the repository whose branches are to be selected</param>
         /// <returns>the selected branches, keyed by their name</returns>
-        private static IEnumerable<KeyValuePair<string, Branch>> SelectedBranches(Repository repository)
+        private static ICollection<KeyValuePair<string, Branch>> SelectedBranches(Repository repository)
         {
             // A symbolic reference, remotes/origin/HEAD in particular, only
             // points at another branch. Reporting on it would repeat that
@@ -160,6 +163,26 @@ namespace SEE.VCS
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// The announcement of the branches <paramref name="selected"/> to be
+        /// walked. Emitted before the first walk, so that an expression in
+        /// <see cref="branches"/> selecting far more branches than intended
+        /// shows at once rather than only once all of them have been walked.
+        /// </summary>
+        /// <param name="selected">the branches selected, keyed by their name</param>
+        /// <returns>the announcement</returns>
+        private static string Selection(ICollection<KeyValuePair<string, Branch>> selected)
+        {
+            StringBuilder result = new();
+            result.AppendLine($"Reporting on {selected.Count} branches, selected by "
+                              + string.Join(", ", branches) + ":");
+            foreach (KeyValuePair<string, Branch> branch in selected)
+            {
+                result.AppendLine($"  {branch.Key}");
+            }
+            return result.ToString();
         }
 
         /// <summary>
