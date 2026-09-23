@@ -1,5 +1,6 @@
 using LibGit2Sharp;
 using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.VCS
@@ -110,6 +112,18 @@ namespace SEE.VCS
         public void TestChurnPerBranch()
         {
             string repositoryPath = DataPath.ProjectFolder();
+            AddNodesAfterDate(repositoryPath, since, directories, extensions, branches, default, default);
+        }
+
+        private static void AddNodesAfterDate
+              (string repositoryPath,
+               DateTimeOffset since,
+               string[] directories,
+               string[] extensions,
+               string[] branches,
+               Action<float> changePercentage,
+               CancellationToken token)
+        {
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
