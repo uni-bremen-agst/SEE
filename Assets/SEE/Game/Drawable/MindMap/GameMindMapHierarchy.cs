@@ -98,14 +98,6 @@ namespace SEE.Game.Drawable.MindMap
         /// <paramref name="oldNodeKind"/> to <paramref name="newNodeKind"/>
         /// according to the structural rules of the Mind Map hierarchy.
         /// </summary>
-        /// <remarks>
-        /// A leaf may be changed to any node kind.
-        /// A subtheme may become a theme at any time and may become a leaf
-        /// only if it has no children.
-        /// A theme may become a subtheme or leaf only if another valid theme
-        /// can act as its parent. Changing a theme to a leaf additionally
-        /// requires that it has no children.
-        /// </remarks>
         /// <param name="node">
         /// The Mind Map node whose kind should be changed.
         /// </param>
@@ -119,6 +111,14 @@ namespace SEE.Game.Drawable.MindMap
         /// True if the requested node-kind transition is structurally valid;
         /// otherwise false.
         /// </returns>
+        /// <remarks>
+        /// A leaf may be changed to any node kind.
+        /// A subtheme may become a theme at any time and may become a leaf
+        /// only if it has no children.
+        /// A theme may become a subtheme or leaf only if another valid theme
+        /// can act as its parent. Changing a theme to a leaf additionally
+        /// requires that it has no children.
+        /// </remarks>
         public static bool CheckValidNodeKindChange(
             GameObject node,
             GameMindMap.NodeKind newNodeKind,
