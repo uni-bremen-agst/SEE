@@ -1,17 +1,15 @@
 ﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.MindMap
 {
     /// <summary>
-    /// Provides the public facade and orchestration for Mind Map operations.
+    /// Provides operations that coordinate multiple components of a Mind Map.
     /// </summary>
     public static class GameMindMap
     {
