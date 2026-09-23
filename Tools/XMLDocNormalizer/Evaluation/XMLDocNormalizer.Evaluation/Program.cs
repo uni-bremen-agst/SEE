@@ -16,7 +16,8 @@ namespace XMLDocNormalizer.Evaluation
             {
                 Console.Error.WriteLine(
                     "Usage: --manifest <path> --workspace <path> --output <directory> "
-                    + "[--source-link enabled|disabled]");
+                    + "[--source-link enabled|disabled] "
+                    + "[--source-reconstruction strict|verified-line-endings]");
                 return 1;
             }
 

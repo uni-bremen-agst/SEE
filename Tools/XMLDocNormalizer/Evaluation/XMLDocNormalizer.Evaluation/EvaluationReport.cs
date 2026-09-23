@@ -25,6 +25,9 @@ namespace XMLDocNormalizer.Evaluation
         /// <summary>Gets or sets whether network Source Link was enabled.</summary>
         public bool SourceLinkEnabled { get; set; }
 
+        /// <summary>Gets or sets the external-source reconstruction policy.</summary>
+        public string SourceReconstructionPolicy { get; set; } = string.Empty;
+
         /// <summary>Gets or sets aggregate counts.</summary>
         public EvaluationSummary Summary { get; set; } = new();
 
@@ -141,6 +144,18 @@ namespace XMLDocNormalizer.Evaluation
 
         /// <summary>Gets or sets the P5J source-tree count.</summary>
         public int SourceTreeCount { get; set; }
+
+        /// <summary>Gets or sets source documents validated without transformation.</summary>
+        public int DirectExactSourceCount { get; set; }
+
+        /// <summary>Gets or sets source documents validated after reconstruction.</summary>
+        public int ReconstructedExactSourceCount { get; set; }
+
+        /// <summary>Gets or sets source documents unavailable after permitted attempts.</summary>
+        public int UnavailableSourceCount { get; set; }
+
+        /// <summary>Gets or sets bounded G3A source acquisition work.</summary>
+        public EvaluationSourceAcquisitionStatistics SourceAcquisition { get; set; } = new();
 
         /// <summary>Gets or sets compiler error count.</summary>
         public int CompilerErrorCount { get; set; }
@@ -286,6 +301,49 @@ namespace XMLDocNormalizer.Evaluation
         public long PositiveCacheHits { get; set; }
 
         /// <summary>Gets or sets the number of negative cache hits.</summary>
+        public long NegativeCacheHits { get; set; }
+    }
+
+    /// <summary>Captures bounded G3A source acquisition and reconstruction work.</summary>
+    public sealed class EvaluationSourceAcquisitionStatistics
+    {
+        /// <summary>Gets or sets direct exact acquired-source successes.</summary>
+        public long DirectExactSources { get; set; }
+
+        /// <summary>Gets or sets reconstruction attempts after direct P5H failure.</summary>
+        public long ReconstructionAttempts { get; set; }
+
+        /// <summary>Gets or sets successful reconstruction attempts.</summary>
+        public long ReconstructionSuccesses { get; set; }
+
+        /// <summary>Gets or sets unsuccessful reconstruction attempts.</summary>
+        public long ReconstructionFailures { get; set; }
+
+        /// <summary>Gets or sets successful LF-to-CRLF candidates.</summary>
+        public long LfToCrlfSuccesses { get; set; }
+
+        /// <summary>Gets or sets successful CRLF-to-LF candidates.</summary>
+        public long CrlfToLfSuccesses { get; set; }
+
+        /// <summary>Gets or sets direct and reconstructed P5H validation attempts.</summary>
+        public long P5HValidationAttempts { get; set; }
+
+        /// <summary>Gets or sets Source Link requests.</summary>
+        public long SourceLinkRequests { get; set; }
+
+        /// <summary>Gets or sets downloaded source bytes.</summary>
+        public long DownloadedSourceBytes { get; set; }
+
+        /// <summary>Gets or sets bytes produced across reconstruction candidates.</summary>
+        public long ReconstructionBytesProduced { get; set; }
+
+        /// <summary>Gets or sets reconstruction elapsed timer ticks.</summary>
+        public long ReconstructionDurationTicks { get; set; }
+
+        /// <summary>Gets or sets positive source-cache hits.</summary>
+        public long PositiveCacheHits { get; set; }
+
+        /// <summary>Gets or sets negative source-cache hits.</summary>
         public long NegativeCacheHits { get; set; }
     }
 

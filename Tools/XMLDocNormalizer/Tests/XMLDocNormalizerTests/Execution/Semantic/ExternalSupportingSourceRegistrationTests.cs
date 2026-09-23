@@ -40,10 +40,18 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             ProjectClosureSemanticContext context = CreateContext(consumer);
             IAssemblySymbol metadataAssembly = GetRequiredAssembly(consumer, reference);
             IMethodSymbol metadataMethod = GetRequiredMethod(metadataAssembly, "External.Api", "A");
+            ExternalSupportingSourceCompilation supportingSource =
+                Assert.IsType<ExternalSupportingSourceCompilation>(dependency.SupportingSource);
 
             Assert.True(context.TryRegisterExternalSupportingSource(
-                Assert.IsType<ExternalSupportingSourceCompilation>(dependency.SupportingSource),
+                supportingSource,
                 out SemanticCompilationScope registeredScope));
+            Assert.Equal(2, supportingSource.SourceMaterials.Length);
+            Assert.All(
+                supportingSource.SourceMaterials,
+                static material => Assert.Equal(
+                    ExternalSourceMaterialExactness.DirectExact,
+                    material.Exactness));
             Assert.Equal(
                 SemanticCompilationScopeKind.SupportingSourceDependency,
                 registeredScope.Kind);

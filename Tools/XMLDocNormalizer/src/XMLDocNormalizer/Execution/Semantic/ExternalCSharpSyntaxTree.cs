@@ -16,22 +16,22 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <summary>
         /// Initializes a successfully reconstructed C# source tree.
         /// </summary>
-        /// <param name="document">The Portable PDB document provenance.</param>
+        /// <param name="material">The exact P5H material and acquisition provenance.</param>
         /// <param name="text">The text decoded from validated source bytes.</param>
         /// <param name="tree">The syntax tree parsed directly from the text.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when any argument is <see langword="null"/>.
         /// </exception>
         internal ExternalCSharpSyntaxTree(
-            ExternalSourceDocumentDescriptor document,
+            ValidatedExternalSourceMaterial material,
             SourceText text,
             SyntaxTree tree)
         {
-            ArgumentNullException.ThrowIfNull(document);
+            ArgumentNullException.ThrowIfNull(material);
             ArgumentNullException.ThrowIfNull(text);
             ArgumentNullException.ThrowIfNull(tree);
 
-            Document = document;
+            Material = material;
             Text = text;
             Tree = tree;
         }
@@ -40,7 +40,13 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Gets the exact Portable PDB source-document provenance.
         /// </summary>
         /// <value>The document associated with the validated source bytes.</value>
-        public ExternalSourceDocumentDescriptor Document { get; }
+        public ExternalSourceDocumentDescriptor Document => Material.Document;
+
+        /// <summary>
+        /// Gets the exact validated bytes and their direct or reconstructed provenance.
+        /// </summary>
+        /// <value>The unchanged P5H material used to create this tree.</value>
+        public ValidatedExternalSourceMaterial Material { get; }
 
         /// <summary>
         /// Gets the source text decoded directly from validated source bytes.

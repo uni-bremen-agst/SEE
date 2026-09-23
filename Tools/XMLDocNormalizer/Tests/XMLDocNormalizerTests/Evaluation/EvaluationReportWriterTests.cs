@@ -61,10 +61,13 @@ namespace XMLDocNormalizerTests.Evaluation
 
             Assert.Contains("| Candidate | Version | PDB | Source | Reconstruction | Analysis | Result |", markdown, StringComparison.Ordinal);
             Assert.Contains("- Candidates evaluated: 2", markdown, StringComparison.Ordinal);
+            Assert.Contains("- Source reconstruction: `VerifiedLineEndings`", markdown, StringComparison.Ordinal);
             Assert.Contains("## PackageA 1.0.0 (net8.0)", markdown, StringComparison.Ordinal);
             Assert.Contains("MissingArtifact", markdown, StringComparison.Ordinal);
             Assert.Contains("- PDB origin: Embedded", markdown, StringComparison.Ordinal);
             Assert.Contains("1 P4B attempts", markdown, StringComparison.Ordinal);
+            Assert.Contains("3 expected, 1 direct, 2 reconstructed, 0 unavailable", markdown, StringComparison.Ordinal);
+            Assert.Contains("2 LF→CRLF", markdown, StringComparison.Ordinal);
         }
 
         private static EvaluationReport CreateReport()
@@ -77,6 +80,7 @@ namespace XMLDocNormalizerTests.Evaluation
                 Runtime = ".NET Test",
                 ProcessArchitecture = "X64",
                 SourceLinkEnabled = true,
+                SourceReconstructionPolicy = "VerifiedLineEndings",
                 Summary = new EvaluationSummary
                 {
                     CandidatesEvaluated = 2,
@@ -94,6 +98,17 @@ namespace XMLDocNormalizerTests.Evaluation
                         PdbType = "Portable",
                         ReconstructionSucceeded = true,
                         ExpectedOutcomeObserved = true,
+                        ExpectedSourceFileCount = 3,
+                        DirectExactSourceCount = 1,
+                        ReconstructedExactSourceCount = 2,
+                        SourceAcquisition = new EvaluationSourceAcquisitionStatistics
+                        {
+                            ReconstructionAttempts = 2,
+                            ReconstructionSuccesses = 2,
+                            LfToCrlfSuccesses = 2,
+                            P5HValidationAttempts = 5,
+                            ReconstructionBytesProduced = 128
+                        },
                         SourceOrigins = new SortedDictionary<string, int>(StringComparer.Ordinal)
                         {
                             ["SourceLink"] = 1

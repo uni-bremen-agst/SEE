@@ -55,7 +55,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                 document,
                 embeddedSource.Value.Image,
                 ExternalSourceMaterialOrigin.Embedded,
-                filePath: null);
+                filePath: null,
+                sourceIdentity: null,
+                ExternalSourceMaterialExactness.DirectExact,
+                ExternalSourceLineEndingTransformation.None);
             return true;
         }
 
@@ -194,9 +197,51 @@ namespace XMLDocNormalizer.Execution.Semantic
         {
             ArgumentNullException.ThrowIfNull(document);
 
-            if (image.IsDefault
+            return TryCreateFromAcquiredImage(
+                document,
+                image,
+                origin,
+                filePath,
+                filePath,
+                ExternalSourceMaterialExactness.DirectExact,
+                ExternalSourceLineEndingTransformation.None,
+                out material);
+        }
+
+        /// <summary>
+        /// Validates acquired or reconstructed bytes while retaining the
+        /// original acquisition identity and reconstruction provenance.
+        /// </summary>
+        /// <param name="document">The Portable PDB document provenance.</param>
+        /// <param name="image">The exact candidate bytes to validate.</param>
+        /// <param name="origin">The original controlled acquisition origin.</param>
+        /// <param name="filePath">Optional original local path.</param>
+        /// <param name="sourceIdentity">Original local path or safe Source Link URI.</param>
+        /// <param name="exactness">Direct or reconstructed exactness.</param>
+        /// <param name="transformation">The deterministic transformation.</param>
+        /// <param name="material">The P5H-valid material.</param>
+        /// <returns>
+        /// <see langword="true"/> only when the supplied bytes pass the
+        /// unchanged Portable PDB checksum validator.
+        /// </returns>
+        internal static bool TryCreateFromAcquiredImage(
+            ExternalSourceDocumentDescriptor document,
+            ImmutableArray<byte> image,
+            ExternalSourceMaterialOrigin origin,
+            string? filePath,
+            string? sourceIdentity,
+            ExternalSourceMaterialExactness exactness,
+            ExternalSourceLineEndingTransformation transformation,
+            out ValidatedExternalSourceMaterial material)
+        {
+            if (document == null
+                || image.IsDefault
                 || (origin != ExternalSourceMaterialOrigin.LocalMapping
                     && origin != ExternalSourceMaterialOrigin.SourceLink)
+                || (exactness == ExternalSourceMaterialExactness.DirectExact
+                    && transformation != ExternalSourceLineEndingTransformation.None)
+                || (exactness == ExternalSourceMaterialExactness.ReconstructedExact
+                    && transformation == ExternalSourceLineEndingTransformation.None)
                 || !ExternalSourceDocumentChecksumValidator.TryValidate(
                     image.AsSpan(),
                     document.HashAlgorithm,
@@ -212,7 +257,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                 document,
                 image,
                 origin,
-                filePath);
+                filePath,
+                sourceIdentity,
+                exactness,
+                transformation);
             return true;
         }
 
@@ -263,7 +311,10 @@ namespace XMLDocNormalizer.Execution.Semantic
                     document,
                     image,
                     origin,
-                    filePath);
+                    filePath,
+                    filePath,
+                    ExternalSourceMaterialExactness.DirectExact,
+                    ExternalSourceLineEndingTransformation.None);
                 return true;
             }
             catch (IOException)

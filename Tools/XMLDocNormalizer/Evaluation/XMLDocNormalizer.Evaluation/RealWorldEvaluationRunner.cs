@@ -67,6 +67,7 @@ namespace XMLDocNormalizer.Evaluation
                 Runtime = RuntimeInformation.FrameworkDescription,
                 ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString(),
                 SourceLinkEnabled = options.SourceLinkEnabled,
+                SourceReconstructionPolicy = options.SourceReconstructionPolicy.ToString(),
                 Summary = summary,
                 Candidates = results
             };
@@ -157,6 +158,12 @@ namespace XMLDocNormalizer.Evaluation
                 result.ExpectedSourceFileCount = configuration.SourceFileCount;
                 AddStage(result, "ConfigurationReconstructed", true, $"Compiler {configuration.CompilerVersion}; {configuration.SourceFileCount} sources.");
                 ExternalSourceAcquisition acquisition = new();
+                if (!acquisition.TryConfigureReconstructionPolicy(
+                        options.SourceReconstructionPolicy))
+                {
+                    return Fail(result, candidate, "SourcesAcquired", EvaluationFailureCategory.PotentialBug, "Source reconstruction policy configuration failed.", stopwatch, potentialBug: true);
+                }
+
                 if (options.SourceLinkEnabled)
                 {
                     _ = acquisition.TryConfigureSourceLink(ExternalSourceLinkClient.CreateDefault());
@@ -173,7 +180,7 @@ namespace XMLDocNormalizer.Evaluation
                         ? EvaluationFailureCategory.SourceUnavailable
                         : EvaluationFailureCategory.ExpectedUnsupported;
                     return Fail(result, candidate, "SourcesAcquired", category, options.SourceLinkEnabled
-                        ? "At least one complete checksum-valid source document was unavailable."
+                        ? $"{result.DirectExactSourceCount} direct exact, {result.ReconstructedExactSourceCount} reconstructed exact, and {result.UnavailableSourceCount} unavailable source documents."
                         : "Source Link is disabled and non-embedded sources remain unavailable.", stopwatch);
                 }
 
@@ -281,28 +288,67 @@ namespace XMLDocNormalizer.Evaluation
         {
             List<ExternalSourceDocumentDescriptor> documents = new();
             List<ExternalCSharpSyntaxTree> trees = new();
+            bool complete = true;
 
             foreach (ExternalSourceDocumentDescriptor document in provenance.PortablePdb.Documents)
             {
                 bool created = ValidatedExternalSourceMaterialFactory.TryCreateFromEmbeddedSource(document, out ValidatedExternalSourceMaterial material)
-                    || acquisition.TryAcquire(document, provenance.PortablePdb.SourceLink, out material);
+                    || acquisition.TryAcquire(
+                        document,
+                        provenance.PortablePdb.SourceLink,
+                        configuration,
+                        out material);
 
                 if (!created)
                 {
-                    syntaxTreeSet = null!;
-                    return false;
+                    result.UnavailableSourceCount++;
+                    complete = false;
+                    continue;
                 }
 
                 string origin = material.Origin.ToString();
                 result.SourceOrigins[origin] = result.SourceOrigins.GetValueOrDefault(origin) + 1;
+                if (material.Exactness == ExternalSourceMaterialExactness.DirectExact)
+                {
+                    result.DirectExactSourceCount++;
+                }
+                else
+                {
+                    result.ReconstructedExactSourceCount++;
+                }
+
                 if (!ExternalCSharpSyntaxTreeFactory.TryCreate(material, configuration, out ExternalCSharpSyntaxTree tree))
                 {
-                    syntaxTreeSet = null!;
-                    return false;
+                    complete = false;
+                    continue;
                 }
 
                 documents.Add(document);
                 trees.Add(tree);
+            }
+
+            ExternalSourceAcquisitionStatistics statistics = acquisition.GetStatistics();
+            result.SourceAcquisition = new EvaluationSourceAcquisitionStatistics
+            {
+                DirectExactSources = statistics.DirectExactSourceCount,
+                ReconstructionAttempts = statistics.ReconstructionAttemptCount,
+                ReconstructionSuccesses = statistics.ReconstructionSuccessCount,
+                ReconstructionFailures = statistics.ReconstructionFailureCount,
+                LfToCrlfSuccesses = statistics.LfToCrlfSuccessCount,
+                CrlfToLfSuccesses = statistics.CrlfToLfSuccessCount,
+                P5HValidationAttempts = statistics.P5HValidationAttempts,
+                SourceLinkRequests = statistics.SourceLinkRequests,
+                DownloadedSourceBytes = statistics.DownloadedSourceBytes,
+                ReconstructionBytesProduced = statistics.ReconstructionBytesProduced,
+                ReconstructionDurationTicks = statistics.ReconstructionDurationTicks,
+                PositiveCacheHits = statistics.PositiveCacheHits,
+                NegativeCacheHits = statistics.NegativeCacheHits
+            };
+
+            if (!complete)
+            {
+                syntaxTreeSet = null!;
+                return false;
             }
 
             return ExternalCSharpSyntaxTreeSetFactory.TryCreate(

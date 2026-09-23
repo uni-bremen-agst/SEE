@@ -63,7 +63,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 || !ExternalSourceDocumentChecksumValidator.TryGetRoslynSourceHashAlgorithm(
                     document.HashAlgorithm,
                     out SourceHashAlgorithm checksumAlgorithm)
-                || !TrySelectEncoding(
+                || !TrySelectEncodingForSourceBytes(
                     material.Image.AsSpan(),
                     configuration,
                     out Encoding encoding))
@@ -102,7 +102,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 text,
                 configuration.ParseOptions,
                 document.Name);
-            sourceTree = new ExternalCSharpSyntaxTree(document, text, tree);
+            sourceTree = new ExternalCSharpSyntaxTree(material, text, tree);
             return true;
         }
 
@@ -116,7 +116,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <see langword="true"/> when the effective encoding is available;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TrySelectEncoding(
+        internal static bool TrySelectEncodingForSourceBytes(
             ReadOnlySpan<byte> sourceBytes,
             ExternalCSharpCompilationConfiguration configuration,
             out Encoding encoding)

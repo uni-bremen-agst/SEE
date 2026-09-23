@@ -18,9 +18,17 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Initializes an ordered reconstructed syntax-tree set.
         /// </summary>
         /// <param name="trees">The trees in explicit source-document order.</param>
-        internal ExternalCSharpSyntaxTreeSet(ImmutableArray<SyntaxTree> trees)
+        /// <param name="sourceMaterials">
+        /// The aligned P5H material provenance, when retained by P5J.
+        /// </param>
+        internal ExternalCSharpSyntaxTreeSet(
+            ImmutableArray<SyntaxTree> trees,
+            ImmutableArray<ValidatedExternalSourceMaterial> sourceMaterials = default)
         {
             Trees = trees.IsDefault ? ImmutableArray<SyntaxTree>.Empty : trees;
+            SourceMaterials = sourceMaterials.IsDefault
+                ? ImmutableArray<ValidatedExternalSourceMaterial>.Empty
+                : sourceMaterials;
         }
 
         /// <summary>
@@ -29,5 +37,14 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </summary>
         /// <value>The immutable ordered Roslyn syntax-tree sequence.</value>
         public ImmutableArray<SyntaxTree> Trees { get; }
+
+        /// <summary>
+        /// Gets the aligned exact source-material provenance retained from P5H.
+        /// </summary>
+        /// <value>
+        /// Direct or reconstructed exact materials in source-tree order, or an
+        /// empty sequence for legacy manually constructed test fixtures.
+        /// </value>
+        public ImmutableArray<ValidatedExternalSourceMaterial> SourceMaterials { get; }
     }
 }

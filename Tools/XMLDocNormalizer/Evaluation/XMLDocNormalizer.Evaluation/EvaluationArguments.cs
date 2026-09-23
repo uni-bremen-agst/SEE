@@ -1,3 +1,5 @@
+using XMLDocNormalizer.Execution.Semantic;
+
 namespace XMLDocNormalizer.Evaluation
 {
     /// <summary>
@@ -7,7 +9,8 @@ namespace XMLDocNormalizer.Evaluation
         string ManifestPath,
         string WorkspacePath,
         string OutputDirectory,
-        bool SourceLinkEnabled)
+        bool SourceLinkEnabled,
+        ExternalSourceReconstructionPolicy SourceReconstructionPolicy)
     {
         /// <summary>
         /// Parses the small explicit evaluation command line.
@@ -44,10 +47,15 @@ namespace XMLDocNormalizer.Evaluation
             }
 
             string policy = values.GetValueOrDefault("--source-link", "enabled");
+            string reconstruction = values.GetValueOrDefault(
+                "--source-reconstruction",
+                "strict");
 
             if (policy is not ("enabled" or "disabled")
+                || reconstruction is not ("strict" or "verified-line-endings")
                 || values.Keys.Any(static key => key is not (
-                    "--manifest" or "--workspace" or "--output" or "--source-link")))
+                    "--manifest" or "--workspace" or "--output" or "--source-link"
+                    or "--source-reconstruction")))
             {
                 options = null!;
                 return false;
@@ -57,7 +65,10 @@ namespace XMLDocNormalizer.Evaluation
                 Path.GetFullPath(manifestPath),
                 Path.GetFullPath(workspacePath),
                 Path.GetFullPath(outputDirectory),
-                string.Equals(policy, "enabled", StringComparison.Ordinal));
+                string.Equals(policy, "enabled", StringComparison.Ordinal),
+                reconstruction == "verified-line-endings"
+                    ? ExternalSourceReconstructionPolicy.VerifiedLineEndings
+                    : ExternalSourceReconstructionPolicy.Strict);
             return true;
         }
     }

@@ -24,22 +24,35 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// The explicit caller path for file material, or
         /// <see langword="null"/> for stream and embedded material.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="document"/> is
-        /// <see langword="null"/>.
-        /// </exception>
+        /// <param name="sourceIdentity">
+        /// The original local path or credential-free Source Link URI.
+        /// </param>
+        /// <param name="exactness">
+        /// Whether original or deterministically reconstructed bytes passed P5H.
+        /// </param>
+        /// <param name="transformation">
+        /// The reconstruction transformation, or <c>None</c> for direct bytes.
+        /// </param>
+        /// <remarks>
+        /// Callers are internal factories that have already validated the
+        /// document and exactness/transformation pairing.
+        /// </remarks>
         internal ValidatedExternalSourceMaterial(
             ExternalSourceDocumentDescriptor document,
             ImmutableArray<byte> image,
             ExternalSourceMaterialOrigin origin,
-            string? filePath)
+            string? filePath,
+            string? sourceIdentity,
+            ExternalSourceMaterialExactness exactness,
+            ExternalSourceLineEndingTransformation transformation)
         {
-            ArgumentNullException.ThrowIfNull(document);
-
             Document = document;
             Image = image;
             Origin = origin;
             FilePath = filePath;
+            SourceIdentity = sourceIdentity;
+            Exactness = exactness;
+            Transformation = transformation;
         }
 
         /// <summary>
@@ -74,5 +87,26 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// does not participate in document identity.
         /// </value>
         public string? FilePath { get; }
+
+        /// <summary>
+        /// Gets the original controlled candidate identity before reconstruction.
+        /// </summary>
+        /// <value>
+        /// The explicit or mapped local path, the credential-free Source Link
+        /// URI, or <see langword="null"/> for stream and embedded material.
+        /// </value>
+        public string? SourceIdentity { get; }
+
+        /// <summary>
+        /// Gets whether direct or reconstructed bytes passed P5H.
+        /// </summary>
+        /// <value>The cryptographically validated source exactness category.</value>
+        public ExternalSourceMaterialExactness Exactness { get; }
+
+        /// <summary>
+        /// Gets the deterministic transformation applied before P5H validation.
+        /// </summary>
+        /// <value><c>None</c> for directly exact material.</value>
+        public ExternalSourceLineEndingTransformation Transformation { get; }
     }
 }

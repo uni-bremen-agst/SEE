@@ -66,6 +66,9 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             ImmutableArray<SyntaxTree>.Builder trees =
                 ImmutableArray.CreateBuilder<SyntaxTree>(sourceTrees.Count);
+            ImmutableArray<ValidatedExternalSourceMaterial>.Builder materials =
+                ImmutableArray.CreateBuilder<ValidatedExternalSourceMaterial>(
+                    sourceTrees.Count);
 
             for (int index = 0; index < sourceTrees.Count; index++)
             {
@@ -89,9 +92,12 @@ namespace XMLDocNormalizer.Execution.Semantic
                 }
 
                 trees.Add(sourceTree.Tree);
+                materials.Add(sourceTree.Material);
             }
 
-            syntaxTreeSet = new ExternalCSharpSyntaxTreeSet(trees.MoveToImmutable());
+            syntaxTreeSet = new ExternalCSharpSyntaxTreeSet(
+                trees.MoveToImmutable(),
+                materials.MoveToImmutable());
             return true;
         }
 

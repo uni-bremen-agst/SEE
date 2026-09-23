@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -15,8 +16,9 @@ namespace XMLDocNormalizer.Execution.Semantic
     internal sealed class ExternalSupportingSourceCompilation
     {
         /// <summary>
-        /// Initializes a validated P5K handoff without retaining intermediate
-        /// source, PE, PDB, or candidate-path material.
+        /// Initializes a validated P5K handoff while retaining the aligned P5H
+        /// source provenance needed to distinguish direct and reconstructed
+        /// exact evidence.
         /// </summary>
         /// <param name="targetAssembly">
         /// The P3 identity of the original external binary.
@@ -24,12 +26,17 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="compilation">
         /// The exact C# compilation instance validated by P5K.
         /// </param>
+        /// <param name="sourceMaterials">
+        /// The P5H materials aligned with compilation syntax-tree order.
+        /// </param>
         private ExternalSupportingSourceCompilation(
             ExternalAssemblyReferenceDescriptor targetAssembly,
-            CSharpCompilation compilation)
+            CSharpCompilation compilation,
+            ImmutableArray<ValidatedExternalSourceMaterial> sourceMaterials)
         {
             TargetAssembly = targetAssembly;
             Compilation = compilation;
+            SourceMaterials = sourceMaterials;
         }
 
         /// <summary>
@@ -46,6 +53,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </summary>
         /// <value>The reconstructed C# compilation.</value>
         public CSharpCompilation Compilation { get; }
+
+        /// <summary>
+        /// Gets direct and reconstructed exact source provenance retained from P5H.
+        /// </summary>
+        /// <value>The source materials in compilation syntax-tree order.</value>
+        public ImmutableArray<ValidatedExternalSourceMaterial> SourceMaterials { get; }
 
         /// <summary>
         /// Tries to create a registration handoff from an existing P5K result.
@@ -97,7 +110,8 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             supportingSource = new ExternalSupportingSourceCompilation(
                 targetAssembly,
-                compilation);
+                compilation,
+                syntaxTreeSet.SourceMaterials);
             return true;
         }
     }

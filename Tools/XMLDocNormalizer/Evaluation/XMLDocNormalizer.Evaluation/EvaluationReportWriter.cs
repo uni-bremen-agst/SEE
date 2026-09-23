@@ -53,6 +53,7 @@ namespace XMLDocNormalizer.Evaluation
             builder.AppendLine($"- Generated: `{report.GeneratedAtUtc:O}`");
             builder.AppendLine($"- Runtime: `{report.Runtime}` ({report.ProcessArchitecture})");
             builder.AppendLine($"- Source Link enabled: `{report.SourceLinkEnabled}`");
+            builder.AppendLine($"- Source reconstruction: `{report.SourceReconstructionPolicy}`");
             builder.AppendLine();
             builder.AppendLine("| Candidate | Version | PDB | Source | Reconstruction | Analysis | Result |");
             builder.AppendLine("| --- | --- | --- | --- | --- | --- | --- |");
@@ -97,6 +98,9 @@ namespace XMLDocNormalizer.Evaluation
                 builder.AppendLine($"- Reason: {candidate.FallbackReason ?? "none"}");
                 builder.AppendLine($"- Findings: {candidate.BaselineFindings.Count} baseline, {candidate.SourceBackedFindings.Count} source-backed, {candidate.AddedFindings.Count} added, {candidate.RemovedFindings.Count} removed, {candidate.ChangedExceptionEvidence.Count} changed exception evidence");
                 builder.AppendLine($"- Trees/references: {candidate.SourceTreeCount}/{candidate.ReferenceCount}");
+                builder.AppendLine($"- Source exactness: {candidate.ExpectedSourceFileCount} expected, {candidate.DirectExactSourceCount} direct, {candidate.ReconstructedExactSourceCount} reconstructed, {candidate.UnavailableSourceCount} unavailable");
+                builder.AppendLine($"- Source reconstruction work: {candidate.SourceAcquisition.ReconstructionAttempts} attempts, {candidate.SourceAcquisition.ReconstructionSuccesses} successes, {candidate.SourceAcquisition.ReconstructionFailures} failures, {candidate.SourceAcquisition.LfToCrlfSuccesses} LF→CRLF, {candidate.SourceAcquisition.CrlfToLfSuccesses} CRLF→LF, {candidate.SourceAcquisition.P5HValidationAttempts} P5H attempts, {candidate.SourceAcquisition.ReconstructionBytesProduced} candidate bytes, {candidate.SourceAcquisition.ReconstructionDurationTicks} timer ticks");
+                builder.AppendLine($"- Source acquisition: {candidate.SourceAcquisition.SourceLinkRequests} requests, {candidate.SourceAcquisition.DownloadedSourceBytes} downloaded bytes, {candidate.SourceAcquisition.PositiveCacheHits} positive cache hits, {candidate.SourceAcquisition.NegativeCacheHits} negative cache hits");
                 builder.AppendLine($"- PDB origin: {candidate.PdbOrigin ?? "none"}");
                 builder.AppendLine($"- PDB acquisition: {candidate.PdbAcquisition.CandidatesConsidered} candidates, {candidate.PdbAcquisition.CandidatesOpened} opens, {candidate.PdbAcquisition.LocalSymbolPackagesInspected} packages, {candidate.PdbAcquisition.RemoteSymbolRequests} requests, {candidate.PdbAcquisition.DownloadedPdbBytes} downloaded bytes, {candidate.PdbAcquisition.ValidationAttempts} P4B attempts, {candidate.PdbAcquisition.PositiveCacheHits} positive cache hits, {candidate.PdbAcquisition.NegativeCacheHits} negative cache hits");
                 string referenceSources = string.Join(

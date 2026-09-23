@@ -64,6 +64,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Equal(source, material.Image);
             Assert.Equal(ExternalSourceMaterialOrigin.ExplicitStream, material.Origin);
             Assert.Null(material.FilePath);
+            Assert.Null(material.SourceIdentity);
+            Assert.Equal(ExternalSourceMaterialExactness.DirectExact, material.Exactness);
+            Assert.Equal(ExternalSourceLineEndingTransformation.None, material.Transformation);
         }
 
         /// <summary>
@@ -88,6 +91,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 Assert.Equal(source, material.Image);
                 Assert.Equal(ExternalSourceMaterialOrigin.ExplicitFile, material.Origin);
                 Assert.Equal(path, material.FilePath);
+                Assert.Equal(path, material.SourceIdentity);
+                Assert.Equal(ExternalSourceMaterialExactness.DirectExact, material.Exactness);
+                Assert.Equal(ExternalSourceLineEndingTransformation.None, material.Transformation);
             }
             finally
             {
@@ -176,6 +182,37 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 stream,
                 out ValidatedExternalSourceMaterial material));
             Assert.Null(material);
+        }
+
+        /// <summary>
+        /// Rejects contradictory direct/reconstructed provenance before a
+        /// checksum-valid material can be created.
+        /// </summary>
+        [Fact]
+        public void ReconstructionProvenance_InconsistentPairFailsClosed()
+        {
+            byte[] source = "class C { }"u8.ToArray();
+            ExternalSourceDocumentDescriptor document = CreateDocument(source);
+            ImmutableArray<byte> image = ImmutableArray.Create(source);
+
+            Assert.False(ValidatedExternalSourceMaterialFactory.TryCreateFromAcquiredImage(
+                document,
+                image,
+                ExternalSourceMaterialOrigin.SourceLink,
+                filePath: null,
+                "https://public.test/Value.cs",
+                ExternalSourceMaterialExactness.DirectExact,
+                ExternalSourceLineEndingTransformation.LfToCrlf,
+                out _));
+            Assert.False(ValidatedExternalSourceMaterialFactory.TryCreateFromAcquiredImage(
+                document,
+                image,
+                ExternalSourceMaterialOrigin.SourceLink,
+                filePath: null,
+                "https://public.test/Value.cs",
+                ExternalSourceMaterialExactness.ReconstructedExact,
+                ExternalSourceLineEndingTransformation.None,
+                out _));
         }
 
         /// <summary>

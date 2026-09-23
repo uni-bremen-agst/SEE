@@ -50,6 +50,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Equal(bytes, material.Image);
             Assert.Equal(path, material.FilePath);
             Assert.Equal(ExternalSourceMaterialOrigin.LocalMapping, material.Origin);
+            Assert.Equal(path, material.SourceIdentity);
+            Assert.Equal(ExternalSourceMaterialExactness.DirectExact, material.Exactness);
+            Assert.Equal(ExternalSourceLineEndingTransformation.None, material.Transformation);
         }
 
         [Fact]

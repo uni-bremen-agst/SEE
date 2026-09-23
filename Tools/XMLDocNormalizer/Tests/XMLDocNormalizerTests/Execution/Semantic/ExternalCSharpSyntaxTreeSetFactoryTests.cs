@@ -203,6 +203,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
 
             Assert.NotSame(expected, inputs.SourceTrees[0].Document);
             Assert.Same(inputs.SourceTrees[0].Tree, Assert.Single(result.Trees));
+            Assert.Same(inputs.SourceTrees[0].Material, Assert.Single(result.SourceMaterials));
         }
 
         /// <summary>
@@ -274,7 +275,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 inputs.Configuration.ParseOptions,
                 "/_/Other.cs");
             ExternalCSharpSyntaxTree mismatched = new(
-                original.Document,
+                original.Material,
                 original.Text,
                 mismatchedTree);
 
@@ -296,7 +297,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 otherOptions,
                 original.Document.Name);
             ExternalCSharpSyntaxTree mismatched = new(
-                original.Document,
+                original.Material,
                 original.Text,
                 mismatchedTree);
 
@@ -321,7 +322,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 inputs.Configuration.ParseOptions,
                 original.Document.Name);
             ExternalCSharpSyntaxTree mismatched = new(
-                original.Document,
+                original.Material,
                 original.Text,
                 mismatchedTree);
 

@@ -255,6 +255,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                                 && sourceAcquisition.TryAcquire(
                                     document,
                                     provenance.PortablePdb.SourceLink,
+                                    configuration,
                                     out material));
                     }
 

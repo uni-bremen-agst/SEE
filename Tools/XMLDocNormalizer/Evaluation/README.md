@@ -29,6 +29,13 @@ artifacts/real-world-evaluation/reports/source-link-enabled/real-world-evaluatio
 
 Use `-SourceLink enabled` or `-SourceLink disabled` to execute one policy only. The network-enabled run uses only the production P7B HTTPS client and the URLs embedded in validated Source Link provenance. The disabled run makes no Source Link request.
 
+Source reconstruction defaults to `-SourceReconstruction strict`, which accepts
+only the originally acquired bytes. Use `verified-line-endings` to permit the
+fixed LF-to-CRLF and CRLF-to-LF candidate set, or `both` to write separate
+strict and verified reports. Every reconstructed candidate is accepted only if
+the existing P5H validation matches its exact bytes to the checksum recorded in
+the validated Portable PDB; the transformation itself establishes no trust.
+
 ## Workspace and repository policy
 
 All downloaded archives, extracted binaries, PDBs, optional manual-verification sources, and generated reports stay below `artifacts/real-world-evaluation`. The repository-level `.gitignore` excludes the complete `artifacts` directory. No third-party binary or source tree is versioned; only coordinates, hashes, relative paths, selection reasons, and concise flow notes are committed.
@@ -51,7 +58,7 @@ Versions are immutable manifest entries. Testing a different release requires a 
 
 ## Evaluation semantics
 
-For each candidate the harness records pinned hashes, PDB/source provenance, every reached reconstruction gate, P7A discovery, P7B origin counts, P5 source/reference counts, compiler diagnostics, fallback classification, duration, and canonical finding sets. It invokes the existing exception detector in `SolutionTransitive` mode; the harness does not implement exception semantics of its own.
+For each candidate the harness records pinned hashes, PDB/source provenance, every reached reconstruction gate, P7A discovery, P7B origin counts, direct/reconstructed/unavailable source counts, bounded line-ending reconstruction work, P5 source/reference counts, compiler diagnostics, fallback classification, duration, and canonical finding sets. It invokes the existing exception detector in `SolutionTransitive` mode; the harness does not implement exception semantics of its own.
 
 The Semver probe compares metadata-only analysis against registered P6A/P6B supporting source. Its manual note refers only to method/type/flow structure at the exact Source Link commit and does not reproduce third-party source text.
 

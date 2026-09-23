@@ -327,6 +327,25 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures whether acquired external source bytes may be subjected
+        /// to deterministic line-ending reconstruction before P5H validation.
+        /// </summary>
+        /// <param name="policy">The context-local reconstruction policy.</param>
+        /// <returns>
+        /// <see langword="true"/> for new or value-idempotent configuration;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// Strict direct-byte validation remains the default. Configuration is
+        /// immutable after the first external source acquisition attempt.
+        /// </remarks>
+        public bool TryConfigureExternalSourceReconstruction(
+            ExternalSourceReconstructionPolicy policy)
+        {
+            return ExternalSources.TryConfigureReconstructionPolicy(policy);
+        }
+
+        /// <summary>
         /// Explicitly enables bounded HTTPS Source Link acquisition for this
         /// semantic context using the production network policy.
         /// </summary>

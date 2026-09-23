@@ -43,6 +43,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         private ExternalSourceLinkClient? sourceLinkClient;
 
         /// <summary>
+        /// Stores the context-local reconstruction policy. Strict is the default.
+        /// </summary>
+        private ExternalSourceReconstructionPolicy reconstructionPolicy =
+            ExternalSourceReconstructionPolicy.Strict;
+
+        /// <summary>
         /// Records whether local mappings were configured.
         /// </summary>
         private bool mappingsConfigured;
@@ -53,9 +59,53 @@ namespace XMLDocNormalizer.Execution.Semantic
         private bool sourceLinkConfigured;
 
         /// <summary>
+        /// Records whether the reconstruction policy was explicitly configured.
+        /// </summary>
+        private bool reconstructionPolicyConfigured;
+
+        /// <summary>
         /// Records whether any acquisition attempt has started.
         /// </summary>
         private bool acquisitionStarted;
+
+        /// <summary>Counts directly validated acquired candidates.</summary>
+        private long directExactSourceCount;
+
+        /// <summary>Counts verified-policy reconstruction attempts.</summary>
+        private long reconstructionAttemptCount;
+
+        /// <summary>Counts reconstruction attempts accepted by P5H.</summary>
+        private long reconstructionSuccessCount;
+
+        /// <summary>Counts reconstruction attempts with no P5H-valid candidate.</summary>
+        private long reconstructionFailureCount;
+
+        /// <summary>Counts accepted bare-LF to CRLF candidates.</summary>
+        private long lfToCrlfSuccessCount;
+
+        /// <summary>Counts accepted CRLF to LF candidates.</summary>
+        private long crlfToLfSuccessCount;
+
+        /// <summary>Counts P5H validations of acquired and reconstructed bytes.</summary>
+        private long p5HValidationAttempts;
+
+        /// <summary>Counts Source Link requests.</summary>
+        private long sourceLinkRequests;
+
+        /// <summary>Counts successfully downloaded original bytes.</summary>
+        private long downloadedSourceBytes;
+
+        /// <summary>Counts bytes produced across reconstruction candidates.</summary>
+        private long reconstructionBytesProduced;
+
+        /// <summary>Counts elapsed reconstruction timer ticks.</summary>
+        private long reconstructionDurationTicks;
+
+        /// <summary>Counts successful cache lookups.</summary>
+        private long positiveCacheHits;
+
+        /// <summary>Counts failed cache lookups.</summary>
+        private long negativeCacheHits;
 
         /// <summary>
         /// Configures the complete local document-prefix projection set
@@ -130,6 +180,68 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Configures the context-local source reconstruction policy before
+        /// any acquisition attempt begins.
+        /// </summary>
+        /// <param name="policy">
+        /// Strict direct-byte validation or verified line-ending candidates.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for new or value-idempotent configuration;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public bool TryConfigureReconstructionPolicy(
+            ExternalSourceReconstructionPolicy policy)
+        {
+            if (!Enum.IsDefined(policy))
+            {
+                return false;
+            }
+
+            lock (gate)
+            {
+                if (reconstructionPolicyConfigured)
+                {
+                    return reconstructionPolicy == policy;
+                }
+
+                if (acquisitionStarted)
+                {
+                    return false;
+                }
+
+                reconstructionPolicy = policy;
+                reconstructionPolicyConfigured = true;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets an atomic snapshot of bounded acquisition and reconstruction work.
+        /// </summary>
+        /// <returns>The current context-local statistics.</returns>
+        public ExternalSourceAcquisitionStatistics GetStatistics()
+        {
+            lock (gate)
+            {
+                return new ExternalSourceAcquisitionStatistics(
+                    directExactSourceCount,
+                    reconstructionAttemptCount,
+                    reconstructionSuccessCount,
+                    reconstructionFailureCount,
+                    lfToCrlfSuccessCount,
+                    crlfToLfSuccessCount,
+                    p5HValidationAttempts,
+                    sourceLinkRequests,
+                    downloadedSourceBytes,
+                    reconstructionBytesProduced,
+                    reconstructionDurationTicks,
+                    positiveCacheHits,
+                    negativeCacheHits);
+            }
+        }
+
+        /// <summary>
         /// Tries local projections and then explicitly enabled Source Link for
         /// one source document, returning only checksum-validated P5H material.
         /// </summary>
@@ -145,6 +257,30 @@ namespace XMLDocNormalizer.Execution.Semantic
             ExternalSourceLinkDescriptor? sourceLink,
             out ValidatedExternalSourceMaterial material)
         {
+            return TryAcquire(
+                document,
+                sourceLink,
+                configuration: null,
+                out material);
+        }
+
+        /// <summary>
+        /// Tries controlled acquisition with optional P5G encoding provenance
+        /// for explicitly enabled verified line-ending reconstruction.
+        /// </summary>
+        /// <param name="document">The expected Portable PDB document.</param>
+        /// <param name="sourceLink">The optional P4B Source Link provenance.</param>
+        /// <param name="configuration">
+        /// The P5G configuration used only to establish a safe source encoding.
+        /// </param>
+        /// <param name="material">The checksum-validated material.</param>
+        /// <returns><see langword="true"/> only for P5H-valid bytes.</returns>
+        public bool TryAcquire(
+            ExternalSourceDocumentDescriptor document,
+            ExternalSourceLinkDescriptor? sourceLink,
+            ExternalCSharpCompilationConfiguration? configuration,
+            out ValidatedExternalSourceMaterial material)
+        {
             if (document == null)
             {
                 material = null!;
@@ -153,24 +289,39 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             ExternalSourceLinkClient? client;
             ImmutableArray<NormalizedMapping> mappingSnapshot;
+            ExternalSourceReconstructionPolicy policy;
 
             lock (gate)
             {
                 acquisitionStarted = true;
                 client = sourceLinkClient;
                 mappingSnapshot = mappings;
+                policy = reconstructionPolicy;
             }
 
             Uri? sourceUri = TryResolveSafeSourceUri(
                 client,
                 sourceLink,
                 document.Name);
-            AcquisitionKey key = AcquisitionKey.Create(document, sourceUri);
+            AcquisitionKey key = AcquisitionKey.Create(
+                document,
+                sourceUri,
+                policy,
+                configuration);
 
             lock (gate)
             {
                 if (entries.TryGetValue(key, out Entry? cached))
                 {
+                    if (cached.State == AcquisitionState.Succeeded)
+                    {
+                        positiveCacheHits++;
+                    }
+                    else if (cached.State == AcquisitionState.Failed)
+                    {
+                        negativeCacheHits++;
+                    }
+
                     material = cached.Material!;
                     return cached.State == AcquisitionState.Succeeded;
                 }
@@ -181,15 +332,20 @@ namespace XMLDocNormalizer.Execution.Semantic
             bool succeeded = TryAcquireLocally(
                     document,
                     mappingSnapshot,
+                    policy,
+                    configuration,
                     out ValidatedExternalSourceMaterial? acquired)
                 || (client != null
                     && sourceUri != null
-                    && client.TryDownload(sourceUri, out ImmutableArray<byte> image)
-                    && ValidatedExternalSourceMaterialFactory.TryCreateFromAcquiredImage(
+                    && TryDownload(client, sourceUri, out ImmutableArray<byte> image)
+                    && TryValidateCandidate(
                         document,
                         image,
                         ExternalSourceMaterialOrigin.SourceLink,
                         filePath: null,
+                        sourceUri.AbsoluteUri,
+                        policy,
+                        configuration,
                         out acquired));
 
             lock (gate)
@@ -210,14 +366,15 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </summary>
         /// <param name="document">The expected Portable PDB document.</param>
         /// <param name="mappingSnapshot">The immutable mapping snapshot.</param>
+        /// <param name="policy">The active reconstruction policy.</param>
+        /// <param name="configuration">Optional P5G encoding provenance.</param>
         /// <param name="material">The first checksum-valid material.</param>
         /// <returns><see langword="true"/> when one local candidate validates.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown transitively when invalid document provenance reaches P5H.
-        /// </exception>
-        private static bool TryAcquireLocally(
+        private bool TryAcquireLocally(
             ExternalSourceDocumentDescriptor document,
             ImmutableArray<NormalizedMapping> mappingSnapshot,
+            ExternalSourceReconstructionPolicy policy,
+            ExternalCSharpCompilationConfiguration? configuration,
             out ValidatedExternalSourceMaterial? material)
         {
             int selectedPrefixLength = -1;
@@ -253,11 +410,14 @@ namespace XMLDocNormalizer.Execution.Semantic
             {
                 if (!IsReparsePointFree(candidatePath, mappingSnapshot)
                     || !TryReadBoundedFile(candidatePath, out ImmutableArray<byte> image)
-                    || !ValidatedExternalSourceMaterialFactory.TryCreateFromAcquiredImage(
+                    || !TryValidateCandidate(
                         document,
                         image,
                         ExternalSourceMaterialOrigin.LocalMapping,
                         candidatePath,
+                        candidatePath,
+                        policy,
+                        configuration,
                         out ValidatedExternalSourceMaterial validated))
                 {
                     continue;
@@ -269,6 +429,130 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             material = null;
             return false;
+        }
+
+        /// <summary>
+        /// Downloads one original Source Link candidate and records only
+        /// successful response bytes for bounded evaluation statistics.
+        /// </summary>
+        /// <param name="client">The configured bounded HTTPS client.</param>
+        /// <param name="sourceUri">The safe resolved Source Link URI.</param>
+        /// <param name="image">The downloaded original bytes.</param>
+        /// <returns><see langword="true"/> when a bounded download succeeds.</returns>
+        private bool TryDownload(
+            ExternalSourceLinkClient client,
+            Uri sourceUri,
+            out ImmutableArray<byte> image)
+        {
+            lock (gate)
+            {
+                sourceLinkRequests++;
+            }
+
+            if (!client.TryDownload(sourceUri, out image))
+            {
+                return false;
+            }
+
+            lock (gate)
+            {
+                downloadedSourceBytes += image.Length;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Prefers the original bytes, then optionally produces deterministic
+        /// line-ending candidates and sends each through unchanged P5H.
+        /// </summary>
+        /// <param name="document">The expected PDB document.</param>
+        /// <param name="image">The original acquired bytes.</param>
+        /// <param name="origin">The original acquisition origin.</param>
+        /// <param name="filePath">Optional mapped local path.</param>
+        /// <param name="sourceIdentity">The original path or safe URI.</param>
+        /// <param name="policy">The context-local reconstruction policy.</param>
+        /// <param name="configuration">Optional P5G encoding provenance.</param>
+        /// <param name="material">The P5H-valid material.</param>
+        /// <returns><see langword="true"/> only when P5H accepts exact bytes.</returns>
+        private bool TryValidateCandidate(
+            ExternalSourceDocumentDescriptor document,
+            ImmutableArray<byte> image,
+            ExternalSourceMaterialOrigin origin,
+            string? filePath,
+            string sourceIdentity,
+            ExternalSourceReconstructionPolicy policy,
+            ExternalCSharpCompilationConfiguration? configuration,
+            out ValidatedExternalSourceMaterial material)
+        {
+            lock (gate)
+            {
+                p5HValidationAttempts++;
+            }
+
+            if (ValidatedExternalSourceMaterialFactory.TryCreateFromAcquiredImage(
+                    document,
+                    image,
+                    origin,
+                    filePath,
+                    sourceIdentity,
+                    ExternalSourceMaterialExactness.DirectExact,
+                    ExternalSourceLineEndingTransformation.None,
+                    out material))
+            {
+                lock (gate)
+                {
+                    directExactSourceCount++;
+                }
+
+                return true;
+            }
+
+            if (policy != ExternalSourceReconstructionPolicy.VerifiedLineEndings)
+            {
+                return false;
+            }
+
+            bool reconstructed =
+                ExternalSourceLineEndingReconstructor.TryCreateValidatedMaterial(
+                    document,
+                    image,
+                    origin,
+                    filePath,
+                    sourceIdentity,
+                    configuration,
+                    out material,
+                    out ExternalSourceReconstructionResult result);
+
+            lock (gate)
+            {
+                reconstructionAttemptCount++;
+                reconstructionBytesProduced += result.BytesProduced;
+                reconstructionDurationTicks += result.DurationTicks;
+                p5HValidationAttempts += result.CandidateCount;
+
+                if (reconstructed)
+                {
+                    reconstructionSuccessCount++;
+
+                    if (result.SuccessfulTransformation
+                        == ExternalSourceLineEndingTransformation.LfToCrlf)
+                    {
+                        lfToCrlfSuccessCount++;
+                    }
+                    else if (result.SuccessfulTransformation
+                        == ExternalSourceLineEndingTransformation.CrlfToLf)
+                    {
+                        crlfToLfSuccessCount++;
+                    }
+                }
+                else
+                {
+                    reconstructionFailureCount++;
+                }
+            }
+
+            return reconstructed;
         }
 
         /// <summary>
@@ -606,29 +890,42 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="Hash">The expected hash bytes as hexadecimal text.</param>
         /// <param name="Language">The PDB source language.</param>
         /// <param name="SourceUri">The safe resolved URI, when any.</param>
+        /// <param name="ReconstructionPolicy">The context-local reconstruction policy.</param>
+        /// <param name="DefaultEncodingWebName">The P5G default encoding identity.</param>
+        /// <param name="FallbackEncodingWebName">The P5G fallback encoding identity.</param>
         private readonly record struct AcquisitionKey(
             string Name,
             Guid HashAlgorithm,
             string Hash,
             Guid Language,
-            string? SourceUri)
+            string? SourceUri,
+            ExternalSourceReconstructionPolicy ReconstructionPolicy,
+            string? DefaultEncodingWebName,
+            string? FallbackEncodingWebName)
         {
             /// <summary>
             /// Creates a stable key from complete source identity provenance.
             /// </summary>
             /// <param name="document">The expected Portable PDB document.</param>
             /// <param name="sourceUri">The optional safe retrieval hint.</param>
+            /// <param name="reconstructionPolicy">The active reconstruction policy.</param>
+            /// <param name="configuration">The optional P5G encoding provenance.</param>
             /// <returns>The immutable acquisition key.</returns>
             public static AcquisitionKey Create(
                 ExternalSourceDocumentDescriptor document,
-                Uri? sourceUri)
+                Uri? sourceUri,
+                ExternalSourceReconstructionPolicy reconstructionPolicy,
+                ExternalCSharpCompilationConfiguration? configuration)
             {
                 return new AcquisitionKey(
                     document.Name,
                     document.HashAlgorithm,
                     Convert.ToHexString(document.Hash.AsSpan()),
                     document.Language,
-                    sourceUri?.AbsoluteUri);
+                    sourceUri?.AbsoluteUri,
+                    reconstructionPolicy,
+                    configuration?.DefaultEncodingWebName,
+                    configuration?.FallbackEncodingWebName);
             }
         }
 

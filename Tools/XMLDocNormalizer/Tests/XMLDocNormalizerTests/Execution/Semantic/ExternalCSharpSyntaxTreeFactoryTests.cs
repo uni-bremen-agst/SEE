@@ -721,7 +721,10 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 document,
                 ImmutableArray.CreateRange(actual),
                 ExternalSourceMaterialOrigin.ExplicitStream,
-                filePath: null);
+                filePath: null,
+                sourceIdentity: document.Name,
+                ExternalSourceMaterialExactness.DirectExact,
+                ExternalSourceLineEndingTransformation.None);
 
             Assert.False(ExternalCSharpSyntaxTreeFactory.TryCreate(
                 material,
