@@ -1,13 +1,13 @@
 using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using NUnit.Framework;
-using SEE.DataModel.DG;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
@@ -78,7 +78,7 @@ namespace SEE.VCS
         /// read the fields above whatever order those are declared in.
         ///
         /// Name every case: with none, all that tells two of them apart in the
-        /// test runner is <c>System.String[]</c> three times over.
+        /// test runner is <c>SEE.VCS.Filter</c> over and over.
         /// </remarks>
         /// <returns>One test case per configuration.</returns>
         private static IEnumerable<TestCaseData> Configurations()
@@ -90,33 +90,32 @@ namespace SEE.VCS
             // switch to or from daylight saving time, be ambiguous.
             DateTimeOffset since = new(2025, 1, 1, 0, 0, 0, TimeSpan.FromHours(1));
 
-            // The directories, relative to the root of the repository and separated
-            // by <c>/</c>, whose files are to be reported on. Nested directories are
-            // included.
-            string[] directories = { "Assets/SEE", "Assets/SEETests" };
+            Filter filter = new
+                (// A file is reported on if it matches at least one inclusive
+                 // pattern and no exclusive one. Add a pattern with the value
+                 // false to leave something out, say { "**/*.Designer.cs", false }.
+                 globbing: new Globbing() { { "**/*.cs", true } },
+                 // The directories, relative to the root of the repository, whose
+                 // files are reported on. Nested directories are included.
+                 repositoryPaths: new string[] { "Assets/SEE", "Assets/SEETests" },
+                 // Regular expressions selecting the branches to be reported on,
+                 // one report for each branch selected. Each is matched against
+                 // the friendly name of a branch as a whole, so "master" is the
+                 // local master alone and "origin/.*" every remote-tracking
+                 // branch of origin. To catch both masters, write ".*master".
+                 //
+                 // Every expression must select at least one branch; one
+                 // selecting none fails this test rather than silently narrowing
+                 // the report. A branch selected by several of them is still
+                 // reported on only once.
+                 //
+                 // Mind that each selected branch costs a walk of its entire
+                 // history, so an expression selecting many makes for a
+                 // long-running test.
+                 branches: new string[] { "master", "996-add-better-support-for-profiling",
+                                          "origin/.*" });
 
-            // The extensions, leading dot included, a file must have to be reported on.
-            string[] extensions = { ".cs" };
-
-            // Regular expressions selecting the branches to be reported on, one
-            // report for each branch selected. A branch is selected if one of these
-            // expressions matches its name as a whole. That name is the one
-            // <c>git branch -a</c> prints: <c>heads/master</c> for a local branch
-            // and <c>remotes/origin/master</c> for a remote-tracking one. Hence
-            // <c>remotes/origin/.*</c> selects every remote branch and
-            // <c>.*/master</c> both the local and the remote master.
-            //
-            // Every expression must select at least one branch; one selecting none
-            // fails this test rather than silently narrowing the report. A branch
-            // selected by several expressions is still reported on only once.
-            //
-            // Mind that each selected branch costs a walk of its entire history, so
-            // an expression selecting many branches makes for a long-running test.
-            string[] branches
-                = { "heads/master", "heads/996-add-better-support-for-profiling", "remotes/origin/.*" };
-
-            yield return new TestCaseData(since, directories, extensions, branches)
-                    .SetName("SEE sources and tests");
+            yield return new TestCaseData(since, filter).SetName("SEE sources and tests");
         }
 
         /// <summary>
@@ -124,17 +123,11 @@ namespace SEE.VCS
         /// section per branch, to the console.
         /// </summary>
         /// <param name="since">The beginning of the period to be reported on.</param>
-        /// <param name="directories">The directories whose files are to be reported on.</param>
-        /// <param name="extensions">The extensions a file must have to be reported on.</param>
-        /// <param name="branches">Regular expressions selecting the branches to be reported on.</param>
+        /// <param name="filter">States which branches and which files are to be reported on.</param>
         [TestCaseSource(nameof(Configurations))]
-        public void TestChurnPerBranch
-              (DateTimeOffset since,
-               string[] directories,
-               string[] extensions,
-               string[] branches)
+        public void TestChurnPerBranch(DateTimeOffset since, Filter filter)
         {
-            AddNodesAfterDate(DataPath.ProjectFolder(), since, directories, extensions, branches, default, default);
+            AddNodesAfterDate(DataPath.ProjectFolder(), since, filter, default, default);
         }
 
         /// <summary>
@@ -147,21 +140,20 @@ namespace SEE.VCS
         /// on the time zone of the machine running this test and would, around a
         /// switch to or from daylight saving time, be ambiguous.
         ///
-        /// <paramref name="directories"/> is the set of directories, relative to the root
-        /// of the repository and separated by <c>/</c>, whose files are to be reported on.
-        /// Nested directories are included.
+        /// <see cref="Filter.RepositoryPaths"/> of <paramref name="filter"/> states the
+        /// directories, relative to the root of the repository and separated by <c>/</c>,
+        /// whose files are to be reported on; nested directories are included. If it is
+        /// null or empty, the whole repository is reported on.
         ///
-        /// <paramref name="extensions"/> is the set of file extensions, leading dot included,
-        /// a file must have to be reported on.
+        /// <see cref="Filter.Globbing"/> states which of the files therein are reported
+        /// on: a file must match at least one inclusive pattern and no exclusive one.
         ///
-        /// <paramref name="branches"/> is a set of regular expressions selecting
+        /// <see cref="Filter.Branches"/> is a set of regular expressions selecting
         /// the branches to be reported on, one report for each branch selected.
-        /// A branch is selected if one of these expressions matches its name as
-        /// a whole. That name is the one <c>git branch -a</c> prints:
-        /// <c>heads/master</c> for a local branch
-        /// and <c>remotes/origin/master</c> for a remote-tracking one. Hence
-        /// <c>remotes/origin/.*</c> selects every remote branch and
-        /// <c>.*/master</c> both the local and the remote master.
+        /// Each is matched against the friendly name of a branch as a whole, so
+        /// <c>master</c> is the local master alone and <c>origin/.*</c> every
+        /// remote-tracking branch of origin; <c>.*master</c> catches both masters.
+        /// If the set is null or empty, every branch is reported on.
         ///
         /// Every expression must select at least one branch; one selecting none
         /// fails this test rather than silently narrowing the report. A branch
@@ -173,21 +165,17 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryPath">The path of the repository to be reported on.</param>
         /// <param name="since">The beginning of the period to be reported on.</param>
-        /// <param name="directories">The directories whose files are to be reported on.</param>
-        /// <param name="extensions">The extensions a file must have to be reported on.</param>
-        /// <param name="branches">Regular expressions selecting the branches to be reported on.</param>
+        /// <param name="filter">States which branches and which files are to be reported on.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         private static void AddNodesAfterDate
               (string repositoryPath,
                DateTimeOffset since,
-               string[] directories,
-               string[] extensions,
-               string[] branches,
+               Filter filter,
                Action<float> changePercentage,
                CancellationToken token)
         {
-            Criteria criteria = new(since, directories, extensions, branches);
+            Criteria criteria = new(since, filter);
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
@@ -236,26 +224,30 @@ namespace SEE.VCS
         private static ICollection<KeyValuePair<string, Branch>> SelectedBranches
               (Repository repository, Criteria criteria)
         {
-            // A symbolic reference, remotes/origin/HEAD in particular, only
-            // points at another branch. Reporting on it would repeat that
-            // branch under a second name.
-            IDictionary<string, Branch> candidates
+            // A symbolic reference, origin/HEAD in particular, only points at
+            // another branch. Reporting on it would repeat that branch under a
+            // second name.
+            ICollection<Branch> candidates
                 = repository.Branches
-                            .Where(branch => !NameOf(branch).EndsWith("/HEAD", StringComparison.Ordinal))
-                            .ToDictionary(NameOf, branch => branch);
+                            .Where(branch => !branch.FriendlyName
+                                                    .EndsWith("/HEAD", StringComparison.Ordinal))
+                            .ToList();
 
             SortedDictionary<string, Branch> result = new(StringComparer.Ordinal);
-            foreach (string pattern in criteria.Branches)
+            foreach (Branch branch in candidates.Where(criteria.Filter.Matches))
             {
-                Regex expression = Expression(pattern);
-                ICollection<string> selected
-                    = candidates.Keys.Where(name => expression.IsMatch(name)).ToList();
-                Assert.That(selected, Is.Not.Empty,
+                result[branch.FriendlyName] = branch;
+            }
+
+            // Reported per expression rather than for the set as a whole, so
+            // that a mistyped one is named. Matching is left to the filter here
+            // too, a lone expression in a filter of its own, rather than
+            // reimplemented beside it.
+            foreach (string pattern in criteria.Filter.Branches ?? Enumerable.Empty<string>())
+            {
+                Filter alone = new(branches: new string[] { pattern });
+                Assert.That(candidates.Any(alone.Matches), Is.True,
                             $"No branch of {repository.Info.Path} is selected by {pattern}.");
-                foreach (string name in selected)
-                {
-                    result[name] = candidates[name];
-                }
             }
             return result;
         }
@@ -274,48 +266,13 @@ namespace SEE.VCS
         {
             StringBuilder result = new();
             result.AppendLine($"Reporting on {selected.Count} branches, selected by "
-                              + string.Join(", ", criteria.Branches) + ":");
+                              + string.Join(", ", criteria.Filter.Branches ?? Enumerable.Empty<string>())
+                              + ":");
             foreach (KeyValuePair<string, Branch> branch in selected)
             {
                 result.AppendLine($"  {branch.Key}");
             }
             return result.ToString();
-        }
-
-        /// <summary>
-        /// The name of <paramref name="branch"/> as <c>git branch -a</c> prints
-        /// it, which is its canonical name without the leading <c>refs/</c>.
-        /// </summary>
-        /// <param name="branch">The branch whose name is asked for.</param>
-        /// <returns>The name of the branch.</returns>
-        private static string NameOf(Branch branch)
-        {
-            const string prefix = "refs/";
-            return branch.CanonicalName.StartsWith(prefix, StringComparison.Ordinal)
-                   ? branch.CanonicalName.Substring(prefix.Length)
-                   : branch.CanonicalName;
-        }
-
-        /// <summary>
-        /// <paramref name="pattern"/> as a regular expression matching a branch
-        /// name as a whole. The anchors keep an expression from selecting a
-        /// branch whose name merely contains what was asked for; the group
-        /// around <paramref name="pattern"/> keeps them from binding to only
-        /// the first and the last alternative of an alternation.
-        /// </summary>
-        /// <param name="pattern">The regular expression.</param>
-        /// <returns>The anchored regular expression.</returns>
-        private static Regex Expression(string pattern)
-        {
-            try
-            {
-                return new Regex($"^(?:{pattern})$", RegexOptions.CultureInvariant);
-            }
-            catch (ArgumentException exception)
-            {
-                Assert.Fail($"{pattern} is not a regular expression: {exception.Message}");
-                throw; // Never reached; Assert.Fail does not return.
-            }
         }
 
         /// <summary>
@@ -476,9 +433,8 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// What is reported on: which commits, which files, which branches.
-        /// Handed to everything needing to know, so that these four values are
-        /// stated in one place only.
+        /// What is reported on: from when, which files, which branches. Handed
+        /// to everything needing to know, so that it is stated in one place only.
         /// </summary>
         private class Criteria
         {
@@ -489,45 +445,44 @@ namespace SEE.VCS
             internal DateTimeOffset Since { get; }
 
             /// <summary>
-            /// The directories, relative to the root of the repository and
-            /// separated by <c>/</c>, whose files are reported on. Nested
-            /// directories are included. Doubles as the pathspec narrowing every
-            /// comparison of a commit against its parent.
+            /// States which branches and which files are reported on.
             /// </summary>
-            internal IReadOnlyList<string> Directories { get; }
+            internal Filter Filter { get; }
 
             /// <summary>
-            /// The extensions, leading dot included, a file must have to be
-            /// reported on.
+            /// The pathspec narrowing every comparison of a commit against its
+            /// parent to the directories reported on, or null where the whole
+            /// repository is reported on.
             /// </summary>
-            internal IReadOnlyList<string> Extensions { get; }
+            internal IEnumerable<string> Pathspec { get; }
 
             /// <summary>
-            /// The regular expressions selecting the branches reported on.
+            /// Decides the globbing of <see cref="Filter"/>. Held here because
+            /// <see cref="Filter.Matcher"/> builds a new one on every access,
+            /// and this one is consulted for every file of every commit.
             /// </summary>
-            internal IReadOnlyList<string> Branches { get; }
+            /// <remarks>Can be null, in which case every file passes.</remarks>
+            private readonly Matcher matcher;
 
             /// <summary>
             /// Constructor setting all properties from the parameters of the
             /// same name.
             /// </summary>
             /// <param name="since">The beginning of the period reported on.</param>
-            /// <param name="directories">The directories whose files are reported on.</param>
-            /// <param name="extensions">The extensions a file must have to be reported on.</param>
-            /// <param name="branches">The expressions selecting the branches reported on.</param>
-            internal Criteria(DateTimeOffset since, IReadOnlyList<string> directories,
-                              IReadOnlyList<string> extensions, IReadOnlyList<string> branches)
+            /// <param name="filter">States which branches and which files are reported on.</param>
+            internal Criteria(DateTimeOffset since, Filter filter)
             {
                 Since = since;
-                Directories = directories;
-                Extensions = extensions;
-                Branches = branches;
+                Filter = filter;
+                matcher = filter.Matcher;
+                Pathspec = filter.RepositoryPaths == null || filter.RepositoryPaths.Length == 0
+                           ? null : filter.RepositoryPaths;
             }
 
             /// <summary>
             /// Whether <paramref name="path"/> denotes a file reported on, that
-            /// is, one located in one of the <see cref="Directories"/> and having
-            /// one of the <see cref="Extensions"/>.
+            /// is, one lying in one of the directories of <see cref="Filter"/>
+            /// and passing its globbing.
             /// </summary>
             /// <param name="path">The path to be checked, relative to the root of
             /// the repository and separated by <c>/</c>; may be null.</param>
@@ -535,9 +490,10 @@ namespace SEE.VCS
             internal bool InScope(string path)
             {
                 return !string.IsNullOrEmpty(path)
-                    && Extensions.Any(extension => path.EndsWith(extension, StringComparison.Ordinal))
-                    && Directories.Any(directory =>
-                                       path.StartsWith(directory + "/", StringComparison.Ordinal));
+                    && (Pathspec == null
+                        || Pathspec.Any(directory =>
+                                        path.StartsWith(directory + "/", StringComparison.Ordinal)))
+                    && (matcher == null || matcher.Matches(path));
             }
         }
 
@@ -752,9 +708,7 @@ namespace SEE.VCS
 
                 if (within)
                 {
-                    using Patch patch
-                        = repository.Diff.Compare<Patch>(parent, commit.Tree,
-                                                         criteria.Directories, compareOptions);
+                    using Patch patch = Compare<Patch>(parent, commit.Tree);
                     foreach (PatchEntryChanges change in patch)
                     {
                         if (criteria.InScope(change.Path) || criteria.InScope(change.OldPath))
@@ -772,9 +726,7 @@ namespace SEE.VCS
                     // would break the chain of names and split a file over two
                     // reported entries. A tree comparison yields them and is much
                     // cheaper than the line counts a patch would have to produce.
-                    using TreeChanges treeChanges
-                        = repository.Diff.Compare<TreeChanges>(parent, commit.Tree,
-                                                               criteria.Directories, compareOptions);
+                    using TreeChanges treeChanges = Compare<TreeChanges>(parent, commit.Tree);
                     foreach (TreeEntryChanges change in treeChanges)
                     {
                         if (change.Status == ChangeKind.Renamed
@@ -786,6 +738,27 @@ namespace SEE.VCS
                 }
                 return new Examined(false, within, commit.Sha,
                                     within ? mailmap.NameOf(author) : null, changes);
+            }
+
+            /// <summary>
+            /// The comparison of <paramref name="newTree"/> against
+            /// <paramref name="oldTree"/>, narrowed to the directories reported
+            /// on where there are any.
+            /// </summary>
+            /// <typeparam name="T">What the comparison is to yield.</typeparam>
+            /// <param name="oldTree">The tree compared against; null denotes the empty tree.</param>
+            /// <param name="newTree">The tree to be compared.</param>
+            /// <returns>The comparison.</returns>
+            private T Compare<T>(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree)
+                where T : class, IDiffResult
+            {
+                // The overload taking no pathspec is used where there is none,
+                // rather than handing it a null, which libgit2 is not documented
+                // to accept.
+                return criteria.Pathspec == null
+                       ? repository.Diff.Compare<T>(oldTree, newTree, compareOptions)
+                       : repository.Diff.Compare<T>(oldTree, newTree, criteria.Pathspec,
+                                                    compareOptions);
             }
         }
 
