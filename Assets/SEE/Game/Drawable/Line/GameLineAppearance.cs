@@ -134,6 +134,8 @@ namespace SEE.Game.Drawable.Line
                 ChangePrimaryColor(shape, conf.PrimaryColor);
                 ChangeSecondaryColor(shape, conf.SecondaryColor);
 
+                /// If the secondary color is clear, use the primary color instead.
+                /// This prevents part of the line from becoming invisible.
                 if (conf.SecondaryColor == Color.clear)
                 {
                     ChangeSecondaryColor(shape, conf.PrimaryColor);

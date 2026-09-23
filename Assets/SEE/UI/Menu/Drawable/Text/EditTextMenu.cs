@@ -210,6 +210,8 @@ namespace SEE.UI.Menu.Drawable.Text
             controls.ReturnButtonManager.clickEvent.RemoveAllListeners();
             controls.ReturnButtonManager.clickEvent.AddListener(returnCall);
 
+            /// When text editing is opened from a parent menu, the text must keep
+            /// the order in layer controlled by its parent drawable object.
             controls.OrderInLayerUnitySlider.interactable = false;
         }
 

@@ -40,6 +40,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
         /// <summary>
         /// Updates the shape-menu layout for the currently selected shape.
+        /// The displayed value controls and their labels are configured to match
+        /// the corresponding explanations in the shape information images.
         /// </summary>
         internal void UpdateForSelection()
         {

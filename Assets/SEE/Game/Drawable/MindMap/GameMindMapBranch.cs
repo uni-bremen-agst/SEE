@@ -89,6 +89,8 @@ namespace SEE.Game.Drawable.MindMap
 
             GameMindMapHierarchy.UpdateMindMapLayer(childValueHolder, parentValueHolder);
 
+            /// Disable the branch-line collider because branch lines belong to the
+            /// Mind Map relation and should not be edited as regular drawable lines.
             branchLine.GetComponent<MeshCollider>().enabled = false;
 
             return branchLine;
