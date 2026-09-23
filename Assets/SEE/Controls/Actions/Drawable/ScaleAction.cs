@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -303,7 +304,7 @@ namespace SEE.Controls.Actions.Drawable
 
             newScale = GameScaler.Scale(selectedObj, scaleFactor);
             ScaleMenu.Instance.AssignValue(selectedObj);
-            bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
+            bool refresh = GameMindMapBranch.ReDrawBranchLines(selectedObj);
             new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, newScale).Execute();
             if (refresh)
             {
@@ -357,7 +358,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.OldScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                bool refresh = GameMindMapBranch.ReDrawBranchLines(memento.SelectedObject);
                 new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name, memento.OldScale).Execute();
                 if (refresh)
@@ -385,7 +386,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.NewScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                bool refresh = GameMindMapBranch.ReDrawBranchLines(memento.SelectedObject);
                 new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.SelectedObject.name, memento.NewScale).Execute();
                 if (refresh)
                 {

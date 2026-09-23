@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -317,7 +318,7 @@ namespace SEE.Game.Drawable
         {
             if (obj.CompareTag(Tags.MindMapNode))
             {
-                GameMindMap.ReDrawParentBranchLine(obj);
+                GameMindMapBranch.ReDrawParentBranchLine(obj);
                 GameObject attachedObject = GameFinder.GetAttachedObjectsObject(obj);
                 MMNodeValueHolder v = obj.GetComponent<MMNodeValueHolder>();
 
@@ -327,7 +328,7 @@ namespace SEE.Game.Drawable
                 {
                     pair.Key.transform.SetParent(attachedObject.transform);
                     pair.Value.transform.SetParent(attachedObject.transform);
-                    GameMindMap.ReDrawParentBranchLine(pair.Key);
+                    GameMindMapBranch.ReDrawParentBranchLine(pair.Key);
                 }
             }
         }
@@ -348,7 +349,7 @@ namespace SEE.Game.Drawable
             {
                 if (node.CompareTag(Tags.MindMapNode))
                 {
-                    GameMindMap.ReDrawBranchLines(node);
+                    GameMindMapBranch.ReDrawBranchLines(node);
                 }
             }
         }

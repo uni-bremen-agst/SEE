@@ -3,6 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -200,7 +201,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     MindMapParentSelectionMenu.Instance.Destroy();
                     Destroyer.Destroy(branchLine);
-                    branchLine = GameMindMap.CreateBranchLine(node, parent);
+                    branchLine = GameMindMapBranch.CreateBranchLine(node, parent);
                     progress = ProgressState.Finish;
                 }
             }
@@ -357,7 +358,7 @@ namespace SEE.Controls.Actions.Drawable
                     && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(GameFinder.GetDrawableSurface(node)))
                 {
                     Destroyer.Destroy(branchLine);
-                    branchLine = GameMindMap.CreateBranchLine(node, hit.collider.gameObject);
+                    branchLine = GameMindMapBranch.CreateBranchLine(node, hit.collider.gameObject);
                     progress = ProgressState.Finish;
                 }
                 else

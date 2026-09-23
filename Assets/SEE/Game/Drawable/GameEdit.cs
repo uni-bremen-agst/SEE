@@ -1,5 +1,6 @@
-﻿using SEE.Game.Drawable.Line;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using System.Collections.Generic;
@@ -403,7 +404,7 @@ namespace SEE.Game.Drawable
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawableSurface(node));
                 GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
-                GameMindMap.ChangeParent(node, parent);
+                GameMindMapBranch.ChangeParent(node, parent);
 
                 GameMindMap.ChangeBoxSize(node);
 

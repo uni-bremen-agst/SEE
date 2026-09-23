@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -373,7 +374,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="surface">The drawable surface on which the node is placed.</param>
         private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject surface)
         {
-            GameMindMap.ChangeParent(addedNode, chosenObject);
+            GameMindMapBranch.ChangeParent(addedNode, chosenObject);
             newConf.ParentNode = chosenObject.name;
             new MindMapChangeParentNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                 newConf).Execute();

@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -281,7 +282,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 GameEdit.ChangeLayer(node, layerOrder);
                 conf.OrderInLayer = layerOrder;
                 new EditLayerNetAction(surface.name, surfaceParentName, node.name, layerOrder).Execute();
-                GameMindMap.ReDrawBranchLines(node);
+                GameMindMapBranch.ReDrawBranchLines(node);
                 new MindMapRefreshBranchLinesNetAction(
                     surface.name, surfaceParentName, MindMapNodeConf.GetNodeConf(node)).Execute();
             });

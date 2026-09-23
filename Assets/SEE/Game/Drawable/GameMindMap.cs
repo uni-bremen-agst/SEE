@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
@@ -250,7 +251,7 @@ namespace SEE.Game.Drawable
                 /// Renew the size of the BoxCollider.
                 ChangeBoxSize(node);
                 /// Re-draws the branch lines, because changes to the border might necessitate adjustments.
-                ReDrawBranchLines(node);
+                GameMindMapBranch.ReDrawBranchLines(node);
             }
         }
 
@@ -348,75 +349,12 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates/Recreates a branch line between the node and the parent.
-        /// If the parameter name is not empty, an attempt is made to redraw the branch line.
-        /// The order of the branch line is a sequence lower than the lower sequence of both nodes (node/parent).
-        /// The mesh collider of the branch line will be deactivated.
-        /// In the <see cref="MMNodeValueHolder"/> component of the node,
-        /// the branch line is added as the parent branch line and the parent as parent.
-        /// The <see cref="MMNodeValueHolder"/> component of the parent, adds the node and the branch line as children.
-        /// </summary>
-        /// <param name="child">The child node.</param>
-        /// <param name="parent">The parent node.</param>
-        /// <param name="name">The branch line ID, empty if it's a new branch line.</param>
-        /// <returns>The created branch line.</returns>
-        public static GameObject CreateBranchLine(GameObject child, GameObject parent, string name = "")
-        {
-            /// Calculates the end point of the branch line.
-            /// Depending on the parent node and the node position.
-            Vector3 endPoint = NearestPoints.GetNearestPoint(parent, child.transform.position);
-
-            /// Calculates the start point of the branch line.
-            /// Depending on the node and the end point.
-            Vector3 startPoint = NearestPoints.GetNearestPoint(child, endPoint);
-
-            /// Array that contains the start and end point.
-            Vector3[] positions = new Vector3[2];
-            positions[0] = startPoint;
-            positions[1] = endPoint;
-            /// Convert the positions to local space.
-            child.GetRootParent().transform.InverseTransformPoints(positions);
-
-            GameObject surface = GameFinder.GetDrawableSurface(child);
-            /// If no name was chosen, use <see cref="ValueHolder.MindMapBranchLine"/> - ParentID - NodeID.
-            if (name == "")
-            {
-                name = ValueHolder.MindMapBranchLine + "-" + GetIDofName(parent.name) + "-" + GetIDofName(child.name);
-            }
-            /// Creates the branch line.
-            GameObject branchLine = GameLineDrawer.DrawLine(surface, name, positions, ColorKind.Monochrome,
-                        Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
-                        LineKind.Solid, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
-
-            /// Calculates the order.
-            /// An order lower than the lower order (parent or node).
-            /// But <0 will be 0.
-            int order = GetBranchLineOrder(child, parent);
-            GameLayerChanger.ChangeOrderInLayer(branchLine, order, GameLayerChanger.LayerChangerStates.Decrease, false);
-
-            /// Adds the node and their branch line as a child/branch line pair to the parent holder.
-            MMNodeValueHolder parentValueHolder = parent.GetComponent<MMNodeValueHolder>();
-            parentValueHolder.AddChild(child, branchLine);
-
-            /// Enter the data in the own node holder.
-            MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
-            nodeValueHolder.SetParent(parent, branchLine);
-            //nodeValueHolder.Layer = parentValueHolder.Layer + 1;
-            MindMapLayer(nodeValueHolder, parentValueHolder);
-
-            /// Disable the Mesh Collider of the branch line.
-            /// It has the same reason as for the border.
-            branchLine.GetComponent<MeshCollider>().enabled = false;
-            return branchLine;
-        }
-
-        /// <summary>
         /// Recursively updates the layer of the given mind map node and all of its children.
         /// Each child node's layer is set to its parent's layer + 1.
         /// </summary>
         /// <param name="holder">The node whose layer will be updated.</param>
         /// <param name="parent">The parent node used to determine the new layer for <paramref name="holder"/>.</param>
-        private static void MindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
+        internal static void UpdateMindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
         {
             int oldLayer = holder.Layer;
             holder.Layer = parent.Layer + 1;
@@ -426,130 +364,7 @@ namespace SEE.Game.Drawable
                 foreach(GameObject child in holder.GetChildren().Keys)
                 {
                     MMNodeValueHolder childHolder = child.GetComponent<MMNodeValueHolder>();
-                    MindMapLayer(childHolder, holder);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Calculates the order for the branch line.
-        /// The order of the branch line is a sequence lower than the lower sequence of both nodes (node/parent).
-        /// </summary>
-        /// <param name="child">The child node.</param>
-        /// <param name="parent">The parent node.</param>
-        /// <returns>The calculated order.</returns>
-        private static int GetBranchLineOrder(GameObject child, GameObject parent)
-        {
-            int order;
-            if (child.GetComponent<OrderInLayerValueHolder>().OrderInLayer >
-                parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer)
-            {
-                /// Block for: Parent has a lower order.
-                order = parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
-            }
-            else
-            {
-                /// Block for: Node has a lower order.
-                order = child.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
-            }
-
-            /// If the order would be lower then 0 it's set to 0.
-            if (order < 0)
-            {
-                order = 0;
-            }
-            return order;
-        }
-
-        /// <summary>
-        /// Redraws the branch line to the parent node.
-        /// </summary>
-        /// <param name="node">The node whose parent branch line should be redrawn.</param>
-        public static void ReDrawParentBranchLine(GameObject node)
-        {
-            if (node.CompareTag(Tags.MindMapNode))
-            {
-                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                if (valueHolder.GetParentBranchLine() != null)
-                {
-                    GameObject parent = valueHolder.GetParent();
-                    CreateBranchLine(node, parent, valueHolder.GetParentBranchLine().name);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Redraws the branch lines of a node.
-        /// Includes the parent branch line and
-        /// the branch lines to the children of the given node.
-        /// </summary>
-        /// <param name="node">The node whose branch lines should be redrawn.</param>
-        /// <returns>True, if the given node has a <see cref="Tags.MindMapNode"/> and the redraw was successful.</returns>
-        public static bool ReDrawBranchLines(GameObject node)
-        {
-            if (node.CompareTag(Tags.MindMapNode))
-            {
-                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                /// Re-draws the parent branch line.
-                ReDrawParentBranchLine(node);
-                /// Block for re-drawing the branch lines of the children.
-                if (valueHolder.GetChildren().Count > 0)
-                {
-                    foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetChildren())
-                    {
-                        CreateBranchLine(pair.Key, node, pair.Value.name);
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Provides the changing of the parent.
-        /// If the newly chosen parent is different from the previous one,
-        /// and if the validity check returns a positive result, the following will happen:
-        /// - It removes the node of the children list of the old parent
-        ///   and destroys the old parent branch line.
-        /// - It creates a new branch line to the new chosen parent.
-        ///   (<see cref="CreateBranchLine"/>)
-        /// </summary>
-        /// <param name="child">The child node.</param>
-        /// <param name="parent">The newly chosen parent node.</param>
-        public static void ChangeParent(GameObject child, GameObject parent)
-        {
-            if (child.CompareTag(Tags.MindMapNode) && parent != null
-                && parent.CompareTag(Tags.MindMapNode))
-            {
-                MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
-                if (nodeValueHolder.GetParent() != parent && ParentChangeIsValid(child, parent))
-                {
-                    /// Remove the node from the list of children of the old parent.
-                    if (nodeValueHolder.GetParent() != null)
-                    {
-                        nodeValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(child);
-                    }
-
-                    LineConf oldBranchLine = null;
-
-                    /// Block for saving the branch configuration.
-                    /// Will be needed for restore the branch line appearance.
-                    if (nodeValueHolder.GetParentBranchLine() != null)
-                    {
-                        oldBranchLine = LineConf.GetLine(nodeValueHolder.GetParentBranchLine());
-                    }
-
-                    /// Destroys the old branch line.
-                    Destroyer.Destroy(nodeValueHolder.GetParentBranchLine());
-
-                    /// Creates the new branch line.
-                    GameObject newBranchLine = CreateBranchLine(child, parent, "");
-
-                    /// Restores the branch line appearance.
-                    if (oldBranchLine != null)
-                    {
-                        GameEdit.ChangeLine(newBranchLine, oldBranchLine);
-                    }
+                    UpdateMindMapLayer(childHolder, holder);
                 }
             }
         }
@@ -675,7 +490,7 @@ namespace SEE.Game.Drawable
                 nodeValueHolder.NodeKind = newNodeKind;
 
                 /// At least refresh the branch lines.
-                ReDrawBranchLines(node);
+                GameMindMapBranch.ReDrawBranchLines(node);
             }
             return nodeValueHolder.NodeKind;
         }
@@ -860,7 +675,7 @@ namespace SEE.Game.Drawable
             /// Create the branch line, if the node has a parent.
             if (parent != null)
             {
-                CreateBranchLine(createdNode, parent, branchToParentName);
+                GameMindMapBranch.CreateBranchLine(createdNode, parent, branchToParentName);
             }
             return createdNode;
         }
