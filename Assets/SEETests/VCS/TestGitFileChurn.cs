@@ -88,7 +88,7 @@ namespace SEE.VCS
         /// an expression selecting many branches makes for a long-running test.
         /// </summary>
         private static readonly string[] branches
-            = { "heads/master", "heads/996-add-better-support-for-profiling" };
+            = { "heads/master", "heads/996-add-better-support-for-profiling", "remotes/origin/.*" };
 
         /// <summary>
         /// The similarity, in percent, at and above which a deletion and an
@@ -116,9 +116,13 @@ namespace SEE.VCS
             ICollection<KeyValuePair<string, Branch>> selected = SelectedBranches(repository);
             Debug.Log(Selection(selected));
 
+            // Shared by all branches, because what a commit changes does not
+            // depend on the branch it is reached from.
+            Examination examined = new(repository, mailmap);
+
             foreach (KeyValuePair<string, Branch> branch in selected)
             {
-                IDictionary<string, Churn> churn = ChurnOf(repository, branch.Value, mailmap);
+                IDictionary<string, Churn> churn = ChurnOf(repository, branch.Value, examined);
                 Debug.Log(Report(branch.Key, churn));
 
                 foreach (KeyValuePair<string, Churn> file in churn)
@@ -129,6 +133,8 @@ namespace SEE.VCS
                                 $"{file.Key} is reported without any author.");
                 }
             }
+            Debug.Log($"{examined.Count} distinct commits were examined for "
+                      + $"{selected.Count} branches.\n");
         }
 
         /// <summary>
@@ -228,25 +234,18 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repository">the repository to be walked</param>
         /// <param name="branch">the branch whose commits are to be taken into account</param>
-        /// <param name="mailmap">used to map an author onto their canonical name</param>
+        /// <param name="examined">what is known of the commits examined so far; will be extended</param>
         /// <returns>the churn per file</returns>
         private static IDictionary<string, Churn> ChurnOf(Repository repository, Branch branch,
-                                                          Mailmap mailmap)
+                                                          Examination examined)
         {
             Dictionary<string, Churn> result = new();
             // Maps the former name of a renamed file onto the name that file
-            // carries later in the history.
+            // carries later in the history. Per branch, because it is the name
+            // at the tip of this branch that a file is reported under, and two
+            // branches may well have renamed one file differently.
             Dictionary<string, string> renamedTo = new();
 
-            CompareOptions compareOptions = new()
-            {
-                Algorithm = DiffAlgorithm.Myers,
-                Similarity = new SimilarityOptions
-                {
-                    RenameDetectionMode = RenameDetectionMode.Renames,
-                    RenameThreshold = renameThreshold
-                }
-            };
             CommitFilter filter = new()
             {
                 IncludeReachableFrom = branch,
@@ -258,27 +257,23 @@ namespace SEE.VCS
 
             foreach (Commit commit in repository.Commits.QueryBy(filter))
             {
-                if (commit.Parents.Count() > 1)
+                Examined examination = examined.Of(commit);
+                if (examination.IsMerge)
                 {
                     // A merge has no churn of its own, exactly as for --no-merges.
                     continue;
                 }
-                // A commit without any parent is the initial one; it is compared
-                // against the empty tree, which a null tree denotes.
-                LibGit2Sharp.Tree parent = commit.Parents.FirstOrDefault()?.Tree;
-
-                if (commit.Author.When >= since)
+                foreach (FileChange change in examination.Changes)
                 {
-                    AddChurn(repository, commit, parent, compareOptions, mailmap, renamedTo, result);
-                }
-                else
-                {
-                    // The churn of this commit is out of the period reported on,
-                    // yet its renames are still needed: leaving them out would
-                    // break the chain of names and split a file over two reported
-                    // entries. A tree comparison suffices for that and is much
-                    // cheaper than the line counts a patch would have to produce.
-                    NoteRenames(repository, commit, parent, compareOptions, renamedTo);
+                    string target = Follow(renamedTo, change.Path);
+                    if (examination.Within)
+                    {
+                        Record(result, target, change, examination);
+                    }
+                    if (change.IsRename)
+                    {
+                        Note(renamedTo, change.OldPath, target);
+                    }
                 }
             }
 
@@ -289,73 +284,25 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Adds the churn of <paramref name="commit"/> relative to
-        /// <paramref name="parent"/> to <paramref name="churn"/> and notes every
-        /// rename it contains in <paramref name="renamedTo"/>.
+        /// Accounts in <paramref name="churn"/> for <paramref name="change"/>
+        /// having been made to the file named <paramref name="path"/> by
+        /// <paramref name="examination"/>'s commit.
         /// </summary>
-        /// <param name="repository">the repository <paramref name="commit"/> belongs to</param>
-        /// <param name="commit">the commit whose churn is to be added</param>
-        /// <param name="parent">the tree <paramref name="commit"/> is compared against</param>
-        /// <param name="compareOptions">the options of that comparison</param>
-        /// <param name="mailmap">used to map the author onto their canonical name</param>
-        /// <param name="renamedTo">the renames noted so far; will be extended</param>
         /// <param name="churn">the churn accumulated so far; will be extended</param>
-        private static void AddChurn(Repository repository, Commit commit, LibGit2Sharp.Tree parent,
-                                     CompareOptions compareOptions, Mailmap mailmap,
-                                     IDictionary<string, string> renamedTo,
-                                     IDictionary<string, Churn> churn)
+        /// <param name="path">the name the changed file carries at the tip of the branch</param>
+        /// <param name="change">the change to be accounted for</param>
+        /// <param name="examination">what is known of the commit making the change</param>
+        private static void Record(IDictionary<string, Churn> churn, string path, FileChange change,
+                                   Examined examination)
         {
-            string author = mailmap.NameOf(commit.Author);
-
-            using Patch patch
-                = repository.Diff.Compare<Patch>(parent, commit.Tree, directories, compareOptions);
-            foreach (PatchEntryChanges change in patch)
+            if (!churn.TryGetValue(path, out Churn file))
             {
-                if (!InScope(change.Path) && !InScope(change.OldPath))
-                {
-                    continue;
-                }
-                string target = Follow(renamedTo, change.Path);
-                // A binary file is reported with no added and no deleted line,
-                // hence it contributes nothing but the commit and its author.
-                if (!churn.TryGetValue(target, out Churn file))
-                {
-                    file = new Churn();
-                    churn[target] = file;
-                }
-                file.Add(change.LinesAdded, change.LinesDeleted, commit.Sha, author);
-
-                if (change.Status == ChangeKind.Renamed)
-                {
-                    Note(renamedTo, change.OldPath, target);
-                }
+                file = new Churn();
+                churn[path] = file;
             }
-        }
-
-        /// <summary>
-        /// Notes every rename <paramref name="commit"/> contains relative to
-        /// <paramref name="parent"/> in <paramref name="renamedTo"/>, without
-        /// accounting for any churn.
-        /// </summary>
-        /// <param name="repository">the repository <paramref name="commit"/> belongs to</param>
-        /// <param name="commit">the commit whose renames are to be noted</param>
-        /// <param name="parent">the tree <paramref name="commit"/> is compared against</param>
-        /// <param name="compareOptions">the options of that comparison</param>
-        /// <param name="renamedTo">the renames noted so far; will be extended</param>
-        private static void NoteRenames(Repository repository, Commit commit, LibGit2Sharp.Tree parent,
-                                        CompareOptions compareOptions,
-                                        IDictionary<string, string> renamedTo)
-        {
-            using TreeChanges changes
-                = repository.Diff.Compare<TreeChanges>(parent, commit.Tree, directories, compareOptions);
-            foreach (TreeEntryChanges change in changes)
-            {
-                if (change.Status == ChangeKind.Renamed
-                    && (InScope(change.Path) || InScope(change.OldPath)))
-                {
-                    Note(renamedTo, change.OldPath, Follow(renamedTo, change.Path));
-                }
-            }
+            // A binary file is reported with no added and no deleted line, hence
+            // it contributes nothing but the commit and its author.
+            file.Add(change.LinesAdded, change.LinesDeleted, examination.Sha, examination.Author);
         }
 
         /// <summary>
@@ -441,6 +388,246 @@ namespace SEE.VCS
                                   + string.Join(", ", file.Value.Authors));
             }
             return result.ToString();
+        }
+
+        /// <summary>
+        /// One change a commit makes to one file in the scope of this test.
+        /// </summary>
+        private class FileChange
+        {
+            /// <summary>
+            /// The name of the file after the change.
+            /// </summary>
+            internal string Path { get; }
+
+            /// <summary>
+            /// The name of the file before the change. Meaningful only where
+            /// <see cref="IsRename"/> holds.
+            /// </summary>
+            internal string OldPath { get; }
+
+            /// <summary>
+            /// Whether the change renames the file.
+            /// </summary>
+            internal bool IsRename { get; }
+
+            /// <summary>
+            /// The number of lines the change adds.
+            /// </summary>
+            internal int LinesAdded { get; }
+
+            /// <summary>
+            /// The number of lines the change deletes.
+            /// </summary>
+            internal int LinesDeleted { get; }
+
+            /// <summary>
+            /// Constructor setting all properties from the parameters of the
+            /// same name.
+            /// </summary>
+            /// <param name="path">the name of the file after the change</param>
+            /// <param name="oldPath">the name of the file before the change</param>
+            /// <param name="isRename">whether the change renames the file</param>
+            /// <param name="linesAdded">the number of lines the change adds</param>
+            /// <param name="linesDeleted">the number of lines the change deletes</param>
+            internal FileChange(string path, string oldPath, bool isRename,
+                                int linesAdded, int linesDeleted)
+            {
+                Path = path;
+                OldPath = oldPath;
+                IsRename = isRename;
+                LinesAdded = linesAdded;
+                LinesDeleted = linesDeleted;
+            }
+        }
+
+        /// <summary>
+        /// Everything this test needs to know about a single commit.
+        /// </summary>
+        private class Examined
+        {
+            /// <summary>
+            /// Whether the commit is a merge.
+            /// </summary>
+            internal bool IsMerge { get; }
+
+            /// <summary>
+            /// Whether the commit was authored within the period reported on.
+            /// </summary>
+            internal bool Within { get; }
+
+            /// <summary>
+            /// The SHA of the commit.
+            /// </summary>
+            internal string Sha { get; }
+
+            /// <summary>
+            /// The canonical name of the author of the commit. Determined only
+            /// where <see cref="Within"/> holds, because it is needed nowhere
+            /// else.
+            /// </summary>
+            internal string Author { get; }
+
+            /// <summary>
+            /// The changes the commit makes to the files in the scope of this
+            /// test, relative to its first parent. Only the renames among them
+            /// where <see cref="Within"/> does not hold; see
+            /// <see cref="Examination.Of"/>.
+            /// </summary>
+            internal IList<FileChange> Changes { get; }
+
+            /// <summary>
+            /// Constructor setting all properties from the parameters of the
+            /// same name.
+            /// </summary>
+            /// <param name="isMerge">whether the commit is a merge</param>
+            /// <param name="within">whether the commit falls in the period reported on</param>
+            /// <param name="sha">the SHA of the commit</param>
+            /// <param name="author">the canonical name of the author of the commit</param>
+            /// <param name="changes">the changes the commit makes</param>
+            internal Examined(bool isMerge, bool within, string sha, string author,
+                              IList<FileChange> changes)
+            {
+                IsMerge = isMerge;
+                Within = within;
+                Sha = sha;
+                Author = author;
+                Changes = changes;
+            }
+        }
+
+        /// <summary>
+        /// What has been found out about the commits examined so far, so that a
+        /// commit is examined only once however many of the selected branches it
+        /// is reachable from.
+        /// </summary>
+        /// <remarks>
+        /// This is where the time goes. What a commit changes relative to its
+        /// first parent does not depend on the branch it is reached from, yet
+        /// the branches of a repository share the greater part of their history:
+        /// in SEE, 91 branches reach 15117 distinct commits between them but
+        /// 1088641 times in total, so without this the same comparison is made
+        /// some 72 times over on average.
+        /// </remarks>
+        private class Examination
+        {
+            /// <summary>
+            /// The repository whose commits are examined.
+            /// </summary>
+            private readonly Repository repository;
+
+            /// <summary>
+            /// Used to map an author onto their canonical name.
+            /// </summary>
+            private readonly Mailmap mailmap;
+
+            /// <summary>
+            /// The options of every comparison made here.
+            /// </summary>
+            private readonly CompareOptions compareOptions = new()
+            {
+                Algorithm = DiffAlgorithm.Myers,
+                Similarity = new SimilarityOptions
+                {
+                    RenameDetectionMode = RenameDetectionMode.Renames,
+                    RenameThreshold = renameThreshold
+                }
+            };
+
+            /// <summary>
+            /// The commits examined so far, keyed by their identifier.
+            /// </summary>
+            private readonly IDictionary<ObjectId, Examined> examined
+                = new Dictionary<ObjectId, Examined>();
+
+            /// <summary>
+            /// Constructor setting all fields from the parameters of the same
+            /// name.
+            /// </summary>
+            /// <param name="repository">the repository whose commits are examined</param>
+            /// <param name="mailmap">used to map an author onto their canonical name</param>
+            internal Examination(Repository repository, Mailmap mailmap)
+            {
+                this.repository = repository;
+                this.mailmap = mailmap;
+            }
+
+            /// <summary>
+            /// The number of commits examined so far.
+            /// </summary>
+            internal int Count => examined.Count;
+
+            /// <summary>
+            /// What is to be known about <paramref name="commit"/>, examining it
+            /// unless that has been done already.
+            /// </summary>
+            /// <param name="commit">the commit to be examined</param>
+            /// <returns>what is known about the commit</returns>
+            internal Examined Of(Commit commit)
+            {
+                if (!examined.TryGetValue(commit.Id, out Examined result))
+                {
+                    result = Examine(commit);
+                    examined[commit.Id] = result;
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// What is to be known about <paramref name="commit"/>, found out by
+            /// comparing it against its first parent.
+            /// </summary>
+            /// <param name="commit">the commit to be examined</param>
+            /// <returns>what is known about the commit</returns>
+            private Examined Examine(Commit commit)
+            {
+                List<FileChange> changes = new();
+                if (commit.Parents.Skip(1).Any())
+                {
+                    return new Examined(true, false, null, null, changes);
+                }
+                // A commit without any parent is the initial one; it is compared
+                // against the empty tree, which a null tree denotes.
+                LibGit2Sharp.Tree parent = commit.Parents.FirstOrDefault()?.Tree;
+                Signature author = commit.Author;
+                bool within = author.When >= since;
+
+                if (within)
+                {
+                    using Patch patch = repository.Diff.Compare<Patch>(parent, commit.Tree,
+                                                                       directories, compareOptions);
+                    foreach (PatchEntryChanges change in patch)
+                    {
+                        if (InScope(change.Path) || InScope(change.OldPath))
+                        {
+                            changes.Add(new FileChange(change.Path, change.OldPath,
+                                                       change.Status == ChangeKind.Renamed,
+                                                       change.LinesAdded, change.LinesDeleted));
+                        }
+                    }
+                }
+                else
+                {
+                    // The churn of a commit out of the period reported on is
+                    // never needed, its renames however are: leaving them out
+                    // would break the chain of names and split a file over two
+                    // reported entries. A tree comparison yields them and is much
+                    // cheaper than the line counts a patch would have to produce.
+                    using TreeChanges treeChanges
+                        = repository.Diff.Compare<TreeChanges>(parent, commit.Tree,
+                                                               directories, compareOptions);
+                    foreach (TreeEntryChanges change in treeChanges)
+                    {
+                        if (change.Status == ChangeKind.Renamed
+                            && (InScope(change.Path) || InScope(change.OldPath)))
+                        {
+                            changes.Add(new FileChange(change.Path, change.OldPath, true, 0, 0));
+                        }
+                    }
+                }
+                return new Examined(false, within, commit.Sha,
+                                    within ? mailmap.NameOf(author) : null, changes);
+            }
         }
 
         /// <summary>
