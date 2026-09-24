@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
@@ -290,8 +291,8 @@ namespace SEE.Game.Drawable.MindMap
             {
                 case MindMapNodeKind.Theme:
                     ellipse = true;
-                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
-                    GameEdit.ChangeFontSize(nodeText, 1.0f);
+                    GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
+                    GameTextEdit.ChangeFontSize(nodeText, 1.0f);
                     GameLineAppearance.ChangeLineKind(
                         nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
@@ -299,8 +300,8 @@ namespace SEE.Game.Drawable.MindMap
                     break;
 
                 case MindMapNodeKind.Subtheme:
-                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
-                    GameEdit.ChangeFontSize(nodeText, 0.7f);
+                    GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
+                    GameTextEdit.ChangeFontSize(nodeText, 0.7f);
                     GameLineAppearance.ChangeLineKind(
                         nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
@@ -309,8 +310,8 @@ namespace SEE.Game.Drawable.MindMap
 
                 case MindMapNodeKind.Leaf:
                     ellipse = true;
-                    GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
-                    GameEdit.ChangeFontSize(nodeText, 0.5f);
+                    GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
+                    GameTextEdit.ChangeFontSize(nodeText, 0.5f);
                     GameLineAppearance.ChangeLineKind(
                         nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.clear);
@@ -332,7 +333,7 @@ namespace SEE.Game.Drawable.MindMap
             if (newNodeKind != MindMapNodeKind.Leaf && borderConf != null
                 && borderConf.PrimaryColor != Color.clear)
             {
-                GameEdit.ChangeLine(nodeBorder, borderConf);
+                GameLineEdit.ChangeLine(nodeBorder, borderConf);
             }
         }
 

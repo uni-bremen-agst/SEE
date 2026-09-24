@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
@@ -232,7 +233,7 @@ namespace SEE.Game.Drawable.MindMap
 
             if (oldBranchLine != null)
             {
-                GameEdit.ChangeLine(
+                GameLineEdit.ChangeLine(
                     newBranchLine,
                     oldBranchLine);
             }
