@@ -115,7 +115,10 @@ namespace SEE.VCS
                  branches: new string[] { "master", "996-add-better-support-for-profiling",
                                           "origin/.*" });
 
-            yield return new TestCaseData(since, filter).SetName("SEE sources and tests");
+            GitRepository repositoryConfiguration = new(new DataPath(DataPath.ProjectFolder()), filter);
+
+            yield return new TestCaseData(since, repositoryConfiguration)
+                .SetName("SEE sources and tests");
         }
 
         /// <summary>
@@ -123,16 +126,18 @@ namespace SEE.VCS
         /// section per branch, to the console.
         /// </summary>
         /// <param name="since">The beginning of the period to be reported on.</param>
-        /// <param name="filter">States which branches and which files are to be reported on.</param>
+        /// <param name="repositoryConfiguration">The repository configuration based on which the
+        /// report is derived.</param>
         [TestCaseSource(nameof(Configurations))]
-        public void TestChurnPerBranch(DateTimeOffset since, Filter filter)
+        public void TestChurnPerBranch(DateTimeOffset since, GitRepository repositoryConfiguration)
         {
-            AddNodesAfterDate(DataPath.ProjectFolder(), since, filter, default, default);
+            AddNodesAfterDate(repositoryConfiguration, since, default, default);
         }
 
         /// <summary>
-        /// Emits the report on the repository at <paramref name="repositoryPath"/>,
-        /// one section per branch, to the console.
+        /// Emits the report on the repository named by
+        /// <paramref name="repositoryConfiguration"/>, one section per branch,
+        /// to the console.
         ///
         /// <paramref name="since"/> is the beginning of the period to be reported on;
         /// commits authored at this very instant are still taken into account. The UTC offset is
@@ -140,7 +145,11 @@ namespace SEE.VCS
         /// on the time zone of the machine running this test and would, around a
         /// switch to or from daylight saving time, be ambiguous.
         ///
-        /// <see cref="Filter.RepositoryPaths"/> of <paramref name="filter"/> states the
+        /// Which branches and which files are reported on is stated by
+        /// <see cref="GitRepository.VCSFilter"/> of
+        /// <paramref name="repositoryConfiguration"/>, as follows.
+        ///
+        /// <see cref="Filter.RepositoryPaths"/> states the
         /// directories, relative to the root of the repository and separated by <c>/</c>,
         /// whose files are to be reported on; nested directories are included. If it is
         /// null or empty, the whole repository is reported on.
@@ -163,19 +172,19 @@ namespace SEE.VCS
         /// an expression selecting many branches makes for a long-running function
         /// call.
         /// </summary>
-        /// <param name="repositoryPath">The path of the repository to be reported on.</param>
+        /// <param name="repositoryConfiguration">The repository configuration based on which the
+        /// report is derived.</param>
         /// <param name="since">The beginning of the period to be reported on.</param>
-        /// <param name="filter">States which branches and which files are to be reported on.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         private static void AddNodesAfterDate
-              (string repositoryPath,
+              (GitRepository repositoryConfiguration,
                DateTimeOffset since,
-               Filter filter,
                Action<float> changePercentage,
                CancellationToken token)
         {
-            Criteria criteria = new(since, filter);
+            string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
+            Criteria criteria = new(since, repositoryConfiguration.VCSFilter);
             Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, ".mailmap"));
 
             using Repository repository = new(repositoryPath);
