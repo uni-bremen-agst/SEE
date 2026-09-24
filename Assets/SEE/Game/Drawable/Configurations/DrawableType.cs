@@ -89,7 +89,7 @@ namespace SEE.Game.Drawable.Configurations
                     new EditImageNetAction(surface.name, surfaceParentName, image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    GameEdit.ChangeMindMapNode(objectToEdit, node);
+                    GameMindMapEdit.ChangeMindMapNode(objectToEdit, node);
                     new EditMMNodeNetAction(surface.name, surfaceParentName, node).Execute();
                     break;
                 default:

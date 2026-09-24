@@ -1,6 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (FindChild(Conf.BorderConf.ID).transform.parent.gameObject != null)
             {
-                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.ID).transform.parent.gameObject, Conf);
+                GameMindMapEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.ID).transform.parent.gameObject, Conf);
             }
         }
     }
