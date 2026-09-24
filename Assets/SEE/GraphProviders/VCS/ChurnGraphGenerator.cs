@@ -15,14 +15,20 @@ namespace SEE.GraphProviders.VCS
 {
     /// <summary>
     /// Builds a graph of the files having a certain extension and located in one
-    /// of a set of directories: a node for every one of them that survived in a
-    /// selected branch, carrying the number of lines added, the number of lines
-    /// deleted, the number of commits and the authors, counting only commits
-    /// authored at or after a chosen date. The commits are those reachable from
-    /// any of the selected branches, each counted once however many reach it.
+    /// of a set of directories: a node for every one of them that survived,
+    /// carrying the number of lines added, the number of lines deleted, the
+    /// number of commits and the authors, with an edge between every two files
+    /// a commit changed together.
     ///
-    /// A file untouched in that period has a node all the same, its every count
-    /// standing at nought.
+    /// Which commits are counted is asked for in one of two ways.
+    /// <see cref="AddNodesAfterDate"/> takes a date and a set of branches, and
+    /// counts what was authored since, over the union of what those branches
+    /// reach, each commit counted once however many reach it.
+    /// <see cref="AddNodesForCommit"/> takes two commits and counts the range
+    /// between them. They differ in that and in nothing else.
+    ///
+    /// A file that survived but was not touched has a node all the same, its
+    /// every count standing at nought.
     /// </summary>
     /// <remarks>
     /// This is the LibGit2Sharp counterpart of the following query, aggregated
@@ -143,9 +149,6 @@ namespace SEE.GraphProviders.VCS
                CancellationToken token)
         {
             string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
-            Criteria criteria = new(new DateTimeOffset(startDate.Date, TimeSpan.Zero),
-                                    repositoryConfiguration.VCSFilter);
-            Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, Mailmap.Filename));
 
             // Two handles on the one repository for the time being: the session
             // decides which branches are relevant and which files exist, the
@@ -154,8 +157,9 @@ namespace SEE.GraphProviders.VCS
             using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
             using Repository repository = new(repositoryPath);
 
-            ICollection<Branch> selected = SelectedBranches(session, criteria);
-            Debug.Log(Selection(selected, criteria));
+            Criteria criteria = new(new DateTimeOffset(startDate.Date, TimeSpan.Zero),
+                                    repositoryConfiguration.VCSFilter,
+                                    SelectedBranches(session, repositoryConfiguration.VCSFilter));
             changePercentage?.Invoke(0.1f);
 
             // The files present at the tip of at least one relevant branch, as
@@ -163,7 +167,150 @@ namespace SEE.GraphProviders.VCS
             // globbing and the repository paths of the filter. A file deleted
             // meanwhile is not among them and is therefore left out of the
             // graph, however much churn its history holds.
-            HashSet<string> present = session.AllFiles(token);
+            AddNodes(graph, criteria, session, repository, session.AllFiles(token),
+                     repositoryPath, repositoryName, simplifyGraph, computeCoFileChanges,
+                     changePercentage, token);
+        }
+
+        /// <summary>
+        /// Adds to <paramref name="graph"/> a node for every file present at
+        /// <paramref name="commitID"/>, carrying what the commits between
+        /// <paramref name="baselineCommitID"/> and <paramref name="commitID"/>
+        /// hold against it, and an edge between every two files one of those
+        /// commits changed together.
+        ///
+        /// The commits taken into account are those reachable from
+        /// <paramref name="commitID"/> and not from
+        /// <paramref name="baselineCommitID"/>, so the baseline itself is left
+        /// out and the named commit is taken in. Merges are passed over, having
+        /// no churn of their own.
+        ///
+        /// Which files are taken into account is stated by
+        /// <see cref="GitRepository.VCSFilter"/> of
+        /// <paramref name="repositoryConfiguration"/>, as
+        /// <see cref="AddNodesAfterDate"/> describes, except that
+        /// <see cref="Filter.Branches"/> has no bearing here: the two commits
+        /// settle what is walked.
+        /// </summary>
+        /// <param name="graph">The graph the nodes and edges are added to.</param>
+        /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
+        /// one another is to be collapsed into its innermost one.</param>
+        /// <param name="repositoryConfiguration">The repository the graph is derived from,
+        /// along with the filter stating which of its files are taken into account.</param>
+        /// <param name="repositoryName">The name of the root node standing for the
+        /// repository.</param>
+        /// <param name="commitID">The commit the files are taken from and the changes are
+        /// counted up to; it is itself taken into account.</param>
+        /// <param name="baselineCommitID">The commit the changes are counted from; it is
+        /// itself left out.</param>
+        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// together.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        internal static void AddNodesForCommit
+              (Graph graph,
+               bool simplifyGraph,
+               GitRepository repositoryConfiguration,
+               string repositoryName,
+               string commitID,
+               string baselineCommitID,
+               bool computeCoFileChanges,
+               Action<float> changePercentage,
+               CancellationToken token)
+        {
+            string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
+
+            using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
+            using Repository repository = new(repositoryPath);
+
+            // Held against the repository here rather than left to the walk,
+            // where an unknown one surfaces as whatever libgit2 makes of it.
+            Check(repository, commitID, nameof(commitID));
+            Check(repository, baselineCommitID, nameof(baselineCommitID));
+
+            graph.BasePath = repositoryPath;
+            graph.Name = repositoryName;
+            graph.SetCommitID(commitID);
+            graph.SetRepositoryPath(repositoryPath);
+
+            Criteria criteria = new(baselineCommitID, commitID, repositoryConfiguration.VCSFilter);
+            changePercentage?.Invoke(0.1f);
+
+            // The files present at the named commit, as the session reports
+            // them, which is to say already passing the globbing and the
+            // repository paths of the filter. A file deleted before it is not
+            // among them and is therefore left out of the graph, however much
+            // churn the range holds against it.
+            AddNodes(graph, criteria, session, repository, session.AllFiles(commitID, token),
+                     repositoryPath, repositoryName, simplifyGraph, computeCoFileChanges,
+                     changePercentage, token);
+        }
+
+        /// <summary>
+        /// Throws unless <paramref name="sha"/> names a commit of
+        /// <paramref name="repository"/>.
+        /// </summary>
+        /// <param name="repository">The repository the commit is looked for in.</param>
+        /// <param name="sha">The SHA naming it.</param>
+        /// <param name="parameter">The name of the parameter <paramref name="sha"/> was
+        /// passed as, to be named in the exception.</param>
+        /// <exception cref="ArgumentException">Thrown where <paramref name="sha"/> is null,
+        /// empty or names no commit of the repository.</exception>
+        private static void Check(Repository repository, string sha, string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(sha))
+            {
+                throw new ArgumentException("A commit must be named.", parameter);
+            }
+            if (repository.Lookup<Commit>(sha) == null)
+            {
+                throw new ArgumentException($"{sha} names no commit of the repository at "
+                                            + $"{repository.Info.WorkingDirectory}.", parameter);
+            }
+        }
+
+        /// <summary>
+        /// Adds to <paramref name="graph"/> a node for every file of
+        /// <paramref name="present"/>, carrying what the commits
+        /// <paramref name="criteria"/> names hold against it, and an edge
+        /// between every two files one of those commits changed together.
+        /// </summary>
+        /// <remarks>
+        /// What the two entry points above have in common, which is everything
+        /// but the commits walked and the files that survive them.
+        /// </remarks>
+        /// <param name="graph">The graph the nodes and edges are added to.</param>
+        /// <param name="criteria">States which commits are walked, which of them count and
+        /// which files are taken into account.</param>
+        /// <param name="session">Used to read the content of a file, which the metrics of its
+        /// code are gathered from.</param>
+        /// <param name="repository">The repository to be walked.</param>
+        /// <param name="present">The files that survived, which are those a node is made
+        /// for.</param>
+        /// <param name="repositoryPath">The path of the repository, which the mailmap is
+        /// read from.</param>
+        /// <param name="repositoryName">The name of the root node standing for the
+        /// repository.</param>
+        /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
+        /// one another is to be collapsed into its innermost one.</param>
+        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// together.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        private static void AddNodes
+              (Graph graph,
+               Criteria criteria,
+               GitRepositorySession session,
+               Repository repository,
+               HashSet<string> present,
+               string repositoryPath,
+               string repositoryName,
+               bool simplifyGraph,
+               bool computeCoFileChanges,
+               Action<float> changePercentage,
+               CancellationToken token)
+        {
+            Debug.Log(criteria.Walked + "\n");
             changePercentage?.Invoke(0.3f);
             if (present.Count == 0)
             {
@@ -172,11 +319,13 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
+            Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, Mailmap.Filename));
+
             // Maps the name a file carries at the end onto the names it carried
             // before, gathered while the renames are followed.
             IDictionary<string, ISet<string>> formerNames = new Dictionary<string, ISet<string>>();
             IDictionary<string, Churn> churn
-                = ChurnOf(repository, selected, criteria, mailmap, formerNames,
+                = ChurnOf(repository, criteria, mailmap, formerNames,
                           present, computeCoFileChanges, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
@@ -187,15 +336,15 @@ namespace SEE.GraphProviders.VCS
             {
                 Debug.LogWarning(
                     $"Not one file of the repository is accounted for, though {withChurn} have "
-                    + $"churn in the period and {present.Count} are present at a tip. Either "
-                    + "nothing was changed in the period, or the paths the session reports "
-                    + "differ in form from the paths a comparison of two commits yields.\n");
+                    + $"churn in the period and {present.Count} survived. Either nothing was "
+                    + "changed in the period, or the paths the session reports differ in form "
+                    + "from the paths a comparison of two commits yields.\n");
             }
 
-            // A node for every file that survived in one of the branches, whether
-            // or not it was changed in the period, as GitGraphGenerator does. One
-            // untouched carries the metrics of its code and nothing else, every
-            // count of its history standing at nought.
+            // A node for every file that survived, whether or not it was changed
+            // in the period, as GitGraphGenerator does. One untouched carries the
+            // metrics of its code and nothing else, every count of its history
+            // standing at nought.
             IDictionary<string, Churn> all = new Dictionary<string, Churn>(churn);
             foreach (string path in present)
             {
@@ -213,10 +362,9 @@ namespace SEE.GraphProviders.VCS
             // just when the number is nought.
             int coChanges
                 = graph.Edges().Count(edge => edge.Type == DataModel.DG.VCS.CoChangeType);
-            Debug.Log($"{present.Count} files have a node, being what survived in the "
-                      + $"{selected.Count} branches; {churn.Count} of them were changed in the "
-                      + $"period, of {withChurn} changed in all, the rest having been deleted "
-                      + "since. "
+            Debug.Log($"{present.Count} files have a node, being what survived; "
+                      + $"{churn.Count} of them were changed in the period, of {withChurn} "
+                      + "changed in all, the rest having been deleted since. "
                       + $"{walked} commits were walked. "
                       + $"{coChanges} edges of type {DataModel.DG.VCS.CoChangeType} join two "
                       + "files a commit changed together.\n");
@@ -228,11 +376,11 @@ namespace SEE.GraphProviders.VCS
         /// the expressions of the filter occurs only once.
         /// </summary>
         /// <param name="session">The session whose relevant branches are asked for.</param>
-        /// <param name="criteria">States the expressions selecting the branches. Its filter
-        /// is the one <paramref name="session"/> was opened with.</param>
+        /// <param name="filter">States the expressions selecting the branches. It is the one
+        /// <paramref name="session"/> was opened with.</param>
         /// <returns>The selected branches, ordered by their name.</returns>
         private static ICollection<Branch> SelectedBranches
-              (GitRepositorySession session, Criteria criteria)
+              (GitRepositorySession session, SEE.VCS.Filter filter)
         {
             SortedDictionary<string, Branch> byName = new(StringComparer.Ordinal);
             // A symbolic reference, origin/HEAD in particular, only points at
@@ -249,7 +397,7 @@ namespace SEE.GraphProviders.VCS
             // that a mistyped one is named. Holding an expression against the
             // branches already selected suffices: a branch matching it would
             // have been selected by it.
-            foreach (string pattern in criteria.Filter.Branches ?? Enumerable.Empty<string>())
+            foreach (string pattern in filter.Branches ?? Enumerable.Empty<string>())
             {
                 SEE.VCS.Filter alone = new(branches: new string[] { pattern });
                 if (!byName.Values.Any(alone.Matches))
@@ -261,41 +409,19 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// The announcement of the branches <paramref name="selected"/> to be
-        /// walked. Emitted before the walk, so that an expression in
-        /// <paramref name="criteria"/> selecting far more branches than intended
-        /// shows at once rather than only once all of them have been walked.
-        /// </summary>
-        /// <param name="selected">The branches selected.</param>
-        /// <param name="criteria">States the expressions the branches were selected by.</param>
-        /// <returns>The announcement.</returns>
-        private static string Selection(ICollection<Branch> selected, Criteria criteria)
-        {
-            StringBuilder result = new();
-            result.AppendLine($"Reporting on the union of {selected.Count} branches, selected by "
-                              + string.Join(", ", criteria.Filter.Branches ?? Enumerable.Empty<string>())
-                              + ":");
-            foreach (Branch branch in selected)
-            {
-                result.AppendLine($"  {branch.FriendlyName}");
-            }
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// The churn of every file in scope, accumulated over the union of the
-        /// commits reachable from <paramref name="selected"/>, keyed by the name
-        /// the file carries at the end.
+        /// The churn of every file in scope, accumulated over the commits
+        /// <paramref name="criteria"/> names, keyed by the name the file
+        /// carries at the end.
         /// </summary>
         /// <remarks>
-        /// One walk over the union, not one per branch: a commit reachable from
-        /// several of the branches is one commit and is counted once. Summing
-        /// what each branch yields separately would count the history they share
-        /// once per branch, which for a file of SEE is a factor of some thirty.
+        /// One walk, however many branches are reported on: a commit reachable
+        /// from several of them is one commit and is counted once. Summing what
+        /// each branch yields separately would count the history they share once
+        /// per branch, which for a file of SEE is a factor of some thirty.
         /// </remarks>
         /// <param name="repository">The repository to be walked.</param>
-        /// <param name="selected">The branches whose commits are to be taken into account.</param>
-        /// <param name="criteria">States from when and which files are taken into account.</param>
+        /// <param name="criteria">States which commits are walked, which of them count and
+        /// which files are taken into account.</param>
         /// <param name="mailmap">Used to map an author onto their canonical name.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end; will be extended.</param>
@@ -308,7 +434,6 @@ namespace SEE.GraphProviders.VCS
         /// <returns>The churn per file.</returns>
         private static IDictionary<string, Churn> ChurnOf
               (Repository repository,
-               ICollection<Branch> selected,
                Criteria criteria,
                Mailmap mailmap,
                IDictionary<string, ISet<string>> formerNames,
@@ -333,17 +458,8 @@ namespace SEE.GraphProviders.VCS
                     RenameThreshold = renameThreshold
                 }
             };
-            CommitFilter filter = new()
-            {
-                IncludeReachableFrom = selected,
-                // Newest commit first, just as git log reports them. A rename is
-                // thus seen before the commits preceding it, which still use the
-                // former name of the renamed file.
-                SortBy = CommitSortStrategies.Time
-            };
-
             walked = 0;
-            foreach (Commit commit in repository.Commits.QueryBy(filter))
+            foreach (Commit commit in repository.Commits.QueryBy(criteria.Commits))
             {
                 token.ThrowIfCancellationRequested();
                 walked++;
@@ -357,9 +473,8 @@ namespace SEE.GraphProviders.VCS
                 // against the empty tree, which a null tree denotes.
                 LibGit2Sharp.Tree parent = commit.Parents.FirstOrDefault()?.Tree;
                 Signature author = commit.Author;
-                bool within = author.When >= criteria.Since;
 
-                if (within)
+                if (criteria.Counts(commit))
                 {
                     using Patch patch = Compare<Patch>(repository, criteria, parent, commit.Tree,
                                                        compareOptions);
@@ -732,22 +847,37 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// What is taken into account: from when, which files, which branches.
-        /// Handed to everything needing to know, so that it is stated in one
-        /// place only.
+        /// What is taken into account: which commits are walked, which of those
+        /// count, and which files. Handed to everything needing to know, so
+        /// that it is stated in one place only.
         /// </summary>
+        /// <remarks>
+        /// The two entry points differ in this and in nothing else. One walks
+        /// the union of a set of branches and counts what was authored since a
+        /// date, the older commits being walked for their renames alone; the
+        /// other walks a range of commits and counts every one of them.
+        /// </remarks>
         private class Criteria
         {
             /// <summary>
             /// The beginning of the period taken into account; commits authored
-            /// at this very instant are still taken into account.
+            /// at this very instant are still taken into account. Null where
+            /// every commit walked is taken into account, which is so for a
+            /// range: the two commits are the boundary.
             /// </summary>
-            internal DateTimeOffset Since { get; }
+            private readonly DateTimeOffset? since;
 
             /// <summary>
-            /// States which branches and which files are taken into account.
+            /// The commits to be walked.
             /// </summary>
-            internal SEE.VCS.Filter Filter { get; }
+            internal CommitFilter Commits { get; }
+
+            /// <summary>
+            /// What is walked, in words, for the log. Emitted before the walk,
+            /// so that a filter taking in far more than was intended shows at
+            /// once rather than only once everything has been walked.
+            /// </summary>
+            internal string Walked { get; }
 
             /// <summary>
             /// The pathspec narrowing every comparison of a commit against its
@@ -757,7 +887,7 @@ namespace SEE.GraphProviders.VCS
             internal IEnumerable<string> Pathspec { get; }
 
             /// <summary>
-            /// Decides the globbing of <see cref="Filter"/>. Held here because
+            /// Decides the globbing of the filter. Held here because
             /// <see cref="SEE.VCS.Filter.Matcher"/> builds a new one on every
             /// access, and this one is consulted for every file of every commit.
             /// </summary>
@@ -765,25 +895,96 @@ namespace SEE.GraphProviders.VCS
             private readonly Matcher matcher;
 
             /// <summary>
-            /// Constructor setting all properties from the parameters of the
-            /// same name.
+            /// What is taken into account over a period: the commits reachable
+            /// from <paramref name="branches"/>, of which those authored at or
+            /// after <paramref name="since"/> count.
             /// </summary>
+            /// <remarks>
+            /// The commits before the period are walked all the same, their
+            /// renames being needed: leaving them out would break the chain of
+            /// names and split a file over two nodes.
+            /// </remarks>
             /// <param name="since">The beginning of the period taken into account.</param>
-            /// <param name="filter">States which branches and which files are taken into
-            /// account.</param>
-            internal Criteria(DateTimeOffset since, SEE.VCS.Filter filter)
+            /// <param name="filter">States which files are taken into account.</param>
+            /// <param name="branches">The branches whose commits are walked, together.</param>
+            internal Criteria(DateTimeOffset since, SEE.VCS.Filter filter,
+                              ICollection<Branch> branches)
+                : this(filter)
             {
-                Since = since;
-                Filter = filter;
+                this.since = since;
+                Commits = new CommitFilter
+                {
+                    IncludeReachableFrom = branches,
+                    // Newest commit first, just as git log reports them. A rename
+                    // is thus seen before the commits preceding it, which still
+                    // use the former name of the renamed file.
+                    SortBy = CommitSortStrategies.Time
+                };
+
+                StringBuilder walked = new();
+                walked.AppendLine($"Reporting on the union of {branches.Count} branches, "
+                                  + "selected by "
+                                  + string.Join(", ", filter.Branches ?? Enumerable.Empty<string>())
+                                  + ":");
+                foreach (Branch branch in branches)
+                {
+                    walked.AppendLine($"  {branch.FriendlyName}");
+                }
+                Walked = walked.ToString();
+            }
+
+            /// <summary>
+            /// What is taken into account over a range: the commits reachable
+            /// from <paramref name="commitID"/> and not from
+            /// <paramref name="baselineCommitID"/>, every one of which counts.
+            /// </summary>
+            /// <param name="baselineCommitID">The commit the range starts after; it is
+            /// itself left out.</param>
+            /// <param name="commitID">The commit the range ends at; it is itself taken
+            /// in.</param>
+            /// <param name="filter">States which files are taken into account.</param>
+            internal Criteria(string baselineCommitID, string commitID, SEE.VCS.Filter filter)
+                : this(filter)
+            {
+                since = null;
+                Commits = new CommitFilter
+                {
+                    IncludeReachableFrom = commitID,
+                    ExcludeReachableFrom = baselineCommitID,
+                    // Newest first, as above: the renames must be seen before
+                    // the commits that precede them.
+                    SortBy = CommitSortStrategies.Time
+                };
+                Walked = $"Reporting on the commits reachable from {commitID} and not from "
+                         + $"{baselineCommitID}.";
+            }
+
+            /// <summary>
+            /// Sets what the two constructors above have in common.
+            /// </summary>
+            /// <param name="filter">States which files are taken into account.</param>
+            private Criteria(SEE.VCS.Filter filter)
+            {
                 matcher = filter.Matcher;
                 Pathspec = filter.RepositoryPaths == null || filter.RepositoryPaths.Length == 0
                            ? null : filter.RepositoryPaths;
             }
 
             /// <summary>
+            /// Whether the churn of <paramref name="commit"/> is taken into
+            /// account, as against its renames alone, which always are.
+            /// </summary>
+            /// <param name="commit">The commit to be judged.</param>
+            /// <returns>True if and only if its churn counts.</returns>
+            internal bool Counts(Commit commit)
+            {
+                return since == null || commit.Author.When >= since.Value;
+            }
+
+            /// <summary>
             /// Whether <paramref name="path"/> denotes a file taken into account,
-            /// that is, one lying in one of the directories of
-            /// <see cref="Filter"/> and passing its globbing.
+            /// that is, one lying in one of the directories of the filter and
+            /// passing its globbing.
             /// </summary>
             /// <param name="path">The path to be checked, relative to the root of
             /// the repository and separated by <c>/</c>; may be null.</param>
