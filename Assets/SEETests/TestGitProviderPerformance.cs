@@ -32,7 +32,7 @@ namespace SEE.GraphProviders
                 // Do nothing here
             }
 
-            GitGraphGenerator.AddNodesAfterDate(new Graph(), false, gitRepository, repoName, DateTime.Now, false, ReportProgress, default);
+            ChurnGraphGenerator.AddNodesAfterDate(new Graph(), false, gitRepository, repoName, DateTime.Now, false, ReportProgress, default);
 
             GitBranchesGraphProvider provider = new()
             {

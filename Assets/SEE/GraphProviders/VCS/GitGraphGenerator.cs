@@ -144,9 +144,9 @@ namespace SEE.GraphProviders.VCS
 
             using GitRepositorySession gitSession = repository.OpenGitSession();
 
-            /// Note: The following code is very similar to
-            /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, Action{float}, CancellationToken)"/>".
-            /// The difference is that we consider only the files present at <paramref name="commitID"/>
+            /// Note: The following code answers the same question as
+            /// <see cref="ChurnGraphGenerator.AddNodesAfterDate"/> for a range of commits
+            /// rather than a period: we consider only the files present at <paramref name="commitID"/>
             /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
             HashSet<string> files = gitSession.AllFiles(commitID, token);
@@ -209,76 +209,6 @@ namespace SEE.GraphProviders.VCS
             }
 
             Finalize(graph, simplifyGraph, repositorySession, repositoryName, fileToMetrics);
-        }
-
-        /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
-        /// for the relevant files specified in the given <paramref name="repositoryConfiguration"/> present after the given
-        /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
-        /// <see cref="GitFileMetrics"/> are calculated, too.
-        /// </summary>
-        /// <param name="graph">Where to add the file metrics.</param>
-        /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repositoryConfiguration"> The repository configuration based on which the nodes and metrics are derived.</param>
-        /// <param name="repositoryName">The name of the repository.</param>
-        /// <param name="startDate">The date from which on commits in the history should be considered,
-        /// the day it names taken in; it denotes the instant that day begins at, in UTC.
-        /// Older commits will be ignored.</param>
-        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="changePercentage">To report the progress.</param>
-        ///  <param name="token">Can be used to cancel the action.</param>
-        internal static void AddNodesAfterDate
-            (Graph graph,
-             bool simplifyGraph,
-             GitRepository repositoryConfiguration,
-             string repositoryName,
-             DateTime startDate,
-             bool computeCoFileChanges,
-             Action<float> changePercentage,
-             CancellationToken token)
-        {
-            /// Note: The following code is very similar to
-            /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, Action{float}, CancellationToken)"/>".
-            /// The difference is that we consider all relevant files passing the repository
-            /// filter and all commits after <paramref name="startDate"/>.
-
-            Performance p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: collect files");
-            using GitRepositorySession gitSession = repositoryConfiguration.OpenGitSession();
-            // all files in the repository passing the repository filter, if any, and present in any of the relevant branches.
-            HashSet<string> files = gitSession.AllFiles(token);
-            p.End(true);
-            if (files.Count == 0)
-            {
-                Debug.LogWarning("No files were matched.\n");
-                changePercentage?.Invoke(1.0f);
-                return;
-            }
-            changePercentage?.Invoke(0.3f);
-
-            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: prepare metrics");
-            FileToMetrics fileToMetrics = Prepare(graph, files);
-            p.End(true);
-            changePercentage?.Invoke(0.5f);
-            token.ThrowIfCancellationRequested();
-
-            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: update metrics");
-            Matcher filterMatcher = repositoryConfiguration.VCSFilter?.Matcher;
-            gitSession.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
-            p.End(true);
-            changePercentage?.Invoke(0.6f);
-
-            p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: finalize");
-            Finalize(graph, simplifyGraph, gitSession, repositoryName, fileToMetrics);
-            p.End(true);
-            changePercentage?.Invoke(1f);
-
-            void UpdateMetricsForCommit(Repository repo, Commit commit)
-            {
-                token.ThrowIfCancellationRequested();
-                GitGraphGenerator.UpdateMetricsForCommit
-                    (fileToMetrics, gitSession, commit, computeCoFileChanges, gitSession.Mailmap, filterMatcher);
-            }
         }
 
         /// <summary>

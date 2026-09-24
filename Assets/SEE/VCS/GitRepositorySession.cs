@@ -260,24 +260,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Runs <paramref name="apply"/> for each non-merge commit after the given <paramref name="startDate"/>
-        /// until today.
-        ///
-        /// The callback <paramref name="apply"/> is called with the current repository and the
-        /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback.
-        /// </summary>
-        /// <param name = "startDate" > The date after which commits should be retrieved.</param>
-        /// <param name="apply">Callback to be called for each commit.</param>
-        public void ForEachCommitAfter(DateTime startDate, Action<Repository, Commit> apply)
-        {
-            foreach (Commit commit in CommitsAfter(repository, startDate))
-            {
-                apply(repository, commit);
-            }
-        }
-
-        /// <summary>
         /// Returns the commit with the given <paramref name="commitID"/> from the repository.
         /// If there is no such <paramref name="commitID"/>, an exception is thrown.
         /// </summary>

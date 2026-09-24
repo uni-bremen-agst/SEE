@@ -71,7 +71,7 @@ namespace SEE.GraphProviders
         ///
         /// This method will collect all commits from all branches which are not older than <see cref="Date"/>.
         /// Then from all these commits the metrics are calculated with
-        /// <see cref="GitGraphGenerator.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
+        /// <see cref="ChurnGraphGenerator.AddNodesAfterDate"/>.
         /// </summary>
         /// <param name="graph">The input graph.</param>
         /// <param name="changePercentage">To report the current status of the process. May be null.</param>
@@ -99,7 +99,7 @@ namespace SEE.GraphProviders
             // We are assuming that CheckAttributes() was already executed so that the date string is
             // neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
-            GitGraphGenerator.AddNodesAfterDate
+            ChurnGraphGenerator.AddNodesAfterDate
                 (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
                  ComputeCoFileChanges, changePercentage, token);
 
