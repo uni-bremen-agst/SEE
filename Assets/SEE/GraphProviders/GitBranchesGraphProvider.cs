@@ -59,8 +59,11 @@ namespace SEE.GraphProviders
             }
             CheckAttributes(branchCity);
 
-            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
-                cancellationToken: token);
+            //using (DeepProfiler.Capture($"{nameof(GitBranchesGraphProvider)}.{nameof(ProvideAsync)}"))
+            {
+                return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
+                                                     cancellationToken: token);
+            }
         }
 
         /// <summary>
@@ -98,8 +101,7 @@ namespace SEE.GraphProviders
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
             GitGraphGenerator.AddNodesAfterDate
                 (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
-                 CombineAuthors, AuthorAliasMap, ComputeCoFileChanges,
-                 changePercentage, token);
+                 ComputeCoFileChanges, changePercentage, token);
 
             changePercentage?.Invoke(1f);
 

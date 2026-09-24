@@ -66,8 +66,7 @@ namespace SEE.GraphProviders
 
             return await UniTask.RunOnThreadPool<Graph>(() => GitGraphGenerator.AddNodesForCommit
             (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
-                CombineAuthors, ComputeCoFileChanges, AuthorAliasMap,
-                changePercentage, token));
+                ComputeCoFileChanges, changePercentage, token));
         }
 
         /// <summary>

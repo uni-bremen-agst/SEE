@@ -65,8 +65,6 @@ namespace SEE.GraphProviders.VCS
                   repositoryConfiguration: repository,
                   repositoryName: "SEE",
                   startDate: startDate,
-                  consultAliasMap: false,
-                  authorAliasMap: new AuthorMapping(),
                   computeCoFileChanges: true,
                   changePercentage: null,
                   token: default

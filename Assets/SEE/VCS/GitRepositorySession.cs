@@ -40,6 +40,20 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// The mapping the .mailmap file at the root of this repository states,
+        /// read when first asked for. Where there is no such file, it maps
+        /// nothing and every author is named as their commits name them.
+        /// </summary>
+        internal Mailmap Mailmap
+            => mailmap ??= Mailmap.Read(Path.Combine(repositoryConfig.RepositoryPath.Path,
+                                                     Mailmap.Filename));
+
+        /// <summary>
+        /// Backs <see cref="Mailmap"/>. Null until that is first asked for.
+        /// </summary>
+        private Mailmap mailmap;
+
+        /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
         /// <returns>True if there are any changes (new, deleted, or changed remote branches); false otherwise.</returns>
@@ -679,39 +693,7 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
-        /// will be returned.
-        /// Otherwise: Returns the alias of the specified <paramref name="author"/> if it exists in the alias mapping;
-        /// or else returns the original <paramref name="author"/>.
-        ///
-        /// For two <see cref="FileAuthor"/>s to match, they must have same name and email address,
-        /// where the string comparison for both facets is case-insensitive.
-        /// </summary>
-        /// <param name="author">The author whose alias is to be retrieved.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
-        /// <returns>A <see cref="FileAuthor"/> instance representing the alias of the author if found,
-        /// or the original author if no alias exists or if <paramref name="consultAliasMap"/> is false.</returns>
-        public static FileAuthor GetAuthorAliasIfExists(FileAuthor author, bool consultAliasMap, AuthorMapping authorAliasMap)
-        {
-            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
-            return ResolveAuthorAliasIfEnabled(author, consultAliasMap, authorAliasMap) ?? author;
-
-            static FileAuthor ResolveAuthorAliasIfEnabled(FileAuthor author, bool combineSimilarAuthors, AuthorMapping authorAliasMap)
-            {
-                if (!combineSimilarAuthors)
-                {
-                    return null;
-                }
-                return authorAliasMap
-                    .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
-                                                               && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
-            }
-        }
-
-        /// <summary>
-        /// Disposes of the LibGit2Sharp git repository instance.
+        /// Disposes the LibGit2Sharp git repository instance.
         /// </summary>
         public void Dispose()
         {

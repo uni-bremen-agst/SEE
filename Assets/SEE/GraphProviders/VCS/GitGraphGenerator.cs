@@ -117,10 +117,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>The input <paramref name="graph"/> with the added nodes.</returns>
@@ -130,9 +127,7 @@ namespace SEE.GraphProviders.VCS
              GitRepository repository,
              string commitID,
              string baselineCommitID,
-             bool consultAliasMap,
              bool computeCoFileChanges,
-             AuthorMapping authorAliasMap,
              Action<float> changePercentage = null,
              CancellationToken token = default)
         {
@@ -150,7 +145,7 @@ namespace SEE.GraphProviders.VCS
             using GitRepositorySession gitSession = repository.OpenGitSession();
 
             /// Note: The following code is very similar to
-            /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, Action{float}, CancellationToken)"/>".
             /// The difference is that we consider only the files present at <paramref name="commitID"/>
             /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
@@ -175,7 +170,8 @@ namespace SEE.GraphProviders.VCS
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 token.ThrowIfCancellationRequested();
-                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, gitSession, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, matcher);
+                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, gitSession, commit, computeCoFileChanges,
+                                                         gitSession.Mailmap, matcher);
             }
         }
 
@@ -193,10 +189,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitChanges">The changes associated with each commit in <paramref name="commitsInBetween"/>;
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
         internal static void AddNodesForCommits
             (Graph graph,
              bool simplifyGraph,
@@ -205,15 +198,14 @@ namespace SEE.GraphProviders.VCS
              HashSet<string> files,
              IList<Commit> commitsInBetween,
              IDictionary<Commit, Patch> commitChanges,
-             bool consultAliasMap,
-             bool computeCoFileChanges,
-             AuthorMapping authorAliasMap)
+             bool computeCoFileChanges)
         {
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, computeCoFileChanges, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween],
+                                      computeCoFileChanges, repositorySession.Mailmap);
             }
 
             Finalize(graph, simplifyGraph, repositorySession, repositoryName, fileToMetrics);
@@ -232,10 +224,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
         /// <param name="changePercentage">To report the progress.</param>
         ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
@@ -244,19 +233,18 @@ namespace SEE.GraphProviders.VCS
              GitRepository repositoryConfiguration,
              string repositoryName,
              DateTime startDate,
-             bool consultAliasMap,
-             AuthorMapping authorAliasMap,
              bool computeCoFileChanges,
              Action<float> changePercentage,
              CancellationToken token)
         {
             /// Note: The following code is very similar to
-            /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, Action{float}, CancellationToken)"/>".
             /// The difference is that we consider all relevant files passing the repository
             /// filter and all commits after <paramref name="startDate"/>.
 
             Performance p = Performance.Begin($"{nameof(GitGraphGenerator)}.{nameof(AddNodesAfterDate)}: collect files");
             using GitRepositorySession gitSession = repositoryConfiguration.OpenGitSession();
+            // all files in the repository passing the repository filter, if any, and present in any of the relevant branches.
             HashSet<string> files = gitSession.AllFiles(token);
             p.End(true);
             if (files.Count == 0)
@@ -288,7 +276,7 @@ namespace SEE.GraphProviders.VCS
             {
                 token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
-                    (fileToMetrics, gitSession, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, filterMatcher);
+                    (fileToMetrics, gitSession, commit, computeCoFileChanges, gitSession.Mailmap, filterMatcher);
             }
         }
 
@@ -301,17 +289,14 @@ namespace SEE.GraphProviders.VCS
         /// will be used.</param>
         /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
+        /// <param name="mailmap">States the canonical identity of an author.</param>
         private static void UpdateMetricsForPatch
             (FileToMetrics fileToMetrics,
             Commit commit,
             Patch patch,
-            bool consultAliasMap,
             bool computeCoFileChanges,
-            AuthorMapping authorAliasMap)
+            Mailmap mailmap)
         {
             if (patch == null || commit == null)
             {
@@ -319,8 +304,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             FileAuthor committer
-                = GitRepositorySession.GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
-                                                       consultAliasMap, authorAliasMap);
+                = mailmap.AuthorOf(commit.Author);
 
             foreach (PatchEntryChanges changedFile in patch)
             {
@@ -400,19 +384,16 @@ namespace SEE.GraphProviders.VCS
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map.</param>
         /// <param name="gitSession">The repository session from which the data is to be gathered.</param>
         /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/>.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
+        /// <param name="mailmap">States the canonical identity of an author.</param>
         /// <param name="matcher">Optional file glob matcher. If non-null, commits that do not change
         /// any matching files will be skipped.</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
              GitRepositorySession gitSession,
              Commit commit,
-             bool consultAliasMap,
              bool computeCoFileChanges,
-             AuthorMapping authorAliasMap,
+             Mailmap mailmap,
              Matcher matcher = null)
         {
             if (commit == null)
@@ -427,7 +408,7 @@ namespace SEE.GraphProviders.VCS
                     if (gitSession.HasRelevantChanges(parent, commit, matcher, out IEnumerable<string> filePaths))
                     {
                         using Patch patch = gitSession.Diff(parent, commit, filePaths);
-                        UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
+                        UpdateMetricsForPatch(fileToMetrics, commit, patch, computeCoFileChanges, mailmap);
                     }
                 }
             }
@@ -437,7 +418,7 @@ namespace SEE.GraphProviders.VCS
                 if (gitSession.HasRelevantChanges(null, commit, matcher, out IEnumerable<string> filePaths))
                 {
                     using Patch patch = gitSession.Diff(null, commit, filePaths);
-                    UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
+                    UpdateMetricsForPatch(fileToMetrics, commit, patch, computeCoFileChanges, mailmap);
                 }
             }
         }

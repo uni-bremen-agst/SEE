@@ -49,33 +49,10 @@ namespace SEE.GraphProviders.Evolution
         public bool SimplifyGraph;
 
         /// <summary>
-        /// If this is true, the authors of the commits with similar identities will be combined.
-        /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
-        /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
-        /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined.")]
-        public bool CombineAuthors;
-
-        /// <summary>
         /// Whether every co-changed files for the commit should be computed.
         /// Co-changed files are files that are changed in the same commit as other files.
         /// </summary>
         public bool ComputeCoFileChanges = false;
-
-        /// <summary>
-        /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
-        /// This is used to manually group commit authors with similar identities together.
-        /// The mapping enables aggregating commit data under a single normalized author identity.
-        /// </summary>
-        [NonSerialized, OdinSerialize,
-         DictionaryDrawerSettings(
-              DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
-              KeyLabel = "Author", ValueLabel = "Aliases"),
-         Tooltip("Author alias mapping."),
-         ShowIf("CombineAuthors"),
-         RuntimeShowIf("CombineAuthors"),
-         HideReferenceObjectPicker]
-        public AuthorMapping AuthorAliasMap = new();
 
         /// <summary>
         /// Provides the evolution graph of the git repository.
@@ -203,7 +180,7 @@ namespace SEE.GraphProviders.Evolution
             using GitRepositorySession gitRepositorySession = GitRepository.OpenGitSession();
             GitGraphGenerator.AddNodesForCommits
                 (graph, SimplifyGraph, gitRepositorySession, repoName, files, commitsInBetween, commitChanges,
-                CombineAuthors, ComputeCoFileChanges, AuthorAliasMap);
+                ComputeCoFileChanges);
             return graph;
         }
 
@@ -231,16 +208,6 @@ namespace SEE.GraphProviders.Evolution
         private const string simplifyGraphLabel = "SimplifyGraph";
 
         /// <summary>
-        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
-        /// </summary>
-        private const string combineAuthorsLabel = "CombineAuthors";
-
-        /// <summary>
-        /// Label of attribute <see cref="AuthorAliasMap"/> in the configuration file.
-        /// </summary>
-        private const string authorAliasMapLabel = "AuthorAliasMap";
-
-        /// <summary>
         /// Label of attribute <see cref="ComputeCoFileChanges"/> in the configuration file.
         /// </summary>
         private const string computeCoFileChangesLabel = "ComputeCoFileChanges";
@@ -254,8 +221,6 @@ namespace SEE.GraphProviders.Evolution
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(Date, dateLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
-            writer.Save(CombineAuthors, combineAuthorsLabel);
-            AuthorAliasMap.Save(writer, authorAliasMapLabel);
             writer.Save(ComputeCoFileChanges, computeCoFileChangesLabel);
         }
 
@@ -268,8 +233,6 @@ namespace SEE.GraphProviders.Evolution
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
-            ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
-            AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
             ConfigIO.Restore(attributes, computeCoFileChangesLabel, ref ComputeCoFileChanges);
         }
         #endregion Config IO

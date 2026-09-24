@@ -18,7 +18,7 @@ namespace SEE.GraphProviders
     {
         private const string defaultDate = "2026/06/01";
 
-        public async UniTask Provide(string gitDir, Globbing glob, List<string> repoPaths, string branch, string repoName)
+        public async UniTask ProvideAsync(string gitDir, Globbing glob, List<string> repoPaths, string branch, string repoName)
         {
 
             GameObject go = new();
@@ -32,7 +32,7 @@ namespace SEE.GraphProviders
                 // Do nothing here
             }
 
-            GitGraphGenerator.AddNodesAfterDate(new Graph(), false, gitRepository, repoName, DateTime.Now, false, null, false, ReportProgress, default);
+            GitGraphGenerator.AddNodesAfterDate(new Graph(), false, gitRepository, repoName, DateTime.Now, false, ReportProgress, default);
 
             GitBranchesGraphProvider provider = new()
             {
@@ -55,7 +55,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, null, "origin/main", "bubbletea").ToCoroutine();
+                    ProvideAsync("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, null, "origin/main", "bubbletea").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -70,7 +70,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("TestRepos/express", new Globbing() { { "**/*.js", true } }, null, "origin/master", "express").ToCoroutine();
+                    ProvideAsync("TestRepos/express", new Globbing() { { "**/*.js", true } }, null, "origin/master", "express").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -85,7 +85,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("TestRepos/node", new Globbing() { { "**/*.js", true }, }, null, "origin/main", "node").ToCoroutine();
+                    ProvideAsync("TestRepos/node", new Globbing() { { "**/*.js", true }, }, null, "origin/main", "node").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
