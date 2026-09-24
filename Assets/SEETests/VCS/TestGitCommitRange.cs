@@ -62,10 +62,11 @@ namespace SEE.VCS
 
             Performance p = Performance.Begin($"Adding nodes for {repositoryName} commits "
                                               + $"{Short(baselineCommitID)}..{Short(commitID)}");
-            GitGraphGenerator.AddNodesForCommit
+            ChurnGraphGenerator.AddNodesForCommit
                 (graph: graph,
                  simplifyGraph: true,
-                 repository: repositoryConfiguration,
+                 repositoryConfiguration: repositoryConfiguration,
+                 repositoryName: repositoryName,
                  commitID: commitID,
                  baselineCommitID: baselineCommitID,
                  computeCoFileChanges: true,

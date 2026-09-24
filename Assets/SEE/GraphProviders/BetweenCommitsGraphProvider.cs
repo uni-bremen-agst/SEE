@@ -64,9 +64,26 @@ namespace SEE.GraphProviders
         {
             CheckArguments(city);
 
-            return await UniTask.RunOnThreadPool<Graph>(() => GitGraphGenerator.AddNodesForCommit
-            (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
-                ComputeCoFileChanges, changePercentage, token));
+            return await UniTask.RunOnThreadPool<Graph>(() => GetGraph(graph, changePercentage, token));
+        }
+
+        /// <summary>
+        /// Adds the nodes and metrics of the commits between
+        /// <see cref="BaselineCommitID"/> and <see cref="CommitID"/> to
+        /// <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph into which the metrics shall be loaded.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>The graph handed in, with the nodes and metrics added.</returns>
+        private Graph GetGraph(Graph graph, Action<float> changePercentage, CancellationToken token)
+        {
+            string repositoryPath = GitRepository.RepositoryPath.Path;
+            ChurnGraphGenerator.AddNodesForCommit
+                (graph, SimplifyGraph, GitRepository,
+                 Utils.Filenames.InnermostDirectoryName(repositoryPath),
+                 CommitID, BaselineCommitID, ComputeCoFileChanges, changePercentage, token);
+            return graph;
         }
 
         /// <summary>
