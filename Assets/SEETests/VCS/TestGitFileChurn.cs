@@ -143,7 +143,8 @@ namespace SEE.VCS
         public void TestChurn(DateTimeOffset since, GitRepository repositoryConfiguration)
         {
             Outcome outcome = AddNodesAfterDate(repositoryConfiguration, since,
-                                                computeCoFileChanges: true, default, default);
+                                                simplifyGraph: true, computeCoFileChanges: true,
+                                                default, default);
             Baseline.CompareOrWrite(TestContext.CurrentContext.Test.Name, outcome);
         }
 
@@ -186,6 +187,8 @@ namespace SEE.VCS
         /// <param name="repositoryConfiguration">The repository configuration based on which the
         /// report is derived.</param>
         /// <param name="since">The beginning of the period to be reported on.</param>
+        /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
+        /// one another is to be collapsed into its innermost one.</param>
         /// <param name="computeCoFileChanges">Whether to note which files a commit changed
         /// together. Mind that this is far from free: for SEE it comes to some hundred
         /// thousand pairs, and the node of one file may name several hundred others.</param>
@@ -194,6 +197,7 @@ namespace SEE.VCS
         private static Outcome AddNodesAfterDate
               (GitRepository repositoryConfiguration,
                DateTimeOffset since,
+               bool simplifyGraph,
                bool computeCoFileChanges,
                Action<float> changePercentage,
                CancellationToken token)
@@ -238,7 +242,7 @@ namespace SEE.VCS
                         + "nothing was changed in the period, or the paths the session reports "
                         + "differ in form from the paths a comparison of two commits yields.");
 
-            Graph graph = GraphOf(churn, formerNames, repositoryPath, session);
+            Graph graph = GraphOf(churn, formerNames, repositoryPath, session, simplifyGraph);
             string report = Summary(graph) + Report(churn, formerNames, criteria, selected);
             Debug.Log(report);
             foreach (KeyValuePair<string, Churn> file in churn)
@@ -1014,9 +1018,10 @@ namespace SEE.VCS
         /// every file, which for a repository the size of SEE is the greater
         /// part of the time this takes.
         ///
-        /// Nor is the hierarchy simplified: <see cref="GitGraphGenerator"/> can
-        /// collapse a chain of directory nodes into its innermost one, which is
-        /// left for later along with the flag asking for it.
+        /// A chain of directory nodes holding nothing but one another is
+        /// collapsed into its innermost one where <paramref name="simplifyGraph"/>
+        /// says so, again by <see cref="GitGraphGenerator"/>. Only directory
+        /// nodes go, so the edges between files outlive it.
         /// </remarks>
         /// <param name="churn">The churn per file the graph is to hold.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
@@ -1024,10 +1029,13 @@ namespace SEE.VCS
         /// <param name="repositoryPath">The path of the repository the graph stands for.</param>
         /// <param name="session">Used to read the content of a file, which the metrics of its
         /// code are gathered from.</param>
+        /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
+        /// one another is to be collapsed into its innermost one.</param>
         /// <returns>The graph.</returns>
         private static Graph GraphOf(IDictionary<string, Churn> churn,
                                      IDictionary<string, ISet<string>> formerNames,
-                                     string repositoryPath, GitRepositorySession session)
+                                     string repositoryPath, GitRepositorySession session,
+                                     bool simplifyGraph)
         {
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
             Graph result = new(repositoryPath, repositoryName);
@@ -1071,6 +1079,10 @@ namespace SEE.VCS
             GitGraphGenerator.AddCodeMetrics(result, session);
             AddCoChanges(result, churn, nodes);
             result.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
+            // After the root, which the collapsing starts from, and again by
+            // GitGraphGenerator rather than afresh. Only directory nodes are
+            // affected, so the edges drawn above outlive it.
+            GitGraphGenerator.Simplify(result, simplifyGraph);
             result.FinalizeNodeHierarchy();
             return result;
         }

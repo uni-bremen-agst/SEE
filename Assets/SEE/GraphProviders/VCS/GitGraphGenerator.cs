@@ -553,7 +553,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">Graph to be simplified.</param>
         /// <param name="simplifyGraph">Whether the graph should be simplified.</param>
-        private static void Simplify(Graph graph, bool simplifyGraph)
+        internal static void Simplify(Graph graph, bool simplifyGraph)
         {
             if (simplifyGraph)
             {
