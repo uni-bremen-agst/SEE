@@ -87,7 +87,7 @@ namespace SEE.UI.Menu.Drawable
             /// the current order-in-layer value.
             AssignOrderInLayer(order =>
             {
-                GameEdit.ChangeLayer(imageObj, order);
+                GameLayerChanger.SetOrderInLayer(imageObj, order);
                 imageConf.OrderInLayer = order;
 
                 ImageConf conf = ImageConf.GetImageConf(imageObj);

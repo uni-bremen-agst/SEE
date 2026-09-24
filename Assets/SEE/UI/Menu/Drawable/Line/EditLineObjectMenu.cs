@@ -47,7 +47,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             controls.LayerSliderController.OnValueChanged.AddListener(layerOrder =>
             {
-                GameEdit.ChangeLayer(selectedLine, layerOrder);
+                GameLayerChanger.SetOrderInLayer(selectedLine, layerOrder);
                 lineHolder.OrderInLayer = layerOrder;
 
                 new EditLayerNetAction(

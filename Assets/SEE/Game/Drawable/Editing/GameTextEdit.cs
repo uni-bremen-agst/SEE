@@ -21,7 +21,7 @@ namespace SEE.Game.Drawable.Editing
             {
                 ChangeText(textObj, text.Text);
                 ChangeFontSize(textObj, text.FontSize);
-                GameEdit.ChangeLayer(textObj, text.OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(textObj, text.OrderInLayer);
                 ChangeFontStyles(textObj, text.FontStyles);
                 ChangeFontColor(textObj, text.FontColor);
                 GameTexter.ChangeOutlineStatus(textObj, text.IsOutlined);

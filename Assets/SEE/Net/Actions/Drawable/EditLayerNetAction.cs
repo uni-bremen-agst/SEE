@@ -45,7 +45,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (TryFindChild(TypeName, out GameObject typeName))
             {
-                GameEdit.ChangeLayer(typeName, OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(typeName, OrderInLayer);
             }
             else
             {

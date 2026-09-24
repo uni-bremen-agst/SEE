@@ -31,7 +31,7 @@ namespace SEE.Game.Drawable.Editing
         {
             if (imageObj.CompareTag(Tags.Image))
             {
-                GameEdit.ChangeLayer(imageObj, conf.OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(imageObj, conf.OrderInLayer);
                 ChangeImageColor(imageObj, conf.ImageColor);
                 GameMoveRotator.SetRotateY(imageObj, conf.EulerAngles.y);
             }

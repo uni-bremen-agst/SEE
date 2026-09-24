@@ -59,7 +59,7 @@ namespace SEE.Game.Drawable.Editing
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
 
-                GameEdit.ChangeLayer(node, conf.OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(node, conf.OrderInLayer);
             }
         }
     }

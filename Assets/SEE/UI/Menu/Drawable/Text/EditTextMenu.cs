@@ -462,7 +462,7 @@ namespace SEE.UI.Menu.Drawable.Text
 
             controls.OrderInLayerSlider.OnValueChanged.AddListener(order =>
             {
-                GameEdit.ChangeLayer(selectedText, order);
+                GameLayerChanger.SetOrderInLayer(selectedText, order);
                 textHolder.OrderInLayer = order;
 
                 new EditTextNetAction(

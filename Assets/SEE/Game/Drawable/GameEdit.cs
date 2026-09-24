@@ -1,6 +1,5 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
-using SEE.Game.Drawable.ValueHolders;
 using TMPro;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
@@ -75,27 +74,6 @@ namespace SEE.Game.Drawable
         public static void ChangeLine(GameObject lineObj, LineConf line)
         {
             GameLineEdit.ChangeLine(lineObj, line);
-        }
-
-        /// <summary>
-        /// This method changes the order in layer of a <see cref="DrawableType"/>.
-        /// </summary>
-        /// <param name="obj">The <see cref="DrawableType"/> whose order should be changed.</param>
-        /// <param name="newLayer">The new order in layer.</param>
-        public static void ChangeLayer(GameObject obj, int newLayer)
-        {
-            if (Tags.DrawableTypes.Contains(obj.tag))
-            {
-                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-                if (newLayer - oldLayer > 0)
-                {
-                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Increase, false);
-                }
-                else
-                {
-                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Decrease, false);
-                }
-            }
         }
 
         /// <summary>

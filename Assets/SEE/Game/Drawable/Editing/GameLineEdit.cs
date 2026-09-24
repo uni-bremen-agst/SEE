@@ -189,7 +189,7 @@ namespace SEE.Game.Drawable.Editing
             if (lineObj.CompareTag(Tags.Line))
             {
                 ChangeThickness(lineObj, line.Thickness);
-                GameEdit.ChangeLayer(lineObj, line.OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(lineObj, line.OrderInLayer);
                 GameLineAppearance.ChangeColorKind(
                     lineObj, line.ColorKind, line);
                 GameLineAppearance.ChangePrimaryColor(

@@ -279,7 +279,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             /// Adds the handler for changing the order in layer.
             layerSlider.OnValueChanged.AddListener(layerOrder =>
             {
-                GameEdit.ChangeLayer(node, layerOrder);
+                GameLayerChanger.SetOrderInLayer(node, layerOrder);
                 conf.OrderInLayer = layerOrder;
                 new EditLayerNetAction(surface.name, surfaceParentName, node.name, layerOrder).Execute();
                 GameMindMapBranch.ReDrawBranchLines(node);
