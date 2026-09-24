@@ -5,7 +5,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.StickyNote
 {
     /// <summary>
     /// This class manages the drawable sticky notes.

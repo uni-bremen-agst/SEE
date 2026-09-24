@@ -4,6 +4,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.StickyNote;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;

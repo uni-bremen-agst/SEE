@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.StickyNote
 {
     /// <summary>
     /// Tests the orientation behavior of <see cref="GameStickyNoteManager"/>.
