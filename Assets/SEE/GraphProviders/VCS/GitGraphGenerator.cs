@@ -222,7 +222,8 @@ namespace SEE.GraphProviders.VCS
         /// will be collapsed into the inner most directory node.</param>
         /// <param name="repositoryConfiguration"> The repository configuration based on which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
-        /// <param name="startDate">The date after which commits in the history should be considered.
+        /// <param name="startDate">The date from which on commits in the history should be considered,
+        /// the day it names taken in; it denotes the instant that day begins at, in UTC.
         /// Older commits will be ignored.</param>
         /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="changePercentage">To report the progress.</param>

@@ -196,25 +196,42 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Yields the SHAs of all commits (excluding merge commits) after <paramref name="startDate"/>
+        /// Yields the SHAs of all commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>, which denotes the instant its day begins at, in UTC,
         /// until today across all branches.
         /// </summary>
-        /// <param name="startDate">The date after which commits should be retrieved.</param>
-        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
+        /// <param name="startDate">The date from which on commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>.</returns>
         public IList<string> CommitsAfter(DateTime startDate)
         {
             return CommitsAfter(repository, startDate).Select(c => c.Sha).ToList();
         }
 
         /// <summary>
-        /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
-        /// until today across all branches.
+        /// Yields all commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/> until today across all branches.
+        ///
+        /// A date denotes the instant it begins at, in UTC, and a commit authored at that
+        /// very instant is yielded. The day named is thus taken in, not left out, and the
+        /// boundary is one moment for every commit rather than one per author.
         /// </summary>
+        /// <remarks>
+        /// Formerly the date of a commit was compared to <paramref name="startDate"/> by the
+        /// day, and only a later day passed. Two shortcomings went with that. The day of a
+        /// commit was the day in the offset of its own author, so two commits made at the
+        /// same instant in different parts of the world could fall on either side of the
+        /// boundary; and the day named was excluded entire, so a date of the first of
+        /// January yielded commits from the second onwards.
+        /// </remarks>
         /// <param name="repository">The repository from which to retrieve the commits.</param>
-        /// <param name="startDate">The date after which commits should be retrieved.</param>
-        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
+        /// <param name="startDate">The date from which on commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>.</returns>
         private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
+            DateTimeOffset since = new(startDate.Date, TimeSpan.Zero);
+
             foreach (Commit commit in repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = repository.Branches,
@@ -225,13 +242,13 @@ namespace SEE.VCS
                 // once we hit the cutoff date for performance reasons, but -- on the other hand --
                 // also have to account for rebased commits.
                 // This approach assumes that the user has not manipulated the dates of their repository.
-                if (commit.Author.When.Date > startDate && commit.Parents.Count() <= 1)
+                if (commit.Author.When >= since && commit.Parents.Count() <= 1)
                 {
                     yield return commit;
                 }
 
                 // Hard cutoff criteria - all parent commits should not be newer than this.
-                if (commit.Committer.When.Date <= startDate)
+                if (commit.Committer.When < since)
                 {
                     yield break;
                 }
