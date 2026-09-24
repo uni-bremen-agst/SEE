@@ -1,6 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeText(FindChild(Text.ID), Text);
+            GameTextEdit.ChangeText(FindChild(Text.ID), Text);
         }
     }
 }

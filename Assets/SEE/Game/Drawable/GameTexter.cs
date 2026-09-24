@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System.Linq;
@@ -220,7 +221,7 @@ namespace SEE.Game.Drawable
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
-            GameEdit.ChangeOutlineColor(textObj, outlineColor);
+            GameTextEdit.ChangeOutlineColor(textObj, outlineColor);
             return textObj;
         }
 
@@ -286,7 +287,7 @@ namespace SEE.Game.Drawable
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation; it is strangely always set to white.
-            GameEdit.ChangeOutlineColor(textObject, outlineColor);
+            GameTextEdit.ChangeOutlineColor(textObject, outlineColor);
 
             return textObject;
         }

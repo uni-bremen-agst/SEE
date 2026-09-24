@@ -81,7 +81,7 @@ namespace SEE.Game.Drawable.Configurations
                     new EditLineNetAction(surface.name, surfaceParentName, LineConf.GetLineWithoutRenderPos(objectToEdit)).Execute();
                     break;
                 case TextConf text:
-                    GameEdit.ChangeText(objectToEdit, text);
+                    GameTextEdit.ChangeText(objectToEdit, text);
                     new EditTextNetAction(surface.name, surfaceParentName, text).Execute();
                     break;
                 case ImageConf image:

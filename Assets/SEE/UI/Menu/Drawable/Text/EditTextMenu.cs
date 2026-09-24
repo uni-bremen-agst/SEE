@@ -1,9 +1,9 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using TMPro;
@@ -99,7 +99,7 @@ namespace SEE.UI.Menu.Drawable.Text
             enableTextMenu(
                 color =>
                 {
-                    GameEdit.ChangeFontColor(selectedText, color);
+                    GameTextEdit.ChangeFontColor(selectedText, color);
                     textHolder.FontColor = color;
 
                     new EditTextNetAction(
@@ -128,7 +128,7 @@ namespace SEE.UI.Menu.Drawable.Text
             textStyleMenu.AssignOutlineThickness(
                 thickness =>
                 {
-                    GameEdit.ChangeOutlineThickness(selectedText, thickness);
+                    GameTextEdit.ChangeOutlineThickness(selectedText, thickness);
                     textHolder.OutlineThickness = thickness;
 
                     new EditTextNetAction(
@@ -150,7 +150,7 @@ namespace SEE.UI.Menu.Drawable.Text
             textStyleMenu.AssignFontSize(
                 size =>
                 {
-                    GameEdit.ChangeFontSize(selectedText, size);
+                    GameTextEdit.ChangeFontSize(selectedText, size);
                     textHolder.FontSize = size;
 
                     new EditTextNetAction(
@@ -163,7 +163,7 @@ namespace SEE.UI.Menu.Drawable.Text
             textStyleMenu.AssignFontStyles(
                 style =>
                 {
-                    GameEdit.ChangeFontStyles(selectedText, style);
+                    GameTextEdit.ChangeFontStyles(selectedText, style);
                     textHolder.FontStyles = style;
 
                     new EditTextNetAction(
@@ -243,7 +243,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 textStyleMenu.AssignColorArea(
                     color =>
                     {
-                        GameEdit.ChangeFontColor(selectedText, color);
+                        GameTextEdit.ChangeFontColor(selectedText, color);
                         textHolder.FontColor = color;
 
                         new EditTextNetAction(
@@ -300,7 +300,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 textStyleMenu.AssignColorArea(
                     color =>
                     {
-                        GameEdit.ChangeOutlineColor(selectedText, color);
+                        GameTextEdit.ChangeOutlineColor(selectedText, color);
                         textHolder.OutlineColor = color;
 
                         new EditTextNetAction(
@@ -358,7 +358,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 if (textHolder.OutlineColor != tmp.outlineColor
                     && tmp.outlineColor == Color.clear)
                 {
-                    GameEdit.ChangeOutlineColor(
+                    GameTextEdit.ChangeOutlineColor(
                         selectedText,
                         textHolder.OutlineColor);
                 }
@@ -414,7 +414,7 @@ namespace SEE.UI.Menu.Drawable.Text
                                 textHolder.FontSize,
                                 textHolder.FontStyles);
 
-                        GameEdit.ChangeText(selectedText, textOut);
+                        GameTextEdit.ChangeText(selectedText, textOut);
                         textHolder.Text = textOut;
 
                         new EditTextNetAction(
