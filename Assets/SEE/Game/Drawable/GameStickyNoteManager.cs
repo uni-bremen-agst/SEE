@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.StickyNote;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
@@ -198,59 +197,6 @@ namespace SEE.Game.Drawable
                 await UniTask.Yield();
             }
             GameDrawableManager.ChangeVisibility(stickyNote, config.Visibility);
-        }
-
-        /// <summary>
-        /// This method changes the order in layer of a sticky note.
-        /// </summary>
-        /// <param name="stickyNote">The sticky note whose order should be changed.</param>
-        /// <param name="newLayer">The new order in layer.</param>
-        public static void ChangeLayer(GameObject stickyNote, int newLayer)
-        {
-            int oldLayer;
-            /// Gets the old order in layer.
-            if (stickyNote.GetComponent<OrderInLayerValueHolder>() != null)
-            {
-                oldLayer = stickyNote.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-            }
-            else
-            {
-                oldLayer = stickyNote.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
-            }
-
-            /// Checks if the order in layer should increase or decrease.
-            if (newLayer - oldLayer > 0)
-            {
-                GameLayerChanger.ChangeOrderInLayer(stickyNote.GetRootParent(), newLayer,
-                    GameLayerChanger.LayerChangerStates.Increase, false, true);
-            }
-            else
-            {
-                GameLayerChanger.ChangeOrderInLayer(stickyNote.GetRootParent(), newLayer,
-                    GameLayerChanger.LayerChangerStates.Decrease, false, true);
-            }
-        }
-
-        /// <summary>
-        /// Combines all edit method together.
-        /// </summary>
-        /// <param name="stickyNote">The sticky note on that the changes should be executed.</param>
-        /// <param name="config">The configuration which holds the values for the changing.</param>
-        public static void Change(GameObject stickyNote, DrawableConfig config)
-        {
-            GameObject root = stickyNote.GetRootParent();
-            GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
-            GameObject surfaceParent = surface.transform.parent.gameObject;
-
-            if (root.name.Contains(ValueHolder.StickyNotePrefix))
-            {
-                GameDrawableManager.Change(surface, config);
-                ChangeLayer(root, config.Order);
-                GameStickyNoteTransform.SetRotateX(root, config.Rotation.x);
-                GameStickyNoteTransform.SetRotateY(root, config.Rotation.y);
-                GameScaler.SetScale(surfaceParent, config.Scale);
-                GameStickyNoteTransform.SetPosition(root, config.Position);
-            }
         }
     }
 }

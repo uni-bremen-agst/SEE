@@ -164,7 +164,7 @@ namespace SEE.Controls.Actions.Drawable
                         GameObject sticky = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                             memento.OriginalConfig.ParentID)
                             .transform.parent.gameObject;
-                        GameStickyNoteManager.Change(sticky, memento.OriginalConfig);
+                        GameStickyNoteEdit.Change(sticky, memento.OriginalConfig);
                         new StickyNoteChangeNetAction(memento.OriginalConfig).Execute();
                         break;
                 }
@@ -255,7 +255,7 @@ namespace SEE.Controls.Actions.Drawable
                             GameObject sticky = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                                 memento.OriginalConfig.ParentID)
                                 .transform.parent.gameObject;
-                            GameStickyNoteManager.Change(sticky, memento.OriginalConfig);
+                            GameStickyNoteEdit.Change(sticky, memento.OriginalConfig);
                             new StickyNoteChangeNetAction(memento.OriginalConfig).Execute();
                             break;
                     }
@@ -937,7 +937,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameObject sticky = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                         memento.OriginalConfig.ParentID)
                         .transform.parent.gameObject;
-                    GameStickyNoteManager.Change(sticky, memento.OriginalConfig);
+                    GameStickyNoteEdit.Change(sticky, memento.OriginalConfig);
                     new StickyNoteChangeNetAction(memento.OriginalConfig).Execute();
                     break;
                 case Operation.Delete:
@@ -977,7 +977,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameObject sticky = GameFinder.FindDrawableSurface(memento.ChangedConfig.ID,
                         memento.ChangedConfig.ParentID)
                         .transform.parent.gameObject;
-                    GameStickyNoteManager.Change(sticky, memento.ChangedConfig);
+                    GameStickyNoteEdit.Change(sticky, memento.ChangedConfig);
                     new StickyNoteChangeNetAction(memento.ChangedConfig).Execute();
                     break;
                 case Operation.Delete:

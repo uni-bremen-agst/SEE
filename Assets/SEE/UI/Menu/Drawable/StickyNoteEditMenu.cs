@@ -1,6 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.StickyNote;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
@@ -85,7 +86,7 @@ namespace SEE.UI.Menu.Drawable
             orderInLayerSlider.OnValueChanged.AddListener(order =>
             {
                 newConfig.Order = order;
-                GameStickyNoteManager.ChangeLayer(stickyNote, order);
+                GameStickyNoteEdit.ChangeLayer(stickyNote, order);
 
                 new EditLayerNetAction(GameFinder.GetDrawableSurface(stickyNote).name,
                     stickyNote.name, "", order).Execute();

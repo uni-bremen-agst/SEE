@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.StickyNote;
 using SEE.GO;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ namespace SEE.Net.Actions.Drawable
             }
             else
             {
-                GameStickyNoteManager.ChangeLayer(Surface.GetRootParent(), OrderInLayer);
+                GameStickyNoteEdit.ChangeLayer(Surface.GetRootParent(), OrderInLayer);
             }
         }
     }
