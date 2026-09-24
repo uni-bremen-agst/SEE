@@ -1,10 +1,9 @@
 ﻿using NUnit.Framework;
-using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using System.Reflection;
 using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.MindMap
 {
     /// <summary>
     /// Tests the hierarchy and validation behavior of <see cref="GameMindMap"/>.
