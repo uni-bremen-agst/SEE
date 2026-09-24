@@ -1,6 +1,8 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
+using SEE.Scanner;
+using SEE.Scanner.Antlr;
 using SEE.Utils;
 using SEE.VCS;
 using System;
@@ -80,8 +82,7 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// The share of the churn of a file its core developers are to answer
-        /// for, the truck factor being how many of them that takes. The value
-        /// <see cref="GitGraphGenerator"/> uses.
+        /// for, the truck factor being how many of them that takes.
         /// </summary>
         private const float truckFactorCoreDevRatio = 0.8f;
 
@@ -342,7 +343,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             // A node for every file that survived, whether or not it was changed
-            // in the period, as GitGraphGenerator does. One untouched carries the
+            // in the period. One untouched carries the
             // metrics of its code and nothing else, every count of its history
             // standing at nought.
             IDictionary<string, Churn> all = new Dictionary<string, Churn>(churn);
@@ -663,24 +664,20 @@ namespace SEE.GraphProviders.VCS
         /// between every two files a commit changed together.
         /// </summary>
         /// <remarks>
-        /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
-        /// from a <see cref="GitFileMetrics"/>, all of them now.
+        /// Every attribute a <see cref="GitFileMetrics"/> holds is set here.
         ///
-        /// Two things go beyond what <see cref="GitGraphGenerator"/> does. It
-        /// gathers the files changed together with a file but puts them nowhere;
-        /// here they are edges, a relation between two files being what an edge
-        /// is for. And it has no notion of the names a file carried before.
+        /// The files changed together with a file are edges rather than an
+        /// attribute, a relation between two files being what an edge is for.
         ///
         /// The metrics of the code itself are gathered by
-        /// <see cref="GitGraphGenerator.AddCodeMetrics"/>, called here rather
-        /// than written afresh. Mind that it reads and lexes the content of
-        /// every file, which for a repository the size of SEE is the greater
-        /// part of the time this takes.
+        /// <see cref="AddCodeMetrics"/>. Mind that it reads and lexes the
+        /// content of every file, which for a repository the size of SEE is
+        /// the greater part of the time this takes.
         ///
         /// A chain of directory nodes holding nothing but one another is
         /// collapsed into its innermost one where <paramref name="simplifyGraph"/>
-        /// says so, again by <see cref="GitGraphGenerator"/>. Only directory
-        /// nodes go, so the edges between files outlive it.
+        /// says so. Only directory nodes go, so the edges between files
+        /// outlive it.
         /// </remarks>
         /// <param name="graph">The graph the nodes and edges are added to.</param>
         /// <param name="churn">The churn of every file the graph is to hold a node for.
@@ -718,8 +715,7 @@ namespace SEE.GraphProviders.VCS
                     node.SetString(DataModel.DG.VCS.AuthorsAttributeName,
                                    string.Join(',', metrics.Authors));
                 }
-                // One attribute per author, named for them, as
-                // GitGraphGenerator names them.
+                // One attribute per author, named for them.
                 foreach (KeyValuePair<FileAuthor, int> authorChurn in metrics.AuthorsChurn)
                 {
                     node.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
@@ -734,15 +730,14 @@ namespace SEE.GraphProviders.VCS
                 }
             }
 
-            // The metrics of the code itself, gathered by GitGraphGenerator
-            // from the content of each file, rather than from its history.
-            GitGraphGenerator.AddCodeMetrics(graph, session);
+            // The metrics of the code itself, gathered from the content of
+            // each file rather than from its history.
+            AddCodeMetrics(graph, session);
             AddCoChanges(graph, churn, nodes);
             graph.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
-            // After the root, which the collapsing starts from, and again by
-            // GitGraphGenerator rather than afresh. Only directory nodes are
-            // affected, so the edges drawn above outlive it.
-            GitGraphGenerator.Simplify(graph, simplifyGraph);
+            // After the root, which the collapsing starts from. Only directory
+            // nodes are affected, so the edges drawn above outlive it.
+            Simplify(graph, simplifyGraph);
             graph.FinalizeNodeHierarchy();
         }
 
@@ -789,8 +784,7 @@ namespace SEE.GraphProviders.VCS
         /// heaviest contributors counted first.
         /// </summary>
         /// <remarks>
-        /// The heuristic of Yamashita et al. for the set of core developers,
-        /// as <see cref="GitGraphGenerator"/> computes it.
+        /// The heuristic of Yamashita et al. for the set of core developers.
         ///
         /// Which authors those are is not settled where two churned equally,
         /// yet how many it takes is, the sum reached after so many of them
@@ -810,9 +804,8 @@ namespace SEE.GraphProviders.VCS
             if (total == 0)
             {
                 // Nobody churned anything, the file having been renamed and not
-                // otherwise touched in the period. One is what
-                // GitGraphGenerator arrives at here, by way of a ratio of zero
-                // over zero, and so this says as much without the arithmetic.
+                // otherwise touched in the period. One is the answer: somebody
+                // moved it, and nought would say the file has no author at all.
                 return 1;
             }
 
@@ -844,6 +837,158 @@ namespace SEE.GraphProviders.VCS
             result.FilesChangesTogether = churn.CoChanges;
             result.TruckFactor = TruckFactorOf(result.AuthorsChurn);
             return result;
+        }
+
+        /// <summary>
+        /// Retrieves the token stream for given file content from its repository and commit ID.
+        /// The programming language is guessed based on the file extension. If the file extension is not supported,
+        /// an empty token stream is returned.
+        /// </summary>
+        /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
+        /// in the syntax of the repository regarding the directory separator.</param>
+        /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
+        /// <returns>The token stream for the specified file and commit.</returns>
+        private static IEnumerable<AntlrToken> RetrieveTokens
+                                                 (string repositoryFilePath,
+                                                  GitRepositorySession repositorySession)
+        {
+            try
+            {
+                AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
+                return AntlrToken.FromStream(repositorySession.GetStream(repositoryFilePath), language);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}\n");
+                return new List<AntlrToken>();
+            }
+        }
+
+        /// <summary>
+        /// Adds Halstead, McCabe, number of tokens and lines of code metrics and comments
+        /// to the corresponding node for the supported TokenLanguages in <paramref name="graph"/>.
+        /// Otherwise, metrics are not available.
+        ///
+        /// Note: A file may exist in multiple branches. We will pick the first one we find.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
+        private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
+        {
+            foreach (Node node in graph.Nodes())
+            {
+                if (node.Type == DataModel.DG.NodeTypes.File)
+                {
+                    string repositoryFilePath = node.ID;
+                    if (AntlrLanguage.HasLexer(Filenames.Extension(repositoryFilePath)))
+                    {
+                        AntlrLanguage language = AntlrLanguage.FromFileExtension(Filenames.Extension(repositoryFilePath));
+                        if (language != AntlrLanguage.Plain)
+                        {
+                            //ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
+                            IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession);
+                            TokenMetrics.Gather(tokens,
+                                                out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
+                                                out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
+
+
+                            node.SetInt(Metrics.LOC, lineMetrics.LOC);
+                            node.SetInt(Metrics.Comments, lineMetrics.Comments);
+                            node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
+
+                            node.SetInt(Metrics.McCabe, mccabeComplexity);
+
+                            node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                            node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                            node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                            node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                            node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                            node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                            node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                            node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                            node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                            node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                            node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                            node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"File {repositoryFilePath} has no supported lexer for file extension {Filenames.Extension(repositoryFilePath)}. No code metrics will be calculated for this file.\n");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// If <paramref name="simplifyGraph"/> is true, the graph will be simplified by
+        /// compressing single chains of directory nodes into the inner most directory node.
+        /// </summary>
+        /// <param name="graph">Graph to be simplified.</param>
+        /// <param name="simplifyGraph">Whether the graph should be simplified.</param>
+        private static void Simplify(Graph graph, bool simplifyGraph)
+        {
+            if (simplifyGraph)
+            {
+                foreach (Node child in graph.GetRoots()[0].Children().ToList())
+                {
+                    SimplifyGraph(child);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simplifies a given graph by combining common directories (nodes of type
+        /// <see cref="DataModel.DG.VCS.DirectoryType"/>).
+        ///
+        /// If a directory has only other directories as children, their paths will be combined.
+        /// For instance the file structure:
+        /// <code>
+        /// root/
+        ///?? dir1/
+        ///?  ?? dir2/
+        ///?  ?  ?? dir6/
+        ///?  ?? dir3/
+        ///?  ?  ?? file1.md
+        ///?  ?  ?? dir5/
+        ///  ?? dir4/
+        /// </code>
+        /// would become:
+        /// <code>
+        ///root/
+        /// ?? dir1/dir2/dir6/
+        /// ?? dir1/dir4/
+        /// ?? dir1/dir3/
+        /// ?  ?? file1.md
+        /// ?  ?? dir5/
+        /// </code>
+        ///
+        /// </summary>
+        /// <param name="root">The root element of the graph to analyse from.</param>
+        private static void SimplifyGraph(Node root)
+        {
+            Graph graph = root.ItsGraph;
+            IList<Node> children = root.Children();
+            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.NodeTypes.File) && children.Any())
+            {
+                foreach (Node child in children.ToList())
+                {
+                    child.Reparent(root.Parent);
+                    SimplifyGraph(child);
+                }
+
+                if (graph.ContainsNode(root))
+                {
+                    graph.RemoveNode(root);
+                }
+            }
+            else
+            {
+                foreach (Node node in children.Where(x => x.Type == DataModel.DG.VCS.DirectoryType).ToList())
+                {
+                    SimplifyGraph(node);
+                }
+            }
         }
 
         /// <summary>

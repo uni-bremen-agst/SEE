@@ -151,9 +151,9 @@ namespace SEE.GraphProviders.Evolution
             */
 
             // GetGraphOfCommit, which the loop above called, is gone. It built the
-            // graph of one evolution step by handing GitGraphGenerator a list of
-            // commits and a patch for each, and that entry point had no other
-            // caller and has been dropped along with it. Whoever revives this
+            // graph of one evolution step by handing a list of commits and a
+            // patch for each to an entry point that had no other caller and has
+            // been dropped along with it. Whoever revives this
             // provider should ask ChurnGraphGenerator for the graph between two
             // commits instead, and let it walk the history itself rather than
             // building every patch up front, which the note above rightly calls

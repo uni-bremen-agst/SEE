@@ -181,24 +181,6 @@ namespace SEE.VCS
 
 
         /// <summary>
-        /// Runs <paramref name="apply"/> for each non-merge commit between the two given commits.
-        ///
-        /// The callback <paramref name="apply"/> is called with the current repository and the
-        /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback.
-        /// </summary>
-        /// <param name="baselineCommitID">Older commit used as the baseline.</param>
-        /// <param name="newCommitId">.</param>
-        /// <param name="apply">Callback to be called for each commit.</param>
-        internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
-        {
-            foreach (Commit commit in CommitsBetween(baselineCommitID, newCommitId))
-            {
-                apply(repository, commit);
-            }
-        }
-
-        /// <summary>
         /// Yields the SHAs of all commits (excluding merge commits) authored at or after
         /// <paramref name="startDate"/>, which denotes the instant its day begins at, in UTC,
         /// until today across all branches.
@@ -299,83 +281,6 @@ namespace SEE.VCS
         private ICommitLog CommitLog()
         {
             return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> for <see cref="repository"/> as a <see cref="Patch"/>.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
-        /// <param name="newCommit">Later commit ID; must not be null.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        public Patch Diff(Commit oldCommit, Commit newCommit)
-        {
-            return Diff(oldCommit, newCommit, new List<string>());
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
-        /// </summary>
-        /// <param name="repository">The repository containing the commits.</param>
-        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
-        /// <param name="newCommit">Later commit ID; must not be null.</param>
-        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> paths)
-        {
-            if (newCommit == null)
-            {
-                throw new ArgumentNullException(nameof(newCommit), "New commit must not be null.");
-            }
-            return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree, paths);
-        }
-
-        /// <summary>
-        /// Returns true if the diff between <paramref name="oldCommit"/> and <paramref name="newCommit"/>
-        /// contains any changes to files matching the given <paramref name="matcher"/>.
-        /// Uses <see cref="TreeChanges"/> which is significantly cheaper than <see cref="Patch"/>
-        /// because it only enumerates changed file paths without computing line-level diffs.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit; can be null for the initial commit.</param>
-        /// <param name="newCommit">Later commit; must not be null.</param>
-        /// <param name="matcher">File glob matcher to check relevance. If null, any change is relevant.</param>
-        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
-        /// <returns>True if at least one changed file matches the matcher.</returns>
-        public bool HasRelevantChanges(Commit oldCommit, Commit newCommit, Matcher matcher, out IEnumerable<string> paths)
-        {
-            if (matcher == null)
-            {
-                // If there is nothing to match, all files should be included.
-                paths = new List<string>();
-                return true;
-            }
-            using TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
-
-            List<string> filePaths = new();
-            foreach (TreeEntryChanges change in changes)
-            {
-                if (matcher.Match(change.Path).HasMatches)
-                {
-                    filePaths.Add(change.Path);
-                }
-            }
-            paths = filePaths;
-            return filePaths.Any();
-        }
-
-        /// <summary>
-        /// Generates a patch representing the differences between two commits.
-        /// Analogous to <see cref="Diff(Commit, Commit)"/>, but takes commit IDs as strings.
-        /// </summary>
-        /// <param name="oldCommitID">The identifier of the older commit to compare.</param>
-        /// <param name="newCommitID">The identifier of the newer commit to compare.</param>
-        /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
-        private Patch Diff(string oldCommitID, string newCommitID)
-        {
-            return Diff(GetCheckedCommit(oldCommitID), GetCheckedCommit(newCommitID));
         }
 
         /// <summary>
