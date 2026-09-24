@@ -136,34 +136,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Moves a point of a line.
-        /// It only works for the drawable type line.
-        /// </summary>
-        /// <param name="line">The line which holds the to moved point.</param>
-        /// <param name="Indices">The indices of the points which should be moved (all indices have the same position).</param>
-        /// <param name="point">The new point position.</param>
-        public static void MovePoint(GameObject line, List<int> Indices, Vector3 point)
-        {
-            Vector3[] originalPositions = GameLineGeometry.GetOriginalLinePositions(line);
-            if (originalPositions == null)
-            {
-                return;
-            }
-
-            foreach (int i in Indices)
-            {
-                if (i < 0 || i >= originalPositions.Length)
-                {
-                    continue;
-                }
-
-                originalPositions[i] = new Vector3(point.x, point.y, originalPositions[i].z);
-            }
-
-            GameLineGeometry.ApplyOriginalLinePositions(line, originalPositions);
-        }
-
-        /// <summary>
         /// Rotates an object at its pivot point.
         /// It is necessary to refresh the object's collider, as it does not update itself.
         /// </summary>

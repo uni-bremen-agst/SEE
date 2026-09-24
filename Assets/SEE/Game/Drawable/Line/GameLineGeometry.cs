@@ -248,6 +248,46 @@ namespace SEE.Game.Drawable.Line
         }
 
         /// <summary>
+        /// Moves the specified points of the given line to a new position.
+        /// </summary>
+        /// <param name="line">The line whose points should be moved.</param>
+        /// <param name="indices">
+        /// The indices of the points to move. All specified points receive the same position.
+        /// </param>
+        /// <param name="point">The new point position.</param>
+        public static void MovePoint(
+            GameObject line,
+            List<int> indices,
+            Vector3 point)
+        {
+            Vector3[] originalPositions =
+                GetOriginalLinePositions(line);
+
+            if (originalPositions == null)
+            {
+                return;
+            }
+
+            foreach (int index in indices)
+            {
+                if (index < 0 || index >= originalPositions.Length)
+                {
+                    continue;
+                }
+
+                originalPositions[index] =
+                    new Vector3(
+                        point.x,
+                        point.y,
+                        originalPositions[index].z);
+            }
+
+            ApplyOriginalLinePositions(
+                line,
+                originalPositions);
+        }
+
+        /// <summary>
         /// Updates the stored original anchors of the given line.
         /// Existing values are overwritten.
         /// </summary>

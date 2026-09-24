@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.Line;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameMoveRotator.MovePoint(FindChild(LineName), Indices, Position);
+            GameLineGeometry.MovePoint(FindChild(LineName), Indices, Position);
         }
     }
 }
