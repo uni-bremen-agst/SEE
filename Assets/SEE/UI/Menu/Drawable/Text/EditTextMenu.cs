@@ -340,7 +340,7 @@ namespace SEE.UI.Menu.Drawable.Text
         {
             controls.OutlineSwitch.OffEvents.AddListener(() =>
             {
-                GameTexter.ChangeOutlineStatus(selectedText, false);
+                GameTextEdit.ChangeOutlineStatus(selectedText, false);
                 textHolder.IsOutlined = false;
 
                 new EditTextNetAction(
@@ -351,7 +351,7 @@ namespace SEE.UI.Menu.Drawable.Text
 
             controls.OutlineSwitch.OnEvents.AddListener(() =>
             {
-                GameTexter.ChangeOutlineStatus(selectedText, true);
+                GameTextEdit.ChangeOutlineStatus(selectedText, true);
                 textHolder.IsOutlined = true;
 
                 TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
@@ -409,7 +409,7 @@ namespace SEE.UI.Menu.Drawable.Text
                             selectedText.GetComponent<TextMeshPro>();
 
                         tmp.rectTransform.sizeDelta =
-                            GameTexter.CalculateWidthAndHeight(
+                            GameTextGeometry.CalculateWidthAndHeight(
                                 textOut,
                                 tmp.font,
                                 textHolder.FontSize,

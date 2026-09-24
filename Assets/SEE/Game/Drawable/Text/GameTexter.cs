@@ -1,12 +1,9 @@
-﻿using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
-using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace SEE.Game.Drawable.Text
 {
@@ -19,85 +16,6 @@ namespace SEE.Game.Drawable.Text
         /// Name of the font for the text.
         /// </summary>
         private const string drawableTextFontName = "Fonts/DrawableTextFont";
-
-        /// <summary>
-        /// The shader keyword for the outline color.
-        /// </summary>
-        public static readonly string OutlineKeyWord = "OUTLINE_ON";
-
-        /// <summary>
-        /// Calculates the text width based on the first line.
-        /// For the calculation it removes the HTML Tags and checks if there are active font styles for bold, upper case or small caps.
-        /// This font styles affects the width.
-        ///
-        /// Method based on the method from Stephan_B's comment in
-        /// https://forum.unity.com/threads/calculate-width-of-a-text-before-without-assigning-it-to-a-tmp-object.758867/#post-5057900
-        /// </summary>
-        /// <param name="text">The first line of the text.</param>
-        /// <param name="fontAsset">The used font asset.</param>
-        /// <param name="fontSize">The used font size.</param>
-        /// <param name="style">The used font styles.</param>
-        /// <returns>The calculated width for the first line of the text.</returns>
-        private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset,
-            float fontSize, FontStyles style)
-        {
-            string result = RichTextRemover.RemoveRichText(text);
-
-            text = text.ToLower();
-            /// The text characters are widened by bold, uppercase, or small caps.
-            bool htmlBold = text.Contains("<b>");
-            bool htmlUpperCase = text.Contains("<uppercase>");
-            bool htmlSmallCaps = text.Contains("<smallcaps>");
-
-            /// Compute scale of the target point size relative to the sampling point size of the font asset.
-            float pointSizeScale = fontSize / (fontAsset.faceInfo.pointSize * fontAsset.faceInfo.scale * 10);
-            float emScale = fontSize * 0.001f;
-
-            float styleSpacingAdjustment = (style & FontStyles.Bold) == FontStyles.Bold
-                || htmlBold ? fontAsset.boldSpacing : 0;
-            float normalSpacingAdjustment = fontAsset.normalSpacingOffset;
-            float width = 0;
-
-            /// If the text would originally be in uppercase, write it back in uppercase.
-            if ((style & FontStyles.UpperCase) != 0 || (style & FontStyles.SmallCaps) != 0
-                || htmlUpperCase || htmlSmallCaps)
-            {
-                result = result.ToUpper();
-            }
-
-            /// Calculates the width based on every character of the first line.
-            /// It takes into account whether the text is bold, uppercase, or in small caps.
-            for (int i = 0; i < result.Length; i++)
-            {
-                /// Makes sure the given unicode exists in the font asset.
-                if (fontAsset.characterLookupTable.TryGetValue(result[i], out TMP_Character character))
-                {
-                    width += character.glyph.metrics.horizontalAdvance * pointSizeScale +
-                        (styleSpacingAdjustment + normalSpacingAdjustment) * emScale;
-                }
-            }
-
-            return width;
-        }
-
-        /// <summary>
-        /// This method calculates the width and height of the text.
-        /// The width depends on the longest line of the text.
-        /// The height is approximated by the number of lines multiplied by 0.1f and the fontSize.
-        /// </summary>
-        /// <param name="text">The written text.</param>
-        /// <param name="fontAsset">The font asset of the text.</param>
-        /// <param name="fontSize">The font size of the text.</param>
-        /// <param name="styles">The font styles of the text.</param>
-        /// <returns>Calculated width and height.</returns>
-        public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset,
-            float fontSize, FontStyles styles)
-        {
-            string[] split = text.Split(new string[]{ "\n", "<br>"}, System.StringSplitOptions.None);
-            float x = split.ToList().Max(s => TextWidthApproximation(s, fontAsset, fontSize, styles));
-            float y = split.Count() * 0.1f * fontSize;
-            return new Vector2(x, y);
-        }
 
         /// <summary>
         /// This method creates the inital drawable text object.
@@ -155,7 +73,7 @@ namespace SEE.Game.Drawable.Text
             tmp.text = text;
             tmp.fontStyle = styles;
             tmp.font = Resources.Load<TMP_FontAsset>(drawableTextFontName);
-            tmp.rectTransform.sizeDelta = CalculateWidthAndHeight(text, tmp.font, fontSize, styles);
+            tmp.rectTransform.sizeDelta = GameTextGeometry.CalculateWidthAndHeight(text, tmp.font, fontSize, styles);
             tmp.color = fontColor;
             tmp.faceColor = fontColor;
             tmp.fontSize = fontSize;
@@ -194,7 +112,7 @@ namespace SEE.Game.Drawable.Text
             tmp.outlineColor = tmp.outlineColor;
 
             /// Enables or disables the outline color.
-            ChangeOutlineStatus(textObj, outlineStatus);
+            GameTextEdit.ChangeOutlineStatus(textObj, outlineStatus);
         }
 
         /// <summary>
@@ -314,36 +232,6 @@ namespace SEE.Game.Drawable.Text
                 text.OrderInLayer,
                 text.FontStyles,
                 text.AssociatedPage);
-        }
-
-        /// <summary>
-        /// Refreshes the mesh collider of the game object.
-        /// It's necessary because the mesh renderer needs some time to calculates the mesh.
-        /// </summary>
-        /// <param name="textObj">The object which contains the mesh collider.</param>
-        public static void RefreshMeshCollider(GameObject textObj)
-        {
-            if (textObj.GetComponent<MeshCollider>() != null)
-            {
-                MeshCollider meshCollider = textObj.GetComponent<MeshCollider>();
-                meshCollider.enabled = false;
-                meshCollider.enabled = true;
-            }
-        }
-
-        /// <summary>
-        /// Changes the status (enabled or disabled) of the outline color.
-        /// </summary>
-        /// <param name="textObj">The text object which outline status should be changed.</param>
-        /// <param name="status">The new status for the outline color.</param>
-        public static void ChangeOutlineStatus(GameObject textObj, bool status)
-        {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, OutlineKeyWord);
-                tmp.fontMaterial.SetKeyword(outlineKeyword, status);
-            }
         }
     }
 }

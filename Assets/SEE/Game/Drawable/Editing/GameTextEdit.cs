@@ -25,11 +25,11 @@ namespace SEE.Game.Drawable.Editing
                 GameLayerChanger.SetOrderInLayer(textObj, text.OrderInLayer);
                 ChangeFontStyles(textObj, text.FontStyles);
                 ChangeFontColor(textObj, text.FontColor);
-                GameTexter.ChangeOutlineStatus(textObj, text.IsOutlined);
+                ChangeOutlineStatus(textObj, text.IsOutlined);
                 ChangeOutlineColor(textObj, text.OutlineColor);
                 ChangeOutlineThickness(textObj, text.OutlineThickness);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
+                GameTextGeometry.RefreshMeshCollider(textObj);
             }
         }
 
@@ -46,7 +46,7 @@ namespace SEE.Game.Drawable.Editing
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.text = text;
                 textMesh.ForceMeshUpdate();
-                GameTexter.RefreshMeshCollider(textObj);
+                GameTextGeometry.RefreshMeshCollider(textObj);
             }
 
             RefreshMindMapNode(textObj);
@@ -65,14 +65,14 @@ namespace SEE.Game.Drawable.Editing
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.fontSize = fontSize;
                 textMesh.rectTransform.sizeDelta =
-                    GameTexter.CalculateWidthAndHeight(
+                    GameTextGeometry.CalculateWidthAndHeight(
                         textMesh.text,
                         textMesh.font,
                         fontSize,
                         textMesh.fontStyle);
 
                 textMesh.ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
+                GameTextGeometry.RefreshMeshCollider(textObj);
             }
 
             RefreshMindMapNode(textObj);
@@ -91,14 +91,14 @@ namespace SEE.Game.Drawable.Editing
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.fontStyle = styles;
                 textMesh.rectTransform.sizeDelta =
-                    GameTexter.CalculateWidthAndHeight(
+                    GameTextGeometry.CalculateWidthAndHeight(
                         textMesh.text,
                         textMesh.font,
                         textMesh.fontSize,
                         textMesh.fontStyle);
 
                 textMesh.ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
+                GameTextGeometry.RefreshMeshCollider(textObj);
             }
 
             RefreshMindMapNode(textObj);
@@ -126,10 +126,17 @@ namespace SEE.Game.Drawable.Editing
         /// <param name="color">The new outline color.</param>
         internal static void ChangeOutlineColor(GameObject textObj, Color color)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                textObj.GetComponent<TextMeshPro>().outlineColor = color;
-            }
+            GameTextAppearance.ChangeOutlineColor(textObj, color);
+        }
+
+        /// <summary>
+        /// Changes whether the outline of a text is enabled.
+        /// </summary>
+        /// <param name="textObj">The object whose outline status should be changed.</param>
+        /// <param name="status">Whether the outline should be enabled.</param>
+        internal static void ChangeOutlineStatus(GameObject textObj, bool status)
+        {
+            GameTextAppearance.ChangeOutlineStatus(textObj, status);
         }
 
         /// <summary>
@@ -144,7 +151,7 @@ namespace SEE.Game.Drawable.Editing
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.outlineWidth = thickness;
                 textMesh.ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
+                GameTextGeometry.RefreshMeshCollider(textObj);
             }
         }
 

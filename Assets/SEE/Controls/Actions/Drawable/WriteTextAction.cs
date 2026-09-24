@@ -149,7 +149,7 @@ namespace SEE.Controls.Actions.Drawable
                     new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(Surface, TextConf.GetText(textObj));
-                    GameTexter.RefreshMeshCollider(textObj);
+                    GameTextGeometry.RefreshMeshCollider(textObj);
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
