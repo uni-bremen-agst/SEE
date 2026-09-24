@@ -470,11 +470,17 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// If <see cref="VCSFilter"/> is null, all branches of <see cref="repository"/> are
-        /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
+        /// If <see cref="Filter.Branches"/> of the <see cref="GitRepository.VCSFilter"/> this
+        /// session was opened for is null, all branches of the repository are returned.
+        /// Otherwise, yields all branches passing that filter, that is, those whose FriendlyName
+        /// is matched as a whole by at least one of its regular expressions; see
+        /// <see cref="Filter.Matches(Branch)"/>.
+        ///
+        /// The result is a collection rather than an enumeration, so that a caller may count
+        /// the branches without walking them twice.
         /// </summary>
-        /// <returns>All relevant branches of the <see cref="repository"/>.</returns>
-        private IList<Branch> RelevantBranches()
+        /// <returns>All relevant branches of the repository.</returns>
+        public ICollection<Branch> RelevantBranches()
         {
             if (repositoryConfig.VCSFilter == null)
             {
@@ -512,7 +518,7 @@ namespace SEE.VCS
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
             HashSet<string> result = new();
-            IList<Branch> branches = RelevantBranches();
+            ICollection<Branch> branches = RelevantBranches();
             if (branches.Count == 0)
             {
                 Debug.LogWarning("There are no branches matching the branch filter.\n");
