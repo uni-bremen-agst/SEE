@@ -25,13 +25,14 @@ namespace SEE.Game.City
     public class BranchCity : VCSCity, ISelfValidator
     {
         /// <summary>
-        /// A date string in the <see cref="SEEDate.DateFormat"/> format.
+        /// The date from which on commits in the history should be considered,
+        /// the day it names taken in; it denotes the instant that day begins at, in UTC.
         ///
-        /// All commits from the most recent to the latest commit
-        /// before the date are used for the analysis.
+        /// The syntax must conform to a date string in the <see cref="SEEDate.DateFormat"/> format.
         /// </summary>
-        [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
-         Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
+        [InspectorName("Start date (" + SEEDate.DateFormat + ")"),
+         Tooltip("The date from which on commits in the history should be considered (in the " + SEEDate.DateFormat + " syntax), "
+            + "the day it names taken in; it denotes the instant that day begins at, in UTC."),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string Date = SEEDate.Now();
 
