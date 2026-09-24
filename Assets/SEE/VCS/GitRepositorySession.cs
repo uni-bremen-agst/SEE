@@ -260,61 +260,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the commit log between the two given commits.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit ID.</param>
-        /// <param name="newCommit">Later commit ID.</param>
-        /// <returns>Commit log between the two given commits.</returns>
-        private ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
-        {
-            return repository.Commits.QueryBy(new CommitFilter
-            {
-                IncludeReachableFrom = newCommit,
-                ExcludeReachableFrom = oldCommit
-            });
-        }
-
-        /// <summary>
-        /// Returns the commit log of the repository, sorted topologically.
-        /// </summary>
-        /// <returns>Commit log of the repository in topological order.</returns>
-        private ICommitLog CommitLog()
-        {
-            return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
-        }
-
-        /// <summary>
-        /// Returns the <see cref="Patch"/> needed to turn the parent of <paramref name="commit"/>
-        /// into the <paramref name="commit"/> itself. If <paramref name="commit"/> has no
-        /// parent (very first commit in the version history), the <see cref="Patch"/> f
-        /// rom the empty tree to <paramref name="commit"/> is returned. If <paramref name="commit"/>
-        /// has multiple parents, the <see cref="Patch"/> from the first parent to <paramref name="commit"/>
-        /// is returned.
-        /// </summary>
-        /// <param name="commit">The commit whose <see cref="Patch"/> is to be returned.</param>
-        /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/>.</returns>
-        private Patch GetPatchRelativeToParent(Commit commit)
-        {
-            if (commit.Parents.Any())
-            {
-                return repository.Diff.Compare<Patch>(commit.Parents.First().Tree, commit.Tree);
-            }
-            return repository.Diff.Compare<Patch>(null, commit.Tree);
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="parent"/>
-        /// and <paramref name="commit"/> as <see cref="TreeChanges"/>.
-        /// </summary>
-        /// <param name="parent">Earlier commit ID.</param>
-        /// <param name="commit">Later commit ID.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        private TreeChanges TreeDiff(Commit parent, Commit commit)
-        {
-            return repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
-        }
-
-        /// <summary>
         /// Returns the content of the file at <paramref name="repositoryFilePath"/>
         /// present in the repository in any of the branches passing the filter.
         ///
