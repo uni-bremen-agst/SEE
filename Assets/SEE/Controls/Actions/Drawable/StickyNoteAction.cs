@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.StickyNote;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -152,7 +153,7 @@ namespace SEE.Controls.Actions.Drawable
                     case Operation.Move:
                         GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                             memento.OriginalConfig.ParentID).GetRootParent();
-                        GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
+                        GameStickyNoteTransform.Move(stickyHolder, memento.OriginalConfig.Position,
                             memento.OriginalConfig.Rotation);
                         GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
                         string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
@@ -243,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
                         case Operation.Move:
                             GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                                 memento.OriginalConfig.ParentID).GetRootParent();
-                            GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
+                            GameStickyNoteTransform.Move(stickyHolder, memento.OriginalConfig.Position,
                                 memento.OriginalConfig.Rotation);
                             GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
                             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
@@ -492,12 +493,12 @@ namespace SEE.Controls.Actions.Drawable
                     hit.point = new Vector3(hit.point.x, hit.point.y, surface.transform.position.z);
                 }
 
-                GameStickyNoteManager.Move(stickyNoteHolder, hit.point, eulerAngles);
+                GameStickyNoteTransform.Move(stickyNoteHolder, hit.point, eulerAngles);
                 Vector3 newPos = stickyNoteHolder.transform.position;
                 /// This block ensures the minimum distance from the object
                 if (oldPos != newPos)
                 {
-                    newPos = GameStickyNoteManager.FinishMoving(stickyNoteHolder);
+                    newPos = GameStickyNoteTransform.FinishMoving(stickyNoteHolder);
                 }
 
                 new StickyNoteMoveNetAction(GameFinder.GetDrawableSurface(stickyNote).name, stickyNote.name,
@@ -528,7 +529,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ValueHolder.MoveDirection direction = GetDirection();
                 GameObject holder = stickyNote.GetRootParent();
-                Vector3 newPos = GameStickyNoteManager.MoveByMenu(holder, direction, StickyNoteMoveMenu.Instance.GetSpeed());
+                Vector3 newPos = GameStickyNoteTransform.MoveByMenu(holder, direction, StickyNoteMoveMenu.Instance.GetSpeed());
                 if (!spawnMode)
                 {
                     GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
@@ -827,7 +828,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 stickyNoteHolder = stickyNote.GetRootParent();
                 float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, newDegree);
+                GameStickyNoteTransform.SetRotateY(stickyNoteHolder, newDegree);
                 StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
                 if (!spawnMode)
                 {
@@ -925,7 +926,7 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                         memento.OriginalConfig.ParentID).GetRootParent();
-                    GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
+                    GameStickyNoteTransform.Move(stickyHolder, memento.OriginalConfig.Position,
                         memento.OriginalConfig.Rotation);
                     GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
                     string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
@@ -965,7 +966,7 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.ChangedConfig.ID,
                         memento.ChangedConfig.ParentID).GetRootParent();
-                    GameStickyNoteManager.Move(stickyHolder, memento.ChangedConfig.Position,
+                    GameStickyNoteTransform.Move(stickyHolder, memento.ChangedConfig.Position,
                         memento.ChangedConfig.Rotation);
                     GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
                     string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);

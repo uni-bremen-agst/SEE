@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -135,7 +136,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
                 {
                     if (hitObject != null)
                     {
-                        GameStickyNoteManager.SetRotateX(
+                        GameStickyNoteTransform.SetRotateX(
                             stickyNoteHolder,
                             90,
                             stickyNoteHolder.transform.position,
@@ -143,7 +144,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
                     }
                     else
                     {
-                        GameStickyNoteManager.SetRotateX(
+                        GameStickyNoteTransform.SetRotateX(
                             stickyNoteHolder,
                             90);
 
@@ -183,7 +184,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
                 .GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
                 {
-                    GameStickyNoteManager.SetRotateX(
+                    GameStickyNoteTransform.SetRotateX(
                         stickyNoteHolder,
                         0);
 

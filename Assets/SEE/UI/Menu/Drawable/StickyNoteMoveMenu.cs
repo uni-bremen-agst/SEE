@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
@@ -129,7 +130,7 @@ namespace SEE.UI.Menu.Drawable
             GameFinder.FindAttachedOrLocalDescendant(gameObject, buttonName)
                 .AddComponent<ButtonHeld>().SetAction(() =>
                 {
-                    Vector3 newPosition = GameStickyNoteManager.MoveByMenu(
+                    Vector3 newPosition = GameStickyNoteTransform.MoveByMenu(
                         stickyNoteHolder, direction, speed);
 
                     if (!spawnMode)

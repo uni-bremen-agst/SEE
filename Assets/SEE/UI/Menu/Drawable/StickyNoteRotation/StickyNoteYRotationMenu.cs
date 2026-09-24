@@ -1,8 +1,8 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -200,7 +200,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
                 {
                     slider.AssignValue(degree);
 
-                    GameStickyNoteManager.SetRotateY(
+                    GameStickyNoteTransform.SetRotateY(
                         stickyNoteHolder,
                         degree);
 
@@ -245,7 +245,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             slider.OnValueChanged.AddListener(degree =>
             {
-                GameStickyNoteManager.SetRotateY(
+                GameStickyNoteTransform.SetRotateY(
                     stickyNote,
                     degree);
 

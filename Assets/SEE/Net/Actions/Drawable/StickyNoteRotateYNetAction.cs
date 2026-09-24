@@ -1,4 +1,4 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.StickyNote;
 using SEE.GO;
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameStickyNoteManager.SetRotateY(Surface.GetRootParent(), Degree);
+            GameStickyNoteTransform.SetRotateY(Surface.GetRootParent(), Degree);
         }
     }
 }
