@@ -16,12 +16,16 @@ using UnityEngine;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Reports, for every file having a certain extension, located in one of a
-    /// set of directories and still present in the repository, the number of
-    /// lines added, the number of lines deleted, the number of commits, and the
-    /// list of authors, taking only commits into account that were authored at
-    /// or after a chosen date. The commits are those reachable from any of a set
-    /// of selected branches, each counted once however many of them reach it.
+    /// Builds a graph of the files having a certain extension and located in one
+    /// of a set of directories: a node for every one of them that survived in a
+    /// selected branch, carrying the number of lines added, the number of lines
+    /// deleted, the number of commits and the authors, counting only commits
+    /// authored at or after a chosen date. The commits are those reachable from
+    /// any of the selected branches, each counted once however many reach it.
+    ///
+    /// A file untouched in that period has a node all the same, its every count
+    /// standing at nought. Only the files that were changed are worth a line in
+    /// the report, which states how many of each there are.
     /// </summary>
     /// <remarks>
     /// This is the LibGit2Sharp counterpart of the following query, aggregated
@@ -134,7 +138,7 @@ namespace SEE.VCS
             GitRepository repositoryConfiguration = new(new DataPath(DataPath.ProjectFolder()), filter);
 
             yield return new TestCaseData(since, repositoryConfiguration)
-                .SetName("SEE sources and tests");
+                .SetName(nameof(TestChurn));
         }
 
         /// <summary>
@@ -248,8 +252,22 @@ namespace SEE.VCS
                         + "nothing was changed in the period, or the paths the session reports "
                         + "differ in form from the paths a comparison of two commits yields.");
 
-            Graph graph = GraphOf(churn, formerNames, repositoryPath, session, simplifyGraph);
-            string report = GraphAccount.Of(graph) + Report(churn, formerNames, criteria, selected);
+            // A node for every file that survived in one of the branches, whether
+            // or not it was changed in the period, as GitGraphGenerator does. One
+            // untouched carries the metrics of its code and nothing else, every
+            // count of its history standing at nought.
+            IDictionary<string, Churn> all = new Dictionary<string, Churn>(churn);
+            foreach (string path in present)
+            {
+                if (!all.ContainsKey(path))
+                {
+                    all[path] = new Churn();
+                }
+            }
+
+            Graph graph = GraphOf(all, formerNames, repositoryPath, session, simplifyGraph);
+            string report
+                = GraphAccount.Of(graph) + Report(churn, formerNames, criteria, selected, all.Count);
             Debug.Log(report);
             foreach (KeyValuePair<string, Churn> file in churn)
             {
@@ -275,9 +293,10 @@ namespace SEE.VCS
             // that account would fall silent just when the number is nought.
             int coChanges
                 = graph.Edges().Count(edge => edge.Type == DataModel.DG.VCS.CoChangeType);
-            Debug.Log($"{churn.Count} files are reported on: of the {withChurn} with churn in the "
-                      + $"period, that many are still present at the tip of one of the "
-                      + $"{selected.Count} branches, which hold {present.Count} files in all. "
+            Debug.Log($"{present.Count} files have a node, being what survived in the "
+                      + $"{selected.Count} branches; {churn.Count} of them were changed in the "
+                      + $"period, of {withChurn} changed in all, the rest having been deleted "
+                      + "since. "
                       + $"{walked} commits were walked. "
                       + $"{coChanges} edges of type {DataModel.DG.VCS.CoChangeType} join two "
                       + "files a commit changed together.\n");
@@ -601,10 +620,13 @@ namespace SEE.VCS
         /// it carries at the end.</param>
         /// <param name="criteria">States the period reported on.</param>
         /// <param name="selected">The branches whose union was walked.</param>
+        /// <param name="surviving">How many files survived in one of those branches, changed
+        /// or not. Each has a node, whereas only the changed ones are worth a line here.</param>
         /// <returns>The report.</returns>
         private static string Report(IDictionary<string, Churn> churn,
                                      IDictionary<string, ISet<string>> formerNames,
-                                     Criteria criteria, ICollection<Branch> selected)
+                                     Criteria criteria, ICollection<Branch> selected,
+                                     int surviving)
         {
             StringBuilder result = new();
             // The separators are quoted, because an unquoted '-' and ':' stand
@@ -612,8 +634,8 @@ namespace SEE.VCS
             // The number of files stands in the heading so that a report holding
             // a different number of them differs from its baseline in the first
             // line, rather than only somewhere down the table.
-            result.AppendLine($"===== {churn.Count} files, {selected.Count} branches, "
-                              + "author date >= "
+            result.AppendLine($"===== {churn.Count} of {surviving} files changed, "
+                              + $"{selected.Count} branches, author date >= "
                               + criteria.Since.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszzz")
                               + " =====");
             if (churn.Count == 0)
@@ -722,10 +744,11 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// The metrics of <paramref name="churn"/> as a graph: one node per file,
-        /// nested in nodes standing for the directories holding them, under a
-        /// single root standing for the repository, with an edge between every
-        /// two files a commit changed together.
+        /// The metrics of <paramref name="churn"/> as a graph: one node per file
+        /// that survived in a selected branch, nested in nodes standing for the
+        /// directories holding them, under a single root standing for the
+        /// repository, with an edge between every two files a commit changed
+        /// together.
         /// </summary>
         /// <remarks>
         /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
@@ -747,7 +770,9 @@ namespace SEE.VCS
         /// says so, again by <see cref="GitGraphGenerator"/>. Only directory
         /// nodes go, so the edges between files outlive it.
         /// </remarks>
-        /// <param name="churn">The churn per file the graph is to hold.</param>
+        /// <param name="churn">The churn of every file the graph is to hold a node for.
+        /// A file untouched in the period is among them, with nothing counted against
+        /// it.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end.</param>
         /// <param name="repositoryPath">The path of the repository the graph stands for.</param>
