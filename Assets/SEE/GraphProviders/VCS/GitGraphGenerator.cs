@@ -457,7 +457,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
-        private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
+        internal static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
         {
             foreach (Node node in graph.Nodes())
             {

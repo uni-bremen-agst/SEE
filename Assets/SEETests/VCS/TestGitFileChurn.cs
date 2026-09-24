@@ -238,7 +238,7 @@ namespace SEE.VCS
                         + "nothing was changed in the period, or the paths the session reports "
                         + "differ in form from the paths a comparison of two commits yields.");
 
-            Graph graph = GraphOf(churn, formerNames, repositoryPath);
+            Graph graph = GraphOf(churn, formerNames, repositoryPath, session);
             string report = Summary(graph) + Report(churn, formerNames, criteria, selected);
             Debug.Log(report);
             foreach (KeyValuePair<string, Churn> file in churn)
@@ -945,7 +945,11 @@ namespace SEE.VCS
                                                      DataModel.DG.VCS.LinesAdded,
                                                      DataModel.DG.VCS.LinesRemoved,
                                                      DataModel.DG.VCS.Churn,
-                                                     DataModel.DG.VCS.TruckNumber })
+                                                     DataModel.DG.VCS.TruckNumber,
+                                                     Metrics.LOC,
+                                                     Metrics.Comments,
+                                                     Metrics.NumberOfTokens,
+                                                     Metrics.McCabe })
             {
                 int sum = graph.Nodes().Sum(node => node.TryGetInt(metric, out int value) ? value : 0);
                 result.AppendLine($"{sum,8}  {metric} over all nodes");
@@ -959,6 +963,10 @@ namespace SEE.VCS
             result.AppendLine($"{churnOfAuthors.Count(),8}  attributes {perAuthor}<author>");
             result.AppendLine($"{churnOfAuthors.Sum(attribute => attribute.Value),8}  "
                               + $"{perAuthor}<author> over all nodes");
+            // Counted, not summed: the Halstead metrics are fractions, and a
+            // fraction written out is a poor thing to hold a baseline against.
+            result.AppendLine($"{graph.Nodes().Count(HasHalstead),8}  nodes with "
+                              + $"{Halstead.Prefix}* attributes");
             foreach (IGrouping<string, Edge> ofType in graph.Edges()
                                                             .GroupBy(edge => edge.Type)
                                                             .OrderBy(group => group.Key,
@@ -972,6 +980,17 @@ namespace SEE.VCS
                                     ? value : 0);
             result.AppendLine($"{together,8}  {DataModel.DG.VCS.ChangedTogether} over all edges");
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Whether <paramref name="node"/> carries any of the Halstead metrics.
+        /// </summary>
+        /// <param name="node">The node to be checked.</param>
+        /// <returns>True if and only if it carries one.</returns>
+        private static bool HasHalstead(Node node)
+        {
+            return node.FloatAttributes.Keys.Any(name => name.StartsWith(Halstead.Prefix,
+                                                                         StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -989,6 +1008,12 @@ namespace SEE.VCS
         /// here they are edges, a relation between two files being what an edge
         /// is for. And it has no notion of the names a file carried before.
         ///
+        /// The metrics of the code itself are gathered by
+        /// <see cref="GitGraphGenerator.AddCodeMetrics"/>, called here rather
+        /// than written afresh. Mind that it reads and lexes the content of
+        /// every file, which for a repository the size of SEE is the greater
+        /// part of the time this takes.
+        ///
         /// Nor is the hierarchy simplified: <see cref="GitGraphGenerator"/> can
         /// collapse a chain of directory nodes into its innermost one, which is
         /// left for later along with the flag asking for it.
@@ -997,10 +1022,12 @@ namespace SEE.VCS
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end.</param>
         /// <param name="repositoryPath">The path of the repository the graph stands for.</param>
+        /// <param name="session">Used to read the content of a file, which the metrics of its
+        /// code are gathered from.</param>
         /// <returns>The graph.</returns>
         private static Graph GraphOf(IDictionary<string, Churn> churn,
                                      IDictionary<string, ISet<string>> formerNames,
-                                     string repositoryPath)
+                                     string repositoryPath, GitRepositorySession session)
         {
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
             Graph result = new(repositoryPath, repositoryName);
@@ -1039,6 +1066,9 @@ namespace SEE.VCS
                 }
             }
 
+            // The metrics of the code itself, gathered by GitGraphGenerator
+            // from the content of each file, rather than from its history.
+            GitGraphGenerator.AddCodeMetrics(result, session);
             AddCoChanges(result, churn, nodes);
             result.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
             result.FinalizeNodeHierarchy();
