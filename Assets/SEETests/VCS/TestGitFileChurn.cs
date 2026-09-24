@@ -214,12 +214,14 @@ namespace SEE.VCS
                 = ChurnOf(repository, selected, criteria, mailmap, formerNames, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
+            int withChurn = churn.Count;
             churn = churn.Where(file => present.Contains(file.Key))
                          .ToDictionary(file => file.Key, file => file.Value);
             Assert.That(churn, Is.Not.Empty,
-                        "Not one file of the repository is reported on. Either nothing was "
-                        + "changed in the period, or the paths the session reports differ in "
-                        + "form from the paths a comparison of two commits yields.");
+                        $"Not one file of the repository is reported on, though {withChurn} have "
+                        + $"churn in the period and {present.Count} are present at a tip. Either "
+                        + "nothing was changed in the period, or the paths the session reports "
+                        + "differ in form from the paths a comparison of two commits yields.");
 
             string report = Report(churn, formerNames, criteria, selected);
             Debug.Log(report);
@@ -232,8 +234,10 @@ namespace SEE.VCS
             }
             changePercentage?.Invoke(1f);
 
-            Debug.Log($"{walked} commits were walked over the union of "
-                      + $"{selected.Count} branches.\n");
+            Debug.Log($"{churn.Count} files are reported on: of the {withChurn} with churn in the "
+                      + $"period, that many are still present at the tip of one of the "
+                      + $"{selected.Count} branches, which hold {present.Count} files in all. "
+                      + $"{walked} commits were walked.\n");
             SortedDictionary<string, string> tips = new(StringComparer.Ordinal);
             foreach (Branch branch in selected)
             {
@@ -538,7 +542,11 @@ namespace SEE.VCS
             StringBuilder result = new();
             // The separators are quoted, because an unquoted '-' and ':' stand
             // for the date and the time separator of the current culture.
-            result.AppendLine($"===== {selected.Count} branches, author date >= "
+            // The number of files stands in the heading so that a report holding
+            // a different number of them differs from its baseline in the first
+            // line, rather than only somewhere down the table.
+            result.AppendLine($"===== {churn.Count} files, {selected.Count} branches, "
+                              + "author date >= "
                               + criteria.Since.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszzz")
                               + " =====");
             if (churn.Count == 0)
