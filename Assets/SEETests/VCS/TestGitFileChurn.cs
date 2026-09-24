@@ -47,10 +47,15 @@ namespace SEE.VCS
     /// Identity and date are the author's rather than the committer's, so that
     /// rebases, cherry-picks and the merges GitHub records under its own name do
     /// neither reattribute the work nor move it across the date boundary.
-    /// Renames are followed, hence all churn of a file is aggregated under the
-    /// name the file carries last. Where two branches renamed one file
-    /// differently, the more recent rename decides; the names given up along the
-    /// way are reported beside the file.
+    /// A rename is followed where the name given up is gone for good, hence all
+    /// churn of such a file is aggregated under the name it carries last, and the
+    /// names given up along the way are reported beside it. Where two branches
+    /// renamed one file differently, the more recent rename decides.
+    ///
+    /// Where the old name is still present at the tip of some branch, though, the
+    /// rename is not followed: a rename is a fact about the branch it was made on,
+    /// and on the others that file is alive and still being worked on under the
+    /// name it always had.
     ///
     /// LibGit2Sharp 0.29 has no equivalent of git's %aN, that is, it does not
     /// read .mailmap. <see cref="Mailmap"/> makes up for that, so that the
@@ -240,7 +245,7 @@ namespace SEE.VCS
             IDictionary<string, ISet<string>> formerNames = new Dictionary<string, ISet<string>>();
             IDictionary<string, Churn> churn
                 = ChurnOf(repository, selected, criteria, mailmap, formerNames,
-                          computeCoFileChanges, out int walked, token);
+                          present, computeCoFileChanges, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
             int withChurn = churn.Count;
@@ -383,6 +388,8 @@ namespace SEE.VCS
         /// <param name="mailmap">Used to map an author onto their canonical name.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end; will be extended.</param>
+        /// <param name="surviving">The files still present at the tip of one of the
+        /// branches. A rename away from one of those is not followed.</param>
         /// <param name="computeCoFileChanges">Whether to note which files a commit changed
         /// together. Off, the co-changes of a file stay empty.</param>
         /// <param name="walked">How many commits the walk visited.</param>
@@ -394,6 +401,7 @@ namespace SEE.VCS
                Criteria criteria,
                Mailmap mailmap,
                IDictionary<string, ISet<string>> formerNames,
+               ISet<string> surviving,
                bool computeCoFileChanges,
                out int walked,
                CancellationToken token)
@@ -462,7 +470,7 @@ namespace SEE.VCS
                         touched.Add(target);
                         if (change.Status == ChangeKind.Renamed)
                         {
-                            Note(renamedTo, formerNames, change.OldPath, target);
+                            Note(renamedTo, formerNames, surviving, change.OldPath, target);
                         }
                     }
                     if (computeCoFileChanges && touched.Count > 1)
@@ -495,7 +503,7 @@ namespace SEE.VCS
                         if (change.Status == ChangeKind.Renamed
                             && (criteria.InScope(change.Path) || criteria.InScope(change.OldPath)))
                         {
-                            Note(renamedTo, formerNames, change.OldPath,
+                            Note(renamedTo, formerNames, surviving, change.OldPath,
                                  Follow(renamedTo, change.Path));
                         }
                     }
@@ -564,15 +572,25 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="renamedTo">The renames noted so far; will be extended.</param>
         /// <param name="formerNames">The former names noted so far; will be extended.</param>
+        /// <param name="surviving">The files still present at the tip of one of the
+        /// branches.</param>
         /// <param name="oldPath">The former name of the file.</param>
         /// <param name="target">The name the file carries later on.</param>
+        /// <remarks>
+        /// A rename is a fact about the one branch it was made on. Where the old
+        /// name is still present at the tip of another, the two are distinct files,
+        /// each alive and each with work of its own, and the rename is not followed:
+        /// doing so would attribute everything ever done to the old one to a name
+        /// its own branch has never borne, and leave its node empty.
+        /// </remarks>
         private static void Note(IDictionary<string, string> renamedTo,
                                  IDictionary<string, ISet<string>> formerNames,
-                                 string oldPath, string target)
+                                 ISet<string> surviving, string oldPath, string target)
         {
-            // The condition keeps a file renamed away and later renamed back from
-            // becoming a cycle of length one.
-            if (oldPath != target)
+            // The first condition keeps a file renamed away and later renamed back
+            // from becoming a cycle of length one; the second leaves a file that is
+            // still there to its own history. See the remarks above.
+            if (oldPath != target && !surviving.Contains(oldPath))
             {
                 // The first rename seen for a name wins, it being the most
                 // recent one: the walk yields the newest commit first. A later,
