@@ -217,6 +217,15 @@ namespace SEE.VCS
         /// boundary is one moment for every commit rather than one per author.
         /// </summary>
         /// <remarks>
+        /// Every commit reachable from a branch is looked at. The walk used to stop at the
+        /// first commit committed before <paramref name="startDate"/>, on the grounds that
+        /// no commit beyond it could qualify. That holds only where the dates increase along
+        /// the walk, and they need not: a rebase, a cherry-pick or a clock out of step all
+        /// let a parent carry a later date than its child, and a commit that should have
+        /// counted was then silently passed over. What the stopping saved has in any case
+        /// dwindled, the commits being walked once over the union of the branches rather
+        /// than once for each of them.
+        ///
         /// Formerly the date of a commit was compared to <paramref name="startDate"/> by the
         /// day, and only a later day passed. Two shortcomings went with that. The day of a
         /// commit was the day in the offset of its own author, so two commits made at the
@@ -238,19 +247,11 @@ namespace SEE.VCS
                 SortBy = CommitSortStrategies.Time
             }))
             {
-                // The tricky thing here is that we -- on the one hand -- want to stop early
-                // once we hit the cutoff date for performance reasons, but -- on the other hand --
-                // also have to account for rebased commits.
-                // This approach assumes that the user has not manipulated the dates of their repository.
+                // Every commit is looked at, the walk never stopping early. See
+                // the remarks above for why.
                 if (commit.Author.When >= since && commit.Parents.Count() <= 1)
                 {
                     yield return commit;
-                }
-
-                // Hard cutoff criteria - all parent commits should not be newer than this.
-                if (commit.Committer.When < since)
-                {
-                    yield break;
                 }
             }
         }
