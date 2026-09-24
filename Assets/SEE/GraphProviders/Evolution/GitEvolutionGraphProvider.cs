@@ -149,39 +149,15 @@ namespace SEE.GraphProviders.Evolution
 
             return graph;
             */
-        }
 
-        /// <summary>
-        /// Returns one evolution step of a commit (<paramref name="currentCommit"/>).
-        ///
-        /// This graph represents all commits between the setted time limit in <see cref="Date"/> and <paramref name="currentCommit"/>.
-        /// </summary>
-        /// <param name="repoName">The name of the git repository.</param>
-        /// <param name="currentCommit">The current commit to generate the graph.</param>
-        /// <param name="commitsInBetween">All commits from the very first commit of the considered
-        /// part of the history until <paramref name="currentCommit"/>.</param>
-        /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
-        /// <param name="files">The set of files in the git repository to be considered.</param>
-        /// <returns>The graph of the evolution step.</returns>
-        private Graph GetGraphOfCommit
-            (string repoName,
-            Commit currentCommit,
-            List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges,
-            HashSet<string> files)
-        {
-            Graph graph = new(GitRepository.RepositoryPath.Path)
-            {
-                BasePath = GitRepository.RepositoryPath.Path
-            };
-
-            graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
-            graph.StringAttributes.Add("CommitId", currentCommit.Sha);
-            using GitRepositorySession gitRepositorySession = GitRepository.OpenGitSession();
-            GitGraphGenerator.AddNodesForCommits
-                (graph, SimplifyGraph, gitRepositorySession, repoName, files, commitsInBetween, commitChanges,
-                ComputeCoFileChanges);
-            return graph;
+            // GetGraphOfCommit, which the loop above called, is gone. It built the
+            // graph of one evolution step by handing GitGraphGenerator a list of
+            // commits and a patch for each, and that entry point had no other
+            // caller and has been dropped along with it. Whoever revives this
+            // provider should ask ChurnGraphGenerator for the graph between two
+            // commits instead, and let it walk the history itself rather than
+            // building every patch up front, which the note above rightly calls
+            // expensive.
         }
 
         /// <summary>

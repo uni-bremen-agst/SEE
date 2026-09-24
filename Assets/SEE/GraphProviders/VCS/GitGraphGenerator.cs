@@ -176,42 +176,6 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Calculates <see cref="GitFileMetrics"/> for all <paramref name="files"/> and adds
-        /// these to their corresponding nodes in the <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">Where to add the file metrics.</param>
-        /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repositorySession">The repository session from which the nodes and metrics are derived.</param>
-        /// <param name="repositoryName">The name of the repository.</param>
-        /// <param name="files">The files for which to calculate the metrics.</param>
-        /// <param name="commitsInBetween">The metrics will be gathered for only the commits in this list.</param>
-        /// <param name="commitChanges">The changes associated with each commit in <paramref name="commitsInBetween"/>;
-        /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
-        /// <paramref name="commitChanges"/>.</param>
-        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
-        internal static void AddNodesForCommits
-            (Graph graph,
-             bool simplifyGraph,
-             GitRepositorySession repositorySession,
-             string repositoryName,
-             HashSet<string> files,
-             IList<Commit> commitsInBetween,
-             IDictionary<Commit, Patch> commitChanges,
-             bool computeCoFileChanges)
-        {
-            FileToMetrics fileToMetrics = Prepare(graph, files);
-
-            foreach (Commit commitInBetween in commitsInBetween)
-            {
-                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween],
-                                      computeCoFileChanges, repositorySession.Mailmap);
-            }
-
-            Finalize(graph, simplifyGraph, repositorySession, repositoryName, fileToMetrics);
-        }
-
-        /// <summary>
         /// Updates the metrics of <paramref name="fileToMetrics"/> according to the <paramref name="commit"/>
         /// for all files changed by <paramref name="patch"/>.
         /// </summary>
