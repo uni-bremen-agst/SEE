@@ -181,10 +181,7 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new color for the image.</param>
         public static void ChangeImageColor(GameObject imageObj, Color color)
         {
-            if (imageObj.CompareTag(Tags.Image))
-            {
-                imageObj.GetComponent<Image>().color = color;
-            }
+            GameImageEdit.ChangeImageColor(imageObj, color);
         }
 
         /// <summary>
@@ -194,12 +191,7 @@ namespace SEE.Game.Drawable
         /// <param name="conf">The configuration which holds the necessary values.</param>
         public static void ChangeImage(GameObject imageObj, ImageConf conf)
         {
-            if (imageObj.CompareTag(Tags.Image))
-            {
-                ChangeLayer(imageObj, conf.OrderInLayer);
-                ChangeImageColor(imageObj, conf.ImageColor);
-                GameMoveRotator.SetRotateY(imageObj, conf.EulerAngles.y);
-            }
+            GameImageEdit.ChangeImage(imageObj, conf);
         }
 
         /// <summary>
