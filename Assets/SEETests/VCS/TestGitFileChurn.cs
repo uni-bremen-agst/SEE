@@ -1,6 +1,8 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using NUnit.Framework;
+using SEE.DataModel.DG;
+using SEE.GraphProviders.VCS;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -223,7 +225,8 @@ namespace SEE.VCS
                         + "nothing was changed in the period, or the paths the session reports "
                         + "differ in form from the paths a comparison of two commits yields.");
 
-            string report = Report(churn, formerNames, criteria, selected);
+            Graph graph = GraphOf(churn, formerNames, repositoryPath);
+            string report = Summary(graph) + Report(churn, formerNames, criteria, selected);
             Debug.Log(report);
             foreach (KeyValuePair<string, Churn> file in churn)
             {
@@ -387,7 +390,7 @@ namespace SEE.VCS
                         }
                         string target = Follow(renamedTo, change.Path);
                         Record(result, target, change.LinesAdded, change.LinesDeleted,
-                               commit.Sha, mailmap.NameOf(author));
+                               commit.Sha, mailmap.AuthorOf(author));
                         if (change.Status == ChangeKind.Renamed)
                         {
                             Note(renamedTo, formerNames, change.OldPath, target);
@@ -458,9 +461,9 @@ namespace SEE.VCS
         /// <param name="linesAdded">The number of lines the change adds.</param>
         /// <param name="linesDeleted">The number of lines the change deletes.</param>
         /// <param name="sha">The SHA of the commit making the change.</param>
-        /// <param name="author">The canonical name of the author of that commit.</param>
+        /// <param name="author">The canonical identity of the author of that commit.</param>
         private static void Record(IDictionary<string, Churn> churn, string path, int linesAdded,
-                                   int linesDeleted, string sha, string author)
+                                   int linesDeleted, string sha, FileAuthor author)
         {
             if (!churn.TryGetValue(path, out Churn file))
             {
@@ -563,7 +566,7 @@ namespace SEE.VCS
             {
                 result.AppendLine($"{file.Value.LinesAdded,8}  {file.Value.LinesDeleted,8}  "
                                   + $"{file.Value.Commits,8}  {file.Key.PadRight(width)}  "
-                                  + string.Join(", ", file.Value.Authors));
+                                  + string.Join(", ", file.Value.Authors.Select(a => a.Name)));
                 // On a line of its own: a file that has been renamed is the
                 // exception, and a name is as long as the one above it.
                 if (formerNames.TryGetValue(file.Key, out ISet<string> names))
@@ -861,6 +864,119 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// The account of <paramref name="graph"/> that is held against the
+        /// baseline: how many nodes of each type it holds, and what its metrics
+        /// come to over all of them.
+        /// </summary>
+        /// <remarks>
+        /// The graph itself is far too large to keep in a baseline, yet a change
+        /// to the way it is built should not pass unnoticed. These few numbers
+        /// move whenever the nodes or their attributes do.
+        /// </remarks>
+        /// <param name="graph">The graph to be accounted for.</param>
+        /// <returns>The account.</returns>
+        private static string Summary(Graph graph)
+        {
+            StringBuilder result = new();
+            result.AppendLine("===== graph =====");
+            foreach (IGrouping<string, Node> ofType in graph.Nodes()
+                                                            .GroupBy(node => node.Type)
+                                                            .OrderBy(group => group.Key,
+                                                                     StringComparer.Ordinal))
+            {
+                result.AppendLine($"{ofType.Count(),8}  nodes of type {ofType.Key}");
+            }
+            foreach (string metric in new string[] { DataModel.DG.VCS.NumberOfDevelopers,
+                                                     DataModel.DG.VCS.NumberOfCommits,
+                                                     DataModel.DG.VCS.LinesAdded,
+                                                     DataModel.DG.VCS.LinesRemoved,
+                                                     DataModel.DG.VCS.Churn })
+            {
+                int sum = graph.Nodes().Sum(node => node.TryGetInt(metric, out int value) ? value : 0);
+                result.AppendLine($"{sum,8}  {metric} over all nodes");
+            }
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// The metrics of <paramref name="churn"/> as a graph: one node per file,
+        /// nested in nodes standing for the directories holding them, under a
+        /// single root standing for the repository.
+        /// </summary>
+        /// <remarks>
+        /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
+        /// from a <see cref="GitFileMetrics"/>, less the three not yet gathered:
+        /// the churn per author, the files changed together with a file, and the
+        /// truck factor. A node therefore carries no
+        /// <see cref="DataModel.DG.VCS.TruckNumber"/> as yet.
+        ///
+        /// Nor is the hierarchy simplified: <see cref="GitGraphGenerator"/> can
+        /// collapse a chain of directory nodes into its innermost one, which is
+        /// left for later along with the flag asking for it.
+        /// </remarks>
+        /// <param name="churn">The churn per file the graph is to hold.</param>
+        /// <param name="formerNames">The names a renamed file carried before, keyed by the name
+        /// it carries at the end.</param>
+        /// <param name="repositoryPath">The path of the repository the graph stands for.</param>
+        /// <returns>The graph.</returns>
+        private static Graph GraphOf(IDictionary<string, Churn> churn,
+                                     IDictionary<string, ISet<string>> formerNames,
+                                     string repositoryPath)
+        {
+            string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
+            Graph result = new(repositoryPath, repositoryName);
+
+            foreach (KeyValuePair<string, Churn> file in churn)
+            {
+                GitFileMetrics metrics = MetricsOf(file.Value);
+                Node node = GraphUtils.GetOrAddFileNode(result, file.Key);
+                node.SetInt(DataModel.DG.VCS.NumberOfDevelopers, metrics.Authors.Count);
+                node.SetInt(DataModel.DG.VCS.NumberOfCommits, metrics.NumberOfCommits);
+                node.SetInt(DataModel.DG.VCS.LinesAdded, metrics.LinesAdded);
+                node.SetInt(DataModel.DG.VCS.LinesRemoved, metrics.LinesRemoved);
+                node.SetInt(DataModel.DG.VCS.Churn, metrics.Churn);
+                if (metrics.Authors.Any())
+                {
+                    node.SetString(DataModel.DG.VCS.AuthorsAttributeName,
+                                   string.Join(',', metrics.Authors));
+                }
+                // Joined into one attribute, as the authors above are. Should
+                // one attribute per former name be wanted instead, this is the
+                // one place to say so.
+                if (formerNames.TryGetValue(file.Key, out ISet<string> names))
+                {
+                    node.SetString(formerNamesAttribute, string.Join(',', names));
+                }
+            }
+
+            result.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
+            result.FinalizeNodeHierarchy();
+            return result;
+        }
+
+        /// <summary>
+        /// The churn <paramref name="churn"/> holds, as the
+        /// <see cref="GitFileMetrics"/> a graph node carries.
+        /// </summary>
+        /// <param name="churn">The churn of one file.</param>
+        /// <returns>The metrics of that file.</returns>
+        private static GitFileMetrics MetricsOf(Churn churn)
+        {
+            return new GitFileMetrics(churn.Commits, churn.Authors.ToHashSet(),
+                                      churn.LinesAdded, churn.LinesDeleted);
+        }
+
+        /// <summary>
+        /// The name of the node attribute holding the names a file carried
+        /// before it was renamed, separated by commas.
+        /// </summary>
+        /// <remarks>
+        /// Not one of <see cref="DataModel.DG.VCS"/>, there being none for this
+        /// yet. Moving it there is due when this leaves the test.
+        /// </remarks>
+        private const string formerNamesAttribute = "Former_Names";
+
+        /// <summary>
         /// What is reported on: from when, which files, which branches. Handed
         /// to everything needing to know, so that it is stated in one place only.
         /// </summary>
@@ -948,9 +1064,11 @@ namespace SEE.VCS
 
             /// <summary>
             /// The authors of those commits, in the order they first occur in and
-            /// without repetition.
+            /// without repetition. Identities rather than names, an author being
+            /// a name and an address, which is what <see cref="GitFileMetrics"/>
+            /// holds as well.
             /// </summary>
-            private readonly IList<string> authors = new List<string>();
+            private readonly IList<FileAuthor> authors = new List<FileAuthor>();
 
             /// <summary>
             /// The number of commits touching the file.
@@ -960,7 +1078,7 @@ namespace SEE.VCS
             /// <summary>
             /// The authors of those commits, in the order they first occur in.
             /// </summary>
-            internal IEnumerable<string> Authors => authors;
+            internal IEnumerable<FileAuthor> Authors => authors;
 
             /// <summary>
             /// Accounts for one change of the file.
@@ -969,7 +1087,7 @@ namespace SEE.VCS
             /// <param name="linesDeleted">The number of lines the change deletes.</param>
             /// <param name="sha">The SHA of the commit the change belongs to.</param>
             /// <param name="author">The author of that commit.</param>
-            internal void Add(int linesAdded, int linesDeleted, string sha, string author)
+            internal void Add(int linesAdded, int linesDeleted, string sha, FileAuthor author)
             {
                 LinesAdded += linesAdded;
                 LinesDeleted += linesDeleted;
@@ -998,16 +1116,16 @@ namespace SEE.VCS
             /// Maps the address recorded in a commit onto the canonical name of
             /// its author.
             /// </summary>
-            private readonly IDictionary<string, string> byEmail
-                = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            private readonly IDictionary<string, FileAuthor> byEmail
+                = new Dictionary<string, FileAuthor>(StringComparer.OrdinalIgnoreCase);
 
             /// <summary>
             /// Maps the name and the address recorded in a commit, in the form
             /// produced by <see cref="Key"/>, onto the canonical name of its
             /// author. Takes precedence over <see cref="byEmail"/>.
             /// </summary>
-            private readonly IDictionary<string, string> byNameAndEmail
-                = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            private readonly IDictionary<string, FileAuthor> byNameAndEmail
+                = new Dictionary<string, FileAuthor>(StringComparer.OrdinalIgnoreCase);
 
             /// <summary>
             /// The mapping given by the .mailmap file at <paramref name="path"/>.
@@ -1069,40 +1187,41 @@ namespace SEE.VCS
                 if (emails.Count == 1 && names[0].Length > 0)
                 {
                     // "Proper Name <proper@email>".
-                    byEmail[emails[0]] = names[0];
+                    byEmail[emails[0]] = new FileAuthor(names[0], emails[0]);
                 }
                 else if (emails.Count == 2 && names[0].Length > 0)
                 {
                     if (names[1].Length > 0)
                     {
                         // "Proper Name <proper@email> Commit Name <commit@email>".
-                        byNameAndEmail[Key(names[1], emails[1])] = names[0];
+                        byNameAndEmail[Key(names[1], emails[1])] = new FileAuthor(names[0], emails[0]);
                     }
                     else
                     {
                         // "Proper Name <proper@email> <commit@email>".
-                        byEmail[emails[1]] = names[0];
+                        byEmail[emails[1]] = new FileAuthor(names[0], emails[0]);
                     }
                 }
             }
 
             /// <summary>
-            /// The canonical name of <paramref name="author"/>, or the name their
-            /// commit records if this mapping has nothing to say about them.
+            /// The canonical identity of <paramref name="author"/>, or the name
+            /// and address their commit records if this mapping has nothing to
+            /// say about them.
             /// </summary>
-            /// <param name="author">The author whose name is asked for.</param>
-            /// <returns>The canonical name.</returns>
-            internal string NameOf(Signature author)
+            /// <param name="author">The author whose identity is asked for.</param>
+            /// <returns>The canonical identity.</returns>
+            internal FileAuthor AuthorOf(Signature author)
             {
-                if (byNameAndEmail.TryGetValue(Key(author.Name, author.Email), out string byBoth))
+                if (byNameAndEmail.TryGetValue(Key(author.Name, author.Email), out FileAuthor byBoth))
                 {
                     return byBoth;
                 }
-                if (byEmail.TryGetValue(author.Email, out string byAddress))
+                if (byEmail.TryGetValue(author.Email, out FileAuthor byAddress))
                 {
                     return byAddress;
                 }
-                return author.Name;
+                return new FileAuthor(author.Name, author.Email);
             }
 
             /// <summary>
