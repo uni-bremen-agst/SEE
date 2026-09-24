@@ -1,5 +1,4 @@
 ﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -46,48 +45,6 @@ namespace SEE.Game.Drawable.MindMap
             }
 
             return createdNode;
-        }
-
-        /// <summary>
-        /// Changes the kind of the given Mind Map node if the requested transition
-        /// is structurally valid.
-        /// </summary>
-        /// <param name="node">The node whose kind should be changed.</param>
-        /// <param name="newNodeKind">The new node kind.</param>
-        /// <param name="borderConf">
-        /// The previous border configuration that should be preserved when applicable.
-        /// </param>
-        /// <returns>The resulting node kind.</returns>
-        public static MindMapNodeKind ChangeNodeKind(GameObject node, MindMapNodeKind newNodeKind,
-            LineConf borderConf = null)
-        {
-            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
-
-            if (nodeValueHolder.NodeKind != newNodeKind
-                && GameMindMapHierarchy.CheckValidNodeKindChange(
-                    node, newNodeKind, nodeValueHolder.NodeKind))
-            {
-                if (newNodeKind == MindMapNodeKind.Theme)
-                {
-                    // Themes cannot have a parent.
-                    if (nodeValueHolder.GetParent() != null)
-                    {
-                        nodeValueHolder.GetParent()
-                            .GetComponent<MMNodeValueHolder>()
-                            .RemoveChild(node);
-                    }
-
-                    Destroyer.Destroy(nodeValueHolder.GetParentBranchLine());
-                    nodeValueHolder.SetParent(null, null);
-                }
-
-                GameMindMapNode.ApplyNodeKindAppearance(node, newNodeKind, borderConf);
-
-                nodeValueHolder.NodeKind = newNodeKind;
-                GameMindMapBranch.ReDrawBranchLines(node);
-            }
-
-            return nodeValueHolder.NodeKind;
         }
 
         /// <summary>

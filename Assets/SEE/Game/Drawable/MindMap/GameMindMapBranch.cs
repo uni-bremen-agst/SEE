@@ -1,18 +1,15 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
-using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.MindMap
 {
     /// <summary>
-    /// Provides creation, redrawing, and parent-changing behavior
-    /// for branch lines between Mind Map nodes.
+    /// Provides creation and redrawing behavior for branch lines
+    /// between Mind Map nodes.
     /// </summary>
     public static class GameMindMapBranch
     {
@@ -179,64 +176,6 @@ namespace SEE.Game.Drawable.MindMap
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Changes the parent of the given Mind Map node.
-        /// The previous parent relationship and branch line are removed,
-        /// a new branch line is created, and the previous branch-line appearance
-        /// is restored if a corresponding configuration exists.
-        /// </summary>
-        /// <param name="child">The Mind Map node whose parent should be changed.</param>
-        /// <param name="parent">The new parent Mind Map node.</param>
-        public static void ChangeParent(
-            GameObject child,
-            GameObject parent)
-        {
-            if (!child.CompareTag(Tags.MindMapNode)
-                || parent == null
-                || !parent.CompareTag(Tags.MindMapNode))
-            {
-                return;
-            }
-
-            MMNodeValueHolder childValueHolder =
-                child.GetComponent<MMNodeValueHolder>();
-
-            if (childValueHolder.GetParent() == parent
-                || !GameMindMapHierarchy.ParentChangeIsValid(child, parent))
-            {
-                return;
-            }
-
-            if (childValueHolder.GetParent() != null)
-            {
-                childValueHolder.GetParent()
-                    .GetComponent<MMNodeValueHolder>()
-                    .RemoveChild(child);
-            }
-
-            LineConf oldBranchLine = null;
-
-            if (childValueHolder.GetParentBranchLine() != null)
-            {
-                oldBranchLine =
-                    LineConf.GetLine(
-                        childValueHolder.GetParentBranchLine());
-            }
-
-            Destroyer.Destroy(
-                childValueHolder.GetParentBranchLine());
-
-            GameObject newBranchLine =
-                CreateBranchLine(child, parent);
-
-            if (oldBranchLine != null)
-            {
-                GameLineEdit.ChangeLine(
-                    newBranchLine,
-                    oldBranchLine);
-            }
         }
     }
 }

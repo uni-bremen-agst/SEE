@@ -151,7 +151,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                                 surface,
                                 surfaceParentName);
 
-                            GameMindMapBranch.ChangeParent(addedNode, parent);
+                            GameMindMapEdit.ChangeParent(addedNode, parent);
                             newConf.ParentNode = parent.name;
 
                             new MindMapChangeParentNetAction(
@@ -216,7 +216,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             MindMapNodeKind newNodeKind, LineConf borderConf,
             GameObject surface, string surfaceParentName)
         {
-            GameMindMap.ChangeNodeKind(addedNode, newNodeKind, borderConf);
+            GameMindMapEdit.ChangeNodeKind(addedNode, newNodeKind, borderConf);
 
             new MindMapChangeNodeKindNetAction(
                 surface.name,
