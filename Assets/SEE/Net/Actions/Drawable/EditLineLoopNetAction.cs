@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+using SEE.Game.Drawable.Editing;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -40,7 +40,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeLoop(FindChild(LineName), Loop);
+            GameLineEdit.ChangeLoop(FindChild(LineName), Loop);
         }
     }
 }

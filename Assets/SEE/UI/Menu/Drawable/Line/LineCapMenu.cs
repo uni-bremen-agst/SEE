@@ -1,9 +1,10 @@
-﻿using SEE.Game.Drawable.Line;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Shapes;
@@ -294,7 +295,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     line.LineCapEnd = newCapConf;
                 }
 
-                GameEdit.ChangeLineCaps(
+                GameLineEdit.ChangeLineCaps(
                     selectedLine,
                     line,
                     line.LineCapStart.CapKind,
@@ -437,7 +438,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             bool isStartCap = IsStartCapSelected;
 
-            GameEdit.ChangeLineCapStyle(selectedLine, isStartCap, capConf);
+            GameLineEdit.ChangeLineCapStyle(selectedLine, isStartCap, capConf);
 
             SynchronizeShapeMenuLineCapsForPreview(selectedLine, line);
 

@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Line;
+﻿using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
@@ -76,7 +77,7 @@ namespace SEE.Game.Drawable.Configurations
             switch(type)
             {
                 case LineConf line:
-                    GameEdit.ChangeLine(objectToEdit, line);
+                    GameLineEdit.ChangeLine(objectToEdit, line);
                     new EditLineNetAction(surface.name, surfaceParentName, LineConf.GetLineWithoutRenderPos(objectToEdit)).Execute();
                     break;
                 case TextConf text:

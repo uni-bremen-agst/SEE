@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
@@ -533,7 +534,7 @@ namespace SEE.Controls.Actions.Drawable
                     conf.BranchLineToParent = branchLineToParent.name;
                     if (oldBranchLineConf != null)
                     {
-                        GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
+                        GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     }
@@ -563,7 +564,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         GameObject branchLineToParent = GameFinder.FindAttachedOrLocalDescendant(oldSurface, oldValueHolder.ID).
                             GetComponent<MMNodeValueHolder>().GetParentBranchLine();
-                        GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
+                        GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     }
@@ -576,7 +577,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (oldBranchLineConf != null && !editToOldBranchLine)
                 {
                     GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
-                    GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
+                    GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                     new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                         LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     editToOldBranchLine = true;
@@ -608,7 +609,7 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
                                 GetParentBranchLine();
-                            GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                            GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                             new EditLineNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
                                 LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                         }
@@ -669,7 +670,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>().
                             GetParentBranchLine();
-                        GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                        GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     }

@@ -1,8 +1,8 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
 using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable.Line
@@ -76,7 +76,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             controls.LoopManager.OnEvents.AddListener(() =>
             {
-                GameEdit.ChangeLoop(selectedLine, true);
+                GameLineEdit.ChangeLoop(selectedLine, true);
                 lineHolder.Loop = true;
 
                 new EditLineLoopNetAction(
@@ -88,7 +88,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             controls.LoopManager.OffEvents.AddListener(() =>
             {
-                GameEdit.ChangeLoop(selectedLine, false);
+                GameLineEdit.ChangeLoop(selectedLine, false);
                 lineHolder.Loop = false;
 
                 new EditLineLoopNetAction(

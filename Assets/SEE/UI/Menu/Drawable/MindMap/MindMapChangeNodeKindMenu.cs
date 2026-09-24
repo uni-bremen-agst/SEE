@@ -1,6 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
@@ -165,7 +166,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
                             if (parentBranchLine != null && parentBranchLineConf != null)
                             {
-                                GameEdit.ChangeLine(parentBranchLine, parentBranchLineConf);
+                                GameLineEdit.ChangeLine(parentBranchLine, parentBranchLineConf);
 
                                 new EditLineNetAction(
                                     surface.name,

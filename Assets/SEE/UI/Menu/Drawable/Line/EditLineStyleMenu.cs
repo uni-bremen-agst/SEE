@@ -1,5 +1,5 @@
-﻿using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
@@ -255,7 +255,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 if (IsMainSegment)
                 {
-                    GameEdit.ChangeThickness(selectedLine, thickness);
+                    GameLineEdit.ChangeThickness(selectedLine, thickness);
                     lineHolder.Thickness = thickness;
 
                     new EditLineThicknessNetAction(

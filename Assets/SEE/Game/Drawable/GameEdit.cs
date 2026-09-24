@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.Editing;
 using TMPro;
 using UnityEngine;
-using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace SEE.Game.Drawable
@@ -12,70 +11,6 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class GameEdit
     {
-        /// <summary>
-        /// This method changes the thickness of a shape.
-        /// </summary>
-        /// <param name="shape">The shape whose thickness should be changed.</param>
-        /// <param name="thickness">The new thickness.</param>
-        public static void ChangeThickness(GameObject shape, float thickness)
-        {
-            GameLineEdit.ChangeThickness(shape, thickness);
-        }
-
-        /// <summary>
-        /// This method changes the loop state of a line.
-        /// </summary>
-        /// <param name="line">The line whose loop should be changed.</param>
-        /// <param name="loop">The new loop state.</param>
-        public static void ChangeLoop(GameObject line, bool loop)
-        {
-            GameLineEdit.ChangeLoop(line, loop);
-        }
-
-        /// <summary>
-        /// Changes the line caps of a line.
-        /// </summary>
-        /// <param name="line">The line whose line caps should be changed.</param>
-        /// <param name="currentConf">The current line configuration.</param>
-        /// <param name="start">The starting line cap.</param>
-        /// <param name="end">The ending line cap.</param>
-        public static void ChangeLineCaps(
-            GameObject line,
-            LineConf currentConf,
-            LineCap start,
-            LineCap end)
-        {
-            GameLineEdit.ChangeLineCaps(line, currentConf, start, end);
-        }
-
-        /// <summary>
-        /// Changes the visual style of one line cap of the given line.
-        /// If the thickness changes, the line caps are recreated so that the geometric
-        /// size and the connection point of the cap are updated accordingly.
-        /// </summary>
-        /// <param name="line">The line whose line cap style should be changed.</param>
-        /// <param name="isStartCap">
-        /// True if the start cap should be changed, false if the end cap should be changed.
-        /// </param>
-        /// <param name="capConf">The new visual configuration of the line cap.</param>
-        public static void ChangeLineCapStyle(
-            GameObject line,
-            bool isStartCap,
-            LineCapConf capConf)
-        {
-            GameLineEdit.ChangeLineCapStyle(line, isStartCap, capConf);
-        }
-
-        /// <summary>
-        /// This method changes all editable values of a line at once.
-        /// </summary>
-        /// <param name="lineObj">The line whose values should be changed.</param>
-        /// <param name="line">Contains the new values.</param>
-        public static void ChangeLine(GameObject lineObj, LineConf line)
-        {
-            GameLineEdit.ChangeLine(lineObj, line);
-        }
-
         /// <summary>
         /// This method changes all editable values of a drawable text at once.
         /// </summary>
