@@ -248,10 +248,17 @@ namespace SEE.VCS
             }
             changePercentage?.Invoke(1f);
 
+            // Counted rather than read off the account of the graph, where the
+            // edges are grouped by type: a type no edge has is not a group, so
+            // that account would fall silent just when the number is nought.
+            int coChanges
+                = graph.Edges().Count(edge => edge.Type == DataModel.DG.VCS.CoChangeType);
             Debug.Log($"{churn.Count} files are reported on: of the {withChurn} with churn in the "
                       + $"period, that many are still present at the tip of one of the "
                       + $"{selected.Count} branches, which hold {present.Count} files in all. "
-                      + $"{walked} commits were walked.\n");
+                      + $"{walked} commits were walked. "
+                      + $"{coChanges} edges of type {DataModel.DG.VCS.CoChangeType} join two "
+                      + "files a commit changed together.\n");
             SortedDictionary<string, string> tips = new(StringComparer.Ordinal);
             foreach (Branch branch in selected)
             {
@@ -1060,6 +1067,12 @@ namespace SEE.VCS
                     Assert.That(back, Is.EqualTo(coChange.Value),
                                 $"{file.Key} and {coChange.Key} were changed together "
                                 + "a different number of times as seen from either of them.");
+                    // The names differ, the comparison above having let this
+                    // pair through. Two names standing for one node would still
+                    // make a loop of the edge, which is what this rules out.
+                    Assert.That(nodes[coChange.Key], Is.Not.SameAs(nodes[file.Key]),
+                                $"{file.Key} and {coChange.Key} are one and the same node, "
+                                + "so an edge between them would be a self loop.");
                     Edge edge = graph.AddEdge(nodes[file.Key], nodes[coChange.Key],
                                               DataModel.DG.VCS.CoChangeType);
                     edge.SetInt(DataModel.DG.VCS.ChangedTogether, coChange.Value);
