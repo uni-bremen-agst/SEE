@@ -67,6 +67,13 @@ namespace SEE.VCS
         private const int maximalRenameChain = 1000;
 
         /// <summary>
+        /// The share of the churn of a file its core developers are to answer
+        /// for, the truck factor being how many of them that takes. The value
+        /// <see cref="GitGraphGenerator"/> uses.
+        /// </summary>
+        private const float truckFactorCoreDevRatio = 0.8f;
+
+        /// <summary>
         /// The configurations <see cref="TestChurn"/> is run on, one
         /// test case each.
         /// </summary>
@@ -245,6 +252,11 @@ namespace SEE.VCS
                 Assert.That(file.Value.AuthorsChurn.Values.Sum(),
                             Is.EqualTo(file.Value.LinesAdded + file.Value.LinesDeleted),
                             $"The churn of {file.Key} is not what its authors churned.");
+                // Its core developers are some of its authors, and where it has
+                // any they cannot be none: somebody churned what was churned.
+                Assert.That(TruckFactorOf(file.Value.AuthorsChurn),
+                            Is.InRange(1, file.Value.AuthorsChurn.Count),
+                            $"The truck factor of {file.Key} is not a number of its authors.");
             }
             changePercentage?.Invoke(1f);
 
@@ -932,7 +944,8 @@ namespace SEE.VCS
                                                      DataModel.DG.VCS.NumberOfCommits,
                                                      DataModel.DG.VCS.LinesAdded,
                                                      DataModel.DG.VCS.LinesRemoved,
-                                                     DataModel.DG.VCS.Churn })
+                                                     DataModel.DG.VCS.Churn,
+                                                     DataModel.DG.VCS.TruckNumber })
             {
                 int sum = graph.Nodes().Sum(node => node.TryGetInt(metric, out int value) ? value : 0);
                 result.AppendLine($"{sum,8}  {metric} over all nodes");
@@ -969,9 +982,7 @@ namespace SEE.VCS
         /// </summary>
         /// <remarks>
         /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
-        /// from a <see cref="GitFileMetrics"/>, less the truck factor, which is
-        /// not gathered yet; a node therefore carries no
-        /// <see cref="DataModel.DG.VCS.TruckNumber"/> as yet.
+        /// from a <see cref="GitFileMetrics"/>, all of them now.
         ///
         /// Two things go beyond what <see cref="GitGraphGenerator"/> does. It
         /// gathers the files changed together with a file but puts them nowhere;
@@ -1006,6 +1017,7 @@ namespace SEE.VCS
                 node.SetInt(DataModel.DG.VCS.LinesAdded, metrics.LinesAdded);
                 node.SetInt(DataModel.DG.VCS.LinesRemoved, metrics.LinesRemoved);
                 node.SetInt(DataModel.DG.VCS.Churn, metrics.Churn);
+                node.SetInt(DataModel.DG.VCS.TruckNumber, metrics.TruckFactor);
                 if (metrics.Authors.Any())
                 {
                     node.SetString(DataModel.DG.VCS.AuthorsAttributeName,
@@ -1081,6 +1093,53 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// How many of the authors of a file answer for
+        /// <see cref="truckFactorCoreDevRatio"/> of its churn between them, the
+        /// heaviest contributors counted first.
+        /// </summary>
+        /// <remarks>
+        /// The heuristic of Yamashita et al. for the set of core developers,
+        /// as <see cref="GitGraphGenerator"/> computes it.
+        ///
+        /// Which authors those are is not settled where two churned equally,
+        /// yet how many it takes is, the sum reached after so many of them
+        /// being the same however equals are ordered.
+        ///
+        /// Source: https://doi.org/10.1145/2804360.2804366
+        /// </remarks>
+        /// <param name="authorsChurn">What each author churned of the file.</param>
+        /// <returns>The truck factor of the file.</returns>
+        private static int TruckFactorOf(IDictionary<FileAuthor, int> authorsChurn)
+        {
+            if (authorsChurn.Count == 0)
+            {
+                return 0;
+            }
+            int total = authorsChurn.Values.Sum();
+            if (total == 0)
+            {
+                // Nobody churned anything, the file having been renamed and not
+                // otherwise touched in the period. One is what
+                // GitGraphGenerator arrives at here, by way of a ratio of zero
+                // over zero, and so this says as much without the arithmetic.
+                return 1;
+            }
+
+            float cumulative = 0;
+            int coreDevs = 0;
+            foreach (int churn in authorsChurn.Values.OrderByDescending(value => value))
+            {
+                if (cumulative > truckFactorCoreDevRatio)
+                {
+                    break;
+                }
+                cumulative += (float)churn / total;
+                coreDevs++;
+            }
+            return coreDevs;
+        }
+
+        /// <summary>
         /// The churn <paramref name="churn"/> holds, as the
         /// <see cref="GitFileMetrics"/> a graph node carries.
         /// </summary>
@@ -1092,6 +1151,7 @@ namespace SEE.VCS
                                         churn.LinesAdded, churn.LinesDeleted);
             result.AuthorsChurn = churn.AuthorsChurn;
             result.FilesChangesTogether = churn.CoChanges;
+            result.TruckFactor = TruckFactorOf(result.AuthorsChurn);
             return result;
         }
 
