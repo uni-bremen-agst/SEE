@@ -135,7 +135,8 @@ namespace SEE.VCS
         [TestCaseSource(nameof(Configurations))]
         public void TestChurn(DateTimeOffset since, GitRepository repositoryConfiguration)
         {
-            Outcome outcome = AddNodesAfterDate(repositoryConfiguration, since, default, default);
+            Outcome outcome = AddNodesAfterDate(repositoryConfiguration, since,
+                                                computeCoFileChanges: true, default, default);
             Baseline.CompareOrWrite(TestContext.CurrentContext.Test.Name, outcome);
         }
 
@@ -178,11 +179,15 @@ namespace SEE.VCS
         /// <param name="repositoryConfiguration">The repository configuration based on which the
         /// report is derived.</param>
         /// <param name="since">The beginning of the period to be reported on.</param>
+        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// together. Mind that this is far from free: for SEE it comes to some hundred
+        /// thousand pairs, and the node of one file may name several hundred others.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         private static Outcome AddNodesAfterDate
               (GitRepository repositoryConfiguration,
                DateTimeOffset since,
+               bool computeCoFileChanges,
                Action<float> changePercentage,
                CancellationToken token)
         {
@@ -213,7 +218,8 @@ namespace SEE.VCS
             // before, gathered while the renames are followed.
             IDictionary<string, ISet<string>> formerNames = new Dictionary<string, ISet<string>>();
             IDictionary<string, Churn> churn
-                = ChurnOf(repository, selected, criteria, mailmap, formerNames, out int walked, token);
+                = ChurnOf(repository, selected, criteria, mailmap, formerNames,
+                          computeCoFileChanges, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
             int withChurn = churn.Count;
@@ -329,6 +335,8 @@ namespace SEE.VCS
         /// <param name="mailmap">Used to map an author onto their canonical name.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end; will be extended.</param>
+        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// together. Off, the co-changes of a file stay empty.</param>
         /// <param name="walked">How many commits the walk visited.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>The churn per file.</returns>
@@ -338,6 +346,7 @@ namespace SEE.VCS
                Criteria criteria,
                Mailmap mailmap,
                IDictionary<string, ISet<string>> formerNames,
+               bool computeCoFileChanges,
                out int walked,
                CancellationToken token)
         {
@@ -387,6 +396,12 @@ namespace SEE.VCS
                 {
                     using Patch patch = Compare<Patch>(repository, criteria, parent, commit.Tree,
                                                        compareOptions);
+                    // The files this one commit changed, under the names they
+                    // carry at the end. Gathered as they are recorded, because
+                    // which files changed together is known only once they all
+                    // are. A set, two entries of one patch being able to lead to
+                    // one name where a rename is followed.
+                    ISet<string> touched = new HashSet<string>();
                     foreach (PatchEntryChanges change in patch)
                     {
                         if (!criteria.InScope(change.Path) && !criteria.InScope(change.OldPath))
@@ -396,9 +411,24 @@ namespace SEE.VCS
                         string target = Follow(renamedTo, change.Path);
                         Record(result, target, change.LinesAdded, change.LinesDeleted,
                                commit.Sha, mailmap.AuthorOf(author));
+                        touched.Add(target);
                         if (change.Status == ChangeKind.Renamed)
                         {
                             Note(renamedTo, formerNames, change.OldPath, target);
+                        }
+                    }
+                    if (computeCoFileChanges && touched.Count > 1)
+                    {
+                        foreach (string path in touched)
+                        {
+                            Churn file = result[path];
+                            foreach (string other in touched)
+                            {
+                                if (other != path)
+                                {
+                                    file.AlsoChanged(other);
+                                }
+                            }
                         }
                     }
                 }
@@ -909,20 +939,37 @@ namespace SEE.VCS
             result.AppendLine($"{churnOfAuthors.Count(),8}  attributes {perAuthor}<author>");
             result.AppendLine($"{churnOfAuthors.Sum(attribute => attribute.Value),8}  "
                               + $"{perAuthor}<author> over all nodes");
+            foreach (IGrouping<string, Edge> ofType in graph.Edges()
+                                                            .GroupBy(edge => edge.Type)
+                                                            .OrderBy(group => group.Key,
+                                                                     StringComparer.Ordinal))
+            {
+                result.AppendLine($"{ofType.Count(),8}  edges of type {ofType.Key}");
+            }
+            int together
+                = graph.Edges()
+                       .Sum(edge => edge.TryGetInt(DataModel.DG.VCS.ChangedTogether, out int value)
+                                    ? value : 0);
+            result.AppendLine($"{together,8}  {DataModel.DG.VCS.ChangedTogether} over all edges");
             return result.ToString();
         }
 
         /// <summary>
         /// The metrics of <paramref name="churn"/> as a graph: one node per file,
         /// nested in nodes standing for the directories holding them, under a
-        /// single root standing for the repository.
+        /// single root standing for the repository, with an edge between every
+        /// two files a commit changed together.
         /// </summary>
         /// <remarks>
         /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
-        /// from a <see cref="GitFileMetrics"/>, less the two not yet gathered:
-        /// the files changed together with a file, and the truck factor, which
-        /// is derived from those. A node therefore carries no
+        /// from a <see cref="GitFileMetrics"/>, less the truck factor, which is
+        /// not gathered yet; a node therefore carries no
         /// <see cref="DataModel.DG.VCS.TruckNumber"/> as yet.
+        ///
+        /// Two things go beyond what <see cref="GitGraphGenerator"/> does. It
+        /// gathers the files changed together with a file but puts them nowhere;
+        /// here they are edges, a relation between two files being what an edge
+        /// is for. And it has no notion of the names a file carried before.
         ///
         /// Nor is the hierarchy simplified: <see cref="GitGraphGenerator"/> can
         /// collapse a chain of directory nodes into its innermost one, which is
@@ -939,6 +986,9 @@ namespace SEE.VCS
         {
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
             Graph result = new(repositoryPath, repositoryName);
+            // The node standing for each file, so that the edges between files
+            // changed together can be drawn once every node exists.
+            IDictionary<string, Node> nodes = new Dictionary<string, Node>();
 
             foreach (KeyValuePair<string, Churn> file in churn)
             {
@@ -960,18 +1010,61 @@ namespace SEE.VCS
                 {
                     node.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
                 }
+                nodes[file.Key] = node;
                 // Joined into one attribute, as the authors above are. Should
                 // one attribute per former name be wanted instead, this is the
                 // one place to say so.
                 if (formerNames.TryGetValue(file.Key, out ISet<string> names))
                 {
-                    node.SetString(formerNamesAttribute, string.Join(',', names));
+                    node.SetString(DataModel.DG.VCS.FormerNames, string.Join(',', names));
                 }
             }
 
+            AddCoChanges(result, churn, nodes);
             result.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
             result.FinalizeNodeHierarchy();
             return result;
+        }
+
+        /// <summary>
+        /// Draws an edge of type <see cref="DataModel.DG.VCS.CoChangeType"/> between every two
+        /// files of <paramref name="churn"/> that a commit changed together,
+        /// counting on it how often that happened.
+        /// </summary>
+        /// <remarks>
+        /// One edge for the two of them, not one each way. Being changed by the
+        /// same commit is symmetric, so the two counts are equal and the second
+        /// edge would say nothing the first does not. Which of the two files an
+        /// edge leaves is therefore arbitrary, and settled by their names, so
+        /// that one and the same repository always yields the same graph.
+        /// </remarks>
+        /// <param name="graph">The graph the edges are drawn in.</param>
+        /// <param name="churn">The churn per file, stating which files changed together.</param>
+        /// <param name="nodes">The node standing for each of those files.</param>
+        private static void AddCoChanges(Graph graph, IDictionary<string, Churn> churn,
+                                         IDictionary<string, Node> nodes)
+        {
+            foreach (KeyValuePair<string, Churn> file in churn)
+            {
+                foreach (KeyValuePair<string, int> coChange in file.Value.CoChanges)
+                {
+                    // Only one of the two orders is drawn, and only where the
+                    // other file is reported on at all: one changed together
+                    // with this one but deleted since has no node to join.
+                    if (string.CompareOrdinal(file.Key, coChange.Key) >= 0
+                        || !churn.TryGetValue(coChange.Key, out Churn other))
+                    {
+                        continue;
+                    }
+                    other.CoChanges.TryGetValue(file.Key, out int back);
+                    Assert.That(back, Is.EqualTo(coChange.Value),
+                                $"{file.Key} and {coChange.Key} were changed together "
+                                + "a different number of times as seen from either of them.");
+                    Edge edge = graph.AddEdge(nodes[file.Key], nodes[coChange.Key],
+                                              DataModel.DG.VCS.CoChangeType);
+                    edge.SetInt(DataModel.DG.VCS.ChangedTogether, coChange.Value);
+                }
+            }
         }
 
         /// <summary>
@@ -985,18 +1078,9 @@ namespace SEE.VCS
             GitFileMetrics result = new(churn.Commits, churn.Authors.ToHashSet(),
                                         churn.LinesAdded, churn.LinesDeleted);
             result.AuthorsChurn = churn.AuthorsChurn;
+            result.FilesChangesTogether = churn.CoChanges;
             return result;
         }
-
-        /// <summary>
-        /// The name of the node attribute holding the names a file carried
-        /// before it was renamed, separated by commas.
-        /// </summary>
-        /// <remarks>
-        /// Not one of <see cref="DataModel.DG.VCS"/>, there being none for this
-        /// yet. Moving it there is due when this leaves the test.
-        /// </remarks>
-        private const string formerNamesAttribute = "Former_Names";
 
         /// <summary>
         /// What is reported on: from when, which files, which branches. Handed
@@ -1103,6 +1187,13 @@ namespace SEE.VCS
             internal IEnumerable<FileAuthor> Authors => authors;
 
             /// <summary>
+            /// How often each other file was changed by the same commit as this
+            /// one, keyed by the name that other file carries at the end.
+            /// </summary>
+            internal IDictionary<string, int> CoChanges { get; }
+                = new Dictionary<string, int>();
+
+            /// <summary>
             /// What each of those authors added to and deleted from the file,
             /// taken together. Summed over all authors, this is the churn of
             /// the file.
@@ -1117,6 +1208,17 @@ namespace SEE.VCS
             /// <param name="linesDeleted">The number of lines the change deletes.</param>
             /// <param name="sha">The SHA of the commit the change belongs to.</param>
             /// <param name="author">The author of that commit.</param>
+            /// <summary>
+            /// Notes that <paramref name="other"/> was changed by the same
+            /// commit as this file.
+            /// </summary>
+            /// <param name="other">The name the other file carries at the end.</param>
+            internal void AlsoChanged(string other)
+            {
+                CoChanges.TryGetValue(other, out int count);
+                CoChanges[other] = count + 1;
+            }
+
             internal void Add(int linesAdded, int linesDeleted, string sha, FileAuthor author)
             {
                 LinesAdded += linesAdded;

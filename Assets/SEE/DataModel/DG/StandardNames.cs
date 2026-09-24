@@ -513,6 +513,13 @@ namespace SEE.DataModel.DG
         public const string AuthorsAttributeName = "Authors";
 
         /// <summary>
+        /// String attribute for the names a file carried before it was renamed.
+        /// </summary>
+        /// <remarks>Note that this is not actually a numeric metric but a list of
+        /// names seperated by a comma.</remarks>
+        public const string FormerNames = "Former_Names";
+
+        /// <summary>
         /// Name of node type used for directories.
         /// </summary>
         public const string DirectoryType = "Directory";
@@ -520,6 +527,22 @@ namespace SEE.DataModel.DG
         /// Name of node type used for repositories.
         /// </summary>
         public const string RepositoryType = "Repository";
+
+        /// <summary>
+        /// Name of the edge type used to join two files that were changed by one
+        /// and the same commit. How often that happened is stated by the
+        /// <see cref="ChangedTogether"/> attribute of the edge.
+        /// </summary>
+        /// <remarks>Being changed together is symmetric, so only one of the two
+        /// possible edges between two files is drawn, and its direction carries
+        /// no meaning.</remarks>
+        public const string CoChangeType = "Cochange";
+
+        /// <summary>
+        /// How often the two files joined by an edge of type <see cref="CoChangeType"/>
+        /// were changed by one and the same commit.
+        /// </summary>
+        public const string ChangedTogether = Prefix + "Changed_Together";
     }
 
     /// <summary>
