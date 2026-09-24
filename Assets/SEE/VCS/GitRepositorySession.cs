@@ -61,6 +61,9 @@ namespace SEE.VCS
         public bool FetchRemotes()
         {
             bool result = false;
+            // A fetch may add, remove or move a branch, so what was held as relevant
+            // is no longer to be trusted.
+            relevantBranches = null;
 
             // Fetch all remotes; this is needed if there are multiple remotes.
             // As a matter of fact, a repository may have multiple remotes.
@@ -510,16 +513,38 @@ namespace SEE.VCS
         ///
         /// The result is a collection rather than an enumeration, so that a caller may count
         /// the branches without walking them twice.
+        ///
+        /// It is worked out once and held. Neither the repository nor the filter changes
+        /// while a session lasts, save through <see cref="FetchRemotes"/>, which discards
+        /// what is held. This matters: <see cref="GetBlob"/> asks for the relevant branches
+        /// once for every file it is asked about, and working them out anew each time means
+        /// materialising every branch of the repository and matching it against every
+        /// expression of the filter, over and over.
         /// </summary>
         /// <returns>All relevant branches of the repository.</returns>
         public ICollection<Branch> RelevantBranches()
         {
-            if (repositoryConfig.VCSFilter == null)
+            return relevantBranches ??= Selected();
+
+            // The branches of the repository the filter holds relevant.
+            ICollection<Branch> Selected()
             {
-                return repository.Branches.ToList();
+                if (repositoryConfig.VCSFilter == null)
+                {
+                    return repository.Branches.ToList();
+                }
+                return repository.Branches
+                                 .Where(branch => repositoryConfig.VCSFilter.Matches(branch))
+                                 .ToList();
             }
-            return repository.Branches.Where(branch => repositoryConfig.VCSFilter.Matches(branch)).ToList();
         }
+
+        /// <summary>
+        /// Backs <see cref="RelevantBranches"/>. Null until first asked for, and again
+        /// after <see cref="FetchRemotes"/>, which may have altered what there is to select
+        /// from.
+        /// </summary>
+        private ICollection<Branch> relevantBranches;
 
         /// <summary>
         /// Yields all distinct file paths of the given <paramref name="repository"/>
