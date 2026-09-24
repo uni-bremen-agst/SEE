@@ -1,5 +1,4 @@
 ﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using System.Collections.Generic;
 using UnityEngine;

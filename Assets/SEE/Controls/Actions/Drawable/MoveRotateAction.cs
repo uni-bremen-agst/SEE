@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
 using SEE.UI;
 using SEE.UI.Drawable;
@@ -650,7 +651,7 @@ namespace SEE.Controls.Actions.Drawable
                         includeChildren);
                     Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                     Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
-                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
+                    GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(selectedObject);
                     new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         memento.SelectedObject.name).Execute();
                     RotationMenu.Instance.Destroy();
@@ -672,7 +673,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Block for reset.
                 CollisionDetectionManager.Disable(selectedObject);
-                GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
+                GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(selectedObject);
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
                 new RbAndCCDestroyerNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     selectedObject.name).Execute();
@@ -737,7 +738,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento.OldObjectLocalEulerAngles.z, memento.IncludeChildren).Execute();
                 }
 
-                GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
+                GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
                 new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name).Execute();
@@ -770,7 +771,7 @@ namespace SEE.Controls.Actions.Drawable
                     new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.Degree, memento.IncludeChildren).Execute();
                 }
-                GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
+                GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
                 new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name).Execute();
