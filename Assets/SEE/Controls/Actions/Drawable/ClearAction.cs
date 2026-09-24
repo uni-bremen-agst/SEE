@@ -147,7 +147,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="page">The page to be cleared.</param>
         private void ClearCurrent(GameObject surface, int page)
         {
-            GameDrawableManager.DeleteTypesFromPage(surface, page);
+            GameDrawablePageManager.DeleteDrawableTypesFromPage(surface, page);
             new SurfaceClearPageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
         }
 
@@ -158,7 +158,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="page">The page to be deleted.</param>
         private void DeleteCurrent(GameObject surface, int page)
         {
-            GameDrawableManager.RemovePage(surface, page);
+            GameDrawablePageManager.RemovePage(surface, page);
             new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
         }
 
@@ -221,7 +221,7 @@ namespace SEE.Controls.Actions.Drawable
             holder.OrderInLayer = 1;
             for (int i = holder.MaxPageSize - 1; i >= 0; i--)
             {
-                GameDrawableManager.RemovePage(surface, i);
+                GameDrawablePageManager.RemovePage(surface, i);
                 new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), i).Execute();
             }
         }
@@ -237,8 +237,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 DrawableType.Restore(type, surface);
             }
-            GameDrawableManager.ChangeCurrentPage(surface, memento.Surface.CurrentPage, true);
-            GameDrawableManager.ChangeMaxPage(surface, memento.Surface.MaxPageSize);
+            GameDrawablePageManager.ChangeCurrentPage(surface, memento.Surface.CurrentPage, true);
+            GameDrawablePageManager.ChangeMaxPage(surface, memento.Surface.MaxPageSize);
             new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface), true).Execute();
         }
 

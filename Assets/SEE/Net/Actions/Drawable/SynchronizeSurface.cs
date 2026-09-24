@@ -32,7 +32,7 @@ namespace SEE.Net.Actions.Drawable
             holder.OrderInLayer = DrawableConf.OrderInLayer;
             holder.Description = DrawableConf.Description;
             holder.MaxPageSize = DrawableConf.MaxPageSize;
-            GameDrawableManager.ChangeCurrentPage(Surface, DrawableConf.CurrentPage, ForceChange);
+            GameDrawablePageManager.ChangeCurrentPage(Surface, DrawableConf.CurrentPage, ForceChange);
         }
     }
 }

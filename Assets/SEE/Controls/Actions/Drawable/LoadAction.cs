@@ -309,14 +309,14 @@ namespace SEE.Controls.Actions.Drawable
                     if (memento.PageMode == LoadPageMode.CurrentSelectedPage)
                     {
                         int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
-                        GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), targetPage);
-                        GameDrawableManager.ChangeMaxPage(
+                        GameDrawablePageManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), targetPage);
+                        GameDrawablePageManager.ChangeMaxPage(
                             memento.SpecificSurface.GetDrawableSurface(),
                             Mathf.Max(selectedSurface.GetComponent<DrawableHolder>().MaxPageSize, targetPage + 1));
                     }
                     else
                     {
-                        GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
+                        GameDrawablePageManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
 
                         int max = DrawableConfigManager.GetDrawableConfig(selectedSurface)
                             .GetAllDrawableTypes()
@@ -324,7 +324,7 @@ namespace SEE.Controls.Actions.Drawable
                             .DefaultIfEmpty(0)
                             .Max();
 
-                        GameDrawableManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
+                        GameDrawablePageManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
                     }
 
                     memento.Configs = configsSpecific;
