@@ -108,7 +108,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             rootKey =
                 new ExceptionFlowCallableKey(
                     rootSymbol,
-                    rootContext.Key);
+                    rootContext);
 
             graph.GetOrAdd(
                 rootKey,

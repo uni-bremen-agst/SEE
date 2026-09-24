@@ -236,6 +236,51 @@ namespace XMLDocNormalizer.Models.DTO
         }
 
         /// <summary>
+        /// Determines whether external-documentation evidence paths were truncated.
+        /// </summary>
+        /// <param name="exceptionType">The exceptionType value.</param>
+        /// <returns>The operation result.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the supplied input cannot be processed.</exception>
+        public bool AreExternalDocumentationEvidencePathsTruncated(
+            INamedTypeSymbol exceptionType)
+        {
+            ArgumentNullException.ThrowIfNull(exceptionType);
+
+            return externalDocumentationEvidencePaths.TryGetValue(
+                       exceptionType,
+                       out ExceptionPathCollection? collection) &&
+                   collection.PathsTruncated;
+        }
+
+        /// <summary>
+        /// Marks proven paths for one exception type as truncated.
+        /// </summary>
+        /// <param name="exceptionType">The exceptionType value.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the supplied input cannot be processed.</exception>
+        internal void MarkPathsTruncated(INamedTypeSymbol exceptionType)
+        {
+            ArgumentNullException.ThrowIfNull(exceptionType);
+
+            thrownExceptions.Add(exceptionType);
+            GetOrCreatePathCollection(exceptionType).MarkTruncated();
+        }
+
+        /// <summary>
+        /// Marks external-documentation evidence paths as truncated.
+        /// </summary>
+        /// <param name="exceptionType">The exceptionType value.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the supplied input cannot be processed.</exception>
+        internal void MarkExternalDocumentationEvidencePathsTruncated(
+            INamedTypeSymbol exceptionType)
+        {
+            ArgumentNullException.ThrowIfNull(exceptionType);
+
+            externalDocumentationEvidenceExceptions.Add(exceptionType);
+            GetOrCreateExternalDocumentationEvidencePathCollection(exceptionType)
+                .MarkTruncated();
+        }
+
+        /// <summary>
         /// Creates finding-ready flow details for the specified exception
         /// type.
         /// </summary>

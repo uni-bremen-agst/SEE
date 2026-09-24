@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -136,27 +137,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 members.Add(normalizedMember);
             }
 
-            List<string> keyParts = parameterFacts
-                .Select(
-                    static pair =>
-                        $"p:{pair.Key}:{(int)pair.Value}")
-                .ToList();
-
-            foreach (KeyValuePair<int, HashSet<ISymbol>> parameterPair
-                     in nonNullParameterMembers)
-            {
-                foreach (ISymbol memberSymbol in parameterPair.Value)
-                {
-                    string memberName = memberSymbol.ToDisplayString(
-                        SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    keyParts.Add(
-                        $"m:{parameterPair.Key}:{memberSymbol.Kind}:{memberName}");
-                }
-            }
-
-            keyParts.Sort(StringComparer.Ordinal);
-            Key = string.Join(",", keyParts);
+            Key = CreateLegacyKey();
         }
 
         /// <summary>
@@ -177,6 +158,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The deterministic call-context key.
         /// </value>
         public string Key { get; }
+
+        /// <summary>
+        /// Gets the Roslyn-independent call-context facts used for durable
+        /// identity and transport.
+        /// </summary>
+        /// <value>The value described by this property.</value>
+        public CanonicalExceptionFlowCallContext? CanonicalContext
+        {
+            get { return TryCreateCanonicalContext(); }
+        }
 
         /// <summary>
         /// Gets the value facts stored for one parameter ordinal.
@@ -438,6 +429,87 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static ISymbol? NormalizeSymbol(ISymbol? symbol)
         {
             return symbol?.OriginalDefinition;
+        }
+
+        /// <summary>
+        /// Creates the canonical form after all local Roslyn facts have been
+        /// normalized and deduplicated.
+        /// </summary>
+        /// <returns>The operation result.</returns>
+        private CanonicalExceptionFlowCallContext? TryCreateCanonicalContext()
+        {
+            try
+            {
+                CanonicalParameterValueFact[] canonicalParameterFacts = parameterFacts
+                    .Select(
+                        static pair => new CanonicalParameterValueFact(
+                            pair.Key,
+                            pair.Value))
+                    .ToArray();
+                List<CanonicalParameterMemberFact> canonicalMemberFacts = new();
+
+                foreach (KeyValuePair<int, HashSet<ISymbol>> parameterPair
+                         in nonNullParameterMembers)
+                {
+                    foreach (ISymbol member in parameterPair.Value)
+                    {
+                        canonicalMemberFacts.Add(
+                            new CanonicalParameterMemberFact(
+                                parameterPair.Key,
+                                RoslynCanonicalIdentityFactory
+                                    .CreateStableMemberIdentity(member)));
+                    }
+                }
+
+                CanonicalCallableIdentity? callable = CallableSymbol == null
+                    ? null
+                    : RoslynCanonicalIdentityFactory.CreateCallableIdentity(
+                        CallableSymbol,
+                        normalizeToOriginalDefinition: true);
+
+                return new CanonicalExceptionFlowCallContext(
+                    callable,
+                    canonicalParameterFacts,
+                    canonicalMemberFacts.ToArray());
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Builds the pre-canonical deterministic key used when a Roslyn symbol
+        /// cannot be represented exactly by the canonical identity model.
+        /// </summary>
+        /// <returns>The deterministic legacy context key.</returns>
+        private string CreateLegacyKey()
+        {
+            List<string> keyParts = parameterFacts
+                .Select(
+                    static pair =>
+                        $"p:{pair.Key}:{(int)pair.Value}")
+                .ToList();
+
+            foreach (KeyValuePair<int, HashSet<ISymbol>> parameterPair
+                     in nonNullParameterMembers)
+            {
+                foreach (ISymbol memberSymbol in parameterPair.Value)
+                {
+                    string memberName = memberSymbol.ToDisplayString(
+                        SymbolDisplayFormat.FullyQualifiedFormat);
+
+                    keyParts.Add(
+                        $"m:{parameterPair.Key}:{memberSymbol.Kind}:{memberName}");
+                }
+            }
+
+            keyParts.Sort(StringComparer.Ordinal);
+            return string.Join(",", keyParts);
         }
     }
 }

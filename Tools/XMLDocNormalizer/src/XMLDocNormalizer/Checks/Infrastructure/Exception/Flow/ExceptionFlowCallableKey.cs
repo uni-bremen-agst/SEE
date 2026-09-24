@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -9,6 +10,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal sealed class ExceptionFlowCallableKey
         : IEquatable<ExceptionFlowCallableKey>
     {
+        /// <summary>
+        /// Retains the local call context for on-demand canonical transport.
+        /// </summary>
+        private readonly ExceptionFlowCallContext? callContext;
+
         /// <summary>
         /// Initializes a new callable key.
         /// </summary>
@@ -34,6 +40,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Initializes a callable key from a canonicalized call context.
+        /// </summary>
+        /// <param name="symbol">The local Roslyn callable handle.</param>
+        /// <param name="callContext">The canonicalizable call context.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the supplied input cannot be processed.</exception>
+        public ExceptionFlowCallableKey(
+            ISymbol symbol,
+            ExceptionFlowCallContext callContext)
+            : this(
+                symbol,
+                callContext.Key)
+        {
+            this.callContext = callContext;
+        }
+
+        /// <summary>
         /// Gets the normalized callable symbol.
         /// </summary>
         /// <value>
@@ -42,12 +64,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public ISymbol Symbol { get; }
 
         /// <summary>
+        /// Gets the Roslyn-independent callable identity used for durable key
+        /// comparison.
+        /// </summary>
+        /// <value>The canonical callable identity.</value>
+        public CanonicalCallableIdentity? CanonicalIdentity
+        {
+            get { return TryCreateCanonicalIdentity(Symbol); }
+        }
+
+        /// <summary>
         /// Gets the deterministic call-context key.
         /// </summary>
         /// <value>
         /// The key describing the parameter facts known for the callable.
         /// </value>
         public string ContextKey { get; }
+
+        /// <summary>
+        /// Gets the canonical call context when this key was created by the
+        /// production summary graph.
+        /// </summary>
+        /// <value>The value described by this property.</value>
+        public CanonicalExceptionFlowCallContext? CanonicalContext
+        {
+            get { return callContext?.CanonicalContext; }
+        }
 
         /// <summary>
         /// Determines whether this key identifies the same callable and call
@@ -75,12 +117,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return SymbolEqualityComparer.Default.Equals(
-                       Symbol,
-                       other.Symbol) &&
-                   StringComparer.Ordinal.Equals(
-                       ContextKey,
-                       other.ContextKey);
+            return SymbolEqualityComparer.Default.Equals(Symbol, other.Symbol)
+                && StringComparer.Ordinal.Equals(ContextKey, other.ContextKey);
         }
 
         /// <summary>
@@ -111,10 +149,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                SymbolEqualityComparer.Default.GetHashCode(
-                    Symbol),
-                StringComparer.Ordinal.GetHashCode(
-                    ContextKey));
+                SymbolEqualityComparer.Default.GetHashCode(Symbol),
+                StringComparer.Ordinal.GetHashCode(ContextKey));
+        }
+
+        /// <summary>
+        /// Creates a canonical callable identity without allowing an unsupported
+        /// representation to alter the active analyzer's exception behavior.
+        /// </summary>
+        /// <param name="symbol">The normalized callable symbol.</param>
+        /// <returns>The exact canonical identity, or <see langword="null"/> when no exact representation exists.</returns>
+        private static CanonicalCallableIdentity? TryCreateCanonicalIdentity(ISymbol symbol)
+        {
+            try
+            {
+                return RoslynCanonicalIdentityFactory.CreateCallableIdentity(
+                    symbol,
+                    normalizeToOriginalDefinition: true);
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

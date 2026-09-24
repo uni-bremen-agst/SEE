@@ -40,7 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowCallableKey requestedKey =
-                new(requestedTarget, requestedContext.Key);
+                new(requestedTarget, requestedContext);
 
             graph.GetOrAdd(requestedKey, requestedContext);
             return requestedKey;
@@ -125,7 +125,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     supportingSourceScope.Compilation));
 
             ExceptionFlowCallableKey supportingSourceKey =
-                new(supportingSourceTarget, supportingSourceContext.Key);
+                new(supportingSourceTarget, supportingSourceContext);
 
             graph.GetOrAdd(supportingSourceKey, supportingSourceContext);
             return supportingSourceKey;
