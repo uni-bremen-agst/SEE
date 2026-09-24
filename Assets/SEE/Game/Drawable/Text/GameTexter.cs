@@ -8,7 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SEE.Game.Drawable
+namespace SEE.Game.Drawable.Text
 {
     /// <summary>
     /// This class is responsible for creating the game objects for the written texts.

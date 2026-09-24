@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.Text;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
 using System;

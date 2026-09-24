@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.Text;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
