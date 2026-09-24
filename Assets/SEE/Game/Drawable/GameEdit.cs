@@ -108,19 +108,7 @@ namespace SEE.Game.Drawable
         /// <param name="text">Contains the new values.</param>
         public static void ChangeText(GameObject textObj, TextConf text)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                ChangeText(textObj, text.Text);
-                ChangeFontSize(textObj, text.FontSize);
-                ChangeLayer(textObj, text.OrderInLayer);
-                ChangeFontStyles(textObj, text.FontStyles);
-                ChangeFontColor(textObj, text.FontColor);
-                GameTexter.ChangeOutlineStatus(textObj, text.IsOutlined);
-                ChangeOutlineColor(textObj, text.OutlineColor);
-                ChangeOutlineThickness(textObj, text.OutlineThickness);
-                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
-            }
+            GameTextEdit.ChangeText(textObj, text);
         }
 
         /// <summary>
@@ -131,19 +119,7 @@ namespace SEE.Game.Drawable
         /// <param name="text">The new text.</param>
         public static void ChangeText(GameObject textObj, string text)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                textObj.GetComponent<TextMeshPro>().text = text;
-                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate();
-                GameTexter.RefreshMeshCollider(textObj);
-            }
-
-            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
-            {
-                GameObject node = textObj.transform.parent.gameObject;
-                GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
-            }
+            GameTextEdit.ChangeText(textObj, text);
         }
 
         /// <summary>
@@ -154,22 +130,7 @@ namespace SEE.Game.Drawable
         /// <param name="fontSize">The new font size.</param>
         public static void ChangeFontSize(GameObject textObj, float fontSize)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-                tmp.fontSize = fontSize;
-                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font,
-                    fontSize, tmp.fontStyle);
-                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
-            }
-
-            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
-            {
-                GameObject node = textObj.transform.parent.gameObject;
-                GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
-            }
+            GameTextEdit.ChangeFontSize(textObj, fontSize);
         }
 
         /// <summary>
@@ -180,22 +141,7 @@ namespace SEE.Game.Drawable
         /// <param name="styles">The new font style.</param>
         public static void ChangeFontStyles(GameObject textObj, FontStyles styles)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-                tmp.fontStyle = styles;
-                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font,
-                    tmp.fontSize, tmp.fontStyle);
-                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
-            }
-
-            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
-            {
-                GameObject node = textObj.transform.parent.gameObject;
-                GameMindMapNode.DisableTextAndBorderCollider(node);
-                GameMindMap.ReDrawBorder(node);
-            }
+            GameTextEdit.ChangeFontStyles(textObj, styles);
         }
 
         /// <summary>
@@ -205,11 +151,7 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new font color.</param>
         public static void ChangeFontColor(GameObject textObj, Color color)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                textObj.GetComponent<TextMeshPro>().color = color;
-                textObj.GetComponent<TextMeshPro>().faceColor = color;
-            }
+            GameTextEdit.ChangeFontColor(textObj, color);
         }
 
         /// <summary>
@@ -219,10 +161,7 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new outline color.</param>
         public static void ChangeOutlineColor(GameObject textObj, Color color)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                textObj.GetComponent<TextMeshPro>().outlineColor = color;
-            }
+            GameTextEdit.ChangeOutlineColor(textObj, color);
         }
 
         /// <summary>
@@ -232,12 +171,7 @@ namespace SEE.Game.Drawable
         /// <param name="thickness">The new outline thickness.</param>
         public static void ChangeOutlineThickness(GameObject textObj, float thickness)
         {
-            if (textObj.CompareTag(Tags.DText))
-            {
-                textObj.GetComponent<TextMeshPro>().outlineWidth = thickness;
-                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-                GameTexter.RefreshMeshCollider(textObj);
-            }
+            GameTextEdit.ChangeOutlineThickness(textObj, thickness);
         }
 
         /// <summary>
