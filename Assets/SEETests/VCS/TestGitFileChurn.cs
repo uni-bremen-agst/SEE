@@ -234,6 +234,11 @@ namespace SEE.VCS
                             $"{file.Key} is reported without any commit.");
                 Assert.That(file.Value.Authors, Is.Not.Empty,
                             $"{file.Key} is reported without any author.");
+                // What the authors of a file churned between them is what the
+                // file was churned, every change being made by one of them.
+                Assert.That(file.Value.AuthorsChurn.Values.Sum(),
+                            Is.EqualTo(file.Value.LinesAdded + file.Value.LinesDeleted),
+                            $"The churn of {file.Key} is not what its authors churned.");
             }
             changePercentage?.Invoke(1f);
 
@@ -895,6 +900,15 @@ namespace SEE.VCS
                 int sum = graph.Nodes().Sum(node => node.TryGetInt(metric, out int value) ? value : 0);
                 result.AppendLine($"{sum,8}  {metric} over all nodes");
             }
+            // One attribute per author of a file, so neither their number nor
+            // their sum is had by asking for a name known beforehand.
+            string perAuthor = DataModel.DG.VCS.Churn + ":";
+            IEnumerable<KeyValuePair<string, int>> churnOfAuthors
+                = graph.Nodes().SelectMany(node => node.IntAttributes)
+                       .Where(attribute => attribute.Key.StartsWith(perAuthor, StringComparison.Ordinal));
+            result.AppendLine($"{churnOfAuthors.Count(),8}  attributes {perAuthor}<author>");
+            result.AppendLine($"{churnOfAuthors.Sum(attribute => attribute.Value),8}  "
+                              + $"{perAuthor}<author> over all nodes");
             return result.ToString();
         }
 
@@ -905,9 +919,9 @@ namespace SEE.VCS
         /// </summary>
         /// <remarks>
         /// The attributes set here are those <see cref="GitGraphGenerator"/> sets
-        /// from a <see cref="GitFileMetrics"/>, less the three not yet gathered:
-        /// the churn per author, the files changed together with a file, and the
-        /// truck factor. A node therefore carries no
+        /// from a <see cref="GitFileMetrics"/>, less the two not yet gathered:
+        /// the files changed together with a file, and the truck factor, which
+        /// is derived from those. A node therefore carries no
         /// <see cref="DataModel.DG.VCS.TruckNumber"/> as yet.
         ///
         /// Nor is the hierarchy simplified: <see cref="GitGraphGenerator"/> can
@@ -940,6 +954,12 @@ namespace SEE.VCS
                     node.SetString(DataModel.DG.VCS.AuthorsAttributeName,
                                    string.Join(',', metrics.Authors));
                 }
+                // One attribute per author, named for them, as
+                // GitGraphGenerator names them.
+                foreach (KeyValuePair<FileAuthor, int> authorChurn in metrics.AuthorsChurn)
+                {
+                    node.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
+                }
                 // Joined into one attribute, as the authors above are. Should
                 // one attribute per former name be wanted instead, this is the
                 // one place to say so.
@@ -962,8 +982,10 @@ namespace SEE.VCS
         /// <returns>The metrics of that file.</returns>
         private static GitFileMetrics MetricsOf(Churn churn)
         {
-            return new GitFileMetrics(churn.Commits, churn.Authors.ToHashSet(),
-                                      churn.LinesAdded, churn.LinesDeleted);
+            GitFileMetrics result = new(churn.Commits, churn.Authors.ToHashSet(),
+                                        churn.LinesAdded, churn.LinesDeleted);
+            result.AuthorsChurn = churn.AuthorsChurn;
+            return result;
         }
 
         /// <summary>
@@ -1081,6 +1103,14 @@ namespace SEE.VCS
             internal IEnumerable<FileAuthor> Authors => authors;
 
             /// <summary>
+            /// What each of those authors added to and deleted from the file,
+            /// taken together. Summed over all authors, this is the churn of
+            /// the file.
+            /// </summary>
+            internal IDictionary<FileAuthor, int> AuthorsChurn { get; }
+                = new Dictionary<FileAuthor, int>();
+
+            /// <summary>
             /// Accounts for one change of the file.
             /// </summary>
             /// <param name="linesAdded">The number of lines the change adds.</param>
@@ -1091,6 +1121,8 @@ namespace SEE.VCS
             {
                 LinesAdded += linesAdded;
                 LinesDeleted += linesDeleted;
+                AuthorsChurn.TryGetValue(author, out int churn);
+                AuthorsChurn[author] = churn + linesAdded + linesDeleted;
                 commits.Add(sha);
                 if (!authors.Contains(author))
                 {
