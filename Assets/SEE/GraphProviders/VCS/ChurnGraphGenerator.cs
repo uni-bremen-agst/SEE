@@ -7,7 +7,6 @@ using SEE.Utils;
 using SEE.VCS;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -149,14 +148,7 @@ namespace SEE.GraphProviders.VCS
                Action<float> changePercentage,
                CancellationToken token)
         {
-            string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
-
-            // Two handles on the one repository for the time being: the session
-            // decides which branches are relevant and which files exist, the
-            // repository is walked directly because the session offers no
-            // comparison detecting renames. The second handle goes once it does.
             using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
-            using Repository repository = new(repositoryPath);
 
             Criteria criteria = new(new DateTimeOffset(startDate.Date, TimeSpan.Zero),
                                     repositoryConfiguration.VCSFilter,
@@ -168,8 +160,8 @@ namespace SEE.GraphProviders.VCS
             // globbing and the repository paths of the filter. A file deleted
             // meanwhile is not among them and is therefore left out of the
             // graph, however much churn its history holds.
-            AddNodes(graph, criteria, session, repository, session.AllFiles(token),
-                     repositoryPath, repositoryName, simplifyGraph, computeCoFileChanges,
+            AddNodes(graph, criteria, session, session.AllFiles(token),
+                     repositoryName, simplifyGraph, computeCoFileChanges,
                      changePercentage, token);
         }
 
@@ -222,12 +214,11 @@ namespace SEE.GraphProviders.VCS
             string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
 
             using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
-            using Repository repository = new(repositoryPath);
 
             // Held against the repository here rather than left to the walk,
             // where an unknown one surfaces as whatever libgit2 makes of it.
-            Check(repository, commitID, nameof(commitID));
-            Check(repository, baselineCommitID, nameof(baselineCommitID));
+            Check(session, repositoryPath, commitID, nameof(commitID));
+            Check(session, repositoryPath, baselineCommitID, nameof(baselineCommitID));
 
             graph.BasePath = repositoryPath;
             graph.Name = repositoryName;
@@ -242,31 +233,34 @@ namespace SEE.GraphProviders.VCS
             // repository paths of the filter. A file deleted before it is not
             // among them and is therefore left out of the graph, however much
             // churn the range holds against it.
-            AddNodes(graph, criteria, session, repository, session.AllFiles(commitID, token),
-                     repositoryPath, repositoryName, simplifyGraph, computeCoFileChanges,
+            AddNodes(graph, criteria, session, session.AllFiles(commitID, token),
+                     repositoryName, simplifyGraph, computeCoFileChanges,
                      changePercentage, token);
         }
 
         /// <summary>
-        /// Throws unless <paramref name="sha"/> names a commit of
-        /// <paramref name="repository"/>.
+        /// Throws unless <paramref name="sha"/> names a commit of the repository
+        /// <paramref name="session"/> is open on.
         /// </summary>
-        /// <param name="repository">The repository the commit is looked for in.</param>
+        /// <param name="session">The repository the commit is looked for in.</param>
+        /// <param name="repositoryPath">The path of that repository, to be named in the
+        /// exception.</param>
         /// <param name="sha">The SHA naming it.</param>
         /// <param name="parameter">The name of the parameter <paramref name="sha"/> was
         /// passed as, to be named in the exception.</param>
         /// <exception cref="ArgumentException">Thrown where <paramref name="sha"/> is null,
         /// empty or names no commit of the repository.</exception>
-        private static void Check(Repository repository, string sha, string parameter)
+        private static void Check(GitRepositorySession session, string repositoryPath,
+                                  string sha, string parameter)
         {
             if (string.IsNullOrWhiteSpace(sha))
             {
                 throw new ArgumentException("A commit must be named.", parameter);
             }
-            if (repository.Lookup<Commit>(sha) == null)
+            if (session.Lookup(sha) == null)
             {
                 throw new ArgumentException($"{sha} names no commit of the repository at "
-                                            + $"{repository.Info.WorkingDirectory}.", parameter);
+                                            + $"{repositoryPath}.", parameter);
             }
         }
 
@@ -283,13 +277,10 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">The graph the nodes and edges are added to.</param>
         /// <param name="criteria">States which commits are walked, which of them count and
         /// which files are taken into account.</param>
-        /// <param name="session">Used to read the content of a file, which the metrics of its
-        /// code are gathered from.</param>
-        /// <param name="repository">The repository to be walked.</param>
+        /// <param name="session">The repository to be walked, and to read the content of a
+        /// file from, which the metrics of its code are gathered from.</param>
         /// <param name="present">The files that survived, which are those a node is made
         /// for.</param>
-        /// <param name="repositoryPath">The path of the repository, which the mailmap is
-        /// read from.</param>
         /// <param name="repositoryName">The name of the root node standing for the
         /// repository.</param>
         /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
@@ -302,9 +293,7 @@ namespace SEE.GraphProviders.VCS
               (Graph graph,
                Criteria criteria,
                GitRepositorySession session,
-               Repository repository,
                HashSet<string> present,
-               string repositoryPath,
                string repositoryName,
                bool simplifyGraph,
                bool computeCoFileChanges,
@@ -320,13 +309,11 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
-            Mailmap mailmap = Mailmap.Read(Path.Combine(repositoryPath, Mailmap.Filename));
-
             // Maps the name a file carries at the end onto the names it carried
             // before, gathered while the renames are followed.
             IDictionary<string, ISet<string>> formerNames = new Dictionary<string, ISet<string>>();
             IDictionary<string, Churn> churn
-                = ChurnOf(repository, criteria, mailmap, formerNames,
+                = ChurnOf(session, criteria, formerNames,
                           present, computeCoFileChanges, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
@@ -420,10 +407,10 @@ namespace SEE.GraphProviders.VCS
         /// each branch yields separately would count the history they share once
         /// per branch, which for a file of SEE is a factor of some thirty.
         /// </remarks>
-        /// <param name="repository">The repository to be walked.</param>
+        /// <param name="session">The repository to be walked. Its mailmap is what maps an
+        /// author onto their canonical name.</param>
         /// <param name="criteria">States which commits are walked, which of them count and
         /// which files are taken into account.</param>
-        /// <param name="mailmap">Used to map an author onto their canonical name.</param>
         /// <param name="formerNames">The names a renamed file carried before, keyed by the name
         /// it carries at the end; will be extended.</param>
         /// <param name="surviving">The files still present at the tip of one of the
@@ -434,9 +421,8 @@ namespace SEE.GraphProviders.VCS
         /// <param name="token">Cancellation token.</param>
         /// <returns>The churn per file.</returns>
         private static IDictionary<string, Churn> ChurnOf
-              (Repository repository,
+              (GitRepositorySession session,
                Criteria criteria,
-               Mailmap mailmap,
                IDictionary<string, ISet<string>> formerNames,
                ISet<string> surviving,
                bool computeCoFileChanges,
@@ -459,8 +445,9 @@ namespace SEE.GraphProviders.VCS
                     RenameThreshold = renameThreshold
                 }
             };
+            Mailmap mailmap = session.Mailmap;
             walked = 0;
-            foreach (Commit commit in repository.Commits.QueryBy(criteria.Commits))
+            foreach (Commit commit in session.Commits(criteria.Commits))
             {
                 token.ThrowIfCancellationRequested();
                 walked++;
@@ -477,7 +464,7 @@ namespace SEE.GraphProviders.VCS
 
                 if (criteria.Counts(commit))
                 {
-                    using Patch patch = Compare<Patch>(repository, criteria, parent, commit.Tree,
+                    using Patch patch = Compare<Patch>(session, criteria, parent, commit.Tree,
                                                        compareOptions);
                     // The files this one commit changed, under the names they
                     // carry at the end. Gathered as they are recorded, because
@@ -523,7 +510,7 @@ namespace SEE.GraphProviders.VCS
                     // nodes. A tree comparison yields them and is much cheaper
                     // than the line counts a patch would have to produce.
                     using TreeChanges treeChanges
-                        = Compare<TreeChanges>(repository, criteria, parent, commit.Tree,
+                        = Compare<TreeChanges>(session, criteria, parent, commit.Tree,
                                                compareOptions);
                     foreach (TreeEntryChanges change in treeChanges)
                     {
@@ -549,24 +536,18 @@ namespace SEE.GraphProviders.VCS
         /// account where there are any.
         /// </summary>
         /// <typeparam name="T">What the comparison is to yield.</typeparam>
-        /// <param name="repository">The repository the trees belong to.</param>
+        /// <param name="session">The repository the trees belong to.</param>
         /// <param name="criteria">States the directories taken into account.</param>
         /// <param name="oldTree">The tree compared against; null denotes the empty tree.</param>
         /// <param name="newTree">The tree to be compared.</param>
         /// <param name="compareOptions">The options of the comparison.</param>
         /// <returns>The comparison.</returns>
-        private static T Compare<T>(Repository repository, Criteria criteria,
+        private static T Compare<T>(GitRepositorySession session, Criteria criteria,
                                     LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree,
                                     CompareOptions compareOptions)
             where T : class, IDiffResult
         {
-            // The overload taking no pathspec is used where there is none,
-            // rather than handing it a null, which libgit2 is not documented
-            // to accept.
-            return criteria.Pathspec == null
-                   ? repository.Diff.Compare<T>(oldTree, newTree, compareOptions)
-                   : repository.Diff.Compare<T>(oldTree, newTree, criteria.Pathspec,
-                                                compareOptions);
+            return session.Compare<T>(oldTree, newTree, criteria.Pathspec, compareOptions);
         }
 
         /// <summary>

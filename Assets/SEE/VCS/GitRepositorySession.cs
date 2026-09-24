@@ -54,6 +54,64 @@ namespace SEE.VCS
         private Mailmap mailmap;
 
         /// <summary>
+        /// The commits <paramref name="filter"/> selects, in the order it asks
+        /// for.
+        /// </summary>
+        /// <remarks>
+        /// Anything <paramref name="filter"/> names a commit by -- a SHA, a
+        /// <see cref="Commit"/>, a <see cref="Branch"/> -- must belong to this
+        /// session. One taken from another session names an object of another
+        /// native repository, and what libgit2 makes of that is not defined.
+        /// </remarks>
+        /// <param name="filter">States which commits are wanted and in which order.</param>
+        /// <returns>The commits selected.</returns>
+        internal IEnumerable<Commit> Commits(CommitFilter filter)
+        {
+            return repository.Commits.QueryBy(filter);
+        }
+
+        /// <summary>
+        /// The comparison of <paramref name="newTree"/> against
+        /// <paramref name="oldTree"/>, narrowed to <paramref name="pathspec"/>
+        /// where there is one.
+        /// </summary>
+        /// <remarks>
+        /// Unlike the comparisons this class used to offer, the caller states
+        /// the <paramref name="options"/>, which is what lets it ask for rename
+        /// detection.
+        /// </remarks>
+        /// <typeparam name="T">What the comparison is to yield, a <see cref="Patch"/>
+        /// or a <see cref="TreeChanges"/>.</typeparam>
+        /// <param name="oldTree">The tree compared against; null denotes the empty tree.</param>
+        /// <param name="newTree">The tree to be compared.</param>
+        /// <param name="pathspec">The directories or files to be compared, or null for all
+        /// of them.</param>
+        /// <param name="options">The options of the comparison.</param>
+        /// <returns>The comparison.</returns>
+        internal T Compare<T>(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree,
+                              IEnumerable<string> pathspec, CompareOptions options)
+            where T : class, IDiffResult
+        {
+            // The overload taking no pathspec is used where there is none,
+            // rather than handing it a null, which libgit2 is not documented
+            // to accept.
+            return pathspec == null
+                   ? repository.Diff.Compare<T>(oldTree, newTree, options)
+                   : repository.Diff.Compare<T>(oldTree, newTree, pathspec, options);
+        }
+
+        /// <summary>
+        /// The commit <paramref name="sha"/> names, or null where this
+        /// repository holds none.
+        /// </summary>
+        /// <param name="sha">The SHA naming the commit.</param>
+        /// <returns>The commit, or null.</returns>
+        internal Commit Lookup(string sha)
+        {
+            return repository.Lookup<Commit>(sha);
+        }
+
+        /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
         /// <returns>True if there are any changes (new, deleted, or changed remote branches); false otherwise.</returns>
