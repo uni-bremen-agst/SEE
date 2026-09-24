@@ -64,9 +64,8 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Edits the object to the given drawable type configuration.
-        /// It calls the corresponding <see cref="GameEdit"/> - change method of the respective
-        /// drawable type.
+        /// Edits the object according to the given drawable type configuration.
+        /// It delegates the change to the editor responsible for the respective drawable type.
         /// </summary>
         /// <param name="objectToEdit">The object to be edited.</param>
         /// <param name="type">The drawable type configuration that should be applied.</param>
