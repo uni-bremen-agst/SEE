@@ -1,6 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
@@ -100,7 +101,7 @@ namespace SEE.UI.Menu.Drawable
             /// with the currently selected color.
             AssignColorArea(color =>
             {
-                GameEdit.ChangeImageColor(imageObj, color);
+                GameImageEdit.ChangeImageColor(imageObj, color);
                 imageConf.ImageColor = color;
 
                 ImageConf conf = ImageConf.GetImageConf(imageObj);

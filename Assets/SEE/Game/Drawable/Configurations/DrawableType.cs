@@ -85,7 +85,7 @@ namespace SEE.Game.Drawable.Configurations
                     new EditTextNetAction(surface.name, surfaceParentName, text).Execute();
                     break;
                 case ImageConf image:
-                    GameEdit.ChangeImage(objectToEdit, image);
+                    GameImageEdit.ChangeImage(objectToEdit, image);
                     new EditImageNetAction(surface.name, surfaceParentName, image).Execute();
                     break;
                 case MindMapNodeConf node:
