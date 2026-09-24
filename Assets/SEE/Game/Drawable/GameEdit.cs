@@ -1,11 +1,8 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
-using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
@@ -201,28 +198,7 @@ namespace SEE.Game.Drawable
         /// <param name="conf">The configuration which holds the necessary values.</param>
         public static void ChangeMindMapNode(GameObject node, MindMapNodeConf conf)
         {
-            if (node.CompareTag(Tags.MindMapNode))
-            {
-                GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
-                ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
-                ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
-                GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
-                        GameFinder.GetDrawableSurface(node));
-                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
-                GameMindMapBranch.ChangeParent(node, parent);
-
-                GameMindMapNode.ChangeBoxSize(node);
-
-                node.FindDescendantWithTag(Tags.Line).GetComponent<MeshCollider>().enabled = false;
-                node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;
-                if (conf.BranchLineToParent != "")
-                {
-                    GameObject branch = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.BranchLineToParent);
-                    ChangeLine(branch, conf.BranchLineConf);
-                    branch.GetComponent<MeshCollider>().enabled = false;
-                }
-                ChangeLayer(node, conf.OrderInLayer);
-            }
+            GameMindMapEdit.ChangeMindMapNode(node, conf);
         }
     }
 }
