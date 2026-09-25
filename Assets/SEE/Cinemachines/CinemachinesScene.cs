@@ -242,18 +242,17 @@ namespace SEE.Cinemachines
             assetPathOfScene = AssetDatabase.GenerateUniqueAssetPath(assetPathOfScene);
 
             // Attempt to create the Prefab
-            bool prefabCreationSuccess;
-            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, assetPathOfScene, out prefabCreationSuccess);
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, assetPathOfScene, out bool prefabCreationSuccess);
 
             // Log result
             if (prefabCreationSuccess)
             {
                 // The GUID names the folder this scene was given when it was created,
                 // and the prefab has just been written carrying it. Every instance made
-                // from that prefab would name the same folder, so deleting such an
+                // from the prefab would name that same folder, and deleting such an
                 // instance would delete the folder of the scene it was copied from,
-                // along with its timeline and its signals. A copy owns no folder, so it
-                // is made to remember none; one is created for it when it is set up.
+                // along with its timeline and signals. A copy owns no folder, so it is
+                // made to remember none; one is created for it when it is set up.
                 CinemachinesScene copy = prefab.GetComponent<CinemachinesScene>();
                 if (copy != null && !String.IsNullOrWhiteSpace(copy.SceneGUID))
                 {
@@ -270,7 +269,7 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Text-Field for a Name Suffix, to be appended to the Objects Name after creation.
+        /// Text field for a name suffix to be appended to the object's name after creation.
         /// </summary>
         [Title("Scene Object Creation", horizontalLine: true)]
         [LabelText("Suffix for Object")]
@@ -279,7 +278,7 @@ namespace SEE.Cinemachines
         public string ObjectNameSuffix = "";
 
         /// <summary>
-        /// Creates a new Spline, that can be assigned inside Cinemachine-Cameras with SplineDolly-Component.
+        /// Creates a new Spline that can be assigned inside Cinemachine-Cameras with SplineDolly-Component.
         /// </summary>
         [Button("Create Spline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Spline")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
@@ -317,7 +316,7 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Creates a new Cinemachines Camera, that can be assigned to a Timeline.
+        /// Creates a new Cinemachines Camera that can be assigned to a Timeline.
         /// </summary>
         [Button("Add Camera", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Cinemachine Camera")]
         [ButtonGroup(CinemachinesSceneRootOptions)]

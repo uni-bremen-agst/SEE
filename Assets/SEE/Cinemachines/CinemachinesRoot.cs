@@ -12,6 +12,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 using SEE.Game;
+using SEE.Utils;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,7 +21,7 @@ using UnityEditor;
 namespace SEE.Cinemachines
 {
     /// <summary>
-    /// Cinemachines Component, that initializes a Folder Structure inside the Project, specifically for
+    /// Cinemachines component, that initializes a folder structure inside the project, specifically for
     /// Cinemachine and all of its associated components and elements.
     /// </summary>
     [Serializable]
@@ -33,10 +34,10 @@ namespace SEE.Cinemachines
         /// True if the root of the Cinemachines is fully initialized.
         /// </summary>
         [SerializeField, DisableInPlayMode, DisableInEditorMode]
-        [Title("Cinemachines-Root Mainenance", horizontalLine: true)]
+        [Title("Cinemachines-Root Maintenance", horizontalLine: true)]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [LabelText("CinemachinesRoot initialized?")]
-        [Tooltip("Displays the State of Initialization of the CinemachinesRoot.")]
+        [Tooltip("Displays the state of initialization of the CinemachinesRoot.")]
         private bool isInitialized = false;
 
         /// <summary>
@@ -83,16 +84,16 @@ namespace SEE.Cinemachines
 
             if (possibleRoots.Length > 1)
             {
-                // One of them is to survive, and every one of them runs this. Were each
-                // to disable itself, a scene holding two roots would end with none of
-                // them working. The instance ID settles which one stays, being the same
-                // answer whichever root asks and in whatever order the search returns.
+                // One of them is to survive, and each of them runs this. Were every
+                // one to disable itself, a scene with two roots would end with none
+                // working at all. The instance ID settles which stays, being the same
+                // answer whichever root asks and whatever order the search returns.
                 CinemachinesRoot survivor = possibleRoots.OrderBy(root => root.GetInstanceID()).First();
 
                 if (survivor != this)
                 {
-                    Debug.LogError("Multiple CinemachinesRoot are not supported. Only use one per "
-                                   + $"Unity-Scene. Disabling this one in favour of {survivor.name}.\n",
+                    Debug.LogError("Multiple CinemachinesRoot are not supported. Use only one per "
+                                   + $"Unity scene. Disabling this one in favour of {survivor.name}.\n",
                                    gameObject);
 
                     // Disable GameObject
@@ -115,28 +116,28 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Sets up the CinemachinesRoot prefab.
         /// </summary>
-        [Button("Setup Cinemachines-Root", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Setup Cinemachines-Root")]
+        [Button("Setup CinemachinesRoot", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Setup CinemachinesRoot")]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [ButtonGroup(CinemachinesRootMaintenance)]
         [HideIf(nameof(isInitialized)), RuntimeHideIf(nameof(isInitialized))]
-        [Tooltip("Sets up the Root for the Cinemachines. Generates the Structure for crucial Elements and Organization.")]
+        [Tooltip("Sets up the root for the Cinemachines. Generates the structure for crucial elements and organization.")]
         internal void SetupCinemachinesRoot()
         {
-            // Create the Structure of the CinemachinesRoot. It fails, if the Prefabs are not available.
+            // Create the structure of the CinemachinesRoot. It fails, if the prefabs are not available.
             if (!CreateCinemachinesRootStructure())
             {
                 return;
             }
 
-            // build the folder structure under "Assets/Cinemachine"
+            // Build the folder structure under "Assets/Cinemachine".
             CreateCinemachineFolderStructure();
 
-            // Either Create or Confirm existence of the RenderTextures.
+            // Either create or confirm existence of the RenderTextures.
             CreateRenderTextures();
 
             isInitialized = true;
 
-            // Make sure, that this Object doesn't get put into a build.
+            // Make sure, that this object doesn't get put into a build.
             tag = Tags.EditorOnly;
         }
 
@@ -146,45 +147,38 @@ namespace SEE.Cinemachines
         [Button("Reset Cinemachines", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Reset Cinemachines")]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [ButtonGroup(CinemachinesRootMaintenance)]
-        [Tooltip("Resets the Root for the Cinemachines. This will also remove any created Scenes.")]
+        [Tooltip("Resets the root for the Cinemachines. This will also remove any created scenes.")]
         [ShowIf(nameof(isInitialized)), RuntimeShowIf(nameof(isInitialized))]
         internal void ResetCinemachinesRoot()
         {
-            // reset initialization, in case the root could not be reset.
+            // Reset initialization in case the root could not be reset.
             isInitialized = false;
 
-            // clear children of CinemachinesRoot
+            // Clear children of CinemachinesRoot
             List<Transform> rootChildren = new();
 
             rootChildren.Add(transform.Find(CinemachinesUtility.CinemachinesBrainsName));
             rootChildren.Add(transform.Find(CinemachinesUtility.CinemachinesScenesName));
             rootChildren.Add(transform.Find(CinemachinesUtility.CinemachinesControlCameraName));
 
-            foreach (Transform child in rootChildren)
+            foreach (Transform child in rootChildren.Where(c => c != null))
             {
-                if (child == null)
-                {
-                    continue;
-                }
-
                 // The whole of this class is compiled for the editor only, so
                 // immediate destruction is the only case there is to handle.
-                Debug.Log("Immediate Destroying Cinemachine-Children within Editor\n", child.gameObject);
-                DestroyImmediate(child.gameObject);
+                Debug.Log("Immediate destroying Cinemachine children within editor\n", child.gameObject);
+                Destroyer.Destroy(child.gameObject);
             }
 
-            // Remove every Scene-Folder from Assets/Cinemachines/Scenes
+            // Remove every scene folder from Assets/Cinemachines/Scenes
             string[] sceneFolders = AssetDatabase.GetSubFolders
                                           ($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}");
             foreach (string sceneFolder in sceneFolders)
             {
-                if (sceneFolder == $"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}/general")
+                if (sceneFolder != $"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}/general")
                 {
-                    continue;
+                    Debug.Log($"Removing {sceneFolder} from project.\n");
+                    AssetDatabase.DeleteAsset(sceneFolder);
                 }
-
-                Debug.Log($"Removing {sceneFolder} from project.\n");
-                AssetDatabase.DeleteAsset(sceneFolder);
             }
 
             sceneCounter = 0;
@@ -197,24 +191,24 @@ namespace SEE.Cinemachines
         #region Scene Creation
 
         /// <summary>
-        /// Text-Field for adding a Suffix to a Scene name.
+        /// Text field for adding a suffix to a scene name.
         /// </summary>
         [SerializeField]
         [Title("Scene Creation", horizontalLine: true)]
         [LabelText("Scene Name")]
         [PropertyOrder(CinemachineSceneConfigOrderCreate), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate)]
         [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]
-        [Tooltip("Name of the Scene to be added as a Suffix to the GameObject.")]
-        private string SceneNameSuffix = "";
+        [Tooltip("Name of the scene to be added as a suffix to the GameObject.")]
+        private string sceneNameSuffix = "";
 
         /// <summary>
-        /// Creates a new Cinemachine-Scene Structure inside the <see cref="CinemachinesRoot">.
+        /// Creates a new Cinemachine scene structure inside the <see cref="CinemachinesRoot">.
         /// </summary>
         [Button("Create new Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Create new Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderCreate + 1), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate + 1)]
         [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]
-        [Tooltip("Creates a new Cinemachine-Scene Structure inside the Unity-Scene.")]
+        [Tooltip("Creates a new Cinemachine scene structure inside the Unity scene.")]
         internal void CreateNewScene()
         {
             // find the Scenes Transform within the CinemachinesRoot-Prefab
@@ -222,19 +216,19 @@ namespace SEE.Cinemachines
 
             // Generate the Scene Name with the sceneCounter and the optional SceneNameSuffix
             string sceneName = $"Scene{sceneCounter}";
-            if (!String.IsNullOrWhiteSpace(SceneNameSuffix))
+            if (!String.IsNullOrWhiteSpace(sceneNameSuffix))
             {
-                sceneName += $" - {SceneNameSuffix}";
+                sceneName += $" - {sceneNameSuffix}";
             }
             sceneCounter += 1;
 
-            // Clear Text Input
-            SceneNameSuffix = "";
+            // Clear text input.
+            sceneNameSuffix = "";
 
-            // Create Prefab inside Cinemachines -> Scenes
+            // Create Prefab inside Cinemachines -> Scenes.
             GameObject newScene = new(sceneName, typeof(CinemachinesScene));
 
-            // check, if the Scenes GameObject exists
+            // Check whether the scenes GameObject exists.
             if (scenesTransform)
             {
                 newScene.transform.SetParent(scenesTransform);
@@ -243,27 +237,27 @@ namespace SEE.Cinemachines
             {
                 newScene.transform.SetParent(transform);
 
-                Debug.LogWarning("Missing Structure. Reset CinemachinesRoot to repair.\n");
+                Debug.LogWarning("Missing structure. Reset CinemachinesRoot to repair.\n");
             }
 
-            // confirm, that the underlining Structure exists
+            // Confirm, that the underlining structure exists.
             CreateCinemachineFolderStructure();
 
-            // Setup Scene Structure
+            // Setup scene structure.
             CinemachinesUtility.GenerateSceneStructure(newScene, sceneName);
 
-            // create new Timeline-Asset and store it in the newly created Scenes-Folder
+            // Create new Timeline asset and store it in the newly created scenes folder.
             TimelineAsset newTimeline = ScriptableObject.CreateInstance<TimelineAsset>();
 
             string scenePath = AssetDatabase.GUIDToAssetPath(newScene.GetComponent<CinemachinesScene>().SceneGUID);
 
-            Debug.Log($"Creating TimelineAsset in: \"{scenePath}\"\n");
+            Debug.Log($"Creating Timeline asset in: \"{scenePath}\"\n");
             AssetDatabase.CreateAsset(newTimeline, $"{scenePath}/Timeline.playable");
 
-            // assign to SceneRoot -> Playable Director
+            // Assign to SceneRoot -> Playable Director
             newScene.GetComponent<PlayableDirector>().playableAsset = newTimeline;
 
-            // Open Timeline Window with the current Scene Selected
+            // Open Timeline window with the currently selected scene.
             newScene.GetComponent<CinemachinesScene>().OpenTimelineWindow();
         }
 
@@ -274,20 +268,19 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Checks for missing prefabs and generates the CinemachinesRoot structure.
         /// </summary>
-        /// <returns> True, if creation of the structure was successful, false otherwise. </returns>
+        /// <returns> True if creation of the structure was successful, false otherwise. </returns>
         private bool CreateCinemachinesRootStructure()
         {
-            // Pre-load any of the required sub-prefabs
+            // Pre-load any of the required sub-prefabs.
             GameObject brains = Resources.Load<GameObject>($"{CinemachinesUtility.CinemachinesRootPrefabsRoot}/{CinemachinesUtility.CinemachinesBrainsName}");
             GameObject controlCamera = Resources.Load<GameObject>($"{CinemachinesUtility.CinemachinesRootPrefabsRoot}/{CinemachinesUtility.CinemachinesControlCameraName}");
 
-            // check for missing prefabs
+            // Check for missing prefabs.
             if (!brains || !controlCamera)
             {
-                // report with error
                 Debug.LogError("Unable to reconstruct the CinemachinesRoot. Missing prefabs.\n");
 
-                // Log, which Prefabs are missing
+                // Log which prefabs are missing.
                 if (!brains)
                 {
                     Debug.LogError($"Missing {CinemachinesUtility.CinemachinesBrainsName} prefab.\n");
@@ -301,22 +294,20 @@ namespace SEE.Cinemachines
                 return false;
             }
 
-            // Create GameObject Structure under CincemachinesRoot
+            // Create GameObject structure under CincemachinesRoot.
             cinemachineBrainsGameObject = Instantiate(brains, transform, false);
             cinemachineControlCameraGameObject = Instantiate(controlCamera, transform, false);
 
             cinemachineScenesGameObject = new GameObject(CinemachinesUtility.CinemachinesScenesName);
             cinemachineScenesGameObject.transform.SetParent(transform);
 
-            // Correct their Names, so that they don't include the "(Clone)" suffix
+            // Correct their names, so that they don't include the "(Clone)" suffix.
             cinemachineBrainsGameObject.name  = $"{CinemachinesUtility.CinemachinesBrainsName}";
             cinemachineControlCameraGameObject.name = $"{CinemachinesUtility.CinemachinesControlCameraName}";
 
-            // Dont Save these GameObjects into the Build by marking these as EditorOnly
+            // Don't save these GameObjects into the build by marking them as EditorOnly.
             cinemachineBrainsGameObject.tag = Tags.EditorOnly;
-
             cinemachineScenesGameObject.tag = Tags.EditorOnly;
-
             cinemachineControlCameraGameObject.tag = Tags.EditorOnly;
             return true;
         }
@@ -327,43 +318,40 @@ namespace SEE.Cinemachines
         /// </summary>
         private void CreateCinemachineFolderStructure()
         {
-            // create new Folder for Scene in Assets/Cinemachines/Scenes
+            // Create new folder for scene in Assets/Cinemachines/Scenes
             if (!AssetDatabase.IsValidFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}"))
             {
-                // Mind that IsValidFolder wants a path from the root of the project,
-                // that is, one beginning with "Assets", and that CreateFolder does not
-                // fail on a name already taken: it makes a unique one beside it. So a
-                // check asking the wrong question leaves a "Cinemachines 1" behind on
-                // every call rather than quietly doing nothing.
+                // Mind that IsValidFolder wants a path from the project root, that is,
+                // one beginning with "Assets", and that CreateFolder does not fail on a
+                // name already taken: it makes a unique one beside it. A check asking
+                // the wrong question therefore leaves a "Cinemachines 1" behind on every
+                // call rather than doing nothing.
                 if (!AssetDatabase.IsValidFolder(CinemachinesUtility.CinemachinesAssetsRoot))
                 {
                     AssetDatabase.CreateFolder("Assets", "Cinemachines");
                 }
 
-                // Two faults in the one line. The interpolation had no braces, so this
-                // asked after a folder named literally for the constant; and the folder
-                // it meant to ask after is the Scenes folder that the body creates.
                 if (!AssetDatabase.IsValidFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes"))
                 {
                     AssetDatabase.CreateFolder(CinemachinesUtility.CinemachinesAssetsRoot, "Scenes");
                 }
 
                 AssetDatabase.CreateFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes", $"{SceneManager.GetActiveScene().name}");
-                Debug.Log($"Created Scenes-Root Folder in \"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}\"\n");
+                Debug.Log($"Created scenes root folder in \"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}\"\n");
             }
         }
 
         /// <summary>
-        /// Helper Function to create the required RenderTextures and storing them as Assets.
+        /// Helper function to create the required RenderTextures and storing them as Assets.
         /// If these RenderTextures already exist, they will be overwritten
         /// </summary>
         private void CreateRenderTextures()
         {
-            // Create the RenderTextureDescriptor, that both RenderTextures should abide by
+            // Create the RenderTextureDescriptor that both RenderTextures should abide by.
             RenderTextureDescriptor renderTextureDescriptor = new(1920, 1080, RenderTextureFormat.ARGB32);
             renderTextureDescriptor.depthStencilFormat = GraphicsFormat.D16_UNorm;
 
-            // Create the RenderTexture for Main Cinemachines-Output, if none exists
+            // Create the RenderTexture for main Cinemachines output, if none exists.
             string pathCinemachineMain = $"{CinemachinesUtility.CinemachinesAssetsRoot}/{CinemachinesUtility.CinemachinesMainOutputName}";
             if (!AssetDatabase.AssetPathExists(pathCinemachineMain))
             {
@@ -371,7 +359,7 @@ namespace SEE.Cinemachines
             }
             mainOutputGUID = AssetDatabase.GUIDFromAssetPath(pathCinemachineMain);
 
-            // Create the RenderTexture for PIP Cinemachines-Output, if none exists
+            // Create the RenderTexture for PIP Cinemachines output, if none exists.
             string pathCinemachinePIP = $"{CinemachinesUtility.CinemachinesAssetsRoot}/{CinemachinesUtility.CinemachinesPIPOutputName}";
             if (!AssetDatabase.AssetPathExists(pathCinemachinePIP))
             {
@@ -380,8 +368,8 @@ namespace SEE.Cinemachines
             pictureInPictureGUID = AssetDatabase.GUIDFromAssetPath(pathCinemachinePIP);
 
             // Mind that Resources.Load wants a path without a file extension; one
-            // carrying ".asset" loads nothing at all, and the guard below would then
-            // pass that failure off as an absent asset.
+            // carrying ".asset" loads nothing and the guard below would then pass the
+            // failure off as an absent asset.
             PIPDataSource controlDataSource = Resources.Load<PIPDataSource>("UI/Cinemachines/ControlCameraDataSource");
             if (controlDataSource != null)
             {
@@ -389,8 +377,7 @@ namespace SEE.Cinemachines
             }
             else
             {
-                Debug.LogWarning("Missing UI/Cinemachines/ControlCameraDataSource. "
-                                 + "The control camera will show no picture.\n");
+                Debug.LogWarning("Missing UI/Cinemachines/ControlCameraDataSource. The control camera will show no picture.\n");
             }
 
             // Find the Cinemachine brains in the child GameObjects.
@@ -399,11 +386,11 @@ namespace SEE.Cinemachines
                 switch (child.name)
                 {
                     case "CMC_MainPicture":
-                        Debug.Log("Found Main Cinemachine Brain.\n");
+                        Debug.Log("Found main CinemachineBrain.\n");
                         child.GetComponent<Camera>().targetTexture = AssetDatabase.LoadAssetByGUID<RenderTexture>(mainOutputGUID);
                         break;
                     case "CMC_PictureInPicture":
-                        Debug.Log("Found PIP Cinemachine Brain.\n");
+                        Debug.Log("Found PIP CinemachineBrain.\n");
                         child.GetComponent<Camera>().targetTexture = AssetDatabase.LoadAssetByGUID<RenderTexture>(pictureInPictureGUID);
                         break;
                     default:
@@ -419,16 +406,31 @@ namespace SEE.Cinemachines
 
         #region Maintenance of CinemachinesRoot
 
+        /// <summary>
+        /// Button group name for the maintenance of the CinemachinesRoot. This ensures that the setup and
+        /// reset buttons are displayed in the correct order in the Odin Inspector.
+        /// </summary>
         protected const string CinemachinesRootMaintenance = "CinemachinesRootMaintenance";
 
+        /// <summary>
+        /// Property order for the maintenance of the CinemachinesRoot. This ensures that the setup and
+        /// reset buttons are displayed in the correct order in the Odin Inspector.
+        /// </summary>
         protected const int CinemachinesRootMaintenanceOrderSetupReset = 0;
 
         #endregion Maintenance of CinemachinesRoot
 
         #region Scene Creation
 
+        /// <summary>
+        /// Button group name for the scene creation configuration.
+        /// </summary>
         protected const string CinemachineSceneConfig = "CinemachineSceneConfig";
 
+        /// <summary>
+        /// Property order for the scene creation configuration. This ensures that the scene name input field and
+        /// create button are displayed in the correct order in the Odin Inspector.
+        /// </summary>
         protected const int CinemachineSceneConfigOrderCreate = 10;
 
         #endregion Scene Creation

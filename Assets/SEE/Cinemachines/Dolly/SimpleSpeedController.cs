@@ -67,7 +67,7 @@ namespace SEE.Cinemachines.Dolly
         /// Whether the emptiness of <see cref="speedList"/> has been reported already.
         /// </summary>
         /// <remarks>Not serialized: this is about one run, not about the asset. It
-        /// keeps the report to the one line rather than one per frame.</remarks>
+        /// keeps the report to one line rather than one per frame.</remarks>
         [NonSerialized]
         private bool emptyListReported;
 
@@ -106,9 +106,9 @@ namespace SEE.Cinemachines.Dolly
                 return currentPosition;
             }
 
-            // This runs once a frame from Cinemachine, so an empty list is reported the
+            // This runs once per frame from Cinemachine, so an empty list is reported
             // once and the dolly left where it is. Throwing here would raise the same
-            // exception on every frame for as long as play mode lasted.
+            // exception on every frame for as long as play mode lasts.
             if (speedList == null || speedList.Length == 0)
             {
                 if (!emptyListReported)
@@ -145,7 +145,7 @@ namespace SEE.Cinemachines.Dolly
                 if (!noSectorReported)
                 {
                     noSectorReported = true;
-                    Debug.LogError("No sector of the simple speed controller starts at or before "
+                    Debug.LogError($"No sector of the simple speed controller starts at or before "
                                    + $"{currentPosition}, so nothing moves. Give it a sector "
                                    + "starting at 0.\n");
                 }
@@ -188,7 +188,7 @@ namespace SEE.Cinemachines.Dolly
             }
 
             // Every position from 0 onwards must fall in some sector, else there is no
-            // speed to travel at over the stretch before the first of them begins.
+            // speed to travel at over the stretch before the first one begins.
             if (!speedList.Any(sector => sector.SectorStart == 0))
             {
                 throw new ArgumentException("One sector must start at '0'.", "SectorRange");

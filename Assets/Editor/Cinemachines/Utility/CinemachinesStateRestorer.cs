@@ -205,9 +205,9 @@ namespace SEEEditor.Cinemachines.Utility
                         {
                             // The stored references are matched to the properties by
                             // their order, so a restored object with more of them than
-                            // were stored would run off the end. That can happen where a
-                            // component came back with different defaults, and the ones
-                            // beyond what was stored are then left as they are.
+                            // were stored would run off the end. That can happen where
+                            // a component came back with different defaults, in which
+                            // case the ones beyond what was stored are left alone.
                             if (index >= storedReferencesList.Count)
                             {
                                 Debug.LogWarning($"'{restoredObject.name}' has more references than were "
@@ -222,11 +222,11 @@ namespace SEEEditor.Cinemachines.Utility
                             if (!storedReference.IsNull)
                             {
                                 // ... else get the Object by InstanceID and apply it.
-                                // The stored ID is the one the object bore before the
+                                // The stored ID is the one the object had before the
                                 // domain reload. Where the object was itself restored,
-                                // referenceList says what it is called now; where it was
-                                // not, the old ID is all there is, and it may well name
-                                // nothing at all.
+                                // referenceList says what it is called now; where it
+                                // was not, the old ID is all there is, and it may well
+                                // name nothing.
                                 if (!referenceList.TryGetValue(storedReference.InstanceID,
                                                                out int objectInstanceID))
                                 {
@@ -238,9 +238,9 @@ namespace SEEEditor.Cinemachines.Utility
                                 if (objectReference == null)
                                 {
                                     // Leave whatever the property holds. Assigning the
-                                    // null would wipe a reference the component may have
-                                    // brought with it from its own defaults, and would do
-                                    // so without the user being any the wiser.
+                                    // null would wipe a reference that the component
+                                    // may have brought with it from its own defaults,
+                                    // and would do so without the user being any wiser.
                                     Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the object was created during runtime, which must then be manually recreated and re-applied.\n");
                                 }
                                 else
@@ -261,12 +261,12 @@ namespace SEEEditor.Cinemachines.Utility
             }
 
             /// <summary>
-            /// The type <paramref name="storedComponent"/> names, or null where the
-            /// assembly or the type is no longer to be found.
+            /// The type <paramref name="storedComponent"/> names, or null where
+            /// the assembly or the type is no longer to be found.
             /// </summary>
-            /// <remarks>A script renamed, or a package changed, between the storing and
-            /// the restoring leaves a name resolving to nothing. Reported rather than
-            /// thrown, so that the rest of the tree still comes back.</remarks>
+            /// <remarks>A script renamed, or a package changed, between the storing
+            /// and the restoring leaves a name that resolves to nothing. Reported
+            /// rather than thrown, so that the rest of the tree still comes back.</remarks>
             /// <param name="storedComponent">Names the assembly and the type.</param>
             /// <returns>The type, or null.</returns>
             private static Type FindComponentType(StoredComponent storedComponent)
@@ -311,8 +311,8 @@ namespace SEEEditor.Cinemachines.Utility
                     Type ComponentType = FindComponentType(storedComponent);
 
                     // The type is gone, so nothing can be made of what was stored for
-                    // it. That happens when a script is renamed, or a package changes,
-                    // between the storing and the restoring.
+                    // it. This happens when a script is renamed or a package changes
+                    // between storing and restoring.
                     if (ComponentType == null)
                     {
                         continue;
@@ -347,9 +347,9 @@ namespace SEEEditor.Cinemachines.Utility
                         readComponent = restoredGameObject.AddComponent(ComponentType);
                     }
 
-                    // AddComponent yields null where the component cannot be added, a
-                    // second one of a type that allows only one, say. Everything below
-                    // would then fail on the null rather than on its cause.
+                    // AddComponent yields null where the component cannot be added,
+                    // a second one of a type allowing only one, say. Everything below
+                    // would then fail on the null rather than on the cause.
                     if (readComponent == null)
                     {
                         Debug.LogWarning($"Could not add a component of type '{ComponentType}' to "
