@@ -70,7 +70,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callContext);
 
-                ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                     constructorSymbol,
                     targetContext,
                     semanticContext,
@@ -80,7 +80,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(
                         targetKey,
-                        CreatePathStep(
+                        ExceptionFlowPathFactory.CreateStep(
                             ExceptionFlowPathStepKind.ConstructorCall,
                             constructorSymbol,
                             creation)));

@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -181,7 +182,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
 
                     ExceptionFlowDataFlowFacts dataFlow =
-                        GetDataFlowFacts(precedingStatement, semanticModel);
+                        ExceptionFlowDataFlowFactsProvider.GetFacts(
+                            precedingStatement,
+                            semanticModel);
                     if (!dataFlow.Succeeded
                         || dataFlow.WrittenInside.Any(
                             writtenSymbol =>

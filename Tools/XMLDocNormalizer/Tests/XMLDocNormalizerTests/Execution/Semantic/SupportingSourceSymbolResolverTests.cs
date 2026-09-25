@@ -123,7 +123,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 new[] { new KeyValuePair<int, ISymbol>(0, metadataProperty) });
             ExceptionFlowSummaryGraph graph = new();
 
-            ExceptionFlowCallableKey targetKey = ExceptionFlowAnalyzer.RegisterSummaryMethodTarget(
+            ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                 metadataMethod, metadataContext, context, graph);
 
             Assert.True(SymbolEqualityComparer.Default.Equals(sourceMethod, targetKey.Symbol));

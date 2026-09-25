@@ -573,13 +573,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+            ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                 targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
                     targetKey,
-                    CreatePathStep(
+                    ExceptionFlowPathFactory.CreateStep(
                         stepKind,
                         targetMethod,
                         sourceNode)));

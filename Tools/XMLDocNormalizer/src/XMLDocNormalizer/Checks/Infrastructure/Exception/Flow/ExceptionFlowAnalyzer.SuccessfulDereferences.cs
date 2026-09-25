@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -1127,9 +1128,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     node switch
                     {
                         StatementSyntax statement =>
-                            GetDataFlowFacts(statement, semanticModel),
+                            ExceptionFlowDataFlowFactsProvider.GetFacts(statement, semanticModel),
                         ExpressionSyntax expression =>
-                            GetDataFlowFacts(expression, semanticModel),
+                            ExceptionFlowDataFlowFactsProvider.GetFacts(expression, semanticModel),
                         _ => ExceptionFlowDataFlowFacts.Unsuccessful
                     };
 

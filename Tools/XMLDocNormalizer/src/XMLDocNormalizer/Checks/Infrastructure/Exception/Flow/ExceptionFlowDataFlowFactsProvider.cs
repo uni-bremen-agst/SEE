@@ -6,10 +6,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains exact, semantic-model-scoped caching for Roslyn data-flow
-    /// facts used by exception-flow provenance checks.
+    /// Owns exact semantic-model-scoped Roslyn data-flow analysis and caching.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// Cache partitions are weakly keyed by semantic model and synchronized
+    /// independently. The component retains no analysis root after its Roslyn
+    /// semantic world becomes unreachable and is safe for concurrent use.
+    /// </remarks>
+    internal static class ExceptionFlowDataFlowFactsProvider
     {
         /// <summary>
         /// Reuses immutable data-flow facts without strongly retaining semantic
@@ -26,7 +30,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model defining the region's semantic world.
         /// </param>
         /// <returns>The immutable facts observed by exception-flow analysis.</returns>
-        internal static ExceptionFlowDataFlowFacts GetDataFlowFacts(
+        internal static ExceptionFlowDataFlowFacts GetFacts(
             StatementSyntax statement,
             SemanticModel semanticModel)
         {
@@ -41,7 +45,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model defining the region's semantic world.
         /// </param>
         /// <returns>The immutable facts observed by exception-flow analysis.</returns>
-        internal static ExceptionFlowDataFlowFacts GetDataFlowFacts(
+        internal static ExceptionFlowDataFlowFacts GetFacts(
             ExpressionSyntax expression,
             SemanticModel semanticModel)
         {

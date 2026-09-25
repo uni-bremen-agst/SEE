@@ -273,7 +273,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(
                         propertyKey,
-                        CreatePathStep(
+                        ExceptionFlowPathFactory.CreateStep(
                             propertySymbol.IsIndexer
                                 ? ExceptionFlowPathStepKind
                                     .IndexerGetter

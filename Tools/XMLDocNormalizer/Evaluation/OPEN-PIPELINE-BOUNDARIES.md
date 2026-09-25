@@ -58,15 +58,15 @@ permanent rejection; status and resolution package identify the active path.
 ## BND-P6-003 — Historical analyzer dependency separation
 
 - Pipeline Stage: P6 / Worker Analyzer Host
-- Status: Planned
+- Status: Under Investigation
 - First Observed: P5O2 readiness audit
-- Current Root Cause: the typed exception-flow analyzer is compiled into the main executable and depends on active-Roslyn semantic context, supporting-source resolution, graph models, and helper infrastructure. Referencing that executable from a worker imports active Roslyn; copying the analyzer would create a prohibited semantic fork.
+- Current Root Cause: P5O2A established an independently buildable Roslyn-neutral single-source core and extracted path creation, external evidence projection, data-flow caching, and summary-target registration. The active executable still compiles that neutral source set locally because a runtime project boundary loses same-compilation value-fact precision. The complete typed analyzer also still depends on main-owned `ProjectClosureSemanticContext`, `SemanticCompilationScope`, supporting-source/cross-compilation resolution, graph models, and body helpers. Referencing the executable from a worker would still import active Roslyn.
 - Current Fail-Closed Behavior: no historical worker is created or invoked; compiler-mismatched reconstruction continues to fail closed at the existing boundary.
 - Affected Evaluation Cases: source-backed external analysis that requires an exact historical compiler, including the planned S1 probes
 - Scientific Relevance: historical parsing and analysis must use one internally consistent Roslyn type universe while returning only canonical IR.
-- Resolution Package: P5O2A neutral contract and analyzer-seam extraction, followed by a single-source dual-version analyzer build
+- Resolution Package: P5O2A2 semantic scope and callable-resolution seam, followed by the remaining single-source analyzer decomposition and P5O2B dual-version build
 - Last Verified: 2026-09-25
-- Evidence / Report: `Evaluation/P5O2-historical-compiler-worker-readiness.md`
+- Evidence / Report: `Evaluation/P5O2-historical-compiler-worker-readiness.md`, `Evaluation/P5O2A-exception-flow-analyzer-decomposition.md`
 
 ## BND-P4P7-001 — OneOf exact PDB
 

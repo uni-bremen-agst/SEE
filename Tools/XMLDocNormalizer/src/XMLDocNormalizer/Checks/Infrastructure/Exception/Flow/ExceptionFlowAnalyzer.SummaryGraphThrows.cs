@@ -500,7 +500,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             fragment.AddSource(
                 new ExceptionFlowSummarySource(
                     exceptionType,
-                    CreateTerminalPath(
+                    ExceptionFlowPathFactory.CreateTerminal(
                         ExceptionFlowPathStepKind.ExplicitThrow,
                         exceptionType,
                         throwNode)));

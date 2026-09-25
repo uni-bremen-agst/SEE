@@ -454,7 +454,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             result.AddExceptionPath(
                 typeSymbol,
-                CreateTerminalPath(
+                ExceptionFlowPathFactory.CreateTerminal(
                     ExceptionFlowPathStepKind.ExplicitThrow,
                     typeSymbol,
                     throwNode));

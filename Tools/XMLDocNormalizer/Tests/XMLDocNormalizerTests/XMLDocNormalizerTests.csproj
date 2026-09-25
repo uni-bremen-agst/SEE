@@ -25,6 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\XMLDocNormalizer.ExceptionFlow.Core\XMLDocNormalizer.ExceptionFlow.Core.csproj"
+                      Aliases="ExceptionFlowCore" />
     <ProjectReference Include="..\..\src\XMLDocNormalizer\XMLDocNormalizer.csproj" />
     <ProjectReference Include="..\..\Evaluation\XMLDocNormalizer.Evaluation\XMLDocNormalizer.Evaluation.csproj" />
   </ItemGroup>

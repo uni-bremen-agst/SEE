@@ -5,9 +5,14 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains helpers for creating structured exception-flow paths.
+    /// Creates structured source-level exception-flow paths.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// This stateless Roslyn-bound component owns the projection from symbols
+    /// and syntax locations to the neutral path model. It is safe for
+    /// concurrent use.
+    /// </remarks>
+    internal static class ExceptionFlowPathFactory
     {
         /// <summary>
         /// Creates one source-level exception-flow path step.
@@ -20,7 +25,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The source node whose position should be recorded.
         /// </param>
         /// <returns>The created path step.</returns>
-        private static ExceptionFlowPathStep CreatePathStep(
+        internal static ExceptionFlowPathStep CreateStep(
             ExceptionFlowPathStepKind kind,
             ISymbol symbol,
             SyntaxNode sourceNode)
@@ -63,13 +68,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The source node whose position should be recorded.
         /// </param>
         /// <returns>The created terminal exception-flow path.</returns>
-        private static ExceptionFlowPath CreateTerminalPath(
+        internal static ExceptionFlowPath CreateTerminal(
             ExceptionFlowPathStepKind kind,
             ISymbol symbol,
             SyntaxNode sourceNode)
         {
             return new ExceptionFlowPath(
-                CreatePathStep(
+                CreateStep(
                     kind,
                     symbol,
                     sourceNode));

@@ -4,9 +4,16 @@ using XMLDocNormalizer.Execution.Semantic;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains canonical registration of method-backed summary graph targets.
+    /// Registers method-backed targets in an exception-flow summary graph.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// This stateless Roslyn-bound component owns supporting-source rebinding
+    /// at the graph-registration boundary. Its current dependency on
+    /// <see cref="ProjectClosureSemanticContext"/> is the explicit remaining
+    /// Main/P6 seam for a future historical build. It is safe for concurrent
+    /// use.
+    /// </remarks>
+    internal static class ExceptionFlowSummaryTargetRegistrar
     {
         /// <summary>
         /// Registers a method target under its canonical supporting source
@@ -17,7 +24,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticContext">The semantic context containing supporting sources.</param>
         /// <param name="graph">The graph receiving the canonical target node.</param>
         /// <returns>The canonical graph key used by the target node and call edge.</returns>
-        internal static ExceptionFlowCallableKey RegisterSummaryMethodTarget(
+        internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ProjectClosureSemanticContext semanticContext,
@@ -30,7 +37,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     out IMethodSymbol supportingSourceTarget,
                     out SemanticCompilationScope supportingSourceScope))
             {
-                return RegisterSummaryMethodTarget(
+                return RegisterMethodTarget(
                     requestedTarget,
                     requestedContext,
                     semanticContext,
@@ -58,7 +65,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The compilation that bound <paramref name="requestedTarget"/>.
         /// </param>
         /// <returns>The canonical graph key used by the target node and call edge.</returns>
-        private static ExceptionFlowCallableKey RegisterSummaryMethodTarget(
+        internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ProjectClosureSemanticContext semanticContext,
@@ -73,7 +80,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     out IMethodSymbol supportingSourceTarget,
                     out SemanticCompilationScope supportingSourceScope))
             {
-                return RegisterSummaryMethodTarget(
+                return RegisterMethodTarget(
                     requestedTarget,
                     requestedContext,
                     semanticContext,
@@ -82,7 +89,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     supportingSourceScope);
             }
 
-            return RegisterSummaryMethodTarget(
+            return RegisterMethodTarget(
                 requestedTarget,
                 requestedContext,
                 semanticContext,
@@ -102,7 +109,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The registered scope that owns <paramref name="supportingSourceTarget"/>.
         /// </param>
         /// <returns>The canonical graph key used by the target node and call edge.</returns>
-        private static ExceptionFlowCallableKey RegisterSummaryMethodTarget(
+        internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ProjectClosureSemanticContext semanticContext,
@@ -114,7 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     supportingSourceTarget.ContainingAssembly,
                     supportingSourceScope.Compilation.Assembly))
             {
-                return RegisterSummaryMethodTarget(
+                return RegisterMethodTarget(
                     requestedTarget, requestedContext, semanticContext, graph);
             }
 

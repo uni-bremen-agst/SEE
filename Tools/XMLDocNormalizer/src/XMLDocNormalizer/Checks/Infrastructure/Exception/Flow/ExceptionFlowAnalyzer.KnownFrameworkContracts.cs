@@ -123,7 +123,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 result.AddExceptionPath(
                     exceptionType,
-                    CreateTerminalPath(
+                    ExceptionFlowPathFactory.CreateTerminal(
                         ExceptionFlowPathStepKind.FrameworkThrowHelper,
                         methodSymbol,
                         sourceNode));
@@ -154,7 +154,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment.AddSource(
                     new ExceptionFlowSummarySource(
                         exceptionType,
-                        CreateTerminalPath(
+                        ExceptionFlowPathFactory.CreateTerminal(
                             ExceptionFlowPathStepKind.FrameworkThrowHelper,
                             methodSymbol,
                             sourceNode)));

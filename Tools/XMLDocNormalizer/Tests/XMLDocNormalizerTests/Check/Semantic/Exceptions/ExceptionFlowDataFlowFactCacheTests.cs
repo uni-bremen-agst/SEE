@@ -43,12 +43,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext context = CreateContext(Source, "Repeated");
             StatementSyntax statement = GetAssignmentStatement(context);
             CalculatorProbe probe = new();
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(probe.Calculate);
 
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts first =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts first =
                 cache.GetFacts(statement, context.SemanticModel);
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts second =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts second =
                 cache.GetFacts(statement, context.SemanticModel);
 
             Assert.True(first.Succeeded);
@@ -68,7 +68,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext context = CreateContext(Source, "Regions");
             StatementSyntax[] statements = context.Method.Body!.Statements.ToArray();
             CalculatorProbe probe = new();
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(probe.Calculate);
 
             cache.GetFacts(statements[0], context.SemanticModel);
@@ -90,8 +90,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             ExpressionStatementSyntax statement =
                 (ExpressionStatementSyntax)GetAssignmentStatement(context);
             ExpressionSyntax expression = statement.Expression;
-            List<ExceptionFlowAnalyzer.DataFlowRegionKind> kinds = new();
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            List<ExceptionFlowDataFlowFactsProvider.DataFlowRegionKind> kinds = new();
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(
                     (key, _) =>
                     {
@@ -105,8 +105,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.Equal(
                 new[]
                 {
-                    ExceptionFlowAnalyzer.DataFlowRegionKind.Statement,
-                    ExceptionFlowAnalyzer.DataFlowRegionKind.Expression
+                    ExceptionFlowDataFlowFactsProvider.DataFlowRegionKind.Statement,
+                    ExceptionFlowDataFlowFactsProvider.DataFlowRegionKind.Expression
                 },
                 kinds);
             Assert.Equal(2, cache.GetEntryCount(context.SemanticModel));
@@ -130,7 +130,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext firstContext = CreateContext(compilation, firstTree);
             DataFlowTestContext secondContext = CreateContext(compilation, secondTree);
             CalculatorProbe probe = new();
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(probe.Calculate);
 
             cache.GetFacts(
@@ -161,7 +161,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext secondContext = CreateContext(secondCompilation, tree);
             StatementSyntax statement = GetAssignmentStatement(firstContext);
             List<SemanticModel> calculatedModels = new();
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(
                     (_, semanticModel) =>
                     {
@@ -196,10 +196,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowAnalysis? directExpression =
                 context.SemanticModel.AnalyzeDataFlow(expression);
 
-            ExceptionFlowAnalyzer.DataFlowFactCache cache = new();
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts cachedStatement =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache = new();
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts cachedStatement =
                 cache.GetFacts(statement, context.SemanticModel);
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts cachedExpression =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts cachedExpression =
                 cache.GetFacts(expression, context.SemanticModel);
 
             Assert.NotNull(directStatement);
@@ -224,19 +224,19 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext context = CreateContext(Source, "Unsuccessful");
             StatementSyntax statement = GetAssignmentStatement(context);
             int calculations = 0;
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(
                     (_, _) =>
                     {
                         calculations++;
-                        return ExceptionFlowAnalyzer
+                        return ExceptionFlowDataFlowFactsProvider
                             .ExceptionFlowDataFlowFacts
                             .Unsuccessful;
                     });
 
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts first =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts first =
                 cache.GetFacts(statement, context.SemanticModel);
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts second =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts second =
                 cache.GetFacts(statement, context.SemanticModel);
 
             Assert.False(first.Succeeded);
@@ -256,7 +256,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext context = CreateContext(Source, "Exception");
             StatementSyntax statement = GetAssignmentStatement(context);
             int calculations = 0;
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(
                     (_, _) =>
                     {
@@ -271,7 +271,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             Assert.Throws<InvalidOperationException>(
                 () => cache.GetFacts(statement, context.SemanticModel));
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts facts =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts facts =
                 cache.GetFacts(statement, context.SemanticModel);
 
             Assert.True(facts.Succeeded);
@@ -289,10 +289,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             DataFlowTestContext context = CreateContext(Source, "Concurrent");
             StatementSyntax statement = GetAssignmentStatement(context);
             CalculatorProbe probe = new(delayMilliseconds: 25);
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(probe.Calculate);
 
-            Task<ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts>[] tasks =
+            Task<ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts>[] tasks =
                 Enumerable.Range(0, 8)
                     .Select(
                         _ => Task.Run(
@@ -301,7 +301,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                                 context.SemanticModel)))
                     .ToArray();
 
-            ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts[] results =
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts[] results =
                 await Task.WhenAll(tasks);
 
             Assert.All(results, static result => Assert.True(result.Succeeded));
@@ -316,7 +316,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void CacheDoesNotRetainSemanticModelOrCompilation()
         {
-            ExceptionFlowAnalyzer.DataFlowFactCache cache =
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache =
                 new(CreateRealFacts);
             WeakDataFlowReferences references =
                 CreateCachedWeakReferences(cache);
@@ -337,15 +337,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.False(references.Compilation.IsAlive);
         }
 
-        private static ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts SuccessfulFacts()
+        private static ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts SuccessfulFacts()
         {
-            return new ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts(
+            return new ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts(
                 succeeded: true,
                 ImmutableArray<ISymbol>.Empty);
         }
 
-        private static ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts CreateRealFacts(
-            ExceptionFlowAnalyzer.DataFlowRegionKey key,
+        private static ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts CreateRealFacts(
+            ExceptionFlowDataFlowFactsProvider.DataFlowRegionKey key,
             SemanticModel semanticModel)
         {
             DataFlowAnalysis? analysis =
@@ -353,19 +353,19 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             if (analysis?.Succeeded != true)
             {
-                return ExceptionFlowAnalyzer
+                return ExceptionFlowDataFlowFactsProvider
                     .ExceptionFlowDataFlowFacts
                     .Unsuccessful;
             }
 
-            return new ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts(
+            return new ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts(
                 succeeded: true,
                 analysis.WrittenInside.ToImmutableArray());
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static WeakDataFlowReferences CreateCachedWeakReferences(
-            ExceptionFlowAnalyzer.DataFlowFactCache cache)
+            ExceptionFlowDataFlowFactsProvider.DataFlowFactCache cache)
         {
             DataFlowTestContext context = CreateContext(Source, "Lifetime");
             StatementSyntax statement = GetAssignmentStatement(context);
@@ -444,8 +444,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             internal int CalculationCount => Volatile.Read(ref calculationCount);
 
-            internal ExceptionFlowAnalyzer.ExceptionFlowDataFlowFacts Calculate(
-                ExceptionFlowAnalyzer.DataFlowRegionKey key,
+            internal ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts Calculate(
+                ExceptionFlowDataFlowFactsProvider.DataFlowRegionKey key,
                 SemanticModel semanticModel)
             {
                 Interlocked.Increment(ref calculationCount);

@@ -87,7 +87,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AddExternalDocumentationContractExceptions(
+                ExceptionFlowExternalDocumentationEvidence.AddToAnalysisResult(
                     invocation,
                     methodSymbol,
                     semanticModel,
@@ -303,13 +303,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     is INamedTypeSymbol typeSymbol)
                 {
                     ExceptionFlowPathStep invocationStep =
-                        CreatePathStep(
+                        ExceptionFlowPathFactory.CreateStep(
                             ExceptionFlowPathStepKind.MethodCall,
                             methodSymbol,
                             invocation);
 
                     ExceptionFlowPathStep factoryStep =
-                        CreatePathStep(
+                        ExceptionFlowPathFactory.CreateStep(
                             ExceptionFlowPathStepKind
                                 .DelegateExceptionFactory,
                             typeSymbol,

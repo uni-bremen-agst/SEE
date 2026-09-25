@@ -434,13 +434,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+            ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                 targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
                     targetKey,
-                    CreatePathStep(
+                    ExceptionFlowPathFactory.CreateStep(
                         ExceptionFlowPathStepKind.DeconstructCall,
                         targetMethod,
                         sourceNode)));
@@ -498,7 +498,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+            ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                 conversionMethod,
                 targetContext,
                 semanticContext,
@@ -508,7 +508,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
                     targetKey,
-                    CreatePathStep(
+                    ExceptionFlowPathFactory.CreateStep(
                         ExceptionFlowPathStepKind
                             .ConversionOperatorCall,
                         conversionMethod,

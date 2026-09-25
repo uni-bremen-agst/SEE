@@ -1,0 +1,12 @@
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\bin\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.deps.json
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\bin\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.dll
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\bin\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.pdb
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.dll
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\refint\XMLDocNormalizer.ExceptionFlow.Core.dll
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.pdb
+D:\Repository\SEE\Tools\XMLDocNormalizer\src\XMLDocNormalizer.ExceptionFlow.Core\obj\Debug\net8.0\ref\XMLDocNormalizer.ExceptionFlow.Core.dll

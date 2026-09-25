@@ -7,10 +7,15 @@ using XMLDocNormalizer.Models.DTO;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains external XML-documentation exception contracts for
-    /// transitively analyzed method invocations.
+    /// Projects external XML-documentation exception evidence into direct and
+    /// summary-graph analysis results.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// This stateless Roslyn-bound component supplements executable analysis
+    /// without claiming that unavailable external bodies are complete. It is
+    /// safe for concurrent use.
+    /// </remarks>
+    internal static class ExceptionFlowExternalDocumentationEvidence
     {
         /// <summary>
         /// Adds documented external exception contracts to the recursive
@@ -33,8 +38,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="result">
         /// The accumulated exception-flow result.
         /// </param>
-        private static void
-            AddExternalDocumentationContractExceptions(
+        internal static void AddToAnalysisResult(
                 InvocationExpressionSyntax invocation,
                 IMethodSymbol methodSymbol,
                 SemanticModel semanticModel,
@@ -49,7 +53,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 result.AddExternalDocumentationEvidencePath(
                     exceptionType,
-                    CreateTerminalPath(
+                    ExceptionFlowPathFactory.CreateTerminal(
                         ExceptionFlowPathStepKind
                             .ExternalDocumentationEvidence,
                         methodSymbol,
@@ -77,8 +81,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local summary fragment.
         /// </param>
-        private static void
-            AddExternalDocumentationContractSummarySources(
+        internal static void AddToSummaryFragment(
                 InvocationExpressionSyntax invocation,
                 IMethodSymbol methodSymbol,
                 SemanticModel semanticModel,
@@ -94,7 +97,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment.AddSource(
                     new ExceptionFlowSummarySource(
                         exceptionType,
-                        CreateTerminalPath(
+                        ExceptionFlowPathFactory.CreateTerminal(
                             ExceptionFlowPathStepKind
                                 .ExternalDocumentationEvidence,
                             methodSymbol,
