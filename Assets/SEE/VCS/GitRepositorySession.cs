@@ -4,6 +4,7 @@ using SEE.GraphProviders.VCS;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -411,13 +412,23 @@ namespace SEE.VCS
         /// materialising every branch of the repository and matching it against every
         /// expression of the filter, over and over.
         /// </summary>
+        /// <remarks>
+        /// A <see cref="Branch"/> is a handle into the native repository this session holds
+        /// and must not outlive it. One that does refers to memory that has been freed, and
+        /// asking such a one for its <see cref="Branch.Tip"/> brings the editor down where
+        /// it stands rather than raising anything that could be caught. Read out of a branch
+        /// whatever is wanted -- its name, the SHA of its tip -- while the session is open,
+        /// and hand out that instead of the branch.
+        ///
+        /// What is returned is read-only, the held collection being the session's own.
+        /// </remarks>
         /// <returns>All relevant branches of the repository.</returns>
         public ICollection<Branch> RelevantBranches()
         {
-            return relevantBranches ??= Selected();
+            return relevantBranches ??= new ReadOnlyCollection<Branch>(Selected());
 
             // The branches of the repository the filter holds relevant.
-            ICollection<Branch> Selected()
+            IList<Branch> Selected()
             {
                 if (repositoryConfig.VCSFilter == null)
                 {
