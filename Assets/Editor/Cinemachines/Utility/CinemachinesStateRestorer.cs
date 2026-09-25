@@ -203,6 +203,18 @@ namespace SEEEditor.Cinemachines.Utility
                         // check, if the type of the Property is relevant to us
                         if (propertyIterator.propertyType == SerializedPropertyType.ObjectReference)
                         {
+                            // The stored references are matched to the properties by
+                            // their order, so a restored object with more of them than
+                            // were stored would run off the end. That can happen where a
+                            // component came back with different defaults, and the ones
+                            // beyond what was stored are then left as they are.
+                            if (index >= storedReferencesList.Count)
+                            {
+                                Debug.LogWarning($"'{restoredObject.name}' has more references than were "
+                                                 + "stored for it. The remaining ones are left as they are.\n");
+                                break;
+                            }
+
                             // Select the indexed StoredReference, which potentially needs to be applied
                             StoredReference storedReference = storedReferencesList[index];
 
