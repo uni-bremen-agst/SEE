@@ -15,7 +15,6 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
     /// </summary>
-    [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]
     internal class TestGraphIO
     {
         /// <summary>
@@ -37,29 +36,66 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
+        /// <summary>
+        /// Measures the time to load a real big graph from a GXL file.
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="DeepProfiler"/> scope below yields a dotTrace snapshot that
+        /// covers only the load, with every method transitively called in it. What
+        /// this requires is that the profiler be driven by the profiled process
+        /// rather than from dotTrace's controller window, that is, "Control
+        /// profiling" must be set to "Using API". With its default, "Manual
+        /// control", the API is inert: the console then reports that no profiler is
+        /// attached and no snapshot is written. The profiling type does not matter
+        /// here; the Timeline type of the Unity preset works.
+        ///
+        /// Set the configuration up once as follows. In dotTrace, under
+        /// "New Process Run", click the "+" icon.
+        /// For Path, enter the Unity executable, for instance
+        /// "C:\Program Files\Unity\Hub\Editor\6000.0.67f1\Editor\Unity.exe".
+        /// For Arguments, enter the path to this project, for instance
+        /// -projectpath "C:\Users\me\SEE".
+        /// In the "Advanced Options", check "Using API" for "Control profiling".
+        /// Give the entry a name of your choosing, for instance "Unity for SEE", then click "Save".
+        ///
+        /// To profile, select that entry and click "Run", which starts Unity under
+        /// the profiler. Only one instance of the Unity editor can run at a time for
+        /// a given project, so you may need to close one first. Then run this test
+        /// from the Test Runner. The console will report that the snapshot was saved,
+        /// and the snapshot itself appears in dotTrace's controller window, from
+        /// where it can be opened.
+        ///
+        /// Note that the GXL parsing runs on a thread-pool thread. The call tree of
+        /// this test method will therefore show mostly waiting; the work itself is
+        /// on the worker thread.
+        /// </remarks>
+        /// <returns>Task.</returns>
         [Test]
-        public async Task TestReadingRealBigGraph()
+        public async Task TestReadingRealBigGraphAsync()
         {
             DataPath path = new(Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz");
             Performance p = Performance.Begin("Loading big GXL file " + path);
-            await LoadGraphAsync(path);
-            p.End();
+            using (DeepProfiler.Capture("TestReadingRealBigGraph"))
+            {
+                await LoadGraphAsync(path);
+            }
+            p.End(true);
         }
 
         [Test]
-        public async Task TestReadingArchitecture()
+        public async Task TestReadingArchitectureAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl"));
         }
 
         [Test]
-        public async Task TestReadingMapping()
+        public async Task TestReadingMappingAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl"));
         }
 
         [Test]
-        public async Task TestReadingCodeFacts()
+        public async Task TestReadingCodeFactsAsync()
         {
             await LoadGraphAsync(new(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz"));
         }
@@ -81,7 +117,7 @@ namespace SEE.DataModel.DG.IO
         /// Test for a simple artificially created graph.
         /// </summary>
         [Test, Sequential]
-        public async Task TestGraphWriter([Values(true, false)] bool compress)
+        public async Task TestGraphWriterAsync([Values(true, false)] bool compress)
         {
             const string basename = "test";
 

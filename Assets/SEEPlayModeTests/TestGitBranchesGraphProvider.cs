@@ -35,7 +35,6 @@ namespace SEE.GraphProviders
             provider.GitRepository.VCSFilter.RepositoryPaths = new string[] { "Assets/SEE/GraphProviders" };
             provider.GitRepository.VCSFilter.Globbing = new() { { "**/*.cs", true } };
             provider.SimplifyGraph = true;
-            provider.CombineAuthors = false;
 
             branchCity.DataProvider.Add(provider);
             Graph graph = await branchCity.DataProvider.ProvideAsync(new Graph(), branchCity);
