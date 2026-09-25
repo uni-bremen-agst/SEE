@@ -370,10 +370,18 @@ namespace SEE.Cinemachines
             }
             pictureInPictureGUID = AssetDatabase.GUIDFromAssetPath(pathCinemachinePIP);
 
-            PIPDataSource controlDataSource = Resources.Load<PIPDataSource>("UI/Cinemachines/ControlCameraDataSource.asset");
+            // Mind that Resources.Load wants a path without a file extension; one
+            // carrying ".asset" loads nothing at all, and the guard below would then
+            // pass that failure off as an absent asset.
+            PIPDataSource controlDataSource = Resources.Load<PIPDataSource>("UI/Cinemachines/ControlCameraDataSource");
             if (controlDataSource != null)
             {
                 controlDataSource.PIPImage = AssetDatabase.LoadAssetByGUID<RenderTexture>(mainOutputGUID);
+            }
+            else
+            {
+                Debug.LogWarning("Missing UI/Cinemachines/ControlCameraDataSource. "
+                                 + "The control camera will show no picture.\n");
             }
 
             // Find the Cinemachine brains in the child GameObjects.
