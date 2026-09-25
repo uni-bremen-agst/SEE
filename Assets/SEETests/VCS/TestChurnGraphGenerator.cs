@@ -139,6 +139,8 @@ namespace SEE.VCS
 
             Performance p = Performance.Begin($"Adding nodes for {repositoryName} commits since "
                                               + $"{startDate:yyyy-MM-dd}");
+            // Enable the following line to get a dotTrace snapshot of the generation, with every
+            // method transitively called in it.
             //using (DeepProfiler.Capture(nameof(TestChurn)))
             {
                 ChurnGraphGenerator.AddNodesAfterDate
