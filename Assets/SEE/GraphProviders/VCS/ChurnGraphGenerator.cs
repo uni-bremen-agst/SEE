@@ -133,8 +133,8 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositoryName">The name of the root node standing for the
         /// repository.</param>
         /// <param name="startDate">The beginning of the period taken into account.</param>
-        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
-        /// together. Mind that this is far from free: for SEE it comes to some hundred
+        /// <param name="addCoChangeEdges">Whether to add co-change edges for files a commit changed
+        /// together. Mind that this is far from free: for a large commit history it comes to some hundred
         /// thousand pairs, and the node of one file may name several hundred others.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
@@ -144,7 +144,7 @@ namespace SEE.GraphProviders.VCS
                GitRepository repositoryConfiguration,
                string repositoryName,
                DateTime startDate,
-               bool computeCoFileChanges,
+               bool addCoChangeEdges,
                Action<float> changePercentage,
                CancellationToken token)
         {
@@ -161,7 +161,7 @@ namespace SEE.GraphProviders.VCS
             // meanwhile is not among them and is therefore left out of the
             // graph, however much churn its history holds.
             AddNodes(graph, criteria, session, session.AllFiles(token),
-                     repositoryName, simplifyGraph, computeCoFileChanges,
+                     repositoryName, simplifyGraph, addCoChangeEdges,
                      changePercentage, token);
         }
 
@@ -196,7 +196,7 @@ namespace SEE.GraphProviders.VCS
         /// counted up to; it is itself taken into account.</param>
         /// <param name="baselineCommitID">The commit the changes are counted from; it is
         /// itself left out.</param>
-        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// <param name="addCoChangeEdges">Whether to add co-change edges for files a commit changed
         /// together.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
@@ -207,7 +207,7 @@ namespace SEE.GraphProviders.VCS
                string repositoryName,
                string commitID,
                string baselineCommitID,
-               bool computeCoFileChanges,
+               bool addCoChangeEdges,
                Action<float> changePercentage,
                CancellationToken token)
         {
@@ -234,7 +234,7 @@ namespace SEE.GraphProviders.VCS
             // among them and is therefore left out of the graph, however much
             // churn the range holds against it.
             AddNodes(graph, criteria, session, session.AllFiles(commitID, token),
-                     repositoryName, simplifyGraph, computeCoFileChanges,
+                     repositoryName, simplifyGraph, addCoChangeEdges,
                      changePercentage, token);
         }
 
@@ -285,7 +285,7 @@ namespace SEE.GraphProviders.VCS
         /// repository.</param>
         /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
         /// one another is to be collapsed into its innermost one.</param>
-        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
+        /// <param name="addCoChangeEdges">Whether to add co-change edges for files a commit changed
         /// together.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
@@ -296,7 +296,7 @@ namespace SEE.GraphProviders.VCS
                HashSet<string> present,
                string repositoryName,
                bool simplifyGraph,
-               bool computeCoFileChanges,
+               bool addCoChangeEdges,
                Action<float> changePercentage,
                CancellationToken token)
         {
@@ -324,7 +324,7 @@ namespace SEE.GraphProviders.VCS
             IDictionary<string, ISet<string>> formerNames = new Dictionary<string, ISet<string>>();
             IDictionary<string, Churn> churn
                 = ChurnOf(session, criteria, formerNames,
-                          present, computeCoFileChanges, out int walked, token);
+                          present, addCoChangeEdges, out int walked, token);
             changePercentage?.Invoke(0.9f);
 
             int withChurn = churn.Count;
@@ -425,8 +425,8 @@ namespace SEE.GraphProviders.VCS
         /// it carries at the end; will be extended.</param>
         /// <param name="surviving">The files still present at the tip of one of the
         /// branches. A rename away from one of those is not followed.</param>
-        /// <param name="computeCoFileChanges">Whether to note which files a commit changed
-        /// together. Off, the co-changes of a file stay empty.</param>
+        /// <param name="addCoChangeEdges">Whether to add co-change edges for files a commit changed
+        /// together.</param>
         /// <param name="walked">How many commits the walk visited.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>The churn per file.</returns>
@@ -435,7 +435,7 @@ namespace SEE.GraphProviders.VCS
                Criteria criteria,
                IDictionary<string, ISet<string>> formerNames,
                ISet<string> surviving,
-               bool computeCoFileChanges,
+               bool addCoChangeEdges,
                out int walked,
                CancellationToken token)
         {
@@ -497,7 +497,7 @@ namespace SEE.GraphProviders.VCS
                             Note(renamedTo, formerNames, surviving, change.OldPath, target);
                         }
                     }
-                    if (computeCoFileChanges && touched.Count > 1)
+                    if (addCoChangeEdges && touched.Count > 1)
                     {
                         foreach (string path in touched)
                         {

@@ -149,7 +149,7 @@ namespace SEE.VCS
                      repositoryConfiguration: repositoryConfiguration,
                      repositoryName: repositoryName,
                      startDate: startDate,
-                     computeCoFileChanges: true,
+                     addCoChangeEdges: true,
                      changePercentage: null,
                      token: default);
             }
@@ -196,7 +196,7 @@ namespace SEE.VCS
                  repositoryName: repositoryName,
                  commitID: commitID,
                  baselineCommitID: baselineCommitID,
-                 computeCoFileChanges: true,
+                 addCoChangeEdges: true,
                  changePercentage: null,
                  token: default);
             p.End(true);
