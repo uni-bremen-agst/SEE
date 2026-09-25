@@ -82,7 +82,7 @@ namespace SEE.GraphProviders
             ChurnGraphGenerator.AddNodesForCommit
                 (graph, SimplifyGraph, GitRepository,
                  Utils.Filenames.InnermostDirectoryName(repositoryPath),
-                 CommitID, BaselineCommitID, ComputeCoFileChanges, changePercentage, token);
+                 CommitID, BaselineCommitID, AddCoChangeEdges, changePercentage, token);
             return graph;
         }
 

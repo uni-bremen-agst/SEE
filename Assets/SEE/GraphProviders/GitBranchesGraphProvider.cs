@@ -101,7 +101,7 @@ namespace SEE.GraphProviders
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
             ChurnGraphGenerator.AddNodesAfterDate
                 (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
-                 ComputeCoFileChanges, changePercentage, token);
+                 AddCoChangeEdges, changePercentage, token);
 
             changePercentage?.Invoke(1f);
 
