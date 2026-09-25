@@ -494,15 +494,20 @@ namespace SEE.GraphProviders.VCS
                     }
                     if (addCoChangeEdges && touched.Count > 1)
                     {
-                        foreach (string path in touched)
+                        // Every pair of them once, noted on both, rather than
+                        // every ordered pair with the one that pairs a file
+                        // with itself thrown away. The churn of each is looked
+                        // up once and held: this is the innermost loop of the
+                        // walk, and a commit touching a hundred files has it
+                        // run some thousands of times.
+                        string[] paths = touched.ToArray();
+                        Churn[] churns = Array.ConvertAll(paths, path => result[path]);
+                        for (int one = 0; one < paths.Length; one++)
                         {
-                            Churn file = result[path];
-                            foreach (string other in touched)
+                            for (int other = one + 1; other < paths.Length; other++)
                             {
-                                if (other != path)
-                                {
-                                    file.AlsoChanged(other);
-                                }
+                                churns[one].AlsoChanged(paths[other]);
+                                churns[other].AlsoChanged(paths[one]);
                             }
                         }
                     }
