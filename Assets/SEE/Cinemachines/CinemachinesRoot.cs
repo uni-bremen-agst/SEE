@@ -331,9 +331,12 @@ namespace SEE.Cinemachines
                     AssetDatabase.CreateFolder("Assets", "Cinemachines");
                 }
 
-                if (!AssetDatabase.IsValidFolder($"CinemachinesUtility.CinemachinesAssetsRoot"))
+                // Two faults in the one line. The interpolation had no braces, so this
+                // asked after a folder named literally for the constant; and the folder
+                // it meant to ask after is the Scenes folder that the body creates.
+                if (!AssetDatabase.IsValidFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes"))
                 {
-                    AssetDatabase.CreateFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}", "Scenes");
+                    AssetDatabase.CreateFolder(CinemachinesUtility.CinemachinesAssetsRoot, "Scenes");
                 }
 
                 AssetDatabase.CreateFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes", $"{SceneManager.GetActiveScene().name}");
