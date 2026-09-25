@@ -410,7 +410,7 @@ namespace SEE.GraphProviders.VCS
         /// One walk, however many branches are reported on: a commit reachable
         /// from several of them is one commit and is counted once. Summing what
         /// each branch yields separately would count the history they share once
-        /// per branch, which for a file of SEE is a factor of some thirty.
+        /// per branch.
         /// </remarks>
         /// <param name="session">The repository to be walked. Its mailmap is what maps an
         /// author onto their canonical name.</param>
@@ -667,8 +667,8 @@ namespace SEE.GraphProviders.VCS
         ///
         /// The metrics of the code itself are gathered by
         /// <see cref="AddCodeMetrics"/>. Mind that it reads and lexes the
-        /// content of every file, which for a repository the size of SEE is
-        /// the greater part of the time this takes.
+        /// content of every file, which for a large repository is the greater part
+        /// of the time this takes.
         ///
         /// A chain of directory nodes holding nothing but one another is
         /// collapsed into its innermost one where <paramref name="simplifyGraph"/>
