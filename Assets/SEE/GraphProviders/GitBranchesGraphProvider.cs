@@ -59,11 +59,8 @@ namespace SEE.GraphProviders
             }
             CheckAttributes(branchCity);
 
-            //using (DeepProfiler.Capture($"{nameof(GitBranchesGraphProvider)}.{nameof(ProvideAsync)}")) // FIXME: Remove.
-            {
-                return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
-                                                     cancellationToken: token);
-            }
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
+                                                 cancellationToken: token);
         }
 
         /// <summary>
