@@ -357,7 +357,8 @@ namespace SEEEditor.Cinemachines.Utility
         /// Save function, utilizing the custom Serializer class for Cinemachines.
         /// </summary>
         /// <param name="unityScene">The Unity scene that the object will be stored from.</param>
-        private static void Save(Scene unityScene)
+        /// <returns>True if that scene held a CinemachinesRoot and it was stored.</returns>
+        private static bool Save(Scene unityScene)
         {
             // Locating the CinemachinesRoot of this scene, and of no other. Several
             // scenes can be open together, and a search across all of them would store
@@ -366,7 +367,7 @@ namespace SEEEditor.Cinemachines.Utility
 
             if (cinemachinesRootTransform == null)
             {
-                return;
+                return false;
             }
 
             // Serialize ScenesRoot
@@ -375,6 +376,7 @@ namespace SEEEditor.Cinemachines.Utility
 
             // Store generated JSON inside EditorPrefs for persistance
             EditorPrefs.SetString($"{unityScene.name}.{CinemachinesUtility.CinemachinesPersistanceKeyName}", JsonUtility.ToJson(storedGameObject));
+            return true;
         }
 
         /// <summary>
@@ -540,16 +542,24 @@ namespace SEEEditor.Cinemachines.Utility
             {
                 case PlayModeStateChange.ExitingPlayMode:   // Editor is exiting Play-Mode, proceed to save changes made
                     // Iterate through all scenes inside the project
+                    bool anythingStored = false;
                     for (int i = 0; i < SceneManager.sceneCount; i++)
                     {
                         // currently selected scene
                         Scene currScene = SceneManager.GetSceneAt(i);
 
                         // Save serialized data
-                        Save(currScene);
+                        anythingStored |= Save(currScene);
                     }
 
-                    GetRestorableRoots();
+                    // Only where there is something to tell. This class is loaded for
+                    // everyone working in the project, and a dialog raised on every
+                    // exit from play mode, in every scene holding no Cinemachines at
+                    // all, is a dialog raised for nothing.
+                    if (anythingStored)
+                    {
+                        GetRestorableRoots();
+                    }
                     break;
                 default:
                     break;
