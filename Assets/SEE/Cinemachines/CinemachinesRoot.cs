@@ -167,13 +167,10 @@ namespace SEE.Cinemachines
                     continue;
                 }
 
-                #if UNITY_EDITOR
+                // The whole of this class is compiled for the editor only, so
+                // immediate destruction is the only case there is to handle.
                 Debug.Log("Immediate Destroying Cinemachine-Children within Editor\n", child.gameObject);
                 DestroyImmediate(child.gameObject);
-                #else
-                Debug.Log("Destroying Cinemachine-Children during Runtime\n", child.gameObject);
-                Destroyer.Destroy(child.gameObject);
-                #endif
             }
 
             // Remove every Scene-Folder from Assets/Cinemachines/Scenes
