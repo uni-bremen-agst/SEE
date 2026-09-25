@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -64,7 +63,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ITypeSymbol? receiverType,
             INamedTypeSymbol? exactReceiverType,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -194,7 +193,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
                 SemanticModel semanticModel,
-                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowSemanticEnvironment semanticContext,
                 ExceptionFlowSummaryGraph graph,
                 ExceptionFlowSummaryFragment fragment,
                 ExceptionFlowCallContext callerContext)
@@ -259,7 +258,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax awaitedExpression,
             string description,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -388,7 +387,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             string description,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -569,7 +568,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext targetContext,
             ExceptionFlowPathStepKind stepKind,
             SyntaxNode sourceNode,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {

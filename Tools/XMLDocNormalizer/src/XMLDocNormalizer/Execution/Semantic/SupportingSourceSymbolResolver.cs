@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 
 namespace XMLDocNormalizer.Execution.Semantic
 {
@@ -224,7 +225,9 @@ namespace XMLDocNormalizer.Execution.Semantic
             out SemanticCompilationScope scope)
         {
             IMethodSymbol? resolvedMethod =
-                CrossCompilationSymbolResolver.ResolveMethod(methodSymbol, supportingScope.Compilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
+                    methodSymbol,
+                    supportingScope.Compilation);
 
             if (resolvedMethod == null
                 || (resolvedMethod.DeclaringSyntaxReferences.Length == 0

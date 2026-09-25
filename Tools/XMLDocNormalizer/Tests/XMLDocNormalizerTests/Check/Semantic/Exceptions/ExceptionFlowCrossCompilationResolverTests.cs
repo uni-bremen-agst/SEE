@@ -3,16 +3,15 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizerTests.Helpers;
 
-namespace XMLDocNormalizerTests.Execution.Semantic
+namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
 {
     /// <summary>
     /// Tests symbol resolution from emitted dependency metadata back into the
     /// corresponding source compilation.
     /// </summary>
-    public sealed class CrossCompilationSymbolResolverTests
+    public sealed class ExceptionFlowCrossCompilationResolverTests
     {
         /// <summary>
         /// Provides members used by the non-generic resolver tests.
@@ -46,7 +45,65 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             IMethodSymbol sourceMethod = sourceType.GetMembers("Execute").OfType<IMethodSymbol>().Single();
 
             IMethodSymbol? resolvedMethod =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataMethod, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataMethod, sourceCompilation);
+
+            AssertSourceMethod(sourceMethod, resolvedMethod);
+        }
+
+        /// <summary>
+        /// Resolves the exact overload selected in the metadata compilation.
+        /// </summary>
+        [Fact]
+        public void ResolveMethod_Overload_ReturnsExactSourceMethod()
+        {
+            const string source =
+                "namespace Dependency { public sealed class Sample { " +
+                "public void Execute(int value) { } " +
+                "public void Execute(string value) { } } }";
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(source);
+            IMethodSymbol metadataMethod = GetRequiredType(consumerCompilation, "Dependency.Sample")
+                .GetMembers("Execute")
+                .OfType<IMethodSymbol>()
+                .Single(method => method.Parameters[0].Type.SpecialType == SpecialType.System_String);
+            IMethodSymbol sourceMethod = GetRequiredType(sourceCompilation, "Dependency.Sample")
+                .GetMembers("Execute")
+                .OfType<IMethodSymbol>()
+                .Single(method => method.Parameters[0].Type.SpecialType == SpecialType.System_String);
+
+            IMethodSymbol? resolvedMethod =
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
+                    metadataMethod,
+                    sourceCompilation);
+
+            AssertSourceMethod(sourceMethod, resolvedMethod);
+        }
+
+        /// <summary>
+        /// Resolves an explicit interface implementation without a simple-name fallback.
+        /// </summary>
+        [Fact]
+        public void ResolveMethod_ExplicitInterfaceImplementation_ReturnsExactSourceMethod()
+        {
+            const string source =
+                "namespace Dependency { " +
+                "public interface IService { void Execute(); } " +
+                "public sealed class Service : IService { void IService.Execute() { } } }";
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(source);
+            IMethodSymbol metadataMethod = GetRequiredType(consumerCompilation, "Dependency.Service")
+                .GetMembers()
+                .OfType<IMethodSymbol>()
+                .Single(method => method.ExplicitInterfaceImplementations.Length == 1);
+            IMethodSymbol sourceMethod = GetRequiredType(sourceCompilation, "Dependency.Service")
+                .GetMembers()
+                .OfType<IMethodSymbol>()
+                .Single(method => method.ExplicitInterfaceImplementations.Length == 1);
+
+            IMethodSymbol? resolvedMethod =
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
+                    metadataMethod,
+                    sourceCompilation);
 
             AssertSourceMethod(sourceMethod, resolvedMethod);
         }
@@ -67,7 +124,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 constructor => !constructor.IsImplicitlyDeclared);
 
             IMethodSymbol? resolvedConstructor =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataConstructor, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataConstructor, sourceCompilation);
 
             AssertSourceMethod(sourceConstructor, resolvedConstructor);
         }
@@ -86,7 +143,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             IMethodSymbol sourceOperator = sourceType.GetMembers("op_Addition").OfType<IMethodSymbol>().Single();
 
             IMethodSymbol? resolvedOperator =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataOperator, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataOperator, sourceCompilation);
 
             AssertSourceMethod(sourceOperator, resolvedOperator);
         }
@@ -109,9 +166,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 .Single();
 
             IMethodSymbol? resolvedGetter =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataProperty.GetMethod!, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataProperty.GetMethod!, sourceCompilation);
             IMethodSymbol? resolvedSetter =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataProperty.SetMethod!, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataProperty.SetMethod!, sourceCompilation);
 
             AssertSourceMethod(sourceProperty.GetMethod!, resolvedGetter);
             AssertSourceMethod(sourceProperty.SetMethod!, resolvedSetter);
@@ -137,9 +194,9 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 .Single();
 
             IMethodSymbol? resolvedAdder =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataEvent.AddMethod!, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataEvent.AddMethod!, sourceCompilation);
             IMethodSymbol? resolvedRemover =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataEvent.RemoveMethod!, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataEvent.RemoveMethod!, sourceCompilation);
 
             AssertSourceMethod(sourceEvent.AddMethod!, resolvedAdder);
             AssertSourceMethod(sourceEvent.RemoveMethod!, resolvedRemover);
@@ -159,7 +216,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             INamedTypeSymbol sourceType = GetRequiredType(sourceCompilation, "Dependency.Sample");
 
             INamedTypeSymbol? resolvedType =
-                CrossCompilationSymbolResolver.ResolveNamedType(metadataType, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveNamedType(metadataType, sourceCompilation);
 
             Assert.NotNull(resolvedType);
             Assert.True(SymbolEqualityComparer.Default.Equals(sourceType, resolvedType));
@@ -192,7 +249,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 .Single();
 
             IMethodSymbol? resolvedMethod =
-                CrossCompilationSymbolResolver.ResolveMethod(metadataMethod, sourceCompilation);
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(metadataMethod, sourceCompilation);
 
             Assert.NotNull(resolvedMethod);
             Assert.False(resolvedMethod.DeclaringSyntaxReferences.IsDefaultOrEmpty);
@@ -232,10 +289,10 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 sourceCompilation.Assembly.Identity,
                 mismatchedCompilation.Assembly.Identity);
 
-            Assert.Null(CrossCompilationSymbolResolver.ResolveNamedType(
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveNamedType(
                 metadataType,
                 mismatchedCompilation));
-            Assert.Null(CrossCompilationSymbolResolver.ResolveMethod(
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveMethod(
                 metadataMethod,
                 mismatchedCompilation));
         }
@@ -254,12 +311,38 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 sourceCompilation.AssemblyName!,
                 "namespace Dependency { public sealed class Other { } }");
 
-            Assert.Null(CrossCompilationSymbolResolver.ResolveNamedType(
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveNamedType(
                 metadataType,
                 incompleteCompilation));
-            Assert.Null(CrossCompilationSymbolResolver.ResolveMethod(
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveMethod(
                 metadataMethod,
                 incompleteCompilation));
+        }
+
+        /// <summary>
+        /// Rejects a destination containing multiple distinct declarations
+        /// for the same documentation identity.
+        /// </summary>
+        [Fact]
+        public void ResolveMethod_AmbiguousDestination_ReturnsNull()
+        {
+            const string validSource =
+                "namespace Dependency { public sealed class Sample { " +
+                "public void Execute() { } } }";
+            (_, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(validSource);
+            IMethodSymbol metadataMethod = GetRequiredType(consumerCompilation, "Dependency.Sample")
+                .GetMembers("Execute")
+                .OfType<IMethodSymbol>()
+                .Single();
+            CSharpCompilation ambiguousCompilation = CreateSourceCompilation(
+                "ResolverDependency",
+                "namespace Dependency { public sealed class Sample { " +
+                "public void Execute() { } public void Execute() { } } }");
+
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveMethod(
+                metadataMethod,
+                ambiguousCompilation));
         }
 
         /// <summary>
@@ -279,7 +362,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 ISymbol sourceMember = GetRequiredType(sourceCompilation, "Dependency.Sample")
                     .GetMembers(memberName)
                     .Single();
-                ISymbol? resolvedMember = CrossCompilationSymbolResolver.ResolveStableMember(
+                ISymbol? resolvedMember = ExceptionFlowCrossCompilationResolver.ResolveStableMember(
                     metadataMember, sourceCompilation);
 
                 Assert.NotNull(resolvedMember);
@@ -301,7 +384,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 .InstanceConstructors
                 .Single(constructor => !constructor.IsImplicitlyDeclared);
 
-            Assert.Null(CrossCompilationSymbolResolver.ResolveStableMember(
+            Assert.Null(ExceptionFlowCrossCompilationResolver.ResolveStableMember(
                 metadataConstructor.Parameters.Single(), sourceCompilation));
         }
 
@@ -346,7 +429,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
 
             ExceptionFlowCallContext sourceContext = metadataContext.RebindCallable(
                 sourceMethod,
-                member => CrossCompilationSymbolResolver.ResolveStableMember(member, sourceCompilation));
+                member => ExceptionFlowCrossCompilationResolver.ResolveStableMember(member, sourceCompilation));
 
             Assert.True(sourceContext.GetParameterFacts(sourceMethod.Parameters[0]).ContainsAll(
                 ExceptionFlowValueFacts.NonNull | ExceptionFlowValueFacts.NonNullElements));

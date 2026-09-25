@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models.DTO;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -54,7 +53,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callerContext)

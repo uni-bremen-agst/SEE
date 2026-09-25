@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizerTests.Helpers;
 
@@ -672,7 +673,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
 
             IMethodSymbol metadataA = Assert.Single(ReadInvocationMethods(target.Reconstructed));
             IMethodSymbol sourceA = Assert.IsAssignableFrom<IMethodSymbol>(
-                CrossCompilationSymbolResolver.ResolveMethod(
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
                     metadataA,
                     dependency.Reconstructed));
             Assert.Equal("A", sourceA.Name);

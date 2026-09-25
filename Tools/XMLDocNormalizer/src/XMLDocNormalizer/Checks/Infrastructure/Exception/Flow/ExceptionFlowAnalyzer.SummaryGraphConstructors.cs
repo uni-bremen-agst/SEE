@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
 
@@ -47,7 +46,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ConstructorDeclarationSyntax constructor,
             IMethodSymbol constructorSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -172,7 +171,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool AnalyzeSummaryImplicitConstructor(
             IMethodSymbol constructorSymbol,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -260,7 +259,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -449,7 +448,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool AnalyzeSummaryInstanceMemberInitializers(
             INamedTypeSymbol typeSymbol,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)

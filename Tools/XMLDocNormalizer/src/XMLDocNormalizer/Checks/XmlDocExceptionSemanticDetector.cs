@@ -120,7 +120,8 @@ namespace XMLDocNormalizer.Checks
                     IsTransitiveMode(options)
                         ? ExceptionFlowAnalyzer
                             .CreateSummaryAnalysisSession(
-                                semanticContext)
+                                new ExceptionFlowSemanticEnvironment(
+                                    semanticContext))
                         : null;
 
             return FindExceptionSmells(
@@ -172,6 +173,8 @@ namespace XMLDocNormalizer.Checks
         {
             List<Finding> findings =
                 new();
+            ExceptionFlowSemanticEnvironment exceptionFlowEnvironment =
+                new ExceptionFlowSemanticEnvironment(semanticContext);
 
             INamedTypeSymbol? exceptionBase =
                 semanticModel.Compilation.GetTypeByMetadataName(
@@ -217,12 +220,13 @@ namespace XMLDocNormalizer.Checks
                     ExceptionFlowAnalyzer
                         .AnalyzeDirectlyThrownExceptions(
                             member,
-                            semanticContext);
+                            exceptionFlowEnvironment);
 
                 ExceptionFlowAnalysisResult flowResult =
                     AnalyzeConfiguredExceptionFlow(
                         member,
                         semanticContext,
+                        exceptionFlowEnvironment,
                         options,
                         directFlowResult,
                         summaryAnalysisSession);
@@ -340,6 +344,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="semanticContext">
         /// The project-closure semantic context.
         /// </param>
+        /// <param name="exceptionFlowEnvironment">
+        /// The analyzer-facing semantic and callable-resolution environment.
+        /// </param>
         /// <param name="options">
         /// The configured XML documentation options.
         /// </param>
@@ -358,6 +365,7 @@ namespace XMLDocNormalizer.Checks
         private static ExceptionFlowAnalysisResult AnalyzeConfiguredExceptionFlow(
             MemberDeclarationSyntax member,
             ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment exceptionFlowEnvironment,
             XmlDocOptions options,
             ExceptionFlowAnalysisResult directFlowResult,
             ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession)
@@ -376,7 +384,7 @@ namespace XMLDocNormalizer.Checks
             ExceptionFlowAnalyzer.SummaryAnalysisSession session =
                 summaryAnalysisSession ??
                 ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(
-                    semanticContext);
+                    exceptionFlowEnvironment);
 
             return session.Analyze(
                 member);

@@ -36,6 +36,33 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
+        /// Projects exact supporting-source resolution through the analyzer
+        /// seam without leaking the Main compilation scope.
+        /// </summary>
+        [Fact]
+        public void SemanticEnvironment_ExactSupportingIdentity_ReturnsMethodAndScope()
+        {
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(CreateDependencySource("1.0.0.0"));
+            ProjectClosureSemanticContext context = CreateConsumerContext(consumerCompilation);
+            SemanticCompilationScope registeredScope =
+                context.RegisterSupportingSource(sourceCompilation);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
+
+            bool resolved = environment.TryResolveSupportingSourceMethod(
+                GetRequiredMethod(consumerCompilation),
+                out ExceptionFlowSupportingSourceMethod resolution);
+
+            Assert.True(resolved);
+            Assert.True(SymbolEqualityComparer.Default.Equals(
+                GetRequiredMethod(sourceCompilation),
+                resolution.Method));
+            Assert.Same(registeredScope, resolution.Scope);
+            Assert.Same(sourceCompilation, resolution.Scope.Compilation);
+        }
+
+        /// <summary>
         /// Leaves an already source-backed method outside metadata-to-source
         /// binding.
         /// </summary>
@@ -122,9 +149,11 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 Array.Empty<KeyValuePair<int, ExceptionFlowValueFacts>>(),
                 new[] { new KeyValuePair<int, ISymbol>(0, metadataProperty) });
             ExceptionFlowSummaryGraph graph = new();
+            ExceptionFlowSemanticEnvironment semanticEnvironment =
+                new ExceptionFlowSemanticEnvironment(context);
 
             ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
-                metadataMethod, metadataContext, context, graph);
+                metadataMethod, metadataContext, semanticEnvironment, graph);
 
             Assert.True(SymbolEqualityComparer.Default.Equals(sourceMethod, targetKey.Symbol));
             Assert.True(graph.TryGetCallContext(
@@ -132,6 +161,70 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.NotNull(sourceContext);
             Assert.True(sourceContext.IsParameterMemberKnownNonNull(
                 sourceMethod.Parameters[0], sourceProperty));
+        }
+
+        /// <summary>
+        /// Keeps an already source-backed target and its call context in the
+        /// same compilation without attempting cross-compilation rebinding.
+        /// </summary>
+        [Fact]
+        public void RegisterSummaryMethodTarget_SourceMethod_PreservesTargetAndContext()
+        {
+            CSharpCompilation compilation = CreateSourceCompilation(
+                CreateDependencySource("1.0.0.0"));
+            SyntaxTree tree = compilation.SyntaxTrees.Single();
+            ProjectClosureSemanticContext context =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    tree,
+                    compilation);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
+            IMethodSymbol sourceMethod = GetRequiredMethod(compilation);
+            ExceptionFlowCallContext callContext = new(sourceMethod);
+            ExceptionFlowSummaryGraph graph = new();
+
+            ExceptionFlowCallableKey targetKey =
+                ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
+                    sourceMethod,
+                    callContext,
+                    environment,
+                    graph);
+
+            Assert.True(SymbolEqualityComparer.Default.Equals(sourceMethod, targetKey.Symbol));
+            Assert.True(graph.TryGetCallContext(
+                targetKey,
+                out ExceptionFlowCallContext? retainedContext));
+            Assert.Same(callContext, retainedContext);
+        }
+
+        /// <summary>
+        /// Keeps an unresolved metadata target fail closed without replacing
+        /// its identity or context.
+        /// </summary>
+        [Fact]
+        public void RegisterSummaryMethodTarget_UnregisteredMetadata_PreservesTargetAndContext()
+        {
+            (_, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(CreateDependencySource("1.0.0.0"));
+            ProjectClosureSemanticContext context = CreateConsumerContext(consumerCompilation);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
+            IMethodSymbol metadataMethod = GetRequiredMethod(consumerCompilation);
+            ExceptionFlowCallContext callContext = new(metadataMethod);
+            ExceptionFlowSummaryGraph graph = new();
+
+            ExceptionFlowCallableKey targetKey =
+                ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
+                    metadataMethod,
+                    callContext,
+                    environment,
+                    graph);
+
+            Assert.True(SymbolEqualityComparer.Default.Equals(metadataMethod, targetKey.Symbol));
+            Assert.True(graph.TryGetCallContext(
+                targetKey,
+                out ExceptionFlowCallContext? retainedContext));
+            Assert.Same(callContext, retainedContext);
         }
 
         /// <summary>

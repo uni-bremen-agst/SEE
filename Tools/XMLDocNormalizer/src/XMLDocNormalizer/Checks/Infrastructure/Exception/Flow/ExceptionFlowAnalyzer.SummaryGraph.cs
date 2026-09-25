@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -34,7 +33,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         internal static bool TryBuildTransitiveSummaryGraph(
             MemberDeclarationSyntax member,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             out ExceptionFlowSummaryGraph graph,
             out ExceptionFlowCallableKey? rootKey)
         {
@@ -80,7 +79,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         internal static bool TryRegisterSummaryGraphRoot(
             MemberDeclarationSyntax member,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             out ExceptionFlowCallableKey? rootKey)
         {
@@ -129,7 +128,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         private static void BuildPendingSummaryNodes(
             ExceptionFlowSummaryGraph graph,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             while (graph.DequeuePendingOrDefault()
                    is ExceptionFlowCallableKey key)
@@ -192,7 +191,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool AnalyzeSummarySymbolDeclarations(
             ISymbol symbol,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -584,7 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool AnalyzeSummaryLocalFunction(
             LocalFunctionStatementSyntax localFunction,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -621,7 +620,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool HasAnalyzableSummaryInvocationBody(
             IMethodSymbol methodSymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             foreach (SyntaxReference syntaxReference
                      in methodSymbol.DeclaringSyntaxReferences)
@@ -707,7 +706,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool AnalyzeSummaryAnonymousFunction(
             AnonymousFunctionExpressionSyntax anonymousFunction,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -767,7 +766,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool AnalyzeSummaryAccessor(
             AccessorDeclarationSyntax accessor,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)

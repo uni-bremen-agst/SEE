@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
@@ -63,7 +64,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Same(registeredScope, resolvedScope);
 
             IMethodSymbol sourceMethod = Assert.IsAssignableFrom<IMethodSymbol>(
-                CrossCompilationSymbolResolver.ResolveMethod(
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
                     metadataMethod,
                     registeredScope.Compilation));
             SyntaxReference declaration = Assert.Single(sourceMethod.DeclaringSyntaxReferences);

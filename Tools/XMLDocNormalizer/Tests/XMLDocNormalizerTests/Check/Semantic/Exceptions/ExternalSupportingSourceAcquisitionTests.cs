@@ -230,7 +230,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                         ExternalSourceReconstructionInput.CreateAcquirable(2)
                     ])));
 
-            Assert.True(TryResolve(fixture, dependency.Reference, out var scope));
+            Assert.True(TryResolve(
+                fixture,
+                dependency.Reference,
+                out SemanticCompilationScope scope));
             Assert.Equal(
                 sources.Select(static source => source.Path),
                 scope.Compilation.SyntaxTrees.Select(static tree => tree.FilePath));
@@ -258,7 +261,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                 [new ExternalSourcePathMapping("/_/", root)]));
             _ = RegisterAcquisitionPlan(fixture, dependency);
 
-            Assert.True(TryResolve(fixture, dependency.Reference, out var scope));
+            Assert.True(TryResolve(
+                fixture,
+                dependency.Reference,
+                out SemanticCompilationScope scope));
             Assert.Single(scope.Compilation.SyntaxTrees);
             Assert.Equal(0, handler.RequestCount);
         }
@@ -371,8 +377,14 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             ConfigureSourceLink(fixture.Context, handler);
             _ = RegisterAcquisitionPlan(fixture, dependency);
 
-            Assert.True(TryResolve(fixture, dependency.Reference, out var first));
-            Assert.True(TryResolve(fixture, dependency.Reference, out var second));
+            Assert.True(TryResolve(
+                fixture,
+                dependency.Reference,
+                out SemanticCompilationScope first));
+            Assert.True(TryResolve(
+                fixture,
+                dependency.Reference,
+                out SemanticCompilationScope second));
             Assert.Same(first, second);
             Assert.Equal(1, handler.RequestCount);
         }
@@ -614,7 +626,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                 declaration => declaration.Identifier.ValueText == methodName);
             Assert.True(ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
                 method,
-                fixture.Context,
+                new ExceptionFlowSemanticEnvironment(fixture.Context),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey));
             return new ExceptionFlowSummaryGraphTestRun(

@@ -60,13 +60,14 @@ permanent rejection; status and resolution package identify the active path.
 - Pipeline Stage: P6 / Worker Analyzer Host
 - Status: Under Investigation
 - First Observed: P5O2 readiness audit
-- Current Root Cause: P5O2A established an independently buildable Roslyn-neutral single-source core and extracted path creation, external evidence projection, data-flow caching, and summary-target registration. The active executable still compiles that neutral source set locally because a runtime project boundary loses same-compilation value-fact precision. The complete typed analyzer also still depends on main-owned `ProjectClosureSemanticContext`, `SemanticCompilationScope`, supporting-source/cross-compilation resolution, graph models, and body helpers. Referencing the executable from a worker would still import active Roslyn.
+- Current Root Cause: P5O2A established an independently buildable Roslyn-neutral single-source core. P5O2A2 removed direct analyzer-source dependencies on `ProjectClosureSemanticContext`, `SemanticCompilationScope`, `SupportingSourceSymbolResolver`, and the Main-owned cross-compilation resolver. The analyzer now consumes a four-operation Roslyn-bound compile-time host, an analyzer-owned compilation scope, and analyzer-owned exact cross-compilation resolution; the active Main partial implementation retains project and P5/P6 acquisition state without an interface/runtime-dispatch boundary. The active executable still compiles the neutral source set locally because a runtime project boundary loses same-compilation value-fact precision. Summary construction/evaluation, context/value facts/catch/local-source analysis, active graph/result models, body helpers, and final assembly composition remain executable-bound.
 - Current Fail-Closed Behavior: no historical worker is created or invoked; compiler-mismatched reconstruction continues to fail closed at the existing boundary.
 - Affected Evaluation Cases: source-backed external analysis that requires an exact historical compiler, including the planned S1 probes
 - Scientific Relevance: historical parsing and analysis must use one internally consistent Roslyn type universe while returning only canonical IR.
-- Resolution Package: P5O2A2 semantic scope and callable-resolution seam, followed by the remaining single-source analyzer decomposition and P5O2B dual-version build
+- Resolution Progress: P5O2A2 completed semantic-scope separation and callable-resolution separation while preserving same-compilation, referenced-project, supporting-source, metadata-only, exact identity, and demand-driven P6 behavior. Direct references to all four targeted blockers are zero inside the analyzer source boundary.
+- Resolution Package: P5O2A3 summary construction/evaluation, P5O2A4 context/value-facts/catch/local-source separation, then P5O2B dual-version build
 - Last Verified: 2026-09-25
-- Evidence / Report: `Evaluation/P5O2-historical-compiler-worker-readiness.md`, `Evaluation/P5O2A-exception-flow-analyzer-decomposition.md`
+- Evidence / Report: `Evaluation/P5O2-historical-compiler-worker-readiness.md`, `Evaluation/P5O2A-exception-flow-analyzer-decomposition.md`, `Evaluation/P5O2A2-semantic-scope-callable-resolution-seam.md`
 
 ## BND-P4P7-001 — OneOf exact PDB
 

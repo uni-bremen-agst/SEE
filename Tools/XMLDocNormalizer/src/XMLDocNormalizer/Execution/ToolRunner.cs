@@ -666,7 +666,8 @@ namespace XMLDocNormalizer.Execution
                 return null;
             }
 
-            return ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(semanticContext);
+            return ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(
+                new ExceptionFlowSemanticEnvironment(semanticContext));
         }
 
         /// <summary>

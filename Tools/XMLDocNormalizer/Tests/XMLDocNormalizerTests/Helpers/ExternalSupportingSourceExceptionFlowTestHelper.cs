@@ -289,7 +289,7 @@ namespace XMLDocNormalizerTests.Helpers
 
             Assert.True(ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
                 root,
-                context,
+                new ExceptionFlowSemanticEnvironment(context),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey));
 

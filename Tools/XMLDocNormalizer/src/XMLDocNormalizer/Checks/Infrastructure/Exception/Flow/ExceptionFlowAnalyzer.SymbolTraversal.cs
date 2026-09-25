@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
 
@@ -41,7 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext)
@@ -120,7 +119,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzePropertyAndIndexerAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext)
@@ -286,7 +285,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </exception>
         private static bool AnalyzePropertyLikeSymbol(
             IPropertySymbol propertySymbol,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext)
@@ -360,7 +359,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool AnalyzeSymbol(
             ISymbol symbol,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext)

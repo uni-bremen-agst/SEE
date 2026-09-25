@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models.DTO;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -44,7 +43,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool TryAnalyzeLocalCallableDeclaration(
             SyntaxNode declarationNode,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext,
@@ -152,7 +151,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol delegateInvokeSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callerContext)

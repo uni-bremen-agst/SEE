@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
@@ -58,7 +57,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public static ExceptionFlowAnalysisResult
             AnalyzeDirectlyThrownExceptions(
                 MemberDeclarationSyntax member,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             ExceptionFlowAnalysisResult result = new();
 
@@ -117,7 +116,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public static ExceptionFlowAnalysisResult
             AnalyzeTransitivelyThrownExceptions(
                 MemberDeclarationSyntax member,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             ExceptionFlowAnalysisResult result = new();
 
@@ -181,7 +180,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeNode(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowTraversalMode mode,
@@ -248,7 +247,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSimpleNode(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowTraversalMode mode,

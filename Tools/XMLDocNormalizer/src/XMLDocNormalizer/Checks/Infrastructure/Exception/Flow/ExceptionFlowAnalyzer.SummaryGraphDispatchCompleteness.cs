@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using XMLDocNormalizer.Execution.Semantic;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -39,7 +38,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IMethodSymbol methodSymbol,
                 ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
-                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowSemanticEnvironment semanticContext,
                 ExceptionFlowSummaryFragment fragment)
         {
             IReadOnlyList<IMethodSymbol> runtimeTargets =
@@ -89,7 +88,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             ITypeSymbol? receiverType,
             INamedTypeSymbol? exactReceiverType,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             if (exactReceiverType != null ||
                 methodSymbol.IsStatic ||
@@ -154,7 +153,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IsSummaryInterfaceDispatchTargetSetComplete(
                 IMethodSymbol interfaceMethod,
                 INamedTypeSymbol receiverType,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             if (receiverType.TypeKind ==
                 TypeKind.Interface)
@@ -209,7 +208,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsSummaryClassDispatchTargetSetComplete(
             IMethodSymbol methodSymbol,
             INamedTypeSymbol receiverType,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             IMethodSymbol effectiveMethod =
                 ResolveSummaryMostDerivedRuntimeOverride(
@@ -246,7 +245,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool
             CanSummaryInterfaceBeImplementedOutsideAnalysis(
                 INamedTypeSymbol interfaceType,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             return interfaceType.TypeKind ==
                        TypeKind.Interface &&
@@ -272,7 +271,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool CanSummaryTypeBeDerivedOutsideAnalysis(
             INamedTypeSymbol typeSymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             if (typeSymbol.TypeKind !=
                     TypeKind.Class ||
@@ -315,7 +314,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool
             CanSummaryMethodBeOverriddenOutsideAnalysis(
                 IMethodSymbol methodSymbol,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             if (methodSymbol.IsStatic ||
                 methodSymbol.IsSealed ||
@@ -348,7 +347,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool IsSummaryTypeAccessibleOutsideAnalysis(
             INamedTypeSymbol typeSymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             bool internalAccessIsOpen =
                 !IsSummaryAssemblyInAnalysisScope(
@@ -404,7 +403,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool IsSummaryMemberAccessibleOutsideAnalysis(
             ISymbol memberSymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             bool internalAccessIsOpen =
                 !IsSummaryAssemblyInAnalysisScope(
@@ -452,7 +451,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool HasSummaryUnanalyzedFriendAssembly(
             IAssemblySymbol assemblySymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             foreach (AttributeData attribute
                      in assemblySymbol.GetAttributes())
@@ -484,7 +483,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 bool friendIsAnalyzed =
                     semanticContext
-                        .GetAnalysisCompilationScopes()
+                        .GetAnalysisScopes()
                         .Any(
                             scope =>
                                 string.Equals(
@@ -547,10 +546,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool IsSummaryAssemblyInAnalysisScope(
             IAssemblySymbol assemblySymbol,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             return semanticContext
-                .GetAnalysisCompilationScopes()
+                .GetAnalysisScopes()
                 .Any(
                     scope =>
                         string.Equals(
@@ -641,7 +640,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 is INamedTypeSymbol namedReceiverType)
             {
                 INamedTypeSymbol? scopedReceiverType =
-                    CrossCompilationSymbolResolver.ResolveNamedType(
+                    ExceptionFlowCrossCompilationResolver.ResolveNamedType(
                         namedReceiverType,
                         compilation);
 
@@ -793,7 +792,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             INamedTypeSymbol? scopedConstraintType =
-                CrossCompilationSymbolResolver.ResolveNamedType(
+                ExceptionFlowCrossCompilationResolver.ResolveNamedType(
                     namedConstraintType,
                     compilation);
 

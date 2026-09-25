@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
@@ -133,6 +134,41 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.False(context.IsInAnalysisScope(unrelatedTree));
             Assert.False(context.IsInReportingScope(unrelatedTree));
             Assert.False(context.TryGetSemanticModel(unrelatedTree, out _));
+        }
+
+        /// <summary>
+        /// Exposes only analyzer-owned scopes and semantic models for trees
+        /// that belong to the wrapped analysis context.
+        /// </summary>
+        [Fact]
+        public void ExceptionFlowEnvironment_ScopeAndSemanticModelRemainCompilationBound()
+        {
+            SyntaxTree reportingTree = CSharpSyntaxTree.ParseText(
+                "namespace Reporting { public sealed class Target { } }");
+            CSharpCompilation reportingCompilation = CreateCompilation(
+                "ReportingAssembly",
+                reportingTree);
+            ProjectClosureSemanticContext context =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    reportingTree,
+                    reportingCompilation);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
+
+            ExceptionFlowSemanticScope scope = Assert.Single(environment.GetAnalysisScopes());
+
+            Assert.Same(
+                Assert.Single(context.GetAnalysisCompilationScopes()),
+                scope);
+            Assert.Same(reportingCompilation, scope.Compilation);
+            Assert.True(environment.TryGetSemanticModel(
+                reportingTree,
+                out SemanticModel semanticModel));
+            Assert.Same(reportingCompilation, semanticModel.Compilation);
+
+            SyntaxTree unrelatedTree = CSharpSyntaxTree.ParseText(
+                "public sealed class Unrelated { }");
+            Assert.False(environment.TryGetSemanticModel(unrelatedTree, out _));
         }
 
         /// <summary>

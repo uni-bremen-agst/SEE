@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -69,7 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             bool staticallyBound,
             bool omitImplicitTargets,
             Compilation bindingCompilation,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
@@ -190,7 +189,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol accessedSymbol,
             SyntaxNode sourceNode,
             Compilation bindingCompilation,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {

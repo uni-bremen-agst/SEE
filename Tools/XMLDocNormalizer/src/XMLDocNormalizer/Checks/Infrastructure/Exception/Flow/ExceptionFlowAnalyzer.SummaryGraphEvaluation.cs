@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 
@@ -26,7 +25,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         internal static SummaryAnalysisSession
             CreateSummaryAnalysisSession(
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             return new SummaryAnalysisSession(
                 semanticContext);
@@ -50,7 +49,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public static ExceptionFlowAnalysisResult
             AnalyzeSolutionTransitivelyThrownExceptions(
                 MemberDeclarationSyntax member,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             SummaryAnalysisSession session =
                 CreateSummaryAnalysisSession(
@@ -544,7 +543,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             /// <summary>
             /// The semantic scope shared by every analyzed root.
             /// </summary>
-            private readonly ProjectClosureSemanticContext semanticContext;
+            private readonly ExceptionFlowSemanticEnvironment semanticContext;
 
             /// <summary>
             /// The graph reused by every root in the session.
@@ -559,7 +558,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             /// The project-closure semantic context.
             /// </param>
             internal SummaryAnalysisSession(
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
             {
                 this.semanticContext =
                     semanticContext;

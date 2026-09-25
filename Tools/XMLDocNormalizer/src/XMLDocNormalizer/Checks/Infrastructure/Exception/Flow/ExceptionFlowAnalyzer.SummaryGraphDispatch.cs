@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -43,7 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             public SummaryInvocationTargetPlan(
                 IMethodSymbol requestedTarget,
                 IMethodSymbol analysisTarget,
-                SemanticCompilationScope? supportingSourceScope)
+                ExceptionFlowSemanticScope? supportingSourceScope)
             {
                 RequestedTarget = requestedTarget;
                 AnalysisTarget = analysisTarget;
@@ -60,7 +59,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             /// <summary>Gets the scope owning a cross-compilation source target.</summary>
             /// <value>The supporting scope, or <see langword="null"/>.</value>
-            public SemanticCompilationScope? SupportingSourceScope { get; }
+            public ExceptionFlowSemanticScope? SupportingSourceScope { get; }
         }
 
         /// <summary>
@@ -183,7 +182,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowCallContext callerContext)
         {
             IMethodSymbol assemblyMethod = methodSymbol.ReducedFrom ?? methodSymbol;
@@ -251,22 +250,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IInvocationOperation invocationOperation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowCallContext callerContext)
         {
             ITypeSymbol? receiverType = invocationOperation.Instance?.Type;
             INamedTypeSymbol? exactReceiverType =
                 GetSummaryExactReceiverType(invocationOperation.Instance);
             IMethodSymbol assemblyMethod = methodSymbol.ReducedFrom ?? methodSymbol;
-            SemanticCompilationScope? externalSupportingScope = null;
+            ExceptionFlowSemanticScope? externalSupportingScope = null;
 
             if (assemblyMethod.DeclaringSyntaxReferences.Length == 0
                 && assemblyMethod.ContainingAssembly != null)
             {
-                SupportingSourceSymbolResolver.TryGetExternalSupportingSourceScope(
+                semanticContext.TryGetExternalSupportingSourceScope(
                     semanticModel.Compilation,
                     assemblyMethod.ContainingAssembly,
-                    semanticContext,
                     out externalSupportingScope);
             }
 
@@ -288,18 +286,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             foreach (SummaryRuntimeTargetCandidate runtimeTarget in runtimeTargets)
             {
                 if (runtimeTarget.MetadataTarget != null
-                    && SupportingSourceSymbolResolver.TryResolveMethod(
+                    && semanticContext.TryResolveSupportingSourceMethod(
                         runtimeTarget.MetadataTarget,
                         semanticModel.Compilation,
-                        semanticContext,
-                        out IMethodSymbol supportingSourceTarget,
-                        out SemanticCompilationScope supportingSourceScope))
+                        out ExceptionFlowSupportingSourceMethod resolution))
                 {
                     resolvedTargets.Add(
                         new SummaryInvocationTargetPlan(
                             runtimeTarget.MetadataTarget,
-                            supportingSourceTarget,
-                            supportingSourceScope));
+                            resolution.Method,
+                            resolution.Scope));
                 }
                 else if (runtimeTarget.SourceTarget != null)
                 {
@@ -369,26 +365,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static SummaryInvocationTargetPlan CreateSummaryDirectInvocationTargetPlan(
             IMethodSymbol methodSymbol,
             Compilation bindingCompilation,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             IMethodSymbol requestedTarget = GetSummaryInvocationAnalysisTarget(
                 methodSymbol,
                 bindingCompilation,
                 semanticContext,
                 out IMethodSymbol? supportingSourceTarget,
-                out SemanticCompilationScope? supportingSourceScope);
+                out ExceptionFlowSemanticScope? supportingSourceScope);
 
             if (supportingSourceTarget == null
                 && requestedTarget.DeclaringSyntaxReferences.Length == 0
-                && SupportingSourceSymbolResolver.TryResolveMethod(
+                && semanticContext.TryResolveSupportingSourceMethod(
                     requestedTarget,
                     bindingCompilation,
-                    semanticContext,
-                    out IMethodSymbol resolvedSourceTarget,
-                    out SemanticCompilationScope resolvedSourceScope))
+                    out ExceptionFlowSupportingSourceMethod resolution))
             {
-                supportingSourceTarget = resolvedSourceTarget;
-                supportingSourceScope = resolvedSourceScope;
+                supportingSourceTarget = resolution.Method;
+                supportingSourceScope = resolution.Scope;
             }
 
             return new SummaryInvocationTargetPlan(
@@ -412,7 +406,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IReadOnlyList<SummaryInvocationTargetPlan> targets,
             bool targetSetComplete,
             bool hasUncoveredRuntimeTarget,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext)
         {
             bool hasSourceTarget = false;
             bool allTargetsHaveExecutableSource = targets.Count > 0;
@@ -452,7 +446,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">The fragment receiving edges and uncertainty.</param>
         private static void AddSummaryInvocationEdges(
             SummaryInvocationPlan plan,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
@@ -544,7 +538,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -646,7 +640,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -657,7 +651,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.Compilation,
                     semanticContext,
                     out IMethodSymbol? resolvedSupportingSourceTarget,
-                    out SemanticCompilationScope? resolvedSupportingSourceScope);
+                    out ExceptionFlowSemanticScope? resolvedSupportingSourceScope);
 
             ExceptionFlowCallContext targetContext =
                 CreateInvocationCallContext(
@@ -726,7 +720,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ResolveSummaryInvocationRuntimeTargets(
                 IInvocationOperation invocationOperation,
                 IMethodSymbol methodSymbol,
-                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowSemanticEnvironment semanticContext,
                 ExceptionFlowSummaryFragment fragment)
         {
             ITypeSymbol? receiverType =
@@ -771,7 +765,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IMethodSymbol methodSymbol,
                 ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             return ResolveSummaryRuntimeTargetCandidates(
                     methodSymbol,
@@ -818,8 +812,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IMethodSymbol methodSymbol,
                 ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
-                ProjectClosureSemanticContext semanticContext,
-                SemanticCompilationScope? additionalScope = null)
+                ExceptionFlowSemanticEnvironment semanticContext,
+                ExceptionFlowSemanticScope? additionalScope = null)
         {
             Dictionary<string, SummaryRuntimeTargetCandidate> runtimeTargets =
                 new(StringComparer.Ordinal);
@@ -827,10 +821,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<Compilation> inspectedCompilations =
                 new(ReferenceEqualityComparer.Instance);
 
-            foreach (SemanticCompilationScope scope
-                     in semanticContext.GetAnalysisCompilationScopes().Concat(
+            foreach (ExceptionFlowSemanticScope scope
+                     in semanticContext.GetAnalysisScopes().Concat(
                          additionalScope == null
-                            ? Array.Empty<SemanticCompilationScope>()
+                            ? Array.Empty<ExceptionFlowSemanticScope>()
                             : new[] { additionalScope }))
             {
                 if (!inspectedCompilations.Add(scope.Compilation))
@@ -839,7 +833,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 IMethodSymbol? scopedMethod =
-                    CrossCompilationSymbolResolver.ResolveMethod(
+                    ExceptionFlowCrossCompilationResolver.ResolveMethod(
                         methodSymbol,
                         scope.Compilation);
 
@@ -851,7 +845,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (exactReceiverType != null)
                 {
                     INamedTypeSymbol? scopedExactReceiverType =
-                        CrossCompilationSymbolResolver.ResolveNamedType(
+                        ExceptionFlowCrossCompilationResolver.ResolveNamedType(
                             exactReceiverType,
                             scope.Compilation);
 
@@ -1124,7 +1118,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             IMethodSymbol? implementedInterfaceMethod =
-                CrossCompilationSymbolResolver.ResolveMethodOnContainingType(
+                ExceptionFlowCrossCompilationResolver.ResolveMethodOnContainingType(
                     interfaceMethod,
                     implementedInterface);
 
@@ -1178,7 +1172,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             IMethodSymbol? matchingVirtualMethod =
-                CrossCompilationSymbolResolver.ResolveMethodOnContainingType(
+                ExceptionFlowCrossCompilationResolver.ResolveMethodOnContainingType(
                     virtualMethod,
                     matchingBaseType);
 

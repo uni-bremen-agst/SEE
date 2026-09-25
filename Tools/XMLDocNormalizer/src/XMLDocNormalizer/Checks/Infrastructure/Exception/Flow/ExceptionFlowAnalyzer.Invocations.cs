@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
-using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 
@@ -38,7 +37,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeInvocations(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowTraversalMode mode,
@@ -246,7 +245,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             CollectThrownExceptionsFromDelegateFactoryCall(
                 InvocationExpressionSyntax invocation,
                 IMethodSymbol methodSymbol,
-                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowSemanticEnvironment semanticContext,
                 ExceptionFlowAnalysisResult result)
         {
             HashSet<int> throwingDelegateParameterIndexes =
@@ -340,7 +339,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static HashSet<int>
             FindThrowingDelegateParameterIndexes(
                 IMethodSymbol methodSymbol,
-                ProjectClosureSemanticContext semanticContext)
+                ExceptionFlowSemanticEnvironment semanticContext)
         {
             HashSet<int> indexes = new();
 

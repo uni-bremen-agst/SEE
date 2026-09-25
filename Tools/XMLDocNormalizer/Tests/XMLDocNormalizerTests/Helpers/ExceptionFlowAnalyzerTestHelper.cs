@@ -250,6 +250,8 @@ namespace XMLDocNormalizerTests.Helpers
                     .CreateSingleCompilationContext(
                         syntaxTree,
                         compilation);
+            ExceptionFlowSemanticEnvironment exceptionFlowEnvironment =
+                new ExceptionFlowSemanticEnvironment(semanticContext);
 
             ExceptionFlowAnalysisResult result =
                 analysisKind switch
@@ -258,19 +260,19 @@ namespace XMLDocNormalizerTests.Helpers
                         ExceptionFlowAnalyzer
                             .AnalyzeDirectlyThrownExceptions(
                                 matchingMethods[0],
-                                semanticContext),
+                                exceptionFlowEnvironment),
 
                     TestAnalysisKind.RecursiveTransitive =>
                         ExceptionFlowAnalyzer
                             .AnalyzeTransitivelyThrownExceptions(
                                 matchingMethods[0],
-                                semanticContext),
+                                exceptionFlowEnvironment),
 
                     TestAnalysisKind.SummaryGraphTransitive =>
                         ExceptionFlowAnalyzer
                             .AnalyzeSolutionTransitivelyThrownExceptions(
                                 matchingMethods[0],
-                                semanticContext),
+                                exceptionFlowEnvironment),
 
                     _ =>
                         throw new InvalidOperationException(

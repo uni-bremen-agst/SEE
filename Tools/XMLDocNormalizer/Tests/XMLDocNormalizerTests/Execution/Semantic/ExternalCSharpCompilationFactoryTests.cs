@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizerTests.Helpers;
 
@@ -892,7 +893,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 metadataType.GetMembers("Run").OfType<IMethodSymbol>());
 
             IMethodSymbol sourceMethod = Assert.IsAssignableFrom<IMethodSymbol>(
-                CrossCompilationSymbolResolver.ResolveMethod(
+                ExceptionFlowCrossCompilationResolver.ResolveMethod(
                     metadataMethod,
                     scope.Compilation));
             SyntaxReference declaration = Assert.Single(

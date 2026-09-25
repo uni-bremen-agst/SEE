@@ -697,7 +697,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 declaration => declaration.Identifier.ValueText == methodName);
             Assert.True(ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
                 method,
-                fixture.Context,
+                new ExceptionFlowSemanticEnvironment(fixture.Context),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey));
             return new ExceptionFlowSummaryGraphTestRun(

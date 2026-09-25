@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using XMLDocNormalizer.Execution.Semantic;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -8,10 +7,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// </summary>
     /// <remarks>
     /// This stateless Roslyn-bound component owns supporting-source rebinding
-    /// at the graph-registration boundary. Its current dependency on
-    /// <see cref="ProjectClosureSemanticContext"/> is the explicit remaining
-    /// Main/P6 seam for a future historical build. It is safe for concurrent
-    /// use.
+    /// at the graph-registration boundary. It depends only on the analyzer's
+    /// semantic capability seam; Main/P6 orchestration is supplied by an
+    /// external adapter. It is safe for concurrent use.
     /// </remarks>
     internal static class ExceptionFlowSummaryTargetRegistrar
     {
@@ -27,23 +25,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph)
         {
             if (requestedTarget.DeclaringSyntaxReferences.Length == 0
-                && SupportingSourceSymbolResolver.TryResolveMethod(
+                && semanticContext.TryResolveSupportingSourceMethod(
                     requestedTarget,
-                    semanticContext,
-                    out IMethodSymbol supportingSourceTarget,
-                    out SemanticCompilationScope supportingSourceScope))
+                    out ExceptionFlowSupportingSourceMethod resolution))
             {
                 return RegisterMethodTarget(
                     requestedTarget,
                     requestedContext,
                     semanticContext,
                     graph,
-                    supportingSourceTarget,
-                    supportingSourceScope);
+                    resolution.Method,
+                    resolution.Scope);
             }
 
             ExceptionFlowCallableKey requestedKey =
@@ -68,25 +64,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             Compilation bindingCompilation)
         {
             if (requestedTarget.DeclaringSyntaxReferences.Length == 0
-                && SupportingSourceSymbolResolver.TryResolveMethod(
+                && semanticContext.TryResolveSupportingSourceMethod(
                     requestedTarget,
                     bindingCompilation,
-                    semanticContext,
-                    out IMethodSymbol supportingSourceTarget,
-                    out SemanticCompilationScope supportingSourceScope))
+                    out ExceptionFlowSupportingSourceMethod resolution))
             {
                 return RegisterMethodTarget(
                     requestedTarget,
                     requestedContext,
                     semanticContext,
                     graph,
-                    supportingSourceTarget,
-                    supportingSourceScope);
+                    resolution.Method,
+                    resolution.Scope);
             }
 
             return RegisterMethodTarget(
@@ -112,10 +106,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal static ExceptionFlowCallableKey RegisterMethodTarget(
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             IMethodSymbol supportingSourceTarget,
-            SemanticCompilationScope supportingSourceScope)
+            ExceptionFlowSemanticScope supportingSourceScope)
         {
             if (!SymbolEqualityComparer.Default.Equals(
                     supportingSourceTarget.ContainingAssembly,
@@ -127,7 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             ExceptionFlowCallContext supportingSourceContext = requestedContext.RebindCallable(
                 supportingSourceTarget,
-                memberSymbol => CrossCompilationSymbolResolver.ResolveStableMember(
+                memberSymbol => ExceptionFlowCrossCompilationResolver.ResolveStableMember(
                     memberSymbol,
                     supportingSourceScope.Compilation));
 

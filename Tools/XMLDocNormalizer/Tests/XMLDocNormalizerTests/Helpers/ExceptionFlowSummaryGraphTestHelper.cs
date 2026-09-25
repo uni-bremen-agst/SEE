@@ -203,7 +203,7 @@ namespace XMLDocNormalizerTests.Helpers
                 ExceptionFlowAnalyzer
                     .TryBuildTransitiveSummaryGraph(
                         matchingMembers[0],
-                        semanticContext,
+                        new ExceptionFlowSemanticEnvironment(semanticContext),
                         out ExceptionFlowSummaryGraph graph,
                         out ExceptionFlowCallableKey? rootKey);
 

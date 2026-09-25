@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Execution.Semantic;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -70,9 +69,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static IMethodSymbol GetSummaryInvocationAnalysisTarget(
             IMethodSymbol selectedMethod,
             Compilation bindingCompilation,
-            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment semanticContext,
             out IMethodSymbol? resolvedSupportingSourceTarget,
-            out SemanticCompilationScope? resolvedSupportingSourceScope)
+            out ExceptionFlowSemanticScope? resolvedSupportingSourceScope)
         {
             resolvedSupportingSourceTarget = null;
             resolvedSupportingSourceScope = null;
@@ -89,15 +88,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return unreducedMethod;
             }
 
-            if (SupportingSourceSymbolResolver.TryResolveMethod(
+            if (semanticContext.TryResolveSupportingSourceMethod(
                     unreducedMethod,
                     bindingCompilation,
-                    semanticContext,
-                    out IMethodSymbol sourceMethod,
-                    out SemanticCompilationScope supportingScope))
+                    out ExceptionFlowSupportingSourceMethod resolution))
             {
-                resolvedSupportingSourceTarget = sourceMethod;
-                resolvedSupportingSourceScope = supportingScope;
+                resolvedSupportingSourceTarget = resolution.Method;
+                resolvedSupportingSourceScope = resolution.Scope;
                 return unreducedMethod;
             }
 

@@ -1,12 +1,12 @@
 using Microsoft.CodeAnalysis;
 
-namespace XMLDocNormalizer.Execution.Semantic
+namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
     /// Resolves Roslyn symbols from one compilation into another compilation
     /// while preserving assembly identity and constructed containing types.
     /// </summary>
-    internal static class CrossCompilationSymbolResolver
+    internal static class ExceptionFlowCrossCompilationResolver
     {
         /// <summary>
         /// Resolves a method or accessor symbol into another compilation while
@@ -34,10 +34,11 @@ namespace XMLDocNormalizer.Execution.Semantic
                     return null;
                 }
 
-                originalMethod = DocumentationCommentId
-                    .GetSymbolsForDeclarationId(declarationId, compilation)
-                    .OfType<IMethodSymbol>()
-                    .FirstOrDefault(candidate => HasSameAssemblyIdentity(candidate, methodSymbol));
+                originalMethod = GetUniqueMatch(
+                    DocumentationCommentId
+                        .GetSymbolsForDeclarationId(declarationId, compilation)
+                        .OfType<IMethodSymbol>(),
+                    candidate => HasSameAssemblyIdentity(candidate, methodSymbol));
             }
 
             if (originalMethod == null)
@@ -77,10 +78,11 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return null;
             }
 
-            return DocumentationCommentId
-                .GetSymbolsForReferenceId(referenceId, compilation)
-                .OfType<INamedTypeSymbol>()
-                .FirstOrDefault(candidate => HasSameAssemblyIdentity(candidate, typeSymbol));
+            return GetUniqueMatch(
+                DocumentationCommentId
+                    .GetSymbolsForReferenceId(referenceId, compilation)
+                    .OfType<INamedTypeSymbol>(),
+                candidate => HasSameAssemblyIdentity(candidate, typeSymbol));
         }
 
         /// <summary>
@@ -99,49 +101,31 @@ namespace XMLDocNormalizer.Execution.Semantic
         {
             if (methodSymbol.AssociatedSymbol is IPropertySymbol associatedProperty)
             {
-                foreach (IPropertySymbol candidateProperty in containingType.GetMembers().OfType<IPropertySymbol>())
-                {
-                    if (!SymbolEqualityComparer.Default.Equals(
-                            candidateProperty.OriginalDefinition,
-                            associatedProperty.OriginalDefinition))
-                    {
-                        continue;
-                    }
+                IPropertySymbol? candidateProperty = GetUniqueMatch(
+                    containingType.GetMembers().OfType<IPropertySymbol>(),
+                    candidate => SymbolEqualityComparer.Default.Equals(
+                        candidate.OriginalDefinition,
+                        associatedProperty.OriginalDefinition));
 
-                    return GetAssociatedAccessor(candidateProperty, methodSymbol.MethodKind);
-                }
-
-                return null;
+                return GetAssociatedAccessor(candidateProperty, methodSymbol.MethodKind);
             }
 
             if (methodSymbol.AssociatedSymbol is IEventSymbol associatedEvent)
             {
-                foreach (IEventSymbol candidateEvent in containingType.GetMembers().OfType<IEventSymbol>())
-                {
-                    if (!SymbolEqualityComparer.Default.Equals(
-                            candidateEvent.OriginalDefinition,
-                            associatedEvent.OriginalDefinition))
-                    {
-                        continue;
-                    }
+                IEventSymbol? candidateEvent = GetUniqueMatch(
+                    containingType.GetMembers().OfType<IEventSymbol>(),
+                    candidate => SymbolEqualityComparer.Default.Equals(
+                        candidate.OriginalDefinition,
+                        associatedEvent.OriginalDefinition));
 
-                    return GetAssociatedAccessor(candidateEvent, methodSymbol.MethodKind);
-                }
-
-                return null;
+                return GetAssociatedAccessor(candidateEvent, methodSymbol.MethodKind);
             }
 
-            foreach (IMethodSymbol candidateMethod in containingType.GetMembers(methodSymbol.Name).OfType<IMethodSymbol>())
-            {
-                if (SymbolEqualityComparer.Default.Equals(
-                        candidateMethod.OriginalDefinition,
-                        methodSymbol.OriginalDefinition))
-                {
-                    return candidateMethod;
-                }
-            }
-
-            return null;
+            return GetUniqueMatch(
+                containingType.GetMembers(methodSymbol.Name).OfType<IMethodSymbol>(),
+                candidate => SymbolEqualityComparer.Default.Equals(
+                    candidate.OriginalDefinition,
+                    methodSymbol.OriginalDefinition));
         }
 
         /// <summary>
@@ -172,9 +156,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return null;
             }
 
-            return DocumentationCommentId
-                .GetSymbolsForDeclarationId(declarationId, compilation)
-                .FirstOrDefault(candidate => HasSameAssemblyIdentity(candidate, memberSymbol));
+            return GetUniqueMatch(
+                DocumentationCommentId.GetSymbolsForDeclarationId(declarationId, compilation),
+                candidate => HasSameAssemblyIdentity(candidate, memberSymbol));
         }
 
         /// <summary>
@@ -206,9 +190,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return null;
             }
 
-            ISymbol? resolvedAssociatedSymbol = DocumentationCommentId
-                .GetSymbolsForDeclarationId(declarationId, compilation)
-                .FirstOrDefault(candidate => HasSameAssemblyIdentity(candidate, associatedSymbol));
+            ISymbol? resolvedAssociatedSymbol = GetUniqueMatch(
+                DocumentationCommentId.GetSymbolsForDeclarationId(declarationId, compilation),
+                candidate => HasSameAssemblyIdentity(candidate, associatedSymbol));
 
             return GetAssociatedAccessor(resolvedAssociatedSymbol, methodSymbol.MethodKind);
         }
@@ -265,6 +249,42 @@ namespace XMLDocNormalizer.Execution.Semantic
             AssemblyIdentity? rightIdentity = rightSymbol.ContainingAssembly?.Identity;
 
             return leftIdentity != null && leftIdentity.Equals(rightIdentity);
+        }
+
+        /// <summary>
+        /// Returns the single exact symbol satisfying a resolution predicate.
+        /// </summary>
+        /// <typeparam name="TSymbol">The resolved Roslyn symbol type.</typeparam>
+        /// <param name="candidates">The candidate symbols.</param>
+        /// <param name="predicate">The exact identity predicate.</param>
+        /// <returns>
+        /// The unique matching symbol, or <see langword="null"/> when no
+        /// symbol or more than one distinct symbol matches.
+        /// </returns>
+        private static TSymbol? GetUniqueMatch<TSymbol>(
+            IEnumerable<TSymbol> candidates,
+            Func<TSymbol, bool> predicate)
+            where TSymbol : class, ISymbol
+        {
+            TSymbol? result = null;
+
+            foreach (TSymbol candidate in candidates)
+            {
+                if (!predicate(candidate))
+                {
+                    continue;
+                }
+
+                if (result != null
+                    && !SymbolEqualityComparer.Default.Equals(result, candidate))
+                {
+                    return null;
+                }
+
+                result = candidate;
+            }
+
+            return result;
         }
     }
 }
