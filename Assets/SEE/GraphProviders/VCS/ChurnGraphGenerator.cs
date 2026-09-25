@@ -605,10 +605,15 @@ namespace SEE.GraphProviders.VCS
                 // that is older, rename of the same name is a different step of
                 // the same chain only if it leads elsewhere, in which case two
                 // branches disagree and the more recent one is to decide.
-                if (!renamedTo.ContainsKey(oldPath))
+                if (renamedTo.ContainsKey(oldPath))
                 {
-                    renamedTo[oldPath] = target;
+                    // Another target has the name already. Noting it here as
+                    // well would have two files both claiming to be what the
+                    // one under that name became, while all its churn goes to
+                    // the one that won.
+                    return;
                 }
+                renamedTo[oldPath] = target;
                 if (!formerNames.TryGetValue(target, out ISet<string> names))
                 {
                     names = new SortedSet<string>(StringComparer.Ordinal);
