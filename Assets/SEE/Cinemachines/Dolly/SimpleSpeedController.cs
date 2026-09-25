@@ -63,6 +63,14 @@ namespace SEE.Cinemachines.Dolly
         private SplineSector[] speedList = {};
 
         /// <summary>
+        /// Whether the emptiness of <see cref="speedList"/> has been reported already.
+        /// </summary>
+        /// <remarks>Not serialized: this is about one run, not about the asset. It
+        /// keeps the report to the one line rather than one per frame.</remarks>
+        [NonSerialized]
+        private bool emptyListReported;
+
+        /// <summary>
         /// Compute the desired position on the spline as requested by
         /// <see cref="SplineAutoDolly.ISplineAutoDolly.GetSplinePosition"/>.
         /// </summary>
@@ -88,16 +96,22 @@ namespace SEE.Cinemachines.Dolly
                 return currentPosition;
             }
 
-            SplineSector selectedSector;
+            // This runs once a frame from Cinemachine, so an empty list is reported the
+            // once and the dolly left where it is. Throwing here would raise the same
+            // exception on every frame for as long as play mode lasted.
+            if (speedList == null || speedList.Length == 0)
+            {
+                if (!emptyListReported)
+                {
+                    emptyListReported = true;
+                    Debug.LogError("The speed list of the simple speed controller is empty, so "
+                                   + "nothing moves. Give it at least one sector, the first of "
+                                   + "them starting at 0.\n");
+                }
+                return currentPosition;
+            }
 
-            if (speedList.Length > 0)
-            {
-                selectedSector = speedList[0];
-            }
-            else
-            {
-                throw new IndexOutOfRangeException("Speed-List must be longer than one (1) entry");
-            }
+            SplineSector selectedSector = speedList[0];
 
             for (int i = 1; i < speedList.Length; i++)
             {
@@ -140,7 +154,7 @@ namespace SEE.Cinemachines.Dolly
                 throw new NullReferenceException("Spline speed list needs to be initialized.");
             }
 
-            if (speedList != null && speedList.Length <= 0)
+            if (speedList.Length == 0)
             {
                 throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list.");
             }
