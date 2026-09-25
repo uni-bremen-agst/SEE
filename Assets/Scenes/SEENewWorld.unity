@@ -14622,10 +14622,13 @@ MonoBehaviour:
       Data: 36|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 1
       Data: Assets/SEE
+    - Name: 
+      Entry: 1
+      Data: Assets/SEETests
     - Name: 
       Entry: 13
       Data: 
@@ -14640,7 +14643,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: origin/master
+      Data: origin/.*
     - Name: 
       Entry: 13
       Data: 
@@ -14659,7 +14662,7 @@ MonoBehaviour:
     - Name: SimplifyGraph
       Entry: 5
       Data: true
-    - Name: ComputeCoFileChanges
+    - Name: AddCoChangeEdges
       Entry: 5
       Data: false
     - Name: 
@@ -24691,7 +24694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1914333879
 Transform:
   m_ObjectHideFlags: 0
@@ -25491,13 +25494,10 @@ MonoBehaviour:
       Data: 36|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 1
-      Data: Assets/SEE/GraphProviders
-    - Name: 
-      Entry: 1
-      Data: Assets/SEE/VCS
+      Data: Assets/SEE
     - Name: 
       Entry: 13
       Data: 
@@ -25531,9 +25531,9 @@ MonoBehaviour:
     - Name: SimplifyGraph
       Entry: 5
       Data: true
-    - Name: ComputeCoFileChanges
+    - Name: AddCoChangeEdges
       Entry: 5
-      Data: false
+      Data: true
     - Name: CommitID
       Entry: 1
       Data: 6468e775f859eda7473736d9040cd760fefa5ebb
@@ -25593,7 +25593,7 @@ MonoBehaviour:
       AbsolutePath: 
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
-    Kind: 0
+    Kind: 3
     showEdges: 0
     animationKind: 2
     animateEdgeFlow: 0
