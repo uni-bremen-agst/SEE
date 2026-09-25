@@ -516,7 +516,7 @@ namespace SEE.DataModel.DG
         /// String attribute for the names a file carried before it was renamed.
         /// </summary>
         /// <remarks>Note that this is not actually a numeric metric but a list of
-        /// names seperated by a comma.</remarks>
+        /// names separated by a comma.</remarks>
         public const string FormerNames = "Former_Names";
 
         /// <summary>
