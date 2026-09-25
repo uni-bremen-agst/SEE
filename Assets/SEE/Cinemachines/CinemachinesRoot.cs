@@ -321,7 +321,12 @@ namespace SEE.Cinemachines
             // create new Folder for Scene in Assets/Cinemachines/Scenes
             if (!AssetDatabase.IsValidFolder($"{CinemachinesUtility.CinemachinesAssetsRoot}/Scenes/{SceneManager.GetActiveScene().name}"))
             {
-                if (!AssetDatabase.IsValidFolder("Cinemachines"))
+                // Mind that IsValidFolder wants a path from the root of the project,
+                // that is, one beginning with "Assets", and that CreateFolder does not
+                // fail on a name already taken: it makes a unique one beside it. So a
+                // check asking the wrong question leaves a "Cinemachines 1" behind on
+                // every call rather than quietly doing nothing.
+                if (!AssetDatabase.IsValidFolder(CinemachinesUtility.CinemachinesAssetsRoot))
                 {
                     AssetDatabase.CreateFolder("Assets", "Cinemachines");
                 }
