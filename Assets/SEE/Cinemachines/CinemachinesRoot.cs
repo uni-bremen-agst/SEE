@@ -4,6 +4,7 @@ using SEE.Cinemachines.UI.PictureInPicture;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -82,13 +83,24 @@ namespace SEE.Cinemachines
 
             if (possibleRoots.Length > 1)
             {
-                Debug.LogError("Multiple CinemachinesRoot are not supported. Only use one per Unity-Scene.\n");
+                // One of them is to survive, and every one of them runs this. Were each
+                // to disable itself, a scene holding two roots would end with none of
+                // them working. The instance ID settles which one stays, being the same
+                // answer whichever root asks and in whatever order the search returns.
+                CinemachinesRoot survivor = possibleRoots.OrderBy(root => root.GetInstanceID()).First();
 
-                // Disable GameObject
-                gameObject.SetActive(false);
-                enabled = false;
+                if (survivor != this)
+                {
+                    Debug.LogError("Multiple CinemachinesRoot are not supported. Only use one per "
+                                   + $"Unity-Scene. Disabling this one in favour of {survivor.name}.\n",
+                                   gameObject);
 
-                return;
+                    // Disable GameObject
+                    gameObject.SetActive(false);
+                    enabled = false;
+
+                    return;
+                }
             }
 
             // If the CinemachinesRoot has not been initialized on Start, initialize it.
