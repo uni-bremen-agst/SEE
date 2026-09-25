@@ -982,6 +982,16 @@ namespace SEE.GraphProviders.VCS
         /// the union of a set of branches and counts what was authored since a
         /// date, the older commits being walked for their renames alone; the
         /// other walks a range of commits and counts every one of them.
+        ///
+        /// Both walk topologically, a commit coming before every one of its
+        /// ancestors. Following a rename asks for exactly that: a commit that
+        /// still uses the name given up must be reached after the commit giving
+        /// it up, or its churn is filed under a name that does not survive and
+        /// is then dropped without a word. Sorting by date alone would answer
+        /// only where the dates increase along the walk, and they need not -- a
+        /// rebase, a cherry-pick or a clock out of step all let a parent carry a
+        /// later date than its child. The same hazard is what
+        /// <see cref="GitRepositorySession.CommitsAfter"/> remarks upon.
         /// </remarks>
         private class Criteria
         {
@@ -1041,10 +1051,12 @@ namespace SEE.GraphProviders.VCS
                 Commits = new CommitFilter
                 {
                     IncludeReachableFrom = branches,
-                    // Newest commit first, just as git log reports them. A rename
-                    // is thus seen before the commits preceding it, which still
-                    // use the former name of the renamed file.
-                    SortBy = CommitSortStrategies.Time
+                    // A commit before every one of its ancestors, ties broken by
+                    // date. A rename is thus seen before the commits preceding
+                    // it, which still use the former name of the renamed file.
+                    // See the remark on Criteria for why the date alone will not
+                    // do.
+                    SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Time
                 };
 
                 StringBuilder walked = new();
@@ -1077,9 +1089,9 @@ namespace SEE.GraphProviders.VCS
                 {
                     IncludeReachableFrom = commitID,
                     ExcludeReachableFrom = baselineCommitID,
-                    // Newest first, as above: the renames must be seen before
-                    // the commits that precede them.
-                    SortBy = CommitSortStrategies.Time
+                    // Topological, as above: the renames must be seen before the
+                    // commits that precede them.
+                    SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Time
                 };
                 Walked = $"Reporting on the commits reachable from {commitID} and not from "
                          + $"{baselineCommitID}.";
