@@ -261,6 +261,36 @@ namespace SEEEditor.Cinemachines.Utility
             }
 
             /// <summary>
+            /// The type <paramref name="storedComponent"/> names, or null where the
+            /// assembly or the type is no longer to be found.
+            /// </summary>
+            /// <remarks>A script renamed, or a package changed, between the storing and
+            /// the restoring leaves a name resolving to nothing. Reported rather than
+            /// thrown, so that the rest of the tree still comes back.</remarks>
+            /// <param name="storedComponent">Names the assembly and the type.</param>
+            /// <returns>The type, or null.</returns>
+            private static Type FindComponentType(StoredComponent storedComponent)
+            {
+                try
+                {
+                    Type result = Assembly.Load(storedComponent.AssemblyName)
+                                          .GetType(storedComponent.TypeName);
+                    if (result == null)
+                    {
+                        Debug.LogWarning($"Type '{storedComponent.TypeName}' no longer exists in "
+                                         + $"assembly '{storedComponent.AssemblyName}'.\n");
+                    }
+                    return result;
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogWarning($"Assembly '{storedComponent.AssemblyName}' could not be loaded: "
+                                     + $"{exception.Message}\n");
+                    return null;
+                }
+            }
+
+            /// <summary>
             /// Actual Deserializing Method, which returns the root transform.
             /// </summary>
             /// <param name="storedGameObject">The StoredGameObject that will be restored to actual GameObjects.</param>
@@ -278,7 +308,15 @@ namespace SEEEditor.Cinemachines.Utility
                 // Iterate through all components for this GameObject
                 foreach (StoredComponent storedComponent in storedGameObject.ListComponents)
                 {
-                    Type ComponentType = Assembly.Load(storedComponent.AssemblyName).GetType(storedComponent.TypeName);
+                    Type ComponentType = FindComponentType(storedComponent);
+
+                    // The type is gone, so nothing can be made of what was stored for
+                    // it. That happens when a script is renamed, or a package changes,
+                    // between the storing and the restoring.
+                    if (ComponentType == null)
+                    {
+                        continue;
+                    }
 
                     // Reconstruct type of this component.
                     Component readComponent;
@@ -307,6 +345,16 @@ namespace SEEEditor.Cinemachines.Utility
                     else
                     {
                         readComponent = restoredGameObject.AddComponent(ComponentType);
+                    }
+
+                    // AddComponent yields null where the component cannot be added, a
+                    // second one of a type that allows only one, say. Everything below
+                    // would then fail on the null rather than on its cause.
+                    if (readComponent == null)
+                    {
+                        Debug.LogWarning($"Could not add a component of type '{ComponentType}' to "
+                                         + $"'{restoredGameObject.name}'. Its stored state is lost.\n");
+                        continue;
                     }
 
                     // apply Data onto the component
