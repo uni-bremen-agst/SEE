@@ -55,6 +55,19 @@ permanent rejection; status and resolution package identify the active path.
 - Last Verified: 2026-09-24
 - Evidence / Report: `Evaluation/P5O1-canonical-exception-flow-ir.md`
 
+## BND-P6-003 — Historical analyzer dependency separation
+
+- Pipeline Stage: P6 / Worker Analyzer Host
+- Status: Planned
+- First Observed: P5O2 readiness audit
+- Current Root Cause: the typed exception-flow analyzer is compiled into the main executable and depends on active-Roslyn semantic context, supporting-source resolution, graph models, and helper infrastructure. Referencing that executable from a worker imports active Roslyn; copying the analyzer would create a prohibited semantic fork.
+- Current Fail-Closed Behavior: no historical worker is created or invoked; compiler-mismatched reconstruction continues to fail closed at the existing boundary.
+- Affected Evaluation Cases: source-backed external analysis that requires an exact historical compiler, including the planned S1 probes
+- Scientific Relevance: historical parsing and analysis must use one internally consistent Roslyn type universe while returning only canonical IR.
+- Resolution Package: P5O2A neutral contract and analyzer-seam extraction, followed by a single-source dual-version analyzer build
+- Last Verified: 2026-09-25
+- Evidence / Report: `Evaluation/P5O2-historical-compiler-worker-readiness.md`
+
 ## BND-P4P7-001 — OneOf exact PDB
 
 - Pipeline Stage: P4/P7
