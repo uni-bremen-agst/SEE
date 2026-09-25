@@ -1,0 +1,131 @@
+# Canonical author and committer identities for SEE.
+#
+# Git applies this file to %aN, %aE, %cN and %cE, and therefore to git shortlog,
+# git blame, git log --author and anything built on those.
+#
+# Canonical address: the address the person used most often, ignoring GitHub's
+#     @users.noreply.github.com addresses, which are aliases rather than real
+#     mailboxes.
+# Canonical name: the fullest form that actually occurs in the history. Where
+#     only a login or a nickname occurs, that is what stands here; replace it
+#     with the real name where you know it.
+#
+# Generated from the identities found in the history; grouping was done by
+# matching addresses and names, so please check the people you know before
+# relying on it. Cases that could not be decided from the data are listed,
+# commented out, at the end.
+
+Rainer Koschke <koschke@uni-bremen.de> <koschke@uni-bremen.de>
+Rainer Koschke <koschke@uni-bremen.de> <koschke@gmail.com>
+Rainer Koschke <koschke@uni-bremen.de> <koschke@axivion.com>
+Rainer Koschke <koschke@uni-bremen.de> <koschke@stvr1.informatik.uni-bremen.de>
+Rainer Koschke <koschke@uni-bremen.de> <koschke@stvr3.informatik.uni-bremen.de>
+
+Michel Krause <krausem@uni-bremen.de> <krausem@uni-bremen.de>
+Michel Krause <krausem@uni-bremen.de> <39034757+cyclone1337@users.noreply.github.com>
+
+Falko Galperin <falko1@uni-bremen.de> <falko1@uni-bremen.de>
+Falko Galperin <falko1@uni-bremen.de> <10247603+falko17@users.noreply.github.com>
+
+Moritz B <mblecker@uni-bremen.de> <mblecker@uni-bremen.de>
+Moritz B <mblecker@uni-bremen.de> <71706098+mblecker@users.noreply.github.com>
+
+Torben Groß <torbengross@gmx.de> <torbengross@gmx.de>
+Torben Groß <torbengross@gmx.de> <grosst@uni-bremen.de>
+
+Thore Frenzel <tfrenzel@uni-bremen.de> <tfrenzel@uni-bremen.de>
+Thore Frenzel <tfrenzel@uni-bremen.de> <thore.frenzel@hotmail.de>
+Thore Frenzel <tfrenzel@uni-bremen.de> <72470006+thorefrenzel@users.noreply.github.com>
+
+Hannes Lennart Kuß <hkuss@uni-bremen.de> <hkuss@uni-bremen.de>
+Hannes Lennart Kuß <hkuss@uni-bremen.de> <102760046+hlkuss@users.noreply.github.com>
+
+Ferdinand Rohlfing <ferdinand.rohlfing@googlemail.com> <ferdinand.rohlfing@googlemail.com>
+Ferdinand Rohlfing <ferdinand.rohlfing@googlemail.com> <fer_roh@uni-bremen.de>
+Ferdinand Rohlfing <ferdinand.rohlfing@googlemail.com> <50866361+gniludio@users.noreply.github.com>
+
+Lino Goedecke <li_go@uni-bremen.de> <li_go@uni-bremen.de>
+Lino Goedecke <li_go@uni-bremen.de> <71646593+lino-3rddimenzions@users.noreply.github.com>
+
+Maximilian Wick <mwick@uni-bremen.de> <mwick@uni-bremen.de>
+
+Marcel Steinbeck <marcel@informatik.uni-bremen.de> <marcel@informatik.uni-bremen.de>
+Marcel Steinbeck <marcel@informatik.uni-bremen.de> <tinyspline@retux.de>
+
+Simon Leykum <git@leykum.net> <git@leykum.net>
+Simon Leykum <git@leykum.net> <59232234+sleykum@users.noreply.github.com>
+
+Yvo M. <yvo@uni-bremen.de> <yvo@uni-bremen.de>
+Yvo M. <yvo@uni-bremen.de> <yvo@stvr1.informatik.uni-bremen.de>
+Yvo M. <yvo@uni-bremen.de> <115483377+yvo02@users.noreply.github.com>
+
+Leon3 <leon3@uni-bremen.de> <leon3@uni-bremen.de>
+
+Max Julian Herrmann <m4xxed@pm.me> <m4xxed@pm.me>
+
+Lysander Gawenda <lysander-gawenda@posteo.de> <lysander-gawenda@posteo.de>
+Lysander Gawenda <lysander-gawenda@posteo.de> <lysander@uni-bremen.de>
+Lysander Gawenda <lysander-gawenda@posteo.de> <73167687+lilsander@users.noreply.github.com>
+
+Jonas Schramm <jschramm@uni-bremen.de> <jschramm@uni-bremen.de>
+Jonas Schramm <jschramm@uni-bremen.de> <jonas_schramm@outlook.de>
+Jonas Schramm <jschramm@uni-bremen.de> <64175807+schrammjonas@users.noreply.github.com>
+
+Zahir Masoumi <zama@uni-bremen.de> <zama@uni-bremen.de>
+Zahir Masoumi <zama@uni-bremen.de> <116647782+zama9@users.noreply.github.com>
+
+Thorsten Friedewold <thofri@uni-bremen.de> <thofri@uni-bremen.de>
+Thorsten Friedewold <thofri@uni-bremen.de> <71721951+thofri-bp@users.noreply.github.com>
+Thorsten Friedewold <thofri@uni-bremen.de> <71721952+thofri-bp@users.noreply.github.com>
+
+Tim Dinh <timdinh1@uni-bremen.de> <timdinh1@uni-bremen.de>
+Tim Dinh <timdinh1@uni-bremen.de> <73787166+timdinh-hub@users.noreply.github.com>
+
+Leonard <s_xsipo6@uni-bremen.de> <s_xsipo6@uni-bremen.de>
+Leonard <s_xsipo6@uni-bremen.de> <45939246+leolion3@users.noreply.github.com>
+
+AnnaZinner <annznner@uni-bremen.de> <annznner@uni-bremen.de>
+AnnaZinner <annznner@uni-bremen.de> <annznner@stvr1.informatik.uni-bremen.de>
+AnnaZinner <annznner@uni-bremen.de> <131189739+annazinner@users.noreply.github.com>
+
+Li-ID <linhen@uni-bremen.de> <linhen@uni-bremen.de>
+Li-ID <linhen@uni-bremen.de> <115718111+li-id@users.noreply.github.com>
+
+Felix Gaebler <fgaebler@uni-bremen.de> <fgaebler@uni-bremen.de>
+Felix Gaebler <fgaebler@uni-bremen.de> <felix.gaebler0@gmail.com>
+
+William <behnkewilliam@gmail.com> <behnkewilliam@gmail.com>
+William <behnkewilliam@gmail.com> <54861950+williamgoesgit@users.noreply.github.com>
+
+Sarah Augustinowski <augustin@uni-bremen.de> <augustin@uni-bremen.de>
+Sarah Augustinowski <augustin@uni-bremen.de> <sarah201090@web.de>
+Sarah Augustinowski <augustin@uni-bremen.de> <146845985+sarahaugustinowski@users.noreply.github.com>
+
+Adam Cihasev <cihasev@uni-bremen.de> <cihasev@uni-bremen.de>
+Adam Cihasev <cihasev@uni-bremen.de> <103834269+evothreat@users.noreply.github.com>
+
+Dilara <degerli1@uni-bremen.de> <degerli1@uni-bremen.de>
+Dilara <degerli1@uni-bremen.de> <107054085+zdegerli@users.noreply.github.com>
+
+azimc <azimcheema95@outlook.de> <azimcheema95@outlook.de>
+azimc <azimcheema95@outlook.de> <146132095+azimc@users.noreply.github.com>
+
+Omid Valipour <omidious.valipour@gmail.com> <omidious.valipour@gmail.com>
+Omid Valipour <omidious.valipour@gmail.com> <119433384+omidious@users.noreply.github.com>
+
+Jan Woiton <janwoiton@gmail.com> <janwoiton@gmail.com>
+Jan Woiton <janwoiton@gmail.com> <woiton@uni-bremen.de>
+
+Alexander Kaiser <alexander.kaiser@greselius.net> <alexander.kaiser@greselius.net>
+Alexander Kaiser <alexander.kaiser@greselius.net> <akaiser@uni-bremen.de>
+
+Nico Weiser <nico.weiser1994@gmail.com> <nico.weiser1994@gmail.com>
+
+# GitHub <noreply@github.com> is deliberately left alone. It is not a person
+# but the address GitHub writes as committer for merges and edits made through
+# the web interface; the real person is the author of those commits.
+
+# ---------------------------------------------------------------------------
+# Not expressible here: six commits are authored by "Leonard" with an empty
+# address. An entry cannot match an empty address, so those commits need
+# history rewriting rather than mapping if they should be attributed.
