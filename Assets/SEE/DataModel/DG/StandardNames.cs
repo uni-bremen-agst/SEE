@@ -509,7 +509,7 @@ namespace SEE.DataModel.DG
         /// String attribute for the list of authors of a file.
         /// </summary>
         /// <remarks>Note that this is not actually a numeric metric but a list of
-        /// author names seperated by a comma.</remarks>
+        /// author names separated by a comma.</remarks>
         public const string AuthorsAttributeName = "Authors";
 
         /// <summary>
