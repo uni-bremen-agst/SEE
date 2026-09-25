@@ -221,14 +221,14 @@ namespace SEEEditor.Cinemachines.Utility
                             // If the StoredReference was null, ignore it, ...
                             if (!storedReference.IsNull)
                             {
-                                // ... else get the Object by InstanceID and apply it
-                                int objectInstanceID;
-                                if (referenceList.TryGetValue(index, out objectInstanceID))
-                                {
-                                    // This part is not working correctly, since Unity differentiates InstanceIDs
-                                    // from actual objects and references
-                                }
-                                else
+                                // ... else get the Object by InstanceID and apply it.
+                                // The stored ID is the one the object bore before the
+                                // domain reload. Where the object was itself restored,
+                                // referenceList says what it is called now; where it was
+                                // not, the old ID is all there is, and it may well name
+                                // nothing at all.
+                                if (!referenceList.TryGetValue(storedReference.InstanceID,
+                                                               out int objectInstanceID))
                                 {
                                     objectInstanceID = storedReference.InstanceID;
                                 }
@@ -237,10 +237,16 @@ namespace SEEEditor.Cinemachines.Utility
 
                                 if (objectReference == null)
                                 {
+                                    // Leave whatever the property holds. Assigning the
+                                    // null would wipe a reference the component may have
+                                    // brought with it from its own defaults, and would do
+                                    // so without the user being any the wiser.
                                     Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the object was created during runtime, which must then be manually recreated and re-applied.\n");
                                 }
-
-                                propertyIterator.objectReferenceValue = objectReference;
+                                else
+                                {
+                                    propertyIterator.objectReferenceValue = objectReference;
+                                }
                             }
 
                             // Increment index for next reference.
@@ -264,6 +270,10 @@ namespace SEEEditor.Cinemachines.Utility
                 // Find object as child of rootTransform
                 GameObject restoredGameObject = new();
                 EditorJsonUtility.FromJsonOverwrite(storedGameObject.JSONGameObject, restoredGameObject);
+
+                // A reference may name the GameObject rather than one of its
+                // components, so what this one used to be called is recorded too.
+                referenceList[storedGameObject.InstanceID] = restoredGameObject.GetInstanceID();
 
                 // Iterate through all components for this GameObject
                 foreach (StoredComponent storedComponent in storedGameObject.ListComponents)
