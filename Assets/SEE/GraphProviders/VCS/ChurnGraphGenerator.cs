@@ -305,6 +305,16 @@ namespace SEE.GraphProviders.VCS
             if (present.Count == 0)
             {
                 Debug.LogWarning("No files were matched.\n");
+                // A graph with no root at all is not one the rest of SEE can
+                // show: GetRoots().First() is asked for in more than one place.
+                // AddSingleRoot makes a root only where there are several to
+                // gather under one, and would otherwise ask an empty list for
+                // its first element, so the making is forced here.
+                if (graph.GetRoots().Count == 0)
+                {
+                    graph.AddSingleRoot(out Node _, repositoryName,
+                                        DataModel.DG.VCS.RepositoryType, initialGraph: true);
+                }
                 changePercentage?.Invoke(1f);
                 return;
             }
