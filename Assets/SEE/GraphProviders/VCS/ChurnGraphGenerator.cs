@@ -340,17 +340,12 @@ namespace SEE.GraphProviders.VCS
             }
 
             // A node for every file that survived, whether or not it was changed
-            // in the period. One untouched carries the
-            // metrics of its code and nothing else, every count of its history
-            // standing at nought.
-            IDictionary<string, Churn> all = new Dictionary<string, Churn>(churn);
-            foreach (string path in present)
-            {
-                if (!all.ContainsKey(path))
-                {
-                    all[path] = new Churn();
-                }
-            }
+            // in the period. One untouched carries the metrics of its code and
+            // nothing else, every count of its history standing at nought.
+            IDictionary<string, Churn> all
+                = present.ToDictionary(path => path,
+                                       path => churn.TryGetValue(path, out Churn known)
+                                               ? known : new Churn());
 
             Fill(graph, all, formerNames, repositoryName, session, simplifyGraph);
             changePercentage?.Invoke(1f);
