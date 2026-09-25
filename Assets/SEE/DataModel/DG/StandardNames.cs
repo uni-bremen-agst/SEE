@@ -536,7 +536,7 @@ namespace SEE.DataModel.DG
         /// <remarks>Being changed together is symmetric, so only one of the two
         /// possible edges between two files is drawn, and its direction carries
         /// no meaning.</remarks>
-        public const string CoChangeType = "Cochange";
+        public const string CoChangeType = "CoChange";
 
         /// <summary>
         /// How often the two files joined by an edge of type <see cref="CoChangeType"/>
