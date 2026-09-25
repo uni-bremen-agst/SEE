@@ -356,11 +356,13 @@ namespace SEEEditor.Cinemachines.Utility
         /// <summary>
         /// Save function, utilizing the custom Serializer class for Cinemachines.
         /// </summary>
-        /// <param name="unitySceneName">The name of the Unity scene that the object will be stored from.</param>
-        private static void Save(string unitySceneName)
+        /// <param name="unityScene">The Unity scene that the object will be stored from.</param>
+        private static void Save(Scene unityScene)
         {
-            // Locating CinemachinesRoot
-            Transform cinemachinesRootTransform = CinemachinesUtility.GetCinemachinesRootInScene();
+            // Locating the CinemachinesRoot of this scene, and of no other. Several
+            // scenes can be open together, and a search across all of them would store
+            // the root of the first under the name of every one of them.
+            Transform cinemachinesRootTransform = CinemachinesUtility.GetCinemachinesRootInScene(unityScene);
 
             if (cinemachinesRootTransform == null)
             {
@@ -372,7 +374,7 @@ namespace SEEEditor.Cinemachines.Utility
             StoredGameObject storedGameObject = serializer.Serialize(cinemachinesRootTransform);
 
             // Store generated JSON inside EditorPrefs for persistance
-            EditorPrefs.SetString($"{unitySceneName}.{CinemachinesUtility.CinemachinesPersistanceKeyName}", JsonUtility.ToJson(storedGameObject));
+            EditorPrefs.SetString($"{unityScene.name}.{CinemachinesUtility.CinemachinesPersistanceKeyName}", JsonUtility.ToJson(storedGameObject));
         }
 
         /// <summary>
@@ -544,7 +546,7 @@ namespace SEEEditor.Cinemachines.Utility
                         Scene currScene = SceneManager.GetSceneAt(i);
 
                         // Save serialized data
-                        Save(currScene.name);
+                        Save(currScene);
                     }
 
                     GetRestorableRoots();

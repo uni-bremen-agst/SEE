@@ -54,6 +54,34 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
+        /// Returns the active CinemachinesRoot-Transform of <paramref name="unityScene"/>
+        /// if one exists in that scene.
+        /// </summary>
+        /// <remarks>Unlike <see cref="GetCinemachinesRootInScene()"/>, which searches
+        /// every loaded scene at once, this looks only in the one named. Several scenes
+        /// can be open together, and then the root of one of them must not be taken for
+        /// the root of another.</remarks>
+        /// <param name="unityScene">The Unity scene to search.</param>
+        /// <returns>The Transform carrying the Cinemachines root component in
+        /// <paramref name="unityScene"/>, or null if there is none.</returns>
+        internal static Transform GetCinemachinesRootInScene(Scene unityScene)
+        {
+            if (!unityScene.IsValid() || !unityScene.isLoaded)
+            {
+                return null;
+            }
+            foreach (GameObject rootGameObject in unityScene.GetRootGameObjects())
+            {
+                CinemachinesRoot found = rootGameObject.GetComponentInChildren<CinemachinesRoot>(false);
+                if (found != null)
+                {
+                    return found.transform;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns all active <see cref="CinemachinesRoot"> components in the current Unity scene.
         /// </summary>
         /// <remarks>There should only be one active <see cref="CinemachinesRoot"> component in a Unity scene.</remarks>
