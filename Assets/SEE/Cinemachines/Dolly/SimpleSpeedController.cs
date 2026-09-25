@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Splines;
 using UnityEngine.Pool;
@@ -71,6 +72,15 @@ namespace SEE.Cinemachines.Dolly
         private bool emptyListReported;
 
         /// <summary>
+        /// Whether it has been reported already that no sector of
+        /// <see cref="speedList"/> had begun.
+        /// </summary>
+        /// <remarks>Not serialized, for the reason given at
+        /// <see cref="emptyListReported"/>.</remarks>
+        [NonSerialized]
+        private bool noSectorReported;
+
+        /// <summary>
         /// Compute the desired position on the spline as requested by
         /// <see cref="SplineAutoDolly.ISplineAutoDolly.GetSplinePosition"/>.
         /// </summary>
@@ -111,17 +121,35 @@ namespace SEE.Cinemachines.Dolly
                 return currentPosition;
             }
 
-            SplineSector selectedSector = speedList[0];
+            // The sector in force is the last one to have begun, that is, the one whose
+            // start is the greatest of those not past the current position. Seeking it
+            // out this way asks nothing of the order the sectors are given in.
+            bool found = false;
+            SplineSector selectedSector = default;
 
-            for (int i = 1; i < speedList.Length; i++)
+            foreach (SplineSector sector in speedList)
             {
-                SplineSector tmpSector = speedList[i];
-
-                if (tmpSector.SectorStart >= selectedSector.SectorStart
-                    && tmpSector.SectorStart <= currentPosition)
+                if (sector.SectorStart <= currentPosition
+                    && (!found || sector.SectorStart > selectedSector.SectorStart))
                 {
-                    selectedSector = tmpSector;
+                    selectedSector = sector;
+                    found = true;
                 }
+            }
+
+            // No sector has begun, so there is no speed to travel at. Validate asks for
+            // one starting at 0, which rules this out; it is caught all the same,
+            // because Validate runs in the editor and cannot stop play mode.
+            if (!found)
+            {
+                if (!noSectorReported)
+                {
+                    noSectorReported = true;
+                    Debug.LogError("No sector of the simple speed controller starts at or before "
+                                   + $"{currentPosition}, so nothing moves. Give it a sector "
+                                   + "starting at 0.\n");
+                }
+                return currentPosition;
             }
 
             // Progress in Preview/Export
@@ -157,6 +185,13 @@ namespace SEE.Cinemachines.Dolly
             if (speedList.Length == 0)
             {
                 throw new IndexOutOfRangeException("Spline speed controller needs at least one entry in the speed list.");
+            }
+
+            // Every position from 0 onwards must fall in some sector, else there is no
+            // speed to travel at over the stretch before the first of them begins.
+            if (!speedList.Any(sector => sector.SectorStart == 0))
+            {
+                throw new ArgumentException("One sector must start at '0'.", "SectorRange");
             }
 
             for (int i = 0; i < speedList.Length; i++)
