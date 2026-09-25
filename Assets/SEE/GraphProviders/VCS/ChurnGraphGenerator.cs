@@ -871,47 +871,44 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
         private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
         {
-            foreach (Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes().Where(n => n.Type == DataModel.DG.NodeTypes.File))
             {
-                if (node.Type == DataModel.DG.NodeTypes.File)
+                string repositoryFilePath = node.ID;
+                if (AntlrLanguage.HasLexer(Filenames.Extension(repositoryFilePath)))
                 {
-                    string repositoryFilePath = node.ID;
-                    if (AntlrLanguage.HasLexer(Filenames.Extension(repositoryFilePath)))
+                    AntlrLanguage language = AntlrLanguage.FromFileExtension(Filenames.Extension(repositoryFilePath));
+                    if (language != AntlrLanguage.Plain)
                     {
-                        AntlrLanguage language = AntlrLanguage.FromFileExtension(Filenames.Extension(repositoryFilePath));
-                        if (language != AntlrLanguage.Plain)
-                        {
-                            //ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
-                            IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession);
-                            TokenMetrics.Gather(tokens,
-                                                out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
-                                                out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
+                        //ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
+                        IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession);
+                        TokenMetrics.Gather(tokens,
+                                            out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
+                                            out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
 
 
-                            node.SetInt(Metrics.LOC, lineMetrics.LOC);
-                            node.SetInt(Metrics.Comments, lineMetrics.Comments);
-                            node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
+                        node.SetInt(Metrics.LOC, lineMetrics.LOC);
+                        node.SetInt(Metrics.Comments, lineMetrics.Comments);
+                        node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
 
-                            node.SetInt(Metrics.McCabe, mccabeComplexity);
+                        node.SetInt(Metrics.McCabe, mccabeComplexity);
 
-                            node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
-                            node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
-                            node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
-                            node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
-                            node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
-                            node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
-                            node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
-                            node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
-                            node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
-                            node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
-                            node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
-                            node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
-                        }
+                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
                     }
-                    else
-                    {
-                        Debug.LogWarning($"File {repositoryFilePath} has no supported lexer for file extension {Filenames.Extension(repositoryFilePath)}. No code metrics will be calculated for this file.\n");
-                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"File {repositoryFilePath} has no supported lexer for file extension {Filenames.Extension(repositoryFilePath)}. No code metrics will be calculated for this file.\n");
                 }
             }
         }
