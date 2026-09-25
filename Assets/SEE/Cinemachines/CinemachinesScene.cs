@@ -172,6 +172,18 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
+        /// Forgets the scene folder this scene was given, so that
+        /// <see cref="SceneGUID"/> may be assigned afresh.
+        /// </summary>
+        /// <remarks>Only for a copy of a scene, which owns no folder of its own.
+        /// A copy that remembered the GUID of the scene it was copied from would
+        /// have <see cref="DestroyObject"/> delete that other scene's folder.</remarks>
+        internal void ForgetSceneFolder()
+        {
+            sceneGUID = "";
+        }
+
+        /// <summary>
         /// Deletes this CinemachineScene from the scenes.
         /// </summary>
         [Button("Delete selected scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]
@@ -231,13 +243,30 @@ namespace SEE.Cinemachines
 
             // Attempt to create the Prefab
             bool prefabCreationSuccess;
-            PrefabUtility.SaveAsPrefabAsset(gameObject, assetPathOfScene, out prefabCreationSuccess);
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, assetPathOfScene, out prefabCreationSuccess);
 
             // Log result
             if (prefabCreationSuccess)
+            {
+                // The GUID names the folder this scene was given when it was created,
+                // and the prefab has just been written carrying it. Every instance made
+                // from that prefab would name the same folder, so deleting such an
+                // instance would delete the folder of the scene it was copied from,
+                // along with its timeline and its signals. A copy owns no folder, so it
+                // is made to remember none; one is created for it when it is set up.
+                CinemachinesScene copy = prefab.GetComponent<CinemachinesScene>();
+                if (copy != null && !String.IsNullOrWhiteSpace(copy.SceneGUID))
+                {
+                    copy.ForgetSceneFolder();
+                    PrefabUtility.SavePrefabAsset(prefab);
+                }
+
                 Debug.Log($"Scene has been successfully stored under {assetPathOfScene}.\n");
+            }
             else
+            {
                 Debug.LogError($"Failed to store scene under {assetPathOfScene}.\n");
+            }
         }
 
         /// <summary>
