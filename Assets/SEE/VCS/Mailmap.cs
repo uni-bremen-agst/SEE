@@ -18,10 +18,10 @@ namespace SEE.VCS
     /// and <c>git blame</c> alike. It supersedes <see cref="AuthorMapping"/>,
     /// which states the same thing in a configuration of SEE's own instead.
     ///
-    /// The forms git defines are all accepted. Of those, the ones naming a
-    /// canonical name have their full effect; <c>&lt;proper@email&gt;
-    /// &lt;commit@email&gt;</c>, which maps an address onto another address,
-    /// leaves the name as the commit records it.
+    /// All four forms git defines are accepted, each with the effect git gives
+    /// it. <c>&lt;proper@email&gt; &lt;commit@email&gt;</c>, the one naming no
+    /// name, replaces the address alone and leaves the name as the commit
+    /// records it; the other three name a canonical name as well.
     /// </remarks>
     internal class Mailmap
     {
@@ -44,6 +44,16 @@ namespace SEE.VCS
         /// </summary>
         private readonly IDictionary<string, FileAuthor> byNameAndEmail
             = new Dictionary<string, FileAuthor>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Maps the address recorded in a commit onto the canonical address of
+        /// its author, the name being left as the commit records it. This is
+        /// what an entry naming no name states. Consulted only where neither
+        /// <see cref="byNameAndEmail"/> nor <see cref="byEmail"/> has anything
+        /// to say, both of which name a name and so say more.
+        /// </summary>
+        private readonly IDictionary<string, string> addressOnly
+            = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// The mapping given by the .mailmap file at <paramref name="path"/>.
@@ -104,12 +114,19 @@ namespace SEE.VCS
 
             if (emails.Count == 1 && names[0].Length > 0)
             {
-                // "Proper Name <proper@email>".
+                // "Proper Name <commit@email>": the name is replaced, the
+                // address is the one the commit records and stays.
                 byEmail[emails[0]] = new FileAuthor(names[0], emails[0]);
             }
-            else if (emails.Count == 2 && names[0].Length > 0)
+            else if (emails.Count == 2)
             {
-                if (names[1].Length > 0)
+                if (names[0].Length == 0)
+                {
+                    // "<proper@email> <commit@email>": the address is replaced
+                    // and the name is left as the commit records it.
+                    addressOnly[emails[1]] = emails[0];
+                }
+                else if (names[1].Length > 0)
                 {
                     // "Proper Name <proper@email> Commit Name <commit@email>".
                     byNameAndEmail[Key(names[1], emails[1])] = new FileAuthor(names[0], emails[0]);
@@ -138,6 +155,10 @@ namespace SEE.VCS
             if (byEmail.TryGetValue(author.Email, out FileAuthor byAddress))
             {
                 return byAddress;
+            }
+            if (addressOnly.TryGetValue(author.Email, out string canonical))
+            {
+                return new FileAuthor(author.Name, canonical);
             }
             return new FileAuthor(author.Name, author.Email);
         }
