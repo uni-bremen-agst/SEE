@@ -92,11 +92,11 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Menu entry for creating the CinemachinesRoot easily.
+        /// Menu entry for adding a CinemachinesRoot to the current Unity scene.
         /// </summary>
-        [MenuItem("SEE/Cinemachines/Create Cinemachines Root", false, 10)]
-        [MenuItem("GameObject/SEE/Cinemachines/Create Cinemachines Root", false, 10)]
-        internal static void CreateCinemachinesRoot()
+        [MenuItem("SEE/Cinemachines/Add Cinemachines Root", false, 10)]
+        [MenuItem("GameObject/SEE/Cinemachines/Add Cinemachines Root", false, 10)]
+        internal static void AddCinemachinesRoot()
         {
             // Create a new CinemachinesRoot at the root of the scene
             new GameObject(CinemachinesRootName, typeof(CinemachinesRoot));
