@@ -107,21 +107,23 @@ namespace SEE.Cinemachines
             // If the CinemachinesRoot has not been initialized on Start, initialize it.
             if (!isInitialized)
             {
-                AddCinemachinesRoot();
+                AddStructure();
             }
         }
 
         #region Root Maintenance
 
         /// <summary>
-        /// Sets up the CinemachinesRoot prefab.
+        /// Builds the structure of this CinemachinesRoot: the Cinemachine brains, the
+        /// control camera, the folder the scenes live in, and the render textures the
+        /// brains draw into. It does not add a root; the root is this component.
         /// </summary>
-        [Button("Add Cinemachines Root", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Add Cinemachines Root")]
+        [Button("Add Structure", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Add Structure")]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [ButtonGroup(CinemachinesRootMaintenance)]
         [HideIf(nameof(isInitialized)), RuntimeHideIf(nameof(isInitialized))]
-        [Tooltip("Sets up the root for the Cinemachines. Generates the structure for crucial elements and organization.")]
-        internal void AddCinemachinesRoot()
+        [Tooltip("Builds the structure this root needs: the Cinemachine brains, the control camera, the scenes folder and the render textures.")]
+        internal void AddStructure()
         {
             // Create the structure of the CinemachinesRoot. It fails, if the prefabs are not available.
             if (!CreateCinemachinesRootStructure())
@@ -183,7 +185,7 @@ namespace SEE.Cinemachines
 
             sceneCounter = 0;
 
-            AddCinemachinesRoot();
+            AddStructure();
         }
 
         #endregion Root Maintenance
