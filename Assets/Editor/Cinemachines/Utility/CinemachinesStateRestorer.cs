@@ -526,10 +526,10 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Display function to get list of restorable scenes.
+        /// Shows the Unity scenes whose Cinemachines root has been backed up.
         /// </summary>
-        [MenuItem("SEE/Cinemachines/Get Restorable Cinemachines Roots", false, 12)]
-        internal static void GetRestorableRoots()
+        [MenuItem("SEE/Cinemachines/Show Restorable Cinemachines Roots", false, 12)]
+        internal static void ShowRestorableRoots()
         {
             // String Builder for dialog body, which includes the names of the scenes, that can restore a CinemachinesRoot
             StringBuilder stringBuilder = new("The Cinemachines roots of the following Unity scenes have been backed up.\n");
@@ -630,7 +630,7 @@ namespace SEEEditor.Cinemachines.Utility
                     // all, is a dialog raised for nothing.
                     if (anythingStored)
                     {
-                        GetRestorableRoots();
+                        ShowRestorableRoots();
                     }
                     break;
                 default:
