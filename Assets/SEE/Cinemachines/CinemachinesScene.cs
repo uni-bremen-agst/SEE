@@ -186,7 +186,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Deletes this CinemachineScene from the scenes.
         /// </summary>
-        [Button("Delete selected scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]
+        [Button("Delete Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderDeletion), RuntimeGroupOrder(CinemachineSceneConfigOrderDeletion)]
         [InfoBox("@CinemachinesUtility.GetSceneDeletionWarningMessage(SceneGUID)", InfoMessageType.Warning)]
