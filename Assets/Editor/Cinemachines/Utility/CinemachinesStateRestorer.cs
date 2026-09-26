@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 using SEE.Cinemachines;
 using SEE.Cinemachines.Utility;
 using SEE.Utils;
-using System.Linq;
 
 #if UNITY_EDITOR
 
@@ -486,43 +485,38 @@ namespace SEEEditor.Cinemachines.Utility
         /// Helper function to get the names of the Unity scenes holding a backed-up
         /// Cinemachines root.
         /// </summary>
-        /// <returns>Name of Unity scenes that have GameObject backups.</returns>
-        private static string[] GetRestorableScenes()
+        /// <returns>The names, in a list that is empty where nothing has been backed
+        /// up.</returns>
+        private static IList<string> GetRestorableScenes()
         {
+            // The names are gathered in a list. They used to be gathered in one string
+            // and split on the newline, which yielded a single empty name where nothing
+            // had been backed up, so that "none" and "one nameless one" looked alike to
+            // the caller.
+            List<string> result = new();
+
             // find all Unity scenes in Project
-            string[] scenesGUIDs = AssetDatabase.FindAssets("t:Scene");
-            List<string> scenesPaths = new();
-
-            foreach (string guid in scenesGUIDs)
+            foreach (string guid in AssetDatabase.FindAssets("t:Scene"))
             {
-                scenesPaths.Add(AssetDatabase.GUIDToAssetPath(guid));
-            }
+                string scenePath = AssetDatabase.GUIDToAssetPath(guid);
 
-            StringBuilder result = new();
-
-            foreach (string scenePath in scenesPaths)
-            {
-                // check wether scene path starts at the correct location;
+                // check whether scene path starts at the correct location;
                 // doing so will exclude every example scene from extensions
                 if (!scenePath.StartsWith("Assets/Scenes"))
                 {
                     continue;
                 }
 
-                // Logic for trimming the path down to the file name of the scene
-                int ToDeleteSuffixLength = ".unity".Length;
-                string[] UnitySceneNameSplit = scenePath.Remove(scenePath.Length - ToDeleteSuffixLength, ToDeleteSuffixLength).Split('/');
-                string UnitySceneName = UnitySceneNameSplit[UnitySceneNameSplit.Length - 1];
+                string unitySceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
 
                 // checking, if a persistance key for the scene exists
-                string prefKeyName = $"{UnitySceneName}.{CinemachinesUtility.CinemachinesPersistanceKeyName}";
-                if (EditorPrefs.HasKey(prefKeyName))
+                if (EditorPrefs.HasKey($"{unitySceneName}.{CinemachinesUtility.CinemachinesPersistanceKeyName}"))
                 {
-                    result.AppendFormat("{0}\n", UnitySceneName);
+                    result.Add(unitySceneName);
                 }
             }
 
-            return result.ToString().Split('\n');
+            return result;
         }
 
         /// <summary>
@@ -531,24 +525,33 @@ namespace SEEEditor.Cinemachines.Utility
         [MenuItem("SEE/Cinemachines/Show Restorable Cinemachines Roots", false, 12)]
         internal static void ShowRestorableRoots()
         {
-            // String Builder for dialog body, which includes the names of the scenes, that can restore a CinemachinesRoot
-            StringBuilder stringBuilder = new("The Cinemachines roots of the following Unity scenes have been backed up.\n");
-            string[] restorableScenes = GetRestorableScenes();
+            IList<string> restorableScenes = GetRestorableScenes();
+            StringBuilder message = new();
 
-            // Format scene names
-            foreach (string scene in restorableScenes.Where(s => s != ""))
+            if (restorableScenes.Count == 0)
             {
-                stringBuilder.AppendFormat("* {0}\n", scene);
+                // Announcing a list and then showing none reads as though something
+                // had gone wrong, so the empty case says outright that there is
+                // nothing, and says where a backup would come from.
+                message.Append("No Cinemachines root has been backed up.\n\n"
+                               + "A backup is taken of every Unity scene holding a Cinemachines "
+                               + "root whenever you leave play mode, and restoring one uses it up.");
+            }
+            else
+            {
+                message.Append("The Cinemachines roots of the following Unity scenes "
+                               + "have been backed up.\n\n");
+
+                foreach (string scene in restorableScenes)
+                {
+                    message.AppendFormat("* {0}\n", scene);
+                }
+
+                message.Append("\nTo restore one, open the Unity scene it belongs to and select "
+                               + "SEE > Cinemachines > Restore Cinemachines Root.");
             }
 
-            stringBuilder.Append("\nTo restore one, open the Unity scene it belongs to and select "
-                                 + "SEE > Cinemachines > Restore Cinemachines Root.");
-
-            EditorUtility.DisplayDialog(
-                "Restoration of Cinemachines",
-                stringBuilder.ToString(),
-                                        "Okay"
-            );
+            EditorUtility.DisplayDialog("Restoration of Cinemachines", message.ToString(), "Okay");
         }
 
         /// <summary>
