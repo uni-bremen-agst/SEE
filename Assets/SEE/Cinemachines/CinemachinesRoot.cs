@@ -59,7 +59,7 @@ namespace SEE.Cinemachines
         private GUID pictureInPictureGUID;
 
         /// <summary>
-        /// Root of the Cinemachine-Brains GameObjects.
+        /// Root of the GameObjects carrying a Cinemachine Brain.
         /// </summary>
         private GameObject cinemachineBrainsGameObject;
 
@@ -69,7 +69,7 @@ namespace SEE.Cinemachines
         private GameObject cinemachineControlCameraGameObject;
 
         /// <summary>
-        /// Root of the Cinemachine-Scene GameObjects.
+        /// Root of the GameObjects holding the Cinemachines scenes.
         /// </summary>
         private GameObject cinemachineScenesGameObject;
 

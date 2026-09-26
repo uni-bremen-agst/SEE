@@ -290,7 +290,7 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Creates a new Spline that can be assigned inside Cinemachine-Cameras with SplineDolly-Component.
+        /// Creates a new spline that can be assigned to a Cinemachine camera with a Spline Dolly component.
         /// </summary>
         [Button("Add Spline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Add Spline")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
