@@ -18,7 +18,7 @@ namespace SEE.UserSettings
         /// <summary>
         /// Indicates whether music is muted.
         /// </summary>
-        public bool MusicMuted = false;
+        public bool MusicMuted = true;
 
         /// <summary>
         /// Current sound effects volume.
