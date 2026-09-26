@@ -483,7 +483,8 @@ namespace SEEEditor.Cinemachines.Utility
         }
 
         /// <summary>
-        /// Helper function to get unity scene names with CinemachineRoot backups.
+        /// Helper function to get the names of the Unity scenes holding a backed-up
+        /// Cinemachines root.
         /// </summary>
         /// <returns>Name of Unity scenes that have GameObject backups.</returns>
         private static string[] GetRestorableScenes()
@@ -527,11 +528,11 @@ namespace SEEEditor.Cinemachines.Utility
         /// <summary>
         /// Display function to get list of restorable scenes.
         /// </summary>
-        [MenuItem("SEE/Cinemachines/Get restorable Cinemachine Roots", false, 12)]
+        [MenuItem("SEE/Cinemachines/Get Restorable Cinemachines Roots", false, 12)]
         internal static void GetRestorableRoots()
         {
             // String Builder for dialog body, which includes the names of the scenes, that can restore a CinemachinesRoot
-            StringBuilder stringBuilder = new("The CinemachineRoots of the following Unity scenes have been backed up.\n");
+            StringBuilder stringBuilder = new("The Cinemachines roots of the following Unity scenes have been backed up.\n");
             string[] restorableScenes = GetRestorableScenes();
 
             // Format scene names
@@ -540,7 +541,8 @@ namespace SEEEditor.Cinemachines.Utility
                 stringBuilder.AppendFormat("* {0}\n", scene);
             }
 
-            stringBuilder.Append("\nTo restore a CinemachineRoot, enter Unity scene and select SEE > Cinemachines > Restore Cinemachine Root");
+            stringBuilder.Append("\nTo restore one, open the Unity scene it belongs to and select "
+                                 + "SEE > Cinemachines > Restore Cinemachines Root.");
 
             EditorUtility.DisplayDialog(
                 "Restoration of Cinemachines",
