@@ -204,7 +204,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a new Cinemachine scene structure inside the <see cref="CinemachinesRoot">.
         /// </summary>
-        [Button("Create new Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Create new Scene")]
+        [Button("Add Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Add Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderCreate + 1), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate + 1)]
         [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]

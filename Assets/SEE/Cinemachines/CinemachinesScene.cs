@@ -280,7 +280,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a new Spline that can be assigned inside Cinemachine-Cameras with SplineDolly-Component.
         /// </summary>
-        [Button("Create Spline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Spline")]
+        [Button("Add Spline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Add Spline")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSpline), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSpline)]
         [Tooltip("Creates a GameObject, including an empty SplineContainer component. Note that the positions inside the SplineContainer are relative to the root of the GameObject and it is always placed at scene origin.")]
@@ -298,7 +298,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a Signal inside the scene folder, which can be used on the scenes timeline to trigger or invoke functions of certain objects or scripts.
         /// </summary>
-        [Button("Create Signal", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Signal")]
+        [Button("Add Signal", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Add Signal")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSignal), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSignal)]
         [Tooltip("Creates a Signal inside the current scenes folder. This Signal then can be used on the current scenes timeline for triggering or accessing specific functions")]
@@ -318,7 +318,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a new Cinemachines Camera that can be assigned to a Timeline.
         /// </summary>
-        [Button("Add Camera", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Cinemachine Camera")]
+        [Button("Add Camera", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Add Camera")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateCamera), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateCamera)]
         [Tooltip("Creates a GameObject, including the Cinemachines Camera component.")]
@@ -330,7 +330,7 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Creates a new GameObject that can be used to focus a Cinemachine Camera on.
         /// </summary>
-        [Button("Create Focus Object", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Create Focus Object")]
+        [Button("Add Focus Object", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootOptions, "Add Focus Object")]
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateFocus), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateFocus)]
         [Tooltip("Creates a GameObject that can be used to focus a Cinemachine Camera onto.")]
