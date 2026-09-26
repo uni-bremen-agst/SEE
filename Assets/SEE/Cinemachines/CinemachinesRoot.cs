@@ -34,7 +34,7 @@ namespace SEE.Cinemachines
         /// True if the root of the Cinemachines is fully initialized.
         /// </summary>
         [SerializeField, DisableInPlayMode, DisableInEditorMode]
-        [Title("Cinemachines-Root Maintenance", horizontalLine: true)]
+        [Title("Cinemachines Root Maintenance", horizontalLine: true)]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [LabelText("CinemachinesRoot initialized?")]
         [Tooltip("Displays the state of initialization of the CinemachinesRoot.")]
