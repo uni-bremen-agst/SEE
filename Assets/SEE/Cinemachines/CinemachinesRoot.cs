@@ -107,7 +107,7 @@ namespace SEE.Cinemachines
             // If the CinemachinesRoot has not been initialized on Start, initialize it.
             if (!isInitialized)
             {
-                SetupCinemachinesRoot();
+                AddCinemachinesRoot();
             }
         }
 
@@ -116,12 +116,12 @@ namespace SEE.Cinemachines
         /// <summary>
         /// Sets up the CinemachinesRoot prefab.
         /// </summary>
-        [Button("Setup CinemachinesRoot", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Setup CinemachinesRoot")]
+        [Button("Add Cinemachines Root", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Add Cinemachines Root")]
         [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
         [ButtonGroup(CinemachinesRootMaintenance)]
         [HideIf(nameof(isInitialized)), RuntimeHideIf(nameof(isInitialized))]
         [Tooltip("Sets up the root for the Cinemachines. Generates the structure for crucial elements and organization.")]
-        internal void SetupCinemachinesRoot()
+        internal void AddCinemachinesRoot()
         {
             // Create the structure of the CinemachinesRoot. It fails, if the prefabs are not available.
             if (!CreateCinemachinesRootStructure())
@@ -183,7 +183,7 @@ namespace SEE.Cinemachines
 
             sceneCounter = 0;
 
-            SetupCinemachinesRoot();
+            AddCinemachinesRoot();
         }
 
         #endregion Root Maintenance
@@ -209,7 +209,7 @@ namespace SEE.Cinemachines
         [PropertyOrder(CinemachineSceneConfigOrderCreate + 1), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate + 1)]
         [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]
         [Tooltip("Creates a new Cinemachine scene structure inside the Unity scene.")]
-        internal void CreateNewScene()
+        internal void AddScene()
         {
             // find the Scenes Transform within the CinemachinesRoot-Prefab
             Transform? scenesTransform = transform.Find("Scenes");

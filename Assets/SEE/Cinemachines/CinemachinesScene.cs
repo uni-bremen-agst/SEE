@@ -284,7 +284,7 @@ namespace SEE.Cinemachines
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSpline), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSpline)]
         [Tooltip("Creates a GameObject, including an empty SplineContainer component. Note that the positions inside the SplineContainer are relative to the root of the GameObject and it is always placed at scene origin.")]
-        internal void CreateEmptySpline()
+        internal void AddSpline()
         {
             CinemachinesUtility.CreateGameObject("CinemachinesSpline", ref splineCount, ref ObjectNameSuffix, cinemachinesSplinesGameObject, typeof(SplineContainer), true);
 
@@ -302,7 +302,7 @@ namespace SEE.Cinemachines
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateSignal), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateSignal)]
         [Tooltip("Creates a Signal inside the current scenes folder. This Signal then can be used on the current scenes timeline for triggering or accessing specific functions")]
-        internal void CreateNewSignal()
+        internal void AddSignal()
         {
             string signalName = $"{transform.name} - {CinemachinesUtility.GetNewObjectName("Signal", ref signalCount, ref ObjectNameSuffix)}";
 
@@ -322,7 +322,7 @@ namespace SEE.Cinemachines
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateCamera), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateCamera)]
         [Tooltip("Creates a GameObject, including the Cinemachines Camera component.")]
-        internal void CreateNewCamera()
+        internal void AddCamera()
         {
             CinemachinesUtility.CreateGameObject("CinemachinesCamera", ref cinemachinesCameraCount, ref ObjectNameSuffix, cinemachinesCamerasGameObject, typeof(CinemachineCamera), true);
         }
@@ -334,7 +334,7 @@ namespace SEE.Cinemachines
         [ButtonGroup(CinemachinesSceneRootOptions)]
         [PropertyOrder(CinemachinesSceneRootOptionsOrderCreateFocus), RuntimeGroupOrder(CinemachinesSceneRootOptionsOrderCreateFocus)]
         [Tooltip("Creates a GameObject that can be used to focus a Cinemachine Camera onto.")]
-        internal void CreateNewFocusObject()
+        internal void AddFocusObject()
         {
             CinemachinesUtility.CreateGameObject("FocusObject", ref focusObjectCount, ref ObjectNameSuffix, cinemachinesFocusObjectGameObject, null, false);
         }
