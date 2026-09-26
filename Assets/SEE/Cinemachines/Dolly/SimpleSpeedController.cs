@@ -66,6 +66,25 @@ namespace SEE.Cinemachines.Dolly
         private SplineSector[] speedList = {};
 
         /// <summary>
+        /// The stretch over which a sector works up to its speed from the speed of the
+        /// one before it, as a fraction of the whole spline. Zero changes speed abruptly
+        /// at the boundary.
+        /// </summary>
+        /// <remarks>A speed that changes from one frame to the next reads on film as a
+        /// jolt rather than as direction, so a sector may be given a run-up instead. The
+        /// stretch begins at the boundary and is cut short where the next sector would
+        /// otherwise be reached, which keeps the sectors after a short one from running
+        /// into each other.
+        ///
+        /// The first sector has nothing to ease away from and so begins at its own speed.
+        ///
+        /// Serialized for the reason given at <see cref="speedList"/>.</remarks>
+        [SerializeField]
+        [Tooltip("The stretch over which a sector works up to its speed from the one before it, "
+                 + "as a fraction of the whole spline. Zero changes speed abruptly at the boundary.")]
+        private float easing = 0;
+
+        /// <summary>
         /// Whether the emptiness of <see cref="speedList"/> has been reported already.
         /// </summary>
         /// <remarks>Not serialized: this is about one run, not about the asset. It
@@ -112,12 +131,14 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="positionUnit">The unit in which positions on the
         /// <paramref name="spline"/> are expressed.</param>
         /// <param name="deltaTime">Delta time between the current and last frame.</param>
-        /// <returns><paramref name="currentPosition"/> advanced by the speed of the sector
-        /// in force, or <paramref name="currentPosition"/> unchanged where nothing can be
-        /// advanced: when <paramref name="deltaTime"/> is not positive, when the speed list
-        /// is empty, when the <paramref name="spline"/> holds no spline, when no sector
-        /// begins at or before the current position, or when the speed of the sector in
-        /// force is not positive. Each of the last four is reported once.</returns>
+        /// <returns><paramref name="currentPosition"/> advanced by the speed in force there
+        /// — that of the sector the position falls in, or a value on its way there from the
+        /// sector before, where <see cref="easing"/> gives the sector a run-up. Returns
+        /// <paramref name="currentPosition"/> unchanged where nothing can be advanced: when
+        /// <paramref name="deltaTime"/> is not positive, when the speed list is empty, when
+        /// the <paramref name="spline"/> holds no spline, when no sector begins at or before
+        /// the current position, or when the speed of the sector in force is not positive.
+        /// Each of the last four is reported once.</returns>
         /// <remarks>Movement is not confined to play mode, so that a shot can be watched by
         /// dragging the playhead of a timeline and comes out of the recorder as it looks
         /// there.</remarks>
@@ -215,7 +236,66 @@ namespace SEE.Cinemachines.Dolly
             }
 
             // Progress in Preview/Export
-            return currentPosition + (selectedSector.SectorSpeed * deltaTime);
+            return currentPosition + (SpeedAt(currentPosition, selectedStart) * deltaTime);
+
+            // The speed in force at the given position: that of the sector it falls in,
+            // except over the run-up at the sector's beginning, where it is on its way
+            // there from the speed of the sector before.
+            float SpeedAt(float position, float sectorStart)
+            {
+                if (easing <= 0)
+                {
+                    return selectedSector.SectorSpeed;
+                }
+
+                // The sector before the one in force is the one eased away from, and the
+                // sector after it bounds how far the run-up may reach.
+                bool previousFound = false;
+                float previousSpeed = 0;
+                float previousStart = 0;
+                bool nextFound = false;
+                float nextStart = 0;
+
+                foreach (SplineSector sector in speedList)
+                {
+                    float start = InPositionUnit(spline, sector.SectorStart, positionUnit);
+                    if (start < sectorStart && (!previousFound || start > previousStart))
+                    {
+                        previousSpeed = sector.SectorSpeed;
+                        previousStart = start;
+                        previousFound = true;
+                    }
+                    else if (start > sectorStart && (!nextFound || start < nextStart))
+                    {
+                        nextStart = start;
+                        nextFound = true;
+                    }
+                }
+
+                if (!previousFound)
+                {
+                    return selectedSector.SectorSpeed;
+                }
+
+                // The end of the run-up is converted as a position rather than scaled as
+                // a length, the unit not being a linear image of the fraction in general.
+                float runUpEnd = InPositionUnit(spline,
+                                                Mathf.Clamp01(selectedSector.SectorStart + easing),
+                                                positionUnit);
+                if (nextFound && runUpEnd > nextStart)
+                {
+                    runUpEnd = nextStart;
+                }
+
+                if (runUpEnd <= sectorStart || position >= runUpEnd)
+                {
+                    return selectedSector.SectorSpeed;
+                }
+
+                return Mathf.SmoothStep(previousSpeed,
+                                        selectedSector.SectorSpeed,
+                                        (position - sectorStart) / (runUpEnd - sectorStart));
+            }
         }
 
         /// <summary>
@@ -259,6 +339,10 @@ namespace SEE.Cinemachines.Dolly
         void SplineAutoDolly.ISplineAutoDolly.Validate()
         {
             speedList ??= Array.Empty<SplineSector>();
+
+            // A run-up of negative length is no run-up; one longer than the spline is cut
+            // short at the next sector anyway.
+            easing = Mathf.Clamp01(easing);
 
             for (int i = 0; i < speedList.Length; i++)
             {
