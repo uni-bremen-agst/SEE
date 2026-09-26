@@ -340,7 +340,8 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Creates a new Spline, that can be assigned inside Cinemachine-Cameras with SplineDolly component.
+        /// Opens the timeline window on this scene's timeline and locks it there, so that
+        /// selecting another game object does not change what the window shows.
         /// </summary>
         [Button("Open Timeline", ButtonSizes.Small), RuntimeButton(CinemachinesSceneRootActions, "Open Timeline")]
         [ButtonGroup(CinemachinesSceneRootActions)]
