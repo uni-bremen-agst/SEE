@@ -769,16 +769,26 @@ namespace SEE.Cinemachines.Utility
                 return;
             }
 
+            // An entry that says nothing at all came from a backup taken before these were
+            // recorded in pieces, when each was one sentence. A sentence cannot be read back
+            // as the record it became, so the count survives and the content does not. Those
+            // are counted and explained rather than printed as a row of blanks.
+            List<LostReference> readable = lost.Where(Names).ToList();
+            int unreadable = lost.Count - readable.Count;
+
+            System.Text.StringBuilder message = new();
+            if (readable.Count > 0)
+            {
+                message.Append($"{what} referred to {readable.Count} object(s) of the Unity scene, which a "
+                               + "backup cannot hold. They have come back empty and must be named again:\n\n");
+            }
+
             // The console keeps what the dialog does not. One entry for each reference
             // rather than one holding them all: the console lists only the first line of a
             // message, so a single entry would hide the very thing it is kept for. Apart,
             // each can be searched for, and each names and points at the game object that
             // has to be put right, so clicking it selects that object in the hierarchy.
-            System.Text.StringBuilder message = new();
-            message.Append($"{what} referred to {lost.Count} object(s) of the Unity scene, which a backup "
-                           + "cannot hold. They have come back empty and must be named again:\n\n");
-
-            foreach (LostReference reference in lost)
+            foreach (LostReference reference in readable)
             {
                 GameObject owner = OwnerOf(restored, reference.Path);
                 string where = owner != null ? PathOf(owner) : DescribePath(restored, reference.Path);
@@ -792,8 +802,21 @@ namespace SEE.Cinemachines.Utility
                                + $"→ {reference.Target}\n");
             }
 
-            message.Append("\nEach is in the console as well, one line apiece, and will still be there "
-                           + "when this window is gone. Clicking one selects the game object it is about.");
+            if (unreadable > 0)
+            {
+                string note = $"This backup also noted {unreadable} reference(s) that cannot be read: it was "
+                              + "taken by an older version of the framework, which recorded them as prose "
+                              + "rather than in parts. Take the backup again to have them named. Until then, "
+                              + "check the tracking targets and the signal reactions by hand.";
+                Debug.LogWarning($"Cinemachines backup: {note}\n", restored);
+                message.Append(readable.Count > 0 ? $"\n{note}\n" : $"{note}\n");
+            }
+
+            if (readable.Count > 0)
+            {
+                message.Append("\nEach is in the console as well, one line apiece, and will still be there "
+                               + "when this window is gone. Clicking one selects the game object it is about.");
+            }
 
             EditorUtility.DisplayDialog(title, message.ToString(), "Okay");
 
@@ -801,6 +824,19 @@ namespace SEE.Cinemachines.Utility
             {
                 scene.ForgetLostReferences();
             }
+        }
+
+        /// <summary>
+        /// Whether <paramref name="reference"/> says anything, which one read back from an
+        /// older backup does not.
+        /// </summary>
+        /// <param name="reference">The recorded reference.</param>
+        /// <returns>True if it names a component, a property or a target.</returns>
+        private static bool Names(LostReference reference)
+        {
+            return !String.IsNullOrEmpty(reference.Component)
+                   || !String.IsNullOrEmpty(reference.Property)
+                   || !String.IsNullOrEmpty(reference.Target);
         }
 
         /// <summary>
