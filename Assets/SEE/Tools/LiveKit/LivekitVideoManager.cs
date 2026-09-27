@@ -14,6 +14,7 @@ using SEE.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
@@ -282,6 +283,7 @@ namespace SEE.Tools.LiveKit
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{UserSetting.BackendServerAPI}" +
                 $"server/livekitToken?id={Network.ServerId}";
+            Net.Util.Logger.Log($"Try Connecting to Livekit server at: {uri}");
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
             await www.SendWebRequest();
@@ -338,7 +340,7 @@ namespace SEE.Tools.LiveKit
             };
 
             RoomOptions options = new();
-
+            Net.Util.Logger.Log($"Try connect to livekit server at: {UserSetting.Instance.Video.LiveKitUrl}");
             // Attempt to connect to the room using the LiveKit server URL and the provided token.;
             ConnectInstruction connect = room.Connect(UserSetting.Instance.Video.LiveKitUrl, token, options);
             float elapsed = 0f;
@@ -485,15 +487,20 @@ namespace SEE.Tools.LiveKit
         {
             Debug.Log("Publishing microphone using Unity Audio");
             GameObject microphoneObject = new GameObject("my-audio-source");
-            var rtcSource = new MicrophoneSource(Microphone.devices[0], microphoneObject);
-            publishedAudioTrack = LocalAudioTrack.CreateAudioTrack("my-audio-track", rtcSource, room);
+            string microphone = UnityEngine.Microphone.devices.FirstOrDefault(x => x == UserSetting.Instance.Audio.Microphone.MicrophoneDevice) ?? UnityEngine.Microphone.devices[0];
+            MicrophoneSource rtcSource = new MicrophoneSource(microphone, microphoneObject);
+            publishedAudioTrack = LocalAudioTrack.CreateAudioTrack($"{UserSetting.Instance.Player.PlayerName}-audio-track", rtcSource, room);
 
-            var options = new TrackPublishOptions();
-            options.AudioEncoding = new AudioEncoding();
-            options.AudioEncoding.MaxBitrate = 64000;
-            options.Source = TrackSource.SourceMicrophone;
+            TrackPublishOptions options = new TrackPublishOptions
+            {
+                AudioEncoding = new AudioEncoding
+                {
+                    MaxBitrate = UserSetting.Instance.Audio.Microphone.MaxBitrate
+                },
+                Source = TrackSource.SourceMicrophone
+            };
 
-            var publish = room.LocalParticipant.PublishTrack(publishedAudioTrack, options);
+            PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(publishedAudioTrack, options);
             yield return publish;
 
             if (!publish.IsError)
@@ -589,7 +596,7 @@ namespace SEE.Tools.LiveKit
         {
             if (track is RemoteVideoTrack videoTrack)
             {
-                Debug.Log("[LiveKit] TrackSubscribed for " + participant.Identity);
+                Debug.Log("[LiveKit] Video TrackSubscribed for " + participant.Identity);
 
                 // Retrieve the LiveKitVideo instance from the registry
                 ulong clientId = ParseIdentity(participant);
@@ -619,6 +626,7 @@ namespace SEE.Tools.LiveKit
             }
             else if (track is RemoteAudioTrack audioTrack)
             {
+                Debug.Log("[LiveKit] Audio TrackSubscribed for " + participant.Identity);
                 GameObject audioOutputObject = new GameObject(audioTrack.Sid);
                 var source = audioOutputObject.AddComponent<AudioSource>();
                 var stream = new AudioStream(audioTrack, source);

@@ -1,6 +1,7 @@
 ﻿using SEE.UI;
 using SEE.Utils.Config;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.UserSettings
 {
@@ -35,6 +36,11 @@ namespace SEE.UserSettings
         /// </summary>
         public bool RemoteSoundEffectsMuted = false;
 
+        /// <summary>
+        /// Stores the microphone settings.
+        /// </summary>
+        public Microphone Microphone;
+
         #region Configuration I/O
         /// <summary>
         /// Label of attribute <see cref="MusicVolume"/> in the configuration file.
@@ -62,6 +68,11 @@ namespace SEE.UserSettings
         private const string remoteSoundEffectsMutedLabel = "remoteSoundEffectsMuted";
 
         /// <summary>
+        /// Label of the attribute <see cref="Microphone"/> in the configuration file.
+        /// </summary>
+        private const string microphoneLabel = "microphone";
+
+        /// <summary>
         /// Saves the settings of this <see cref="Video"/> using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The writer to be used to save the settings.</param>
@@ -74,6 +85,7 @@ namespace SEE.UserSettings
             writer.Save(MusicMuted, musicMutedLabel);
             writer.Save(SoundEffectsMuted, soundEffectsMutedLabel);
             writer.Save(RemoteSoundEffectsMuted, remoteSoundEffectsMutedLabel);
+            Microphone.Save(writer, microphoneLabel);
             writer.EndGroup();
         }
 
@@ -93,6 +105,7 @@ namespace SEE.UserSettings
                 ConfigIO.Restore(values, musicMutedLabel, ref MusicMuted);
                 ConfigIO.Restore(values, soundEffectsMutedLabel, ref SoundEffectsMuted);
                 ConfigIO.Restore(values, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
+                ConfigIO.Restore(values, microphoneLabel, ref Microphone);
             }
         }
         #endregion

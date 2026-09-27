@@ -88,6 +88,8 @@ namespace SEE.UI
         /// </summary>
         private Toggle remoteSfxToggle;
 
+        private Dropdown microphoneDropdown;
+
         /// <summary>
         /// The slider that allows to change the sound effect volume.
         /// </summary>
@@ -428,6 +430,8 @@ namespace SEE.UI
             sfxVolumeSlider = settingsMenuGameObject.FindDescendant("SFXVolumeSlider").MustGetComponent<Slider>();
             remoteSfxToggle = settingsMenuGameObject.FindDescendant("RemoteSFXToggle").MustGetComponent<Toggle>();
 
+            microphoneDropdown = settingsMenuGameObject.FindDescendant("MicrophoneSelectDropdown").MustGetComponent<Dropdown>();
+
             audioManager = AudioManagerImpl.Instance();
             musicVolumeSlider.value = audioManager.MusicVolume;
             musicVolumeSlider.interactable = !audioManager.MusicMuted;
@@ -437,6 +441,16 @@ namespace SEE.UI
             sfxToggle.isOn = !audioManager.SoundEffectsMuted;
             remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
             remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+
+            foreach (string mic in UnityEngine.Microphone.devices)
+            {
+                microphoneDropdown.options.Add(new Dropdown.OptionData(mic));
+            }
+
+            microphoneDropdown.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.MicrophoneDevice = UnityEngine.Microphone.devices[value];
+            });
 
             sfxVolumeSlider.onValueChanged.AddListener((value) =>
             {
