@@ -209,6 +209,18 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
+        /// Records <paramref name="lost"/> as the references that could not be stored.
+        /// </summary>
+        /// <remarks>For a backup of a whole root, whose losses are gathered once over the
+        /// root and set down on one of its scenes, so that the restore has one report to
+        /// make rather than one for each scene.</remarks>
+        /// <param name="lost">Descriptions of the references that were dropped.</param>
+        internal void RememberLostReferences(IEnumerable<string> lost)
+        {
+            lostReferences = new List<string>(lost);
+        }
+
+        /// <summary>
         /// Deletes this CinemachineScene from the scenes.
         /// </summary>
         [Button("Delete Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Delete Scene")]

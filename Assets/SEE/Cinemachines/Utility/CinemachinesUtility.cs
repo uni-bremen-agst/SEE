@@ -21,6 +21,12 @@ namespace SEE.Cinemachines.Utility
         #region Constant String names
         internal const string CinemachinesBrainsName = "CinemachinesBrains";
         internal const string CinemachinesScenesName = "Scenes";
+
+        /// <summary>
+        /// Name of the folder under <see cref="CinemachinesPrefabsRoot"/> holding the backups
+        /// of whole Cinemachines roots, as distinct from the backups of single scenes.
+        /// </summary>
+        internal const string CinemachinesRootsName = "Roots";
         internal const string CinemachinesControlCameraName = "ControlCamera";
         internal const string CinemachinesMainOutputName = "CinemachinesMainOutput.renderTexture";
         internal const string CinemachinesPIPOutputName = "CinemachinesPIPOutput.renderTexture";
@@ -103,6 +109,112 @@ namespace SEE.Cinemachines.Utility
         }
 
         /// <summary>
+        /// Menu entry bringing back a Cinemachines root stored earlier with
+        /// <c>Backup Cinemachines Root</c>, with everything that was under it.
+        /// </summary>
+        /// <remarks>Not a button on the root, there being no root to put one on when this is
+        /// wanted. It refuses where the Unity scene already holds a root, only one being
+        /// supported, rather than adding a second and disabling one of them.</remarks>
+        [MenuItem("SEE/Cinemachines/Add Cinemachines Root from Backup", false, 11)]
+        internal static void AddCinemachinesRootFromBackup()
+        {
+            const string title = "Add Cinemachines Root from Backup";
+
+            if (GetCinemachinesRootInScene() != null)
+            {
+                EditorUtility.DisplayDialog(title,
+                                            "This Unity scene already has a Cinemachines root, and only one is "
+                                            + "supported.\n\nRemove it first if you mean to replace it: select it "
+                                            + "in the hierarchy and delete it. That leaves the timelines and "
+                                            + "signals in the project untouched, which Delete Scene and Reset "
+                                            + "Cinemachines would not.",
+                                            "Okay");
+                return;
+            }
+
+            string folder = $"{CinemachinesPrefabsRoot}/{CinemachinesRootsName}";
+            if (!AssetDatabase.IsValidFolder(folder)
+                || AssetDatabase.FindAssets("t:Prefab", new[] { folder }).Length == 0)
+            {
+                EditorUtility.DisplayDialog(title,
+                                            "No Cinemachines root has been backed up.\n\n"
+                                            + "Press Backup Cinemachines Root on a root to store it, with its "
+                                            + $"brains, its control camera and all of its scenes. It is kept under "
+                                            + $"{folder} until you delete it.",
+                                            "Okay");
+                return;
+            }
+
+            string chosen = EditorUtility.OpenFilePanel("Choose a stored Cinemachines root",
+                                                        folder, "prefab");
+            if (String.IsNullOrEmpty(chosen))
+            {
+                return;
+            }
+
+            string assetPath = ToAssetPath(chosen);
+            if (assetPath == null)
+            {
+                EditorUtility.DisplayDialog(title,
+                                            "That file is outside the project and cannot be loaded.\n\n"
+                                            + $"Stored roots are kept under {folder}.",
+                                            "Okay");
+                return;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            if (prefab == null || prefab.GetComponent<CinemachinesRoot>() == null)
+            {
+                EditorUtility.DisplayDialog(title,
+                                            "That prefab is not a stored Cinemachines root.",
+                                            "Okay");
+                return;
+            }
+
+            GameObject restored = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            if (restored == null)
+            {
+                Debug.LogError($"The stored root {assetPath} could not be instantiated.\n");
+                return;
+            }
+            Undo.RegisterCreatedObjectUndo(restored, title);
+
+            // Detached from the prefab, so that working on the restored root leaves the
+            // backup as it was.
+            PrefabUtility.UnpackPrefabInstance(restored, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            restored.name = CinemachinesRootName;
+
+            // Each scene owns no folder, the backup having forgotten them, so each is given
+            // one of its own here.
+            CinemachinesScene[] scenes = restored.GetComponentsInChildren<CinemachinesScene>(includeInactive: true);
+            foreach (CinemachinesScene scene in scenes)
+            {
+                GenerateSceneStructure(scene.gameObject, scene.gameObject.name);
+            }
+
+            ReportLostReferences(title, "The stored root", scenes);
+
+            Selection.activeGameObject = restored;
+            Debug.Log($"The Cinemachines root has been restored from {assetPath} with {scenes.Length} scene(s).\n",
+                      restored);
+        }
+
+        /// <summary>
+        /// The project-relative path of <paramref name="absolute"/>, or null where that file
+        /// lies outside the project.
+        /// </summary>
+        /// <param name="absolute">An absolute path, as a file dialog returns.</param>
+        /// <returns>The path below <c>Assets</c>, or null.</returns>
+        private static string ToAssetPath(string absolute)
+        {
+            string project = Application.dataPath.Replace('\\', '/');
+            string chosen = absolute.Replace('\\', '/');
+            return chosen.StartsWith(project, StringComparison.OrdinalIgnoreCase)
+                ? "Assets" + chosen.Substring(project.Length)
+                : null;
+        }
+
+        /// <summary>
         /// Helper Function to generate the "Scene Deletion Warning" message,
         /// including the path to the respective folder.
         /// </summary>
@@ -133,10 +245,10 @@ namespace SEE.Cinemachines.Utility
         /// <summary>
         /// Creates the Cinemachines prefab structure.
         /// </summary>
-        internal static void GenerateCinemachinesPrefabFolder()
+        internal static void GenerateCinemachinesPrefabFolder(string leaf = CinemachinesScenesName)
         {
             // If the Directory doesn't exist, create it.
-            if (!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/Scenes"))
+            if (!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/{leaf}"))
             {
                 // Check and create Sub-Directories, if they don't exist
                 if (!AssetDatabase.IsValidFolder("Assets/Resources"))
@@ -154,12 +266,12 @@ namespace SEE.Cinemachines.Utility
                     AssetDatabase.CreateFolder("Assets/Resources/Prefabs", "Cinemachines");
                 }
 
-                if (!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/Scenes"))
+                if (!AssetDatabase.IsValidFolder($"{CinemachinesPrefabsRoot}/{leaf}"))
                 {
-                    AssetDatabase.CreateFolder(CinemachinesPrefabsRoot, "Scenes");
+                    AssetDatabase.CreateFolder(CinemachinesPrefabsRoot, leaf);
                 }
 
-                Debug.Log($"Created Folder Structure: {CinemachinesPrefabsRoot}/Scenes.\n");
+                Debug.Log($"Created Folder Structure: {CinemachinesPrefabsRoot}/{leaf}.\n");
             }
         }
 

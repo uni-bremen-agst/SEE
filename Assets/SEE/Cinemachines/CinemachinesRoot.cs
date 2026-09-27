@@ -264,6 +264,66 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
+        /// Stores this whole root — its brains, its control camera and every scene under it —
+        /// as a prefab, to be brought back later with
+        /// <c>SEE > Cinemachines > Add Cinemachines Root from Backup</c>.
+        /// </summary>
+        /// <remarks>Backing up a single scene carries that scene to another Unity scene.
+        /// This carries the whole piece of filming, which is what is wanted before the root
+        /// is taken out of a Unity scene that is committed without it: the brains and the
+        /// control camera are rebuilt from prefabs by <see cref="AddStructure"/>, so any
+        /// tuning of them is kept by nothing else.</remarks>
+        [Button("Backup Cinemachines Root", ButtonSizes.Small), RuntimeButton(CinemachinesRootMaintenance, "Backup Cinemachines Root")]
+        [ButtonGroup(CinemachinesRootMaintenance)]
+        [PropertyOrder(CinemachinesRootMaintenanceOrderSetupReset), RuntimeGroupOrder(CinemachinesRootMaintenanceOrderSetupReset)]
+        [ShowIf(nameof(isInitialized)), RuntimeShowIf(nameof(isInitialized))]
+        [Tooltip("Stores this root and everything under it as a prefab, to be brought back later from the SEE menu.")]
+        internal void BackupCinemachinesRoot()
+        {
+            CinemachinesUtility.GenerateCinemachinesPrefabFolder(CinemachinesUtility.CinemachinesRootsName);
+
+            string path = $"{CinemachinesUtility.CinemachinesPrefabsRoot}/"
+                          + $"{CinemachinesUtility.CinemachinesRootsName}/"
+                          + $"{SceneManager.GetActiveScene().name} - {gameObject.name}.prefab";
+            path = AssetDatabase.GenerateUniqueAssetPath(path);
+
+            // Taken from the root as it stands: the prefab loses these as it is written and
+            // will not say afterwards which they were.
+            List<string> leaving = CinemachinesUtility.ReferencesLeaving(gameObject);
+
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, path, out bool saved);
+            if (!saved || prefab == null)
+            {
+                Debug.LogError($"Failed to store the Cinemachines root under {path}.\n", gameObject);
+                return;
+            }
+
+            // Every scene in the copy owns no folder: the folders belong to the scenes this
+            // was copied from, and an instance that remembered them would have Delete Scene
+            // destroy the originals. See CinemachinesScene.ForgetSceneFolder.
+            CinemachinesScene[] copies = prefab.GetComponentsInChildren<CinemachinesScene>(includeInactive: true);
+            foreach (CinemachinesScene copy in copies)
+            {
+                copy.ForgetSceneFolder();
+            }
+
+            // The losses are recorded against the first scene, there being one report for
+            // the whole root rather than one for each of its scenes.
+            if (copies.Length > 0)
+            {
+                copies[0].RememberLostReferences(leaving);
+            }
+            else if (leaving.Count > 0)
+            {
+                Debug.LogWarning($"The stored root referred to {leaving.Count} object(s) of the Unity scene, "
+                                 + "which a backup cannot hold:\n  " + String.Join("\n  ", leaving) + "\n", gameObject);
+            }
+
+            PrefabUtility.SavePrefabAsset(prefab);
+            Debug.Log($"The Cinemachines root has been stored under {path}.\n", gameObject);
+        }
+
+        /// <summary>
         /// The Cinemachines scene stored earlier that <see cref="AddSceneFromBackup"/> is to
         /// bring back, named as the prefab holding it is named.
         /// </summary>
