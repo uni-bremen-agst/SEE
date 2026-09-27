@@ -10,14 +10,14 @@ using UnityEngine.TestTools;
 namespace SEE.Cinemachines.Dolly
 {
     /// <summary>
-    /// Tests for <see cref="SimpleSpeedController"/>.
+    /// Tests for <see cref="SpeedProfile"/>.
     /// </summary>
     /// <remarks>The speed at a position is what these tests are really about, but the
     /// controller reports a position rather than a speed. They are one and the same here:
     /// the controller advances the position by the speed times the elapsed time, so asking
     /// it for a step of one second and subtracting where it started gives the speed in
     /// force. That is what <see cref="SpeedAt"/> does.</remarks>
-    internal class TestSimpleSpeedController
+    internal class TestSpeedProfile
     {
         /// <summary>
         /// The distance from the first knot of the test spline to its last, in world units.
@@ -74,7 +74,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestSectorInForceGivesTheSpeed()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0, (0, 1), (0.5f, 3));
 
             Assert.That(SpeedAt(controller, 0.25f), Is.EqualTo(1).Within(tolerance));
             Assert.That(SpeedAt(controller, 0.75f), Is.EqualTo(3).Within(tolerance));
@@ -87,7 +87,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestSpeedChangesAtTheBoundary()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0, (0, 1), (0.5f, 3));
 
             Assert.That(SpeedAt(controller, 0.4999f), Is.EqualTo(1).Within(tolerance));
             Assert.That(SpeedAt(controller, 0.5f), Is.EqualTo(3).Within(tolerance));
@@ -100,7 +100,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestSectorsNeedNotBeOrdered()
         {
-            SimpleSpeedController controller = Controller(0, (0.5f, 3), (0.8f, 5), (0, 1));
+            SpeedProfile controller = Controller(0, (0.5f, 3), (0.8f, 5), (0, 1));
 
             Assert.That(SpeedAt(controller, 0.1f), Is.EqualTo(1).Within(tolerance));
             Assert.That(SpeedAt(controller, 0.6f), Is.EqualTo(3).Within(tolerance));
@@ -123,7 +123,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestBoundariesFollowTheDistanceUnit()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0, (0, 1), (0.5f, 3));
             float length = container.Spline.GetLength();
 
             Assert.That(SpeedAt(controller, 0.25f * length, PathIndexUnit.Distance),
@@ -138,7 +138,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestBoundariesFollowTheKnotUnit()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0, (0, 1), (0.5f, 3));
 
             // The spline has two knots, so its one curve runs from index 0 to index 1 and
             // the boundary at half the spline falls at index 0.5.
@@ -157,7 +157,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestWithoutEasingTheSpeedJumps()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0, (0, 1), (0.5f, 3));
 
             Assert.That(SpeedAt(controller, 0.5f), Is.EqualTo(3).Within(tolerance));
             Assert.That(SpeedAt(controller, 0.6f), Is.EqualTo(3).Within(tolerance));
@@ -170,7 +170,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestEasingGivesTheSectorARunUp()
         {
-            SimpleSpeedController controller = Controller(0.2f, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0.2f, (0, 1), (0.5f, 3));
 
             Assert.That(SpeedAt(controller, 0.4999f), Is.EqualTo(1).Within(tolerance),
                         "Before the boundary nothing has changed.");
@@ -190,7 +190,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestTheRunUpIsMonotone()
         {
-            SimpleSpeedController controller = Controller(0.2f, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0.2f, (0, 1), (0.5f, 3));
             float previous = SpeedAt(controller, 0.5f);
 
             for (int step = 1; step <= 40; step++)
@@ -209,7 +209,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestTheFirstSectorHasNoRunUp()
         {
-            SimpleSpeedController controller = Controller(0.2f, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0.2f, (0, 1), (0.5f, 3));
 
             Assert.That(SpeedAt(controller, 0), Is.EqualTo(1).Within(tolerance));
             Assert.That(SpeedAt(controller, 0.1f), Is.EqualTo(1).Within(tolerance));
@@ -223,7 +223,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestTheRunUpStopsAtTheNextSector()
         {
-            SimpleSpeedController controller = Controller(0.2f, (0, 1), (0.5f, 3), (0.55f, 9));
+            SpeedProfile controller = Controller(0.2f, (0, 1), (0.5f, 3), (0.55f, 9));
 
             Assert.That(SpeedAt(controller, 0.525f), Is.EqualTo(2).Within(tolerance),
                         "The run-up is cut to [0.5, 0.55], so its midpoint is at 0.525.");
@@ -237,7 +237,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestTheChainOfRunUpsIsContinuous()
         {
-            SimpleSpeedController controller = Controller(0.2f, (0, 1), (0.5f, 3), (0.55f, 9));
+            SpeedProfile controller = Controller(0.2f, (0, 1), (0.5f, 3), (0.55f, 9));
             float before = SpeedAt(controller, 0.55f - 1e-4f);
             float after = SpeedAt(controller, 0.55f + 1e-4f);
 
@@ -257,7 +257,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestTimeNotAdvancingMovesNothing()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1));
+            SpeedProfile controller = Controller(0, (0, 1));
 
             Assert.That(Position(controller, 0.25f, PathIndexUnit.Normalized, 0),
                         Is.EqualTo(0.25f).Within(tolerance));
@@ -272,8 +272,8 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestAnEmptyListIsReportedOnce()
         {
-            SimpleSpeedController controller = Controller(0);
-            LogAssert.Expect(LogType.Error, new Regex("The speed list of the simple speed controller is empty"));
+            SpeedProfile controller = Controller(0);
+            LogAssert.Expect(LogType.Error, new Regex("The speed list of the speed profile is empty"));
 
             Assert.That(Position(controller, 0.25f), Is.EqualTo(0.25f).Within(tolerance));
             Assert.That(Position(controller, 0.25f), Is.EqualTo(0.25f).Within(tolerance));
@@ -285,7 +285,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestAMissingSplineIsReportedOnce()
         {
-            SimpleSpeedController controller = Controller(0, (0, 1));
+            SpeedProfile controller = Controller(0, (0, 1));
             LogAssert.Expect(LogType.Error, new Regex("has no spline to work on"));
             SplineAutoDolly.ISplineAutoDolly dolly = controller;
 
@@ -302,9 +302,9 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestAPositionBeforeEverySectorIsReportedOnce()
         {
-            SimpleSpeedController controller = Controller(0, (0.3f, 2));
+            SpeedProfile controller = Controller(0, (0.3f, 2));
             LogAssert.Expect(LogType.Error,
-                             new Regex("No sector of the simple speed controller starts at or before"));
+                             new Regex("No sector of the speed profile starts at or before"));
 
             Assert.That(Position(controller, 0.1f), Is.EqualTo(0.1f).Within(tolerance));
             Assert.That(Position(controller, 0.1f), Is.EqualTo(0.1f).Within(tolerance));
@@ -316,7 +316,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestASectorWithoutSpeedIsReportedOnce()
         {
-            SimpleSpeedController controller = Controller(0, (0, 0));
+            SpeedProfile controller = Controller(0, (0, 0));
             LogAssert.Expect(LogType.Error, new Regex("travels at a speed of"));
 
             Assert.That(Position(controller, 0.25f), Is.EqualTo(0.25f).Within(tolerance));
@@ -339,7 +339,7 @@ namespace SEE.Cinemachines.Dolly
             SplineAutoDolly.ISplineAutoDolly empty = Controller(0);
             Assert.That(() => empty.Validate(), Throws.Nothing, "An empty list must be tolerated.");
 
-            SimpleSpeedController uninitialized = new();
+            SpeedProfile uninitialized = new();
             SetField(uninitialized, "speedList", null);
             Assert.That(() => ((SplineAutoDolly.ISplineAutoDolly)uninitialized).Validate(), Throws.Nothing,
                         "A list that was never given an array must be tolerated.");
@@ -358,14 +358,14 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestValidationClampsWhatItCan()
         {
-            SimpleSpeedController controller = Controller(-3, (-1, 2), (5, 4));
+            SpeedProfile controller = Controller(-3, (-1, 2), (5, 4));
 
             ((SplineAutoDolly.ISplineAutoDolly)controller).Validate();
 
             Assert.That(GetField<float>(controller, "easing"), Is.EqualTo(0).Within(tolerance),
                         "A run-up cannot be shorter than nothing.");
-            SimpleSpeedController.SplineSector[] sectors =
-                GetField<SimpleSpeedController.SplineSector[]>(controller, "speedList");
+            SpeedProfile.SplineSector[] sectors =
+                GetField<SpeedProfile.SplineSector[]>(controller, "speedList");
             Assert.That(sectors[0].SectorStart, Is.EqualTo(0).Within(tolerance));
             Assert.That(sectors[1].SectorStart, Is.EqualTo(1).Within(tolerance));
         }
@@ -376,7 +376,7 @@ namespace SEE.Cinemachines.Dolly
         [Test]
         public void TestValidationLeavesGoodSettingsAlone()
         {
-            SimpleSpeedController controller = Controller(0.25f, (0, 1), (0.5f, 3));
+            SpeedProfile controller = Controller(0.25f, (0, 1), (0.5f, 3));
 
             ((SplineAutoDolly.ISplineAutoDolly)controller).Validate();
 
@@ -395,16 +395,16 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="easing">The value for the controller's easing.</param>
         /// <param name="sectors">The sectors of the speed list, as start and speed.</param>
         /// <returns>The controller.</returns>
-        private static SimpleSpeedController Controller(float easing, params (float Start, float Speed)[] sectors)
+        private static SpeedProfile Controller(float easing, params (float Start, float Speed)[] sectors)
         {
-            SimpleSpeedController.SplineSector[] list = new SimpleSpeedController.SplineSector[sectors.Length];
+            SpeedProfile.SplineSector[] list = new SpeedProfile.SplineSector[sectors.Length];
             for (int i = 0; i < sectors.Length; i++)
             {
                 list[i].SectorStart = sectors[i].Start;
                 list[i].SectorSpeed = sectors[i].Speed;
             }
 
-            SimpleSpeedController controller = new();
+            SpeedProfile controller = new();
             SetField(controller, "speedList", list);
             SetField(controller, "easing", easing);
             return controller;
@@ -418,7 +418,7 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="position">The position on the spline, in <paramref name="unit"/>.</param>
         /// <param name="unit">The unit positions are expressed in.</param>
         /// <returns>The speed in force at <paramref name="position"/>.</returns>
-        private float SpeedAt(SimpleSpeedController controller, float position,
+        private float SpeedAt(SpeedProfile controller, float position,
                               PathIndexUnit unit = PathIndexUnit.Normalized)
         {
             return Position(controller, position, unit) - position;
@@ -432,7 +432,7 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="unit">The unit positions are expressed in.</param>
         /// <param name="deltaTime">The time said to have passed.</param>
         /// <returns>The position the controller asks for.</returns>
-        private float Position(SimpleSpeedController controller, float position,
+        private float Position(SpeedProfile controller, float position,
                                PathIndexUnit unit = PathIndexUnit.Normalized, float deltaTime = 1)
         {
             SplineAutoDolly.ISplineAutoDolly dolly = controller;
@@ -450,7 +450,7 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="controller">The controller whose field is to be set.</param>
         /// <param name="name">The name of the field.</param>
         /// <param name="value">The value to assign.</param>
-        private static void SetField(SimpleSpeedController controller, string name, object value)
+        private static void SetField(SpeedProfile controller, string name, object value)
         {
             Field(name).SetValue(controller, value);
         }
@@ -462,22 +462,22 @@ namespace SEE.Cinemachines.Dolly
         /// <param name="controller">The controller whose field is to be read.</param>
         /// <param name="name">The name of the field.</param>
         /// <returns>The value of the field.</returns>
-        private static T GetField<T>(SimpleSpeedController controller, string name)
+        private static T GetField<T>(SpeedProfile controller, string name)
         {
             return (T)Field(name).GetValue(controller);
         }
 
         /// <summary>
-        /// The private instance field <paramref name="name"/> of <see cref="SimpleSpeedController"/>.
+        /// The private instance field <paramref name="name"/> of <see cref="SpeedProfile"/>.
         /// </summary>
         /// <param name="name">The name of the field.</param>
         /// <returns>The field.</returns>
         private static FieldInfo Field(string name)
         {
-            FieldInfo field = typeof(SimpleSpeedController).GetField(name,
+            FieldInfo field = typeof(SpeedProfile).GetField(name,
                                                                     BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null,
-                        $"{nameof(SimpleSpeedController)} has no field {name}; has it been renamed?");
+                        $"{nameof(SpeedProfile)} has no field {name}; has it been renamed?");
             return field;
         }
 

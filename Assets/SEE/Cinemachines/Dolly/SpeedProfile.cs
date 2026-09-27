@@ -6,21 +6,23 @@ using Unity.Cinemachine;
 namespace SEE.Cinemachines.Dolly
 {
     /// <summary>
-    /// Class for a simple implementation of a speed controller, based on which
-    /// section of the spline the object is.
+    /// An automatic dolly that gives a spline a speed of its own in each of several
+    /// sectors, rather than one speed throughout, so that a single camera on a single
+    /// spline can linger over what is worth seeing and press on over what is not.
     /// </summary>
-    /// <remarks>This class it is selected by hand in the Inspector, from the
+    /// <remarks>This class is selected by hand in the Inspector, from the
     /// "Automatic Dolly" dropdown on a CinemachineSplineDolly or CinemachineSplineCart.
     /// Cinemachine's SplineAutoDollyPropertyDrawer builds that dropdown by reflection
     /// over all non-abstract, non-obsolete ISplineAutoDolly implementations.
-    /// It shows up as "Simple Speed Controller" next to Cinemachine's own "Fixed Speed"
+    /// It shows up as "Speed Profile" next to Cinemachine's own "Fixed Speed"
     /// and "Nearest Point To Target". Picking it would then store it into the scene as
     /// a SerializeReference object.</remarks>
     [Serializable]
-    internal class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
+    internal class SpeedProfile : SplineAutoDolly.ISplineAutoDolly
     {
         /// <summary>
-        /// Structure for storing sector data, specifically start point on a line [0,1), and its speed on that sector.
+        /// One sector of the profile: where along the spline it begins, and the speed
+        /// travelled while it is in force.
         /// </summary>
         [Serializable]
         internal struct SplineSector
@@ -166,7 +168,7 @@ namespace SEE.Cinemachines.Dolly
                 if (!emptyListReported)
                 {
                     emptyListReported = true;
-                    Debug.LogError("The speed list of the simple speed controller is empty, so "
+                    Debug.LogError("The speed list of the speed profile is empty, so "
                                    + "nothing moves. Give it at least one sector, the first of "
                                    + "them starting at 0.\n");
                 }
@@ -180,7 +182,7 @@ namespace SEE.Cinemachines.Dolly
                 if (!noSplineReported)
                 {
                     noSplineReported = true;
-                    Debug.LogError("The simple speed controller has no spline to work on, so "
+                    Debug.LogError("The speed profile has no spline to work on, so "
                                    + "nothing moves. Name one in the Spline property of the "
                                    + "dolly.\n");
                 }
@@ -213,7 +215,7 @@ namespace SEE.Cinemachines.Dolly
                 if (!noSectorReported)
                 {
                     noSectorReported = true;
-                    Debug.LogError($"No sector of the simple speed controller starts at or before "
+                    Debug.LogError($"No sector of the speed profile starts at or before "
                                    + $"{currentPosition}, so nothing moves. Give it a sector "
                                    + "starting at 0.\n");
                 }
@@ -227,7 +229,7 @@ namespace SEE.Cinemachines.Dolly
                 if (!noSpeedReported)
                 {
                     noSpeedReported = true;
-                    Debug.LogError($"The sector of the simple speed controller beginning at "
+                    Debug.LogError($"The sector of the speed profile beginning at "
                                    + $"{selectedSector.SectorStart} travels at a speed of "
                                    + $"{selectedSector.SectorSpeed}, so nothing moves. Give it "
                                    + "a speed greater than zero.\n");
