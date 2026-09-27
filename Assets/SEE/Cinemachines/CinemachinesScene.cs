@@ -293,9 +293,30 @@ namespace SEE.Cinemachines
                 CinemachinesScene copy = prefab.GetComponent<CinemachinesScene>();
                 if (copy != null)
                 {
+                    // Where this scene's assets are, taken before the copy forgets its folder.
+                    string from = String.IsNullOrWhiteSpace(SceneGUID)
+                        ? null
+                        : AssetDatabase.GUIDToAssetPath(SceneGUID);
+
                     if (!String.IsNullOrWhiteSpace(copy.SceneGUID))
                     {
                         copy.ForgetSceneFolder();
+                    }
+
+                    // The timeline and signals are copied in beside the prefab, so that the
+                    // backup stands on its own: deleting this scene afterwards, which takes
+                    // its folder with it, leaves the backup whole.
+                    if (!String.IsNullOrWhiteSpace(from))
+                    {
+                        copy.TryGetComponent(out SignalReceiver receiver);
+                        if (!CinemachinesUtility.CopySceneAssets(from,
+                                                                 CinemachinesUtility.AssetFolderOfBackup(assetPathOfScene),
+                                                                 copy.GetComponent<PlayableDirector>(),
+                                                                 receiver))
+                        {
+                            Debug.LogWarning("The timeline and signals could not be stored with the backup. It "
+                                             + "will go on referring to those of this scene.\n", this);
+                        }
                     }
 
                     // Taken from the scene object rather than from the prefab: the prefab

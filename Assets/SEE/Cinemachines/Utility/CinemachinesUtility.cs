@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
+using UnityEngine.Timeline;
 using SEE.Game;
 
 
@@ -190,6 +193,14 @@ namespace SEE.Cinemachines.Utility
             foreach (CinemachinesScene scene in scenes)
             {
                 GenerateSceneStructure(scene.gameObject, scene.gameObject.name);
+
+                // And its own copy of the timeline and signals, so that the backup is left
+                // as it was and can be restored again.
+                scene.TryGetComponent(out SignalReceiver receiver);
+                CopySceneAssetsInto(AssetFolderOfBackup(assetPath, scene.name),
+                                    scene,
+                                    scene.GetComponent<PlayableDirector>(),
+                                    receiver);
             }
 
             ReportLostReferences(title, "The stored root", scenes);
@@ -364,6 +375,248 @@ namespace SEE.Cinemachines.Utility
             // Sets the new Objects hideFlags to not Save into a build
             newObject.tag = Tags.EditorOnly;
         }
+
+        #region Assets of a scene
+
+        /// <summary>
+        /// Name of the folder holding the signal assets of a Cinemachines scene.
+        /// </summary>
+        internal const string CinemachinesSignalsName = "Signals";
+
+        /// <summary>
+        /// Copies the assets of one Cinemachines scene — its timeline and its signals — from
+        /// <paramref name="fromFolder"/> into <paramref name="toFolder"/> and points
+        /// <paramref name="director"/> at the copies.
+        /// </summary>
+        /// <remarks>This is what makes a backup stand on its own. Without it a stored scene
+        /// refers to the timeline of the scene it was copied from, so deleting that scene
+        /// takes the sequence with it and two restores of one backup drive a single
+        /// timeline.
+        ///
+        /// Three things have to be carried over by hand. Copying a folder does not point the
+        /// copies at each other, so the copied timeline's signal emitters still name the
+        /// original signals. The receiver's reactions are keyed by signal asset and name the
+        /// originals likewise. And a director's bindings are keyed by the track object,
+        /// so the copy's tracks, being other objects, arrive bound to nothing.</remarks>
+        /// <param name="fromFolder">The folder holding the assets to copy.</param>
+        /// <param name="toFolder">The folder to copy them into; created if absent.</param>
+        /// <param name="director">The director to point at the copies.</param>
+        /// <param name="receiver">The receiver whose reactions are to be re-keyed, or null.</param>
+        /// <returns>True if the assets were copied and the director repointed.</returns>
+        internal static bool CopySceneAssets(string fromFolder, string toFolder,
+                                             PlayableDirector director, SignalReceiver receiver)
+        {
+            if (director == null || String.IsNullOrWhiteSpace(fromFolder)
+                || !AssetDatabase.IsValidFolder(fromFolder))
+            {
+                return false;
+            }
+            if (director.playableAsset is not TimelineAsset original)
+            {
+                return false;
+            }
+
+            CreateFolderPath(toFolder);
+
+            // The signals first, the copied timeline being pointed at them afterwards.
+            Dictionary<string, SignalAsset> copiedSignals = new();
+            string fromSignals = $"{fromFolder}/{CinemachinesSignalsName}";
+            if (AssetDatabase.IsValidFolder(fromSignals))
+            {
+                string toSignals = $"{toFolder}/{CinemachinesSignalsName}";
+                CreateFolderPath(toSignals);
+                foreach (string guid in AssetDatabase.FindAssets("t:SignalAsset", new[] { fromSignals }))
+                {
+                    string signalPath = AssetDatabase.GUIDToAssetPath(guid);
+                    string target = $"{toSignals}/{System.IO.Path.GetFileName(signalPath)}";
+                    if (AssetDatabase.CopyAsset(signalPath, target)
+                        && AssetDatabase.LoadAssetAtPath<SignalAsset>(target) is SignalAsset copiedSignal)
+                    {
+                        copiedSignals[copiedSignal.name] = copiedSignal;
+                    }
+                }
+            }
+
+            string timelinePath = AssetDatabase.GetAssetPath(original);
+            string timelineTarget = $"{toFolder}/{System.IO.Path.GetFileName(timelinePath)}";
+            if (!AssetDatabase.CopyAsset(timelinePath, timelineTarget)
+                || AssetDatabase.LoadAssetAtPath<TimelineAsset>(timelineTarget) is not TimelineAsset copy)
+            {
+                Debug.LogError($"The timeline {timelinePath} could not be copied to {timelineTarget}.\n");
+                return false;
+            }
+
+            RebindSignals(copy, receiver, copiedSignals);
+            CarryBindingsOver(director, original, copy);
+
+            director.playableAsset = copy;
+            EditorUtility.SetDirty(copy);
+            EditorUtility.SetDirty(director);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        /// <summary>
+        /// Points the signal emitters of <paramref name="timeline"/>, and the reactions of
+        /// <paramref name="receiver"/>, at the copied signals rather than the originals.
+        /// </summary>
+        /// <param name="timeline">The copied timeline.</param>
+        /// <param name="receiver">The receiver whose reactions are keyed by signal, or null.</param>
+        /// <param name="copiedSignals">The copied signals, by name.</param>
+        private static void RebindSignals(TimelineAsset timeline, SignalReceiver receiver,
+                                          Dictionary<string, SignalAsset> copiedSignals)
+        {
+            if (copiedSignals.Count == 0)
+            {
+                return;
+            }
+
+            foreach (TrackAsset track in TracksOf(timeline))
+            {
+                foreach (IMarker marker in track.GetMarkers())
+                {
+                    if (marker is SignalEmitter emitter && emitter.asset != null
+                        && copiedSignals.TryGetValue(emitter.asset.name, out SignalAsset copied))
+                    {
+                        emitter.asset = copied;
+                    }
+                }
+            }
+
+            if (receiver != null)
+            {
+                for (int i = 0; i < receiver.Count(); i++)
+                {
+                    SignalAsset key = receiver.GetSignalAssetAtIndex(i);
+                    if (key != null && copiedSignals.TryGetValue(key.name, out SignalAsset copied))
+                    {
+                        receiver.ChangeSignalAtIndex(i, copied);
+                    }
+                }
+                EditorUtility.SetDirty(receiver);
+            }
+        }
+
+        /// <summary>
+        /// Gives the tracks of <paramref name="copy"/> the bindings the director held for the
+        /// corresponding tracks of <paramref name="original"/>.
+        /// </summary>
+        /// <remarks>A binding is keyed by the track it belongs to, so a copied timeline, whose
+        /// tracks are different objects, would otherwise arrive bound to nothing at all — no
+        /// brain on its Cinemachine track, no receiver on its signal track. The tracks are
+        /// matched by their position, a copy listing them in the order the original does.</remarks>
+        /// <param name="director">The director holding the bindings.</param>
+        /// <param name="original">The timeline the bindings are keyed against.</param>
+        /// <param name="copy">The copied timeline.</param>
+        private static void CarryBindingsOver(PlayableDirector director, TimelineAsset original, TimelineAsset copy)
+        {
+            List<TrackAsset> before = TracksOf(original).ToList();
+            List<TrackAsset> after = TracksOf(copy).ToList();
+            if (before.Count != after.Count)
+            {
+                Debug.LogWarning($"The copy of {original.name} has {after.Count} tracks where the original has "
+                                 + $"{before.Count}. Bindings are carried over as far as they match.\n");
+            }
+            for (int i = 0; i < Math.Min(before.Count, after.Count); i++)
+            {
+                UnityEngine.Object bound = director.GetGenericBinding(before[i]);
+                if (bound != null)
+                {
+                    director.SetGenericBinding(after[i], bound);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Every track of <paramref name="timeline"/> that can carry clips or markers.
+        /// </summary>
+        /// <param name="timeline">The timeline to look through.</param>
+        /// <returns>The output tracks, and the timeline's own marker track where it has one.</returns>
+        private static List<TrackAsset> TracksOf(TimelineAsset timeline)
+        {
+            List<TrackAsset> tracks = timeline.GetOutputTracks().ToList();
+            if (timeline.markerTrack != null && !tracks.Contains(timeline.markerTrack))
+            {
+                tracks.Add(timeline.markerTrack);
+            }
+            return tracks;
+        }
+
+        /// <summary>
+        /// Creates <paramref name="folder"/> and whatever of its parents is missing.
+        /// </summary>
+        /// <param name="folder">An asset path such as <c>Assets/a/b/c</c>.</param>
+        internal static void CreateFolderPath(string folder)
+        {
+            if (AssetDatabase.IsValidFolder(folder))
+            {
+                return;
+            }
+            string[] parts = folder.Split('/');
+            string walked = parts[0];
+            for (int i = 1; i < parts.Length; i++)
+            {
+                string next = $"{walked}/{parts[i]}";
+                if (!AssetDatabase.IsValidFolder(next))
+                {
+                    AssetDatabase.CreateFolder(walked, parts[i]);
+                }
+                walked = next;
+            }
+        }
+
+        /// <summary>
+        /// Copies the assets stored with a backup into the folder <paramref name="scene"/>
+        /// has just been given, and points <paramref name="director"/> at the copies.
+        /// </summary>
+        /// <remarks>Says so and carries on where the backup has none, which is what a backup
+        /// taken before backups held their own assets looks like, and what one whose source
+        /// scene was deleted before this was written looks like too. The restored scene then
+        /// refers to whatever the prefab referred to, as it always did.</remarks>
+        /// <param name="storedFolder">The folder of assets stored with the backup.</param>
+        /// <param name="scene">The restored scene, already given a folder of its own.</param>
+        /// <param name="director">The director of the restored scene.</param>
+        /// <param name="receiver">The receiver of the restored scene, or null.</param>
+        internal static void CopySceneAssetsInto(string storedFolder, CinemachinesScene scene,
+                                                 PlayableDirector director, SignalReceiver receiver)
+        {
+            if (!AssetDatabase.IsValidFolder(storedFolder))
+            {
+                Debug.LogWarning($"The backup of {scene.name} holds no assets of its own, so the restored scene "
+                                 + "shares the timeline the backup refers to. Editing it will edit that one.\n",
+                                 scene);
+                return;
+            }
+            string into = AssetDatabase.GUIDToAssetPath(scene.SceneGUID);
+            if (String.IsNullOrWhiteSpace(into))
+            {
+                Debug.LogWarning($"{scene.name} has no folder to copy its assets into.\n", scene);
+                return;
+            }
+            if (!CopySceneAssets(storedFolder, into, director, receiver))
+            {
+                Debug.LogWarning($"The assets stored with the backup of {scene.name} could not be copied into "
+                                 + $"{into}.\n", scene);
+            }
+        }
+
+        /// <summary>
+        /// The folder in which the assets of a stored Cinemachines scene are kept, beside the
+        /// prefab holding its game objects.
+        /// </summary>
+        /// <param name="prefabPath">The asset path of the prefab.</param>
+        /// <param name="sceneName">The name of the Cinemachines scene, for a stored root
+        /// holding several; empty for a stored single scene.</param>
+        /// <returns>The folder path.</returns>
+        internal static string AssetFolderOfBackup(string prefabPath, string sceneName = "")
+        {
+            string folder = prefabPath.EndsWith(".prefab")
+                ? prefabPath.Substring(0, prefabPath.Length - ".prefab".Length)
+                : prefabPath;
+            return String.IsNullOrWhiteSpace(sceneName) ? folder : $"{folder}/{sceneName}";
+        }
+
+        #endregion Assets of a scene
 
         #region References a backup cannot keep
 

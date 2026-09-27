@@ -298,6 +298,18 @@ namespace SEE.Cinemachines
                 return;
             }
 
+            // Where the assets of each scene are: known from the live scenes, the copies
+            // being about to forget their folders. Matched by name, the scenes of a root
+            // being named apart.
+            Dictionary<string, string> folders = new();
+            foreach (CinemachinesScene scene in GetComponentsInChildren<CinemachinesScene>(includeInactive: true))
+            {
+                if (!String.IsNullOrWhiteSpace(scene.SceneGUID) && !folders.ContainsKey(scene.name))
+                {
+                    folders[scene.name] = AssetDatabase.GUIDToAssetPath(scene.SceneGUID);
+                }
+            }
+
             // Every scene in the copy owns no folder: the folders belong to the scenes this
             // was copied from, and an instance that remembered them would have Delete Scene
             // destroy the originals. See CinemachinesScene.ForgetSceneFolder.
@@ -305,6 +317,23 @@ namespace SEE.Cinemachines
             foreach (CinemachinesScene copy in copies)
             {
                 copy.ForgetSceneFolder();
+
+                // The timeline and signals are copied in beside the prefab, so that the
+                // backup stands on its own and deleting the scene it was made from takes
+                // nothing of it away.
+                if (folders.TryGetValue(copy.name, out string from))
+                {
+                    copy.TryGetComponent(out SignalReceiver receiver);
+                    if (!CinemachinesUtility.CopySceneAssets(from,
+                                                             CinemachinesUtility.AssetFolderOfBackup(path, copy.name),
+                                                             copy.GetComponent<PlayableDirector>(),
+                                                             receiver))
+                    {
+                        Debug.LogWarning($"The assets of {copy.name} could not be stored with the backup. It "
+                                         + "will go on referring to the timeline of the scene it was made from.\n",
+                                         gameObject);
+                    }
+                }
             }
 
             // The losses are recorded against the first scene, there being one report for
@@ -416,6 +445,16 @@ namespace SEE.Cinemachines
                 // A folder of its own, the backup owning none: see CinemachinesScene.ForgetSceneFolder.
                 CreateCinemachineFolderStructure();
                 CinemachinesUtility.GenerateSceneStructure(restored, restored.name);
+
+                // Its own copy of the timeline and signals too, so that working on the
+                // restored scene leaves the backup as it was and two restores of one backup
+                // do not drive a single timeline.
+                restored.TryGetComponent(out SignalReceiver receiver);
+                CinemachinesUtility.CopySceneAssetsInto(CinemachinesUtility.AssetFolderOfBackup(PathOfBackup(backup)),
+                                                        scene,
+                                                        restored.GetComponent<PlayableDirector>(),
+                                                        receiver);
+
                 CinemachinesUtility.ReportLostReferences("Add Scene from Backup",
                                                          restored.name,
                                                          new[] { scene });
