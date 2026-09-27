@@ -289,7 +289,7 @@ namespace SEE.Cinemachines
 
             // Taken from the root as it stands: the prefab loses these as it is written and
             // will not say afterwards which they were.
-            List<string> leaving = CinemachinesUtility.ReferencesLeaving(gameObject);
+            List<CinemachinesUtility.LostReference> leaving = CinemachinesUtility.ReferencesLeaving(gameObject);
 
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, path, out bool saved);
             if (!saved || prefab == null)
@@ -346,10 +346,12 @@ namespace SEE.Cinemachines
             {
                 // No scene to write them down on, so they are said now and not again. One
                 // entry each, the console listing only the first line of a message.
-                foreach (string reference in leaving)
+                foreach (CinemachinesUtility.LostReference reference in leaving)
                 {
-                    Debug.LogWarning("Cinemachines backup: this reference cannot be stored and will have to "
-                                     + $"be named again after restoring — {reference}\n", gameObject);
+                    Debug.LogWarning($"Cinemachines backup: {gameObject.name}/{reference.Path} will lose the "
+                                     + $"{reference.Property} of its {reference.Component}, which names "
+                                     + $"\"{reference.Target}\". It will have to be named again after "
+                                     + "restoring.\n", gameObject);
                 }
             }
 
@@ -462,6 +464,7 @@ namespace SEE.Cinemachines
 
                 CinemachinesUtility.ReportLostReferences("Add Scene from Backup",
                                                          restored.name,
+                                                         restored,
                                                          new[] { scene });
             }
 

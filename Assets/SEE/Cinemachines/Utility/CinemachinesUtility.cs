@@ -203,7 +203,7 @@ namespace SEE.Cinemachines.Utility
                                     receiver);
             }
 
-            ReportLostReferences(title, "The stored root", scenes);
+            ReportLostReferences(title, "The stored root", restored, scenes);
 
             Selection.activeGameObject = restored;
             Debug.Log($"The Cinemachines root has been restored from {assetPath} with {scenes.Length} scene(s).\n",
@@ -629,9 +629,9 @@ namespace SEE.Cinemachines.Utility
         /// <param name="stored">The scene object about to be stored.</param>
         /// <returns>One line for each, naming where it sits, which property holds it, and
         /// what it referred to.</returns>
-        internal static List<string> ReferencesLeaving(GameObject stored)
+        internal static List<LostReference> ReferencesLeaving(GameObject stored)
         {
-            List<string> leaving = new();
+            List<LostReference> leaving = new();
 
             foreach (Component component in stored.GetComponentsInChildren<Component>(includeInactive: true))
             {
@@ -656,8 +656,13 @@ namespace SEE.Cinemachines.Utility
                         && !EditorUtility.IsPersistent(referenced)
                         && !IsWithin(stored, referenced))
                     {
-                        leaving.Add($"{PathWithin(stored, component.transform)} · "
-                                    + $"{component.GetType().Name}.{property.displayName} → {referenced.name}");
+                        leaving.Add(new LostReference
+                        {
+                            Path = PathWithin(stored, component.transform),
+                            Component = component.GetType().Name,
+                            Property = property.displayName,
+                            Target = referenced.name
+                        });
                     }
                 }
             }
@@ -691,13 +696,51 @@ namespace SEE.Cinemachines.Utility
         /// <returns>The names from <paramref name="stored"/> down, separated by slashes.</returns>
         private static string PathWithin(GameObject stored, Transform transform)
         {
+            if (transform == stored.transform)
+            {
+                return "";
+            }
             string path = transform.name;
-            while (transform != stored.transform && transform.parent != null)
+            while (transform.parent != null && transform.parent != stored.transform)
             {
                 transform = transform.parent;
                 path = $"{transform.name}/{path}";
             }
             return path;
+        }
+
+        /// <summary>
+        /// One reference that a backup could not keep: which game object held it, which
+        /// property of which component, and what it named.
+        /// </summary>
+        /// <remarks>Kept in pieces rather than as a sentence so that the game object can be
+        /// found again when the backup is brought back. What has to be put right is a
+        /// camera or a receiver somewhere below the restored object, and saying only which
+        /// scene it belongs to leaves the reader to search for it.</remarks>
+        [Serializable]
+        internal struct LostReference
+        {
+            /// <summary>
+            /// The path of the game object that held the reference, below the object that
+            /// was stored, in the form <see cref="Transform.Find"/> takes. Empty where the
+            /// stored object itself held it.
+            /// </summary>
+            public string Path;
+
+            /// <summary>
+            /// The name of the type of component that held the reference.
+            /// </summary>
+            public string Component;
+
+            /// <summary>
+            /// The name of the property that held the reference, as the inspector shows it.
+            /// </summary>
+            public string Property;
+
+            /// <summary>
+            /// The name of the object that was referred to.
+            /// </summary>
+            public string Target;
         }
 
         /// <summary>
@@ -707,18 +750,16 @@ namespace SEE.Cinemachines.Utility
         /// <param name="title">The title of the dialog, naming the operation reporting.</param>
         /// <param name="what">What was brought back, named for the reader.</param>
         /// <param name="scenes">The restored Cinemachines scenes.</param>
-        internal static void ReportLostReferences(string title, string what, IEnumerable<CinemachinesScene> scenes)
+        internal static void ReportLostReferences(string title, string what, GameObject restored,
+                                                  IEnumerable<CinemachinesScene> scenes)
         {
-            List<(CinemachinesScene Scene, string Reference)> lost = new();
+            List<LostReference> lost = new();
             List<CinemachinesScene> reported = new();
             foreach (CinemachinesScene scene in scenes)
             {
                 if (scene != null && scene.LostReferences.Count > 0)
                 {
-                    foreach (string reference in scene.LostReferences)
-                    {
-                        lost.Add((scene, reference));
-                    }
+                    lost.AddRange(scene.LostReferences);
                     reported.Add(scene);
                 }
             }
@@ -731,23 +772,28 @@ namespace SEE.Cinemachines.Utility
             // The console keeps what the dialog does not. One entry for each reference
             // rather than one holding them all: the console lists only the first line of a
             // message, so a single entry would hide the very thing it is kept for. Apart,
-            // each can be searched for, and each points at the scene it belongs to, so
-            // clicking it selects that scene in the hierarchy.
-            foreach ((CinemachinesScene scene, string reference) in lost)
-            {
-                Debug.LogWarning("Cinemachines backup: this reference was not kept and has to be named "
-                                 + $"again — {scene.name}: {reference}\n", scene);
-            }
-
+            // each can be searched for, and each names and points at the game object that
+            // has to be put right, so clicking it selects that object in the hierarchy.
             System.Text.StringBuilder message = new();
             message.Append($"{what} referred to {lost.Count} object(s) of the Unity scene, which a backup "
                            + "cannot hold. They have come back empty and must be named again:\n\n");
-            foreach ((CinemachinesScene scene, string reference) in lost)
+
+            foreach (LostReference reference in lost)
             {
-                message.Append($"  {scene.name}: {reference}\n");
+                GameObject owner = OwnerOf(restored, reference.Path);
+                string where = owner != null ? PathOf(owner) : DescribePath(restored, reference.Path);
+
+                Debug.LogWarning($"Cinemachines backup: {where} has lost the {reference.Property} of its "
+                                 + $"{reference.Component}, which named \"{reference.Target}\". "
+                                 + "Name it again.\n",
+                                 owner != null ? owner : restored);
+
+                message.Append($"  {where}\n      {reference.Component}.{reference.Property} "
+                               + $"→ {reference.Target}\n");
             }
+
             message.Append("\nEach is in the console as well, one line apiece, and will still be there "
-                           + "when this window is gone. Clicking one selects the scene it belongs to.");
+                           + "when this window is gone. Clicking one selects the game object it is about.");
 
             EditorUtility.DisplayDialog(title, message.ToString(), "Okay");
 
@@ -755,6 +801,58 @@ namespace SEE.Cinemachines.Utility
             {
                 scene.ForgetLostReferences();
             }
+        }
+
+        /// <summary>
+        /// The game object at <paramref name="path"/> below <paramref name="restored"/>, or
+        /// null where there is none.
+        /// </summary>
+        /// <param name="restored">The object that was stored, now brought back.</param>
+        /// <param name="path">The path recorded when the reference was lost.</param>
+        /// <returns>The game object that held the reference, or null.</returns>
+        private static GameObject OwnerOf(GameObject restored, string path)
+        {
+            if (restored == null)
+            {
+                return null;
+            }
+            if (String.IsNullOrEmpty(path))
+            {
+                return restored;
+            }
+            Transform found = restored.transform.Find(path);
+            return found != null ? found.gameObject : null;
+        }
+
+        /// <summary>
+        /// The path of <paramref name="gameObject"/> from the root of its Unity scene, as the
+        /// hierarchy shows it.
+        /// </summary>
+        /// <param name="gameObject">The object to name.</param>
+        /// <returns>The names of it and its ancestors, separated by slashes.</returns>
+        private static string PathOf(GameObject gameObject)
+        {
+            string path = gameObject.name;
+            for (Transform parent = gameObject.transform.parent; parent != null; parent = parent.parent)
+            {
+                path = $"{parent.name}/{path}";
+            }
+            return path;
+        }
+
+        /// <summary>
+        /// What to call a game object that was recorded but cannot be found again, which is
+        /// what a renamed or deleted one comes to.
+        /// </summary>
+        /// <param name="restored">The object that was stored, now brought back.</param>
+        /// <param name="path">The path recorded when the reference was lost.</param>
+        /// <returns>The path as it was recorded, marked as no longer findable.</returns>
+        private static string DescribePath(GameObject restored, string path)
+        {
+            string under = restored != null ? PathOf(restored) : "the restored object";
+            return String.IsNullOrEmpty(path)
+                ? $"{under} (not found)"
+                : $"{under}/{path} (not found)";
         }
 
         #endregion References a backup cannot keep

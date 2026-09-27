@@ -193,12 +193,12 @@ namespace SEE.Cinemachines
         /// one that was never set, which is why what is about to be lost is written down
         /// while it is still known.</remarks>
         [SerializeField, HideInInspector]
-        private List<string> lostReferences = new();
+        private List<CinemachinesUtility.LostReference> lostReferences = new();
 
         /// <summary>
         /// The references that could not be stored when this scene was backed up.
         /// </summary>
-        internal IReadOnlyList<string> LostReferences => lostReferences;
+        internal IReadOnlyList<CinemachinesUtility.LostReference> LostReferences => lostReferences;
 
         /// <summary>
         /// Forgets <see cref="LostReferences"/>, once they have been reported.
@@ -215,9 +215,9 @@ namespace SEE.Cinemachines
         /// root and set down on one of its scenes, so that the restore has one report to
         /// make rather than one for each scene.</remarks>
         /// <param name="lost">Descriptions of the references that were dropped.</param>
-        internal void RememberLostReferences(IEnumerable<string> lost)
+        internal void RememberLostReferences(IEnumerable<CinemachinesUtility.LostReference> lost)
         {
-            lostReferences = new List<string>(lost);
+            lostReferences = new List<CinemachinesUtility.LostReference>(lost);
         }
 
         /// <summary>
