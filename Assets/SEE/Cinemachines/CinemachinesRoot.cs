@@ -451,7 +451,7 @@ namespace SEE.Cinemachines
             {
                 // A folder of its own, the backup owning none: see CinemachinesScene.ForgetSceneFolder.
                 CreateCinemachineFolderStructure();
-                CinemachinesUtility.GenerateSceneStructure(restored, restored.name);
+                CinemachinesUtility.AdoptOrGenerateSceneStructure(restored, restored.name);
 
                 // Its own copy of the timeline and signals too, so that working on the
                 // restored scene leaves the backup as it was and two restores of one backup

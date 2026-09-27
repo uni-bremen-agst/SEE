@@ -193,7 +193,7 @@ namespace SEE.Cinemachines.Utility
             CinemachinesScene[] scenes = restored.GetComponentsInChildren<CinemachinesScene>(includeInactive: true);
             foreach (CinemachinesScene scene in scenes)
             {
-                GenerateSceneStructure(scene.gameObject, scene.gameObject.name);
+                AdoptOrGenerateSceneStructure(scene.gameObject, scene.gameObject.name);
 
                 // And its own copy of the timeline and signals, so that the backup is left
                 // as it was and can be restored again.
@@ -292,6 +292,81 @@ namespace SEE.Cinemachines.Utility
         /// </summary>
         /// <param name="scene">The Cinemachine scene GameObject.</param>
         /// <param name="sceneName">The name of the Cinemachines scene.</param>
+        /// <summary>
+        /// Gives <paramref name="scene"/> a folder to own: one the project already holds and
+        /// nothing claims, where there is such a one, and a new one otherwise.
+        /// </summary>
+        /// <remarks>For the restores. Creating a folder every time would be tidy only until
+        /// the second restore: a folder is left behind whenever a Cinemachines scene is
+        /// taken out of a Unity scene by deleting the game objects, which is the way of
+        /// clearing a Unity scene this framework recommends, and nothing ever comes back for
+        /// it. Restoring eleven times left eleven folders, ten of them orphaned and all of
+        /// them looking equally like the real one. An orphan of the right name is taken over
+        /// instead, and the assets of the backup are copied into it.</remarks>
+        /// <param name="scene">The game object of the restored Cinemachines scene.</param>
+        /// <param name="sceneName">The name of the Cinemachines scene.</param>
+        internal static void AdoptOrGenerateSceneStructure(GameObject scene, string sceneName)
+        {
+            string adopted = UnclaimedSceneFolder(sceneName);
+            if (adopted != null)
+            {
+                scene.GetComponent<CinemachinesScene>().SceneGUID = adopted;
+                Debug.Log($"{sceneName} has taken over {AssetDatabase.GUIDToAssetPath(adopted)}, which was "
+                          + "left behind by an earlier scene of that name and belonged to nothing.\n", scene);
+            }
+            else
+            {
+                GenerateSceneStructure(scene, sceneName);
+            }
+        }
+
+        /// <summary>
+        /// The GUID of a scene folder of this Unity scene that is named for
+        /// <paramref name="sceneName"/> and that no Cinemachines scene owns.
+        /// </summary>
+        /// <param name="sceneName">The name of the Cinemachines scene.</param>
+        /// <returns>The GUID of such a folder, or null where there is none.</returns>
+        private static string UnclaimedSceneFolder(string sceneName)
+        {
+            string parent = $"{CinemachinesAssetsRoot}/{CinemachinesScenesName}/"
+                            + SceneManager.GetActiveScene().name;
+            if (!AssetDatabase.IsValidFolder(parent))
+            {
+                return null;
+            }
+
+            HashSet<string> claimed = new(
+                UnityEngine.Object.FindObjectsByType<CinemachinesScene>(FindObjectsInactive.Include,
+                                                                       FindObjectsSortMode.None)
+                                  .Select(scene => scene.SceneGUID)
+                                  .Where(guid => !String.IsNullOrWhiteSpace(guid)));
+
+            // The name as given, or the name Unity made unique by counting: "Scene0", then
+            // "Scene0 1". Anything else is another scene's folder however alike it looks.
+            Regex numbered = new("^" + Regex.Escape(sceneName) + @" \d+$");
+            string candidate = null;
+            foreach (string folder in AssetDatabase.GetSubFolders(parent))
+            {
+                string name = System.IO.Path.GetFileName(folder);
+                if (name != sceneName && !numbered.IsMatch(name))
+                {
+                    continue;
+                }
+                string guid = AssetDatabase.AssetPathToGUID(folder);
+                if (claimed.Contains(guid))
+                {
+                    continue;
+                }
+                if (name == sceneName)
+                {
+                    // The plain name is the one it had before, so it is preferred.
+                    return guid;
+                }
+                candidate ??= guid;
+            }
+            return candidate;
+        }
+
         internal static void GenerateSceneStructure(GameObject scene, string sceneName)
         {
             // Add the CinemachinesScenes Component to the newly created scene GameObject
@@ -426,6 +501,15 @@ namespace SEE.Cinemachines.Utility
             {
                 string toSignals = $"{toFolder}/{CinemachinesSignalsName}";
                 CreateFolderPath(toSignals);
+
+                // The folder may have been taken over from a scene that is gone, in which
+                // case it holds that one's signals. What is restored is to be what the
+                // backup holds and nothing besides, so the old ones go first.
+                foreach (string guid in AssetDatabase.FindAssets("t:SignalAsset", new[] { toSignals }))
+                {
+                    AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
+                }
+
                 foreach (string guid in AssetDatabase.FindAssets("t:SignalAsset", new[] { fromSignals }))
                 {
                     string signalPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -440,6 +524,15 @@ namespace SEE.Cinemachines.Utility
 
             string timelinePath = AssetDatabase.GetAssetPath(original);
             string timelineTarget = $"{toFolder}/{System.IO.Path.GetFileName(timelinePath)}";
+
+            // Likewise for a timeline left in a folder that has been taken over; copying
+            // onto an asset that is already there does nothing but fail.
+            if (timelineTarget != timelinePath
+                && AssetDatabase.LoadAssetAtPath<TimelineAsset>(timelineTarget) != null)
+            {
+                AssetDatabase.DeleteAsset(timelineTarget);
+            }
+
             if (!AssetDatabase.CopyAsset(timelinePath, timelineTarget)
                 || AssetDatabase.LoadAssetAtPath<TimelineAsset>(timelineTarget) is not TimelineAsset copy)
             {
