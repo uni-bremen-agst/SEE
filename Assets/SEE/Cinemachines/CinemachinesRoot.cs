@@ -342,10 +342,15 @@ namespace SEE.Cinemachines
             {
                 copies[0].RememberLostReferences(leaving);
             }
-            else if (leaving.Count > 0)
+            else
             {
-                Debug.LogWarning($"The stored root referred to {leaving.Count} object(s) of the Unity scene, "
-                                 + "which a backup cannot hold:\n  " + String.Join("\n  ", leaving) + "\n", gameObject);
+                // No scene to write them down on, so they are said now and not again. One
+                // entry each, the console listing only the first line of a message.
+                foreach (string reference in leaving)
+                {
+                    Debug.LogWarning("Cinemachines backup: this reference cannot be stored and will have to "
+                                     + $"be named again after restoring — {reference}\n", gameObject);
+                }
             }
 
             PrefabUtility.SavePrefabAsset(prefab);

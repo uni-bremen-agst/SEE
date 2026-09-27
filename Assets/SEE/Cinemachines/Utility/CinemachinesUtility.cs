@@ -709,7 +709,7 @@ namespace SEE.Cinemachines.Utility
         /// <param name="scenes">The restored Cinemachines scenes.</param>
         internal static void ReportLostReferences(string title, string what, IEnumerable<CinemachinesScene> scenes)
         {
-            List<string> lost = new();
+            List<(CinemachinesScene Scene, string Reference)> lost = new();
             List<CinemachinesScene> reported = new();
             foreach (CinemachinesScene scene in scenes)
             {
@@ -717,7 +717,7 @@ namespace SEE.Cinemachines.Utility
                 {
                     foreach (string reference in scene.LostReferences)
                     {
-                        lost.Add($"{scene.name}: {reference}");
+                        lost.Add((scene, reference));
                     }
                     reported.Add(scene);
                 }
@@ -728,16 +728,27 @@ namespace SEE.Cinemachines.Utility
                 return;
             }
 
+            // The console keeps what the dialog does not. One entry for each reference
+            // rather than one holding them all: the console lists only the first line of a
+            // message, so a single entry would hide the very thing it is kept for. Apart,
+            // each can be searched for, and each points at the scene it belongs to, so
+            // clicking it selects that scene in the hierarchy.
+            foreach ((CinemachinesScene scene, string reference) in lost)
+            {
+                Debug.LogWarning("Cinemachines backup: this reference was not kept and has to be named "
+                                 + $"again — {scene.name}: {reference}\n", scene);
+            }
+
             System.Text.StringBuilder message = new();
             message.Append($"{what} referred to {lost.Count} object(s) of the Unity scene, which a backup "
                            + "cannot hold. They have come back empty and must be named again:\n\n");
-            foreach (string reference in lost)
+            foreach ((CinemachinesScene scene, string reference) in lost)
             {
-                message.Append($"  {reference}\n");
+                message.Append($"  {scene.name}: {reference}\n");
             }
-            message.Append("\nThe list is also in the console.");
+            message.Append("\nEach is in the console as well, one line apiece, and will still be there "
+                           + "when this window is gone. Clicking one selects the scene it belongs to.");
 
-            Debug.LogWarning(message.ToString());
             EditorUtility.DisplayDialog(title, message.ToString(), "Okay");
 
             foreach (CinemachinesScene scene in reported)
