@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -261,6 +262,151 @@ namespace SEE.Cinemachines
 
             // Open Timeline window with the currently selected scene.
             newScene.GetComponent<CinemachinesScene>().OpenTimelineWindow();
+        }
+
+        /// <summary>
+        /// The Cinemachines scene stored earlier that <see cref="AddSceneFromBackup"/> is to
+        /// bring back, named as the prefab holding it is named.
+        /// </summary>
+        [SerializeField]
+        [LabelText("Backup")]
+        [PropertyOrder(CinemachineSceneConfigOrderCreate + 2), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate + 2)]
+        [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]
+        [ValueDropdown(nameof(Backups))]
+        [Tooltip("A Cinemachines scene stored earlier with Backup Scene.")]
+        private string backup = "";
+
+        /// <summary>
+        /// The names of the Cinemachines scenes stored with <c>Backup Scene</c>.
+        /// </summary>
+        /// <returns>The name of every prefab under the backup folder, without its extension.
+        /// They are unique, the folder being written with a unique path each time.</returns>
+        private static IEnumerable<string> Backups()
+        {
+            string folder = $"{CinemachinesUtility.CinemachinesPrefabsRoot}/{CinemachinesUtility.CinemachinesScenesName}";
+            if (!AssetDatabase.IsValidFolder(folder))
+            {
+                return Enumerable.Empty<string>();
+            }
+            return AssetDatabase.FindAssets("t:Prefab", new[] { folder })
+                                .Select(AssetDatabase.GUIDToAssetPath)
+                                .Select(System.IO.Path.GetFileNameWithoutExtension)
+                                .OrderBy(name => name);
+        }
+
+        /// <summary>
+        /// Brings the Cinemachines scene named by <see cref="backup"/> back into this root,
+        /// and reports the references that could not be brought back with it.
+        /// </summary>
+        /// <remarks>The copy is detached from the prefab, so that working on it does not
+        /// alter the backup, and is given a scene folder of its own. Its timeline is the one
+        /// the backup refers to; where that has been deleted meanwhile, which
+        /// <c>Delete Scene</c> does, the copy arrives without a timeline and says so.</remarks>
+        [Button("Add Scene from Backup", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Add Scene from Backup")]
+        [ButtonGroup(CinemachineSceneConfig)]
+        [PropertyOrder(CinemachineSceneConfigOrderCreate + 3), RuntimeGroupOrder(CinemachineSceneConfigOrderCreate + 3)]
+        [EnableIf(nameof(isInitialized)), RuntimeEnableIf(nameof(isInitialized))]
+        [Tooltip("Brings a Cinemachines scene stored earlier with Backup Scene back into this root.")]
+        internal void AddSceneFromBackup()
+        {
+            List<string> stored = Backups().ToList();
+            if (stored.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Add Scene from Backup",
+                                            "No Cinemachines scene has been backed up.\n\n"
+                                            + "Press Backup Scene on a scene to store it; it is kept as a prefab "
+                                            + "under " + CinemachinesUtility.CinemachinesPrefabsRoot + "/"
+                                            + CinemachinesUtility.CinemachinesScenesName + " until you delete it.",
+                                            "Okay");
+                return;
+            }
+            if (String.IsNullOrWhiteSpace(backup) || !stored.Contains(backup))
+            {
+                EditorUtility.DisplayDialog("Add Scene from Backup",
+                                            "Choose one of the stored scenes in the Backup field first.",
+                                            "Okay");
+                return;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PathOfBackup(backup));
+            if (prefab == null)
+            {
+                Debug.LogError($"The backup {backup} could not be loaded.\n");
+                return;
+            }
+
+            Transform scenes = transform.Find(CinemachinesUtility.CinemachinesScenesName);
+            GameObject restored = PrefabUtility.InstantiatePrefab(prefab, scenes != null ? scenes : transform) as GameObject;
+            if (restored == null)
+            {
+                Debug.LogError($"The backup {backup} could not be instantiated.\n");
+                return;
+            }
+            Undo.RegisterCreatedObjectUndo(restored, "Add Scene from Backup");
+
+            // Detached from the prefab, so that arranging the restored scene leaves the
+            // backup as it was.
+            PrefabUtility.UnpackPrefabInstance(restored, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+            restored.name = prefab.name;
+            restored.tag = Tags.EditorOnly;
+
+            CinemachinesScene scene = restored.GetComponent<CinemachinesScene>();
+            if (scene != null)
+            {
+                // A folder of its own, the backup owning none: see CinemachinesScene.ForgetSceneFolder.
+                CreateCinemachineFolderStructure();
+                CinemachinesUtility.GenerateSceneStructure(restored, restored.name);
+                ReportLostReferences(restored.name, scene);
+            }
+
+            if (restored.TryGetComponent(out PlayableDirector director) && director.playableAsset == null)
+            {
+                Debug.LogWarning($"The backup {backup} has no timeline. It was deleted after the backup was "
+                                 + "taken, which is what Delete Scene does to the timeline and signals of a "
+                                 + "scene. The cameras and splines are here; the sequence is not.\n", restored);
+            }
+
+            Selection.activeGameObject = restored;
+            Debug.Log($"Scene {restored.name} has been restored from its backup.\n", restored);
+        }
+
+        /// <summary>
+        /// The asset path of the backup prefab called <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the backup, without its extension.</param>
+        /// <returns>The path of the prefab.</returns>
+        private static string PathOfBackup(string name)
+        {
+            return $"{CinemachinesUtility.CinemachinesPrefabsRoot}/"
+                   + $"{CinemachinesUtility.CinemachinesScenesName}/{name}.prefab";
+        }
+
+        /// <summary>
+        /// Tells the user which references <paramref name="scene"/> lost when it was stored,
+        /// and then forgets them, they having been reported.
+        /// </summary>
+        /// <param name="name">The name of the restored scene.</param>
+        /// <param name="scene">The restored scene.</param>
+        private static void ReportLostReferences(string name, CinemachinesScene scene)
+        {
+            if (scene.LostReferences.Count == 0)
+            {
+                return;
+            }
+
+            StringBuilder message = new();
+            message.Append($"{name} referred to {scene.LostReferences.Count} object(s) of the Unity scene, "
+                           + "which a backup cannot hold. They have come back empty and must be named again:\n\n");
+            foreach (string lost in scene.LostReferences)
+            {
+                message.Append($"  {lost}\n");
+            }
+            message.Append("\nThe list is also in the console.");
+
+            Debug.LogWarning(message.ToString(), scene);
+            EditorUtility.DisplayDialog("Add Scene from Backup", message.ToString(), "Okay");
+            scene.ForgetLostReferences();
         }
 
         #endregion Scene Creation
