@@ -288,7 +288,7 @@ namespace SEE.Cinemachines
 
                     // Taken from the scene object rather than from the prefab: the prefab
                     // has already lost these, and will not say which they were.
-                    copy.lostReferences = ReferencesLeaving(gameObject);
+                    copy.lostReferences = CinemachinesUtility.ReferencesLeaving(gameObject);
                     PrefabUtility.SavePrefabAsset(prefab);
                 }
 
@@ -298,84 +298,6 @@ namespace SEE.Cinemachines
             {
                 Debug.LogError($"Failed to store scene under {assetPathOfScene}.\n");
             }
-        }
-
-        /// <summary>
-        /// Describes every reference within <paramref name="root"/> that names an object of
-        /// the Unity scene outside it, and which a prefab therefore cannot keep.
-        /// </summary>
-        /// <param name="root">The scene object about to be stored.</param>
-        /// <returns>One line for each, naming where it sits, which property holds it, and
-        /// what it referred to.</returns>
-        private static List<string> ReferencesLeaving(GameObject root)
-        {
-            List<string> leaving = new();
-
-            foreach (Component component in root.GetComponentsInChildren<Component>(includeInactive: true))
-            {
-                if (component == null)
-                {
-                    // A component whose script has gone missing has nothing to read.
-                    continue;
-                }
-
-                using SerializedObject serialized = new(component);
-                SerializedProperty property = serialized.GetIterator();
-                while (property.NextVisible(enterChildren: true))
-                {
-                    if (property.propertyType != SerializedPropertyType.ObjectReference)
-                    {
-                        continue;
-                    }
-                    UnityEngine.Object referenced = property.objectReferenceValue;
-                    // An asset of the project survives in a prefab; only what lives in the
-                    // Unity scene is lost, and only if it lies outside what is being stored.
-                    if (referenced != null
-                        && !EditorUtility.IsPersistent(referenced)
-                        && !IsWithin(root, referenced))
-                    {
-                        leaving.Add($"{PathWithin(root, component.transform)} · "
-                                    + $"{component.GetType().Name}.{property.displayName} → {referenced.name}");
-                    }
-                }
-            }
-
-            return leaving;
-        }
-
-        /// <summary>
-        /// Whether <paramref name="referenced"/> is <paramref name="root"/> or something
-        /// below it.
-        /// </summary>
-        /// <param name="root">The scene object being stored.</param>
-        /// <param name="referenced">The object referred to.</param>
-        /// <returns>True if the reference stays inside what is being stored.</returns>
-        private static bool IsWithin(GameObject root, UnityEngine.Object referenced)
-        {
-            GameObject owner = referenced as GameObject;
-            if (owner == null && referenced is Component component)
-            {
-                owner = component.gameObject;
-            }
-            return owner != null && owner.transform.IsChildOf(root.transform);
-        }
-
-        /// <summary>
-        /// The path of <paramref name="transform"/> below <paramref name="root"/>, so that a
-        /// report names where in the scene the reference sits.
-        /// </summary>
-        /// <param name="root">The scene object being stored.</param>
-        /// <param name="transform">The transform whose path is wanted.</param>
-        /// <returns>The names from <paramref name="root"/> down, separated by slashes.</returns>
-        private static string PathWithin(GameObject root, Transform transform)
-        {
-            string path = transform.name;
-            while (transform != root.transform && transform.parent != null)
-            {
-                transform = transform.parent;
-                path = $"{transform.name}/{path}";
-            }
-            return path;
         }
 
         /// <summary>

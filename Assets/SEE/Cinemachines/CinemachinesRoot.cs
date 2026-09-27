@@ -5,7 +5,6 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -357,7 +356,9 @@ namespace SEE.Cinemachines
                 // A folder of its own, the backup owning none: see CinemachinesScene.ForgetSceneFolder.
                 CreateCinemachineFolderStructure();
                 CinemachinesUtility.GenerateSceneStructure(restored, restored.name);
-                ReportLostReferences(restored.name, scene);
+                CinemachinesUtility.ReportLostReferences("Add Scene from Backup",
+                                                         restored.name,
+                                                         new[] { scene });
             }
 
             if (restored.TryGetComponent(out PlayableDirector director) && director.playableAsset == null)
@@ -380,33 +381,6 @@ namespace SEE.Cinemachines
         {
             return $"{CinemachinesUtility.CinemachinesPrefabsRoot}/"
                    + $"{CinemachinesUtility.CinemachinesScenesName}/{name}.prefab";
-        }
-
-        /// <summary>
-        /// Tells the user which references <paramref name="scene"/> lost when it was stored,
-        /// and then forgets them, they having been reported.
-        /// </summary>
-        /// <param name="name">The name of the restored scene.</param>
-        /// <param name="scene">The restored scene.</param>
-        private static void ReportLostReferences(string name, CinemachinesScene scene)
-        {
-            if (scene.LostReferences.Count == 0)
-            {
-                return;
-            }
-
-            StringBuilder message = new();
-            message.Append($"{name} referred to {scene.LostReferences.Count} object(s) of the Unity scene, "
-                           + "which a backup cannot hold. They have come back empty and must be named again:\n\n");
-            foreach (string lost in scene.LostReferences)
-            {
-                message.Append($"  {lost}\n");
-            }
-            message.Append("\nThe list is also in the console.");
-
-            Debug.LogWarning(message.ToString(), scene);
-            EditorUtility.DisplayDialog("Add Scene from Backup", message.ToString(), "Okay");
-            scene.ForgetLostReferences();
         }
 
         #endregion Scene Creation

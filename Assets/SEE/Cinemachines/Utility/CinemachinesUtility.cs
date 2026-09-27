@@ -253,6 +253,136 @@ namespace SEE.Cinemachines.Utility
             newObject.tag = Tags.EditorOnly;
         }
 
+        #region References a backup cannot keep
+
+        /// <summary>
+        /// Describes every reference within <paramref name="stored"/> that names an object of
+        /// the Unity scene outside it, and which a prefab therefore cannot keep.
+        /// </summary>
+        /// <remarks>Taken before the prefab is written, the prefab having no way to say
+        /// afterwards which of its empty properties once held something.</remarks>
+        /// <param name="stored">The scene object about to be stored.</param>
+        /// <returns>One line for each, naming where it sits, which property holds it, and
+        /// what it referred to.</returns>
+        internal static List<string> ReferencesLeaving(GameObject stored)
+        {
+            List<string> leaving = new();
+
+            foreach (Component component in stored.GetComponentsInChildren<Component>(includeInactive: true))
+            {
+                if (component == null)
+                {
+                    // A component whose script has gone missing has nothing to read.
+                    continue;
+                }
+
+                using SerializedObject serialized = new(component);
+                SerializedProperty property = serialized.GetIterator();
+                while (property.NextVisible(enterChildren: true))
+                {
+                    if (property.propertyType != SerializedPropertyType.ObjectReference)
+                    {
+                        continue;
+                    }
+                    UnityEngine.Object referenced = property.objectReferenceValue;
+                    // An asset of the project survives in a prefab; only what lives in the
+                    // Unity scene is lost, and only if it lies outside what is being stored.
+                    if (referenced != null
+                        && !EditorUtility.IsPersistent(referenced)
+                        && !IsWithin(stored, referenced))
+                    {
+                        leaving.Add($"{PathWithin(stored, component.transform)} · "
+                                    + $"{component.GetType().Name}.{property.displayName} → {referenced.name}");
+                    }
+                }
+            }
+
+            return leaving;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="referenced"/> is <paramref name="stored"/> or something
+        /// below it.
+        /// </summary>
+        /// <param name="stored">The scene object being stored.</param>
+        /// <param name="referenced">The object referred to.</param>
+        /// <returns>True if the reference stays inside what is being stored.</returns>
+        private static bool IsWithin(GameObject stored, UnityEngine.Object referenced)
+        {
+            GameObject owner = referenced as GameObject;
+            if (owner == null && referenced is Component component)
+            {
+                owner = component.gameObject;
+            }
+            return owner != null && owner.transform.IsChildOf(stored.transform);
+        }
+
+        /// <summary>
+        /// The path of <paramref name="transform"/> below <paramref name="stored"/>, so that
+        /// a report names where in the scene the reference sits.
+        /// </summary>
+        /// <param name="stored">The scene object being stored.</param>
+        /// <param name="transform">The transform whose path is wanted.</param>
+        /// <returns>The names from <paramref name="stored"/> down, separated by slashes.</returns>
+        private static string PathWithin(GameObject stored, Transform transform)
+        {
+            string path = transform.name;
+            while (transform != stored.transform && transform.parent != null)
+            {
+                transform = transform.parent;
+                path = $"{transform.name}/{path}";
+            }
+            return path;
+        }
+
+        /// <summary>
+        /// Tells the user which references the given scenes lost when they were stored, and
+        /// then forgets them, they having been reported.
+        /// </summary>
+        /// <param name="title">The title of the dialog, naming the operation reporting.</param>
+        /// <param name="what">What was brought back, named for the reader.</param>
+        /// <param name="scenes">The restored Cinemachines scenes.</param>
+        internal static void ReportLostReferences(string title, string what, IEnumerable<CinemachinesScene> scenes)
+        {
+            List<string> lost = new();
+            List<CinemachinesScene> reported = new();
+            foreach (CinemachinesScene scene in scenes)
+            {
+                if (scene != null && scene.LostReferences.Count > 0)
+                {
+                    foreach (string reference in scene.LostReferences)
+                    {
+                        lost.Add($"{scene.name}: {reference}");
+                    }
+                    reported.Add(scene);
+                }
+            }
+
+            if (lost.Count == 0)
+            {
+                return;
+            }
+
+            System.Text.StringBuilder message = new();
+            message.Append($"{what} referred to {lost.Count} object(s) of the Unity scene, which a backup "
+                           + "cannot hold. They have come back empty and must be named again:\n\n");
+            foreach (string reference in lost)
+            {
+                message.Append($"  {reference}\n");
+            }
+            message.Append("\nThe list is also in the console.");
+
+            Debug.LogWarning(message.ToString());
+            EditorUtility.DisplayDialog(title, message.ToString(), "Okay");
+
+            foreach (CinemachinesScene scene in reported)
+            {
+                scene.ForgetLostReferences();
+            }
+        }
+
+        #endregion References a backup cannot keep
+
         #endif
     }
 }
