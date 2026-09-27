@@ -548,27 +548,32 @@ namespace SEEEditor.Cinemachines.Utility
                 }
 
                 message.Append("\nTo restore one, open the Unity scene it belongs to and select "
-                               + "SEE > Cinemachines > Restore Cinemachines Root.");
+                               + "SEE > Cinemachines > Recover Play-Mode Changes.");
             }
 
             EditorUtility.DisplayDialog("Restoration of Cinemachines", message.ToString(), "Okay");
         }
 
         /// <summary>
-        /// Checker function, to see if current Unity scene has a restorable CinemachinesRoot.
+        /// Whether the current Unity scene has play-mode changes waiting to be recovered,
+        /// which decides whether the menu entry can be chosen.
         /// </summary>
         /// <returns>True, if the current scene has a backup, else false.</returns>
-        [MenuItem("SEE/Cinemachines/Restore Cinemachines Root", true, 10)]
+        [MenuItem("SEE/Cinemachines/Recover Play-Mode Changes", true, 10)]
         private static bool HasUnitySceneBackup()
         {
             return EditorPrefs.HasKey($"{SceneManager.GetActiveScene().name}.{CinemachinesUtility.CinemachinesPersistanceKeyName}");
         }
 
         /// <summary>
-        /// Menu Entry for restoring the CinemachinesRoot at current scene.
+        /// Menu entry putting back the changes made to the Cinemachines root of the current
+        /// Unity scene while the game was running, which leaving play mode discarded.
         /// </summary>
-        [MenuItem("SEE/Cinemachines/Restore Cinemachines Root", false, 10)]
-        internal static void RestoreCinemachinesRoot()
+        /// <remarks>This recovers an afternoon's adjusting in play mode. It is not the way
+        /// to keep a piece of filming: for that, see the Backup Cinemachines Root button of
+        /// the root, whose prefab stays in the project until it is deleted.</remarks>
+        [MenuItem("SEE/Cinemachines/Recover Play-Mode Changes", false, 10)]
+        internal static void RecoverPlayModeChanges()
         {
             // Get current scene's name
             string UnitySceneName = SceneManager.GetActiveScene().name;
