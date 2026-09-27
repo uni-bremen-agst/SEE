@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
@@ -777,29 +778,62 @@ namespace SEE.Cinemachines.Utility
             int unreadable = lost.Count - readable.Count;
 
             System.Text.StringBuilder message = new();
-            if (readable.Count > 0)
-            {
-                message.Append($"{what} referred to {readable.Count} object(s) of the Unity scene, which a "
-                               + "backup cannot hold. They have come back empty and must be named again:\n\n");
-            }
+            System.Text.StringBuilder rows = new();
 
-            // The console keeps what the dialog does not. One entry for each reference
-            // rather than one holding them all: the console lists only the first line of a
-            // message, so a single entry would hide the very thing it is kept for. Apart,
-            // each can be searched for, and each names and points at the game object that
-            // has to be put right, so clicking it selects that object in the hierarchy.
+            // What was recorded is the name of the object referred to, and a name can be
+            // looked up. Where the Unity scene still holds one object of that name, the
+            // reference is simply put back and the reader is told so rather than asked to
+            // do it. Where it does not, or where several objects answer to the name, the
+            // choice is not ours to make and the property is left empty.
+            Dictionary<string, List<GameObject>> byName = ObjectsByName();
+            List<LostReference> unresolved = new();
+            int resolved = 0;
+
             foreach (LostReference reference in readable)
             {
                 GameObject owner = OwnerOf(restored, reference.Path);
                 string where = owner != null ? PathOf(owner) : DescribePath(restored, reference.Path);
 
+                string why = "the game object that held it is no longer there";
+                if (owner != null && TryResolve(owner, reference, byName, out string how, out why))
+                {
+                    resolved++;
+                    Debug.Log($"Cinemachines backup: the {reference.Property} of the {reference.Component} "
+                              + $"on {where} has been found again by name and points at {how}.\n", owner);
+                    continue;
+                }
+
+                unresolved.Add(reference);
+
+                // The console keeps what the dialog does not. One entry for each reference
+                // rather than one holding them all: the console lists only the first line of
+                // a message, so a single entry would hide the very thing it is kept for.
+                // Apart, each can be searched for, and each names and points at the game
+                // object that has to be put right, so clicking it selects that object.
                 Debug.LogWarning($"Cinemachines backup: {where} has lost the {reference.Property} of its "
-                                 + $"{reference.Component}, which named \"{reference.Target}\". "
-                                 + "Name it again.\n",
+                                 + $"{reference.Component}, which named \"{reference.Target}\". It could not "
+                                 + $"be put back because {why}. Name it by hand.\n",
                                  owner != null ? owner : restored);
 
-                message.Append($"  {where}\n      {reference.Component}.{reference.Property} "
-                               + $"→ {reference.Target}\n");
+                rows.Append($"  {where}\n      {reference.Component}.{reference.Property} "
+                            + $"→ {reference.Target}\n         ({why})\n");
+            }
+
+            if (resolved > 0)
+            {
+                message.Append($"{resolved} of the references {what} lost have been found again by name and "
+                               + "put back. They are listed in the console.\n");
+                if (unresolved.Count > 0)
+                {
+                    message.Append('\n');
+                }
+            }
+
+            if (unresolved.Count > 0)
+            {
+                message.Append($"{unresolved.Count} could not be found, nothing of the name recorded being in "
+                               + "the Unity scene, and must be named by hand:\n\n");
+                message.Append(rows);
             }
 
             if (unreadable > 0)
@@ -809,13 +843,14 @@ namespace SEE.Cinemachines.Utility
                               + "rather than in parts. Take the backup again to have them named. Until then, "
                               + "check the tracking targets and the signal reactions by hand.";
                 Debug.LogWarning($"Cinemachines backup: {note}\n", restored);
-                message.Append(readable.Count > 0 ? $"\n{note}\n" : $"{note}\n");
+                message.Append(message.Length > 0 ? $"\n{note}\n" : $"{note}\n");
             }
 
             if (readable.Count > 0)
             {
-                message.Append("\nEach is in the console as well, one line apiece, and will still be there "
-                               + "when this window is gone. Clicking one selects the game object it is about.");
+                message.Append("\nAll of it is in the console as well, one line apiece, and will still be "
+                               + "there when this window is gone. Clicking one selects the game object it is "
+                               + "about.");
             }
 
             EditorUtility.DisplayDialog(title, message.ToString(), "Okay");
@@ -824,6 +859,163 @@ namespace SEE.Cinemachines.Utility
             {
                 scene.ForgetLostReferences();
             }
+        }
+
+        /// <summary>
+        /// Every game object of the loaded Unity scenes, gathered by name.
+        /// </summary>
+        /// <remarks>Gathered once and consulted for each reference: a code city has many
+        /// thousands of objects, and searching it afresh for every lost reference would be
+        /// felt.</remarks>
+        /// <returns>The objects that answer to each name.</returns>
+        private static Dictionary<string, List<GameObject>> ObjectsByName()
+        {
+            Dictionary<string, List<GameObject>> byName = new();
+            foreach (Transform transform in UnityEngine.Object.FindObjectsByType<Transform>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (!byName.TryGetValue(transform.name, out List<GameObject> named))
+                {
+                    named = new List<GameObject>();
+                    byName[transform.name] = named;
+                }
+                named.Add(transform.gameObject);
+            }
+            return byName;
+        }
+
+        /// <summary>
+        /// Puts <paramref name="reference"/> back on <paramref name="owner"/>, where the
+        /// object it named can be found again.
+        /// </summary>
+        /// <remarks>Only where exactly one object answers to the name. Several would be a
+        /// guess, and a guess that looks like a restoration is worse than an empty property,
+        /// which at least says that something is wanted.</remarks>
+        /// <param name="owner">The game object holding the reference.</param>
+        /// <param name="reference">What was lost.</param>
+        /// <param name="byName">The objects of the Unity scene, by name.</param>
+        /// <param name="how">What the reference was pointed at.</param>
+        /// <returns>True if the reference was put back.</returns>
+        private static bool TryResolve(GameObject owner, LostReference reference,
+                                       Dictionary<string, List<GameObject>> byName,
+                                       out string how, out string why)
+        {
+            how = null;
+            why = null;
+
+            if (String.IsNullOrEmpty(reference.Target))
+            {
+                why = "the backup recorded no name for it";
+                return false;
+            }
+            if (!byName.TryGetValue(reference.Target, out List<GameObject> candidates))
+            {
+                why = $"nothing in the Unity scene is called \"{reference.Target}\"";
+                return false;
+            }
+            if (candidates.Count > 1)
+            {
+                why = $"{candidates.Count} objects are called \"{reference.Target}\", so which was meant "
+                      + "cannot be told";
+                return false;
+            }
+
+            Component component = owner.GetComponents<Component>()
+                                       .FirstOrDefault(c => c != null && c.GetType().Name == reference.Component);
+            if (component == null)
+            {
+                why = $"it no longer carries a {reference.Component}";
+                return false;
+            }
+
+            using SerializedObject serialized = new(component);
+            SerializedProperty property = serialized.GetIterator();
+            while (property.NextVisible(enterChildren: true))
+            {
+                if (property.propertyType != SerializedPropertyType.ObjectReference
+                    || property.displayName != reference.Property)
+                {
+                    continue;
+                }
+                if (property.objectReferenceValue != null)
+                {
+                    why = $"its {reference.Property} is not empty, so it has been left as it is";
+                    return false;
+                }
+
+                string expected = ExpectedType(property);
+                UnityEngine.Object target = AsExpected(candidates[0], expected);
+                if (target == null)
+                {
+                    why = $"\"{reference.Target}\" was found but is no {expected}";
+                    return false;
+                }
+                property.objectReferenceValue = target;
+                serialized.ApplyModifiedProperties();
+                how = $"{PathOf(candidates[0])} ({target.GetType().Name})";
+                return true;
+            }
+
+            why = $"its {reference.Component} has no {reference.Property} any more";
+            return false;
+        }
+
+        /// <summary>
+        /// The name of the type <paramref name="property"/> will hold.
+        /// </summary>
+        /// <remarks>Unity reports the type of an object reference as <c>PPtr&lt;$Transform&gt;</c>,
+        /// there being no property giving it plainly.</remarks>
+        /// <param name="property">An object reference property.</param>
+        /// <returns>The type name, or the empty string where it cannot be read.</returns>
+        private static string ExpectedType(SerializedProperty property)
+        {
+            Match match = Regex.Match(property.type ?? "", @"PPtr<\$?(?<type>[^>]+)>");
+            return match.Success ? match.Groups["type"].Value : "";
+        }
+
+        /// <summary>
+        /// The part of <paramref name="candidate"/> that a property expecting
+        /// <paramref name="typeName"/> can hold: the game object itself, its transform, or
+        /// one of its components.
+        /// </summary>
+        /// <param name="candidate">The game object found by name.</param>
+        /// <param name="typeName">The type the property expects.</param>
+        /// <returns>Something assignable to the property, or null.</returns>
+        private static UnityEngine.Object AsExpected(GameObject candidate, string typeName)
+        {
+            if (String.IsNullOrEmpty(typeName) || typeName == "GameObject")
+            {
+                return candidate;
+            }
+            foreach (Component component in candidate.GetComponents<Component>())
+            {
+                if (component != null && IsCalled(component.GetType(), typeName))
+                {
+                    return component;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="type"/> or any type it derives from is called
+        /// <paramref name="typeName"/>.
+        /// </summary>
+        /// <remarks>By name rather than by <see cref="Type"/>, the name being all a backup
+        /// records, and up the hierarchy so that a RectTransform answers for a Transform.</remarks>
+        /// <param name="type">The type to examine.</param>
+        /// <param name="typeName">The name looked for.</param>
+        /// <returns>True where the name is found.</returns>
+        private static bool IsCalled(Type type, string typeName)
+        {
+            for (Type walked = type; walked != null; walked = walked.BaseType)
+            {
+                if (walked.Name == typeName)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
