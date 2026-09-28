@@ -470,6 +470,11 @@ namespace SEE.Tools.EchoFace
             if (headTransform != null)
             {
                 headRestRotation = headTransform.localRotation;
+
+                // Smoothing starts from where the head actually is. Left at the identity
+                // it was given at declaration, the first tracked frame would slerp the
+                // head from an orientation the rig never had.
+                currentHeadRotation = headRestRotation;
                 FindEyeBones(headTransform);
             }
 
@@ -884,7 +889,12 @@ namespace SEE.Tools.EchoFace
             // Clear internal smoothing states and buffered frames
             currentBlendshapeValues.Clear();
             targetBlendshapeValues.Clear();
-            currentHeadRotation = Quaternion.identity;
+            // Back to the rest pose, not to the identity. The eyes' smoothing states are
+            // offsets from their rest rotations and so are identity at rest, but the head's
+            // is the rotation itself: setting it to the identity would have the next frame
+            // without landmarks, which returns this value unchanged, drive the head to an
+            // orientation the rig never had.
+            currentHeadRotation = headRestRotation;
             currentLeftEyeRotation = Quaternion.identity;
             currentRightEyeRotation = Quaternion.identity;
             latestFaceData = null;
