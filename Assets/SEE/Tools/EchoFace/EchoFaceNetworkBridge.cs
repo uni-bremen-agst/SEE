@@ -172,18 +172,41 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
+        /// Netcode lifecycle method, called when this <see cref="NetworkObject"/> despawns.
+        /// Undoes the subscription made in <see cref="OnNetworkSpawn"/>.
+        /// </summary>
+        /// <remarks>Paired with the spawn rather than with destruction, which is where it
+        /// was. An object that despawns and spawns again without being destroyed, as a
+        /// pooled one does, would otherwise run OnNetworkSpawn a second time and subscribe
+        /// a second time, and every tracked frame would then be sent twice.</remarks>
+        public override void OnNetworkDespawn()
+        {
+            Unsubscribe();
+            base.OnNetworkDespawn();
+        }
+
+        /// <summary>
         /// Unity lifecycle method, overriding <see cref="NetworkBehaviour.OnDestroy"/>.
         /// Unsubscribes from <see cref="tracker"/>'s
         /// <see cref="MediaPipeFaceTracker.OnFaceTracked"/> event, if subscribed.
         /// </summary>
         public override void OnDestroy()
         {
+            Unsubscribe();
+            base.OnDestroy();
+        }
+
+        /// <summary>
+        /// Stops listening to <see cref="tracker"/>, if this instance ever started.
+        /// </summary>
+        /// <remarks>Removing a handler that is not subscribed does nothing, so this is
+        /// safe to call from both the despawn and the destruction path.</remarks>
+        private void Unsubscribe()
+        {
             if (tracker != null)
             {
                 tracker.OnFaceTracked -= HandleRawFaceTracked;
             }
-
-            base.OnDestroy();
         }
 
         // --- RPC Methods ---
