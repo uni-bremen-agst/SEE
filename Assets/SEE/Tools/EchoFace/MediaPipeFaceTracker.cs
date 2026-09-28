@@ -80,9 +80,15 @@ namespace SEE.Tools.EchoFace
         private FaceLandmarker faceLandmarker;
 
         /// <summary>
-        /// Measures elapsed time since initialization, used to generate
+        /// Measures elapsed time since the first initialization, used to generate
         /// timestamps for <see cref="FaceLandmarker.DetectAsync"/>.
         /// </summary>
+        /// <remarks>Started once and never reset, so that the timestamps it yields only
+        /// ever increase over the life of this component. They leave the machine: the
+        /// receiving side of <see cref="EchoFaceNetworkBridge"/> discards any frame not
+        /// newer than the last it applied, so a timestamp that began again from zero after
+        /// a re-initialization would put every later frame behind the high-water mark and
+        /// stop the animation for good.</remarks>
         private readonly Stopwatch stopwatch = new();
 
         /// <summary>
@@ -319,7 +325,11 @@ namespace SEE.Tools.EchoFace
             {
                 faceLandmarker = FaceLandmarker.CreateFromOptions(options);
                 textureFrame = new(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
-                stopwatch.Restart();
+
+                // Resumed, not restarted: see the remark on the stopwatch. A new
+                // FaceLandmarker is content to begin at any timestamp, so long as the ones
+                // it is given keep rising.
+                stopwatch.Start();
                 isInitialized = true;
             }
             catch (Exception ex)
