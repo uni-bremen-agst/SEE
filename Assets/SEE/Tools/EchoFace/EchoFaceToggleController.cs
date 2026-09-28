@@ -26,7 +26,7 @@ namespace SEE.Tools.EchoFace
     /// used for conflicting components, since it is a data source rather than
     /// a conflicting animation system.
     /// </summary>
-    internal class EchoFaceController : MonoBehaviour
+    internal class EchoFaceToggleController : MonoBehaviour
     {
         // --- Inspector Fields ---
 
@@ -149,7 +149,7 @@ namespace SEE.Tools.EchoFace
                 echoFace = GetComponent<EchoFace>();
                 if (echoFace == null)
                 {
-                    Debug.LogError("[EchoFaceController] EchoFace not found.\n");
+                    Debug.LogError("[EchoFaceToggleController] EchoFace not found.\n");
                     enabled = false;
                     return;
                 }
@@ -160,7 +160,7 @@ namespace SEE.Tools.EchoFace
                 faceTracker = GetComponent<MediaPipeFaceTracker>();
                 if (faceTracker == null)
                 {
-                    Debug.LogWarning("[EchoFaceController] MediaPipeFaceTracker not found; it will not be toggled together with EchoFace.\n");
+                    Debug.LogWarning("[EchoFaceToggleController] MediaPipeFaceTracker not found; it will not be toggled together with EchoFace.\n");
                 }
             }
 
@@ -319,7 +319,7 @@ namespace SEE.Tools.EchoFace
                 }
                 else
                 {
-                    Debug.LogWarning($"[EchoFaceController] Conflicting component '{targetName}' not found on '{echoFace.gameObject.name}'.\n");
+                    Debug.LogWarning($"[EchoFaceToggleController] Conflicting component '{targetName}' not found on '{echoFace.gameObject.name}'.\n");
                 }
             }
         }
