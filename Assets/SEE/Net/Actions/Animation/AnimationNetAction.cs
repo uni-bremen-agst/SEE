@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Evolution;
-using SEE.GO;
+using SEE.Extensions;
 using System;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace SEE.Net.Actions.Animation
         /// The unique full (hierarchical) name of the gameObject holding an <see cref="AnimationInteraction"/>
         /// component that needs to be triggered.
         /// </summary>
-        public readonly string GameObjectID;
+        public string GameObjectID;
 
         /// <summary>
         /// Constructor.

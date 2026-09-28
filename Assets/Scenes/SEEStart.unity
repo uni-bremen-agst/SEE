@@ -660,7 +660,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 831127263}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eccf4ad3f8d39cc46bd0331d97b4c692, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ffddefd7964be745be7c5cc0be0eb03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   VoiceChat: 1

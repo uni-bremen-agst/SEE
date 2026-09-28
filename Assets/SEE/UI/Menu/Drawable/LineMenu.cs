@@ -1,6 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
+﻿using Michsky.UI.ModernUIPack;
+using SEE.Controls.ReversibleActions.Drawable;
+using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
@@ -790,11 +790,11 @@ namespace SEE.UI.Menu.Drawable
             if (newValueHolder is LineConf lineHolder)
             {
                 rememberedStartCapConf = lineHolder.LineCapStart != null && lineHolder.LineCapStart.CapKind != LineCap.None
-                        ? (LineCapConf)lineHolder.LineCapStart.Clone()
+                        ? lineHolder.LineCapStart.Clone()
                         : null;
 
                 rememberedEndCapConf = lineHolder.LineCapEnd != null && lineHolder.LineCapEnd.CapKind != LineCap.None
-                    ? (LineCapConf)lineHolder.LineCapEnd.Clone()
+                    ? lineHolder.LineCapEnd.Clone()
                     : null;
 
 
@@ -1336,11 +1336,11 @@ namespace SEE.UI.Menu.Drawable
 
             if (isStartCap)
             {
-                rememberedStartCapConf = (LineCapConf)capConf.Clone();
+                rememberedStartCapConf = capConf.Clone();
             }
             else
             {
-                rememberedEndCapConf = (LineCapConf)capConf.Clone();
+                rememberedEndCapConf = capConf.Clone();
             }
         }
 

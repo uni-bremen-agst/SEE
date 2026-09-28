@@ -39,6 +39,13 @@ namespace SEE.GraphProviders
         public bool CombineAuthors = false;
 
         /// <summary>
+        /// If for each file the co-changed files for the commit should be computed.
+        /// Co-changed files are files that are changed in the same commit as other files.
+        /// </summary>
+        [Tooltip("If true, the co-changed files (files that are changed in the same commit as other files.) will be calculated for each file.")]
+        public bool ComputeCoFileChanges = false;
+
+        /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
@@ -75,6 +82,11 @@ namespace SEE.GraphProviders
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
         /// <summary>
+        /// Label of attribute <see cref="ComputeCoFileChanges"/> in the configuration file.
+        /// </summary>
+        private const string computeCoFileChangesLabel = "ComputeCoFileChanges";
+
+        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
@@ -84,6 +96,7 @@ namespace SEE.GraphProviders
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(CombineAuthors, combineAuthorsLabel);
             AuthorAliasMap.Save(writer, authorAliasMapLabel);
+            writer.Save(ComputeCoFileChanges, computeCoFileChangesLabel);
         }
 
         /// <summary>
@@ -96,6 +109,7 @@ namespace SEE.GraphProviders
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
             AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
+            ConfigIO.Restore(attributes, computeCoFileChangesLabel, ref ComputeCoFileChanges);
         }
 
         #endregion Config I/O

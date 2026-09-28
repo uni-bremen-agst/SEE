@@ -1,8 +1,7 @@
-﻿using SEE.Utils.History;
-using SEE.Controls.Actions;
+﻿using SEE.ReversibleActionHistory;
 using System.Collections.Generic;
-using static SEE.Utils.History.ActionHistory;
 using System.Linq;
+using static SEE.ReversibleActionHistory.ActionHistory;
 
 namespace SEE.Net.Actions
 {

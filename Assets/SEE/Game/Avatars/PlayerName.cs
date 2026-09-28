@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.UserSettings;
 
 namespace SEE.Game.Avatars
 {
@@ -48,7 +49,7 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 Log($"{nameof(Start)}() uses GetLocalPlayerName()\n");
-                SetPlayerName(User.UserSettings.Instance.Player.PlayerName);
+                SetPlayerName(UserSetting.Instance.Player.PlayerName);
             }
             else
             {

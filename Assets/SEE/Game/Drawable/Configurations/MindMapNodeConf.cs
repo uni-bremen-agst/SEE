@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -10,13 +10,8 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable line.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
-    /// mechanism as part of a dedicated refactoring. This class currently follows the
-    /// cloning approach used throughout the drawable configuration hierarchy.
-    /// </remarks>
     [Serializable]
-    public class MindMapNodeConf : DrawableType, ICloneable
+    public class MindMapNodeConf : DrawableType
     {
         /// <summary>
         /// The mind map layer of the node.
@@ -112,10 +107,13 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones the mind map node configuration object.
+        /// Returns an independent clone of this mind map node configuration.
+        /// Nested line and text configurations as well as the child collections are copied.
+        /// The <see cref="GameObject"/> instances contained in <see cref="Children"/> are intentionally
+        /// retained by reference because the configuration does not own the corresponding scene objects.
         /// </summary>
-        /// <returns>A copy of this configuration object.</returns>
-        public object Clone()
+        /// <returns>A new <see cref="MindMapNodeConf"/> with the values of this object.</returns>
+        public MindMapNodeConf Clone()
         {
             return new MindMapNodeConf
             {
@@ -129,10 +127,13 @@ namespace SEE.Game.Drawable.Configurations
                 ParentNode = this.ParentNode,
                 BranchLineToParent = this.BranchLineToParent,
                 NodeKind = this.NodeKind,
-                Children = this.Children,
-                childrenNames = this.childrenNames,
-                BorderConf = this.BorderConf,
-                TextConf = this.TextConf
+                Children = this.Children != null
+                    ? new Dictionary<GameObject, GameObject>(this.Children)
+                    : null,
+                childrenNames = new Dictionary<string, string>(this.childrenNames),
+                BorderConf = this.BorderConf?.Clone(),
+                TextConf = this.TextConf?.Clone(),
+                BranchLineConf = this.BranchLineConf?.Clone()
             };
         }
 

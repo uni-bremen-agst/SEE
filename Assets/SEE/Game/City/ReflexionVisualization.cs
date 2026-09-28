@@ -6,10 +6,11 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
 using SEE.UI.Notification;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Components.GameEdges;
 
 namespace SEE.Game.City
 {

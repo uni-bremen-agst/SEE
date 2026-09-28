@@ -3,7 +3,7 @@ using SEE.Utils;
 using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
-using SEE.GO;
+using SEE.Extensions;
 using Michsky.UI.ModernUIPack;
 using System.Linq;
 using System;

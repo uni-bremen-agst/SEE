@@ -1,6 +1,6 @@
 using System;
 using DG.Tweening;
-using SEE.GO;
+using SEE.Components.GameEdges;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;

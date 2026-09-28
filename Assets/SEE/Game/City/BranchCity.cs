@@ -1,10 +1,8 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.GameObjects;
-using SEE.GameObjects.BranchCity;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -15,6 +13,7 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.Game.City
 {
@@ -339,7 +338,7 @@ namespace SEE.Game.City
                 return;
             }
             // Backup old graph
-            Graph oldGraph = LoadedGraph.Clone() as Graph;
+            Graph oldGraph = LoadedGraph.Clone();
             await LoadDataAsync();
             Graph newGraph = LoadedGraph;
             bool edgesAreDrawn = EdgeLayoutSettings.Kind != EdgeLayoutKind.None;

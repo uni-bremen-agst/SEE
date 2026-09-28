@@ -86,8 +86,18 @@ namespace SEE.DataModel.DG
         public Node Target { get; set; }
 
         /// <summary>
+        /// Returns a clone of this edge. The type and attributes are copied, while source
+        /// and target remain references to the original nodes.
+        /// </summary>
+        /// <returns>A clone of this edge.</returns>
+        public new Edge Clone()
+        {
+            return (Edge)base.Clone();
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every
+        /// <see cref="Clone"/> once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         ///
         /// IMPORTANT NOTE: Cloning an edge means only to create deep copies of its

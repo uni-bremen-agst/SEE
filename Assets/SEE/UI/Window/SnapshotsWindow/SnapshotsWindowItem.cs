@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Util;
 using SEE.UI.Notification;
 using SEE.Utils;

@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// The kinds of voice-chats system we support. None means no voice

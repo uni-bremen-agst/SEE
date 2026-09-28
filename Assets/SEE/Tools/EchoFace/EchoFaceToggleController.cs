@@ -1,30 +1,38 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+using SEE.Controls;
+using SEE.Utils;
+using SEE.Controls.KeyActions;
 
 // Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
 {
     /// <summary>
     /// Allows toggling <see cref="EchoFace"/> on and off at runtime via a
-    /// hotkey, resetting all blendshapes and bone rotations to their rest
-    /// pose when disabling it, and shows a short on-screen popup indicating
-    /// the new state.
+    /// key binding and shows a short on-screen popup indicating the new state.
+    /// Starts in the state configured by <see cref="startEnabled"/>. While
+    /// <see cref="EchoFace"/> is active, also disables a configurable list
+    /// of conflicting components (such as SALSA LipSync), restoring them to their
+    /// original enabled state once <see cref="EchoFace"/> is switched off again.
+    /// The <see cref="MediaPipeFaceTracker"/> that supplies <see cref="EchoFace"/>
+    /// with tracking data is instead kept in the same enabled state as
+    /// <see cref="EchoFace"/> itself, rather than the inverted, restored state
+    /// used for conflicting components, since it is a data source rather than
+    /// a conflicting animation system.
     /// </summary>
-    /// <remarks>
-    /// This component creates its own popup UI (a <see cref="Canvas"/>,
-    /// panel, and <see cref="TextMeshProUGUI"/> text) at runtime if none is
-    /// assigned, reusing an existing screen-space-overlay canvas if one is
-    /// found. It is intended to be attached to the same character prefab
-    /// as <see cref="EchoFace"/>, or otherwise assigned a reference to it.
-    /// </remarks>
-    internal class EchoFaceToggleController : MonoBehaviour
+    internal class EchoFaceController : MonoBehaviour
     {
+        // --- Inspector Fields ---
+
         /// <summary>
         /// The <see cref="EchoFace"/> component to toggle. If not assigned
-        /// in the Inspector, the first instance found in the scene via
-        /// <see cref="Object.FindObjectOfType{T}()"/> is used in
+        /// in the Inspector, an attempt is made to auto-resolve it from the same
+        /// <see cref="GameObject"/> via <see cref="Component.GetComponent{T}()"/> in
         /// <see cref="Awake"/>. If none is found, this component disables itself.
         /// </summary>
         [Header("Target")]
@@ -32,48 +40,20 @@ namespace SEE.Tools.EchoFace
         private EchoFace echoFace;
 
         /// <summary>
-        /// The name of the child transform holding the
-        /// <see cref="SkinnedMeshRenderer"/> whose blendshapes should be
-        /// reset to zero when <see cref="EchoFace"/> is disabled. Only used
-        /// if <see cref="skinnedMeshRenderer"/> is not assigned manually.
-        /// </summary>
-        [Header("Blendshapes (Reset on Disable)")]
-        [SerializeField]
-        private string bodyTransformName = "CC_Base_Body";
-
-        /// <summary>
-        /// The skinned mesh renderer whose blendshapes are reset to zero
-        /// when <see cref="EchoFace"/> is disabled. If not assigned in the
-        /// Inspector, an attempt is made to auto-assign it from a child
-        /// named <see cref="bodyTransformName"/> during <see cref="Awake"/>.
+        /// The <see cref="MediaPipeFaceTracker"/> that supplies
+        /// <see cref="EchoFace"/> with tracking data. Its
+        /// <see cref="Behaviour.enabled"/> state is kept in sync with
+        /// <see cref="echoFace"/>: enabled together with EchoFace and
+        /// disabled together with it, so that webcam capture and face
+        /// detection only run while EchoFace is actually being driven by
+        /// them. If not assigned in the Inspector, an attempt is made to
+        /// auto-resolve it from the same <see cref="GameObject"/> via
+        /// <see cref="Component.GetComponent{T}()"/> in <see cref="Awake"/>.
+        /// If none is found, a warning is logged and the tracker is simply
+        /// not toggled.
         /// </summary>
         [SerializeField]
-        private SkinnedMeshRenderer skinnedMeshRenderer;
-
-        /// <summary>
-        /// The name of the head bone transform to search for, whose
-        /// rotation is cached as the rest pose and restored when
-        /// <see cref="EchoFace"/> is disabled.
-        /// </summary>
-        [Header("Bones (Reset on Disable)")]
-        [SerializeField]
-        private string headTransformName = "CC_Base_Head";
-
-        /// <summary>
-        /// The name of the left eye bone transform to search for, whose
-        /// rotation is cached as the rest pose and restored when
-        /// <see cref="EchoFace"/> is disabled.
-        /// </summary>
-        [SerializeField]
-        private string leftEyeName = "CC_Base_L_Eye";
-
-        /// <summary>
-        /// The name of the right eye bone transform to search for, whose
-        /// rotation is cached as the rest pose and restored when
-        /// <see cref="EchoFace"/> is disabled.
-        /// </summary>
-        [SerializeField]
-        private string rightEyeName = "CC_Base_R_Eye";
+        private MediaPipeFaceTracker faceTracker;
 
         /// <summary>
         /// How long, in seconds, the state-change popup remains visible
@@ -90,16 +70,35 @@ namespace SEE.Tools.EchoFace
         private Color backgroundColor = new(0f, 0f, 0f, 0.65f);
 
         /// <summary>
-        /// The key that toggles <see cref="EchoFace"/> on and off.
+        /// Whether <see cref="echoFace"/> (and, if found, <see cref="faceTracker"/>)
+        /// should start enabled rather than disabled. Conflicting components
+        /// are disabled from the start accordingly if this is <c>true</c>.
         /// </summary>
-        [Header("Input")]
+        [Header("Initial State")]
+        [Tooltip("Whether EchoFace (and the linked MediaPipeFaceTracker) should be enabled from the start, rather than starting disabled.")]
         [SerializeField]
-        private KeyCode toggleKey = KeyCode.T;
+        private bool startEnabled = false;
+
+        /// <summary>
+        /// Class names of components on <c>echoFace.gameObject</c> that conflict
+        /// with EchoFace animation and should be disabled while EchoFace is active.
+        /// Their enabled state is restored when EchoFace is disabled again.
+        /// </summary>
+        [Header("Conflict Resolution")]
+        [SerializeField]
+        private List<string> conflictingComponentNames = new();
+
+        // --- Private Fields ---
 
         /// <summary>
         /// The root of the popup panel created by <see cref="EnsurePopupUI"/>.
         /// </summary>
         private GameObject popupPanel;
+
+        /// <summary>
+        /// The canvas GameObject that contains the popup panel and text.
+        /// </summary>
+        private GameObject popupCanvasGO;
 
         /// <summary>
         /// The text component of the popup panel, whose text is set in
@@ -115,94 +114,88 @@ namespace SEE.Tools.EchoFace
         private Coroutine hideRoutine;
 
         /// <summary>
-        /// The head bone transform found under <see cref="headTransformName"/>,
-        /// or <c>null</c> if it could not be found.
+        /// The conflicting components resolved by <see cref="ResolveConflictingComponents"/>
+        /// from <see cref="conflictingComponentNames"/>, excluding any that could not be found.
         /// </summary>
-        private Transform headTransform;
+        private readonly List<Behaviour> resolvedConflictingComponents = new();
 
         /// <summary>
-        /// The left eye bone transform found under <see cref="leftEyeName"/>,
-        /// or <c>null</c> if it could not be found.
+        /// Caches the <see cref="Behaviour.enabled"/> state that each resolved
+        /// component had at the time <see cref="CacheInitialComponentStates"/> was called.
         /// </summary>
-        private Transform leftEyeTransform;
+        private readonly Dictionary<Behaviour, bool> initialEnabledStates = new();
 
-        /// <summary>
-        /// The right eye bone transform found under <see cref="rightEyeName"/>,
-        /// or <c>null</c> if it could not be found.
-        /// </summary>
-        private Transform rightEyeTransform;
-
-        /// <summary>
-        /// The local rotation of <see cref="headTransform"/> cached in
-        /// <see cref="CacheHeadAndEyes"/>, restored when
-        /// <see cref="EchoFace"/> is disabled.
-        /// </summary>
-        private Quaternion headRestRotation;
-
-        /// <summary>
-        /// The local rotation of <see cref="leftEyeTransform"/> cached in
-        /// <see cref="FindEyeBones"/>, restored when <see cref="EchoFace"/>
-        /// is disabled.
-        /// </summary>
-        private Quaternion leftEyeRestRotation;
-
-        /// <summary>
-        /// The local rotation of <see cref="rightEyeTransform"/> cached in
-        /// <see cref="FindEyeBones"/>, restored when <see cref="EchoFace"/>
-        /// is disabled.
-        /// </summary>
-        private Quaternion rightEyeRestRotation;
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Resolves <see cref="echoFace"/> and
-        /// <see cref="skinnedMeshRenderer"/> if not assigned, caches the
-        /// rest rotations of the head and eye bones, and creates the popup
+        /// <see cref="faceTracker"/> if not assigned, caches the initial
+        /// states of conflicting components, then brings EchoFace, the face
+        /// tracker, and the conflicting components into the state
+        /// configured by <see cref="startEnabled"/>, and creates the popup
         /// UI. Disables this component if no <see cref="EchoFace"/>
         /// instance can be found.
         /// </summary>
         private void Awake()
         {
-            // Find EchoFace if not assigned.
             if (echoFace == null)
             {
-                echoFace = FindObjectOfType<EchoFace>();
+                echoFace = GetComponent<EchoFace>();
                 if (echoFace == null)
                 {
-                    Debug.LogError("[EchoFaceToggleController] EchoFace not found.");
+                    Debug.LogError("[EchoFaceController] EchoFace not found.\n");
                     enabled = false;
                     return;
                 }
             }
 
-            // Find SkinnedMeshRenderer if not assigned.
-            if (skinnedMeshRenderer == null)
+            if (faceTracker == null)
             {
-                skinnedMeshRenderer = transform.Find(bodyTransformName)?.GetComponent<SkinnedMeshRenderer>();
-                if (skinnedMeshRenderer == null)
+                faceTracker = GetComponent<MediaPipeFaceTracker>();
+                if (faceTracker == null)
                 {
-                    Debug.LogWarning($"[EchoFaceToggleController] SkinnedMeshRenderer not found under '{bodyTransformName}'. Blendshape reset will be skipped.");
+                    Debug.LogWarning("[EchoFaceController] MediaPipeFaceTracker not found; it will not be toggled together with EchoFace.\n");
                 }
             }
 
-            // Find head & eyes and cache their rest rotation.
-            CacheHeadAndEyes();
+            // Cache the conflicting components' original enabled state before
+            // anything below potentially changes it, so the cache reflects
+            // the scene's authored state rather than a state we set ourselves.
+            ResolveConflictingComponents();
+            CacheInitialComponentStates();
 
-            // Create the popup UI.
+            echoFace.enabled = startEnabled;
+            if (faceTracker != null)
+            {
+                faceTracker.enabled = startEnabled;
+            }
+
+            // Only disable conflicting components if starting enabled; if
+            // starting disabled, they are simply left at their cached,
+            // authored state untouched.
+            if (startEnabled)
+            {
+                DisableConflictingComponents();
+            }
+
             EnsurePopupUI();
             popupPanel.SetActive(false);
 
-            Debug.Log("[EchoFaceToggleController] Ready. ToggleKey = " + toggleKey);
+            Debug.Log($"[EchoFaceController] Ready. Initial state: {(startEnabled ? "enabled" : "disabled")}.\n");
         }
 
         /// <summary>
-        /// Unity lifecycle method. Toggles <see cref="EchoFace"/> on and
-        /// off when <see cref="toggleKey"/> is pressed, resetting
-        /// blendshapes and bone rotations when disabling it, and shows a
-        /// popup indicating the new state.
+        /// Unity lifecycle method. Toggles <see cref="EchoFace"/> on and off via
+        /// <see cref="SEEInput.ToggleEchoFace"/>. When enabling <see cref="EchoFace"/>,
+        /// also enables <see cref="faceTracker"/> and disables conflicting components.
+        /// When disabling <see cref="EchoFace"/>, also disables <see cref="faceTracker"/>
+        /// and restores conflicting components to their original enabled state (facial
+        /// rest pose is handled automatically by EchoFace's OnDisable). Shows a popup
+        /// indicating the new state.
         /// </summary>
         private void Update()
         {
-            if (!Input.GetKeyDown(toggleKey))
+            if (!SEEInput.ToggleEchoFace())
             {
                 return;
             }
@@ -210,193 +203,146 @@ namespace SEE.Tools.EchoFace
             bool newState = !echoFace.enabled;
             echoFace.enabled = newState;
 
-            // When disabling: reset everything.
-            if (!newState)
+            if (faceTracker != null)
             {
-                ResetAllBlendShapes(skinnedMeshRenderer);
-                ResetEyesAndHead();
+                faceTracker.enabled = newState;
+            }
+
+            if (newState)
+            {
+                DisableConflictingComponents();
+            }
+            else
+            {
+                RestoreConflictingComponents();
             }
 
             ShowPopup($"EchoFace {(newState ? "enabled" : "disabled")}");
         }
 
         /// <summary>
-        /// Sets all blendshape weights on the given renderer's mesh to zero.
+        /// Unity lifecycle method. Cleans up the dynamically created popup UI
+        /// (canvas or panel) to prevent orphaned UI GameObjects when the avatar is destroyed.
         /// </summary>
-        /// <param name="meshRenderer">
-        /// The skinned mesh renderer to reset. If <c>null</c>, or if it has
-        /// no shared mesh, the method returns without doing anything.
-        /// </param>
-        private void ResetAllBlendShapes(SkinnedMeshRenderer meshRenderer)
+        private void OnDestroy()
         {
-            if (meshRenderer == null)
+            if (popupCanvasGO != null)
             {
-                return;
+                Destroyer.Destroy(popupCanvasGO);
             }
-
-            Mesh mesh = meshRenderer.sharedMesh;
-            if (mesh == null)
+            else if (popupPanel != null)
             {
-                return;
-            }
-
-            int count = mesh.blendShapeCount;
-            for (int i = 0; i < count; i++)
-            {
-                meshRenderer.SetBlendShapeWeight(i, 0f);
+                Destroyer.Destroy(popupPanel);
             }
         }
 
-        /// <summary>
-        /// Finds the head bone transform named <see cref="headTransformName"/>
-        /// under this <see cref="GameObject"/>, caches its rest rotation,
-        /// and resolves the eye bones via <see cref="FindEyeBones"/>.
-        /// </summary>
-        private void CacheHeadAndEyes()
-        {
-            headTransform = FindDeepChild(transform, headTransformName);
-            if (headTransform == null)
-            {
-                Debug.LogWarning($"[EchoFaceToggleController] Head transform '{headTransformName}' not found. Head/Eye reset will be skipped.");
-                return;
-            }
-
-            // Cache the rest pose of the head
-            headRestRotation = headTransform.localRotation;
-
-            // Resolve the eye bones and cache their rest rotations
-            FindEyeBones(headTransform);
-        }
+        // --- Private Methods ---
 
         /// <summary>
-        /// Finds the left and right eye bone transforms under the given
-        /// head transform and caches their rest rotations.
+        /// Resolves the configured component names in <see cref="conflictingComponentNames"/>
+        /// against the runtime type name of every <see cref="Behaviour"/> attached to
+        /// <c>echoFace.gameObject</c>. The comparison ignores case and spaces.
         /// </summary>
-        /// <param name="head">
-        /// The head transform to search under. If <c>null</c>, the method
-        /// returns without doing anything.
-        /// </param>
-        private void FindEyeBones(Transform head)
+        private void ResolveConflictingComponents()
         {
-            if (head == null)
+            resolvedConflictingComponents.Clear();
+
+            if (echoFace == null || conflictingComponentNames == null)
             {
                 return;
             }
 
-            leftEyeTransform = FindDeepChild(head, leftEyeName);
-            rightEyeTransform = FindDeepChild(head, rightEyeName);
+            Behaviour[] attachedBehaviours = echoFace.GetComponents<Behaviour>();
 
-            if (leftEyeTransform == null || rightEyeTransform == null)
+            foreach (string targetName in conflictingComponentNames)
             {
-                return;
-            }
-
-            leftEyeRestRotation = leftEyeTransform.localRotation;
-            rightEyeRestRotation = rightEyeTransform.localRotation;
-        }
-
-        /// <summary>
-        /// Restores the head and eye bone transforms to their cached rest
-        /// rotations, if they were found.
-        /// </summary>
-        private void ResetEyesAndHead()
-        {
-            // Reset eyes (if found).
-            if (leftEyeTransform != null)
-            {
-                leftEyeTransform.localRotation = leftEyeRestRotation;
-            }
-
-            if (rightEyeTransform != null)
-            {
-                rightEyeTransform.localRotation = rightEyeRestRotation;
-            }
-
-            // Reset head (if found).
-            if (headTransform != null)
-            {
-                headTransform.localRotation = headRestRotation;
-            }
-        }
-
-        /// <summary>
-        /// Recursively finds a child transform by name.
-        /// </summary>
-        /// <param name="parent">
-        /// The transform whose descendants are searched. If <c>null</c>,
-        /// <c>null</c> is returned.
-        /// </param>
-        /// <param name="name">The name of the child transform to find.</param>
-        /// <returns>
-        /// The first matching descendant transform, searched breadth-first
-        /// among direct children before recursing; or <c>null</c> if no
-        /// matching descendant exists.
-        /// </returns>
-        private Transform FindDeepChild(Transform parent, string name)
-        {
-            if (parent == null)
-            {
-                return null;
-            }
-
-            Transform directChild = parent.Find(name);
-            if (directChild != null)
-            {
-                return directChild;
-            }
-
-            foreach (Transform child in parent)
-            {
-                Transform found = FindDeepChild(child, name);
-                if (found != null)
+                if (string.IsNullOrWhiteSpace(targetName))
                 {
-                    return found;
+                    continue;
+                }
+
+                string normalizedTargetName = targetName.Replace(" ", string.Empty);
+                Behaviour match = null;
+
+                foreach (Behaviour behaviour in attachedBehaviours)
+                {
+                    if (behaviour != null
+                        && string.Equals(behaviour.GetType().Name, normalizedTargetName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        match = behaviour;
+                        break;
+                    }
+                }
+
+                if (match != null)
+                {
+                    resolvedConflictingComponents.Add(match);
+                }
+                else
+                {
+                    Debug.LogWarning($"[EchoFaceController] Conflicting component '{targetName}' not found on '{echoFace.gameObject.name}'.\n");
                 }
             }
-
-            return null;
         }
 
         /// <summary>
-        /// Ensures the popup UI exists, creating a screen-space-overlay
-        /// canvas, panel, and <see cref="TextMeshProUGUI"/> text if
-        /// necessary. Reuses an existing screen-space-overlay canvas in the
-        /// scene if one is found.
+        /// Caches the current <see cref="Behaviour.enabled"/> state of each resolved
+        /// conflicting component into <see cref="initialEnabledStates"/>.
+        /// </summary>
+        private void CacheInitialComponentStates()
+        {
+            foreach (Behaviour behaviour in resolvedConflictingComponents)
+            {
+                initialEnabledStates[behaviour] = behaviour.enabled;
+            }
+        }
+
+        /// <summary>
+        /// Disables all resolved conflicting components.
+        /// </summary>
+        private void DisableConflictingComponents()
+        {
+            foreach (Behaviour behaviour in resolvedConflictingComponents)
+            {
+                behaviour.enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Restores all resolved conflicting components to the state cached by
+        /// <see cref="CacheInitialComponentStates"/>.
+        /// </summary>
+        private void RestoreConflictingComponents()
+        {
+            foreach (Behaviour behaviour in resolvedConflictingComponents)
+            {
+                if (initialEnabledStates.TryGetValue(behaviour, out bool initialEnabled))
+                {
+                    behaviour.enabled = initialEnabled;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ensures the popup UI exists, creating a dedicated screen-space-overlay
+        /// canvas, panel, and <see cref="TextMeshProUGUI"/> text.
         /// </summary>
         private void EnsurePopupUI()
         {
-            // Find or create canvas (overlay).
-            Canvas canvas = null;
-            foreach (Canvas c in FindObjectsOfType<Canvas>())
-            {
-                if (c.renderMode == RenderMode.ScreenSpaceOverlay)
-                {
-                    canvas = c;
-                    break;
-                }
-            }
+            popupCanvasGO = new(
+                "EchoFacePopupCanvas",
+                typeof(Canvas),
+                typeof(CanvasScaler),
+                typeof(GraphicRaycaster)
+            );
 
-            if (canvas == null)
-            {
-                GameObject canvasGO = new(
-                    "PopupCanvas",
-                    typeof(Canvas),
-                    typeof(CanvasScaler),
-                    typeof(GraphicRaycaster)
-                );
+            Canvas canvas = popupCanvasGO.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 5000;
 
-                canvas = canvasGO.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = 5000;
-
-                CanvasScaler scaler = canvasGO.GetComponent<CanvasScaler>();
-                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                scaler.referenceResolution = new(1920, 1080);
-            }
-            else
-            {
-                canvas.sortingOrder = Mathf.Max(canvas.sortingOrder, 5000);
-            }
+            CanvasScaler scaler = popupCanvasGO.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new(1920, 1080);
 
             // Panel (box).
             popupPanel = new("PopupPanel", typeof(RectTransform), typeof(Image));
@@ -442,7 +388,7 @@ namespace SEE.Tools.EchoFace
         {
             if (popupPanel == null || popupText == null)
             {
-                Debug.LogWarning("[EchoFaceToggleController] Popup UI is missing. Message: " + message);
+                Debug.LogWarning($"[EchoFaceController] Popup UI is missing. Message: {message}\n");
                 return;
             }
 
@@ -465,9 +411,6 @@ namespace SEE.Tools.EchoFace
         /// <returns>An enumerator for use with <see cref="MonoBehaviour.StartCoroutine(IEnumerator)"/>.</returns>
         private IEnumerator CoHidePopup()
         {
-            // Note: "new()" cannot be used here because this iterator method
-            // returns the non-generic IEnumerator, so "yield return" has no
-            // inferable target type for the constructed object.
             yield return new WaitForSecondsRealtime(popupDuration);
             if (popupPanel != null)
             {

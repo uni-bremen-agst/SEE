@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using SimpleFileBrowser;
 using TMPro;

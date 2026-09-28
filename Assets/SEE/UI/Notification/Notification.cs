@@ -2,7 +2,7 @@
 using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Operator;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

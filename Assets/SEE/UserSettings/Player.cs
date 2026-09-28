@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents a local player in the SEE environment (player name and avatar).

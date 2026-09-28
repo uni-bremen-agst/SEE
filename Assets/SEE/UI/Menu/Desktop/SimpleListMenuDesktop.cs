@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

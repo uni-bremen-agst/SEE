@@ -1,4 +1,4 @@
-using SEE.GO;
+using SEE.Extensions;
 using System.Collections.Generic;
 using SEE.Utils;
 using UnityEngine;
@@ -6,8 +6,7 @@ using UnityEngine;
 namespace SEE.Audio
 {
     /// <summary>
-    /// An Object that contains a SEE game object
-    /// and an audio queue and makes the sounds originate
+    /// An object that contains a SEE game object and an audio queue and makes the sounds originate
     /// from the game object in 3D space.
     /// </summary>
     public class AudioGameObject

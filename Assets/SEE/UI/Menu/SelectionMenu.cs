@@ -1,5 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.GO;
+using SEE.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;

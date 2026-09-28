@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using SEE.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +30,7 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with strongly typed clone methods.
-    /// This change should be applied consistently across the affected class hierarchy
-    /// and is therefore tracked separately in issue #964.
-    /// </remarks>
-    public abstract class Attributable : Observable<ChangeEvent>, ICloneable
+    public abstract class Attributable : Observable<ChangeEvent>
     {
         /// <summary>
         /// The names of all numeric attributes (int and float) of any <see cref="Attributable"/>.
@@ -666,8 +662,8 @@ namespace SEE.DataModel.DG
         /// Returns a deep clone of this attributable. Deep means that the list
         /// of attributes of this attributable are copied, too.
         /// </summary>
-        /// <returns>Deep clone.</returns>
-        public virtual object Clone()
+        /// <returns>Deep clone of this attributable.</returns>
+        public Attributable Clone()
         {
             Attributable clone = (Attributable)MemberwiseClone();
             HandleCloned(clone);

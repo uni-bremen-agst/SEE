@@ -1,0 +1,1020 @@
+using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.Controls.Interactables;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.SceneManipulation;
+using SEE.Extensions;
+using SEE.Net.Actions.City;
+using SEE.Net.Actions.GraphElement;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PopupMenus;
+using SEE.UI.PropertyDialog.CitySelection;
+using SEE.UI.Window;
+using SEE.UI.Window.PropertyWindow;
+using SEE.UI.Window.TreeWindow;
+using SEE.Utils;
+using SEE.Utils.Paths;
+using SEE.XR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using SEE.GraphElementRefs;
+using SEE.UserSettings;
+using SEE.Controls.KeyActions;
+using SEE.ReversibleActionHistory;
+using SEE.Controls;
+using SEE.Controls.ReversibleActions;
+using SEE.Controls.Players;
+using SEE.Components.GameNodes.BranchCity;
+
+namespace SEE.UI
+{
+    /// <summary>
+    /// Shows a context menu with available actions when the user requests it.
+    /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
+    public class ContextMenu : MonoBehaviour
+    {
+        /// <summary>
+        /// The popup menu that is shown when the user requests the context menu.
+        /// </summary>
+        private PopupMenu popupMenu;
+
+        /// <summary>
+        /// The position where the menu should be opened.
+        /// </summary>
+        private Vector3 position;
+
+        /// <summary>
+        /// The interactable object during the start must be the same as when
+        /// the right mouse button is released in order for the context menu to open.
+        /// </summary>
+        private InteractableObject startObject;
+
+        /// <summary>
+        /// Tries to open the context menu with multiselection.
+        /// </summary>
+        private bool multiselection = false;
+
+        /// The position of the mouse when the user started opening the context menu.
+        /// </summary>
+        private Vector3 startMousePosition = Vector3.zero;
+
+        private void Start()
+        {
+            popupMenu = gameObject.AddComponent<PopupMenu>();
+        }
+
+        /// <summary>
+        /// Is true when the context-menu is open.
+        /// This is used in VR to open and close the menu.
+        /// </summary>
+        private bool onSelect;
+
+        private void Update()
+        {
+            if (SEEInput.OpenContextMenuStart() || XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle)
+            {
+                if (InteractableObject.SelectedObjects.Count <= 1)
+                {
+                    Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
+                    startObject = o;
+                    if (UserSetting.IsDesktop)
+                    {
+                        startMousePosition = Input.mousePosition;
+                    }
+                    multiselection = false;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
+                }
+                else
+                {
+                    startObject = null;
+                    multiselection = true;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
+                }
+            }
+            if (SEEInput.OpenContextMenuEnd() || XRSEEActions.OnSelectToggle && onSelect)
+            {
+                if (!multiselection)
+                {
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject hitObject);
+                    if (hit == HitGraphElement.None)
+                    {
+                        return;
+                    }
+                    if (UserSetting.IsVR
+                        || hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
+                    {
+                        if (UserSetting.IsDesktop)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
+                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(raycastHit, hitObject);
+                        onSelect = false;
+                        popupMenu.ShowWith(entries, position);
+                    }
+                }
+                else
+                {
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit _, out InteractableObject o);
+                    if (hit == HitGraphElement.None)
+                    {
+                        return;
+                    }
+                    if (InteractableObject.SelectedObjects.Contains(o))
+                    {
+                        if (UserSetting.IsDesktop)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
+                        // Note: as of now, multiselection only works for graph elements.
+                        // We currently do not have multiselection options for authors.
+                        IEnumerable<PopupMenuEntry> entries
+                            = GetApplicableOptionsForGraphElementMultiselection(popupMenu,
+                                                                                InteractableGraphElements(InteractableObject.SelectedObjects));
+                        onSelect = false;
+                        popupMenu.ShowWith(entries, position);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the applicable options for the given hit object depending on its type.
+        /// </summary>
+        /// <param name="raycastHit">Where the raycast hit <paramref name="hitObject"/>.</param>
+        /// <param name="hitObject">The hit object.</param>
+        /// <returns>Applicable options.</returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptions(RaycastHit raycastHit, InteractableObject hitObject)
+        {
+            if (hitObject is InteractableGraphElement graphElement)
+            {
+                return GetApplicableOptionsForGraphElement(popupMenu, position, raycastHit.point, graphElement.GraphElemRef.Elem, graphElement.gameObject);
+            }
+            else if (hitObject is InteractableAuthor author)
+            {
+                return GetApplicableOptionsForAuthor(popupMenu, position, author);
+            }
+            else
+            {
+                return Enumerable.Empty<PopupMenuEntry>();
+            }
+        }
+
+        /// <summary>
+        /// Updates the context menu.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="entries">The new entries for the context menu.</param>
+        private static void UpdateEntries(PopupMenu popupMenu, Vector3 position, IEnumerable<PopupMenuEntry> entries)
+        {
+            popupMenu.ShowWith(entries, position);
+        }
+
+        /// <summary>
+        /// Returns all elements in <paramref name="selectedObjects"/> whose type is <see cref="InteractableGraphElement"/>.
+        /// </summary>
+        /// <returns>All <see cref="InteractableGraphElement"/>s in <paramref name="selectedObjects"/>.</returns>
+        private static IEnumerable<InteractableGraphElement> InteractableGraphElements(IEnumerable<InteractableObject> list)
+        {
+            return list.OfType<InteractableGraphElement>();
+        }
+
+        #region Multiple-Selection
+        /// <summary>
+        /// Returns the options available for multiple selection.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="selectedObjects">The selected objects.</param>
+        /// <returns>Options available for the selected objects.</returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElementMultiselection
+            (PopupMenu popupMenu, IEnumerable<InteractableGraphElement> selectedObjects)
+        {
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),
+
+                new PopupMenuActionDoubleIcon("Inspect", () =>
+                {
+                    List<PopupMenuEntry> submenuEntries = new()
+                    {
+                        new PopupMenuAction("Inspect", () =>
+                        {
+                            UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElementMultiselection(popupMenu, selectedObjects));
+                        }, Icons.ArrowLeft, CloseAfterClick: false),
+                        new PopupMenuAction("Properties", ShowProperties, Icons.Info),
+                        new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
+                    };
+
+                    if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
+                    {
+                        submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
+                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<CommitCity>() != null))
+                        {
+                            submenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
+                        }
+                    }
+                    UpdateEntries(popupMenu, position, submenuEntries);
+                },
+                Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 5),
+                new PopupMenuAction("Delete", Delete, Icons.Trash)
+            };
+
+            if (selectedObjects.Any(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
+            {
+                entries.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark, Priority: 1));
+            }
+            return entries;
+
+            void Delete()
+            {
+                if (selectedObjects.Any(iO => iO.gameObject.IsArchitectureOrImplementationRoot()))
+                {
+                    ShowNotification.Info("Cannot clear in multiselection",
+                        "In multiselection mode, architecture and implementation roots cannot be cleared. They will be skipped.");
+                }
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.Delete);
+                DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject).Where(iO => !iO.IsArchitectureOrImplementationRoot()));
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void AcceptDivergence()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
+                AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
+                List<Edge> divergences = selectedObjects
+                    .Select(x => x.GraphElemRef.Elem)
+                    .OfType<Edge>()
+                    .Where(e => e.IsInImplementation() && ReflexionGraph.IsDivergent(e))
+                    .ToList();
+                action.ContextMenuExecution(divergences);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void ShowProperties()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        GameWindowManager.ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowCode()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowDiffCode()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null && iO.gameObject.ContainingCity<CommitCity>())
+                    {
+                        GameWindowManager.ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
+                                                                  iO.gameObject.ContainingCity<CommitCity>()));
+                    }
+                }
+            }
+
+            void Highlight()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        iO.gameObject.Operator().Highlight(duration: 10);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Single-Selection
+
+        /// <summary>
+        /// Returns the options available for the given <paramref name="author"/>.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="menuPosition">The position where the menu should be opened.</param>
+        /// <param name="author">The hit author for which to return the options.</param>
+        /// <returns>Options applicable to <paramref name="author"/>.</returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForAuthor(PopupMenu popupMenu, Vector3 menuPosition, InteractableAuthor author)
+        {
+            if (!author.TryGetComponent(out AuthorSphere authorSphere))
+            {
+                return Enumerable.Empty<PopupMenuEntry>();
+            }
+
+            string name = authorSphere.Author.Name;
+
+            IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
+            {
+                new PopupMenuHeading(name, Priority: int.MaxValue),
+                new PopupMenuAction("Properties", () => ShowProperties(), Icons.Info, Priority: 0)
+            };
+
+            return entries;
+
+            void ShowProperties()
+            {
+                GameWindowManager.ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
+            }
+        }
+
+        /// <summary>
+        /// Returns the options available for the given graph element.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The context menu position.</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
+        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>Options available for the given graph element.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
+        public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position,
+            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            return GetApplicableOptionsForGraphElement(popupMenu, position, position, graphElement, gameObject, appendActions)
+                  .OfType<PopupMenuAction>();
+        }
+
+        /// <summary>
+        /// Returns the options available for the given graph element.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The context menu position.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
+        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>Options available for the given graph element.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
+        private static IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElement(PopupMenu popupMenu, Vector3 position,
+            Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            IEnumerable<PopupMenuEntry> options
+                = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+
+            return options.Concat(graphElement switch
+            {
+                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
+                    .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
+                        : new() { })
+                    .Concat(node.Type == ReflexionGraph.ArchitectureType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Architecture", LoadArchitecture, Icons.Upload, Priority: 3) }
+                        : new() { }),
+                Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
+                _ => throw new ArgumentOutOfRangeException()
+            });
+
+            // We want to empower the user to load the implementation and architecture, separately.
+            // This method loads only the implementation.
+            void LoadImplementation()
+            {
+                LoadReflexionDataProperty dialog = new();
+                dialog.Open();
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            // This method loads only the architecture.
+            void LoadArchitecture()
+            {
+                LoadReflexionDataProperty dialog = new();
+                dialog.Open(false);
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            async UniTask WaitForInputAsync(LoadReflexionDataProperty dialog)
+            {
+                await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
+                SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                if (dialog.TryGetImplementationDataPaths(out DataPath implDataPath, out DataPath projectFolder))
+                {
+                    city.LoadAndDrawSubgraphAsync(implDataPath, projectFolder).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implDataPath, projectFolder).Execute();
+                }
+
+                if (dialog.TryGetArchitectureDataPath(out DataPath archDataPath))
+                {
+                    city.LoadAndDrawSubgraphAsync(archDataPath).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, true, archDataPath).Execute();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the common options available for all graph elements.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        /// <returns>Common options available for all graph elements.</returns>
+        private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position,
+            Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            string name = graphElement.ID;
+            string target, source = target = null;
+            if (graphElement is Node node
+                && !string.IsNullOrEmpty(node.SourceName))
+            {
+                name = node.SourceName;
+            }
+            if (graphElement is Edge edge)
+            {
+                name = edge.Type;
+                source = edge.Source.SourceName ?? edge.Source.ID;
+                target = edge.Target.SourceName ?? edge.Target.ID;
+            }
+            IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
+            {
+                new PopupMenuHeading(name, Priority: int.MaxValue)
+            };
+            if (source != null && target != null)
+            {
+                entries.Add(new PopupMenuHeading("Source: " + source, Priority: int.MaxValue));
+                entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
+            }
+
+            entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
+                "Clear" : graphElement is Node nodeElement && nodeElement.IsRoot() ? "Delete City" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+
+            if (appendActions == null && graphElement is Node n && n.IsArchitectureOrImplementationRoot())
+            {
+                entries.Add(new PopupMenuAction("Delete City", () => DeleteCityAsync(n.Parent).Forget(), Icons.Trash, Priority: 0));
+            }
+
+            entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
+            {
+                List<PopupMenuEntry> subMenuEntries = new()
+                    {
+                        new PopupMenuAction("Inspect", () =>
+                        {
+                            ProvideParentMenuActions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+                        },
+                            Icons.ArrowLeft, CloseAfterClick: false),
+                        new PopupMenuAction("Properties", ShowProperties, Icons.Info),
+                    };
+                if (gameObject != null)
+                {
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Locally)", Highlight, Icons.LightBulb));
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Shared)", HighlightShared, Icons.LightBulb));
+                }
+
+                if (graphElement.Filename != null)
+                {
+                    subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
+                    if (gameObject.ContainingCity<CommitCity>() != null)
+                    {
+                        subMenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
+                    }
+                }
+                subMenuEntries.AddRange(graphElement switch
+                {
+                    Node node => GetNodeShowOptions(node, gameObject, appendActions != null),
+                    Edge edge => GetEdgeShowOptions(edge, gameObject),
+                    _ => throw new ArgumentOutOfRangeException()
+                });
+                UpdateEntries(popupMenu, position, subMenuEntries);
+            }, Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 1));
+
+            return entries;
+
+            async UniTaskVoid DeleteElement()
+            {
+                if (graphElement is Node node && node.IsRoot())
+                {
+                    DeleteCityAsync(node).Forget();
+                    return;
+                }
+                if (gameObject != null)
+                {
+                    ActionStateType previousAction = GlobalActionHistory.Current();
+                    GlobalActionHistory.Execute(ActionStateTypes.Delete);
+                    DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
+                    action.ContextMenuExecution(gameObject);
+                    ExecutePreviousActionAsync(action, previousAction).Forget();
+                }
+                else
+                {
+                    string message = $"Do you really want to delete the element {graphElement.ID}?\nThis action cannot be undone.";
+                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(message)))
+                    {
+                        graphElement.ItsGraph.RemoveElement(graphElement);
+                    }
+                }
+            }
+
+            void ShowProperties()
+            {
+                GameWindowManager.ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void ShowCode()
+            {
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void ShowDiffCode()
+            {
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
+                                                          gameObject.ContainingCity<CommitCity>()));
+            }
+
+            void Highlight()
+            {
+                if (gameObject != null)
+                {
+                    gameObject.Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    ShowNotification.Warn("No game object", "There is nothing to highlight for this element.");
+                }
+            }
+
+            void HighlightShared()
+            {
+                if (gameObject != null)
+                {
+                    float duration = 10;
+                    gameObject.Operator().Highlight(duration: duration);
+                    new ShowInCityNetAction(gameObject.name, duration).Execute();
+                }
+                else
+                {
+                    ShowNotification.Warn("No game object", "There is nothing to highlight for this element.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Provides the actions of the main menu and takes into account any appended actions.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        private static void ProvideParentMenuActions(PopupMenu popupMenu, Vector3 position,
+            Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            if (appendActions != null)
+            {
+                List<PopupMenuAction> actions = new(GetApplicableOptionsForGraphElement(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject, appendActions)
+                    .OfType<PopupMenuAction>()
+                    .Where(x => !x.Name.Contains("TreeWindow")));
+                actions.AddRange(appendActions);
+                UpdateEntries(popupMenu, position, actions);
+            }
+            else
+            {
+                UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElement(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject));
+            }
+        }
+
+        /// <summary>
+        /// Returns the show options available for the given node.
+        /// </summary>
+        /// <param name="node">The node to get the show options for.</param>
+        /// <param name="gameObject">The game object that the node is attached to.</param>
+        /// <param name="openViaTreeView">Whether the popup menu was opened via tree view.</param>
+        /// <returns>Show options available for the given node.</returns>
+        private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject, bool openViaTreeView)
+        {
+            List<PopupMenuEntry> actions = new();
+            if (!openViaTreeView)
+            {
+                actions.Add(new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView));
+            }
+            if (node.OutgoingsOfType(LSP.Reference).Any())
+            {
+                actions.Add(new PopupMenuAction("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Declaration).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Declaration", () => ShowTargets(LSP.Declaration).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Definition).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Extend).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Supertype", () => ShowTargets(LSP.Extend).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Call).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Outgoing Calls", () => ShowTargets(LSP.Call).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.OfType).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
+            }
+            return actions;
+
+
+            void RevealInTreeView()
+            {
+                ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
+            }
+
+            // Highlights all nodes that are targets of the given kind of edge.
+            async UniTaskVoid ShowTargets(string kind, bool outgoings = true)
+            {
+                IList<Node> nodes;
+                if (outgoings)
+                {
+                    nodes = node.OutgoingsOfType(kind).Select(e => e.Target).ToList();
+                }
+                else
+                {
+                    nodes = node.IncomingsOfType(kind).Select(e => e.Source).ToList();
+                }
+                if (nodes.Count == 1)
+                {
+                    // We will just highlight the target node directly.
+                    nodes.First().Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    TreeWindow window = ActivateTreeWindow(node, gameObject.transform, title: $"{kind}s of " + node.SourceName);
+                    await UniTask.Yield();
+                    window.ConstrainToAsync(nodes).Forget();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the options available for the given node.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="node">The node to get the options for.</param>
+        /// <param name="gameObject">The game object that the node is attached to.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        /// <returns>Options available for the given node.</returns>
+        private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+            Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
+        {
+            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>();
+
+            if (appendActions == null)
+            {
+                actions.Add(new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1));
+                if (!node.IsArchitectureOrImplementationRoot())
+                {
+                    actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                }
+                actions.Add(new PopupMenuAction("New Edge", NewEdge, Icons.Edge, Priority: 2));
+                actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
+
+                if (gameObject != null)
+                {
+                    VisualNodeAttributes gameNodeAttributes = gameObject.ContainingCity().NodeTypes[node.Type];
+                    if (gameNodeAttributes.AllowManualResize)
+                    {
+                        actions.Add(new PopupMenuAction("Resize Node", ResizeNode, Icons.Resize));
+                    }
+                }
+            }
+
+            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Node Options", Icons.Node,
+                    node.IsRoot()?
+                        new List<PopupMenuEntry>() {new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1)}
+                        : actions,
+                    node, gameObject, 2, appendActions) };
+
+            void MoveNode()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.Move);
+                UpdatePlayerMenu();
+                MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject, raycastHitPosition);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void NewNode()
+            {
+                if (!AddNodeAction.HasNotOnlyRootNodeTypes(gameObject.ContainingCity()))
+                {
+                    ShowNotification.Warn("No node type available.", "Node could not be added. A node type must be added first.");
+                    return;
+                }
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.NewNode);
+                AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject, raycastHitPosition);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void NewEdge()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.NewEdge);
+                UpdatePlayerMenu();
+                AddEdgeAction action = (AddEdgeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void EditNode()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.EditNode);
+                UpdatePlayerMenu();
+                EditNodeAction action = (EditNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(node);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+
+            void ResizeNode()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.ResizeNode);
+                UpdatePlayerMenu();
+                ResizeNodeAction action = (ResizeNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+        }
+
+        /// <summary>
+        /// Returns the show options available for the given edge.
+        /// </summary>
+        /// <param name="edge">The edge to get the show options for.</param>
+        /// <param name="gameObject">The game object that the edge is attached to.</param>
+        /// <returns>Show options available for the given edge.</returns>
+        private static IEnumerable<PopupMenuEntry> GetEdgeShowOptions(Edge edge, GameObject gameObject)
+        {
+            List<PopupMenuEntry> entries = new() {
+                new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
+                new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
+            };
+
+            if (edge.Type == "Clone")
+            {
+                entries.Add(new PopupMenuAction("Show Unified Diff", ShowUnifiedDiff, Icons.Compare));
+            }
+
+            return entries;
+
+
+            void RevealAtSource()
+            {
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: true).Forget();
+            }
+
+            void RevealAtTarget()
+            {
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: false).Forget();
+            }
+
+            void ShowUnifiedDiff()
+            {
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
+            }
+        }
+
+        /// <summary>
+        /// Returns the options available for the given edge.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="edge">The edge to get the options for.</param>
+        /// <param name="gameObject">The game object that the edge is attached to.</param>
+        /// <param name="appendActions">Options to be append at the end of the entries.</param>
+        /// <returns>Options available for the given edge.</returns>
+        private static IEnumerable<PopupMenuEntry> GetEdgeOptions
+            (PopupMenu popupMenu,
+            Vector3 position,
+            Vector3 raycastHitPosition,
+            Edge edge,
+            GameObject gameObject,
+            IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>();
+
+            if (edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge))
+            {
+                actions.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark));
+            }
+
+            List<PopupMenuEntry> entries = new();
+            if (actions.Count > 0)
+            {
+                entries.Add(CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Edge Options", Icons.Node, actions, edge, gameObject, 2, appendActions));
+            }
+            return entries;
+
+            void AcceptDivergence()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
+                AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(edge);
+                ExecutePreviousActionAsync(action, previousAction).Forget();
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Activates the tree window for the given graph element and returns it.
+        /// </summary>
+        /// <param name="graphElement">The graph element to activate the tree window for.</param>
+        /// <param name="transform">The transform of the game object that the graph element is attached to.</param>
+        /// <param name="title">The title of the tree window to be used. Should only be set if this is not supposed
+        /// to be the main tree window.</param>
+        /// <returns>The activated tree window.</returns>
+        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
+        {
+            WindowSpace windowSpaceOfLocalPlayer = WindowSpaceManager.WindowSpaceOfLocalPlayer;
+            TreeWindow openWindow = windowSpaceOfLocalPlayer.Windows.OfType<TreeWindow>()
+                .FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
+
+            if (openWindow == null)
+            {
+                // Window is not open yet, so we create it.
+                GameObject city = transform.gameObject.GetCodeCity();
+                openWindow = city.AddComponent<TreeWindow>();
+                openWindow.Graph = graphElement.ItsGraph;
+                if (title != null)
+                {
+                    openWindow.Title = title;
+                }
+                windowSpaceOfLocalPlayer.AddWindow(openWindow);
+            }
+            windowSpaceOfLocalPlayer.ActiveWindow = openWindow;
+            return openWindow;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="GraphElementPropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the property window for.</param>
+        /// <returns>The <see cref="GraphElementPropertyWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static GraphElementPropertyWindow CreateGraphElementPropertyWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out GraphElementPropertyWindow propertyMenu))
+            {
+                propertyMenu = graphElementRef.gameObject.AddComponent<GraphElementPropertyWindow>();
+                propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
+                propertyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return propertyMenu;
+        }
+
+        /// <summary>
+        /// Returns an <see cref="AuthorPropertyWindow"/> showing the attributes of <paramref name="author"/>.
+        /// </summary>
+        /// <param name="author">The author to activate the property window for.</param>
+        /// <returns>The <see cref="AuthorPropertyWindow"/> object showing the attributes of the specified author.</returns>
+        private static AuthorPropertyWindow CreateAuthorPropertyWindow(AuthorSphere author)
+        {
+            // Create new window for active selection, or use existing one
+            if (!author.TryGetComponent(out AuthorPropertyWindow propertyMenu))
+            {
+                propertyMenu = author.gameObject.AddComponent<AuthorPropertyWindow>();
+                propertyMenu.Title = "Properties for " + author.Author.Name;
+                propertyMenu.author = author;
+            }
+            return propertyMenu;
+        }
+
+        /// <summary>
+        /// Creates a sub menu for the context menu.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed in the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="name">The name for the sub menu.</param>
+        /// <param name="icon">The icon for the sub menu.</param>
+        /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
+        /// <param name="priority">The priority for this sub menu.</param>
+        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>The created sub menu.</returns>
+        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position,
+            Vector3 raycastHitPosition, string name, char icon, IEnumerable<PopupMenuEntry> actions,
+            GraphElement graphElement, GameObject gameObject = null, int priority = 0,
+            IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            return new(name, () =>
+            {
+                List<PopupMenuEntry> entries = new()
+                    {
+                        new PopupMenuAction(name, () =>
+                        {
+                            ProvideParentMenuActions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+                        },
+                        Icons.ArrowLeft, CloseAfterClick: false, Priority: int.MaxValue)
+                    };
+                entries.AddRange(actions);
+                UpdateEntries(popupMenu, position, entries);
+            }, icon, Icons.ArrowRight, CloseAfterClick: false, priority);
+        }
+
+        /// <summary>
+        /// Ensures that the previous action is executed again after the current action has
+        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>) or canceled.
+        /// Additionally, the <see cref="PlayerMenu"/> is updated.
+        /// </summary>
+        /// <param name="action">The current action which was executed via context menu.</param>
+        /// <param name="previousAction">The previously executed action to be re-executed.</param>
+        private static async UniTask ExecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
+        {
+            await UniTask.WaitUntil(() =>
+                action.CurrentProgress() == IReversibleAction.Progress.Completed
+                || action is AbstractPlayerAction playerAction && playerAction.IsCanceled);
+
+            GlobalActionHistory.Execute(previousAction);
+            UpdatePlayerMenu();
+        }
+
+        /// <summary>
+        /// Updates the current active entry in the <see cref="PlayerMenu"/>.
+        /// </summary>
+        private static void UpdatePlayerMenu()
+        {
+            LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
+            menu.UpdateActiveEntry();
+        }
+
+        /// <summary>
+        /// Deletes the root of a city.
+        /// This cannot be undone, so a <see cref="ConfirmDialog"/> is opened first to obtain
+        /// confirmation for the deletion.
+        /// </summary>
+        /// <param name="node">The root node that is to be deleted.</param>
+        /// <returns>Waits until a response from the <see cref="ConfirmDialog"/> is received.</returns>
+        private async static UniTask DeleteCityAsync(Node node)
+        {
+            if (node.IsRoot())
+            {
+                if (await ConfirmDialog.ConfirmAsync
+                    (ConfirmConfiguration.Delete
+                      ("Do you really want to delete the city?\r\nThis action cannot be undone.")))
+                {
+                    GameElementDeleter.DeleteRoot(node.GameObject());
+                    new DeleteNetAction(node.ID).Execute();
+                }
+            }
+        }
+    }
+}

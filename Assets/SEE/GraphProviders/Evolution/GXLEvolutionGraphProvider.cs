@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;

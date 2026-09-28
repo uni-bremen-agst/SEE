@@ -3,35 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using SEE.Game.Avatars;
+
 /// <summary>
-/// Contains components for real-time facial animation driven by externally
-/// provided MediaPipe/ARKit-style tracking data.
+/// Contains components and data structures for real-time facial animation driven
+/// by externally provided MediaPipe/ARKit-style tracking data.
 /// </summary>
 namespace SEE.Tools.EchoFace
 {
-    /// <summary>
-    /// Provides named constants for MediaPipe facial landmark indices used
-    /// to identify specific points on the face (e.g., chin, eyelids) for
-    /// head-pose estimation.
-    /// </summary>
-    internal static class Landmarks
-    {
-        /// <summary>
-        /// The landmark index for the chin.
-        /// </summary>
-        internal const string Chin = "152";
-
-        /// <summary>
-        /// The landmark index for the left upper eyelid.
-        /// </summary>
-        internal const string LeftUpperEyelid = "446";
-
-        /// <summary>
-        /// The landmark index for the right upper eyelid.
-        /// </summary>
-        internal const string RightUpperEyelid = "226";
-    }
-
     /// <summary>
     /// Applies externally provided facial tracking data to a character.
     /// This component maps MediaPipe/ARKit-style blendshapes to custom
@@ -41,28 +20,27 @@ namespace SEE.Tools.EchoFace
     /// <remarks>
     /// This component is intended to be attached to a character prefab
     /// containing a <see cref="SkinnedMeshRenderer"/> with the expected
-    /// custom blendshape names, along with a head bone and two eye bones
-    /// following the naming convention used by <see cref="FindDeepChild"/>.
+    /// custom blendshape names, along with a head bone and two eye bones.
+    /// Uses <see cref="FaceBlendshape"/> and <see cref="FaceLandmark"/> for
+    /// zero-allocation, type-safe array indexing.
     /// </remarks>
     internal class EchoFace : MonoBehaviour
     {
-        //-------------------------------------------------
-        // Public Fields
-        //-------------------------------------------------
+        // --- Inspector Fields ---
 
-        [Header("Avatar Settings")]
         /// <summary>
         /// The skinned mesh renderer whose blendshapes are driven by this component.
         /// If not assigned in the Inspector, an attempt is made to auto-assign it
         /// from a child named "CC_Base_Body" during <see cref="Start"/>.
         /// </summary>
+        [Header("Avatar")]
         [SerializeField]
         private SkinnedMeshRenderer skinnedMeshRenderer;
 
-        [Header("Face Animation Settings")]
         /// <summary>
         /// Whether blendshape-driven face animation is applied at all.
         /// </summary>
+        [Header("Face Animation")]
         [Tooltip("Enable all face animation based on blendshapes.")]
         [SerializeField]
         private bool enableFaceAnimation = true;
@@ -98,18 +76,17 @@ namespace SEE.Tools.EchoFace
         /// stronger squints more pronounced.
         /// </summary>
         /// <remarks>
-        /// The optimal value is around 3; higher values were found in practice
-        /// to exaggerate the effect further.
+        /// The optimal value is around 3; higher values exaggerate the effect further.
         /// </remarks>
         [Tooltip("Power curve for eye squint expression, to make it more pronounced.")]
         [Range(0f, 12f)]
         [SerializeField]
-        private float eyeSquintPower = 12f;
+        private float eyeSquintPower = 3f;
 
-        [Header("Head Rotation Settings")]
         /// <summary>
         /// Whether the head bone is rotated based on estimated landmark data.
         /// </summary>
+        [Header("Head Rotation")]
         [Tooltip("Enable head rotation based on landmarks.")]
         [SerializeField]
         private bool enableHeadRotation = true;
@@ -142,10 +119,10 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private float tiltCorrection = -15.0f;
 
-        [Header("Eye Rotation Settings")]
         /// <summary>
         /// Whether the eye bones are rotated based on eye-look blendshapes.
         /// </summary>
+        [Header("Eye Rotation")]
         [Tooltip("Enable eye rotation based on blendshapes.")]
         [SerializeField]
         private bool enableEyeRotation = true;
@@ -185,9 +162,7 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private float eyeLookScale = 30f;
 
-        //-------------------------------------------------
-        // Private Fields
-        //-------------------------------------------------
+        // --- Private Fields ---
 
         /// <summary>
         /// Stores the most recently received face data, to be applied during
@@ -202,6 +177,12 @@ namespace SEE.Tools.EchoFace
         /// frame's smoothing calculation.
         /// </summary>
         private readonly Dictionary<string, float> currentBlendshapeValues = new();
+
+        /// <summary>
+        /// Reusable buffer for calculating target blendshape weights each frame
+        /// to avoid per-frame GC allocations.
+        /// </summary>
+        private readonly Dictionary<string, float> targetBlendshapeValues = new();
 
         /// <summary>
         /// Caches the mesh blendshape index for each custom blendshape name,
@@ -235,154 +216,158 @@ namespace SEE.Tools.EchoFace
         /// was resolved, used as the rest pose that eye-look rotations are
         /// applied on top of.
         /// </summary>
-        private Quaternion leftEyeRestRotation;
+        private Quaternion leftEyeRestRotation = Quaternion.identity;
 
         /// <summary>
         /// The local rotation of <see cref="rightEyeTransform"/> at the time it
         /// was resolved, used as the rest pose that eye-look rotations are
         /// applied on top of.
         /// </summary>
-        private Quaternion rightEyeRestRotation;
+        private Quaternion rightEyeRestRotation = Quaternion.identity;
+
+        /// <summary>
+        /// The local rotation of <see cref="headTransform"/> at the time it
+        /// was resolved, used as the rest pose to restore on reset.
+        /// </summary>
+        private Quaternion headRestRotation = Quaternion.identity;
 
         /// <summary>
         /// Maps each synthesized viseme blendshape name (<c>V_*</c>) to a
-        /// function that computes its weight, in the range [0, 1], from a set
-        /// of ARKit-style blendshape values.
+        /// function that computes its weight, in the range [0, 1], from a
+        /// <see cref="FaceData"/> instance via <see cref="FaceBlendshape"/> lookups.
         /// </summary>
-        private readonly Dictionary<string, Func<Dictionary<string, float>, float>> visemeSynthesisMap = new()
+        private readonly Dictionary<string, Func<FaceData, float>> visemeSynthesisMap = new()
         {
             {
                 "V_Open",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    arkit["jawOpen"] * 0.9f
-                    + (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.1f
-                    + (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.1f
-                    + arkit["mouthShrugLower"] * 0.05f
-                    - arkit["mouthPucker"] * 0.2f
-                    - arkit["mouthFunnel"] * 0.1f
+                    data[FaceBlendshape.JawOpen] * 0.9f
+                    + (data[FaceBlendshape.MouthUpperUpLeft] + data[FaceBlendshape.MouthUpperUpRight]) * 0.1f
+                    + (data[FaceBlendshape.MouthLowerDownLeft] + data[FaceBlendshape.MouthLowerDownRight]) * 0.1f
+                    + data[FaceBlendshape.MouthShrugLower] * 0.05f
+                    - data[FaceBlendshape.MouthPucker] * 0.2f
+                    - data[FaceBlendshape.MouthFunnel] * 0.1f
                 )
             },
             {
                 "V_Explosive",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
-                    + arkit["mouthPucker"] * 0.4f
-                    + arkit["mouthClose"] * 0.5f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + (1f - arkit["jawOpen"]) * 0.3f
+                    Mathf.Max(data[FaceBlendshape.MouthPressLeft], data[FaceBlendshape.MouthPressRight]) * 0.7f
+                    + data[FaceBlendshape.MouthPucker] * 0.4f
+                    + data[FaceBlendshape.MouthClose] * 0.5f
+                    + Mathf.Max(data[FaceBlendshape.MouthRollUpper], data[FaceBlendshape.MouthRollLower]) * 0.2f
+                    + (1f - data[FaceBlendshape.JawOpen]) * 0.3f
                 )
             },
             {
                 "V_Dental_Lip",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.4f
-                    + arkit["mouthRollLower"] * 0.8f
-                    + (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.2f
-                    + Mathf.Max(arkit["noseSneerLeft"], arkit["noseSneerRight"]) * 0.1f
-                    + (1f - arkit["jawOpen"]) * 0.2f
+                    (data[FaceBlendshape.MouthLowerDownLeft] + data[FaceBlendshape.MouthLowerDownRight]) * 0.4f
+                    + data[FaceBlendshape.MouthRollLower] * 0.8f
+                    + (data[FaceBlendshape.MouthUpperUpLeft] + data[FaceBlendshape.MouthUpperUpRight]) * 0.2f
+                    + Mathf.Max(data[FaceBlendshape.NoseSneerLeft], data[FaceBlendshape.NoseSneerRight]) * 0.1f
+                    + (1f - data[FaceBlendshape.JawOpen]) * 0.2f
                 )
             },
             {
                 "V_Tight_O",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    arkit["mouthPucker"] * 0.7f
-                    + arkit["mouthFunnel"] * 0.6f
-                    + (1f - arkit["jawOpen"]) * 0.2f
-                    + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.1f
-                    - Mathf.Max(arkit["mouthSmileLeft"], arkit["mouthSmileRight"]) * 0.3f
+                    data[FaceBlendshape.MouthPucker] * 0.7f
+                    + data[FaceBlendshape.MouthFunnel] * 0.6f
+                    + (1f - data[FaceBlendshape.JawOpen]) * 0.2f
+                    + Mathf.Max(data[FaceBlendshape.MouthPressLeft], data[FaceBlendshape.MouthPressRight]) * 0.1f
+                    - Mathf.Max(data[FaceBlendshape.MouthSmileLeft], data[FaceBlendshape.MouthSmileRight]) * 0.3f
                 )
             },
             {
                 "V_Tight",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
-                    + arkit["mouthClose"] * 0.5f
-                    //+ (1f - arkit["jawOpen"]) * 0.2f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.15f
+                    Mathf.Max(data[FaceBlendshape.MouthPressLeft], data[FaceBlendshape.MouthPressRight]) * 0.7f
+                    + data[FaceBlendshape.MouthClose] * 0.5f
+                    + Mathf.Max(data[FaceBlendshape.MouthRollUpper], data[FaceBlendshape.MouthRollLower]) * 0.2f
+                    + Mathf.Max(data[FaceBlendshape.MouthFrownLeft], data[FaceBlendshape.MouthFrownRight]) * 0.15f
                 )
             },
             {
                 "V_Wide",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    (arkit["mouthStretchLeft"] + arkit["mouthStretchRight"]) * 0.3f
-                    + (arkit["mouthSmileLeft"] + arkit["mouthSmileRight"]) * 0.3f
-                    + arkit["jawOpen"] * 0.3f
-                    + (arkit["mouthDimpleLeft"] + arkit["mouthDimpleRight"]) * 0.1f
-                    - arkit["mouthPucker"] * 0.2f
-                    - arkit["mouthFunnel"] * 0.2f
+                    (data[FaceBlendshape.MouthStretchLeft] + data[FaceBlendshape.MouthStretchRight]) * 0.3f
+                    + (data[FaceBlendshape.MouthSmileLeft] + data[FaceBlendshape.MouthSmileRight]) * 0.3f
+                    + data[FaceBlendshape.JawOpen] * 0.3f
+                    + (data[FaceBlendshape.MouthDimpleLeft] + data[FaceBlendshape.MouthDimpleRight]) * 0.1f
+                    - data[FaceBlendshape.MouthPucker] * 0.2f
+                    - data[FaceBlendshape.MouthFunnel] * 0.2f
                 )
             },
             {
                 "V_Affricate",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    arkit["mouthFunnel"] * 1.0f
-                    + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.4f
-                    //+ (1f - arkit["jawOpen"]) * 0.3f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.1f
+                    data[FaceBlendshape.MouthFunnel] * 1.0f
+                    + Mathf.Max(data[FaceBlendshape.MouthPressLeft], data[FaceBlendshape.MouthPressRight]) * 0.4f
+                    + Mathf.Max(data[FaceBlendshape.MouthRollUpper], data[FaceBlendshape.MouthRollLower]) * 0.2f
+                    + Mathf.Max(data[FaceBlendshape.MouthFrownLeft], data[FaceBlendshape.MouthFrownRight]) * 0.1f
                 )
             },
             {
                 "V_Lip_Open",
-                arkit =>
+                data =>
                 Mathf.Clamp01(
-                    (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.3f
-                    + (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.3f
-                    + arkit["mouthFunnel"] * 0.6f
-                    + arkit["mouthPucker"] * 0.4f
-                    + arkit["jawOpen"] * 0.2f
+                    (data[FaceBlendshape.MouthUpperUpLeft] + data[FaceBlendshape.MouthUpperUpRight]) * 0.3f
+                    + (data[FaceBlendshape.MouthLowerDownLeft] + data[FaceBlendshape.MouthLowerDownRight]) * 0.3f
+                    + data[FaceBlendshape.MouthFunnel] * 0.6f
+                    + data[FaceBlendshape.MouthPucker] * 0.4f
+                    + data[FaceBlendshape.JawOpen] * 0.2f
                 )
             }
         };
 
         /// <summary>
-        /// Maps each MediaPipe/ARKit blendshape name to the list of custom
+        /// Maps each tracked <see cref="FaceBlendshape"/> to the list of custom
         /// blendshape names on <see cref="skinnedMeshRenderer"/>'s mesh that it
         /// should drive.
         /// </summary>
-        private readonly Dictionary<string, List<string>> mediapipeToCustomMap = new()
+        private readonly Dictionary<FaceBlendshape, List<string>> mediapipeToCustomMap = new()
         {
-            { "browDownLeft", new() { "Brow_Drop_L" } },
-            { "browDownRight", new() { "Brow_Drop_R" } },
-            { "browInnerUp", new() { "Brow_Raise_Inner_L", "Brow_Raise_Inner_R" } },
-            { "browOuterUpLeft", new() { "Brow_Raise_Outer_L" } },
-            { "browOuterUpRight", new() { "Brow_Raise_Outer_R" } },
-            { "cheekPuff", new() { "Cheek_Puff_L", "Cheek_Puff_R" } },
-            { "cheekSquintLeft", new() { "Cheek_Raise_L" } },
-            { "cheekSquintRight", new() { "Cheek_Raise_R" } },
-            { "eyeBlinkLeft", new() { "Eye_Blink_L" } },
-            { "eyeBlinkRight", new() { "Eye_Blink_R" } },
-            { "eyeSquintLeft", new() { "Eye_Squint_L" } },
-            { "eyeSquintRight", new() { "Eye_Squint_R" } },
-            { "eyeWideLeft", new() { "Eye_Wide_L" } },
-            { "eyeWideRight", new() { "Eye_Wide_R" } },
-            { "eyeLookDownLeft", new() { "Eye_L_Look_Down" } },
-            { "eyeLookDownRight", new() { "Eye_R_Look_Down" } },
-            { "eyeLookUpLeft", new() { "Eye_L_Look_Up" } },
-            { "eyeLookUpRight", new() { "Eye_R_Look_Up" } },
-            { "eyeLookInLeft", new() { "Eye_L_Look_R" } },
-            { "eyeLookInRight", new() { "Eye_R_Look_L" } },
-            { "eyeLookOutLeft", new() { "Eye_L_Look_L" } },
-            { "eyeLookOutRight", new() { "Eye_R_Look_R" } },
-            { "jawForward", new() { "Jaw_Forward" } },
-            { "jawLeft", new() { "Jaw_L" } },
-            { "jawRight", new() { "Jaw_R" } },
-            { "jawOpen", new() { "Merged_Open_Mouth" } },
-            { "mouthClose", new() { "Mouth_Close" } },
-            { "mouthDimpleLeft", new() { "Mouth_Dimple_L" } },
-            { "mouthDimpleRight", new() { "Mouth_Dimple_R" } },
-            { "mouthFrownLeft", new() { "Mouth_Frown_L" } },
-            { "mouthFrownRight", new() { "Mouth_Frown_R" } },
+            { FaceBlendshape.BrowDownLeft, new() { "Brow_Drop_L" } },
+            { FaceBlendshape.BrowDownRight, new() { "Brow_Drop_R" } },
+            { FaceBlendshape.BrowInnerUp, new() { "Brow_Raise_Inner_L", "Brow_Raise_Inner_R" } },
+            { FaceBlendshape.BrowOuterUpLeft, new() { "Brow_Raise_Outer_L" } },
+            { FaceBlendshape.BrowOuterUpRight, new() { "Brow_Raise_Outer_R" } },
+            { FaceBlendshape.CheekPuff, new() { "Cheek_Puff_L", "Cheek_Puff_R" } },
+            { FaceBlendshape.CheekSquintLeft, new() { "Cheek_Raise_L" } },
+            { FaceBlendshape.CheekSquintRight, new() { "Cheek_Raise_R" } },
+            { FaceBlendshape.EyeBlinkLeft, new() { "Eye_Blink_L" } },
+            { FaceBlendshape.EyeBlinkRight, new() { "Eye_Blink_R" } },
+            { FaceBlendshape.EyeSquintLeft, new() { "Eye_Squint_L" } },
+            { FaceBlendshape.EyeSquintRight, new() { "Eye_Squint_R" } },
+            { FaceBlendshape.EyeWideLeft, new() { "Eye_Wide_L" } },
+            { FaceBlendshape.EyeWideRight, new() { "Eye_Wide_R" } },
+            { FaceBlendshape.EyeLookDownLeft, new() { "Eye_L_Look_Down" } },
+            { FaceBlendshape.EyeLookDownRight, new() { "Eye_R_Look_Down" } },
+            { FaceBlendshape.EyeLookUpLeft, new() { "Eye_L_Look_Up" } },
+            { FaceBlendshape.EyeLookUpRight, new() { "Eye_R_Look_Up" } },
+            { FaceBlendshape.EyeLookInLeft, new() { "Eye_L_Look_R" } },
+            { FaceBlendshape.EyeLookInRight, new() { "Eye_R_Look_L" } },
+            { FaceBlendshape.EyeLookOutLeft, new() { "Eye_L_Look_L" } },
+            { FaceBlendshape.EyeLookOutRight, new() { "Eye_R_Look_R" } },
+            { FaceBlendshape.JawForward, new() { "Jaw_Forward" } },
+            { FaceBlendshape.JawLeft, new() { "Jaw_L" } },
+            { FaceBlendshape.JawRight, new() { "Jaw_R" } },
+            { FaceBlendshape.JawOpen, new() { "Merged_Open_Mouth" } },
+            { FaceBlendshape.MouthClose, new() { "Mouth_Close" } },
+            { FaceBlendshape.MouthDimpleLeft, new() { "Mouth_Dimple_L" } },
+            { FaceBlendshape.MouthDimpleRight, new() { "Mouth_Dimple_R" } },
+            { FaceBlendshape.MouthFrownLeft, new() { "Mouth_Frown_L" } },
+            { FaceBlendshape.MouthFrownRight, new() { "Mouth_Frown_R" } },
             {
-                "mouthFunnel",
+                FaceBlendshape.MouthFunnel,
                 new()
                 {
                     "Mouth_Funnel_Up_L",
@@ -391,14 +376,14 @@ namespace SEE.Tools.EchoFace
                     "Mouth_Funnel_Down_R"
                 }
             },
-            { "mouthLeft", new() { "Mouth_L" } },
-            { "mouthRight", new() { "Mouth_R" } },
-            { "mouthLowerDownLeft", new() { "Mouth_Down_Lower_L" } },
-            { "mouthLowerDownRight", new() { "Mouth_Down_Lower_R" } },
-            { "mouthPressLeft", new() { "Mouth_Press_L" } },
-            { "mouthPressRight", new() { "Mouth_Press_R" } },
+            { FaceBlendshape.MouthLeft, new() { "Mouth_L" } },
+            { FaceBlendshape.MouthRight, new() { "Mouth_R" } },
+            { FaceBlendshape.MouthLowerDownLeft, new() { "Mouth_Down_Lower_L" } },
+            { FaceBlendshape.MouthLowerDownRight, new() { "Mouth_Down_Lower_R" } },
+            { FaceBlendshape.MouthPressLeft, new() { "Mouth_Press_L" } },
+            { FaceBlendshape.MouthPressRight, new() { "Mouth_Press_R" } },
             {
-                "mouthPucker",
+                FaceBlendshape.MouthPucker,
                 new()
                 {
                     "Mouth_Pucker_Up_L",
@@ -407,18 +392,18 @@ namespace SEE.Tools.EchoFace
                     "Mouth_Pucker_Down_R"
                 }
             },
-            { "mouthRollLower", new() { "Mouth_Roll_In_Lower_L", "Mouth_Roll_In_Lower_R" } },
-            { "mouthRollUpper", new() { "Mouth_Roll_In_Upper_L", "Mouth_Roll_In_Upper_R" } },
-            { "mouthShrugLower", new() { "Mouth_Shrug_Lower" } },
-            { "mouthShrugUpper", new() { "Mouth_Shrug_Upper" } },
-            { "mouthSmileLeft", new() { "Mouth_Smile_L" } },
-            { "mouthSmileRight", new() { "Mouth_Smile_R" } },
-            { "mouthStretchLeft", new() { "Mouth_Stretch_L" } },
-            { "mouthStretchRight", new() { "Mouth_Stretch_R" } },
-            { "mouthUpperUpLeft", new() { "Mouth_Up_Upper_L" } },
-            { "mouthUpperUpRight", new() { "Mouth_Up_Upper_R" } },
-            { "noseSneerLeft", new() { "Nose_Sneer_L" } },
-            { "noseSneerRight", new() { "Nose_Sneer_R" } }
+            { FaceBlendshape.MouthRollLower, new() { "Mouth_Roll_In_Lower_L", "Mouth_Roll_In_Lower_R" } },
+            { FaceBlendshape.MouthRollUpper, new() { "Mouth_Roll_In_Upper_L", "Mouth_Roll_In_Upper_R" } },
+            { FaceBlendshape.MouthShrugLower, new() { "Mouth_Shrug_Lower" } },
+            { FaceBlendshape.MouthShrugUpper, new() { "Mouth_Shrug_Upper" } },
+            { FaceBlendshape.MouthSmileLeft, new() { "Mouth_Smile_L" } },
+            { FaceBlendshape.MouthSmileRight, new() { "Mouth_Smile_R" } },
+            { FaceBlendshape.MouthStretchLeft, new() { "Mouth_Stretch_L" } },
+            { FaceBlendshape.MouthStretchRight, new() { "Mouth_Stretch_R" } },
+            { FaceBlendshape.MouthUpperUpLeft, new() { "Mouth_Up_Upper_L" } },
+            { FaceBlendshape.MouthUpperUpRight, new() { "Mouth_Up_Upper_R" } },
+            { FaceBlendshape.NoseSneerLeft, new() { "Nose_Sneer_L" } },
+            { FaceBlendshape.NoseSneerRight, new() { "Nose_Sneer_R" } }
         };
 
         /// <summary>
@@ -450,9 +435,7 @@ namespace SEE.Tools.EchoFace
             { "Mouth_Pucker_Down_R", 0.8f },
         };
 
-        //-------------------------------------------------
-        // Unity Lifecycle Methods
-        //-------------------------------------------------
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Auto-assigns <see cref="skinnedMeshRenderer"/>
@@ -465,26 +448,29 @@ namespace SEE.Tools.EchoFace
             // Attempt to auto-assign skinnedMeshRenderer if not set in Inspector
             if (skinnedMeshRenderer == null)
             {
-                skinnedMeshRenderer = transform.Find("CC_Base_Body")?.GetComponent<SkinnedMeshRenderer>();
+                skinnedMeshRenderer = transform.Find(AvatarSceleton.BaseBody)?.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer == null)
                 {
-                    Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.");
+                    Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.\n");
+                    return;
                 }
             }
 
             // Attempt to auto-assign headTransform
             if (headTransform == null)
             {
-                headTransform = FindDeepChild(transform, "CC_Base_Head");
+                headTransform = transform.Find(AvatarSceleton.Head);
                 if (headTransform == null)
                 {
-                    Debug.LogWarning("[EchoFace] Head bone transform not found. Head rotation will be disabled.");
+                    Debug.LogWarning("[EchoFace] Head bone transform not found. Head rotation will be disabled.\n");
                 }
-                else
-                {
-                    // Find eye bones if head is found
-                    FindEyeBones(headTransform);
-                }
+            }
+
+            // Find eye bones if head is found
+            if (headTransform != null)
+            {
+                headRestRotation = headTransform.localRotation;
+                FindEyeBones(headTransform);
             }
 
             CacheBlendshapeIndices();
@@ -498,7 +484,6 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private void LateUpdate()
         {
-            // Apply blendshapes and head/eye rotation in LateUpdate after all animations have been processed.
             if (latestFaceData == null)
             {
                 return;
@@ -507,88 +492,81 @@ namespace SEE.Tools.EchoFace
             // Apply blendshapes
             if (enableFaceAnimation && skinnedMeshRenderer != null)
             {
-                ApplyBlendshapes(latestFaceData.Blendshapes);
+                ApplyBlendshapes(latestFaceData);
             }
 
             // Estimate and apply head pose
             if (enableHeadRotation && headTransform != null)
             {
-                Quaternion targetRotation = EstimateHeadRotation(latestFaceData.LandmarkPositions);
+                Quaternion targetRotation = EstimateHeadRotation(latestFaceData);
                 ApplyHeadRotation(targetRotation);
             }
 
             // Apply eye rotation
             if (enableEyeRotation && leftEyeTransform != null && rightEyeTransform != null)
             {
-                ApplyEyeRotation();
+                ApplyEyeRotation(latestFaceData);
             }
-
-            // latestFaceData = null; // IMPORTANT: Resetting the data will enable other components to manipulate the face causing jitter!
         }
 
-        //-------------------------------------------------
-        // Private Methods
-        //-------------------------------------------------
+        /// <summary>
+        /// Unity lifecycle method. Ensures all facial animations and tracking
+        /// states are reset to their default rest pose when this component is disabled.
+        /// </summary>
+        private void OnDisable()
+        {
+            ResetToRestPose();
+        }
+
+        // --- Private Methods ---
 
         /// <summary>
         /// Converts MediaPipe landmark coordinates to a Unity Vector3.
         /// MediaPipe's coordinate system is different from Unity's, so the axes are flipped.
         /// </summary>
-        /// <param name="coords">The landmark coordinates from the JSON data.</param>
-        /// <returns>A new Vector3 suitable for use in Unity's world space.</returns>
+        /// <param name="coords">The landmark coordinates from the tracking data.</param>
+        /// <returns>A new Vector3 suitable for use in Unity's local space.</returns>
         private Vector3 ToUnityVector3(FaceData.LandmarkCoordinates coords)
         {
-            return new Vector3(-coords.X, -coords.Y, -coords.Z);
+            return new(-coords.X, -coords.Y, -coords.Z);
         }
 
         /// <summary>
-        /// Applies blendshape weights with smoothing.
+        /// Applies blendshape weights with exponential smoothing.
         /// </summary>
-        /// <param name="blendshapes">
-        /// The MediaPipe/ARKit blendshape values to apply, keyed by blendshape
-        /// name. If <c>null</c>, the method returns without applying anything.
+        /// <param name="data">
+        /// The face data containing raw blendshape weights.
+        /// If <c>null</c> or unassigned, the method returns without applying anything.
         /// </param>
-        private void ApplyBlendshapes(Dictionary<string, float> blendshapes)
+        private void ApplyBlendshapes(FaceData data)
         {
-            if (blendshapes == null)
+            if (data == null || data.Blendshapes == null)
             {
                 return;
             }
 
-            Dictionary<string, float> targetBlendshapeValues = new();
+            targetBlendshapeValues.Clear();
 
             // 1. Map MediaPipe to Custom Blendshapes and apply enhancements
-            foreach (var kvp in blendshapes)
+            for (int i = 0; i < (int)FaceBlendshape.Count; i++)
             {
-                if (!mediapipeToCustomMap.TryGetValue(kvp.Key, out List<string> customNames))
+                FaceBlendshape shape = (FaceBlendshape)i;
+                if (!mediapipeToCustomMap.TryGetValue(shape, out List<string> customNames))
                 {
                     continue;
                 }
 
-                float value = kvp.Value;
+                float value = data[shape];
 
                 // Apply power curve to eyeSquint AND add the influence of browDown
-                if (kvp.Key.Contains("eyeSquint"))
+                if (shape == FaceBlendshape.EyeSquintLeft || shape == FaceBlendshape.EyeSquintRight)
                 {
-                    float browDownValue = 0f;
-                    if (kvp.Key == "eyeSquintLeft" && blendshapes.ContainsKey("browDownLeft"))
-                    {
-                        browDownValue = blendshapes["browDownLeft"];
-                    }
-                    else if (kvp.Key == "eyeSquintRight" && blendshapes.ContainsKey("browDownRight"))
-                    {
-                        browDownValue = blendshapes["browDownRight"];
-                    }
+                    float browDown = shape == FaceBlendshape.EyeSquintLeft
+                        ? data[FaceBlendshape.BrowDownLeft]
+                        : data[FaceBlendshape.BrowDownRight];
 
-                    // Version 1 (more subtle):
-                    // - Apply the eyeSquintPower to exaggerate stronger squints
-                    // - Scale the browDown contribution linearly with the powered squint
                     value = Mathf.Pow(value, eyeSquintPower);
-                    value = Mathf.Clamp01(value + value * browDownValue);
-
-                    // Alternative Version (more expressive):
-                    // float brow = Mathf.Pow(browDownValue * value, eyeSquintPower);
-                    // value = Mathf.Clamp01(value + brow);
+                    value = Mathf.Clamp01(value + value * browDown);
                 }
 
                 foreach (string name in customNames)
@@ -605,23 +583,22 @@ namespace SEE.Tools.EchoFace
             // Multiply upper lip lift by the smile intensity to drive Mouth_Down,
             // creating a counter-pull to hide the upper gums while smiling.
             targetBlendshapeValues["Mouth_Down"] = Mathf.Max(
-                blendshapes.GetValueOrDefault("mouthUpperUpLeft", 0f),
-                blendshapes.GetValueOrDefault("mouthUpperUpRight", 0f)
+                data[FaceBlendshape.MouthUpperUpLeft],
+                data[FaceBlendshape.MouthUpperUpRight]
             ) * Mathf.Max(
-                blendshapes.GetValueOrDefault("mouthSmileLeft", 0f),
-                blendshapes.GetValueOrDefault("mouthSmileRight", 0f)
+                data[FaceBlendshape.MouthSmileLeft],
+                data[FaceBlendshape.MouthSmileRight]
             );
 
             // Damp the lower lip's downward movement proportionally to 'jawOpen' to prevent the lip
             // from drooping and exposing the lower gums when the mouth is wide open.
+            float jawOpen = data[FaceBlendshape.JawOpen];
             targetBlendshapeValues["Mouth_Down_Lower_L"] = Mathf.Clamp01(
-                blendshapes.GetValueOrDefault("mouthLowerDownLeft", 0f)
-                * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+                data[FaceBlendshape.MouthLowerDownLeft] * (1f - jawOpen)
             );
 
             targetBlendshapeValues["Mouth_Down_Lower_R"] = Mathf.Clamp01(
-                blendshapes.GetValueOrDefault("mouthLowerDownRight", 0f)
-                * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+                data[FaceBlendshape.MouthLowerDownRight] * (1f - jawOpen)
             );
 
             // 3. Synthesize and Apply Visemes
@@ -629,7 +606,7 @@ namespace SEE.Tools.EchoFace
             {
                 foreach (var visemeKvp in visemeSynthesisMap)
                 {
-                    targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(blendshapes);
+                    targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(data);
                 }
             }
             else
@@ -686,32 +663,23 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
-        /// Estimates the head's rotation from a set of facial landmarks by
-        /// constructing an orthonormal basis from the chin and eyelid
-        /// positions, then applying a manual pitch correction.
+        /// Estimates the head's rotation from facial landmarks in <see cref="FaceData"/>
+        /// by constructing an orthonormal basis from the chin and eyelid positions.
         /// </summary>
-        /// <param name="landmarks">
-        /// The landmark positions, keyed by landmark index (see
-        /// <see cref="Landmarks"/>). Must contain at least the chin and both
-        /// upper eyelid landmarks; otherwise the previously computed rotation
-        /// is returned unchanged.
-        /// </param>
+        /// <param name="faceData">The latest frame's face data.</param>
         /// <returns>
-        /// The estimated head rotation, or the current head rotation if the
-        /// required landmarks are missing.
+        /// The estimated head rotation, or the current head rotation if landmarks are missing.
         /// </returns>
-        private Quaternion EstimateHeadRotation(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
+        private Quaternion EstimateHeadRotation(FaceData faceData)
         {
-            // Ensure the required landmarks exist using named constants.
-            if (landmarks == null || landmarks.Count < 3)
+            if (faceData == null || !faceData.HasLandmarks)
             {
-                Debug.LogWarning("[EchoFace] Required landmarks for head pose not found in the received data.");
                 return currentHeadRotation;
             }
 
-            Vector3 chin = ToUnityVector3(landmarks[Landmarks.Chin]);
-            Vector3 leftEyeInner = ToUnityVector3(landmarks[Landmarks.LeftUpperEyelid]);
-            Vector3 rightEyeInner = ToUnityVector3(landmarks[Landmarks.RightUpperEyelid]);
+            Vector3 chin = ToUnityVector3(faceData[FaceLandmark.Chin]);
+            Vector3 leftEyeInner = ToUnityVector3(faceData[FaceLandmark.LeftUpperEyelid]);
+            Vector3 rightEyeInner = ToUnityVector3(faceData[FaceLandmark.RightUpperEyelid]);
 
             // Calculate a vector representing the direction of the face's "up."
             Vector3 eyeMidpoint = (leftEyeInner + rightEyeInner) * 0.5f;
@@ -730,42 +698,43 @@ namespace SEE.Tools.EchoFace
 
             // Apply a manual pitch correction for the camera's tilt.
             Quaternion correction = Quaternion.Euler(tiltCorrection, 0, 0);
-            targetRotation = targetRotation * correction;
+            targetRotation *= correction;
 
             return targetRotation;
         }
 
         /// <summary>
         /// Rotates the eye bones based on blendshape-driven look directions.
+        /// Yaw rotations are aligned so that both eyes rotate parallel in the gaze direction.
         /// </summary>
-        private void ApplyEyeRotation()
+        /// <param name="data">The face data containing raw blendshape weights.</param>
+        private void ApplyEyeRotation(FaceData data)
         {
-            if (latestFaceData?.Blendshapes == null)
+            if (data == null || data.Blendshapes == null)
             {
                 return;
             }
 
-            Dictionary<string, float> blendshapes = latestFaceData.Blendshapes;
             float pitchLeft = 0f;
             float yawLeft = 0f;
             float pitchRight = 0f;
             float yawRight = 0f;
 
             // Pitch (up/down)
-            pitchLeft -= blendshapes.GetValueOrDefault("eyeLookUpLeft") * eyeLookScale;
-            pitchLeft += blendshapes.GetValueOrDefault("eyeLookDownLeft") * eyeLookScale;
+            pitchLeft -= data[FaceBlendshape.EyeLookUpLeft] * eyeLookScale;
+            pitchLeft += data[FaceBlendshape.EyeLookDownLeft] * eyeLookScale;
             pitchLeft -= tiltCorrection * 0.5f;
 
-            pitchRight -= blendshapes.GetValueOrDefault("eyeLookUpRight") * eyeLookScale;
-            pitchRight += blendshapes.GetValueOrDefault("eyeLookDownRight") * eyeLookScale;
+            pitchRight -= data[FaceBlendshape.EyeLookUpRight] * eyeLookScale;
+            pitchRight += data[FaceBlendshape.EyeLookDownRight] * eyeLookScale;
             pitchRight -= tiltCorrection * 0.5f;
 
-            // Yaw (left/right)
-            yawLeft -= blendshapes.GetValueOrDefault("eyeLookOutLeft") * eyeLookScale;
-            yawLeft += blendshapes.GetValueOrDefault("eyeLookInLeft") * eyeLookScale;
+            // Yaw (left/right: looking left drives left eye OUT and right eye IN; both must rotate in parallel)
+            yawLeft -= data[FaceBlendshape.EyeLookOutLeft] * eyeLookScale;
+            yawLeft += data[FaceBlendshape.EyeLookInLeft] * eyeLookScale;
 
-            yawRight += blendshapes.GetValueOrDefault("eyeLookOutRight") * eyeLookScale;
-            yawRight -= blendshapes.GetValueOrDefault("eyeLookInRight") * eyeLookScale;
+            yawRight -= data[FaceBlendshape.EyeLookInRight] * eyeLookScale;
+            yawRight += data[FaceBlendshape.EyeLookOutRight] * eyeLookScale;
 
             // Target rotations, with Z-axis fixed at 0
             Quaternion targetLeftRotation = Quaternion.Euler(pitchLeft, 0, yawLeft);
@@ -800,7 +769,7 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
-        /// Finds the left and right eye bones by recursively searching under the head transform.
+        /// Finds the left and right eye bones by looking up the avatar skeleton hierarchy.
         /// </summary>
         /// <param name="head">
         /// The head transform to search under. If <c>null</c>, the method
@@ -813,13 +782,12 @@ namespace SEE.Tools.EchoFace
                 return;
             }
 
-            // Use the recursive search method to find the eyes
-            leftEyeTransform = FindDeepChild(head, "CC_Base_L_Eye");
-            rightEyeTransform = FindDeepChild(head, "CC_Base_R_Eye");
+            leftEyeTransform = transform.Find(AvatarSceleton.LeftEye);
+            rightEyeTransform = transform.Find(AvatarSceleton.RightEye);
 
             if (leftEyeTransform == null || rightEyeTransform == null)
             {
-                Debug.LogWarning("[EchoFace] Eye bone transforms not found. Eye rotation will be disabled.");
+                Debug.LogWarning("[EchoFace] Eye bone transforms not found. Eye rotation will be disabled.\n");
             }
             else
             {
@@ -830,43 +798,15 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
-        /// Recursively finds a child transform by name.
-        /// </summary>
-        /// <param name="parent">The transform whose descendants are searched.</param>
-        /// <param name="name">The name of the child transform to find.</param>
-        /// <returns>
-        /// The first matching descendant transform, searched breadth-first
-        /// among direct children before recursing; or <c>null</c> if no
-        /// matching descendant exists.
-        /// </returns>
-        private Transform FindDeepChild(Transform parent, string name)
-        {
-            // First, check direct children
-            Transform directChild = parent.Find(name);
-            if (directChild != null)
-            {
-                return directChild;
-            }
-
-            // If not found, recursively search grand-children and beyond
-            foreach (Transform child in parent)
-            {
-                Transform found = FindDeepChild(child, name);
-                if (found != null)
-                {
-                    return found;
-                }
-            }
-
-            // Not found in this branch
-            return null;
-        }
-
-        /// <summary>
         /// Caches blendshape name-to-index mappings for faster lookup.
         /// </summary>
         private void CacheBlendshapeIndices()
         {
+            if (skinnedMeshRenderer == null)
+            {
+                return;
+            }
+
             blendshapeIndexCache.Clear();
             Mesh mesh = skinnedMeshRenderer.sharedMesh;
             if (mesh == null)
@@ -880,7 +820,6 @@ namespace SEE.Tools.EchoFace
                     .ToList();
 
             allBlendshapeNames.Add("Mouth_Down");
-            allBlendshapeNames.Add("Mouth_Up");
 
             foreach (string name in allBlendshapeNames.Distinct())
             {
@@ -891,13 +830,13 @@ namespace SEE.Tools.EchoFace
                 }
                 else
                 {
-                    Debug.LogWarning($"[EchoFace] Blendshape '{name}' not found on the mesh.");
+                    Debug.LogWarning($"[EchoFace] Blendshape '{name}' not found on the mesh.\n");
                 }
             }
         }
 
         /// <summary>
-        /// Receives externally provided face-tracking data (e.g., from UDP or other sources)
+        /// Receives externally provided face-tracking data (e.g., from network replication)
         /// and stores it as the latest frame to be applied during <c>LateUpdate</c>.
         /// </summary>
         /// <remarks>
@@ -908,6 +847,47 @@ namespace SEE.Tools.EchoFace
         internal void SetFaceData(FaceData data)
         {
             latestFaceData = data;
+        }
+
+        /// <summary>
+        /// Resets the facial animation, bone transforms, and internal tracking state
+        /// back to their default rest pose.
+        /// </summary>
+        internal void ResetToRestPose()
+        {
+            // Reset blendshapes to zero
+            if (skinnedMeshRenderer != null && skinnedMeshRenderer.sharedMesh != null)
+            {
+                int count = skinnedMeshRenderer.sharedMesh.blendShapeCount;
+                for (int i = 0; i < count; i++)
+                {
+                    skinnedMeshRenderer.SetBlendShapeWeight(i, 0f);
+                }
+            }
+
+            // Reset head and eye rotations to their rest poses
+            if (headTransform != null)
+            {
+                headTransform.localRotation = headRestRotation;
+            }
+
+            if (leftEyeTransform != null)
+            {
+                leftEyeTransform.localRotation = leftEyeRestRotation;
+            }
+
+            if (rightEyeTransform != null)
+            {
+                rightEyeTransform.localRotation = rightEyeRestRotation;
+            }
+
+            // Clear internal smoothing states and buffered frames
+            currentBlendshapeValues.Clear();
+            targetBlendshapeValues.Clear();
+            currentHeadRotation = Quaternion.identity;
+            currentLeftEyeRotation = Quaternion.identity;
+            currentRightEyeRotation = Quaternion.identity;
+            latestFaceData = null;
         }
     }
 }

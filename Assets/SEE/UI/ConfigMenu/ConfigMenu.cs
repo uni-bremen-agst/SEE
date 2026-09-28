@@ -26,7 +26,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;

@@ -1,9 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.DataModel;
-using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System;

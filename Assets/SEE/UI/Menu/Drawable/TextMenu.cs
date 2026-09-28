@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
@@ -14,6 +13,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.Menu.Drawable
 {

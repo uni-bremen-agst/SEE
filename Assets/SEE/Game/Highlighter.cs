@@ -1,6 +1,5 @@
 ﻿using HighlightPlus;
-using SEE.GO;
-using SEE.Utils;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Game

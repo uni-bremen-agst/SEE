@@ -1,5 +1,5 @@
-﻿using SEE.Controls;
-using SEE.GO;
+﻿using SEE.Controls.SpeechInput;
+using SEE.Extensions;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using Sirenix.OdinInspector;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {

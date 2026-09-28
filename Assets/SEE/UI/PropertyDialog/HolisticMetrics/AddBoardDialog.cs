@@ -1,4 +1,4 @@
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog.HolisticMetrics

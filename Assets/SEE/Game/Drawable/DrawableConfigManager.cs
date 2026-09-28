@@ -1,6 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -355,28 +355,28 @@ namespace SEE.Game.Drawable
 
             foreach (LineConf line in source.LineConfigs.Where(line => line.AssociatedPage == page))
             {
-                LineConf clone = (LineConf)line.Clone();
+                LineConf clone = line.Clone();
                 clone.AssociatedPage = 0;
                 result.LineConfigs.Add(clone);
             }
 
             foreach (TextConf text in source.TextConfigs.Where(text => text.AssociatedPage == page))
             {
-                TextConf clone = (TextConf)text.Clone();
+                TextConf clone = text.Clone();
                 clone.AssociatedPage = 0;
                 result.TextConfigs.Add(clone);
             }
 
             foreach (ImageConf image in source.ImageConfigs.Where(image => image.AssociatedPage == page))
             {
-                ImageConf clone = (ImageConf)image.Clone();
+                ImageConf clone = image.Clone();
                 clone.AssociatedPage = 0;
                 result.ImageConfigs.Add(clone);
             }
 
             foreach (MindMapNodeConf node in source.MindMapNodeConfigs.Where(node => node.AssociatedPage == page))
             {
-                MindMapNodeConf clone = (MindMapNodeConf)node.Clone();
+                MindMapNodeConf clone = node.Clone();
                 clone.AssociatedPage = 0;
                 result.MindMapNodeConfigs.Add(clone);
             }

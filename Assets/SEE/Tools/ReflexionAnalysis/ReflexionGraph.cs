@@ -130,6 +130,15 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Returns a clone of this reflexion graph using the graph cloning behavior.
+        /// </summary>
+        /// <returns>A clone of this reflexion graph.</returns>
+        public new ReflexionGraph Clone()
+        {
+            return (ReflexionGraph)base.Clone();
+        }
+
+        /// <summary>
         /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
         /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
         /// the result. Note that the name of the three graphs may be modified.

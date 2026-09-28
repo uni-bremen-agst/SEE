@@ -1,9 +1,10 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.CityRendering;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.GraphElementRefs;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Net;
@@ -11,7 +12,7 @@ using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -23,6 +24,7 @@ using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using SEE.SceneManipulation;
 
 namespace SEE.Game.City
 {
@@ -421,7 +423,7 @@ namespace SEE.Game.City
         {
             SaveData();
             SaveLayout();
-            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            if (!string.IsNullOrEmpty(UserSetting.BackendServerAPI))
             {
                 SEEReflexionCitySnapshot snapshot = new()
                 {
@@ -505,7 +507,7 @@ namespace SEE.Game.City
                 Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
                 foreach (GameObject gameObject in gameObjects)
                 {
-                    Node node = gameObject.GetComponent<NodeRef>().Value;
+                    Node node = gameObject.GetNode();
                     // Skip the root node. For implementation nodes, we only need the position.
                     if (node.IsRoot())
                     {

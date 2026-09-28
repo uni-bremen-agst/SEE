@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -48,6 +48,7 @@ namespace SEE.UI
     /// end of your loading process and hide the spinner.
     /// You can also call <see cref="Hide"/> manually with your unique message to hide the spinner.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class LoadingSpinner : PlatformDependentComponent
     {
         /// <summary>

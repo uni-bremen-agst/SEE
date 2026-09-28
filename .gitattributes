@@ -7,6 +7,20 @@
 #*.cs text
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
+# Declare files that will always have LF line endings on checkout.
+# Unity writes its text assets with LF on every platform. Without these rules,
+# git smudges them to CRLF on checkout and Unity rewrites them as LF again,
+# whereupon git status reports them as modified forever while git diff shows
+# nothing: the size cached in the index is the CRLF one, the file on disk is the
+# LF one, and only the cheap stat check notices. Keep these rules above the
+# Git LFS section below, whose -text must continue to win for binary content.
+*.anim text eol=lf
+*.asmdef text eol=lf
+*.asset text eol=lf
+*.mat text eol=lf
+*.meta text eol=lf
+*.prefab text eol=lf
+*.unity text eol=lf
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary

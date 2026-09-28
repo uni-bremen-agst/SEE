@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 

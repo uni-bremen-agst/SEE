@@ -1,8 +1,8 @@
 using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using SEE.Controls;
-using SEE.GO;
+using SEE.Controls.Players;
+using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.ConsoleWindow;
 using SEE.UI.Window.VariablesWindow;
@@ -86,7 +86,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void OpenConsole(bool start = false)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             ConsoleWindow console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
             if (console == null)
             {
@@ -116,7 +116,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void OpenVariables()
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             if (variablesWindow == null)
             {
                 variablesWindow = manager.Windows.OfType<VariablesWindow>().FirstOrDefault() ?? Canvas.AddComponent<VariablesWindow>();

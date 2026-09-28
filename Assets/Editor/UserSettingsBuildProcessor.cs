@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using SEE.User;
+using SEE.UserSettings;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -30,12 +30,12 @@ namespace SEEEditor
         /// </remarks>
         public void OnPreprocessBuild(BuildReport report)
         {
-            UserSettings userSettings = UserSettings.Instance;
+            UserSetting userSettings = UserSetting.Instance;
 
             if (userSettings == null)
             {
                 throw new BuildFailedException(
-                    $"Cannot regenerate user settings because no {nameof(UserSettings)} component exists in the currently loaded scene." +
+                    $"Cannot regenerate user settings because no {nameof(UserSetting)} component exists in the currently loaded scene." +
                     "Open the SEEStart scene before creating a player build.");
             }
 
