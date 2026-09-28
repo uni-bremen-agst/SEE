@@ -48,7 +48,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if an enclosing branch is proven unreachable;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsThrowStatementProvenUnreachable(
+        internal static bool IsThrowStatementProvenUnreachable(
             ThrowStatementSyntax throwStatement,
             SyntaxNode analysisRoot,
             SemanticModel semanticModel,
@@ -115,7 +115,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the throw expression is proven unreachable;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsThrowExpressionProvenUnreachable(
+        internal static bool IsThrowExpressionProvenUnreachable(
     ThrowExpressionSyntax throwExpression,
     SyntaxNode analysisRoot,
     SemanticModel semanticModel,

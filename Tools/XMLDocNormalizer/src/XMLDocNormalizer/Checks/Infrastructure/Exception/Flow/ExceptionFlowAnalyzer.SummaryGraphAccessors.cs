@@ -35,7 +35,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known while analyzing the caller.
         /// </param>
-        private static void AnalyzeSummarySimpleNamePropertyAccesses(
+        internal static void AnalyzeSummarySimpleNamePropertyAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
@@ -107,7 +107,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known while analyzing the caller.
         /// </param>
-        private static void AnalyzeSummaryWriteAccesses(
+        internal static void AnalyzeSummaryWriteAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,

@@ -84,7 +84,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// introduced outside the analysis scope; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool IsSummaryDispatchTargetSetComplete(
+        internal static bool IsSummaryDispatchTargetSetComplete(
             IMethodSymbol methodSymbol,
             ITypeSymbol? receiverType,
             INamedTypeSymbol? exactReceiverType,
@@ -574,7 +574,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The uncertainty description.
         /// </returns>
-        private static string CreateSummaryDispatchUncertainty(
+        internal static string CreateSummaryDispatchUncertainty(
             IMethodSymbol methodSymbol,
             ITypeSymbol? receiverType)
         {

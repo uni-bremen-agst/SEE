@@ -5,8 +5,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains local syntax traversal for callable summary graphs.
+    /// Discovers local sources and specialized call edges for one summary
+    /// callable body.
     /// </summary>
+    /// <remarks>
+    /// The component owns no graph lifecycle or evaluation state. It mutates
+    /// only the fragment and graph supplied for the current builder work item
+    /// and is safe for concurrent calls with independent arguments.
+    /// </remarks>
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
@@ -311,7 +317,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             foreach (CatchClauseSyntax catchClause
                      in tryStatement.Catches)
             {
-                if (!CatchSuppressesOriginalException(
+                if (!ExceptionFlowCatchSemantics.CatchSuppressesOriginalException(
                         catchClause,
                         semanticModel) ||
                     catchClause.Filter != null)
@@ -319,7 +325,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (IsCatchAll(
+                if (ExceptionFlowCatchSemantics.IsCatchAll(
                         catchClause,
                         semanticModel))
                 {
@@ -327,7 +333,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return;
                 }
 
-                if (GetCaughtExceptionType(
+                if (ExceptionFlowCatchSemantics.GetCaughtExceptionType(
                         catchClause,
                         semanticModel)
                     is INamedTypeSymbol caughtType)
@@ -377,7 +383,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Matching nodes excluding nested try-statements and bodies of local
         /// functions, lambdas, and anonymous methods.
         /// </returns>
-        private static IEnumerable<TNode>
+        internal static IEnumerable<TNode>
             GetSummaryDescendantsAndSelf<TNode>(
                 SyntaxNode node)
             where TNode : SyntaxNode

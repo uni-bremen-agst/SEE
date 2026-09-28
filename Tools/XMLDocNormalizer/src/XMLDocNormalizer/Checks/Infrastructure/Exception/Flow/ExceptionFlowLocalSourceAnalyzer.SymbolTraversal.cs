@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -10,7 +11,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains transitive traversal of constructors, properties, indexers,
     /// and callable symbols.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowLocalSourceAnalyzer
     {
         /// <summary>
         /// Resolves explicit and target-typed constructor calls within the
@@ -206,27 +207,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether the specified object creation is part of a
-        /// direct throw statement or throw expression and is therefore
-        /// already covered by direct throw analysis.
-        /// </summary>
-        /// <param name="creation">
-        /// The object creation to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the object creation is directly thrown;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsPartOfDirectThrow(
-            BaseObjectCreationExpressionSyntax creation)
-        {
-            return creation.Parent
-                       is ThrowStatementSyntax ||
-                   creation.Parent
-                       is ThrowExpressionSyntax;
-        }
-
-        /// <summary>
         /// Analyzes a property-like symbol by first trying its getter symbol
         /// and then falling back to the property or indexer declaration
         /// itself.
@@ -328,7 +308,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if at least one executable body was analyzed
         /// for the symbol; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool AnalyzeSymbol(
+        internal static bool AnalyzeSymbol(
             ISymbol symbol,
             ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowAnalysisResult result,

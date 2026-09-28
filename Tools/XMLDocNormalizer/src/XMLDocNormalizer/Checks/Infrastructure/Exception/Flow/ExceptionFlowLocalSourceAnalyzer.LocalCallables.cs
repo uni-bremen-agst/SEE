@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models.DTO;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -8,7 +9,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains recursive analysis of local functions, anonymous functions,
     /// and stable delegate invocations.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowLocalSourceAnalyzer
     {
         /// <summary>
         /// Attempts to analyze one local or anonymous callable declaration.

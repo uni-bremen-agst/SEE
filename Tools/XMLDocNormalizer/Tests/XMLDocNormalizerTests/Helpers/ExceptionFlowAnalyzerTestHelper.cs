@@ -257,13 +257,13 @@ namespace XMLDocNormalizerTests.Helpers
                 analysisKind switch
                 {
                     TestAnalysisKind.Direct =>
-                        ExceptionFlowAnalyzer
+                        ExceptionFlowLocalSourceAnalyzer
                             .AnalyzeDirectlyThrownExceptions(
                                 matchingMethods[0],
                                 exceptionFlowEnvironment),
 
                     TestAnalysisKind.RecursiveTransitive =>
-                        ExceptionFlowAnalyzer
+                        ExceptionFlowLocalSourceAnalyzer
                             .AnalyzeTransitivelyThrownExceptions(
                                 matchingMethods[0],
                                 exceptionFlowEnvironment),

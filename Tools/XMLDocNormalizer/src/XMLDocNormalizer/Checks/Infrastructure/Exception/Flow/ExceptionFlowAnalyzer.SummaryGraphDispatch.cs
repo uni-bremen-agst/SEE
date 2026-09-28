@@ -760,7 +760,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The distinct known executable runtime targets.
         /// </returns>
-        private static IReadOnlyList<IMethodSymbol>
+        internal static IReadOnlyList<IMethodSymbol>
             ResolveSummaryRuntimeTargets(
                 IMethodSymbol methodSymbol,
                 ITypeSymbol? receiverType,
@@ -1418,7 +1418,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The created named type, or <see langword="null"/> when the receiver
         /// is not known exactly.
         /// </returns>
-        private static INamedTypeSymbol? GetSummaryExactReceiverType(
+        internal static INamedTypeSymbol? GetSummaryExactReceiverType(
             IOperation? instanceOperation)
         {
             IOperation? currentOperation =

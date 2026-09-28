@@ -28,7 +28,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the expression is proven to be non-null;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsDefinitelyNonNull(
+        internal static bool IsDefinitelyNonNull(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callContext)
@@ -64,7 +64,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the expression is proven to be non-null;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsDefinitelyNonNull(
+        internal static bool IsDefinitelyNonNull(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callContext,

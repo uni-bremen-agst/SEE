@@ -217,7 +217,7 @@ namespace XMLDocNormalizer.Checks
                         filePath);
 
                 ExceptionFlowAnalysisResult directFlowResult =
-                    ExceptionFlowAnalyzer
+                    ExceptionFlowLocalSourceAnalyzer
                         .AnalyzeDirectlyThrownExceptions(
                             member,
                             exceptionFlowEnvironment);

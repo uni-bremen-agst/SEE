@@ -33,7 +33,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known for the current callable.
         /// </param>
-        private static void AnalyzeSummaryInvocations(
+        internal static void AnalyzeSummaryInvocations(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
@@ -211,7 +211,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if one stable target was resolved;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryResolveDelegateTarget(
+        internal static bool TryResolveDelegateTarget(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             out IMethodSymbol? targetMethod)
@@ -246,7 +246,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if one stable target was resolved;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryResolveDelegateTarget(
+        internal static bool TryResolveDelegateTarget(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedSymbols,
@@ -468,7 +468,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                      in root.DescendantNodes()
                          .OfType<AssignmentExpressionSyntax>())
             {
-                if (ContainsLocalSymbolReference(
+                if (ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         assignment.Left,
                         localSymbol,
                         semanticModel))
@@ -489,7 +489,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (ContainsLocalSymbolReference(
+                if (ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         prefix.Operand,
                         localSymbol,
                         semanticModel))
@@ -510,7 +510,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (ContainsLocalSymbolReference(
+                if (ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         postfix.Operand,
                         localSymbol,
                         semanticModel))
@@ -531,52 +531,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (ContainsLocalSymbolReference(
+                if (ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         argument.Expression,
                         localSymbol,
                         semanticModel))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether an expression contains a reference to a
-        /// specified local symbol.
-        /// </summary>
-        /// <param name="expression">
-        /// The expression to inspect.
-        /// </param>
-        /// <param name="localSymbol">
-        /// The expected local symbol.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the expression references the local;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool ContainsLocalSymbolReference(
-            ExpressionSyntax expression,
-            ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
-        {
-            foreach (ExpressionSyntax candidate
-                     in expression.DescendantNodesAndSelf()
-                         .OfType<ExpressionSyntax>())
-            {
-                SymbolInfo symbolInfo =
-                    semanticModel.GetSymbolInfo(
-                        candidate);
-
-                if (symbolInfo.Symbol != null &&
-                    SymbolEqualityComparer.Default.Equals(
-                        symbolInfo.Symbol.OriginalDefinition,
-                        localSymbol.OriginalDefinition))
                 {
                     return true;
                 }
@@ -754,7 +712,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known for the current callable.
         /// </param>
-        private static void AnalyzeSummaryObjectCreations(
+        internal static void AnalyzeSummaryObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
@@ -829,7 +787,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known for the current callable.
         /// </param>
-        private static void AnalyzeSummaryPropertyAndIndexerAccesses(
+        internal static void AnalyzeSummaryPropertyAndIndexerAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,

@@ -21,7 +21,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The unreduced source extension method when one is available;
         /// otherwise <paramref name="selectedMethod"/>.
         /// </returns>
-        private static IMethodSymbol GetInvocationAnalysisTarget(
+        internal static IMethodSymbol GetInvocationAnalysisTarget(
             IMethodSymbol selectedMethod)
         {
             IMethodSymbol? unreducedMethod =
@@ -122,7 +122,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// A context associated with the actual analysis target and containing
         /// all safely transferable call-site facts.
         /// </returns>
-        private static ExceptionFlowCallContext
+        internal static ExceptionFlowCallContext
             CreateInvocationCallContext(
                 InvocationExpressionSyntax invocation,
                 IMethodSymbol selectedMethod,
@@ -152,7 +152,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// A context associated with <paramref name="analysisTarget"/> and
         /// containing all safely transferable call-site facts.
         /// </returns>
-        private static ExceptionFlowCallContext CreateInvocationCallContext(
+        internal static ExceptionFlowCallContext CreateInvocationCallContext(
             InvocationExpressionSyntax invocation,
             IMethodSymbol selectedMethod,
             IMethodSymbol analysisTarget,

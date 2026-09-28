@@ -120,7 +120,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            if (TryGetCaughtExceptionRethrow(
+            if (ExceptionFlowCatchSemantics.TryGetCaughtExceptionRethrow(
                     throwNode,
                     semanticModel,
                     out bool hasPotentiallyThrowingConversion))

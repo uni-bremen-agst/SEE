@@ -22,7 +22,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local summary fragment receiving uncertainty.
         /// </param>
-        private static void AnalyzeSummaryDynamicBindings(
+        internal static void AnalyzeSummaryDynamicBindings(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSummaryFragment fragment)

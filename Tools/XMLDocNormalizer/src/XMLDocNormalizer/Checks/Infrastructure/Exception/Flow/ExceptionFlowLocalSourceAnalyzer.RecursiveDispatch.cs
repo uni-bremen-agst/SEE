@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using XMLDocNormalizer.Models.DTO;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -9,7 +10,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains runtime-dispatch analysis for recursive transitive exception
     /// flow.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowLocalSourceAnalyzer
     {
         /// <summary>
         /// Resolves and analyzes the known runtime targets of one virtual or
@@ -49,7 +50,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// dispatch and was handled here; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool TryAnalyzeRecursiveRuntimeDispatch(
+        internal static bool TryAnalyzeRecursiveRuntimeDispatch(
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,

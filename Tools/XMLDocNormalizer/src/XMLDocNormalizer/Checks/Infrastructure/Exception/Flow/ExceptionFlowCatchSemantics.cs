@@ -7,101 +7,16 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains try/catch-specific exception-flow analysis.
+    /// Applies Roslyn-authoritative catch, filter, and rethrow semantics to
+    /// already discovered local exception flow.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// This stateless component does not traverse callable bodies and does not
+    /// construct or evaluate summary graphs. Filters remain conservative and
+    /// therefore never suppress protected flow.
+    /// </remarks>
+    internal static class ExceptionFlowCatchSemantics
     {
-        /// <summary>
-        /// Analyzes a try-statement and suppresses exceptions from the
-        /// try-block that are fully handled by one of its catch-clauses.
-        /// </summary>
-        /// <param name="tryStatement">
-        /// The try-statement to analyze.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
-        /// </param>
-        /// <param name="semanticContext">
-        /// The project-closure semantic context.
-        /// </param>
-        /// <param name="result">
-        /// The accumulated exception-flow result.
-        /// </param>
-        /// <param name="traversalState">
-        /// The traversal state used to prevent recursive analysis cycles.
-        /// </param>
-        /// <param name="mode">The traversal mode.</param>
-        /// <param name="callContext">
-        /// The call-site facts known for the currently analyzed callable.
-        /// </param>
-        private static void AnalyzeTryStatement(
-            TryStatementSyntax tryStatement,
-            SemanticModel semanticModel,
-            ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowAnalysisResult result,
-            ExceptionFlowTraversalState traversalState,
-            ExceptionFlowTraversalMode mode,
-            ExceptionFlowCallContext callContext)
-        {
-            ExceptionFlowAnalysisResult tryResult =
-                new();
-
-            AnalyzeNode(
-                tryStatement.Block,
-                semanticModel,
-                semanticContext,
-                tryResult,
-                traversalState,
-                mode,
-                callContext);
-
-            SuppressCaughtExceptionsFromTry(
-                tryStatement,
-                semanticModel,
-                tryResult);
-
-            MergeResults(
-                result,
-                tryResult);
-
-            foreach (CatchClauseSyntax catchClause
-                     in tryStatement.Catches)
-            {
-                if (catchClause.Filter != null)
-                {
-                    AnalyzeNode(
-                        catchClause.Filter.FilterExpression,
-                        semanticModel,
-                        semanticContext,
-                        result,
-                        traversalState,
-                        mode,
-                        callContext);
-                }
-
-                AnalyzeNode(
-                    catchClause.Block,
-                    semanticModel,
-                    semanticContext,
-                    result,
-                    traversalState,
-                    mode,
-                    callContext);
-            }
-
-            if (tryStatement.Finally != null)
-            {
-                AnalyzeNode(
-                    tryStatement.Finally.Block,
-                    semanticModel,
-                    semanticContext,
-                    result,
-                    traversalState,
-                    mode,
-                    callContext);
-            }
-        }
-
         /// <summary>
         /// Suppresses exceptions from a try-block that are fully handled by
         /// the associated catch-clauses.
@@ -115,7 +30,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="tryResult">
         /// The exception-flow result produced for the try-block.
         /// </param>
-        private static void SuppressCaughtExceptionsFromTry(
+        internal static void SuppressCaughtExceptionsFromTry(
             TryStatementSyntax tryStatement,
             SemanticModel semanticModel,
             ExceptionFlowAnalysisResult tryResult)
@@ -177,7 +92,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the original caught exception is never
         /// rethrown by the catch-clause; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool CatchSuppressesOriginalException(
+        internal static bool CatchSuppressesOriginalException(
             CatchClauseSyntax catchClause,
             SemanticModel semanticModel)
         {
@@ -216,7 +131,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// rethrow, a direct caught-variable rethrow, or a stable local alias
         /// of the caught variable; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryGetCaughtExceptionRethrow(
+        internal static bool TryGetCaughtExceptionRethrow(
             SyntaxNode throwNode,
             SemanticModel semanticModel,
             out bool hasPotentiallyThrowingConversion)
@@ -565,7 +480,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the catch-clause catches all exceptions;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsCatchAll(
+        internal static bool IsCatchAll(
             CatchClauseSyntax catchClause,
             SemanticModel semanticModel)
         {
@@ -601,7 +516,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The caught exception type if it can be resolved; otherwise
         /// <see langword="null"/>.
         /// </returns>
-        private static INamedTypeSymbol? GetCaughtExceptionType(
+        internal static INamedTypeSymbol? GetCaughtExceptionType(
             CatchClauseSyntax catchClause,
             SemanticModel semanticModel)
         {
@@ -637,5 +552,47 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                        SymbolDisplayFormat.FullyQualifiedFormat) ==
                    "global::System.Exception";
         }
+        /// <summary>
+        /// Determines whether an expression contains a reference to a
+        /// specified local symbol.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
+        /// <param name="localSymbol">
+        /// The expected local symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression references the local;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool ContainsLocalSymbolReference(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel)
+        {
+            foreach (ExpressionSyntax candidate
+                     in expression.DescendantNodesAndSelf()
+                         .OfType<ExpressionSyntax>())
+            {
+                SymbolInfo symbolInfo =
+                    semanticModel.GetSymbolInfo(
+                        candidate);
+
+                if (symbolInfo.Symbol != null &&
+                    SymbolEqualityComparer.Default.Equals(
+                        symbolInfo.Symbol.OriginalDefinition,
+                        localSymbol.OriginalDefinition))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }

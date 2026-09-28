@@ -35,7 +35,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known while analyzing the containing callable.
         /// </param>
-        private static void AnalyzeSummaryDisposals(
+        internal static void AnalyzeSummaryDisposals(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
@@ -530,7 +530,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         assignment,
                         startPosition,
                         endPosition) ||
-                    !ContainsLocalSymbolReference(
+                    !ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         assignment.Left,
                         localSymbol,
                         semanticModel))
@@ -551,7 +551,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         prefixExpression,
                         startPosition,
                         endPosition) ||
-                    !ContainsLocalSymbolReference(
+                    !ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         prefixExpression.Operand,
                         localSymbol,
                         semanticModel))
@@ -572,7 +572,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         postfixExpression,
                         startPosition,
                         endPosition) ||
-                    !ContainsLocalSymbolReference(
+                    !ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         postfixExpression.Operand,
                         localSymbol,
                         semanticModel))
@@ -599,7 +599,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (ContainsLocalSymbolReference(
+                if (ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         argument.Expression,
                         localSymbol,
                         semanticModel))
@@ -616,7 +616,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         refExpression,
                         startPosition,
                         endPosition) ||
-                    !ContainsLocalSymbolReference(
+                    !ExceptionFlowCatchSemantics.ContainsLocalSymbolReference(
                         refExpression.Expression,
                         localSymbol,
                         semanticModel))

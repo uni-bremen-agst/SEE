@@ -5,20 +5,20 @@ using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Performs direct and transitive analysis of exceptions that may escape
-    /// from a member.
+    /// Discovers direct local exception sources in one Roslyn member body.
     /// </summary>
     /// <remarks>
-    /// The analysis is conservative and attempts to suppress exceptions that
-    /// are fully handled by surrounding catch-clauses. Catch filters are
-    /// treated conservatively and therefore do not suppress the caught
-    /// exception flow.
+    /// One call owns its traversal state and result. The component is
+    /// stateless, concrete, nonvirtual, and safe for concurrent calls with
+    /// independent state. It may follow source callables in transitive mode,
+    /// but it never constructs or evaluates a summary graph.
     /// </remarks>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowLocalSourceAnalyzer
     {
         /// <summary>
         /// Determines how exception flow should be traversed.
@@ -54,7 +54,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// A result object containing all proven directly escaping exception
         /// types.
         /// </returns>
-        public static ExceptionFlowAnalysisResult
+        internal static ExceptionFlowAnalysisResult
             AnalyzeDirectlyThrownExceptions(
                 MemberDeclarationSyntax member,
                 ExceptionFlowSemanticEnvironment semanticContext)
@@ -113,7 +113,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// exception types and any uncertainty that could not be resolved
         /// safely.
         /// </returns>
-        public static ExceptionFlowAnalysisResult
+        internal static ExceptionFlowAnalysisResult
             AnalyzeTransitivelyThrownExceptions(
                 MemberDeclarationSyntax member,
                 ExceptionFlowSemanticEnvironment semanticContext)
@@ -214,6 +214,85 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 AnalyzeTryStatement(
                     nestedTry,
+                    semanticModel,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    mode,
+                    callContext);
+            }
+        }
+
+        /// <summary>
+        /// Traverses one try statement and applies catch semantics to the
+        /// direct flow discovered for its protected body.
+        /// </summary>
+        /// <param name="tryStatement">The try statement to analyze.</param>
+        /// <param name="semanticModel">The semantic model.</param>
+        /// <param name="semanticContext">The semantic environment.</param>
+        /// <param name="result">The accumulated result.</param>
+        /// <param name="traversalState">The recursive traversal state.</param>
+        /// <param name="mode">The direct or transitive traversal mode.</param>
+        /// <param name="callContext">The current call-site facts.</param>
+        private static void AnalyzeTryStatement(
+            TryStatementSyntax tryStatement,
+            SemanticModel semanticModel,
+            ExceptionFlowSemanticEnvironment semanticContext,
+            ExceptionFlowAnalysisResult result,
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowTraversalMode mode,
+            ExceptionFlowCallContext callContext)
+        {
+            ExceptionFlowAnalysisResult tryResult =
+                new();
+
+            AnalyzeNode(
+                tryStatement.Block,
+                semanticModel,
+                semanticContext,
+                tryResult,
+                traversalState,
+                mode,
+                callContext);
+
+            ExceptionFlowCatchSemantics.SuppressCaughtExceptionsFromTry(
+                tryStatement,
+                semanticModel,
+                tryResult);
+
+            MergeResults(
+                result,
+                tryResult);
+
+            foreach (CatchClauseSyntax catchClause
+                     in tryStatement.Catches)
+            {
+                if (catchClause.Filter != null)
+                {
+                    AnalyzeNode(
+                        catchClause.Filter.FilterExpression,
+                        semanticModel,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        mode,
+                        callContext);
+                }
+
+                AnalyzeNode(
+                    catchClause.Block,
+                    semanticModel,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    mode,
+                    callContext);
+            }
+
+            if (tryStatement.Finally != null)
+            {
+                AnalyzeNode(
+                    tryStatement.Finally.Block,
                     semanticModel,
                     semanticContext,
                     result,

@@ -21,7 +21,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// A call context without assumed parameter facts.
         /// </returns>
-        private static ExceptionFlowCallContext CreateRootCallContext(
+        internal static ExceptionFlowCallContext CreateRootCallContext(
             MemberDeclarationSyntax member,
             SemanticModel semanticModel)
         {
@@ -52,7 +52,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The call context containing the value facts proven for the target
         /// parameters.
         /// </returns>
-        private static ExceptionFlowCallContext CreateCallContext(
+        internal static ExceptionFlowCallContext CreateCallContext(
             IMethodSymbol methodSymbol,
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SemanticModel semanticModel,
@@ -92,7 +92,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The call context containing the value facts proven for the target
         /// parameters.
         /// </returns>
-        private static ExceptionFlowCallContext CreateCallContext(
+        internal static ExceptionFlowCallContext CreateCallContext(
             IMethodSymbol methodSymbol,
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SemanticModel semanticModel,
@@ -155,7 +155,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// ordinals while preserving compile-time named-argument and optional
         /// default semantics.
         /// </returns>
-        private static ExceptionFlowCallContext
+        internal static ExceptionFlowCallContext
             CreateDispatchCallContext(
                 IMethodSymbol callSiteMethodSymbol,
                 IMethodSymbol targetMethodSymbol,
@@ -592,7 +592,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The resolved parameter index, or the fallback index if no named
         /// match exists.
         /// </returns>
-        private static int GetParameterIndexForArgument(
+        internal static int GetParameterIndexForArgument(
             ArgumentSyntax argument,
             int fallbackIndex,
             IMethodSymbol methodSymbol)
