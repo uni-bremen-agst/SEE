@@ -6,20 +6,37 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains nonrecursive construction of context-sensitive callable
-    /// summary graphs.
+    /// Constructs context-sensitive callable summary graphs for one semantic
+    /// environment.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    /// <remarks>
+    /// One builder belongs to one sequential analysis session. It owns no
+    /// graph state itself and is intentionally not thread-safe.
+    /// </remarks>
+    internal sealed class ExceptionFlowSummaryGraphBuilder
     {
+        /// <summary>
+        /// The semantic environment used to resolve every graph node.
+        /// </summary>
+        private readonly ExceptionFlowSemanticEnvironment semanticContext;
+
+        /// <summary>
+        /// Initializes a builder for one project-closure semantic environment.
+        /// </summary>
+        /// <param name="semanticContext">The semantic environment.</param>
+        internal ExceptionFlowSummaryGraphBuilder(
+            ExceptionFlowSemanticEnvironment semanticContext)
+        {
+            this.semanticContext =
+                semanticContext;
+        }
+
         /// <summary>
         /// Attempts to construct the complete context-sensitive summary graph
         /// reachable from one source-level member.
         /// </summary>
         /// <param name="member">
         /// The root member whose reachable callables should be summarized.
-        /// </param>
-        /// <param name="semanticContext">
-        /// The project-closure semantic context.
         /// </param>
         /// <param name="graph">
         /// The constructed summary graph.
@@ -31,9 +48,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the root symbol and its semantic model
         /// could be resolved; otherwise <see langword="false"/>.
         /// </returns>
-        internal static bool TryBuildTransitiveSummaryGraph(
+        internal bool TryBuildTransitiveSummaryGraph(
             MemberDeclarationSyntax member,
-            ExceptionFlowSemanticEnvironment semanticContext,
             out ExceptionFlowSummaryGraph graph,
             out ExceptionFlowCallableKey? rootKey)
         {
@@ -42,7 +58,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (!TryRegisterSummaryGraphRoot(
                     member,
-                    semanticContext,
                     graph,
                     out rootKey) ||
                 rootKey == null)
@@ -51,8 +66,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             BuildPendingSummaryNodes(
-                graph,
-                semanticContext);
+                graph);
 
             return true;
         }
@@ -64,9 +78,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="member">
         /// The member to register.
         /// </param>
-        /// <param name="semanticContext">
-        /// The project-closure semantic context.
-        /// </param>
         /// <param name="graph">
         /// The graph receiving the root summary.
         /// </param>
@@ -77,9 +88,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the member symbol and semantic model were
         /// resolved; otherwise <see langword="false"/>.
         /// </returns>
-        internal static bool TryRegisterSummaryGraphRoot(
+        internal bool TryRegisterSummaryGraphRoot(
             MemberDeclarationSyntax member,
-            ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,
             out ExceptionFlowCallableKey? rootKey)
         {
@@ -123,12 +133,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="graph">
         /// The graph containing pending callable keys.
         /// </param>
-        /// <param name="semanticContext">
-        /// The project-closure semantic context.
-        /// </param>
-        private static void BuildPendingSummaryNodes(
-            ExceptionFlowSummaryGraph graph,
-            ExceptionFlowSemanticEnvironment semanticContext)
+        internal void BuildPendingSummaryNodes(
+            ExceptionFlowSummaryGraph graph)
         {
             while (graph.DequeuePendingOrDefault()
                    is ExceptionFlowCallableKey key)
@@ -201,7 +207,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     MethodKind.Constructor &&
                 implicitConstructor.IsImplicitlyDeclared)
             {
-                return AnalyzeSummaryImplicitConstructor(
+                return ExceptionFlowAnalyzer.AnalyzeSummaryImplicitConstructor(
                     implicitConstructor,
                     semanticContext,
                     graph,
@@ -234,7 +240,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             out SyntaxNode? methodBody)
                         && methodBody != null)
                     {
-                        AnalyzeSummaryNode(
+                        ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                             methodBody,
                             semanticModel,
                             semanticContext,
@@ -288,7 +294,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             MethodKind.Constructor)
                     {
                         analyzedAnyBody |=
-                            AnalyzeSummaryInstanceConstructor(
+                            ExceptionFlowAnalyzer.AnalyzeSummaryInstanceConstructor(
                                 constructor,
                                 constructorSymbol,
                                 semanticModel,
@@ -302,7 +308,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                  out SyntaxNode? constructorBody) &&
                              constructorBody != null)
                     {
-                        AnalyzeSummaryNode(
+                        ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                             constructorBody,
                             semanticModel,
                             semanticContext,
@@ -325,7 +331,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         out SyntaxNode? operatorBody) &&
                     operatorBody != null)
                 {
-                    AnalyzeSummaryNode(
+                    ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                         operatorBody,
                         semanticModel,
                         semanticContext,
@@ -347,7 +353,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         out SyntaxNode? conversionBody) &&
                     conversionBody != null)
                 {
-                    AnalyzeSummaryNode(
+                    ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                         conversionBody,
                         semanticModel,
                         semanticContext,
@@ -366,7 +372,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     if (property.ExpressionBody != null)
                     {
-                        AnalyzeSummaryNode(
+                        ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                             property.ExpressionBody.Expression,
                             semanticModel,
                             semanticContext,
@@ -401,7 +407,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     if (indexer.ExpressionBody != null)
                     {
-                        AnalyzeSummaryNode(
+                        ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                             indexer.ExpressionBody.Expression,
                             semanticModel,
                             semanticContext,
@@ -540,7 +546,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AnalyzeSummaryNode(
+                ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                     expressionBody,
                     semanticModel,
                     semanticContext,
@@ -593,7 +599,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     out SyntaxNode? body)
                 && body != null)
             {
-                AnalyzeSummaryNode(
+                ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                     body,
                     semanticModel,
                     semanticContext,
@@ -618,7 +624,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// would inspect an executable method or local-function body;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool HasAnalyzableSummaryInvocationBody(
+        internal static bool HasAnalyzableSummaryInvocationBody(
             IMethodSymbol methodSymbol,
             ExceptionFlowSemanticEnvironment semanticContext)
         {
@@ -731,7 +737,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            AnalyzeSummaryNode(
+            ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                 body,
                 semanticModel,
                 semanticContext,
@@ -781,7 +787,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (accessor.Body != null)
             {
-                AnalyzeSummaryNode(
+                ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                     accessor.Body,
                     semanticModel,
                     semanticContext,
@@ -794,7 +800,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (accessor.ExpressionBody != null)
             {
-                AnalyzeSummaryNode(
+                ExceptionFlowAnalyzer.AnalyzeSummaryNode(
                     accessor.ExpressionBody.Expression,
                     semanticModel,
                     semanticContext,

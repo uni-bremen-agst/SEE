@@ -200,10 +200,10 @@ namespace XMLDocNormalizerTests.Helpers
                         compilation);
 
             bool built =
-                ExceptionFlowAnalyzer
+                new ExceptionFlowSummaryGraphBuilder(
+                    new ExceptionFlowSemanticEnvironment(semanticContext))
                     .TryBuildTransitiveSummaryGraph(
                         matchingMembers[0],
-                        new ExceptionFlowSemanticEnvironment(semanticContext),
                         out ExceptionFlowSummaryGraph graph,
                         out ExceptionFlowCallableKey? rootKey);
 

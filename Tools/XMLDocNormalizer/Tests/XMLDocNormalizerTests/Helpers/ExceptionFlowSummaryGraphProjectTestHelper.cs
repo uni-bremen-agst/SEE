@@ -223,9 +223,10 @@ namespace XMLDocNormalizerTests.Helpers
             semanticContext.RegisterSupportingSource(targetDependencyCompilation);
             semanticContext.RegisterSupportingSource(callingDependencyCompilation);
 
-            bool built = ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
+            bool built = new ExceptionFlowSummaryGraphBuilder(
+                    new ExceptionFlowSemanticEnvironment(semanticContext))
+                .TryBuildTransitiveSummaryGraph(
                 rootMethods[0],
-                new ExceptionFlowSemanticEnvironment(semanticContext),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey);
 
@@ -407,10 +408,10 @@ namespace XMLDocNormalizerTests.Helpers
             }
 
             bool built =
-                ExceptionFlowAnalyzer
+                new ExceptionFlowSummaryGraphBuilder(
+                    new ExceptionFlowSemanticEnvironment(semanticContext))
                     .TryBuildTransitiveSummaryGraph(
                         rootMethods[0],
-                        new ExceptionFlowSemanticEnvironment(semanticContext),
                         out ExceptionFlowSummaryGraph graph,
                         out ExceptionFlowCallableKey? rootKey);
 

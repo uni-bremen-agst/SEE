@@ -115,7 +115,7 @@ namespace XMLDocNormalizer.Checks
             ProjectClosureSemanticContext semanticContext,
             XmlDocOptions options)
         {
-            ExceptionFlowAnalyzer.SummaryAnalysisSession?
+            ExceptionFlowSummaryAnalysisSession?
                 summaryAnalysisSession =
                     IsTransitiveMode(options)
                         ? ExceptionFlowAnalyzer
@@ -168,7 +168,7 @@ namespace XMLDocNormalizer.Checks
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             XmlDocOptions options,
-            ExceptionFlowAnalyzer.SummaryAnalysisSession?
+            ExceptionFlowSummaryAnalysisSession?
                 summaryAnalysisSession)
         {
             List<Finding> findings =
@@ -368,7 +368,7 @@ namespace XMLDocNormalizer.Checks
             ExceptionFlowSemanticEnvironment exceptionFlowEnvironment,
             XmlDocOptions options,
             ExceptionFlowAnalysisResult directFlowResult,
-            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession)
+            ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession)
         {
             if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.Direct)
             {
@@ -381,7 +381,7 @@ namespace XMLDocNormalizer.Checks
                 return directFlowResult;
             }
 
-            ExceptionFlowAnalyzer.SummaryAnalysisSession session =
+            ExceptionFlowSummaryAnalysisSession session =
                 summaryAnalysisSession ??
                 ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(
                     exceptionFlowEnvironment);

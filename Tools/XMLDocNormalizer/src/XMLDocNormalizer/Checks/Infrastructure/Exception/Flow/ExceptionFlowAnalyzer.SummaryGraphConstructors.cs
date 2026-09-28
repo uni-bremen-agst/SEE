@@ -42,7 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if executable constructor content was
         /// analyzed; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool AnalyzeSummaryInstanceConstructor(
+        internal static bool AnalyzeSummaryInstanceConstructor(
             ConstructorDeclarationSyntax constructor,
             IMethodSymbol constructorSymbol,
             SemanticModel semanticModel,
@@ -169,7 +169,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the containing source type could be
         /// analyzed; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool AnalyzeSummaryImplicitConstructor(
+        internal static bool AnalyzeSummaryImplicitConstructor(
             IMethodSymbol constructorSymbol,
             ExceptionFlowSemanticEnvironment semanticContext,
             ExceptionFlowSummaryGraph graph,

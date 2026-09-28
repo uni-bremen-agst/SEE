@@ -695,9 +695,10 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             MethodDeclarationSyntax method = Assert.Single(
                 fixture.Tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>(),
                 declaration => declaration.Identifier.ValueText == methodName);
-            Assert.True(ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
+            Assert.True(new ExceptionFlowSummaryGraphBuilder(
+                    new ExceptionFlowSemanticEnvironment(fixture.Context))
+                .TryBuildTransitiveSummaryGraph(
                 method,
-                new ExceptionFlowSemanticEnvironment(fixture.Context),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey));
             return new ExceptionFlowSummaryGraphTestRun(

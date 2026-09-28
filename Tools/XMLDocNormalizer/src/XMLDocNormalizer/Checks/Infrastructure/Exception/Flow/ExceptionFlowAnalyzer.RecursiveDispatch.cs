@@ -116,7 +116,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         targetContext))
                 {
-                    MarkUncertain(
+                    ExceptionFlowUncertaintyRecorder.AddSymbol(
                         result,
                         runtimeTarget);
                 }

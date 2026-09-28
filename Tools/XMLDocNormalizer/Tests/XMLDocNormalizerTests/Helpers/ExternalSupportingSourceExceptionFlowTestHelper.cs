@@ -287,9 +287,10 @@ namespace XMLDocNormalizerTests.Helpers
                 Assert.True(context.TryRegisterExternalSupportingSource(source, out _));
             }
 
-            Assert.True(ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
+            Assert.True(new ExceptionFlowSummaryGraphBuilder(
+                    new ExceptionFlowSemanticEnvironment(context))
+                .TryBuildTransitiveSummaryGraph(
                 root,
-                new ExceptionFlowSemanticEnvironment(context),
                 out ExceptionFlowSummaryGraph graph,
                 out ExceptionFlowCallableKey? rootKey));
 

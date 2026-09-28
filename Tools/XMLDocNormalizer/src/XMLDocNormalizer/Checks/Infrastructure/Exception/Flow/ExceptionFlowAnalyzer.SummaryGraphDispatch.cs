@@ -418,7 +418,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 hasSourceTarget |= hasSource;
                 allTargetsHaveExecutableSource &=
                     hasSource
-                    && HasAnalyzableSummaryInvocationBody(
+                    && ExceptionFlowSummaryGraphBuilder.HasAnalyzableSummaryInvocationBody(
                         target.AnalysisTarget,
                         semanticContext);
             }

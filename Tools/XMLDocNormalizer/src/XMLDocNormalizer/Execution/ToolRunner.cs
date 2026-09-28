@@ -122,7 +122,7 @@ namespace XMLDocNormalizer.Execution
                     projectsToAnalyze,
                     options.XmlDocOptions.ExceptionAnalysisMode);
 
-            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession =
+            ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession =
                 CreateExceptionFlowSummaryAnalysisSession(
                     options.XmlDocOptions,
                     semanticContext);
@@ -590,7 +590,7 @@ namespace XMLDocNormalizer.Execution
                     prepared.Projects,
                     modeOptions.XmlDocOptions.ExceptionAnalysisMode);
 
-            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession =
+            ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession =
                 CreateExceptionFlowSummaryAnalysisSession(
                     modeOptions.XmlDocOptions,
                     semanticContext);
@@ -651,7 +651,7 @@ namespace XMLDocNormalizer.Execution
         /// A reusable session when productive transitive analysis is required;
         /// otherwise <see langword="null"/>.
         /// </returns>
-        private static ExceptionFlowAnalyzer.SummaryAnalysisSession? CreateExceptionFlowSummaryAnalysisSession(
+        private static ExceptionFlowSummaryAnalysisSession? CreateExceptionFlowSummaryAnalysisSession(
             XmlDocOptions options,
             ProjectClosureSemanticContext semanticContext)
         {

@@ -28,7 +28,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known for the current callable.
         /// </param>
-        private static void AnalyzeSummaryNode(
+        internal static void AnalyzeSummaryNode(
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,

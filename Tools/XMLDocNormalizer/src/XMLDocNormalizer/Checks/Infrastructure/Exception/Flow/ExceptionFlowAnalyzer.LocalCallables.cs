@@ -162,7 +162,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     out IMethodSymbol? targetMethod) ||
                 targetMethod == null)
             {
-                MarkUncertain(
+                ExceptionFlowUncertaintyRecorder.AddSymbol(
                     result,
                     delegateInvokeSymbol);
 
@@ -190,7 +190,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     traversalState,
                     targetContext))
             {
-                MarkUncertain(
+                ExceptionFlowUncertaintyRecorder.AddSymbol(
                     result,
                     targetMethod);
             }

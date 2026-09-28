@@ -87,7 +87,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         constructorContext))
                 {
-                    MarkUncertain(
+                    ExceptionFlowUncertaintyRecorder.AddSymbol(
                         result,
                         constructorSymbol);
                 }
@@ -159,7 +159,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         propertyContext))
                 {
-                    MarkUncertain(
+                    ExceptionFlowUncertaintyRecorder.AddSymbol(
                         result,
                         propertySymbol);
                 }
@@ -198,7 +198,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         indexerContext))
                 {
-                    MarkUncertain(
+                    ExceptionFlowUncertaintyRecorder.AddSymbol(
                         result,
                         indexerSymbol);
                 }
@@ -224,35 +224,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                        is ThrowStatementSyntax ||
                    creation.Parent
                        is ThrowExpressionSyntax;
-        }
-
-        /// <summary>
-        /// Marks the given callable target as uncertain because its exception
-        /// flow could not be analyzed.
-        /// </summary>
-        /// <param name="result">
-        /// The accumulated exception-flow result.
-        /// </param>
-        /// <param name="symbol">
-        /// The symbol whose flow could not be decided.
-        /// </param>
-        private static void MarkUncertain(
-            ExceptionFlowAnalysisResult result,
-            ISymbol symbol)
-        {
-            string display =
-                symbol.ToDisplayString(
-                    SymbolDisplayFormat.CSharpErrorMessageFormat);
-
-            if (string.IsNullOrWhiteSpace(display))
-            {
-                display = symbol.Name;
-            }
-
-            if (!string.IsNullOrWhiteSpace(display))
-            {
-                result.UncertainTargets.Add(display);
-            }
         }
 
         /// <summary>
