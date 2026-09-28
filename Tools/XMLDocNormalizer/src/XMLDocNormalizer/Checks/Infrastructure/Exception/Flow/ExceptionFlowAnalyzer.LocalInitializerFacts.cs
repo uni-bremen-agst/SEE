@@ -81,7 +81,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         return true;
                     }
 
-                    if (StatementWritesSymbol(
+                    if (ExceptionFlowSymbolUsageFacts.StatementWritesSymbol(
                             precedingStatement,
                             localSymbol,
                             semanticModel))

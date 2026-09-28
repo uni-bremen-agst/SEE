@@ -562,8 +562,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
                 else if (parameterSymbol.HasExplicitDefaultValue)
                 {
-                    facts =
-                        GetConstantValueFacts(
+                    facts = ExceptionFlowPrimitiveValueFactsProvider
+                        .GetConstantValueFacts(
                             parameterSymbol.ExplicitDefaultValue);
                 }
 

@@ -168,7 +168,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return true;
                 }
 
-                ExceptionFlowValueFacts guardFacts = GetFactsProvenByPrecedingGuard(
+                ExceptionFlowValueFacts guardFacts = ExceptionFlowGuardFactsProvider
+                    .GetFactsProvenByPrecedingGuard(
                     expression,
                     parameterSymbol,
                     semanticModel);
@@ -285,7 +286,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
-            if (IsLocalProvenNonNullByPrecedingGuard(
+            if (ExceptionFlowGuardFactsProvider.IsLocalProvenNonNullByPrecedingGuard(
                     expression,
                     localSymbol,
                     semanticModel))

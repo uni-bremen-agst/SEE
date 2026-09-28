@@ -3,10 +3,10 @@ using Microsoft.CodeAnalysis;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value facts for framework properties with stable documented
+    /// Provides value facts for framework properties with stable documented
     /// return contracts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowKnownPropertyValueFactsProvider
     {
         /// <summary>
         /// Gets value facts guaranteed by a known framework property.
@@ -19,7 +19,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see cref="ExceptionFlowValueFacts.None"/> when the property has no
         /// explicit model.
         /// </returns>
-        private static ExceptionFlowValueFacts GetKnownFrameworkPropertyValueFacts(
+        internal static ExceptionFlowValueFacts GetKnownFrameworkPropertyValueFacts(
             IPropertySymbol propertySymbol)
         {
             if (IsRoslynOriginalDefinitionProperty(propertySymbol)

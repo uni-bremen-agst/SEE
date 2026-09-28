@@ -38,6 +38,34 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Determines whether a statement writes to the specified symbol.
+        /// </summary>
+        /// <param name="statement">The statement to inspect.</param>
+        /// <param name="symbol">The symbol whose writes are detected.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the statement may write the symbol;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool StatementWritesSymbol(
+            StatementSyntax statement,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts dataFlow =
+                ExceptionFlowDataFlowFactsProvider.GetFacts(statement, semanticModel);
+
+            return dataFlow.Succeeded
+                && dataFlow.WrittenInside.Any(
+                    writtenSymbol =>
+                        SymbolEqualityComparer.Default.Equals(
+                            writtenSymbol,
+                            symbol));
+        }
+
+        /// <summary>
         /// Determines whether an expression resolves to the specified symbol.
         /// </summary>
         /// <param name="expression">The expression to resolve.</param>

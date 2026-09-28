@@ -42,7 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
 
             if (symbolInfo.Symbol is not ILocalSymbol localSymbol
-                || !GetFactsProvenByPrecedingGuard(
+                || !ExceptionFlowGuardFactsProvider.GetFactsProvenByPrecedingGuard(
                         unwrappedExpression,
                         localSymbol,
                         semanticModel)
@@ -303,7 +303,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return GetFactsProvenByPrecedingGuard(
+            return ExceptionFlowGuardFactsProvider.GetFactsProvenByPrecedingGuard(
                     unwrappedExpression,
                     symbolInfo.Symbol,
                     semanticModel)

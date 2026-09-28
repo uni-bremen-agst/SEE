@@ -2,14 +2,13 @@ using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlow
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains control-flow reasoning for terminating value guards.
+    /// Provides control-flow facts established by terminating value guards.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowGuardFactsProvider
     {
         /// <summary>
         /// Determines whether reaching the specified expression proves that a local variable
@@ -22,7 +21,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if an earlier terminating guard proves the local variable
         /// to be non-null; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsLocalProvenNonNullByPrecedingGuard(
+        internal static bool IsLocalProvenNonNullByPrecedingGuard(
             ExpressionSyntax expression,
             ILocalSymbol localSymbol,
             SemanticModel semanticModel)
@@ -45,7 +44,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used for symbol and data-flow analysis.
         /// </param>
         /// <returns>The facts proven by preceding terminating guards.</returns>
-        private static ExceptionFlowValueFacts GetFactsProvenByPrecedingGuard(
+        internal static ExceptionFlowValueFacts GetFactsProvenByPrecedingGuard(
             ExpressionSyntax expression,
             ISymbol symbol,
             SemanticModel semanticModel)
@@ -267,34 +266,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a statement writes to the specified symbol.
-        /// </summary>
-        /// <param name="statement">The statement to inspect.</param>
-        /// <param name="symbol">The symbol whose writes are detected.</param>
-        /// <param name="semanticModel">
-        /// The semantic model used for data-flow analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the statement may write the symbol; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool StatementWritesSymbol(
-            StatementSyntax statement,
-            ISymbol symbol,
-            SemanticModel semanticModel)
-        {
-            ExceptionFlowDataFlowFacts dataFlow =
-                ExceptionFlowDataFlowFactsProvider.GetFacts(statement, semanticModel);
-
-            return dataFlow.Succeeded &&
-                   dataFlow.WrittenInside.Any(
-                       writtenSymbol =>
-                           SymbolEqualityComparer.Default.Equals(
-                               writtenSymbol,
-                               symbol));
-        }
-
-        /// <summary>
         /// Gets value facts established by earlier operands that had to be
         /// evaluated successfully before the current expression can be reached
         /// through short-circuit Boolean evaluation.
@@ -311,7 +282,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The facts implied by earlier short-circuit operands.
         /// </returns>
-        private static ExceptionFlowValueFacts GetFactsProvenByEarlierShortCircuitConditions(
+        internal static ExceptionFlowValueFacts GetFactsProvenByEarlierShortCircuitConditions(
             ExpressionSyntax expression,
             ISymbol symbol,
             SemanticModel semanticModel)
@@ -539,7 +510,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the expression is an equality comparison between
         /// the symbol and <see langword="null"/>; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsSymbolComparedEqualToNull(
+        internal static bool IsSymbolComparedEqualToNull(
             ExpressionSyntax expression,
             ISymbol symbol,
             SemanticModel semanticModel)
@@ -628,7 +599,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if the expression has the form
         /// <c>symbol is null</c>; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsSymbolMatchedAgainstNullPattern(
+        internal static bool IsSymbolMatchedAgainstNullPattern(
             ExpressionSyntax expression,
             ISymbol symbol,
             SemanticModel semanticModel)

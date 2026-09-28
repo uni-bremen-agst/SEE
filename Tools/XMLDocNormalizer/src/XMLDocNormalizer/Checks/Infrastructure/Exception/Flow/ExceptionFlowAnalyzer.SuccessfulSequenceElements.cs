@@ -538,11 +538,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                            semanticModel);
             }
 
-            if (IsSymbolComparedEqualToNull(
+            if (ExceptionFlowGuardFactsProvider.IsSymbolComparedEqualToNull(
                     unwrappedCondition,
                     parameterSymbol,
                     semanticModel)
-                || IsSymbolMatchedAgainstNullPattern(
+                || ExceptionFlowGuardFactsProvider.IsSymbolMatchedAgainstNullPattern(
                     unwrappedCondition,
                     parameterSymbol,
                     semanticModel))
