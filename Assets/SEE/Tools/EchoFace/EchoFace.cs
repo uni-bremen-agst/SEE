@@ -703,6 +703,16 @@ namespace SEE.Tools.EchoFace
             // The cross product is ordered (up, right) for a right-handed coordinate system.
             Vector3 forwardVector = Vector3.Cross(upVector, rightVector).normalized;
 
+            // Landmarks that are present but all at the origin, which is what a frame
+            // carrying no landmark data comes to once it has crossed the network, leave
+            // these vectors at zero. LookRotation would log an error for every such frame
+            // and hand back the identity, taking the head with it. Having no pose to
+            // estimate, the last one is kept.
+            if (upVector.sqrMagnitude < 1e-6f || forwardVector.sqrMagnitude < 1e-6f)
+            {
+                return currentHeadRotation;
+            }
+
             // Create the final rotation from the calculated vectors.
             Quaternion targetRotation = Quaternion.LookRotation(forwardVector, upVector);
 
