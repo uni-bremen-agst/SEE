@@ -162,6 +162,18 @@ Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
 /Assets/_Recovery
 
+# Python bytecode & cache
+__pycache__/
+*.pyc
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python environment variables & secrets
+.env
+
 # Cinemachines. What a director makes with the framework is the working
 # material of one video: the scenes, their timelines and signals, and the
 # backups taken of them. The framework itself stays in git -- its scripts,

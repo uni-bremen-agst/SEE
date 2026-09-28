@@ -1318,6 +1318,23 @@ namespace SEE.Controls.KeyActions
             return result;
         }
 
+        /// <summary>
+        /// True if the user wants to toggle the EchoFace facial animation on/off.
+        /// </summary>
+        /// <returns>True if the user requests this action.</returns>
+        internal static bool ToggleEchoFace()
+        {
+            bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleEchoFace);
+
+            if (result)
+            {
+                // Track the ToggleEchoFace action
+                TracingHelperService.Instance?.TrackKeyPress("ToggleEchoFace");
+            }
+
+            return result;
+        }
+
         #endregion
     }
 }
