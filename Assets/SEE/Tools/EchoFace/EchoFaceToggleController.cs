@@ -6,8 +6,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using SEE.Controls;
-using SEE.Utils;
 using SEE.Controls.KeyActions;
+using SEE.Game;
+using SEE.Utils;
 
 // Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
@@ -114,6 +115,11 @@ namespace SEE.Tools.EchoFace
         private Coroutine hideRoutine;
 
         /// <summary>
+        /// Whether <see cref="ApplyInitialState"/> has already run, it being wanted once.
+        /// </summary>
+        private bool initialStateApplied;
+
+        /// <summary>
         /// The conflicting components resolved by <see cref="ResolveConflictingComponents"/>
         /// from <see cref="conflictingComponentNames"/>, excluding any that could not be found.
         /// </summary>
@@ -164,24 +170,16 @@ namespace SEE.Tools.EchoFace
             ResolveConflictingComponents();
             CacheInitialComponentStates();
 
-            echoFace.enabled = startEnabled;
+            // Off for every avatar to begin with, this one included. Whether the local
+            // player's avatar starts tracking is settled in the first Update, once it is
+            // known which avatar is the local player's; see ApplyInitialState.
+            echoFace.enabled = false;
             if (faceTracker != null)
             {
-                faceTracker.enabled = startEnabled;
+                faceTracker.enabled = false;
             }
 
-            // Only disable conflicting components if starting enabled; if
-            // starting disabled, they are simply left at their cached,
-            // authored state untouched.
-            if (startEnabled)
-            {
-                DisableConflictingComponents();
-            }
-
-            EnsurePopupUI();
-            popupPanel.SetActive(false);
-
-            Debug.Log($"[EchoFaceController] Ready. Initial state: {(startEnabled ? "enabled" : "disabled")}.\n");
+            Debug.Log($"[EchoFaceToggleController] Ready. Initial state: {(startEnabled ? "enabled" : "disabled")}.\n");
         }
 
         /// <summary>
@@ -195,6 +193,19 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private void Update()
         {
+            // Every avatar in the Unity scene carries one of these, the local player's and
+            // everyone else's alike, and the key is read from the keyboard rather than from
+            // the avatar. Without this, one press would toggle every avatar at once: a
+            // MediaPipe face landmarker would start for each remote player, all of them
+            // inferring on this machine's single webcam, and a popup would appear per
+            // avatar. Only the local player's avatar answers to the key.
+            if (LocalPlayer.Instance != gameObject)
+            {
+                return;
+            }
+
+            ApplyInitialState();
+
             if (!SEEInput.ToggleEchoFace())
             {
                 return;
@@ -218,6 +229,34 @@ namespace SEE.Tools.EchoFace
             }
 
             ShowPopup($"EchoFace {(newState ? "enabled" : "disabled")}");
+        }
+
+        /// <summary>
+        /// Brings this avatar into the state <see cref="startEnabled"/> asks for, once and
+        /// only for the local player's avatar.
+        /// </summary>
+        /// <remarks>Not done in <see cref="Awake"/>, where it was: which avatar belongs to
+        /// the local player is not known that early, and starting enabled would have
+        /// started a face tracker on every avatar in the Unity scene.</remarks>
+        private void ApplyInitialState()
+        {
+            if (initialStateApplied)
+            {
+                return;
+            }
+            initialStateApplied = true;
+
+            if (!startEnabled)
+            {
+                return;
+            }
+
+            echoFace.enabled = true;
+            if (faceTracker != null)
+            {
+                faceTracker.enabled = true;
+            }
+            DisableConflictingComponents();
         }
 
         /// <summary>
@@ -327,8 +366,15 @@ namespace SEE.Tools.EchoFace
         /// Ensures the popup UI exists, creating a dedicated screen-space-overlay
         /// canvas, panel, and <see cref="TextMeshProUGUI"/> text.
         /// </summary>
+        /// <remarks>Does nothing where it has been built already, which is what its name
+        /// promises and what lets <see cref="ShowPopup"/> call it each time.</remarks>
         private void EnsurePopupUI()
         {
+            if (popupCanvasGO != null)
+            {
+                return;
+            }
+
             popupCanvasGO = new(
                 "EchoFacePopupCanvas",
                 typeof(Canvas),
@@ -386,9 +432,15 @@ namespace SEE.Tools.EchoFace
         /// <param name="message">The message to display in the popup.</param>
         private void ShowPopup(string message)
         {
+            // Built when it is first wanted rather than on waking. Only the local player's
+            // avatar ever shows a popup, and which avatar that is cannot be known in Awake,
+            // so building it there gave every avatar in the Unity scene a screen-space
+            // canvas and a raycaster of its own for a popup it would never show.
+            EnsurePopupUI();
+
             if (popupPanel == null || popupText == null)
             {
-                Debug.LogWarning($"[EchoFaceController] Popup UI is missing. Message: {message}\n");
+                Debug.LogWarning($"[EchoFaceToggleController] Popup UI is missing. Message: {message}\n");
                 return;
             }
 
