@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -223,7 +224,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             semanticModel);
 
                     facts |=
-                        GetFactsProvenByPrecedingSuccessfulDereference(
+                        ExceptionFlowDereferenceFactDiscovery.GetFactsProvenByPrecedingSuccessfulDereference(
                             unwrappedExpression,
                             parameterSymbol,
                             semanticModel);
@@ -241,7 +242,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         localSymbol,
                         semanticModel);
 
-                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
+                    facts |= ExceptionFlowDereferenceFactDiscovery.GetFactsProvenByPrecedingSuccessfulDereference(
                         unwrappedExpression,
                         localSymbol,
                         semanticModel);
@@ -309,12 +310,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             semanticModel,
                             callContext);
 
-                    facts |= GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+                    facts |= ExceptionFlowDereferenceFactDiscovery.GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
                         unwrappedExpression,
                         propertySymbol,
                         semanticModel);
 
-                    if (TryGetStableCallContextPropertyReceiverParameter(
+                    if (ExceptionFlowDereferenceFactDiscovery.TryGetStableCallContextPropertyReceiverParameter(
                             unwrappedExpression,
                             propertySymbol,
                             semanticModel,
@@ -323,7 +324,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         && callContext.IsParameterMemberKnownNonNull(
                             receiverParameter,
                             propertySymbol)
-                        && IsParameterValueStillCurrentSinceEntry(
+                        && ExceptionFlowDereferenceFactDiscovery.IsParameterValueStillCurrentSinceEntry(
                             unwrappedExpression,
                             receiverParameter,
                             semanticModel))

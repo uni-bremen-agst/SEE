@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -201,7 +202,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 StatementSyntax? containingStatement =
-                    GetSafeContainingStatement(
+                    ExceptionFlowDereferenceFactDiscovery.GetSafeContainingStatement(
                         containingBlock,
                         localSymbol,
                         semanticModel);
@@ -1021,7 +1022,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     invocation.ArgumentList.Arguments[argumentIndex];
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         argumentIndex,
                         methodSymbol);
@@ -1101,7 +1102,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             int parameterIndex =
-                GetParameterIndexForArgument(
+                ExceptionFlowArgumentMapper.GetParameterIndex(
                     argument,
                     fallbackIndex,
                     selectedMethod);

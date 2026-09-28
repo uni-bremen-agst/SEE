@@ -636,7 +636,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     arguments[index];
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         index,
                         methodSymbol);

@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,7 +10,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains value-fact reasoning derived from successful completion of
     /// source-level helper calls.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowDereferenceFactDiscovery
     {
         /// <summary>
         /// Determines whether successful completion of a statement proves a
@@ -408,7 +409,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         argumentIndex,
                         methodSymbol);
@@ -583,7 +584,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the declaration represents a supported
         /// source method; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryGetDeclaredMethodAndBody(
+        internal static bool TryGetDeclaredMethodAndBody(
             SyntaxNode declaration,
             SemanticModel semanticModel,
             out IMethodSymbol? methodSymbol,
@@ -639,7 +640,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <c>yield</c> statement outside nested callables; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool DeclarationContainsYield(
+        internal static bool DeclarationContainsYield(
             SyntaxNode declaration)
         {
             return declaration

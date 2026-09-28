@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -135,7 +136,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 StatementSyntax? containingStatement =
-                    GetSafeContainingStatement(
+                    ExceptionFlowDereferenceFactDiscovery.GetSafeContainingStatement(
                         containingBlock,
                         symbol,
                         semanticModel);
@@ -228,7 +229,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ArgumentSyntax argument = arguments[index];
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         index,
                         methodSymbol);
@@ -266,83 +267,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets the statement containing a nested block when value facts can safely
-        /// be propagated from the surrounding block into that nested block.
-        /// </summary>
-        /// <param name="block">The nested block.</param>
-        /// <param name="symbol">The symbol whose facts are propagated.</param>
-        /// <param name="semanticModel">
-        /// The semantic model used for data-flow analysis.
-        /// </param>
-        /// <returns>
-        /// The containing statement when the nesting construct preserves the
-        /// tracked symbol; otherwise <see langword="null"/>.
-        /// </returns>
-        private static StatementSyntax? GetSafeContainingStatement(
-            BlockSyntax block,
-            ISymbol symbol,
-            SemanticModel semanticModel)
-        {
-            if (block.Parent is IfStatementSyntax ifStatement)
-            {
-                if (ExpressionWritesSymbol(
-                        ifStatement.Condition,
-                        symbol,
-                        semanticModel))
-                {
-                    return null;
-                }
-
-                return ifStatement.Parent is BlockSyntax
-                    ? ifStatement
-                    : null;
-            }
-
-            if (block.Parent is ElseClauseSyntax elseClause &&
-                elseClause.Parent is IfStatementSyntax elseIfStatement)
-            {
-                if (ExpressionWritesSymbol(
-                        elseIfStatement.Condition,
-                        symbol,
-                        semanticModel))
-                {
-                    return null;
-                }
-
-                return elseIfStatement.Parent is BlockSyntax
-                    ? elseIfStatement
-                    : null;
-            }
-
-            if (block.Parent is CommonForEachStatementSyntax forEachStatement)
-            {
-                /*
-                 * A fact established before a foreach remains valid on every
-                 * iteration only when neither source evaluation nor the body
-                 * can write the tracked symbol.
-                 */
-                if (StatementMayWriteSymbolForDereferenceFacts(
-                        forEachStatement,
-                        symbol,
-                        semanticModel))
-                {
-                    return null;
-                }
-
-                return forEachStatement.Parent is BlockSyntax
-                    ? forEachStatement
-                    : null;
-            }
-
-            if (block.Parent is BlockSyntax)
-            {
-                return block;
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Determines whether a statement writes to the specified symbol.
         /// </summary>
         /// <param name="statement">The statement to inspect.</param>
@@ -361,34 +285,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             ExceptionFlowDataFlowFacts dataFlow =
                 ExceptionFlowDataFlowFactsProvider.GetFacts(statement, semanticModel);
-
-            return dataFlow.Succeeded &&
-                   dataFlow.WrittenInside.Any(
-                       writtenSymbol =>
-                           SymbolEqualityComparer.Default.Equals(
-                               writtenSymbol,
-                               symbol));
-        }
-
-        /// <summary>
-        /// Determines whether an expression writes to the specified symbol.
-        /// </summary>
-        /// <param name="expression">The expression to inspect.</param>
-        /// <param name="symbol">The symbol whose writes are detected.</param>
-        /// <param name="semanticModel">
-        /// The semantic model used for data-flow analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the expression may write the symbol; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool ExpressionWritesSymbol(
-            ExpressionSyntax expression,
-            ISymbol symbol,
-            SemanticModel semanticModel)
-        {
-            ExceptionFlowDataFlowFacts dataFlow =
-                ExceptionFlowDataFlowFactsProvider.GetFacts(expression, semanticModel);
 
             return dataFlow.Succeeded &&
                    dataFlow.WrittenInside.Any(
@@ -788,52 +684,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 isPatternExpression.Expression,
                 symbol,
                 semanticModel);
-        }
-
-        /// <summary>
-        /// Determines whether an expression resolves to the specified symbol.
-        /// </summary>
-        /// <param name="expression">The expression to resolve.</param>
-        /// <param name="symbol">The expected symbol.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <returns>
-        /// <see langword="true"/> if the expression references the specified symbol;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool ExpressionReferencesSymbol(
-            ExpressionSyntax expression,
-            ISymbol symbol,
-            SemanticModel semanticModel)
-        {
-            ExpressionSyntax unwrappedExpression =
-                UnwrapParenthesizedExpression(expression);
-
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(unwrappedExpression);
-
-            return symbolInfo.Symbol != null &&
-                   SymbolEqualityComparer.Default.Equals(
-                       symbolInfo.Symbol,
-                       symbol);
-        }
-
-        /// <summary>
-        /// Removes surrounding parenthesized expressions.
-        /// </summary>
-        /// <param name="expression">The expression to unwrap.</param>
-        /// <returns>The innermost non-parenthesized expression.</returns>
-        private static ExpressionSyntax UnwrapParenthesizedExpression(
-            ExpressionSyntax expression)
-        {
-            ExpressionSyntax currentExpression = expression;
-
-            while (currentExpression
-                   is ParenthesizedExpressionSyntax parenthesized)
-            {
-                currentExpression = parenthesized.Expression;
-            }
-
-            return currentExpression;
         }
 
         /// <summary>

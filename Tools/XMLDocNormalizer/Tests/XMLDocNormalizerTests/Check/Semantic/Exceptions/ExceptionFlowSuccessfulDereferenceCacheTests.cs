@@ -357,7 +357,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             ISymbol symbol,
             SemanticModel semanticModel)
         {
-            MethodInfo method = typeof(ExceptionFlowAnalyzer).GetMethod(
+            MethodInfo method = typeof(ExceptionFlowDereferenceFactDiscovery).GetMethod(
                                     methodName,
                                     BindingFlags.NonPublic | BindingFlags.Static) ??
                                 throw new InvalidOperationException(
@@ -377,7 +377,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
         private static int GetCacheEntryCount(SemanticModel semanticModel)
         {
-            FieldInfo field = typeof(ExceptionFlowAnalyzer).GetField(
+            FieldInfo field = typeof(ExceptionFlowDereferenceFactDiscovery).GetField(
                                   "successfulDereferenceCaches",
                                   BindingFlags.NonPublic | BindingFlags.Static) ??
                               throw new InvalidOperationException(

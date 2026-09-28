@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -253,7 +254,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         argumentIndex,
                         selectedMethod);
@@ -312,7 +313,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode declaration =
                 normalizedMethod.DeclaringSyntaxReferences[0].GetSyntax();
 
-            if (DeclarationContainsYield(declaration))
+            if (ExceptionFlowDereferenceFactDiscovery.DeclarationContainsYield(declaration))
             {
                 return false;
             }
@@ -323,7 +324,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     declaration.SyntaxTree);
 
             if (declarationSemanticModel == null
-                || !TryGetDeclaredMethodAndBody(
+                || !ExceptionFlowDereferenceFactDiscovery.TryGetDeclaredMethodAndBody(
                     declaration,
                     declarationSemanticModel,
                     out IMethodSymbol? declaredMethod,
@@ -657,7 +658,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (foreachStatement.Statement is not BlockSyntax body)
             {
-                return StatementDefinitelyDereferencesSymbol(
+                return ExceptionFlowDereferenceFactDiscovery.StatementDefinitelyDereferencesSymbol(
                     foreachStatement.Statement,
                     iterationSymbol,
                     semanticModel);
@@ -665,7 +666,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (StatementSyntax statement in body.Statements)
             {
-                if (StatementDefinitelyDereferencesSymbol(
+                if (ExceptionFlowDereferenceFactDiscovery.StatementDefinitelyDereferencesSymbol(
                         statement,
                         iterationSymbol,
                         semanticModel))

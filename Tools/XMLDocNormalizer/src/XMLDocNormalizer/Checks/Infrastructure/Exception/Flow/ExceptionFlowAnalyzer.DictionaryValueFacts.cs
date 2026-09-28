@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -437,7 +438,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ?? -1;
 
             return argumentIndex >= 0
-                && GetParameterIndexForArgument(
+                && ExceptionFlowArgumentMapper.GetParameterIndex(
                     argument,
                     argumentIndex,
                     constructorSymbol) == 0;

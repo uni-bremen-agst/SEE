@@ -1,3 +1,5 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowStableMemberFacts;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -292,7 +294,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             int argumentIndex = invocation.ArgumentList.Arguments.IndexOf(outArgument);
 
             if (argumentIndex < 0
-                || GetParameterIndexForArgument(outArgument, argumentIndex, tryGetValueMethod) != 1
+                || ExceptionFlowArgumentMapper.GetParameterIndex(outArgument, argumentIndex, tryGetValueMethod) != 1
                 || !IsUseGuardedBySuccessfulTryGetValue(expression, invocation))
             {
                 return false;
@@ -788,7 +790,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ArgumentSyntax argument = invocation.ArgumentList.Arguments[argumentIndex];
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(argument, argumentIndex, methodSymbol);
+                    ExceptionFlowArgumentMapper.GetParameterIndex(argument, argumentIndex, methodSymbol);
 
                 if (parameterIndex == 1)
                 {
@@ -891,7 +893,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 ArgumentSyntax argument = invocation.ArgumentList.Arguments[argumentIndex];
 
-                if (GetParameterIndexForArgument(argument, argumentIndex, methodSymbol) == 1)
+                if (ExceptionFlowArgumentMapper.GetParameterIndex(argument, argumentIndex, methodSymbol) == 1)
                 {
                     outArgument = argument;
                     break;

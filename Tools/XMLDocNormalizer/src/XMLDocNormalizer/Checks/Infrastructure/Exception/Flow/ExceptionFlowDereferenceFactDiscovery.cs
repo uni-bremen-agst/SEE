@@ -1,3 +1,5 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowStableMemberFacts;
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,8 +12,80 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains value-fact reasoning based on earlier successful runtime
     /// dereferences.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowDereferenceFactDiscovery
     {
+        /// <summary>
+        /// Gets the statement containing a nested block when value facts can
+        /// safely be propagated from the surrounding block.
+        /// </summary>
+        /// <param name="block">The nested block.</param>
+        /// <param name="symbol">The symbol whose facts are propagated.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// The containing statement when the nesting construct preserves the
+        /// tracked symbol; otherwise <see langword="null"/>.
+        /// </returns>
+        internal static StatementSyntax? GetSafeContainingStatement(
+            BlockSyntax block,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            if (block.Parent is IfStatementSyntax ifStatement)
+            {
+                if (ExceptionFlowSymbolUsageFacts.ExpressionWritesSymbol(
+                        ifStatement.Condition,
+                        symbol,
+                        semanticModel))
+                {
+                    return null;
+                }
+
+                return ifStatement.Parent is BlockSyntax
+                    ? ifStatement
+                    : null;
+            }
+
+            if (block.Parent is ElseClauseSyntax elseClause
+                && elseClause.Parent is IfStatementSyntax elseIfStatement)
+            {
+                if (ExceptionFlowSymbolUsageFacts.ExpressionWritesSymbol(
+                        elseIfStatement.Condition,
+                        symbol,
+                        semanticModel))
+                {
+                    return null;
+                }
+
+                return elseIfStatement.Parent is BlockSyntax
+                    ? elseIfStatement
+                    : null;
+            }
+
+            if (block.Parent is CommonForEachStatementSyntax forEachStatement)
+            {
+                if (StatementMayWriteSymbolForDereferenceFacts(
+                        forEachStatement,
+                        symbol,
+                        semanticModel))
+                {
+                    return null;
+                }
+
+                return forEachStatement.Parent is BlockSyntax
+                    ? forEachStatement
+                    : null;
+            }
+
+            if (block.Parent is BlockSyntax)
+            {
+                return block;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Stores successful-dereference results in weak semantic-model
         /// partitions so cached syntax and symbols cannot outlive their Roslyn
@@ -42,7 +116,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// successful dereference proves the symbol non-null; otherwise
         /// <see cref="ExceptionFlowValueFacts.None"/>.
         /// </returns>
-        private static ExceptionFlowValueFacts
+        internal static ExceptionFlowValueFacts
             GetFactsProvenByPrecedingSuccessfulDereference(
                 ExpressionSyntax expression,
                 ISymbol symbol,
@@ -223,7 +297,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// dereference proves the stable property value non-null for the unchanged
         /// receiver; otherwise <see cref="ExceptionFlowValueFacts.None"/>.
         /// </returns>
-        private static ExceptionFlowValueFacts GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+        internal static ExceptionFlowValueFacts GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
             ExpressionSyntax expression,
             IPropertySymbol propertySymbol,
             SemanticModel semanticModel)
@@ -676,7 +750,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The stable properties whose values are proven non-null for the unchanged
         /// receiver.
         /// </returns>
-        private static IReadOnlyCollection<IPropertySymbol>
+        internal static IReadOnlyCollection<IPropertySymbol>
             GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
                 ExpressionSyntax receiverExpression,
                 SemanticModel semanticModel)
@@ -807,7 +881,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// callable entry and the current expression; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool IsParameterValueStillCurrentSinceEntry(
+        internal static bool IsParameterValueStillCurrentSinceEntry(
             ExpressionSyntax expression,
             IParameterSymbol parameterSymbol,
             SemanticModel semanticModel)
@@ -958,7 +1032,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the property is stable and uses a directly
         /// trackable parameter receiver; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryGetStableCallContextPropertyReceiverParameter(
+        internal static bool TryGetStableCallContextPropertyReceiverParameter(
             ExpressionSyntax expression,
             IPropertySymbol propertySymbol,
             SemanticModel semanticModel,
@@ -1077,7 +1151,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// data-flow analysis is unavailable; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool StatementMayWriteSymbolForDereferenceFacts(
+        internal static bool StatementMayWriteSymbolForDereferenceFacts(
             StatementSyntax statement,
             ISymbol symbol,
             SemanticModel semanticModel)
@@ -1171,7 +1245,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// requires the symbol to have been non-null; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool StatementDefinitelyDereferencesSymbol(
+        internal static bool StatementDefinitelyDereferencesSymbol(
             StatementSyntax statement,
             ISymbol symbol,
             SemanticModel semanticModel)

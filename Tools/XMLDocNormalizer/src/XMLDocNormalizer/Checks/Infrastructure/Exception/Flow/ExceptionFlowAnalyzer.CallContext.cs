@@ -1,3 +1,4 @@
+using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -356,7 +357,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     arguments[index];
 
                 int parameterIndex =
-                    GetParameterIndexForArgument(
+                    ExceptionFlowArgumentMapper.GetParameterIndex(
                         argument,
                         index,
                         methodSymbol);
@@ -456,7 +457,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 ArgumentSyntax argument = arguments[index];
 
-                int parameterIndex = GetParameterIndexForArgument(
+                int parameterIndex = ExceptionFlowArgumentMapper.GetParameterIndex(
                     argument,
                     index,
                     methodSymbol);
@@ -482,7 +483,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.GetSymbolInfo(argumentExpression);
 
                 if (argumentSymbolInfo.Symbol is IParameterSymbol sourceParameter
-                    && IsParameterValueStillCurrentSinceEntry(
+                    && ExceptionFlowDereferenceFactDiscovery.IsParameterValueStillCurrentSinceEntry(
                         argumentExpression,
                         sourceParameter,
                         semanticModel))
@@ -498,7 +499,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 IReadOnlyCollection<IPropertySymbol> locallyProvenProperties =
-                    GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
+                    ExceptionFlowDereferenceFactDiscovery.GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
                         argumentExpression,
                         semanticModel);
 
@@ -575,50 +576,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
-        /// <summary>
-        /// Gets the effective target parameter index for an argument, taking
-        /// named arguments into account.
-        /// </summary>
-        /// <param name="argument">
-        /// The argument to inspect.
-        /// </param>
-        /// <param name="fallbackIndex">
-        /// The positional fallback index.
-        /// </param>
-        /// <param name="methodSymbol">
-        /// The target method symbol.
-        /// </param>
-        /// <returns>
-        /// The resolved parameter index, or the fallback index if no named
-        /// match exists.
-        /// </returns>
-        internal static int GetParameterIndexForArgument(
-            ArgumentSyntax argument,
-            int fallbackIndex,
-            IMethodSymbol methodSymbol)
-        {
-            if (argument.NameColon == null)
-            {
-                return fallbackIndex;
-            }
-
-            string name =
-                argument.NameColon.Name.Identifier.ValueText;
-
-            for (int index = 0;
-                 index < methodSymbol.Parameters.Length;
-                 index++)
-            {
-                if (string.Equals(
-                        methodSymbol.Parameters[index].Name,
-                        name,
-                        StringComparison.Ordinal))
-                {
-                    return index;
-                }
-            }
-
-            return fallbackIndex;
-        }
     }
 }

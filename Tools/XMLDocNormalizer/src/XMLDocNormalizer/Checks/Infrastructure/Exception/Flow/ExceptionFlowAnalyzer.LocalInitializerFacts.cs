@@ -91,7 +91,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 currentStatement =
-                    GetSafeContainingStatement(
+                    ExceptionFlowDereferenceFactDiscovery.GetSafeContainingStatement(
                         containingBlock,
                         localSymbol,
                         semanticModel);
