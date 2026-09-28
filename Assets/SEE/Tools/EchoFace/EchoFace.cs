@@ -451,8 +451,13 @@ namespace SEE.Tools.EchoFace
                 skinnedMeshRenderer = transform.Find(AvatarSceleton.BaseBody)?.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer == null)
                 {
-                    Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.\n");
-                    return;
+                    // Reported and carried on with rather than returned upon: the head and
+                    // the eyes are bones and owe nothing to the renderer, and giving up
+                    // here left them unresolved, so a missing renderer silently took the
+                    // head and eye tracking with it and said only that a renderer was
+                    // missing. Blendshapes alone are lost, which is what the warning says.
+                    Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually. "
+                                     + "Blendshape animation is disabled; head and eye rotation are not affected.\n");
                 }
             }
 
