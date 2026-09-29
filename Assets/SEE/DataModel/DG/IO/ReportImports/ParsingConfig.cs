@@ -3,7 +3,9 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+#if UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -21,7 +23,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// It will be used to identify what type of <see cref="ParsingConfig"/> must
         /// instantiated when reading a configuration file. It depends solely on the type
         /// of report data and will be set by the subclasses appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public string ToolId = string.Empty;
 
         /// <summary>
@@ -43,11 +47,13 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// Leave this empty if report paths and paths in the graph already match.
         /// </summary>
         /// <remarks>This is a user setting. It must be saved to a configuration file.</remarks>
+#if UNITY_5_3_OR_NEWER
         [Tooltip("Marks the root of external paths of the import. "
             + "If set, it will be used to normalize imported paths to match the paths in the the current graph. "
             + "For instance, if an external path is 'C:/work/proj/src/main/java/com/acme/Foo.java' "
             + "and this setting is 'src/main/java', the normalized path will be 'com/acme/Foo.java'. "
             + "Leave empty if the paths match already.")]
+#endif
         public string SourceRootMarker = string.Empty;
 
         /// <summary>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+#if UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -46,7 +48,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public Dictionary<string, string> LinePatterns { get; set; } = new();
 
         /// <summary>
@@ -58,7 +62,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public Dictionary<string, string> PathBuilders { get; set; } = new();
 
         /// <summary>
@@ -70,7 +76,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public Dictionary<string, string> FileNameTemplates { get; set; } = new();
 
         /// <summary>
@@ -82,7 +90,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public Dictionary<string, string>? LocationMapping { get; set; }
 
         /// <summary>
@@ -94,7 +104,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } = new();
 
         /// <summary>
@@ -105,7 +117,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public RegexOptions RegexOptions { get; set; } = RegexOptions.None;
 
         /// <summary>
@@ -116,7 +130,9 @@ namespace SEE.DataModel.DG.IO.ReportImports
         /// <remarks>This is not a user setting. It will not be saved to a configuration file.
         /// It depends solely on the type of report data and will be set by the subclasses
         /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
         [HideInInspector]
+#endif
         public string? LineFilter { get; set; }
 
         /// <summary>
