@@ -1,7 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.UserSettings;
 using SEE.Utils.Config;
+#if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+#endif
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -205,7 +207,9 @@ namespace SEE.Utils.Paths
         /// system we are running on, that is, the directory separator will be \
         /// on Windows and / on all other platforms.
         /// </summary>
+#if ODIN_INSPECTOR
         [ShowInInspector, FilePath(AbsolutePath = true)]
+#endif
         public string Path
         {
             get => Get();
