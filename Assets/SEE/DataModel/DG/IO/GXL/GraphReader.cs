@@ -33,7 +33,7 @@ namespace SEE.DataModel.DG.IO.GXL
         /// <param name="basePath">The base path of the graph.</param>
         /// <param name="rootID">Unique ID of the artificial root node if required.</param>
         /// <param name="logger">The logger used for messages; if null, no messages are emitted.</param>
-        public GraphReader(HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
+        public GraphReader(HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", SEE.Utils.ILogger logger = null)
             : base(logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
@@ -53,7 +53,7 @@ namespace SEE.DataModel.DG.IO.GXL
         /// <returns>Loaded graph.</returns>
         public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,
                                                      Action<float> changePercentage = null, CancellationToken token = default,
-                                                     Utils.ILogger logger = null)
+                                                     SEE.Utils.ILogger logger = null)
         {
             GraphReader graphReader = new(hierarchicalEdgeTypes, basePath, logger: logger);
             await graphReader.LoadAsync(await path.LoadAsync(), path.Path, changePercentage, token);

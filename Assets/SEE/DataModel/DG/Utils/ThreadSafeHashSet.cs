@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace SEE.Utils
+namespace SEE.DataModel.DG.Utils
 {
     /// <summary>
     /// A thread-safe hash set.
