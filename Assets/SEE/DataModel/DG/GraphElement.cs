@@ -1,6 +1,5 @@
 ﻿using SEE.Utils;
 using SEE.Utils.Paths;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.DataModel.DG
@@ -203,11 +202,11 @@ namespace SEE.DataModel.DG
         {
             string filename = Filename;
             string directory = Directory;
-            if (filename.IsNullOrWhitespace())
+            if (string.IsNullOrWhiteSpace(filename))
             {
-                return directory.IsNullOrWhitespace() ? string.Empty : directory;
+                return string.IsNullOrWhiteSpace(directory) ? string.Empty : directory;
             }
-            return directory.IsNullOrWhitespace() ? filename : Filenames.Join(directory, filename);
+            return string.IsNullOrWhiteSpace(directory) ? filename : Filenames.Join(directory, filename);
         }
 
         /// <summary>
