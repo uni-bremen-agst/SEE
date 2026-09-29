@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.Controls.Actions.Drawable.DrawShapes;
 using SEE.Game.Drawable.Line;
 
 namespace SEE.Controls.Actions.Drawable
@@ -16,7 +17,7 @@ namespace SEE.Controls.Actions.Drawable
         [Test]
         public void TestNormalPreviewPreservesCurrentLineKind()
         {
-            LineKind result = DrawShapesAction.ResolvePreviewLineKind(
+            LineKind result = DrawShapeLineCapController.ResolvePreviewLineKind(
                 false,
                 false,
                 LineKind.Dashed25,
@@ -31,7 +32,7 @@ namespace SEE.Controls.Actions.Drawable
         [Test]
         public void TestReferenceUsesDashed25()
         {
-            LineKind result = DrawShapesAction.ResolvePreviewLineKind(
+            LineKind result = DrawShapeLineCapController.ResolvePreviewLineKind(
                 true,
                 false,
                 LineKind.Dashed75,
@@ -47,7 +48,7 @@ namespace SEE.Controls.Actions.Drawable
         [Test]
         public void TestRemovingReferenceRestoresDrawingLineKind()
         {
-            LineKind result = DrawShapesAction.ResolvePreviewLineKind(
+            LineKind result = DrawShapeLineCapController.ResolvePreviewLineKind(
                 false,
                 true,
                 LineKind.Dashed25,

@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Controls.Actions.Drawable.DrawShapes;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
@@ -14,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -92,6 +92,11 @@ namespace SEE.Controls.Actions.Drawable
         private bool finishDrawingViaButton = false;
 
         /// <summary>
+        /// Manages line-cap configuration and state for the current preview.
+        /// </summary>
+        private readonly DrawShapeLineCapController lineCapController = new();
+
+        /// <summary>
         /// Position for the fixed shape preview.
         /// </summary>
         private Vector3 shapePreviewFixPosition;
@@ -123,24 +128,6 @@ namespace SEE.Controls.Actions.Drawable
         /// Status and color if a shape has activates the fill out option.
         /// </summary>
         private Color? shapeFillOut = null;
-
-        /// <summary>
-        /// The previously applied start line cap of the preview.
-        /// Used to detect changes while interacting with the menu.
-        /// </summary>
-        private LineCap lastPreviewStartCap = LineCap.None;
-
-        /// <summary>
-        /// The previously applied end line cap of the preview.
-        /// Used to detect changes while interacting with the menu.
-        /// </summary>
-        private LineCap lastPreviewEndCap = LineCap.None;
-
-        /// <summary>
-        /// The previously applied line kind of the preview.
-        /// Used to detect changes while interacting with the menu.
-        /// </summary>
-        private LineKind lastPreviewLineKind;
 
         /// <summary>
         /// The positions currently used for the visible preview.
@@ -226,7 +213,12 @@ namespace SEE.Controls.Actions.Drawable
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
 
-            RefreshPreviewLineCapsIfMenuChanged();
+            lineCapController.RefreshPreviewIfMenuChanged(
+                Shape,
+                Surface,
+                currentPreviewPositions,
+                shapeFillOut,
+                drawing || shapePreview || shapePreviewFix);
             UpdatePreviewAssociatedPage();
 
             if (!Raycasting.IsMouseOverGUI())
@@ -347,7 +339,7 @@ namespace SEE.Controls.Actions.Drawable
             GameLineDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
             Shape = GameLineGeometry.SetPivot(Shape, shapeFillOut);
-            LineConf finalShape = ApplyLineCaps(LineConf.GetLine(Shape));
+            LineConf finalShape = lineCapController.ApplyFinal(Shape, Surface, LineConf.GetLine(Shape));
             memento = new Memento(Surface, finalShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, finalShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
@@ -673,7 +665,7 @@ namespace SEE.Controls.Actions.Drawable
                 shapeFillOut = LineMenu.GetFillOutColorForDrawing();
                 Shape.GetComponent<LineRenderer>().loop = false;
                 Shape.AddOrGetComponent<BlinkEffect>();
-                ApplyPreviewLineCaps(positions);
+                lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
             else
@@ -690,7 +682,7 @@ namespace SEE.Controls.Actions.Drawable
                     BlinkEffect.AddFillOutToEffect(shape);
                 }
                 GameLineDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
-                ApplyPreviewLineCaps(positions);
+                lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
         }
@@ -751,57 +743,6 @@ namespace SEE.Controls.Actions.Drawable
 
         #region Line Preview
         /// <summary>
-        /// Refreshes the preview line caps if the selected cap settings or the effective
-        /// main-line kind changed while interacting with the menu.
-        /// </summary>
-        private void RefreshPreviewLineCapsIfMenuChanged()
-        {
-            if (Shape == null || currentPreviewPositions == null
-                || !(drawing || shapePreview || shapePreviewFix))
-            {
-                return;
-            }
-
-            LineCap startCap = ShapeMenu.GetLineStartCap();
-            LineCap endCap = ShapeMenu.GetLineEndCap();
-
-            bool hasReference =
-                startCap == LineCap.Reference
-                || endCap == LineCap.Reference;
-
-            bool hadReference =
-                lastPreviewStartCap == LineCap.Reference
-                || lastPreviewEndCap == LineCap.Reference;
-
-            LineConf currentShape = LineConf.GetLine(Shape);
-
-            if (currentShape == null)
-            {
-                return;
-            }
-
-            LineKind previewLineKind = ResolvePreviewLineKind(
-                hasReference,
-                hadReference,
-                currentShape.LineKind,
-                ValueHolder.CurrentLineKind);
-
-            if (startCap == lastPreviewStartCap
-                && endCap == lastPreviewEndCap
-                && previewLineKind == lastPreviewLineKind)
-            {
-                return;
-            }
-
-            ApplyPreviewLineCaps(currentPreviewPositions);
-
-            new DrawNetAction(
-                Surface.name,
-                GameFinder.GetDrawableSurfaceParentName(Surface),
-                LineConf.GetLine(Shape)).Execute();
-        }
-
-        /// <summary>
         /// This method provides a line preview for the user
         /// to select the desired position of the next line point.
         /// </summary>
@@ -822,7 +763,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
                     GameLineDrawer.Drawing(Shape, newPositions, shapeFillOut);
-                    ApplyPreviewLineCaps(newPositions);
+                    lineCapController.ApplyPreview(Shape, newPositions, shapeFillOut);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         LineConf.GetLine(Shape)).Execute();
                     if (shapeFillOut != null)
@@ -840,7 +781,7 @@ namespace SEE.Controls.Actions.Drawable
                 else
                 {
                     GameLineDrawer.Drawing(Shape, newPositions);
-                    ApplyPreviewLineCaps(newPositions);
+                    lineCapController.ApplyPreview(Shape, newPositions, shapeFillOut);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         LineConf.GetLine(Shape)).Execute();
                 }
@@ -873,7 +814,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
                         GameLineDrawer.Drawing(Shape, positions, shapeFillOut);
-                        ApplyPreviewLineCaps(positions);
+                        lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
                         new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                             LineConf.GetLine(Shape)).Execute();
                         if (shapeFillOut != null)
@@ -890,7 +831,7 @@ namespace SEE.Controls.Actions.Drawable
                     else
                     {
                         GameLineDrawer.Drawing(Shape, positions);
-                        ApplyPreviewLineCaps(positions);
+                        lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
                         new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                             LineConf.GetLine(Shape)).Execute();
                     }
@@ -905,9 +846,7 @@ namespace SEE.Controls.Actions.Drawable
         private void ResetPreviewState()
         {
             currentPreviewPositions = null;
-            lastPreviewStartCap = LineCap.None;
-            lastPreviewEndCap = LineCap.None;
-            lastPreviewLineKind = ValueHolder.CurrentLineKind;
+            lineCapController.Reset();
         }
 
         /// <summary>
@@ -935,228 +874,6 @@ namespace SEE.Controls.Actions.Drawable
                     Shape.name,
                     color).Execute();
             }, () => shapeFillOut = null);
-        }
-        #endregion
-
-        #region Line Caps
-        /// <summary>
-        /// Applies the currently selected line caps to the finished line.
-        /// </summary>
-        /// <param name="currentShapeConf">The configuration of the finished line.</param>
-        /// <returns>The updated <see cref="LineConf"/> after applying the selected line caps.</returns>
-        private LineConf ApplyLineCaps(LineConf currentShapeConf)
-        {
-            if (Shape == null || currentShapeConf == null)
-            {
-                return currentShapeConf;
-            }
-
-            (LineCapConf startConf, LineCapConf endConf, bool hasReference)
-                = CreateSelectedLineCapConfs(currentShapeConf, sendLineKindChange: true);
-
-            GameLineCapApplicator.ApplyLineCaps(
-                Shape,
-                startConf,
-                endConf,
-                LineConf.GetFillOutColor(currentShapeConf),
-                hasReference || startConf.UseOwnVisuals,
-                hasReference || endConf.UseOwnVisuals);
-
-            return LineConf.GetLine(Shape);
-        }
-
-        /// <summary>
-        /// Applies the currently selected line caps to the preview line.
-        /// </summary>
-        /// <param name="previewPositions">The current positions of the preview line.</param>
-        private void ApplyPreviewLineCaps(Vector3[] previewPositions)
-        {
-            if (Shape == null || previewPositions == null || previewPositions.Length < 2)
-            {
-                return;
-            }
-
-            GameLineGeometry.UpdateOriginalAnchors(Shape, previewPositions);
-
-            LineConf currentShape = LineConf.GetLine(Shape);
-            if (currentShape == null)
-            {
-                return;
-            }
-
-            (LineCapConf startConf, LineCapConf endConf, bool hasReference)
-                = CreateSelectedLineCapConfs(currentShape, sendLineKindChange: false);
-
-            GameLineCapApplicator.ApplyLineCaps(
-                Shape,
-                startConf,
-                endConf,
-                shapeFillOut,
-                hasReference || startConf.UseOwnVisuals,
-                hasReference || endConf.UseOwnVisuals);
-
-            lastPreviewStartCap = ShapeMenu.GetLineStartCap();
-            lastPreviewEndCap = ShapeMenu.GetLineEndCap();
-
-            LineConf refreshedShape = LineConf.GetLine(Shape);
-
-            lastPreviewLineKind = hasReference
-                ? LineKind.Dashed25
-                : refreshedShape?.LineKind ?? currentShape.LineKind;
-        }
-
-        /// <summary>
-        /// Creates the currently selected start and end line-cap configurations
-        /// and applies the required main-line kind for reference caps.
-        /// The current preview line kind is preserved during normal cap updates.
-        /// When a reference cap is removed, the regular drawing line kind is restored.
-        /// </summary>
-        /// <param name="currentShapeConf">The current line configuration.</param>
-        /// <param name="sendLineKindChange">
-        /// Whether a line-kind change caused by a reference cap should be synchronized separately.
-        /// </param>
-        /// <returns>
-        /// The created start and end line-cap configurations and whether a reference cap is used.
-        /// </returns>
-        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference)
-            CreateSelectedLineCapConfs(
-                LineConf currentShapeConf,
-                bool sendLineKindChange)
-        {
-            LineCapConf startConf = ShapeMenu.GetLineStartCapConf();
-            LineCapConf endConf = ShapeMenu.GetLineEndCapConf();
-
-            LineCap startCap = startConf.CapKind;
-            LineCap endCap = endConf.CapKind;
-
-            bool hasReference =
-                startCap == LineCap.Reference
-                || endCap == LineCap.Reference;
-
-            bool hadReference =
-                lastPreviewStartCap == LineCap.Reference
-                || lastPreviewEndCap == LineCap.Reference;
-
-            LineKind lineKind = ResolvePreviewLineKind(
-                hasReference,
-                hadReference,
-                currentShapeConf.LineKind,
-                ValueHolder.CurrentLineKind);
-
-            GameLineAppearance.ChangeLineKind(Shape, lineKind, currentShapeConf.Tiling);
-            currentShapeConf.LineKind = lineKind;
-
-            if (hasReference && sendLineKindChange)
-            {
-                new ChangeLineKindNetAction(
-                    Surface.name,
-                    GameFinder.GetDrawableSurfaceParentName(Surface),
-                    Shape.name,
-                    LineKind.Dashed25,
-                    currentShapeConf.Tiling).Execute();
-            }
-
-            LineCap actualStartCap =
-                startCap == LineCap.Reference
-                    ? LineCap.Arrow
-                    : startCap;
-
-            LineCap actualEndCap =
-                endCap == LineCap.Reference
-                    ? LineCap.Arrow
-                    : endCap;
-
-            startConf = CreateSelectedLineCapConf(
-                currentShapeConf,
-                startConf,
-                actualStartCap,
-                startCap);
-
-            endConf = CreateSelectedLineCapConf(
-                currentShapeConf,
-                endConf,
-                actualEndCap,
-                endCap);
-
-            return (startConf, endConf, hasReference);
-        }
-
-        /// <summary>
-        /// Creates the selected line-cap configuration for the preview or final line.
-        /// Cap-specific visual settings are preserved only if the existing cap uses
-        /// its own visuals. Otherwise, the cap inherits the current visual settings
-        /// of the parent line.
-        /// </summary>
-        /// <param name="currentShapeConf">The parent line configuration.</param>
-        /// <param name="existingCapConf">The existing cap configuration, if any.</param>
-        /// <param name="actualCap">The actual cap kind to draw.</param>
-        /// <param name="selectedCap">The cap kind selected in the shape menu.</param>
-        /// <returns>The normalized line-cap configuration.</returns>
-        private static LineCapConf CreateSelectedLineCapConf(
-            LineConf currentShapeConf,
-            LineCapConf existingCapConf,
-            LineCap actualCap,
-            LineCap selectedCap)
-        {
-            LineCapConf reusableCapConf = existingCapConf != null
-                && existingCapConf.CapKind == actualCap
-                && existingCapConf.UseOwnVisuals
-                    ? existingCapConf
-                    : null;
-
-            LineCapConf capConf =
-                GameLineCapConfiguration.CreateLineCapConf(currentShapeConf, reusableCapConf, actualCap);
-
-            ConfigureReferenceLineCap(selectedCap, capConf);
-            return capConf;
-        }
-
-        /// <summary>
-        /// Configures a line cap as the visible cap of a reference line.
-        /// </summary>
-        /// <param name="selectedCap">The cap selected in the menu.</param>
-        /// <param name="capConf">The cap configuration to adjust.</param>
-        private static void ConfigureReferenceLineCap(LineCap selectedCap, LineCapConf capConf)
-        {
-            if (selectedCap != LineCap.Reference)
-            {
-                return;
-            }
-
-            capConf.LineKind = LineKind.Solid;
-            capConf.Tiling = ValueHolder.StandardLineTiling;
-            capConf.FillOutStatus = false;
-            capConf.FillOutColor = Color.clear;
-        }
-
-        /// <summary>
-        /// Determines the effective line kind of a line preview while line caps are applied.
-        /// Reference caps temporarily require <see cref="LineKind.Dashed25"/>.
-        /// When the last reference cap is removed, the configured drawing line kind is restored.
-        /// Otherwise, the current line kind of the preview is preserved.
-        /// </summary>
-        /// <param name="hasReference">Whether the current cap selection contains a reference cap.</param>
-        /// <param name="hadReference">Whether the previous cap selection contained a reference cap.</param>
-        /// <param name="currentLineKind">The current line kind of the preview.</param>
-        /// <param name="drawingLineKind">The regular line kind configured for drawing.</param>
-        /// <returns>The line kind that should be applied to the preview.</returns>
-        internal static LineKind ResolvePreviewLineKind(
-            bool hasReference,
-            bool hadReference,
-            LineKind currentLineKind,
-            LineKind drawingLineKind)
-        {
-            if (hasReference)
-            {
-                return LineKind.Dashed25;
-            }
-
-            if (hadReference)
-            {
-                return drawingLineKind;
-            }
-
-            return currentLineKind;
         }
         #endregion
 
