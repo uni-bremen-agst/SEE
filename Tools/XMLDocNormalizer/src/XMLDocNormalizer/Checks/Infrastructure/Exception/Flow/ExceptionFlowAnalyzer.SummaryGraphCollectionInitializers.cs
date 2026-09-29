@@ -225,7 +225,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callerContext);
 
             if (selectedAddMethod.ReducedFrom != null ||
-                !RequiresSummaryRuntimeDispatch(
+                !ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
                     selectedAddMethod))
             {
                 AddSummaryCollectionInitializerTargetEdge(
@@ -530,7 +530,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
 
-            AddDefaultParameterFacts(
+            ExceptionFlowCallContextFactProjector.AddDefaultParameterFacts(
                 targetMethod,
                 knownParameterFacts,
                 suppliedParameterIndexes);

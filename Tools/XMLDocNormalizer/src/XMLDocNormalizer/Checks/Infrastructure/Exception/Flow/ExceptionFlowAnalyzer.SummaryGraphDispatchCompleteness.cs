@@ -92,7 +92,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             if (exactReceiverType != null ||
                 methodSymbol.IsStatic ||
-                !RequiresSummaryRuntimeDispatch(
+                !ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
                     methodSymbol))
             {
                 return true;

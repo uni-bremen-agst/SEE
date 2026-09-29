@@ -1,0 +1,152 @@
+{
+  "Package": "P5O2A4C",
+  "Scope": "Runtime Dispatch Classification and Stable Source Member Fact Extraction",
+  "Head": "48ba04dbcca750afdf9b0d4fe557005e3ef29227",
+  "InitialStatus": [
+    "M ../../.gitignore"
+  ],
+  "RuntimeDispatchClassification": {
+    "FormerDefinition": "ExceptionFlowAnalyzer.RequiresSummaryRuntimeDispatch in ExceptionFlowAnalyzer.SummaryGraphAccessorDispatch.cs",
+    "FinalOwner": "ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch",
+    "Input": "IMethodSymbol",
+    "Output": "bool",
+    "ReadsAnalyzerState": false,
+    "WritesAnalyzerState": false,
+    "SemanticEnvironmentDependency": false,
+    "SemanticScopeDependency": false,
+    "SummaryGraphDependency": false,
+    "RuntimeTargetResolutionDependency": false,
+    "CallableResolutionDependency": false,
+    "CacheDependency": false,
+    "Rule": "Static or sealed methods are direct; interface, abstract, virtual, and non-sealed override methods require runtime target expansion.",
+    "DirectCallerCount": 14,
+    "DirectCallers": [
+      "ExceptionFlowStableSourceMemberFactsProvider.GetStableNonNullMemberFactsFromDirectSourceInvocation",
+      "ExceptionFlowAnalyzer.TryProveSourceInvocationDefinedEnumElements",
+      "ExceptionFlowAnalyzer.IsCallbackReturnDefinitelyNonNull",
+      "ExceptionFlowAnalyzer.IsSequenceExpressionProvenToExcludeNullElements",
+      "ExceptionFlowAnalyzer.TryGetSourceInvocationReturnValueFacts",
+      "ExceptionFlowAnalyzer.IsDictionarySourceHelperArgumentSafeForNonNullValues",
+      "ExceptionFlowAnalyzer.IsSourceHelperArgumentProvenToPreserveSequenceContents",
+      "ExceptionFlowAnalyzer.InvocationSuccessfulCompletionProvesSequenceElementsNonNull",
+      "ExceptionFlowAnalyzer.AddSummaryAccessorCallEdges",
+      "ExceptionFlowAnalyzer.AddSummaryCollectionInitializerEdges",
+      "ExceptionFlowAnalyzer.IsSummaryDispatchTargetSetComplete",
+      "ExceptionFlowAnalyzer.AddSummaryDeconstructionMethodEdges",
+      "ExceptionFlowAnalyzer.AddSummaryImplicitDispatchMethodEdges",
+      "ExceptionFlowAnalyzer.AddSummaryDisposalEdges"
+    ],
+    "SimilarButDistinctResponsibilities": [
+      "IsSummaryDispatchTargetSetComplete proves whether the expanded target set is closed.",
+      "ResolveSummaryRuntimeTargets and ResolveSummaryRuntimeTargetCandidates discover runtime targets.",
+      "Summary graph call, accessor, collection, deconstruction, implicit-call, and disposal methods construct edges.",
+      "Callable resolution maps source-backed symbols and does not classify virtual dispatchability."
+    ],
+    "InterfacesAdded": 0,
+    "VirtualMethodsAdded": 0,
+    "CallbacksAdded": 0,
+    "AnalyzerBackReferences": 0
+  },
+  "StableSourceMemberFacts": {
+    "Responsibility": "Source- and SemanticModel-dependent discovery of stable non-null auto-property facts from guarded local invocations and directly returned object initializers.",
+    "FinalOwner": "ExceptionFlowStableSourceMemberFactsProvider",
+    "Methods": [
+      "GetStableNonNullMemberFactsFromGuardedLocalSourceInvocation",
+      "GetStableNonNullMemberFactsFromDirectSourceInvocation",
+      "TryGetDirectObjectCreationInitializer",
+      "GetStableNonNullMembersFromObjectInitializer",
+      "IsObjectInitializerValueProvenNonNull"
+    ],
+    "Dependencies": [
+      "ExceptionFlowRuntimeDispatchClassifier",
+      "ExceptionFlowStableMemberFacts",
+      "ExceptionFlowSymbolUsageFacts",
+      "ExceptionFlowGuardFactsProvider",
+      "ExceptionFlowLocalInitializerFactsProvider",
+      "ExceptionFlowEnumValueFactsProvider",
+      "ExceptionFlowSemanticScope"
+    ],
+    "UsesCallContext": false,
+    "UsesCache": false,
+    "CreatesCalleeContext": false,
+    "AnalyzerBackReferences": 0
+  },
+  "CallContextFactProjection": {
+    "Responsibility": "Project stable member facts and omitted/default parameter facts into the collections used to construct ExceptionFlowCallContext.",
+    "FinalOwner": "ExceptionFlowCallContextFactProjector",
+    "Methods": [
+      "AddExplicitArgumentNonNullMemberFacts",
+      "AddDefaultParameterFacts"
+    ],
+    "Dependencies": [
+      "ExceptionFlowArgumentMapper",
+      "ExceptionFlowDereferenceFactDiscovery",
+      "ExceptionFlowStableSourceMemberFactsProvider",
+      "ExceptionFlowPrimitiveValueFactsProvider",
+      "ExceptionFlowSymbolUsageFacts",
+      "ExceptionFlowCallContext"
+    ],
+    "ChangesContextRepresentation": false,
+    "ChangesContextKeying": false,
+    "AnalyzerBackReferences": 0
+  },
+  "Measurements": {
+    "AnalyzerOwnedDownstreamMethodsBefore": 64,
+    "AnalyzerOwnedDownstreamMethodsAfter": 57,
+    "FactFamiliesBefore": 9,
+    "FactFamiliesAfter": 7,
+    "SccMethodsBefore": 63,
+    "SccMethodsAfter": 63,
+    "SccInternalEdgesBefore": 112,
+    "SccInternalEdgesAfter": 112,
+    "SccToAnalyzerEdgesBefore": 38,
+    "SccToAnalyzerEdgesAfter": 36,
+    "SccToProviderEdgesBefore": 50,
+    "SccToProviderEdgesAfter": 57,
+    "SccToSemanticScopeEdgesBefore": 18,
+    "SccToSemanticScopeEdgesAfter": 18,
+    "ProviderToAnalyzerEdgesBefore": 0,
+    "ProviderToAnalyzerEdgesAfter": 0,
+    "AnalyzerPartialsBefore": 43,
+    "AnalyzerPartialsAfter": 42,
+    "AnalyzerNonblankSlocBefore": 21775,
+    "AnalyzerNonblankSlocAfter": 21343,
+    "NewOwnerNonblankSloc": 442
+  },
+  "RemainingAnalyzerOwnedFamilies": [
+    "Return/condition value facts",
+    "Dictionary value facts",
+    "Sequence call-context observation",
+    "Sequence element facts",
+    "Sequence range/dictionary mutation",
+    "Sequence source preservation",
+    "Successful sequence validation"
+  ],
+  "OriginBehavior": {
+    "SameCompilation": "Unchanged",
+    "ReferencedProject": "Unchanged",
+    "SupportingSource": "Unchanged",
+    "MetadataOnly": "UnchangedFailClosed"
+  },
+  "CacheOwnership": {
+    "ConditionalWeakTable": "ExceptionFlowAnalyzer",
+    "DataFlow": "ExceptionFlowDataFlowFactsProvider",
+    "SuccessfulDereference": "ExceptionFlowDereferenceFactDiscovery"
+  },
+  "Validation": {
+    "PreChangeCharacterization": "81/81",
+    "Focused": "100/100",
+    "ArchitectureGuards": "6/6",
+    "FourModes": "15/15",
+    "P5P6GCanonicalSemanticDependency": "489/489",
+    "FullSuite": "2524/2524; 0 failed; 0 skipped",
+    "Build": "0 warnings; 0 errors",
+    "SelfAnalysis": "16 findings in 62311 ms; DOC610=0; DOC611=1; DOC631=15; DOC632=0",
+    "CanonicalDiff": "0 added; 0 removed; 0 changed evidence; exact finding arrays equal",
+    "E1": "7 candidates; 5 complete; 2 expected fail closed; 0 unexpected; 0 potential bugs",
+    "DiffCheck": "Passed; only the protected foreign .gitignore line-ending warning was emitted",
+    "TaskCSharpFormat": "20 files; CRLF only; UTF-8 without BOM; no bare LF, bare CR, trailing whitespace, or added var"
+  },
+  "P5O2BReady": false,
+  "SmallestNextBlocker": "The eight-method Return/condition downstream family mixes five condition-derived string-fact helpers with three independent known-framework return classifiers; it owns four SCC-to-Analyzer edges and needs a separate ownership split before safe extraction."
+}

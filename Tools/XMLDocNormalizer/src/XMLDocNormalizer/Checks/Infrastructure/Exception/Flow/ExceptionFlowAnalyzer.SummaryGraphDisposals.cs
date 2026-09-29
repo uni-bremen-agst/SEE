@@ -827,7 +827,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            if (!RequiresSummaryRuntimeDispatch(
+            if (!ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
                     dispatchMethod))
             {
                 AddSummaryDisposalTargetEdge(

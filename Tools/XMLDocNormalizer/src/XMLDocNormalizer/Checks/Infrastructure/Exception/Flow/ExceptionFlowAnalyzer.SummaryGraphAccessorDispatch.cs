@@ -73,7 +73,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment)
         {
             if (staticallyBound ||
-                !RequiresSummaryRuntimeDispatch(selectedAccessor))
+                !ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(selectedAccessor))
             {
                 if (omitImplicitTargets && selectedAccessor.IsImplicitlyDeclared)
                 {
@@ -207,34 +207,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         stepKind,
                         accessedSymbol,
                         sourceNode)));
-        }
-
-        /// <summary>
-        /// Determines whether an accessor can select a different runtime
-        /// implementation.
-        /// </summary>
-        /// <param name="accessor">
-        /// The accessor to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for dispatchable class and interface
-        /// accessors; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool RequiresSummaryRuntimeDispatch(IMethodSymbol accessor)
-        {
-            if (accessor.IsStatic || accessor.IsSealed)
-            {
-                return false;
-            }
-
-            if (accessor.ContainingType.TypeKind == TypeKind.Interface)
-            {
-                return true;
-            }
-
-            return accessor.IsAbstract ||
-                   accessor.IsVirtual ||
-                   accessor.IsOverride;
         }
 
         /// <summary>

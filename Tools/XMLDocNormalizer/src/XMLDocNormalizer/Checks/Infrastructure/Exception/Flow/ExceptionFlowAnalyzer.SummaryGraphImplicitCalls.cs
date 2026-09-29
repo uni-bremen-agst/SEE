@@ -719,7 +719,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
 
-            AddDefaultParameterFacts(
+            ExceptionFlowCallContextFactProjector.AddDefaultParameterFacts(
                 targetMethod,
                 knownParameterFacts,
                 suppliedParameterIndexes);

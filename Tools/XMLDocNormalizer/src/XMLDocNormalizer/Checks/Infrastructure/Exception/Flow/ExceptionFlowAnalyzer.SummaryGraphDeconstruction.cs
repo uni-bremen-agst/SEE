@@ -310,7 +310,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callerContext);
 
             if (selectedMethod.ReducedFrom != null ||
-                !RequiresSummaryRuntimeDispatch(
+                !ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
                     selectedMethod))
             {
                 AddSummaryDeconstructionTargetEdge(

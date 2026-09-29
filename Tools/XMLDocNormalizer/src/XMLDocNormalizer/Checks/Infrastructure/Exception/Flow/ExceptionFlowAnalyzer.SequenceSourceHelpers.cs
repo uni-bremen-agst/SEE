@@ -68,7 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 selectedMethod.ReducedFrom != null ||
                 selectedMethod.IsAbstract ||
                 selectedMethod.IsExtern ||
-                RequiresSummaryRuntimeDispatch(selectedMethod) ||
+                ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(selectedMethod) ||
                 selectedMethod.DeclaringSyntaxReferences.Length != 1)
             {
                 return false;

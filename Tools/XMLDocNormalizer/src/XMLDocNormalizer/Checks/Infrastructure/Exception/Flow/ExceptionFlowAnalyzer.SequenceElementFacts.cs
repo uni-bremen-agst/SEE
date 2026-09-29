@@ -1085,7 +1085,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 !selectedMethod.IsStatic ||
                 selectedMethod.IsAbstract ||
                 selectedMethod.IsExtern ||
-                RequiresSummaryRuntimeDispatch(
+                ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
                     selectedMethod) ||
                 selectedMethod.DeclaringSyntaxReferences.Length != 1)
             {

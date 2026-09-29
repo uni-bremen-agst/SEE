@@ -6,10 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains narrowly scoped source-value analysis used to transfer stable
-    /// member facts into exception-flow call contexts.
+    /// Discovers stable member facts from guarded local source invocations.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowStableSourceMemberFactsProvider
     {
         /// <summary>
         /// Gets stable member facts for a guarded local whose still-current
@@ -26,7 +25,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Stable member symbols proven non-null on every supported non-null
         /// return value of the source invocation.
         /// </returns>
-        private static IReadOnlyCollection<ISymbol>
+        internal static IReadOnlyCollection<ISymbol>
             GetStableNonNullMemberFactsFromGuardedLocalSourceInvocation(
                 ExpressionSyntax expression,
                 SemanticModel semanticModel)
@@ -103,7 +102,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 || selectedMethod.IsIterator
                 || selectedMethod.ReturnsByRef
                 || selectedMethod.ReturnsByRefReadonly
-                || RequiresSummaryRuntimeDispatch(selectedMethod))
+                || ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(
+                    selectedMethod))
             {
                 return Array.Empty<ISymbol>();
             }

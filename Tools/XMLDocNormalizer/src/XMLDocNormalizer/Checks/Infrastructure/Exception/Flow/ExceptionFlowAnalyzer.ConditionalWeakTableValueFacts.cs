@@ -472,7 +472,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 || targetMethod.ReturnsByRef
                 || targetMethod.ReturnsByRefReadonly
                 || targetMethod.ReducedFrom != null
-                || RequiresSummaryRuntimeDispatch(targetMethod)
+                || ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(targetMethod)
                 || targetMethod.DeclaringSyntaxReferences.Length != 1)
             {
                 return false;

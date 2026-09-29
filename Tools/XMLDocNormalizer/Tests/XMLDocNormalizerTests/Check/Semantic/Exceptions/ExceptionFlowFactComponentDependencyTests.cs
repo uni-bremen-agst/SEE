@@ -21,6 +21,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Type[] componentTypes =
             [
                 typeof(ExceptionFlowArgumentMapper),
+                typeof(ExceptionFlowCallContextFactProjector),
                 typeof(ExceptionFlowConditionalWeakTableValueFactsProvider),
                 typeof(ExceptionFlowDataFlowFactsProvider),
                 typeof(ExceptionFlowDereferenceFactDiscovery),
@@ -31,9 +32,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 typeof(ExceptionFlowLocalInitializerFactsProvider),
                 typeof(ExceptionFlowNullabilityFactsProvider),
                 typeof(ExceptionFlowPrimitiveValueFactsProvider),
+                typeof(ExceptionFlowRuntimeDispatchClassifier),
                 typeof(ExceptionFlowSequenceCollectionFactsProvider),
                 typeof(ExceptionFlowSourcePositionValueFactsProvider),
                 typeof(ExceptionFlowStableMemberFacts),
+                typeof(ExceptionFlowStableSourceMemberFactsProvider),
                 typeof(ExceptionFlowSymbolUsageFacts)
             ];
 
@@ -53,6 +56,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             string[] componentFiles =
             [
                 "ExceptionFlowArgumentMapper.cs",
+                "ExceptionFlowCallContextFactProjector.cs",
                 "ExceptionFlowDataFlowFactsProvider.cs",
                 "ExceptionFlowDereferenceFactDiscovery.Callee.cs",
                 "ExceptionFlowDereferenceFactDiscovery.cs",
@@ -63,9 +67,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "ExceptionFlowLocalInitializerFactsProvider.cs",
                 "ExceptionFlowNullabilityFactsProvider.cs",
                 "ExceptionFlowPrimitiveValueFactsProvider.cs",
+                "ExceptionFlowRuntimeDispatchClassifier.cs",
                 "ExceptionFlowSequenceCollectionFactsProvider.cs",
                 "ExceptionFlowSourcePositionValueFactsProvider.cs",
                 "ExceptionFlowStableMemberFacts.cs",
+                "ExceptionFlowStableSourceMemberFactsProvider.cs",
                 "ExceptionFlowSymbolUsageFacts.cs"
             ];
 
@@ -160,6 +166,14 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                         Path.Combine(
                             flowDirectory,
                             "ExceptionFlowArgumentMapper.cs"))
+                    .Append(
+                        Path.Combine(
+                            flowDirectory,
+                            "ExceptionFlowCallContextFactProjector.cs"))
+                    .Append(
+                        Path.Combine(
+                            flowDirectory,
+                            "ExceptionFlowRuntimeDispatchClassifier.cs"))
                     .Append(
                         Path.Combine(
                             flowDirectory,

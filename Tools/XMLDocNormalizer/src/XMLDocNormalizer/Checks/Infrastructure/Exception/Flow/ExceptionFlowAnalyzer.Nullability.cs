@@ -583,7 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 || methodSymbol.IsIterator
                 || methodSymbol.ReturnsByRef
                 || methodSymbol.ReturnsByRefReadonly
-                || RequiresSummaryRuntimeDispatch(methodSymbol)
+                || ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(methodSymbol)
                 || originalMethod.DeclaringSyntaxReferences.Length != 1
                 || !inspectedSequenceSources.Add(originalMethod))
             {

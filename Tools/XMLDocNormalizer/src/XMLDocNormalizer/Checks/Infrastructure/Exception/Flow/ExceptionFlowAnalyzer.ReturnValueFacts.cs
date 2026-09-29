@@ -57,7 +57,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 || selectedMethod.IsIterator
                 || selectedMethod.ReturnsByRef
                 || selectedMethod.ReturnsByRefReadonly
-                || RequiresSummaryRuntimeDispatch(selectedMethod))
+                || ExceptionFlowRuntimeDispatchClassifier.RequiresRuntimeDispatch(selectedMethod))
             {
                 return false;
             }
