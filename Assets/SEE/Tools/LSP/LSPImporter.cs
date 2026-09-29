@@ -7,14 +7,23 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using SEE.DataModel.DG;
 using SEE.Tools;
-using SEE.Tools.LSP;
 using SEE.Utils;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
+// While this file lived in SEE.DataModel.DG.IO, the enclosing namespace made
+// every unqualified Range the graph's one, in preference to the imported
+// OmniSharp range of the same name. The alias keeps that meaning here.
+using Range = SEE.DataModel.DG.Range;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.Tools.LSP
 {
+    // SEE.Tools already has a member named LSP -- this very namespace -- which
+    // hides the type of that name holding the LSP edge types. The alias restores
+    // it, and has to stand inside the namespace to be found before that member.
+    using LSP = SEE.DataModel.DG.LSP;
+
     /// <summary>
     /// The kinds of nodes that can be imported.
     ///

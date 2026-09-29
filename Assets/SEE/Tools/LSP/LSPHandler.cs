@@ -17,7 +17,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol.General;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Window;
-using SEE.DataModel.DG.IO;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.Utils;
