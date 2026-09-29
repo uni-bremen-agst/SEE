@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using Debug = UnityEngine.Debug;
 
 namespace SEE.Utils
 {
@@ -57,7 +56,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Emits the elapsed time from the start of the performance time span
-        /// until now. Reports it to Debug.Log along with the action name.
+        /// until now. Reports it to <see cref="Logging.Logger"/> along with the
+        /// action name.
         /// </summary>
         /// <param name="print">If true, the elapsed time will be printed.</param>
         public void End(bool print = false)
@@ -67,7 +67,7 @@ namespace SEE.Utils
             totalTimeInMilliSeconds = ts.TotalMilliseconds;
             if (print)
             {
-                Debug.Log($"Action {action} finished in {GetElapsedTime()} [h:m:s:ms] elapsed time).\n");
+                Logging.Logger.LogInfo($"Action {action} finished in {GetElapsedTime()} [h:m:s:ms] elapsed time).\n");
             }
         }
 

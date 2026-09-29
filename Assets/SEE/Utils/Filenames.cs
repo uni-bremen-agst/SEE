@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -268,7 +267,7 @@ namespace SEE.Utils
                 }
                 catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
                 {
-                    Debug.LogWarning($"Failed to delete temporary snapshot directory '{directoryPath}': {e.Message}.\n");
+                    Logging.Logger.LogWarning($"Failed to delete temporary snapshot directory '{directoryPath}': {e.Message}.\n");
                 }
             }
         }

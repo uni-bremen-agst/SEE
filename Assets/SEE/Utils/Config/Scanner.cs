@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace SEE.Utils.Config
 {
@@ -250,7 +249,7 @@ namespace SEE.Utils.Config
                 else
                 {
                     // assert: index < input.Length
-                    Debug.LogError($"Unexpected character: {input[index]}\n");
+                    Logging.Logger.LogError($"Unexpected character: {input[index]}\n");
                     tokenValue = "";
                     currentToken = TokenType.Error;
                     index++;
