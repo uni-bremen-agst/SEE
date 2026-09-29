@@ -13,7 +13,6 @@ using SEE.Tools;
 using CsvHelper;
 using CsvHelper.Configuration;
 using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.CSV
 {
@@ -63,7 +62,7 @@ namespace SEE.DataModel.DG.IO.CSV
                     foreach (MetricValueTableRow metricValue in metricValues)
                     {
                         // Only set if value doesn't already exist, or if we're supposed to override and the value differs
-                        if (!node.TryGetFloat(metricValue.Metric, out float value) || @override && !Mathf.Approximately(metricValue.Value, value))
+                        if (!node.TryGetFloat(metricValue.Metric, out float value) || @override && !FloatUtils.Approximately(metricValue.Value, value))
                         {
                             node.SetFloat(metricValue.Metric, metricValue.Value);
                             updatedMetrics++;

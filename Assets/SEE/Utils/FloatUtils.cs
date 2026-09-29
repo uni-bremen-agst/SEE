@@ -32,6 +32,28 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Returns true if <paramref name="left"/> and <paramref name="right"/> are
+        /// equal to within floating-point precision, that is, if they differ by less
+        /// than a millionth of the larger of the two magnitudes.
+        ///
+        /// This is <c>UnityEngine.Mathf.Approximately</c> without the dependency on
+        /// Unity, and computes the same expression. The only difference concerns
+        /// the floor that keeps the comparison meaningful near zero: Unity raises it
+        /// from the smallest denormal to the smallest normal float on a platform
+        /// that flushes denormals to zero, which matters solely for two values that
+        /// are both within about 1e-38 of zero.
+        /// </summary>
+        /// <param name="left">Left operand of the comparison.</param>
+        /// <param name="right">Right operand of the comparison.</param>
+        /// <returns>True if the two are equal to within floating-point precision.</returns>
+        public static bool Approximately(float left, float right)
+        {
+            return Math.Abs(right - left)
+                   < Math.Max(1E-06f * Math.Max(Math.Abs(left), Math.Abs(right)),
+                              float.Epsilon * 8f);
+        }
+
+        /// <summary>
         /// Returns true if <paramref name="left"/> <= <paramref name="right"/> with
         /// some <paramref name="tolerance"/>. The tolerance accounts for imprecision
         /// in floating number representations.

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -1035,7 +1034,7 @@ namespace SEE.DataModel.DG
                     {
                         targetNode.SetFloat(attribute.Key, attribute.Value);
                     }
-                    else if (!Mathf.Approximately(value, attribute.Value))
+                    else if (!FloatUtils.Approximately(value, attribute.Value))
                     {
                         throw new InvalidOperationException($"Node attribute {attribute.Key} differs in nodes "
                                                             + $"{targetNode} and {sourceNode}");

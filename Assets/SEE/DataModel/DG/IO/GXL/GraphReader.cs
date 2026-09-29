@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.GXL
 {
@@ -254,15 +253,6 @@ namespace SEE.DataModel.DG.IO.GXL
                     }
                 }
                 current = null;
-            }
-        }
-
-        private static void Dump(GameObject obj)
-        {
-            Logging.Logger.LogInfo($"Loaded: {obj.name}\n");
-            if (obj.TryGetComponent(out Node node))
-            {
-                Logging.Logger.LogInfo($"{node}\n");
             }
         }
 
