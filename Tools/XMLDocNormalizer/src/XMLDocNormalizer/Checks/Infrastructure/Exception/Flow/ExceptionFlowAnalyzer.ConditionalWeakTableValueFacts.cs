@@ -259,7 +259,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SemanticModel? declarationSemanticModel =
-                GetSemanticModelForSyntaxTree(
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                     semanticModel,
                     declarator.SyntaxTree);
 
@@ -304,8 +304,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
             {
-                SemanticModel treeSemanticModel =
-                    compilation.GetSemanticModel(syntaxTree);
+                SemanticModel? treeSemanticModel =
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                        compilation,
+                        syntaxTree);
+
+                if (treeSemanticModel == null)
+                {
+                    return false;
+                }
 
                 foreach (IdentifierNameSyntax identifier
                          in syntaxTree.GetRoot()
@@ -453,7 +460,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetMethod.DeclaringSyntaxReferences[0].GetSyntax();
 
                 SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                         semanticModel,
                         declaration.SyntaxTree);
 

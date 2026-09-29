@@ -58,7 +58,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         .GetSyntax();
 
                 SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                         semanticModel,
                         declarationNode.SyntaxTree);
 
@@ -670,7 +670,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                         semanticModel,
                         variableDeclarator.SyntaxTree);
 
@@ -1181,7 +1181,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                         semanticModel,
                         containingCallable.SyntaxTree);
 

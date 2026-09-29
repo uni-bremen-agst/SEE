@@ -496,15 +496,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         break;
                     }
 
-                    SemanticModel targetSemanticModel;
+                    SemanticModel? targetSemanticModel =
+                        ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                            compilation,
+                            declaration.SyntaxTree);
 
-                    try
-                    {
-                        targetSemanticModel =
-                            compilation.GetSemanticModel(
-                                declaration.SyntaxTree);
-                    }
-                    catch (ArgumentException)
+                    if (targetSemanticModel == null)
                     {
                         continue;
                     }

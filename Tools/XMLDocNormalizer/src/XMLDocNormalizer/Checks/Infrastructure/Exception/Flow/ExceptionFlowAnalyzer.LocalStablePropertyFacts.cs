@@ -377,7 +377,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SemanticModel? initializerSemanticModel =
-                GetSemanticModelForSyntaxTree(
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                     semanticModel,
                     propertyDeclaration.SyntaxTree);
 

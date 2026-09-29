@@ -19,7 +19,13 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Type[] componentTypes =
             [
                 typeof(ExceptionFlowArgumentMapper),
+                typeof(ExceptionFlowDataFlowFactsProvider),
                 typeof(ExceptionFlowDereferenceFactDiscovery),
+                typeof(ExceptionFlowGuardFactsProvider),
+                typeof(ExceptionFlowImmutableMemberValueFactsProvider),
+                typeof(ExceptionFlowKnownPropertyValueFactsProvider),
+                typeof(ExceptionFlowNullabilityFactsProvider),
+                typeof(ExceptionFlowPrimitiveValueFactsProvider),
                 typeof(ExceptionFlowStableMemberFacts),
                 typeof(ExceptionFlowSymbolUsageFacts)
             ];
@@ -40,8 +46,14 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             string[] componentFiles =
             [
                 "ExceptionFlowArgumentMapper.cs",
+                "ExceptionFlowDataFlowFactsProvider.cs",
                 "ExceptionFlowDereferenceFactDiscovery.Callee.cs",
                 "ExceptionFlowDereferenceFactDiscovery.cs",
+                "ExceptionFlowGuardFactsProvider.cs",
+                "ExceptionFlowImmutableMemberValueFactsProvider.cs",
+                "ExceptionFlowKnownPropertyValueFactsProvider.cs",
+                "ExceptionFlowNullabilityFactsProvider.cs",
+                "ExceptionFlowPrimitiveValueFactsProvider.cs",
                 "ExceptionFlowStableMemberFacts.cs",
                 "ExceptionFlowSymbolUsageFacts.cs"
             ];
@@ -90,13 +102,16 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 Environment.NewLine,
                 Directory.EnumerateFiles(
                         flowDirectory,
-                        "ExceptionFlow*Facts.cs",
+                        "ExceptionFlow*Provider.cs",
                         SearchOption.TopDirectoryOnly)
-                    .Where(
-                        static path =>
-                            Path.GetFileName(path) is
-                                "ExceptionFlowStableMemberFacts.cs" or
-                                "ExceptionFlowSymbolUsageFacts.cs")
+                    .Append(
+                        Path.Combine(
+                            flowDirectory,
+                            "ExceptionFlowStableMemberFacts.cs"))
+                    .Append(
+                        Path.Combine(
+                            flowDirectory,
+                            "ExceptionFlowSymbolUsageFacts.cs"))
                     .Append(
                         Path.Combine(
                             flowDirectory,
@@ -127,6 +142,36 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     name,
                     source,
                     StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Ensures compilation-local semantic-model resolution cannot acquire
+        /// runtime dispatch or implementation interfaces.
+        /// </summary>
+        [Fact]
+        public void SemanticModelResolution_IsConcreteAndNonvirtual()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            MethodInfo[] resolutionMethods =
+                typeof(ExceptionFlowSemanticScope)
+                    .GetMethods(flags)
+                    .Where(
+                        static method =>
+                            method.Name is
+                                "TryGetSemanticModel" or
+                                "GetSemanticModelForSyntaxTree")
+                    .ToArray();
+
+            Assert.Equal(3, resolutionMethods.Length);
+            Assert.All(
+                resolutionMethods,
+                method => Assert.False(method.IsVirtual));
+            Assert.Empty(typeof(ExceptionFlowSemanticScope).GetInterfaces());
         }
 
         /// <summary>

@@ -136,7 +136,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
 
                     SemanticModel? declarationSemanticModel =
-                        GetSemanticModelForSyntaxTree(
+                        ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                             semanticModel,
                             variableDeclarator.SyntaxTree);
 

@@ -128,7 +128,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (ExpressionSyntax returnExpression in returnExpressions)
             {
-                SemanticModel? returnSemanticModel = GetSemanticModelForSyntaxTree(
+                SemanticModel? returnSemanticModel = ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                     semanticModel,
                     returnExpression.SyntaxTree);
 

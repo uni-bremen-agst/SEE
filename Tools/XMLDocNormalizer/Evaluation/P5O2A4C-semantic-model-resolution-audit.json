@@ -1,0 +1,133 @@
+{
+  "Package": "P5O2A4C",
+  "BaselineAudit": "P5O2A4C-downstream-fact-provider-audit.json",
+  "BaselineResidualAnalyzerDownstreamMethodCount": 102,
+  "SemanticModelResolution": {
+    "FormerOwner": "ExceptionFlowAnalyzer.GetSemanticModelForSyntaxTree",
+    "FinalCompilationLocalOwner": "ExceptionFlowSemanticScope",
+    "FinalCrossScopeOwner": "ExceptionFlowSemanticEnvironment",
+    "DirectAnalyzerCallerCount": 27,
+    "DirectSccCallerCount": 18,
+    "DirectDownstreamCallerCount": 9,
+    "CalleeCount": 0,
+    "ReadsAnalyzerState": false,
+    "UsesCache": false,
+    "AddsCache": false,
+    "MainOnlyDependency": false,
+    "AnalyzerBackReference": false,
+    "InterfaceCount": 0,
+    "VirtualResolutionMethodCount": 0,
+    "IdentityRule": "The exact SyntaxTree object must belong to the selected Compilation.",
+    "ForeignTreeBehavior": "FailClosed",
+    "MetadataOnlyBehavior": "NoSyntheticSyntaxTreeOrSemanticModel",
+    "EquivalentPaths": [
+      {
+        "Path": "ProjectClosureSemanticContext.TryGetSemanticModel",
+        "Disposition": "Retained cross-scope ownership map and existing per-tree cache; delegates compilation-local creation to the owning ExceptionFlowSemanticScope."
+      },
+      {
+        "Path": "ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts compilation scan",
+        "Disposition": "Uses ExceptionFlowSemanticScope and fails closed on ownership mismatch."
+      },
+      {
+        "Path": "ExceptionFlowDereferenceFactDiscovery callee declaration",
+        "Disposition": "Uses ExceptionFlowSemanticScope and fails closed on ownership mismatch."
+      },
+      {
+        "Path": "RoslynCanonicalIdentityResolver declaration lookup",
+        "Disposition": "Retained as a separate canonical-resolver-internal exact-compilation path."
+      }
+    ]
+  },
+  "NewlyExtractedFamilies": [
+    {
+      "Family": "Nullability helpers",
+      "BaselineMethodCount": 5,
+      "ExtractedMethodCount": 5,
+      "ResidualAnalyzerMethodCount": 0,
+      "FinalOwners": [
+        "ExceptionFlowSemanticScope",
+        "ExceptionFlowNullabilityFactsProvider"
+      ],
+      "Methods": [
+        {
+          "Name": "GetSemanticModelForSyntaxTree",
+          "Owner": "ExceptionFlowSemanticScope",
+          "IncomingFromSccCount": 18
+        },
+        {
+          "Name": "IsNullableValueType",
+          "Owner": "ExceptionFlowNullabilityFactsProvider",
+          "IncomingFromSccCount": 1
+        },
+        {
+          "Name": "IsPatternLocalGuaranteedNonNull",
+          "Owner": "ExceptionFlowNullabilityFactsProvider",
+          "IncomingFromSccCount": 1
+        },
+        {
+          "Name": "IsKnownFrameworkSequenceWithNonNullElements",
+          "Owner": "ExceptionFlowNullabilityFactsProvider",
+          "IncomingFromSccCount": 1
+        },
+        {
+          "Name": "IsOfTypeSequenceMethod",
+          "Owner": "ExceptionFlowNullabilityFactsProvider",
+          "IncomingFromSccCount": 1
+        }
+      ]
+    },
+    {
+      "Family": "Immutable-member facts",
+      "BaselineMethodCount": 5,
+      "ExtractedMethodCount": 5,
+      "ResidualAnalyzerMethodCount": 0,
+      "FinalOwner": "ExceptionFlowImmutableMemberValueFactsProvider",
+      "Methods": [
+        {
+          "Name": "HasConstructorAssignmentToMember",
+          "IncomingFromSccCount": 2
+        },
+        {
+          "Name": "HasFieldAssignmentOutsideInitializer",
+          "IncomingFromSccCount": 1
+        },
+        {
+          "Name": "IsThisDelegatingConstructor",
+          "IncomingFromSccCount": 2
+        },
+        {
+          "Name": "TryGetDirectConstructorAssignment",
+          "IncomingFromSccCount": 2
+        },
+        {
+          "Name": "AssignmentTargetsSymbol",
+          "IncomingFromSccCount": 0
+        }
+      ]
+    }
+  ],
+  "PackageExtractedMethodCount": 10,
+  "CumulativeExtractedMethodCount": 32,
+  "ResidualAnalyzerDownstreamMethodCount": 92,
+  "ResidualFamilyCount": 16,
+  "ProviderToAnalyzerEdgeCount": 0,
+  "ResidualAnalyzerToProviderEdgeCount": 6,
+  "Scc": {
+    "NodeCount": 63,
+    "InternalEdgeCount": 112,
+    "SccToResidualAnalyzerDownstreamEdgeCount": 68,
+    "SccToProviderEdgeCount": 20,
+    "SccToSemanticScopeEdgeCount": 18,
+    "ExtractionDecision": "STOP: the SCC still has 68 outgoing edges to residual Analyzer-owned downstream methods."
+  },
+  "ConditionalWeakTableCacheOwner": "ExceptionFlowAnalyzer",
+  "AnalyzerPartialCountBefore": 45,
+  "AnalyzerPartialCountAfter": 45,
+  "AnalyzerNonblankSlocBefore": 23291,
+  "AnalyzerNonblankSlocAfter": 22799,
+  "AnalyzerNonblankSlocRemoved": 492,
+  "NewProviderNonblankSloc": 473,
+  "P5O2BReady": false,
+  "SmallestNextBlocker": "The 92-method residual Analyzer-owned downstream fact closure still prevents acyclic ownership of the intact 63-method recursive contextual fact evaluator."
+}

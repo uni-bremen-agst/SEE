@@ -48,6 +48,99 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Tries to obtain the semantic model for a syntax tree owned by this
+        /// compilation scope.
+        /// </summary>
+        /// <param name="syntaxTree">The syntax tree whose model is required.</param>
+        /// <param name="semanticModel">The owned semantic model when found.</param>
+        /// <returns>
+        /// <see langword="true"/> when the exact syntax-tree object belongs to
+        /// this scope; otherwise <see langword="false"/>.
+        /// </returns>
+        internal bool TryGetSemanticModel(
+            SyntaxTree syntaxTree,
+            out SemanticModel semanticModel)
+        {
+            SemanticModel? resolvedModel =
+                GetSemanticModelForCompilation(
+                    Compilation,
+                    syntaxTree);
+
+            if (resolvedModel == null)
+            {
+                semanticModel = null!;
+                return false;
+            }
+
+            semanticModel = resolvedModel;
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the semantic model for a syntax tree when it belongs to the
+        /// same compilation scope as an already available semantic model.
+        /// </summary>
+        /// <param name="semanticModel">
+        /// The semantic model that identifies the required compilation scope.
+        /// </param>
+        /// <param name="syntaxTree">The syntax tree whose model is required.</param>
+        /// <returns>
+        /// The semantic model for <paramref name="syntaxTree"/>, or
+        /// <see langword="null"/> when the tree is foreign to the identified
+        /// compilation scope.
+        /// </returns>
+        internal static SemanticModel? GetSemanticModelForSyntaxTree(
+            SemanticModel semanticModel,
+            SyntaxTree syntaxTree)
+        {
+            if (ReferenceEquals(
+                    semanticModel.SyntaxTree,
+                    syntaxTree))
+            {
+                return semanticModel;
+            }
+
+            return GetSemanticModelForCompilation(
+                semanticModel.Compilation,
+                syntaxTree);
+        }
+
+        /// <summary>
+        /// Gets a semantic model only when an exact syntax-tree object belongs
+        /// to the supplied compilation.
+        /// </summary>
+        /// <param name="compilation">The owning compilation candidate.</param>
+        /// <param name="syntaxTree">The syntax tree whose model is required.</param>
+        /// <returns>The owned model, or <see langword="null"/>.</returns>
+        internal static SemanticModel? GetSemanticModelForSyntaxTree(
+            Compilation compilation,
+            SyntaxTree syntaxTree)
+        {
+            return GetSemanticModelForCompilation(
+                compilation,
+                syntaxTree);
+        }
+
+        /// <summary>
+        /// Resolves an exact compilation-local semantic model without adding a
+        /// second cache or permitting cross-compilation binding.
+        /// </summary>
+        /// <param name="compilation">The owning compilation candidate.</param>
+        /// <param name="syntaxTree">The syntax tree whose model is required.</param>
+        /// <returns>The owned model, or <see langword="null"/>.</returns>
+        private static SemanticModel? GetSemanticModelForCompilation(
+            Compilation compilation,
+            SyntaxTree syntaxTree)
+        {
+            if (!compilation.SyntaxTrees.Contains(syntaxTree))
+            {
+                return null;
+            }
+
+            return compilation.GetSemanticModel(syntaxTree);
+        }
+
+        /// <summary>
         /// Collects source-declared named types from one compilation.
         /// </summary>
         /// <param name="compilation">The compilation to inspect.</param>

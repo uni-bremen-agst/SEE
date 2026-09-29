@@ -83,7 +83,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (expressionType != null
                 && expressionType.IsValueType
-                && !IsNullableValueType(expressionType))
+                && !ExceptionFlowNullabilityFactsProvider.IsNullableValueType(
+                    expressionType))
             {
                 return true;
             }
@@ -209,25 +210,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether the specified type is a nullable value type.
-        /// </summary>
-        /// <param name="typeSymbol">
-        /// The type symbol to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the type is a nullable value type;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsNullableValueType(
-            ITypeSymbol typeSymbol)
-        {
-            return typeSymbol
-                       is INamedTypeSymbol namedType &&
-                   namedType.OriginalDefinition.SpecialType ==
-                   SpecialType.System_Nullable_T;
-        }
-
-        /// <summary>
         /// Determines whether a local variable is guaranteed to contain a
         /// non-null value because it was introduced by a non-null pattern,
         /// initialized with a value proven to be non-null, obtained from a
@@ -261,7 +243,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext,
             HashSet<ISymbol> inspectedReturnSymbols)
         {
-            if (IsPatternLocalGuaranteedNonNull(
+            if (ExceptionFlowNullabilityFactsProvider.IsPatternLocalGuaranteedNonNull(
                     localSymbol,
                     semanticModel))
             {
@@ -317,7 +299,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                         semanticModel,
                         variableDeclarator.SyntaxTree);
 
@@ -338,76 +320,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         inspectedReturnSymbols))
                 {
                     return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether a local variable is introduced by a pattern
-        /// that guarantees a non-null value whenever the local is definitely
-        /// assigned.
-        /// </summary>
-        /// <param name="localSymbol">
-        /// The local symbol to inspect.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used to resolve the declaring designation.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the local is declared by a pattern that
-        /// excludes <see langword="null"/>; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsPatternLocalGuaranteedNonNull(
-            ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
-        {
-            foreach (SyntaxReference syntaxReference
-                     in localSymbol.DeclaringSyntaxReferences)
-            {
-                SyntaxNode declarationNode =
-                    syntaxReference.GetSyntax();
-
-                SemanticModel? declarationSemanticModel =
-                    GetSemanticModelForSyntaxTree(
-                        semanticModel,
-                        declarationNode.SyntaxTree);
-
-                if (declarationSemanticModel == null)
-                {
-                    continue;
-                }
-
-                IEnumerable<SingleVariableDesignationSyntax> designations =
-                    declarationNode
-                        .DescendantNodesAndSelf()
-                        .OfType<SingleVariableDesignationSyntax>();
-
-                foreach (SingleVariableDesignationSyntax designation
-                         in designations)
-                {
-                    ISymbol? declaredSymbol =
-                        declarationSemanticModel.GetDeclaredSymbol(
-                            designation);
-
-                    if (!SymbolEqualityComparer.Default.Equals(
-                            declaredSymbol,
-                            localSymbol))
-                    {
-                        continue;
-                    }
-
-                    PatternSyntax? declaringPattern =
-                        designation.Ancestors()
-                            .OfType<PatternSyntax>()
-                            .FirstOrDefault();
-
-                    return declaringPattern
-                        is DeclarationPatternSyntax or
-                            RecursivePatternSyntax or
-                            ListPatternSyntax;
                 }
             }
 
@@ -509,7 +421,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SemanticModel? declarationSemanticModel =
-                GetSemanticModelForSyntaxTree(
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                     semanticModel,
                     foreachStatement.SyntaxTree);
 
@@ -636,12 +548,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 methodSymbol.ReducedFrom?.OriginalDefinition ??
                 methodSymbol.OriginalDefinition;
 
-            if (IsOfTypeSequenceMethod(originalMethod))
+            if (ExceptionFlowNullabilityFactsProvider.IsOfTypeSequenceMethod(
+                    originalMethod))
             {
                 return true;
             }
 
-            if (IsKnownFrameworkSequenceWithNonNullElements(
+            if (ExceptionFlowNullabilityFactsProvider.IsKnownFrameworkSequenceWithNonNullElements(
                     originalMethod,
                     semanticModel.Compilation))
             {
@@ -701,7 +614,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 foreach (ExpressionSyntax returnExpression in returnExpressions)
                 {
                     SemanticModel? returnSemanticModel =
-                        GetSemanticModelForSyntaxTree(
+                        ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
                             semanticModel,
                             returnExpression.SyntaxTree);
 
@@ -724,128 +637,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
-        /// <summary>
-        /// Determines whether a known framework method returns a sequence
-        /// whose elements are guaranteed to be non-null after normal return.
-        /// </summary>
-        /// <param name="methodSymbol">The original method definition.</param>
-        /// <param name="compilation">
-        /// The compilation used to resolve trusted framework types.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the exact framework signature has a
-        /// modeled non-null element guarantee; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsKnownFrameworkSequenceWithNonNullElements(
-            IMethodSymbol methodSymbol,
-            Compilation compilation)
-        {
-            if (!methodSymbol.IsStatic
-                || methodSymbol.MethodKind != MethodKind.Ordinary
-                || methodSymbol.Arity != 0
-                || !string.Equals(
-                    methodSymbol.Name,
-                    nameof(Directory.EnumerateFiles),
-                    StringComparison.Ordinal)
-                || methodSymbol.ContainingType is not INamedTypeSymbol containingType
-                || !IsFrameworkType(
-                    containingType,
-                    compilation,
-                    "System.IO.Directory")
-                || methodSymbol.Parameters.Length != 3
-                || methodSymbol.Parameters[0].Type.SpecialType != SpecialType.System_String
-                || methodSymbol.Parameters[1].Type.SpecialType != SpecialType.System_String
-                || methodSymbol.Parameters[2].Type is not INamedTypeSymbol searchOptionType
-                || !IsFrameworkType(
-                    searchOptionType,
-                    compilation,
-                    "System.IO.SearchOption")
-                || methodSymbol.ReturnType is not INamedTypeSymbol returnType
-                || !IsFrameworkType(
-                    returnType,
-                    compilation,
-                    "System.Collections.Generic.IEnumerable`1")
-                || returnType.TypeArguments.Length != 1
-                || returnType.TypeArguments[0].SpecialType != SpecialType.System_String)
-            {
-                return false;
-            }
-
-            foreach (IParameterSymbol parameter in methodSymbol.Parameters)
-            {
-                if (parameter.RefKind != RefKind.None)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether a method is LINQ's runtime type-filtering
-        /// <c>OfType&lt;T&gt;</c> operation.
-        /// </summary>
-        /// <param name="methodSymbol">
-        /// The method symbol to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the method filters elements by runtime
-        /// type; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsOfTypeSequenceMethod(
-            IMethodSymbol methodSymbol)
-        {
-            if (!methodSymbol.IsStatic ||
-                methodSymbol.Name != "OfType" ||
-                methodSymbol.Arity != 1 ||
-                methodSymbol.Parameters.Length != 1)
-            {
-                return false;
-            }
-
-            string containingTypeName =
-                methodSymbol.ContainingType.ToDisplayString();
-
-            return containingTypeName ==
-                       "System.Linq.Enumerable" ||
-                   containingTypeName ==
-                       "System.Linq.Queryable";
-        }
-
-        /// <summary>
-        /// Gets a semantic model for a syntax tree if the tree belongs to
-        /// the same compilation as the supplied semantic model.
-        /// </summary>
-        /// <param name="semanticModel">
-        /// The currently available semantic model.
-        /// </param>
-        /// <param name="syntaxTree">
-        /// The syntax tree whose semantic model is required.
-        /// </param>
-        /// <returns>
-        /// The semantic model for <paramref name="syntaxTree"/>, or
-        /// <see langword="null"/> if the tree does not belong to the
-        /// compilation.
-        /// </returns>
-        private static SemanticModel? GetSemanticModelForSyntaxTree(
-            SemanticModel semanticModel,
-            SyntaxTree syntaxTree)
-        {
-            if (semanticModel.SyntaxTree == syntaxTree)
-            {
-                return semanticModel;
-            }
-
-            if (!semanticModel.Compilation.SyntaxTrees.Contains(
-                    syntaxTree))
-            {
-                return null;
-            }
-
-            return semanticModel.Compilation.GetSemanticModel(
-                syntaxTree);
-        }
     }
 }

@@ -14,35 +14,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Determines whether a type symbol represents the specified
-        /// framework type.
-        /// </summary>
-        /// <param name="actualType">The actual type symbol.</param>
-        /// <param name="compilation">
-        /// The compilation used for type resolution.
-        /// </param>
-        /// <param name="metadataName">
-        /// The expected metadata name.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the symbols represent the same type;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        internal static bool IsFrameworkType(
-            INamedTypeSymbol actualType,
-            Compilation compilation,
-            string metadataName)
-        {
-            INamedTypeSymbol? expectedType =
-                compilation.GetTypeByMetadataName(metadataName);
-
-            return expectedType != null &&
-                   SymbolEqualityComparer.Default.Equals(
-                       actualType.OriginalDefinition,
-                       expectedType.OriginalDefinition);
-        }
-
-        /// <summary>
         /// Looks up and evaluates a framework exception contract without
         /// constructing argument facts for unregistered callables.
         /// </summary>

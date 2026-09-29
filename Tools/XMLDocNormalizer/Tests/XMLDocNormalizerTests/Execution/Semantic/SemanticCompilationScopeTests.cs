@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
@@ -44,6 +45,8 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 scope => scope.ProjectId == reportingProject.Id);
             SemanticCompilationScope referencedScope = context.GetAnalysisCompilationScopes().Single(
                 scope => scope.ProjectId == referencedProject.Id);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
 
             Assert.Equal(SemanticCompilationScopeKind.AnalysisTarget, reportingScope.Kind);
             Assert.Equal(SemanticCompilationScopeKind.ReferencedProject, referencedScope.Kind);
@@ -55,6 +58,17 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Equal(reportingProject.Id, reportingProjectId);
             Assert.True(context.TryGetOwningProjectId(referencedTree, out ProjectId referencedProjectId));
             Assert.Equal(referencedProject.Id, referencedProjectId);
+            Assert.True(environment.TryGetSemanticModel(
+                referencedTree,
+                out SemanticModel referencedSemanticModel));
+            Assert.Same(referencedScope.Compilation, referencedSemanticModel.Compilation);
+            Assert.Equal(
+                "ReferencedException",
+                referencedSemanticModel
+                    .GetDeclaredSymbol(referencedTree.GetRoot().DescendantNodes()
+                        .OfType<ClassDeclarationSyntax>()
+                        .Single())?
+                    .Name);
             Assert.False(context.HasDeclaredExceptionTypesInReportingScope());
         }
 
@@ -105,6 +119,12 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.False(context.TryGetOwningProjectId(supportingTree, out _));
             Assert.True(context.TryGetSemanticModel(supportingTree, out SemanticModel semanticModel));
             Assert.Same(supportingCompilation, semanticModel.Compilation);
+            ExceptionFlowSemanticEnvironment environment =
+                new ExceptionFlowSemanticEnvironment(context);
+            Assert.True(environment.TryGetSemanticModel(
+                supportingTree,
+                out SemanticModel environmentSemanticModel));
+            Assert.Same(supportingCompilation, environmentSemanticModel.Compilation);
 
             IReadOnlyList<SemanticCompilationScope> scopesAfter =
                 context.GetAnalysisCompilationScopes();
@@ -169,6 +189,51 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             SyntaxTree unrelatedTree = CSharpSyntaxTree.ParseText(
                 "public sealed class Unrelated { }");
             Assert.False(environment.TryGetSemanticModel(unrelatedTree, out _));
+        }
+
+        /// <summary>
+        /// Resolves only exact syntax-tree objects within one analyzer scope
+        /// and preserves an already available model for its own tree.
+        /// </summary>
+        [Fact]
+        public void ExceptionFlowScope_SemanticModelResolutionIsCompilationLocal()
+        {
+            SyntaxTree firstTree = CSharpSyntaxTree.ParseText(
+                "public sealed class First { }");
+            SyntaxTree secondTree = CSharpSyntaxTree.ParseText(
+                "public sealed class Second { }");
+            CSharpCompilation compilation = CreateCompilation(
+                "ScopedAssembly",
+                firstTree,
+                secondTree);
+            ExceptionFlowSemanticScope scope =
+                new ExceptionFlowSemanticScope(compilation);
+            SemanticModel firstModel = compilation.GetSemanticModel(firstTree);
+
+            Assert.Same(
+                firstModel,
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                    firstModel,
+                    firstTree));
+            Assert.True(scope.TryGetSemanticModel(
+                secondTree,
+                out SemanticModel secondModel));
+            Assert.Same(compilation, secondModel.Compilation);
+            Assert.Equal(
+                "Second",
+                secondModel
+                    .GetDeclaredSymbol(secondTree.GetRoot().DescendantNodes()
+                        .OfType<ClassDeclarationSyntax>()
+                        .Single())?
+                    .Name);
+
+            SyntaxTree foreignTree = CSharpSyntaxTree.ParseText(
+                "public sealed class Foreign { }");
+            Assert.False(scope.TryGetSemanticModel(foreignTree, out _));
+            Assert.Null(
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                    firstModel,
+                    foreignTree));
         }
 
         /// <summary>

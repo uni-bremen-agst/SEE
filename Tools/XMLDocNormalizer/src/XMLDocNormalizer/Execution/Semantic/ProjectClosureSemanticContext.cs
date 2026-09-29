@@ -792,7 +792,11 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
-            semanticModel = scope.Compilation.GetSemanticModel(tree);
+            if (!scope.TryGetSemanticModel(tree, out semanticModel))
+            {
+                return false;
+            }
+
             semanticModelCache[tree] = semanticModel;
             return true;
         }

@@ -53,7 +53,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SemanticModel? declarationSemanticModel =
-                GetSemanticModelForSyntaxTree(semanticModel, variableDeclarator.SyntaxTree);
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(semanticModel, variableDeclarator.SyntaxTree);
 
             if (declarationSemanticModel == null
                 || !IsKnownEmptyListCreation(variableDeclarator.Initializer.Value, declarationSemanticModel))
@@ -583,7 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SemanticModel? propertySemanticModel =
-                GetSemanticModelForSyntaxTree(semanticModel, declaration.SyntaxTree);
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(semanticModel, declaration.SyntaxTree);
 
             if (propertySemanticModel == null
                 || !IsKnownEmptyDictionaryCreation(
@@ -669,7 +669,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     SyntaxNode typeNode = typeReference.GetSyntax();
 
                     SemanticModel? typeSemanticModel =
-                        GetSemanticModelForSyntaxTree(declarationSemanticModel, typeNode.SyntaxTree);
+                        ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(declarationSemanticModel, typeNode.SyntaxTree);
 
                     if (typeSemanticModel == null)
                     {
