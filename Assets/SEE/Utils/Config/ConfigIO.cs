@@ -262,7 +262,7 @@ namespace SEE.Utils.Config
         /// <param name="value">The Vector3 that will be updated if <paramref name="label"/> exists.</param>
         /// <returns>True if the <paramref name="label"/> was found; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
-        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{String, Object}"/>.
         /// </exception>
         /// <remarks>
         /// This method is intended specifically for Vector3 values. For enums, use <see cref="RestoreEnum()"/>,
@@ -291,7 +291,7 @@ namespace SEE.Utils.Config
         /// <param name="setter">An action to apply the restored Vector3 value (e.g., a property setter).</param>
         /// <returns>True if the <paramref name="label"/> was found; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
-        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{String, Object}"/>.
         /// </exception>
         /// <remarks>
         /// This variant allows direct use with properties or methods that encapsulate setting logic,
@@ -319,7 +319,7 @@ namespace SEE.Utils.Config
         /// <param name="result">The Vector3 extracted from <paramref name="attributes"/>.</param>
         /// <returns>True if the label was found and <paramref name="result"/> was populated; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
-        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{String, Object}"/>.
         /// </exception>
         /// <remarks>
         /// This method is intended as a common implementation for both the ref and Action variants of Restore.

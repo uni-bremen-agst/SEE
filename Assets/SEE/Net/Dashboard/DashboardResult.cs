@@ -19,14 +19,14 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// This contains the error object which has been returned from the dashboard, if the call was not successful
-        /// due to an API error. Will be <see cref="null"/> if <see cref="Success"/> is true
+        /// due to an API error. Will be <c>null</c> if <see cref="Success"/> is true
         /// or if <see cref="Exception"/> is not null.
         /// </summary>
         public readonly DashboardError Error;
 
         /// <summary>
         /// This contains the exception which occurred when trying to access the dashboard.
-        /// Will be <see cref="null"/> if <see cref="Success"/> is true or if <see cref="Error"/>
+        /// Will be <c>null</c> if <see cref="Success"/> is true or if <see cref="Error"/>
         /// is not null.
         /// </summary>
         public readonly Exception Exception;

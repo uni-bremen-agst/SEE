@@ -108,7 +108,7 @@ namespace SEE.Utils.Paths
         /// <summary>
         /// If <paramref name="rootKind"/> is absolute, the empty string is returned.
         /// Otherwise yields Unity's folders as absolute paths depending upon
-        /// <see cref="<paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
+        /// <paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
         /// The character / will be used as directory separator for that path.
         /// The last character in the path will never be the directory separator /.
         ///

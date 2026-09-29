@@ -595,7 +595,7 @@ namespace SEE.Net.Util
         /// <param name="id">The unique identifier of the file to be retrieved.</param>
         /// <param name="path">The path and filename of the file to be saved locally after retrieval.</param>
         /// <returns>
-        /// A <see cref="UniTask{bool}"/> indicating whether the file retrieval was successful.
+        /// A <see cref="UniTask{Boolean}"/> indicating whether the file retrieval was successful.
         /// Returns true if the file is successfully retrieved and saved; otherwise, false.
         /// </returns>
         /// <remarks>
@@ -641,7 +641,7 @@ namespace SEE.Net.Util
         /// must be set.
         /// </summary>
         /// <returns>
-        /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
+        /// A <see cref="UniTask{Boolean}"/> indicating whether the login was successful.
         /// Returns true if the login is successful; otherwise, false.
         /// </returns>
         public static async UniTask<bool> LogInAsync()
