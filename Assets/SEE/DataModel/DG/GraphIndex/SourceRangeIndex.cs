@@ -213,7 +213,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// a <see cref="FileRanges"/> under this filename will be added at top level.
         ///
         /// Let F be the <see cref="FileRanges"/> representing the file with the node's filename (full
-        /// path). Then the <paramref name="node"/> is added via <see cref="FileRanges.Add(Node))"/>
+        /// path). Then the <paramref name="node"/> is added via <see cref="FileRanges.Add(Node)"/>
         /// passing F.
         /// </summary>
         /// <param name="node">Graph node to be added.</param>

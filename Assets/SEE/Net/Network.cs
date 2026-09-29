@@ -257,7 +257,7 @@ namespace SEE.Net
         /// the command-line arguments (if not running in the editor mode).
         ///
         /// This method does not really start any server or client. Use <see cref="StartClient(CallBack)"/>,
-        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)/> instead.
+        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)"/> instead.
         /// </summary>
         public void SetUp()
         {

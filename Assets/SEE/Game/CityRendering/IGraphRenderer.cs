@@ -22,7 +22,7 @@ namespace SEE.Game.CityRendering
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
         /// Note: The default edge layout <see cref="EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
@@ -40,7 +40,7 @@ namespace SEE.Game.CityRendering
         /// based on the current settings.
         ///
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must either have a valid
         /// node reference or be null. The corresponding graph nodes must be in the same graph.
@@ -60,7 +60,7 @@ namespace SEE.Game.CityRendering
         /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
         ///
         /// Note: The default edge layout <see cref="EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         /// </summary>
         /// <param name="gameEdges">The edges for which to create a layout.</param>
         /// <returns>Mapping of the names of the game objects in <paramref name="gameEdges"/> onto

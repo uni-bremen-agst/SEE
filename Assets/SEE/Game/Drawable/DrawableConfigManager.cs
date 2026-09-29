@@ -274,7 +274,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a new <see cref="DrawablesConfigs"/> from the given drawables.
         /// </summary>
-        /// <param name="drawables<">The drawables for which a configuration is to be created.</param>
+        /// <param name="drawables">The drawables for which a configuration is to be created.</param>
         /// <returns>The created <see cref="DrawablesConfigs"/>.</returns>
         internal static DrawablesConfigs GetDrawablesConfigs(GameObject[] drawables)
         {

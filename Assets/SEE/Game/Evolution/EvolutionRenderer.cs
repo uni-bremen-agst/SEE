@@ -1,4 +1,4 @@
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
 using SEE.UI.Notification;
@@ -616,7 +616,7 @@ namespace SEE.Game.Evolution
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.

@@ -19,7 +19,7 @@ namespace SEE.GraphProviders
     /// Instead, you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
     /// </summary>
     /// <typeparam name="T">The type of data which should be provided (e.g. a single <see cref="Graph"/> for
-    /// simple code cities or a list of <see cref="Graph}"/>s for evolution cities)</typeparam>
+    /// simple code cities or a list of <see cref="Graph"/>s for evolution cities)</typeparam>
     /// <typeparam name="K">
     /// This type specifies the graph provider kind enum type.
     /// This can either be a <see cref="SingleGraphProviderKind"/> or <see cref="MultiGraphProviderKind"/>.

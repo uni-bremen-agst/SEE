@@ -1,4 +1,4 @@
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -233,7 +233,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
         /// <summary>
         /// At the beginning of this action, it saves the current color values
-        /// (<see cref="ValueHolder.CurrentPrimaryColor>"/> and <see cref="ValueHolder.CurrentSecondaryColor"/>)
+        /// (<see cref="ValueHolder.CurrentPrimaryColor"/> and <see cref="ValueHolder.CurrentSecondaryColor"/>)
         /// of the <see cref="ValueHolder"/>.
         /// It also adds to the UICanvas a <see cref="ColorPickerMenuDisabler"/> component.
         /// This is required to prevent a display error when displaying the color picker menu.
