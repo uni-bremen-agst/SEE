@@ -58,6 +58,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Writes <paramref name="message"/> to the standard error stream.
+        /// </summary>
+        /// <param name="message">A message describing the assumption that was violated.</param>
+        public void LogAssertion(string message)
+        {
+            Write(Console.Error, "ASSERTION", message);
+        }
+
+        /// <summary>
         /// Writes <paramref name="message"/> to <paramref name="stream"/> as a single
         /// line, prefixed by <paramref name="severity"/>.
         ///

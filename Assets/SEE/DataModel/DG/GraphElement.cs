@@ -1,6 +1,5 @@
 ﻿using SEE.Utils;
 using SEE.Utils.Paths;
-using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -244,7 +243,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                Debug.Assert(value is null or > 0, $"expected positive line number, but got {value}");
+                Assertion.Assert(value is null or > 0, $"expected positive line number, but got {value}");
                 SetInt(sourceLineAttribute, value);
             }
         }
@@ -269,7 +268,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                Debug.Assert(value == null || value > 0);
+                Assertion.Assert(value is null or > 0, $"expected positive column number, but got {value}");
                 SetInt(sourceColumnAttribute, value);
             }
         }

@@ -32,5 +32,14 @@ namespace SEE.Utils
         {
             Debug.LogWarning(message);
         }
+
+        /// <summary>
+        /// Logs <paramref name="message"/> with Unity's assertion log type.
+        /// </summary>
+        /// <param name="message">A message describing the assumption that was violated.</param>
+        public void LogAssertion(string message)
+        {
+            Debug.LogAssertion(message);
+        }
     }
 }
