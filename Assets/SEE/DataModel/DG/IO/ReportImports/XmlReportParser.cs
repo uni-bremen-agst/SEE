@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.IO;
 using System.Threading;
 using System.Xml;
 using System.Xml.XPath;
-using UnityEngine;
 
 /// <summary>
 /// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
@@ -177,7 +177,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning(
+                    Logging.Logger.LogWarning(
                         $"[{nameof(XmlReportParser)}] XPath error in path builder '{pathExpression}': {ex.Message}.\n");
                 }
 
@@ -189,7 +189,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
             }
 
-            Debug.Log(
+            Logging.Logger.LogInfo(
                 $"[{nameof(XmlReportParser)}] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.\n");
 
             return metricSchema;
@@ -251,7 +251,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[{nameof(XmlReportParser)}] XPath error in metric '{kv.Key}': {ex.Message}.\n");
+                    Logging.Logger.LogWarning($"[{nameof(XmlReportParser)}] XPath error in metric '{kv.Key}': {ex.Message}.\n");
                 }
 
                 if (!string.IsNullOrEmpty(value) && value != "NaN")
@@ -320,7 +320,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning(
+                    Logging.Logger.LogWarning(
                         $"[{nameof(XmlReportParser)}] XPath error in location field '{kv.Key}': {ex.Message}.\n");
                 }
             }

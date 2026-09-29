@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.GraphIndex
 {
@@ -126,7 +126,7 @@ namespace SEE.DataModel.DG.GraphIndex
             int i = 0;
             foreach (SourceRange range in values)
             {
-                Debug.Log($"{i} => {range}\n");
+                Logging.Logger.LogInfo($"{i} => {range}\n");
                 i++;
             }
         }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using SEE.DataModel.DG.GraphIndex;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -103,7 +103,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
 
                 if (string.IsNullOrWhiteSpace(findingPathAsLogicalId))
                 {
-                    Debug.LogWarning(
+                    Logging.Logger.LogWarning(
                         $"[{nameof(MetricApplier)}] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.\n");
                     continue;
                 }
@@ -148,12 +148,12 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 else
                 {
-                    Debug.LogWarning(
+                    Logging.Logger.LogWarning(
                         $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, MainType={findingPathAsLogicalId}, line={startLine}.\n");
                 }
             }
 
-            Debug.Log($"[{nameof(MetricApplier)}] Finished applying metrics. Matched {matchedCount} out of {schema.Findings.Count} findings.\n");
+            Logging.Logger.LogInfo($"[{nameof(MetricApplier)}] Finished applying metrics. Matched {matchedCount} out of {schema.Findings.Count} findings.\n");
         }
 
         /// <summary>

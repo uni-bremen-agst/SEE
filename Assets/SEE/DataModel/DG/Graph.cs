@@ -1,10 +1,11 @@
 ﻿using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -720,7 +721,7 @@ namespace SEE.DataModel.DG
                 indentation += "-";
             }
 
-            Debug.Log(indentation + root.ID + "\n");
+            Logging.Logger.LogInfo(indentation + root.ID + "\n");
             foreach (Node child in root.Children())
             {
                 DumpTree(child, level + 1);

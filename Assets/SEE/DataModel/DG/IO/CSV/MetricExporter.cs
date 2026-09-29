@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.CSV
 {
@@ -36,7 +36,7 @@ namespace SEE.DataModel.DG.IO.CSV
             }
             else
             {
-                Debug.LogWarning("The graph has no node attributes. No CSV file will be written.\n");
+                Logging.Logger.LogWarning("The graph has no node attributes. No CSV file will be written.\n");
             }
         }
 

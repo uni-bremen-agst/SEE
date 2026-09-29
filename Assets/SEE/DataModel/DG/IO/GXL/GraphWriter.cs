@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using SEE.Utils;
-using UnityEngine;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;
 
@@ -42,7 +41,7 @@ namespace SEE.DataModel.DG.IO.GXL
             }
             catch (Exception e)
             {
-                Debug.LogError($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
+                Logging.Logger.LogError($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
                 throw;
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -72,7 +72,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 catch (ArgumentException exception)
                 {
-                    Debug.LogError(
+                    Logging.Logger.LogError(
                         $"[{nameof(TextReportParser)}] Invalid regex pattern for context '{patternEntry.Key}': {exception.Message}\n");
                 }
             }
@@ -87,7 +87,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
                 catch (ArgumentException exception)
                 {
-                    Debug.LogError(
+                    Logging.Logger.LogError(
                         $"[{nameof(TextReportParser)}] Invalid line filter pattern: {exception.Message}\n");
                 }
             }
@@ -197,7 +197,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
             }
 
-            Debug.Log(
+            Logging.Logger.LogInfo(
                 $"[{nameof(TextReportParser)}] Parsing finished. Lines processed: {lineCount}, " +
                 $"Matched lines: {matchedLines}, Findings: {metricSchema.Findings.Count}.\n");
 

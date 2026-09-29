@@ -1,12 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -94,7 +94,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[{nameof(JsonReportParser)}] Failed to parse JSON content: {ex.Message}\n");
+                Logging.Logger.LogError($"[{nameof(JsonReportParser)}] Failed to parse JSON content: {ex.Message}\n");
                 return schema;
             }
 
@@ -110,7 +110,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 // Ensure we have a way to build an ID for this context
                 if (!mapping.PathBuilders.TryGetValue(context, out string idPath))
                 {
-                    Debug.LogWarning($"[{nameof(JsonReportParser)}] No PathBuilder defined for context '{context}'. Skipping.\n");
+                    Logging.Logger.LogWarning($"[{nameof(JsonReportParser)}] No PathBuilder defined for context '{context}'. Skipping.\n");
                     continue;
                 }
 
@@ -184,7 +184,7 @@ namespace SEE.DataModel.DG.IO.ReportImports
                 }
             }
 
-            Debug.Log($"[{nameof(JsonReportParser)}] Parsing finished. Found {findingsCount} findings in {mapping.SelectElements.Count} contexts.\n");
+            Logging.Logger.LogInfo($"[{nameof(JsonReportParser)}] Parsing finished. Found {findingsCount} findings in {mapping.SelectElements.Count} contexts.\n");
 
             return schema;
         }

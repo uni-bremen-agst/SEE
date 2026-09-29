@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.ReportImports
 {
@@ -65,13 +65,13 @@ namespace SEE.DataModel.DG.IO.ReportImports
                         }
                         else
                         {
-                            Debug.LogError($"Duplicate ParsingConfig kind found: '{kind}' used by {_registry[kind].Name} and {type.Name}");
+                            Logging.Logger.LogError($"Duplicate ParsingConfig kind found: '{kind}' used by {_registry[kind].Name} and {type.Name}");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"Could not register ParsingConfig type {type.Name}: {ex.Message}");
+                    Logging.Logger.LogError($"Could not register ParsingConfig type {type.Name}: {ex.Message}");
                 }
             }
         }

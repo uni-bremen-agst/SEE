@@ -10,10 +10,10 @@ using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools;
-using UnityEngine;
 using CsvHelper;
 using CsvHelper.Configuration;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.CSV
 {
@@ -129,7 +129,7 @@ namespace SEE.DataModel.DG.IO.CSV
             MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
 
             await UniTask.SwitchToMainThread();
-            Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
+            Logging.Logger.LogInfo($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
                       + "using the Axivion dashboard.\n");
             return graph;
 
@@ -202,7 +202,7 @@ namespace SEE.DataModel.DG.IO.CSV
         {
             if (!File.Exists(filename))
             {
-                Debug.LogWarning($"Metric file {filename} does not exist. CSV Metrics will not be available.\n");
+                Logging.Logger.LogWarning($"Metric file {filename} does not exist. CSV Metrics will not be available.\n");
                 return 0;
             }
 
@@ -251,7 +251,7 @@ namespace SEE.DataModel.DG.IO.CSV
                 string[] columns = header[1..];
                 if (columns.Length == 0)
                 {
-                    Debug.LogWarning($"There are no data columns in {Input()}.\n");
+                    Logging.Logger.LogWarning($"There are no data columns in {Input()}.\n");
                     return 0;
                 }
                 while (await csv.ReadAsync())
@@ -281,24 +281,24 @@ namespace SEE.DataModel.DG.IO.CSV
                             }
                             catch (CsvHelper.MissingFieldException)
                             {
-                                Debug.LogError($"{SourceLocation()} Missing value.\n");
+                                Logging.Logger.LogError($"{SourceLocation()} Missing value.\n");
                                 numberOfErrors++;
                             }
                             catch (FormatException)
                             {
-                                Debug.LogError($"{SourceLocation()} Value {entry} does not represent a number in a valid format.\n");
+                                Logging.Logger.LogError($"{SourceLocation()} Value {entry} does not represent a number in a valid format.\n");
                                 numberOfErrors++;
                             }
                             catch (OverflowException)
                             {
-                                Debug.LogError($"{SourceLocation()} Value {entry} represents a number less than minimum or greater than maximum.\n");
+                                Logging.Logger.LogError($"{SourceLocation()} Value {entry} represents a number less than minimum or greater than maximum.\n");
                                 numberOfErrors++;
                             }
                         }
                     }
                     else
                     {
-                        Debug.LogWarning($"{SourceLocation()} Unknown node id '{id}'.\n");
+                        Logging.Logger.LogWarning($"{SourceLocation()} Unknown node id '{id}'.\n");
                         numberOfErrors++;
                     }
                 }
@@ -306,7 +306,7 @@ namespace SEE.DataModel.DG.IO.CSV
             else
             {
                 const string errorMessage = "There is no header.";
-                Debug.LogError(errorMessage + "\n");
+                Logging.Logger.LogError(errorMessage + "\n");
                 throw new IOException(errorMessage);
 
             }

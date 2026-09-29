@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.GraphIndex
 {
@@ -61,7 +61,7 @@ namespace SEE.DataModel.DG.GraphIndex
                     bool isDescendant = range.Node.IsDescendantOf(parentRange.Node);
                     if (!isDescendant)
                     {
-                        Debug.LogError($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
+                        Logging.Logger.LogError($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
                             + $"not a descendant of {parentRange.Node.ID} in the node hierarchy.\n");
                     }
                     result &= isDescendant;
@@ -160,7 +160,7 @@ namespace SEE.DataModel.DG.GraphIndex
         {
             foreach ((string key, FileRanges value) in files)
             {
-                Debug.Log($"*** {key} ***\n");
+                Logging.Logger.LogInfo($"*** {key} ***\n");
                 DumpFile(value);
             }
 
@@ -176,7 +176,7 @@ namespace SEE.DataModel.DG.GraphIndex
 
             void DumpRange(string enumeration, SourceRange range)
             {
-                Debug.Log($"{enumeration} {range}\n");
+                Logging.Logger.LogInfo($"{enumeration} {range}\n");
                 int i = 1;
                 foreach (SourceRange child in range.Children)
                 {
@@ -240,7 +240,7 @@ namespace SEE.DataModel.DG.GraphIndex
                 }
                 else
                 {
-                    Debug.LogWarning($"{node.ID} does not have a path. Will be ignored.\n");
+                    Logging.Logger.LogWarning($"{node.ID} does not have a path. Will be ignored.\n");
                 }
             }
         }

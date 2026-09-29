@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -91,11 +92,11 @@ namespace SEE.DataModel.DG.IO.GXL
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
                 {
-                    Debug.LogWarning($"Graph stored in {Name} is empty.\n");
+                    Logging.Logger.LogWarning($"Graph stored in {Name} is empty.\n");
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarning($"Graph stored in {Name} has multiple roots. Adding an artificial single root {rootName}.\n");
+                    Logging.Logger.LogWarning($"Graph stored in {Name} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new()
                     {
                         Type = Graph.RootType,
@@ -243,7 +244,7 @@ namespace SEE.DataModel.DG.IO.GXL
                         }
                         catch (InvalidOperationException e)
                         {
-                            Debug.LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.\n");
+                            Logging.Logger.LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.\n");
                             LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.");
                         }
                     }
@@ -258,10 +259,10 @@ namespace SEE.DataModel.DG.IO.GXL
 
         private static void Dump(GameObject obj)
         {
-            Debug.Log($"Loaded: {obj.name}\n");
+            Logging.Logger.LogInfo($"Loaded: {obj.name}\n");
             if (obj.TryGetComponent(out Node node))
             {
-                Debug.Log($"{node}\n");
+                Logging.Logger.LogInfo($"{node}\n");
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
 
 namespace SEE.DataModel.DG.GraphIndex
 {
@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG.GraphIndex
             }
             else if (ReportMissingSourceRange)
             {
-                Debug.LogWarning($"{node.ID} does not have a source range. Will be ignored.\n");
+                Logging.Logger.LogWarning($"{node.ID} does not have a source range. Will be ignored.\n");
             }
         }
 

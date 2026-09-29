@@ -5,7 +5,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Utils;
 using SEE.Utils.Paths;
-using UnityEngine;
 
 namespace SEE.DataModel.DG.IO.GXL
 {
@@ -67,23 +66,23 @@ namespace SEE.DataModel.DG.IO.GXL
                 // if graph was loaded, put in graph list
                 if (graph == null)
                 {
-                    Debug.LogError($"Graph {gxlPath} could not be loaded.\n");
+                    Logging.Logger.LogError($"Graph {gxlPath} could not be loaded.\n");
                 }
                 else
                 {
                     string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
                     if (File.Exists(csvFilename))
                     {
-                        Debug.Log($"Loading CSV file {csvFilename}.\n");
+                        Logging.Logger.LogInfo($"Loading CSV file {csvFilename}.\n");
                         int numberOfErrors = await CSV.MetricImporter.LoadCsvAsync(graph, csvFilename);
                         if (numberOfErrors > 0)
                         {
-                            Debug.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
+                            Logging.Logger.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
                         }
                     }
                     else
                     {
-                        Debug.LogWarning($"CSV file {csvFilename} does not exist.\n");
+                        Logging.Logger.LogWarning($"CSV file {csvFilename} does not exist.\n");
                     }
                     maxRevisionsToLoad--;
                     Graphs.Add(graph);
@@ -94,7 +93,7 @@ namespace SEE.DataModel.DG.IO.GXL
                 }
             }
             p.End();
-            Debug.Log($"Number of graphs loaded: {Graphs.Count}\n");
+            Logging.Logger.LogInfo($"Number of graphs loaded: {Graphs.Count}\n");
         }
     }
 }

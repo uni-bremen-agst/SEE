@@ -12,7 +12,6 @@ using SEE.Tools.LSP;
 using SEE.Utils;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
-using Debug = UnityEngine.Debug;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -222,7 +221,7 @@ namespace SEE.DataModel.DG.IO
             bool supportsPullDiagnostics = Handler.ServerCapabilities.DiagnosticProvider != null;
             if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
             {
-                Debug.LogWarning("The language server does not support pull diagnostics. "
+                Logging.Logger.LogWarning("The language server does not support pull diagnostics. "
                                  + "We can only catch diagnostics that have been emitted until the graph import is done,"
                                  + "hence, some diagnostics might be missing.\n");
             }
@@ -262,7 +261,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     if (symbol.IsDocumentSymbolInformation)
                     {
-                        Debug.LogError("This language server emits SymbolInformation, which is deprecated and not "
+                        Logging.Logger.LogError("This language server emits SymbolInformation, which is deprecated and not "
                                        + "supported by SEE. Please choose a language server that is capable of "
                                        + "returning hierarchic DocumentSymbols.\n");
                         return;
@@ -278,7 +277,7 @@ namespace SEE.DataModel.DG.IO
 
             // Relevant nodes (for edges) are those that have a source range and are not already in the graph.
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
-            Debug.Log($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).\n");
+            Logging.Logger.LogInfo($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).\n");
 
             if (Handler.Server == LSPServer.EclipseJdtls)
             {
@@ -288,7 +287,7 @@ namespace SEE.DataModel.DG.IO
 
             if (relevantNodes.Count == 0)
             {
-                Debug.LogError("LSPImporter: No relevant nodes found. Aborting import.\n");
+                Logging.Logger.LogError("LSPImporter: No relevant nodes found. Aborting import.\n");
                 return;
             }
 
@@ -340,7 +339,7 @@ namespace SEE.DataModel.DG.IO
                     changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
                 }
             }
-            Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
+            Logging.Logger.LogInfo($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
 
             // Handle diagnostics if not pulled.
             if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
@@ -373,7 +372,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (TimeoutException e)
                 {
-                    Debug.LogWarning(e + "\n");
+                    Logging.Logger.LogWarning(e + "\n");
                 }
             }
 
