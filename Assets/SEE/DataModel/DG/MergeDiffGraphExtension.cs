@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System;
-using Sirenix.Utilities;
 
 namespace SEE.DataModel.DG
 {
@@ -144,11 +143,20 @@ namespace SEE.DataModel.DG
             where T : GraphElement
         {
             // here graphElement stems from the newer graph
-            added.ForEach(graphElement => graphElement.SetToggle(ChangeMarkers.IsNew));
+            foreach (T graphElement in added)
+            {
+                graphElement.SetToggle(ChangeMarkers.IsNew);
+            }
             // here graphElement stems from the newer graph
-            changed.ForEach(UpdateChanged);
+            foreach (T graphElement in changed)
+            {
+                UpdateChanged(graphElement);
+            }
             // here graphElement stems from the baseline graph
-            removed.ForEach(MergeRemoved);
+            foreach (T graphElement in removed)
+            {
+                MergeRemoved(graphElement);
+            }
 
             // Adds graphElement to newer graph and marks it as deleted.
             // This graphElement is assumed to be in the baseline graph.
