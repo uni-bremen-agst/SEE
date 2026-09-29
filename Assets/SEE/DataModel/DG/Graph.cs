@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using UnityEngine.Assertions;
 using UnityEngine;
 
 namespace SEE.DataModel.DG
@@ -807,7 +806,7 @@ namespace SEE.DataModel.DG
             // We need to create two copies because we'll mess with the graph's nodes and edges,
             // and don't want to leave a mangled mess.
             T mergedGraph = Clone() as T;
-            Assert.IsNotNull(mergedGraph);
+            Assertion.IsNotNull(mergedGraph);
             Graph otherGraph = other.Clone();
 
             // Name and Path are implicitly taken from this graph.

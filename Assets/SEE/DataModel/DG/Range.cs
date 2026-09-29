@@ -1,6 +1,6 @@
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace SEE.DataModel.DG
 {
@@ -123,7 +123,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                Assert.IsTrue(!other.StartCharacter.HasValue && !other.EndCharacter.HasValue);
+                Assertion.IsTrue(!other.StartCharacter.HasValue && !other.EndCharacter.HasValue);
                 // Has to contain all lines in full.
                 contains = Contains(other.StartLine, 0) && Contains(other.StartLine, int.MaxValue);
                 contains = contains && Contains(other.EndLine - 1, 0) && Contains(other.EndLine - 1, int.MaxValue);
@@ -196,7 +196,7 @@ namespace SEE.DataModel.DG
             {
                 if (StartCharacter.HasValue && other.StartCharacter.HasValue)
                 {
-                    Assert.IsTrue(EndCharacter.HasValue && other.EndCharacter.HasValue);
+                    Assertion.IsTrue(EndCharacter.HasValue && other.EndCharacter.HasValue);
                     if (EndLine == other.EndLine)
                     {
                         // We can just count and compare the characters.

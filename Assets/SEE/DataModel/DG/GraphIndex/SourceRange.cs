@@ -1,4 +1,4 @@
-﻿using UnityEngine.Assertions;
+﻿using SEE.Utils;
 
 namespace SEE.DataModel.DG.GraphIndex
 {
@@ -25,8 +25,8 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <param name="node">The node whose source-code range is represented.</param>
         public SourceRange(int start, int end, Node node)
         {
-            Assert.IsNotNull(node);
-            Assert.IsTrue(start <= end, $"Start line {start} must be less than or equal to end line {end}");
+            Assertion.IsNotNull(node);
+            Assertion.IsTrue(start <= end, $"Start line {start} must be less than or equal to end line {end}");
 
             Range = new Range(start, end+1);  // In a Range, the end line is exclusive
             Node = node;
@@ -39,8 +39,8 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <param name="node">The node whose source-code range is represented.</param>
         public SourceRange(Range range, Node node)
         {
-            Assert.IsNotNull(node);
-            Assert.IsNotNull(range);
+            Assertion.IsNotNull(node);
+            Assertion.IsNotNull(range);
 
             Range = range;
             Node = node;
