@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis.Operations;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact reasoning for one-based source positions derived
+    /// Provides value-fact reasoning for one-based source positions derived
     /// from Roslyn line-span information.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowSourcePositionValueFactsProvider
     {
         /// <summary>
         /// Gets positive integer facts for a one-based Roslyn source
@@ -33,7 +33,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// expression is proven to be a one-based source coordinate;
         /// otherwise <see cref="ExceptionFlowValueFacts.None"/>.
         /// </returns>
-        private static ExceptionFlowValueFacts GetOneBasedSourcePositionValueFacts(
+        internal static ExceptionFlowValueFacts GetOneBasedSourcePositionValueFacts(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callContext,
@@ -86,12 +86,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             ExpressionSyntax? coordinateExpression = null;
 
-            if (TryGetInt32Constant(addition.Left, semanticModel, out int leftConstant)
+            if (ExceptionFlowPrimitiveValueFactsProvider.TryGetInt32Constant(
+                    addition.Left,
+                    semanticModel,
+                    out int leftConstant)
                 && leftConstant == 1)
             {
                 coordinateExpression = addition.Right;
             }
-            else if (TryGetInt32Constant(addition.Right, semanticModel, out int rightConstant)
+            else if (ExceptionFlowPrimitiveValueFactsProvider.TryGetInt32Constant(
+                         addition.Right,
+                         semanticModel,
+                         out int rightConstant)
                 && rightConstant == 1)
             {
                 coordinateExpression = addition.Left;
@@ -420,7 +426,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                return TryGetInt32Constant(argument.Expression, semanticModel, out int length)
+                return ExceptionFlowPrimitiveValueFactsProvider.TryGetInt32Constant(
+                           argument.Expression,
+                           semanticModel,
+                           out int length)
                     && length > 0;
             }
 
@@ -448,7 +457,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the local has a usable initializer that
         /// still determines its value; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryGetCurrentLocalInitializerExpression(
+        internal static bool TryGetCurrentLocalInitializerExpression(
             ExpressionSyntax useExpression,
             ILocalSymbol localSymbol,
             SemanticModel semanticModel,
@@ -459,7 +468,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (localSymbol.DeclaringSyntaxReferences.Length != 1
                 || localSymbol.DeclaringSyntaxReferences[0].GetSyntax() is not VariableDeclaratorSyntax declarator
                 || declarator.Initializer == null
-                || !IsLocalInitializerStillCurrent(
+                || !ExceptionFlowLocalInitializerFactsProvider.IsLocalInitializerStillCurrent(
                     useExpression,
                     localSymbol,
                     declarator,

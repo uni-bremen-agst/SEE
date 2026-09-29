@@ -44,7 +44,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callerContext,
             HashSet<ISymbol> inspectedSequenceSources)
         {
-            if (!IsListType(localSymbol.Type)
+            if (!ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                    localSymbol.Type)
                 || localSymbol.DeclaringSyntaxReferences.Length != 1
                 || localSymbol.DeclaringSyntaxReferences[0].GetSyntax() is not VariableDeclaratorSyntax variableDeclarator
                 || variableDeclarator.Initializer == null)
@@ -56,7 +57,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(semanticModel, variableDeclarator.SyntaxTree);
 
             if (declarationSemanticModel == null
-                || !IsKnownEmptyListCreation(variableDeclarator.Initializer.Value, declarationSemanticModel))
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyListCreation(
+                    variableDeclarator.Initializer.Value,
+                    declarationSemanticModel))
             {
                 return false;
             }
@@ -228,7 +231,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
             if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !IsListType(methodSymbol.ContainingType)
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                    methodSymbol.ContainingType)
                 || !string.Equals(methodSymbol.Name, "AddRange", StringComparison.Ordinal)
                 || invocation.ArgumentList.Arguments.Count != 1)
             {
@@ -620,7 +624,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return IsListType(dictionaryType.TypeArguments[1]);
+            return ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                dictionaryType.TypeArguments[1]);
         }
 
         /// <summary>
@@ -825,7 +830,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 new(semanticModel.GetEnclosingSymbol(expression.SpanStart));
 
             if (AreSequenceElementsProvenNonNull(expression, semanticModel, localContext)
-                || IsKnownEmptyListCreation(expression, semanticModel))
+                || ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyListCreation(
+                    expression,
+                    semanticModel))
             {
                 return true;
             }
@@ -843,7 +850,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            if (IsKnownEmptyListCreation(assignedExpression, semanticModel))
+            if (ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyListCreation(
+                    assignedExpression,
+                    semanticModel))
             {
                 return true;
             }
@@ -1070,7 +1079,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
             if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !IsListType(methodSymbol.ContainingType))
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                    methodSymbol.ContainingType))
             {
                 return false;
             }
@@ -1136,7 +1146,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
             if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !IsListType(methodSymbol.ContainingType)
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                    methodSymbol.ContainingType)
                 || !string.Equals(methodSymbol.Name, "AddRange", StringComparison.Ordinal)
                 || invocation.ArgumentList.Arguments.Count != 1)
             {

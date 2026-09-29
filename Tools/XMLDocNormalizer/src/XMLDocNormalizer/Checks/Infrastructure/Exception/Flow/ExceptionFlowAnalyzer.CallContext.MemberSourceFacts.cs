@@ -59,7 +59,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return Array.Empty<ISymbol>();
             }
 
-            if (!TryGetStraightLineCurrentLocalInitializerExpression(
+            if (!ExceptionFlowLocalInitializerFactsProvider.TryGetStraightLineCurrentLocalInitializerExpression(
                     unwrappedExpression,
                     localSymbol,
                     semanticModel,
@@ -116,7 +116,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             SyntaxNode declaration = targetMethod.DeclaringSyntaxReferences[0].GetSyntax();
-            List<ExpressionSyntax> returnExpressions = GetSourceReturnExpressions(declaration);
+            List<ExpressionSyntax> returnExpressions =
+                ExceptionFlowEnumValueFactsProvider.GetSourceReturnExpressions(
+                    declaration);
 
             if (returnExpressions.Count == 0)
             {

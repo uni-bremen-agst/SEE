@@ -83,7 +83,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (!receiverFacts.ContainsAll(
                     ExceptionFlowValueFacts.NonNull)
-                || !IsLocalInitializerStillCurrent(
+                || !ExceptionFlowLocalInitializerFactsProvider.IsLocalInitializerStillCurrent(
                     unwrappedExpression,
                     receiverLocal,
                     variableDeclarator,

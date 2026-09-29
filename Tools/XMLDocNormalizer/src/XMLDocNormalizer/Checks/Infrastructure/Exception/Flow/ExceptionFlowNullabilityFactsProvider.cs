@@ -182,6 +182,40 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Determines whether a framework method is known to return a
+        /// non-null value.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The resolved invoked method.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the method is a supported non-null
+        /// framework factory; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsKnownNonNullFrameworkFactory(
+            IMethodSymbol methodSymbol)
+        {
+            IMethodSymbol originalMethod =
+                methodSymbol.OriginalDefinition;
+
+            if (originalMethod.IsStatic
+                && originalMethod.Name == "Empty"
+                && originalMethod.Arity == 1
+                && originalMethod.Parameters.Length == 0
+                && originalMethod.ContainingType.SpecialType ==
+                    SpecialType.System_Array)
+            {
+                return true;
+            }
+
+            return originalMethod.IsStatic
+                && originalMethod.Name ==
+                    nameof(string.Join)
+                && originalMethod.ContainingType.SpecialType ==
+                    SpecialType.System_String;
+        }
+
+        /// <summary>
         /// Determines whether a type symbol represents the specified
         /// framework type.
         /// </summary>

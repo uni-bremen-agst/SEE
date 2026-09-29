@@ -1,4 +1,6 @@
 using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
@@ -19,13 +21,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Type[] componentTypes =
             [
                 typeof(ExceptionFlowArgumentMapper),
+                typeof(ExceptionFlowConditionalWeakTableValueFactsProvider),
                 typeof(ExceptionFlowDataFlowFactsProvider),
                 typeof(ExceptionFlowDereferenceFactDiscovery),
+                typeof(ExceptionFlowEnumValueFactsProvider),
                 typeof(ExceptionFlowGuardFactsProvider),
                 typeof(ExceptionFlowImmutableMemberValueFactsProvider),
                 typeof(ExceptionFlowKnownPropertyValueFactsProvider),
+                typeof(ExceptionFlowLocalInitializerFactsProvider),
                 typeof(ExceptionFlowNullabilityFactsProvider),
                 typeof(ExceptionFlowPrimitiveValueFactsProvider),
+                typeof(ExceptionFlowSequenceCollectionFactsProvider),
+                typeof(ExceptionFlowSourcePositionValueFactsProvider),
                 typeof(ExceptionFlowStableMemberFacts),
                 typeof(ExceptionFlowSymbolUsageFacts)
             ];
@@ -49,11 +56,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "ExceptionFlowDataFlowFactsProvider.cs",
                 "ExceptionFlowDereferenceFactDiscovery.Callee.cs",
                 "ExceptionFlowDereferenceFactDiscovery.cs",
+                "ExceptionFlowEnumValueFactsProvider.cs",
                 "ExceptionFlowGuardFactsProvider.cs",
                 "ExceptionFlowImmutableMemberValueFactsProvider.cs",
                 "ExceptionFlowKnownPropertyValueFactsProvider.cs",
+                "ExceptionFlowLocalInitializerFactsProvider.cs",
                 "ExceptionFlowNullabilityFactsProvider.cs",
                 "ExceptionFlowPrimitiveValueFactsProvider.cs",
+                "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                "ExceptionFlowSourcePositionValueFactsProvider.cs",
                 "ExceptionFlowStableMemberFacts.cs",
                 "ExceptionFlowSymbolUsageFacts.cs"
             ];
@@ -63,6 +74,39 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 file => Assert.DoesNotContain(
                     "ExceptionFlowAnalyzer",
                     File.ReadAllText(Path.Combine(flowDirectory, file)),
+                    StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Ensures every partial declaration of the stateless table-fact
+        /// provider remains free of Analyzer back references even though the
+        /// cache owner remains in the same source file.
+        /// </summary>
+        [Fact]
+        public void ConditionalWeakTableProvider_DoesNotDependOnAnalyzer()
+        {
+            string source = File.ReadAllText(
+                Path.Combine(
+                    GetFlowDirectory(),
+                    "ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts.cs"));
+            CompilationUnitSyntax root =
+                CSharpSyntaxTree.ParseText(source)
+                    .GetCompilationUnitRoot();
+            ClassDeclarationSyntax[] declarations =
+                root.DescendantNodes()
+                    .OfType<ClassDeclarationSyntax>()
+                    .Where(
+                        static declaration =>
+                            declaration.Identifier.ValueText ==
+                                nameof(ExceptionFlowConditionalWeakTableValueFactsProvider))
+                    .ToArray();
+
+            Assert.Equal(3, declarations.Length);
+            Assert.All(
+                declarations,
+                declaration => Assert.DoesNotContain(
+                    nameof(ExceptionFlowAnalyzer),
+                    declaration.ToFullString(),
                     StringComparison.Ordinal));
         }
 

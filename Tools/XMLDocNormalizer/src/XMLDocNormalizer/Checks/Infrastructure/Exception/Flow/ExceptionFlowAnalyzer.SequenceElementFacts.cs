@@ -500,7 +500,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return TryGetSequenceSourceExpression(
+            return ExceptionFlowSequenceCollectionFactsProvider.TryGetSequenceSourceExpression(
                 invocation,
                 methodSymbol,
                 out sourceExpression);

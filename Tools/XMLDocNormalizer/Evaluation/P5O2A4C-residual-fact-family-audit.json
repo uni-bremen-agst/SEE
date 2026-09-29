@@ -1,0 +1,699 @@
+{
+    "Package":  "P5O2A4C",
+    "Scope":  "Residual Downstream Fact Family Extraction",
+    "Head":  "e0f362f958180f06fbed4a2a3f7a8c643eeaa9fb",
+    "BaselineAudit":  "P5O2A4C-downstream-fact-provider-audit.json",
+    "SemanticResolutionAudit":  "P5O2A4C-semantic-model-resolution-audit.json",
+    "Baseline":  {
+                     "AnalyzerOwnedDownstreamMethods":  92,
+                     "FactFamilies":  16,
+                     "SccMethods":  63,
+                     "SccInternalEdges":  112,
+                     "SccToAnalyzerEdges":  68,
+                     "SccToProviderEdges":  20,
+                     "SccToSemanticScopeEdges":  18,
+                     "ProviderToAnalyzerEdges":  0,
+                     "AnalyzerToProviderEdges":  6
+                 },
+    "Final":  {
+                  "AnalyzerOwnedDownstreamMethods":  64,
+                  "FactFamilies":  9,
+                  "SccMethods":  63,
+                  "SccInternalEdges":  112,
+                  "SccToAnalyzerEdges":  38,
+                  "SccToProviderEdges":  50,
+                  "SccToSemanticScopeEdges":  18,
+                  "ProviderToAnalyzerEdges":  0,
+                  "AnalyzerToProviderEdges":  11,
+                  "AnalyzerToSemanticScopeEdges":  4
+              },
+    "ExtractedMethodCount":  28,
+    "ExtractionOrder":  [
+                            "Known-framework return nullability",
+                            "Numeric constant facts",
+                            "Enum value facts",
+                            "Local-initializer currency",
+                            "Sequence collection shape",
+                            "Source-position value facts",
+                            "ConditionalWeakTable value facts"
+                        ],
+    "FamilyDependencyEdgesBefore":  [
+                                        "Call-context projection/defaults -\u003e Stable source-member facts",
+                                        "Stable source-member facts -\u003e Enum value facts",
+                                        "Stable source-member facts -\u003e Local-initializer currency",
+                                        "ConditionalWeakTable value facts -\u003e Enum value facts",
+                                        "Dictionary value facts -\u003e Sequence call-context observation",
+                                        "Sequence call-context observation -\u003e Sequence element facts",
+                                        "Sequence element facts -\u003e Sequence collection shape",
+                                        "Sequence element facts -\u003e Sequence source preservation",
+                                        "Sequence range/dictionary mutation -\u003e Sequence collection shape",
+                                        "Sequence range/dictionary mutation -\u003e Sequence element facts",
+                                        "Sequence source preservation -\u003e Sequence call-context observation",
+                                        "Sequence source preservation -\u003e Sequence collection shape",
+                                        "Sequence source preservation -\u003e Sequence element facts",
+                                        "Source-position value facts -\u003e Local-initializer currency",
+                                        "Source-position value facts -\u003e Numeric constant facts",
+                                        "Successful sequence validation -\u003e Sequence call-context observation",
+                                        "Successful sequence validation -\u003e Sequence element facts",
+                                        "Successful sequence validation -\u003e Sequence source preservation"
+                                    ],
+    "CondensationCycle":  [
+                              "Sequence call-context observation",
+                              "Sequence element facts",
+                              "Sequence source preservation"
+                          ],
+    "FamilyDependencyEdgesFinal":  [
+                                       "Call-context projection/defaults -\u003e Stable source-member facts",
+                                       "Dictionary value facts -\u003e Sequence call-context observation",
+                                       "Sequence call-context observation -\u003e Sequence element facts",
+                                       "Sequence element facts -\u003e Sequence source preservation",
+                                       "Sequence range/dictionary mutation -\u003e Sequence element facts",
+                                       "Sequence source preservation -\u003e Sequence call-context observation",
+                                       "Sequence source preservation -\u003e Sequence element facts",
+                                       "Successful sequence validation -\u003e Sequence call-context observation",
+                                       "Successful sequence validation -\u003e Sequence element facts",
+                                       "Successful sequence validation -\u003e Sequence source preservation"
+                                   ],
+    "Families":  [
+                     {
+                         "Name":  "Call-context projection/defaults",
+                         "BaselineMethodCount":  2,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.CallContext.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  2,
+                         "SccCallers":  [
+                                            "CallContext.cs:96:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.CreateCallContext"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Stable source-member facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowPrimitiveValueFactsProvider"
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  1,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowCallContextFactory",
+                         "Classification":  "Intermediate / SCC-bound",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Depends on stable source-member discovery and remains Analyzer-owned."
+                     },
+                     {
+                         "Name":  "ConditionalWeakTable value facts",
+                         "BaselineMethodCount":  7,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  4,
+                         "SccCallers":  [
+                                            "ConditionalWeakTableValueFacts.cs:297:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreAllConditionalWeakTableFieldValuesDefinitelyNonNull",
+                                            "ConditionalWeakTableValueFacts.cs:40:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsConditionalWeakTableGetValueResultDefinitelyNonNull",
+                                            "ConditionalWeakTableValueFacts.cs:419:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsCallbackReturnDefinitelyNonNull"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Enum value facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowNullabilityFactsProvider / ExceptionFlowSemanticScope"
+                                                          ],
+                         "SemanticScopeDependencyCount":  1,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowConditionalWeakTableValueFactsProvider",
+                         "Classification":  "Freed intermediate, extracted",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowConditionalWeakTableValueFactsProvider",
+                         "DecisionNote":  "Seven stateless helpers extracted; the weak SemanticModel cache partition and recursive callback evaluation remain Analyzer-owned."
+                     },
+                     {
+                         "Name":  "Dictionary value facts",
+                         "BaselineMethodCount":  4,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.DictionaryValueFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  4,
+                         "SccCallers":  [
+                                            "DictionaryValueFacts.cs:318:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsPrivateDictionaryFieldReferenceSafeForNonNullValues",
+                                            "DictionaryValueFacts.cs:462:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryInsertionValueProvenNonNull",
+                                            "SequenceRangeFacts.cs:820:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsStoredSequenceExpressionProvenNonNullElements",
+                                            "ValueFacts.cs:64:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetExpressionValueFacts"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence call-context observation"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  1,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowDictionaryValueFactsProvider",
+                         "Classification":  "Intermediate / SCC-bound",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Depends on the sequence context/element/source family cycle."
+                     },
+                     {
+                         "Name":  "Enum value facts",
+                         "BaselineMethodCount":  6,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.EnumValueFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  7,
+                         "SccCallers":  [
+                                            "EnumValueFacts.cs:201:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToContainOnlyDefinedEnumValues",
+                                            "EnumValueFacts.cs:336:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryProveSourceInvocationDefinedEnumElements",
+                                            "EnumValueFacts.cs:35:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetDefinedEnumValueFacts",
+                                            "Nullability.cs:553:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToExcludeNullElements",
+                                            "ReturnValueFacts.cs:39:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetSourceInvocationReturnValueFacts"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "ConditionalWeakTable value facts",
+                                                     "Stable source-member facts"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowEnumValueFactsProvider",
+                         "Classification":  "Leaf, extracted",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowEnumValueFactsProvider",
+                         "DecisionNote":  "Closed after semantic/nullability extraction and moved intact."
+                     },
+                     {
+                         "Name":  "Known-framework return nullability",
+                         "BaselineMethodCount":  1,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.ReturnNullability.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  1,
+                         "SccCallers":  [
+                                            "ReturnNullability.cs:34:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsInvocationResultDefinitelyNonNull"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowKnownFrameworkReturnFactsProvider",
+                         "Classification":  "Leaf, extracted into existing provider",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowNullabilityFactsProvider",
+                         "DecisionNote":  "Moved to the existing nullability provider."
+                     },
+                     {
+                         "Name":  "Local-initializer currency",
+                         "BaselineMethodCount":  2,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.LocalInitializerFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  3,
+                         "SccCallers":  [
+                                            "LocalStablePropertyFacts.cs:38:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetFactsProvenByCurrentLocalStablePropertyInitializer",
+                                            "Nullability.cs:256:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalGuaranteedNonNull",
+                                            "ValueFacts.cs:64:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetExpressionValueFacts"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Source-position value facts",
+                                                     "Stable source-member facts"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowSymbolUsageFacts"
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowLocalInitializerFactsProvider",
+                         "Classification":  "Leaf, extracted",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowLocalInitializerFactsProvider",
+                         "DecisionNote":  "Consumes existing symbol-usage, dereference, and data-flow owners only."
+                     },
+                     {
+                         "Name":  "Numeric constant facts",
+                         "BaselineMethodCount":  1,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.NumericConditions.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  0,
+                         "SccCallers":  [
+
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Source-position value facts"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowNumericFactsProvider",
+                         "Classification":  "Leaf, extracted into existing provider",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowPrimitiveValueFactsProvider",
+                         "DecisionNote":  "Moved to the existing primitive-value provider."
+                     },
+                     {
+                         "Name":  "Return/condition value facts",
+                         "BaselineMethodCount":  8,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.ReturnValueFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  4,
+                         "SccCallers":  [
+                                            "ReturnValueFacts.cs:172:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetSourceReturnExpressionValueFacts",
+                                            "ReturnValueFacts.cs:596:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetKnownFrameworkInvocationValueFacts"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  1,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowReturnConditionFactsProvider",
+                         "Classification":  "Leaf-shaped / heterogeneous",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Coarse family contains condition-derived string facts and independent framework-return classifiers; no mixed catch-all owner was introduced."
+                     },
+                     {
+                         "Name":  "Sequence call-context observation",
+                         "BaselineMethodCount":  5,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SequenceCallContext.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  4,
+                         "SccCallers":  [
+                                            "Nullability.cs:256:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalGuaranteedNonNull",
+                                            "Nullability.cs:553:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToExcludeNullElements",
+                                            "SequenceCallContext.cs:63:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreSequenceElementsProvenNonNull",
+                                            "SequenceRangeFacts.cs:995:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Dictionary value facts",
+                                                     "Sequence source preservation",
+                                                     "Successful sequence validation"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence element facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  1,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSequenceContextFactsProvider",
+                         "Classification":  "Sequence family-cycle member / hub",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Condensation-cycle member with sequence element and sequence source preservation."
+                     },
+                     {
+                         "Name":  "Sequence collection shape",
+                         "BaselineMethodCount":  4,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SequenceCollectionFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  11,
+                         "SccCallers":  [
+                                            "EnumValueFacts.cs:201:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToContainOnlyDefinedEnumValues",
+                                            "EnumValueFacts.cs:493:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListProvenToContainOnlyDefinedEnumValues",
+                                            "EnumValueFacts.cs:578:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAddOfDefinedEnumValue",
+                                            "SequenceCollectionFacts.cs:395:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListReferenceSafeForNonNullElements",
+                                            "SequenceCollectionFacts.cs:96:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsGroupingSequenceProvenToContainNonNullElements",
+                                            "SequenceRangeFacts.cs:1066:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAliasMemberInvocationSafe",
+                                            "SequenceRangeFacts.cs:214:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAddRangeReferenceSafeForNonNullElements",
+                                            "SequenceRangeFacts.cs:40:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListWithRangeAddsProvenToExcludeNullElements",
+                                            "SequenceRangeFacts.cs:820:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsStoredSequenceExpressionProvenNonNullElements"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Sequence element facts",
+                                                     "Sequence range/dictionary mutation",
+                                                     "Sequence source preservation"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSequenceCollectionFactsProvider",
+                         "Classification":  "Leaf, extracted",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowSequenceCollectionFactsProvider",
+                         "DecisionNote":  "Stateless collection/type/source-shape sink used by several sequence families."
+                     },
+                     {
+                         "Name":  "Sequence element facts",
+                         "BaselineMethodCount":  12,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SequenceElementFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  15,
+                         "SccCallers":  [
+                                            "DictionaryValueFacts.cs:221:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues",
+                                            "EnumValueFacts.cs:493:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListProvenToContainOnlyDefinedEnumValues",
+                                            "Nullability.cs:553:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToExcludeNullElements",
+                                            "SequenceCollectionFacts.cs:395:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListReferenceSafeForNonNullElements",
+                                            "SequenceCollectionFacts.cs:96:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsGroupingSequenceProvenToContainNonNullElements",
+                                            "SequenceElementFacts.cs:1066:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySourceHelperArgumentSafeForNonNullValues",
+                                            "SequenceElementFacts.cs:41:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalSequenceExpressionProvenToExcludeNullElements",
+                                            "SequenceElementFacts.cs:562:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryValuesExpressionProvenToExcludeNullElements",
+                                            "SequenceElementFacts.cs:644:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalDictionaryProvenToExcludeNullValues",
+                                            "SequenceElementFacts.cs:893:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryReferenceSafeForNonNullValues",
+                                            "SequenceElementFacts.cs:966:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryMemberInvocationSafeForNonNullValues",
+                                            "SequenceRangeFacts.cs:731:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequencePropertyReferenceSafe",
+                                            "SequenceRangeFacts.cs:995:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Sequence call-context observation",
+                                                     "Sequence range/dictionary mutation",
+                                                     "Sequence source preservation",
+                                                     "Successful sequence validation"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence collection shape",
+                                                              "Sequence source preservation"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSequenceElementFactsProvider",
+                         "Classification":  "Sequence family-cycle member / hub",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Condensation-cycle member with sequence context and sequence source preservation."
+                     },
+                     {
+                         "Name":  "Sequence range/dictionary mutation",
+                         "BaselineMethodCount":  9,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SequenceRangeFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  7,
+                         "SccCallers":  [
+                                            "SequenceRangeFacts.cs:265:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryTryGetValueOutSequenceProvenNonNullElements",
+                                            "SequenceRangeFacts.cs:506:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryOfSequencesProvenToExcludeNullElements",
+                                            "SequenceRangeFacts.cs:876:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesDictionaryTryGetValueAliasPreserveNonNullElements",
+                                            "SequenceRangeFacts.cs:995:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence collection shape",
+                                                              "Sequence element facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowNullabilityFactsProvider / ExceptionFlowSemanticScope"
+                                                          ],
+                         "SemanticScopeDependencyCount":  1,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  1,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSequenceMutationFactsProvider",
+                         "Classification":  "Intermediate / SCC-bound",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Feeds the sequence family cycle and retains self-recursive condition reasoning."
+                     },
+                     {
+                         "Name":  "Sequence source preservation",
+                         "BaselineMethodCount":  5,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  1,
+                         "SccCallers":  [
+                                            "SequenceRangeFacts.cs:995:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Sequence element facts",
+                                                     "Successful sequence validation"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence call-context observation",
+                                                              "Sequence collection shape",
+                                                              "Sequence element facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowNullabilityFactsProvider / ExceptionFlowSemanticScope"
+                                                          ],
+                         "SemanticScopeDependencyCount":  1,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSequenceSourceFactsProvider",
+                         "Classification":  "Sequence family-cycle member / hub",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Condensation-cycle member with sequence context and sequence element facts."
+                     },
+                     {
+                         "Name":  "Source-position value facts",
+                         "BaselineMethodCount":  7,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SourcePositionValueFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  4,
+                         "SccCallers":  [
+                                            "EnumValueFacts.cs:201:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToContainOnlyDefinedEnumValues",
+                                            "EnumValueFacts.cs:35:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetDefinedEnumValueFacts",
+                                            "ReturnValueFacts.cs:172:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetSourceReturnExpressionValueFacts",
+                                            "ValueFacts.cs:64:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetExpressionValueFacts"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Local-initializer currency",
+                                                              "Numeric constant facts"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+
+                                                          ],
+                         "SemanticScopeDependencyCount":  0,
+                         "ContextReadMethodCount":  1,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  4,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSourcePositionValueFactsProvider",
+                         "Classification":  "Intermediate freed by local/numeric extraction, extracted",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Extracted",
+                         "FinalOwner":  "ExceptionFlowSourcePositionValueFactsProvider",
+                         "DecisionNote":  "Moved after local-initializer and numeric dependencies acquired provider owners."
+                     },
+                     {
+                         "Name":  "Stable source-member facts",
+                         "BaselineMethodCount":  5,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.CallContext.MemberSourceFacts.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  0,
+                         "SccCallers":  [
+
+                                        ],
+                         "OtherCallerFamilies":  [
+                                                     "Call-context projection/defaults"
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Enum value facts",
+                                                              "Local-initializer currency"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowGuardFactsProvider",
+                                                              "ExceptionFlowNullabilityFactsProvider / ExceptionFlowSemanticScope"
+                                                          ],
+                         "SemanticScopeDependencyCount":  1,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  0,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowStableMemberFacts",
+                         "Classification":  "Leaf-shaped / blocked by external Analyzer helper",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "GetStableNonNullMemberFactsFromDirectSourceInvocation calls Analyzer-owned RequiresSummaryRuntimeDispatch outside the 252-method inventory; extraction would violate Provider-to-Analyzer = 0."
+                     },
+                     {
+                         "Name":  "Successful sequence validation",
+                         "BaselineMethodCount":  14,
+                         "SourceFiles":  [
+                                             "ExceptionFlowAnalyzer.SuccessfulSequenceElements.cs"
+                                         ],
+                         "SccIncomingEdgeCount":  1,
+                         "SccCallers":  [
+                                            "SequenceCallContext.cs:63:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreSequenceElementsProvenNonNull"
+                                        ],
+                         "OtherCallerFamilies":  [
+
+                                                 ],
+                         "ResidualAnalyzerDependencies":  [
+                                                              "Sequence call-context observation",
+                                                              "Sequence element facts",
+                                                              "Sequence source preservation"
+                                                          ],
+                         "ExistingProviderDependencies":  [
+                                                              "ExceptionFlowGuardFactsProvider",
+                                                              "ExceptionFlowNullabilityFactsProvider / ExceptionFlowSemanticScope"
+                                                          ],
+                         "SemanticScopeDependencyCount":  1,
+                         "ContextReadMethodCount":  0,
+                         "ContextCreationMethodCount":  0,
+                         "CacheRequirement":  "None",
+                         "SelfRecursiveMethodCount":  1,
+                         "CreatesCalleeContext":  false,
+                         "CandidateOwner":  "ExceptionFlowSuccessfulSequenceFactsProvider",
+                         "Classification":  "Hub / SCC-bound",
+                         "ExtractionRisk":  [
+                                                "Low-to-medium: leaf/helper, but physically or semantically shared with a residual family.",
+                                                "Medium: context/fact/recursion coupling; extract only with its closed family."
+                                            ],
+                         "FinalDisposition":  "Residual",
+                         "FinalOwner":  "ExceptionFlowAnalyzer",
+                         "DecisionNote":  "Feeds all three members of the sequence family cycle."
+                     }
+                 ],
+    "CacheOwnership":  {
+                           "ConditionalWeakTable":  "ExceptionFlowAnalyzer; weak SemanticModel partition, normalized field-symbol key, private partition lock, unchanged",
+                           "DataFlow":  "ExceptionFlowDataFlowFactsProvider; unchanged",
+                           "SuccessfulDereference":  "ExceptionFlowDereferenceFactDiscovery; unchanged"
+                       },
+    "StopDecision":  "Stop at a natural family boundary. Stable source-member extraction would introduce a provider-to-Analyzer edge to RequiresSummaryRuntimeDispatch; Return/condition is heterogeneous; the remaining sequence context/element/source condensation cycle requires a coordinated decomposition.",
+    "P5O2BReady":  false,
+    "SmallestNextBlocker":  "GetStableNonNullMemberFactsFromDirectSourceInvocation depends on Analyzer-owned RequiresSummaryRuntimeDispatch outside the 252-method inventory, preventing extraction of the five-method Stable source-member family and its two dependent call-context projection methods."
+}

@@ -5,10 +5,10 @@ using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Except
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains validity checks for facts derived from local-variable
+    /// Provides stateless validity checks for facts derived from local-variable
     /// declaration initializers.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowLocalInitializerFactsProvider
     {
         /// <summary>
         /// Determines whether the value established by a local declaration
@@ -31,7 +31,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// its declaration and the use site; otherwise
         /// <see langword="true"/>.
         /// </returns>
-        private static bool IsLocalInitializerStillCurrent(
+        internal static bool IsLocalInitializerStillCurrent(
             ExpressionSyntax expression,
             ILocalSymbol localSymbol,
             VariableDeclaratorSyntax variableDeclarator,
@@ -130,7 +130,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the declaration initializer still determines
         /// the local value at the use site; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryGetStraightLineCurrentLocalInitializerExpression(
+        internal static bool TryGetStraightLineCurrentLocalInitializerExpression(
             ExpressionSyntax useExpression,
             ILocalSymbol localSymbol,
             SemanticModel semanticModel,
@@ -208,3 +208,4 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
     }
 }
+

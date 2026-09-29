@@ -77,7 +77,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetMethod.DeclaringSyntaxReferences[0].GetSyntax();
 
                 List<ExpressionSyntax> returnExpressions =
-                    GetSourceReturnExpressions(declaration);
+                    ExceptionFlowEnumValueFactsProvider.GetSourceReturnExpressions(
+                        declaration);
 
                 if (returnExpressions.Count == 0)
                 {
@@ -217,7 +218,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 try
                 {
-                    if (TryGetCurrentLocalInitializerExpression(
+                    if (ExceptionFlowSourcePositionValueFactsProvider.TryGetCurrentLocalInitializerExpression(
                             unwrappedExpression,
                             localSymbol,
                             semanticModel,

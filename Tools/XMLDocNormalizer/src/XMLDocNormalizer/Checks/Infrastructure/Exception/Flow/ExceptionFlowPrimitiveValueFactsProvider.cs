@@ -132,5 +132,41 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return facts.Normalize();
         }
+
+        /// <summary>
+        /// Attempts to resolve an expression to a compile-time
+        /// <see cref="int"/> constant.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to evaluate.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to retrieve the constant value.
+        /// </param>
+        /// <param name="value">
+        /// The resolved integer value when the method succeeds.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the expression resolves to an
+        /// <see cref="int"/> constant; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetInt32Constant(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            out int value)
+        {
+            Optional<object?> constantValue =
+                semanticModel.GetConstantValue(expression);
+
+            if (constantValue.HasValue
+                && constantValue.Value is int intValue)
+            {
+                value = intValue;
+                return true;
+            }
+
+            value = 0;
+            return false;
+        }
     }
 }

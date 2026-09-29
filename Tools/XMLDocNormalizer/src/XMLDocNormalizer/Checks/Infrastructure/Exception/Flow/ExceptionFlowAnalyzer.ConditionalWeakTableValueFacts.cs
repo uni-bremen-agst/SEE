@@ -42,7 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedValueSources)
         {
-            if (!TryGetConditionalWeakTableGetValueParts(
+            if (!ExceptionFlowConditionalWeakTableValueFactsProvider.TryGetConditionalWeakTableGetValueParts(
                     invocation,
                     semanticModel,
                     out ExpressionSyntax? receiver,
@@ -85,7 +85,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     };
 
                 bool result =
-                    IsConditionalWeakTableFieldInitializedEmpty(
+                    ExceptionFlowConditionalWeakTableValueFactsProvider.IsConditionalWeakTableFieldInitializedEmpty(
                         fieldSymbol,
                         semanticModel)
                     && AreAllConditionalWeakTableFieldValuesDefinitelyNonNull(
@@ -102,6 +102,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
+    }
+
+    /// <summary>
+    /// Provides stateless framework-contract, invocation-shape, and callback
+    /// syntax facts for ConditionalWeakTable value analysis.
+    /// </summary>
+    internal static partial class ExceptionFlowConditionalWeakTableValueFactsProvider
+    {
         /// <summary>
         /// Attempts to resolve the receiver and value-factory argument of the
         /// exact framework <c>ConditionalWeakTable.GetValue</c> overload.
@@ -121,7 +129,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// framework overload and both expressions were identified; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool TryGetConditionalWeakTableGetValueParts(
+        internal static bool TryGetConditionalWeakTableGetValueParts(
             InvocationExpressionSyntax invocation,
             SemanticModel semanticModel,
             out ExpressionSyntax? receiver,
@@ -246,7 +254,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// framework-table creation initializer; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool IsConditionalWeakTableFieldInitializedEmpty(
+        internal static bool IsConditionalWeakTableFieldInitializedEmpty(
             IFieldSymbol fieldSymbol,
             SemanticModel semanticModel)
         {
@@ -278,6 +286,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fieldSymbol.Type);
         }
 
+    }
+
+    /// <summary>
+    /// Owns the cached whole-field invariant computation that consumes the
+    /// stateless ConditionalWeakTable facts.
+    /// </summary>
+    internal static partial class ExceptionFlowAnalyzer
+    {
         /// <summary>
         /// Determines whether every source use of a private table field can
         /// store only callback results proven to be non-null.
@@ -334,7 +350,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                     foundReference = true;
 
-                    if (!TryGetConditionalWeakTableFactoryForFieldReference(
+                    if (!ExceptionFlowConditionalWeakTableValueFactsProvider.TryGetConditionalWeakTableFactoryForFieldReference(
                             identifier,
                             fieldSymbol,
                             treeSemanticModel,
@@ -353,6 +369,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return foundReference;
         }
 
+    }
+
+    /// <summary>
+    /// Provides stateless receiver-to-factory matching for supported
+    /// ConditionalWeakTable invocations.
+    /// </summary>
+    internal static partial class ExceptionFlowConditionalWeakTableValueFactsProvider
+    {
         /// <summary>
         /// Attempts to identify the factory of the supported
         /// <c>GetValue</c> invocation whose receiver contains a field
@@ -371,7 +395,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// the exact supported invocation; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool TryGetConditionalWeakTableFactoryForFieldReference(
+        internal static bool TryGetConditionalWeakTableFactoryForFieldReference(
             IdentifierNameSyntax fieldReference,
             IFieldSymbol fieldSymbol,
             SemanticModel semanticModel,
@@ -407,6 +431,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return false;
         }
 
+    }
+
+    /// <summary>
+    /// Owns recursive non-null evaluation of source callback returns.
+    /// </summary>
+    internal static partial class ExceptionFlowAnalyzer
+    {
         /// <summary>
         /// Determines whether every normal return of one statically resolved
         /// source callback is proven to be non-null.
@@ -484,7 +515,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     new(targetMethod, parameterFacts);
 
                 List<ExpressionSyntax> returnExpressions =
-                    GetCallbackReturnExpressions(declaration);
+                    ExceptionFlowConditionalWeakTableValueFactsProvider.GetCallbackReturnExpressions(
+                        declaration);
 
                 if (returnExpressions.Count == 0)
                 {
@@ -511,6 +543,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
+    }
+
+    /// <summary>
+    /// Provides stateless return-expression discovery for supported callback
+    /// syntax forms.
+    /// </summary>
+    internal static partial class ExceptionFlowConditionalWeakTableValueFactsProvider
+    {
         /// <summary>
         /// Gets the normal return expressions of a supported source callback.
         /// </summary>
@@ -521,7 +561,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The explicit return expressions, or an empty collection for an
         /// unsupported callback form.
         /// </returns>
-        private static List<ExpressionSyntax> GetCallbackReturnExpressions(
+        internal static List<ExpressionSyntax> GetCallbackReturnExpressions(
             SyntaxNode declaration)
         {
             if (declaration is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
@@ -539,7 +579,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return GetBlockReturnExpressions(anonymousMethod.Block);
             }
 
-            return GetSourceReturnExpressions(declaration);
+            return ExceptionFlowEnumValueFactsProvider.GetSourceReturnExpressions(
+                declaration);
         }
 
         /// <summary>
@@ -583,6 +624,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 .ToList();
         }
 
+    }
+
+    /// <summary>
+    /// Owns the weak semantic-model cache partition for table-field
+    /// invariants.
+    /// </summary>
+    internal static partial class ExceptionFlowAnalyzer
+    {
         /// <summary>
         /// Stores immutable table-field invariant results for one semantic
         /// model.

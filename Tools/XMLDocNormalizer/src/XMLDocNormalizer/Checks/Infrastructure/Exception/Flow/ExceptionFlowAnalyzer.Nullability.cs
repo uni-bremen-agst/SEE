@@ -308,7 +308,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (IsLocalInitializerStillCurrent(
+                if (ExceptionFlowLocalInitializerFactsProvider.IsLocalInitializerStillCurrent(
                         expression,
                         localSymbol,
                         variableDeclarator,
@@ -596,7 +596,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     originalMethod.DeclaringSyntaxReferences[0].GetSyntax();
 
                 List<ExpressionSyntax> returnExpressions =
-                    GetSourceReturnExpressions(declaration);
+                    ExceptionFlowEnumValueFactsProvider.GetSourceReturnExpressions(
+                        declaration);
 
                 if (returnExpressions.Count == 0)
                 {

@@ -117,7 +117,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowValueFacts sourcePositionFacts =
-                GetOneBasedSourcePositionValueFacts(
+                ExceptionFlowSourcePositionValueFactsProvider.GetOneBasedSourcePositionValueFacts(
                     unwrappedExpression,
                     semanticModel,
                     callContext,
@@ -262,7 +262,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     {
                         try
                         {
-                            if (TryGetStraightLineCurrentLocalInitializerExpression(
+                            if (ExceptionFlowLocalInitializerFactsProvider.TryGetStraightLineCurrentLocalInitializerExpression(
                                     unwrappedExpression,
                                     localSymbol,
                                     semanticModel,

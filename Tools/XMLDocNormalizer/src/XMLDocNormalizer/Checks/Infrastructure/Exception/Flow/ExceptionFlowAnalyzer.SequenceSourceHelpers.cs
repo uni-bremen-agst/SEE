@@ -119,7 +119,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ITypeSymbol typeSymbol)
         {
             return typeSymbol is IArrayTypeSymbol ||
-                   IsListType(typeSymbol);
+                   ExceptionFlowSequenceCollectionFactsProvider.IsListType(
+                       typeSymbol);
         }
 
         /// <summary>
