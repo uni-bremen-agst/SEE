@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
@@ -549,18 +548,19 @@ namespace SEE.UI.Menu.Drawable.Line
                 ? lineHolder.FillOutStatus
                 : GetSelectedCapConf(lineHolder)?.FillOutStatus ?? false;
 
-            RefreshFillOut();
+            controls.FillOutManager.UpdateUI();
         }
 
         /// <summary>
-        /// Assigns a fill-out status and color while editing.
+        /// Assigns the fill-out state and callbacks of the current preview
+        /// to the editing UI.
         /// </summary>
         /// <param name="fillOut">The fill-out color or null if filling is disabled.</param>
         /// <param name="setFillOutAction">
         /// The action executed when the fill-out color changes.
         /// </param>
         /// <param name="clearFillOutAction">
-        /// The action registered for clearing an externally stored fill-out color.
+        /// The action registered for clearing the externally stored fill-out color.
         /// </param>
         internal void AssignFillOut(
             Color? fillOut,
@@ -574,37 +574,29 @@ namespace SEE.UI.Menu.Drawable.Line
                 return;
             }
 
-            if (fillOut != null && setFillOutAction != null)
+            bool fillOutEnabled =
+                fillOut != null
+                && setFillOutAction != null;
+
+            if (controls.FillOutManager.isOn != fillOutEnabled)
             {
-                controls.FillOutManager.isOn = true;
+                controls.FillOutManager.isOn = fillOutEnabled;
+                controls.FillOutManager.UpdateUI();
+            }
 
-                if (GameLineFillOut.FillOut(DrawShapesAction.currentShape, fillOut))
-                {
-                    GameObject surface =
-                        GameFinder.GetDrawableSurface(DrawShapesAction.currentShape);
-
-                    new DrawingFillOutNetAction(
-                        surface.name,
-                        GameFinder.GetDrawableSurfaceParentName(surface),
-                        DrawShapesAction.currentShape.name,
-                        LineConf.GetLine(DrawShapesAction.currentShape).FillOutColor).Execute();
-
-                    if (BlinkEffect.CanFillOutBeAdded(DrawShapesAction.currentShape))
-                    {
-                        BlinkEffect.AddFillOutToEffect(DrawShapesAction.currentShape);
-                    }
-                }
-
+            if (fillOutEnabled)
+            {
                 if (colorAction != setFillOutAction)
                 {
-                    AssignColorArea(setFillOutAction, fillOut.Value);
+                    AssignColorArea(
+                        setFillOutAction,
+                        fillOut.Value);
                 }
             }
-            else
+            else if (colorAction != null)
             {
-                controls.FillOutManager.isOn = false;
-                controls.FillOutManager.OffEvents.Invoke();
-                RefreshFillOut();
+                controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                colorAction = null;
             }
         }
 
@@ -817,6 +809,7 @@ namespace SEE.UI.Menu.Drawable.Line
         internal void AssignFillOutStatus(bool fillOutStatus)
         {
             controls.FillOutManager.isOn = fillOutStatus;
+            controls.FillOutManager.UpdateUI();
         }
 
         /// <summary>
@@ -854,17 +847,6 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.ColorKindButtonManager.buttonVar.interactable = false;
             controls.FillOutButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Refreshes the fill-out switch.
-        /// </summary>
-        internal void RefreshFillOut()
-        {
-            controls.FillOutObject.SetActive(
-                !controls.FillOutObject.activeInHierarchy);
-            controls.FillOutObject.SetActive(
-                !controls.FillOutObject.activeInHierarchy);
         }
 
         /// <summary>

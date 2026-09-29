@@ -1,6 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
 using SEE.UI.Drawable;
@@ -270,8 +268,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <summary>
         /// Enables all line-menu layers, restores the UI Canvas as parent,
         /// enables dragging and hides the line menu.
-        /// The parent of the line menu can temporarily be changed by
-        /// <see cref="DrawShapesAction"/>.
+        /// The parent of the line menu can temporarily be changed while drawing shapes.
         /// </summary>
         public override void Disable()
         {

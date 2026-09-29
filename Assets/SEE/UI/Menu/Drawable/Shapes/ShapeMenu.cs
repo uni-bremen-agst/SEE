@@ -53,6 +53,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
         private static readonly ShapeMenuState state = new();
 
         /// <summary>
+        /// The shape currently used as drawing preview.
+        /// </summary>
+        private static GameObject currentPreviewShape;
+
+        /// <summary>
         /// Whether the shape information image is visible.
         /// </summary>
         private static bool infoVisibility;
@@ -123,6 +128,34 @@ namespace SEE.UI.Menu.Drawable.Shapes
         public static Shape GetSelectedShape()
         {
             return state.SelectedShape;
+        }
+
+        /// <summary>
+        /// Gets the shape currently used as drawing preview.
+        /// </summary>
+        /// <returns>The current preview shape, or null if no preview exists.</returns>
+        internal static GameObject GetCurrentPreviewShape()
+        {
+            return currentPreviewShape;
+        }
+
+        /// <summary>
+        /// Sets the shape currently used as drawing preview.
+        /// </summary>
+        /// <param name="shape">The current preview shape.</param>
+        internal static void SetCurrentPreviewShape(GameObject shape)
+        {
+            currentPreviewShape = shape;
+        }
+
+        /// <summary>
+        /// Determines whether the given shape is the current drawing preview.
+        /// </summary>
+        /// <param name="shape">The shape to check.</param>
+        /// <returns>True if the given shape is the current preview shape.</returns>
+        internal static bool IsCurrentPreviewShape(GameObject shape)
+        {
+            return currentPreviewShape != null && currentPreviewShape == shape;
         }
 
         /// <summary>
@@ -658,6 +691,15 @@ namespace SEE.UI.Menu.Drawable.Shapes
         internal static void SetLineEndCap(LineCapConf endCapConf)
         {
             layout.SetLineEndCap(endCapConf);
+        }
+
+        /// <summary>
+        /// Resets custom visual settings of the selected line caps while preserving
+        /// their selected cap kinds.
+        /// </summary>
+        internal static void ResetLineCapVisualOverrides()
+        {
+            state.ResetLineCapVisualOverrides();
         }
         #endregion
     }

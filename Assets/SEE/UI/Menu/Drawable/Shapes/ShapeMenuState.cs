@@ -132,5 +132,15 @@ namespace SEE.UI.Menu.Drawable.Shapes
                 ? configuration.Clone()
                 : LineCapConf.CreateNone();
         }
+
+        /// <summary>
+        /// Resets the visual overrides of the selected line caps.
+        /// The selected cap kinds are preserved.
+        /// </summary>
+        internal void ResetLineCapVisualOverrides()
+        {
+            lineStartCapConf.UseOwnVisuals = false;
+            lineEndCapConf.UseOwnVisuals = false;
+        }
     }
 }

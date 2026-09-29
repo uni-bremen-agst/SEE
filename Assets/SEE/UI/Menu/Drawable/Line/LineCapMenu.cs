@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
@@ -474,7 +473,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SynchronizeShapeMenuLineCapsForPreview(
             GameObject selectedLine, LineConf line)
         {
-            if (!DrawShapesAction.IsCurrentPreviewShape(selectedLine) || line == null)
+            if (!ShapeMenu.IsCurrentPreviewShape(selectedLine) || line == null)
             {
                 return;
             }

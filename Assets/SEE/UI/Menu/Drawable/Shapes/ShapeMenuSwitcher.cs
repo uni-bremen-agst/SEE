@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
@@ -89,15 +88,17 @@ namespace SEE.UI.Menu.Drawable.Shapes
             controls.ShapeButtonManager.enabled = true;
             controls.ShapeButton.interactable = true;
 
-            if (DrawShapesAction.currentShape == null)
+            GameObject currentPreviewShape = ShapeMenu.GetCurrentPreviewShape();
+
+            if (currentPreviewShape == null)
             {
                 LineMenu.Instance.EnableForDrawing();
             }
             else
             {
                 LineMenu.Instance.EnableForEditing(
-                    DrawShapesAction.currentShape,
-                    LineConf.Get(DrawShapesAction.currentShape));
+                    currentPreviewShape,
+                    LineConf.Get(currentPreviewShape));
             }
 
             MenuHelper.CalculateHeight(

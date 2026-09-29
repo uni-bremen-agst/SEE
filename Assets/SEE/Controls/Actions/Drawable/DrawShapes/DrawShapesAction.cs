@@ -1,9 +1,7 @@
-﻿using SEE.Controls.Actions.Drawable.DrawShapes;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
-using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable.Line;
@@ -16,7 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.DrawShapes
 {
     /// <summary>
     /// Allows the user to draw a shape.
@@ -30,17 +28,19 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject shape;
 
         /// <summary>
-        /// The current shape. Will needed for open the <see cref="LineMenu"/> in the correct mode.
+        /// Gets or sets the currently drawn or previewed shape
+        /// and synchronizes it with the shape menu.
         /// </summary>
-        public static GameObject currentShape;
-
-        /// <summary>
-        /// Property of the shape.
-        /// </summary>
-        private GameObject Shape {
-            get { return shape; }
-            set { shape = value;
-                currentShape = value;
+        private GameObject Shape
+        {
+            get
+            {
+                return shape;
+            }
+            set
+            {
+                shape = value;
+                ShapeMenu.SetCurrentPreviewShape(value);
             }
         }
 
@@ -135,6 +135,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
+            ShapeMenu.SetCurrentPreviewShape(null);
             ShapeMenu.AssignFinishButton(() =>
             {
                 if (drawing && positions.Length > 1
@@ -383,7 +384,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         if (shapeFillOut != null)
                         {
-                            GameObject.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
+                            UnityEngine.Object.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
                             new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                             LineMenu.AssignFillOutForEditing(null, null, () => { });
                         }
@@ -576,15 +577,40 @@ namespace SEE.Controls.Actions.Drawable
             if (GameLineGeometry.DifferentPositionCounter(positions) > 1)
             {
                 BlinkEffect.Deactivate(Shape);
+
                 LineConf currentShape = LineConf.GetLine(Shape);
-                Shape = GameLineGeometry.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape), true);
+                Color? fillOutColor = LineConf.GetFillOutColor(currentShape);
+
+                // Restore the original, unshortened shape geometry before moving the pivot.
+                GameLineDrawer.Drawing(
+                    Shape,
+                    positions,
+                    fillOutColor);
+
+                Shape = GameLineGeometry.SetPivotShape(
+                    Shape,
+                    convertedHitPoint,
+                    fillOutColor,
+                    true);
+
+                currentShape = lineCapController.ApplyFinal(
+                    Shape,
+                    Surface,
+                    LineConf.GetLine(Shape));
+
                 previewController.Reset();
-                currentShape = LineConf.GetLine(Shape);
+
                 memento = new Memento(Surface, currentShape);
-                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
+
+                new DrawNetAction(
+                    memento.Surface.ID,
+                    memento.Surface.ParentID,
+                    currentShape).Execute();
+
                 CurrentState = IReversibleAction.Progress.Completed;
                 drawing = false;
                 ResetPreviewState();
+
                 return true;
             }
             else
@@ -651,12 +677,7 @@ namespace SEE.Controls.Actions.Drawable
             else
             {
                 shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
-                LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
-                {
-                    shapeFillOut = color;
-                    GameLineFillOut.ChangeFillOutColor(shape, color);
-                    new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
-                }, () => shapeFillOut = null);
+                RegisterPreviewFillOutCallbacks();
                 if (shapeFillOut != null && BlinkEffect.CanFillOutBeAdded(shape))
                 {
                     BlinkEffect.AddFillOutToEffect(shape);
@@ -695,12 +716,7 @@ namespace SEE.Controls.Actions.Drawable
                         LineConf.GetLine(Shape)).Execute();
                     if (shapeFillOut != null)
                     {
-                        LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
-                            shapeFillOut = color;
-                            GameLineFillOut.ChangeFillOutColor(shape, color);
-                            new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                shape.name, color).Execute();
-                        }, () => shapeFillOut = null);
+                        RegisterPreviewFillOutCallbacks();
                         new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name,
                             shapeFillOut.Value).Execute();
                     }
@@ -746,11 +762,7 @@ namespace SEE.Controls.Actions.Drawable
                             LineConf.GetLine(Shape)).Execute();
                         if (shapeFillOut != null)
                         {
-                            LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
-                                shapeFillOut = color; GameLineFillOut.ChangeFillOutColor(shape, color);
-                                new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                    shape.name, color).Execute();
-                            }, () => shapeFillOut = null);
+                            RegisterPreviewFillOutCallbacks();
                             new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                 Shape.name, shapeFillOut.Value).Execute();
                         }
@@ -768,18 +780,18 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Resets the cached preview state.
+        /// Resets the cached preview state and prepares the selected line caps
+        /// for the next shape.
         /// </summary>
         private void ResetPreviewState()
         {
             currentPreviewPositions = null;
             lineCapController.Reset();
+            ShapeMenu.ResetLineCapVisualOverrides();
         }
 
         /// <summary>
         /// Registers the fill-out callbacks of the currently drawn line at the line menu.
-        /// This ensures that changes made through the edit menu are synchronized with
-        /// the fill-out state used for the line preview.
         /// </summary>
         private void RegisterLinePreviewFillOutCallbacks()
         {
@@ -790,17 +802,41 @@ namespace SEE.Controls.Actions.Drawable
                 return;
             }
 
-            LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
-            {
-                shapeFillOut = color;
-                GameLineFillOut.ChangeFillOutColor(Shape, color);
+            RegisterPreviewFillOutCallbacks();
+        }
 
-                new EditLineFillOutColorNetAction(
-                    Surface.name,
-                    GameFinder.GetDrawableSurfaceParentName(Surface),
-                    Shape.name,
-                    color).Execute();
-            }, () => shapeFillOut = null);
+
+        /// <summary>
+        /// Registers the fill-out callbacks of the current preview at the line menu.
+        /// </summary>
+        private void RegisterPreviewFillOutCallbacks()
+        {
+            if (Shape == null)
+            {
+                return;
+            }
+
+            LineMenu.AssignFillOutForEditing(
+                shapeFillOut,
+                color =>
+                {
+                    shapeFillOut = color;
+                    ValueHolder.CurrentFillOutStatus = true;
+                    ValueHolder.CurrentTertiaryColor = color;
+
+                    GameLineFillOut.ChangeFillOutColor(Shape, color);
+
+                    new EditLineFillOutColorNetAction(
+                        Surface.name,
+                        GameFinder.GetDrawableSurfaceParentName(Surface),
+                        Shape.name,
+                        color).Execute();
+                },
+                () =>
+                {
+                    shapeFillOut = null;
+                    ValueHolder.CurrentFillOutStatus = false;
+                });
         }
         #endregion
 
@@ -888,17 +924,5 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
         #endregion
-
-        /// <summary>
-        /// Determines whether the given shape is the currently drawn preview shape.
-        /// </summary>
-        /// <param name="selectedShape">The shape to check.</param>
-        /// <returns>
-        /// True if <paramref name="selectedShape"/> is the active preview shape; otherwise, false.
-        /// </returns>
-        public static bool IsCurrentPreviewShape(GameObject selectedShape)
-        {
-            return currentShape != null && currentShape == selectedShape;
-        }
     }
 }

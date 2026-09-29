@@ -218,6 +218,11 @@ namespace SEE.UI.Menu.Drawable.Line
             UnityAction<Color> setFillOutAction,
             UnityAction clearFillOutAction)
         {
+            if (!IsMainSegment)
+            {
+                return;
+            }
+
             colorMenu.AssignFillOut(
                 fillOut,
                 setFillOutAction,
@@ -342,8 +347,6 @@ namespace SEE.UI.Menu.Drawable.Line
                         colorMenu.AssignFillOutStatus(capConf.FillOutStatus);
                     }
                 }
-
-                colorMenu.RefreshFillOut();
             }
             finally
             {

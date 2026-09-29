@@ -4,9 +4,8 @@ using SEE.Game.Drawable.Line;
 
 namespace SEE.Controls.Actions.Drawable
 {
-    /// <summary>
-    /// Tests line-cap-related preview state handling of <see cref="DrawShapesAction"/>.
-    /// </summary>
+    /// Tests line-cap-related preview state handling of
+    /// <see cref="DrawShapeLineCapController"/>.
     [TestFixture]
     public class TestDrawShapesActionLineCaps
     {

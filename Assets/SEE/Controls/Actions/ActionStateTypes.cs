@@ -3,6 +3,7 @@ using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions.Table;
+using SEE.Controls.Actions.Drawable.DrawShapes;
 
 namespace SEE.Controls.Actions
 {

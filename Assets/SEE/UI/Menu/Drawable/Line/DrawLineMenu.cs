@@ -342,7 +342,7 @@ namespace SEE.UI.Menu.Drawable.Line
             });
 
             controls.FillOutManager.isOn = ValueHolder.CurrentFillOutStatus;
-            RefreshFillOut();
+            controls.FillOutManager.UpdateUI();
         }
 
         /// <summary>
@@ -462,17 +462,6 @@ namespace SEE.UI.Menu.Drawable.Line
         private void HideFillOut()
         {
             controls.FillOutObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Refreshes the fill-out switch after its state changed.
-        /// </summary>
-        private void RefreshFillOut()
-        {
-            controls.FillOutObject.SetActive(
-                !controls.FillOutObject.activeInHierarchy);
-            controls.FillOutObject.SetActive(
-                !controls.FillOutObject.activeInHierarchy);
         }
     }
 }
