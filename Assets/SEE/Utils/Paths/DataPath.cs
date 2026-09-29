@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.UserSettings;
 using SEE.Utils.Config;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -10,7 +9,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using Network = SEE.Net.Network;
 
 namespace SEE.Utils.Paths
 {
@@ -18,11 +16,25 @@ namespace SEE.Utils.Paths
     /// A representation of URLs or local disk paths of files and directories containing data.
     /// Files and directories can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
-    /// our server at <see cref="Network.BackendServerAPI"/> or relate to other servers.
+    /// our server at <see cref="BackendServerAPI"/> or relate to other servers.
     /// </summary>
     [Serializable]
     public class DataPath
     {
+        /// <summary>
+        /// Yields the URL of our backend server, or null if none is known.
+        /// </summary>
+        /// <remarks>
+        /// A path must be able to resolve a URL relative to our server, yet the data
+        /// model must not know where that setting is kept. The layer owning the setting
+        /// assigns this delegate instead; until it does, no backend server is known,
+        /// which is the same situation as a scene without the component holding it.
+        ///
+        /// It is a delegate rather than a string because the setting may change while
+        /// SEE is running and every resolution must see the current value.
+        /// </remarks>
+        public static Func<string> BackendServerAPI { get; set; } = () => null;
+
         /// <summary>
         /// Defines how the path is to be interpreted. If it is absolute or a URL,
         /// nothing will be prepended to the path. In all other cases,
@@ -241,7 +253,7 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSetting.BackendServerAPI);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(BackendServerAPI());
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
@@ -271,8 +283,8 @@ namespace SEE.Utils.Paths
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         ///
         /// If the <see cref="Root"/> is a <see cref="RootKind.Url"/> and the URI prefix matches
-        /// <see cref="Network.BackendServerAPI"/>, the path will be stored as a relative path,
-        /// where <see cref="Network.BackendServerAPI"/> is removed from <paramref name="path"/>.
+        /// <see cref="BackendServerAPI"/>, the path will be stored as a relative path,
+        /// where <see cref="BackendServerAPI"/> is removed from <paramref name="path"/>.
         /// If the URI prefix does not match, <paramref name="path"/> will be stored as relative
         /// or absolute path, respectively, depending upon whether <paramref name="path"/>
         /// interpreted as a universal resource identifier is relative or absolute.
@@ -300,7 +312,7 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    string backendServerAPI = UserSetting.BackendServerAPI;
+                    string backendServerAPI = BackendServerAPI();
                     if (backendServerAPI != null && path.Contains(backendServerAPI))
                     {
                         // The path relates to our server.

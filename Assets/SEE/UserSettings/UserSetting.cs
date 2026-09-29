@@ -250,6 +250,23 @@ namespace SEE.UserSettings
         public static string BackendServerAPI => Instance?.Network.BackendServerAPI;
 
         /// <summary>
+        /// Tells <see cref="DataPath"/> where our backend server is, so that it can
+        /// resolve a URL relative to it without depending upon this layer.
+        /// </summary>
+        /// <remarks>
+        /// Registered for the editor as well as for the player, because a
+        /// <see cref="DataPath"/> is resolved while its inspector is drawn, too.
+        /// </remarks>
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+#endif
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void ProvideBackendServerAPI()
+        {
+            DataPath.BackendServerAPI = () => BackendServerAPI;
+        }
+
+        /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
         /// </summary>
         private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
