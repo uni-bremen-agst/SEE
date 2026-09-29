@@ -97,18 +97,9 @@ namespace SEE.Controls.Actions.Drawable
         private readonly DrawShapeLineCapController lineCapController = new();
 
         /// <summary>
-        /// Position for the fixed shape preview.
+        /// Manages the interaction state of shape previews.
         /// </summary>
-        private Vector3 shapePreviewFixPosition;
-        /// <summary>
-        /// Status if the fixed shape preview is active.
-        /// </summary>
-        private bool shapePreviewFix = false;
-
-        /// <summary>
-        /// Status if the preview is active.
-        /// </summary>
-        private bool shapePreview = false;
+        private readonly DrawShapePreviewController previewController = new();
 
         /// <summary>
         /// Status if the line menu was changes to edit mode.
@@ -164,7 +155,7 @@ namespace SEE.Controls.Actions.Drawable
             ShapeMenu.DisablePartUndo();
 
             if (drawing && Shape != null
-                || Shape != null && (shapePreview || shapePreviewFix))
+                || Shape != null && previewController.IsActiveOrFixed)
             {
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
@@ -184,8 +175,12 @@ namespace SEE.Controls.Actions.Drawable
         public override bool Update()
         {
             /// Offers a preview for a shape representation on a fixed chosen position.
-            ShapePreviewFixed();
-            /// Disables the preview if the user selects <see cref="ShapePointsCalculator.Shape.Line"/>
+            if (previewController.TryGetFixedPosition(drawing, out Vector3 fixedPreviewPosition))
+            {
+                ShapePreview(fixedPreviewPosition);
+            }
+
+            /// Disables the preview if the user selects <see cref="ShapePointsCalculator.Shape.Line"/>.
             DisableShapePreview();
 
             if (Shape != null && LineMenu.Instance.IsInDrawingMode() && !editMode)
@@ -218,17 +213,30 @@ namespace SEE.Controls.Actions.Drawable
                 Surface,
                 currentPreviewPositions,
                 shapeFillOut,
-                drawing || shapePreview || shapePreviewFix);
-            UpdatePreviewAssociatedPage();
+                drawing || previewController.IsActiveOrFixed);
+
+            previewController.UpdateAssociatedPage(Shape, Surface);
 
             if (!Raycasting.IsMouseOverGUI())
             {
                 /// Offers a preview for shape representation.
-                ShapePreviewUnfixed();
+                if (previewController.TryGetUnfixedHit(drawing, out RaycastHit previewHit))
+                {
+                    Surface = GameFinder.GetDrawableSurface(previewHit.collider.gameObject);
+                    ShapePreview(previewHit.point);
+                }
+
                 /// Marks a position as fixed for the shape preview.
-                ShapePreviewFixPosition();
+                if (previewController.TryFixPosition(out RaycastHit fixedPreviewHit))
+                {
+                    Surface = GameFinder.GetDrawableSurface(fixedPreviewHit.collider.gameObject);
+                }
+
                 /// Releases the fixed position.
-                ShapePreviewReleasePosition();
+                if (previewController.TryReleaseFixedPosition())
+                {
+                    Surface = null;
+                }
 
                 /// Block for initiating shape drawing.
                 /// All shapes, except for straight lines, are also completed within this block.
@@ -416,14 +424,17 @@ namespace SEE.Controls.Actions.Drawable
             Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
             drawing = true;
             Vector3 convertedHitPoint;
-            if (!shapePreviewFix)
+
+            if (!previewController.IsFixed)
             {
                 convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, raycastHit.point);
                 GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
             }
             else
             {
-                convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, shapePreviewFixPosition);
+                convertedHitPoint = GameLineGeometry.GetConvertedPosition(
+                    Surface,
+                    previewController.FixedPosition);
             }
 
             /// This block draws and completes the action for all shapes except lines.
@@ -567,7 +578,7 @@ namespace SEE.Controls.Actions.Drawable
                 BlinkEffect.Deactivate(Shape);
                 LineConf currentShape = LineConf.GetLine(Shape);
                 Shape = GameLineGeometry.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape), true);
-                shapePreview = shapePreviewFix = false;
+                previewController.Reset();
                 currentShape = LineConf.GetLine(Shape);
                 memento = new Memento(Surface, currentShape);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
@@ -596,55 +607,24 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void DisableShapePreview()
         {
-            if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && (shapePreview || shapePreviewFix)
-                || (drawing && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line))
+            if (!previewController.ShouldDisable(drawing))
             {
-                drawing = false;
-                shapePreview = false;
-                shapePreviewFix = false;
-                editMode = false;
-                shapePreviewFixPosition = Vector3.zero;
-                new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                Destroyer.Destroy(Shape);
-                positions = new Vector3[1];
-                ResetPreviewState();
+                return;
             }
-        }
 
-        /// <summary>
-        /// Releases a fixed position for the shape preview.
-        /// </summary>
-        private void ShapePreviewReleasePosition()
-        {
-            if (SEEInput.MouseDown(MouseButton.Middle)
-                && shapePreviewFix
-                && Input.GetKey(KeyCode.LeftControl)
-                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
-            {
-                shapePreviewFix = false;
-                shapePreviewFixPosition = Vector3.zero;
-                Surface = null;
-                ShowNotification.Info("Fix position released.", "The fixed position for the shape preview was released.");
-            }
-        }
+            drawing = false;
+            editMode = false;
+            previewController.Reset();
 
-        /// <summary>
-        /// Allows a position to be marked where the preview is held.
-        /// It can then be further configured until the confirming left click.
-        /// </summary>
-        private void ShapePreviewFixPosition()
-        {
-            if (Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
-                && SEEInput.MouseDown(MouseButton.Middle)
-                && !Input.GetKey(KeyCode.LeftControl)
-                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
-            {
-                shapePreviewFix = true;
-                shapePreviewFixPosition = raycastHit.point;
-                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
-                ShowNotification.Info("Fix position set.", "The fixed position for the shape preview has been set.");
-            }
+            new EraseNetAction(
+                Surface.name,
+                GameFinder.GetDrawableSurfaceParentName(Surface),
+                Shape.name).Execute();
+
+            Destroyer.Destroy(Shape);
+
+            positions = new Vector3[1];
+            ResetPreviewState();
         }
 
         /// <summary>
@@ -685,59 +665,6 @@ namespace SEE.Controls.Actions.Drawable
                 lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
-        }
-
-        /// <summary>
-        /// Draws a shape preview that follows the pointer.
-        /// </summary>
-        private void ShapePreviewUnfixed()
-        {
-            if (!drawing && !SEEInput.LeftMouseInteraction()
-                && !shapePreviewFix
-                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
-                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
-            {
-                shapePreview = true;
-                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
-                ShapePreview(raycastHit.point);
-            }
-        }
-
-        /// <summary>
-        /// Draws a shape preview on a fix position.
-        /// The position must be chosen with a right mouse click.
-        /// </summary>
-        private void ShapePreviewFixed()
-        {
-            if (!drawing && !SEEInput.LeftMouseDown()
-                && shapePreviewFix
-                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
-            {
-                shapePreview = true;
-                ShapePreview(shapePreviewFixPosition);
-            }
-        }
-
-        /// <summary>
-        /// Updates the associated page of the current preview and ensures that it is visible
-        /// on the currently active page of the drawable surface.
-        /// </summary>
-        private void UpdatePreviewAssociatedPage()
-        {
-            if (Shape == null || Surface == null)
-            {
-                return;
-            }
-
-            int currentPage = Surface.GetComponent<DrawableHolder>().CurrentPage;
-
-            foreach (AssociatedPageHolder holder in Shape.GetComponentsInChildren<AssociatedPageHolder>(true))
-            {
-                holder.AssociatedPage = currentPage;
-                //holder.gameObject.SetActive(true);
-            }
-
-            Shape.SetActive(true);
         }
         #endregion
 
