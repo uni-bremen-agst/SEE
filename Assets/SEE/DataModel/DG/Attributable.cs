@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static SEE.DataModel.ChangeType;
+using static SEE.DataModel.Events.ChangeType;
 
 namespace SEE.DataModel.DG
 {

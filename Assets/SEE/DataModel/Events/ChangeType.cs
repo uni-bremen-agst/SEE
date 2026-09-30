@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel
+﻿namespace SEE.DataModel.Events
 {
     /// <summary>
     /// Type of change to a graph element (node or edge, including "part-of" edges).
