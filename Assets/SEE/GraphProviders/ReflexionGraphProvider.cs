@@ -2,7 +2,7 @@
 using SEE.Graphs;
 using SEE.Graphs.IO.GXL;
 using SEE.Game.City;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;

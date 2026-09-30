@@ -1,6 +1,6 @@
 using System;
 using SEE.Graphs;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 
 namespace SEE.Graphs.Events
 {

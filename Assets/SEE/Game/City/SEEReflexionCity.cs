@@ -9,7 +9,7 @@ using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Net;
 using SEE.Net.Util;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UserSettings;

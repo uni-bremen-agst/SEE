@@ -1,9 +1,8 @@
 ﻿using NUnit.Framework;
 using SEE.Graphs;
-using SEE.Graphs;
 using SEE.Graphs.Events;
-using SEE.Tools.ReflexionAnalysis;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
+using SEE.Graphs.Reflexion;
+using static SEE.Graphs.Reflexion.ReflexionGraph;
 
 namespace SEE.Tools.Architecture
 {

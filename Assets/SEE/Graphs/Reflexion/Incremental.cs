@@ -6,9 +6,9 @@ using JetBrains.Annotations;
 using MoreLinq;
 using SEE.Graphs;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
+using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
-namespace SEE.Tools.ReflexionAnalysis
+namespace SEE.Graphs.Reflexion
 {
     /// <summary>
     /// This partial class contains methods for the Incremental Reflexion Analysis.

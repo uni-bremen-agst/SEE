@@ -5,7 +5,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;

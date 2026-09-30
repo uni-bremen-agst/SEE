@@ -2,7 +2,7 @@ using System;
 using SEE.Graphs;
 using UnityEngine.Assertions;
 
-namespace SEE.Tools.ReflexionAnalysis
+namespace SEE.Graphs.Reflexion
 {
     /// <summary>
     /// Super class for all exceptions thrown by the architecture analysis.

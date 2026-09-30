@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using SEE.Graphs;
 using SEE.Graphs.IO.GXL;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using SEE.Utils.Paths;
 

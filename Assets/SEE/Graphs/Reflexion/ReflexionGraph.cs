@@ -5,9 +5,9 @@ using System.Linq;
 using SEE.Graphs;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
+using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
-namespace SEE.Tools.ReflexionAnalysis
+namespace SEE.Graphs.Reflexion
 {
     /// <summary>
     /// Part of the reflexion class managing the inheritance to <see cref="Graph"/>, e.g., overriding relevant methods.

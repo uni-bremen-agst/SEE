@@ -1,5 +1,5 @@
 using System;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 
 namespace SEE.Graphs.Events
 {

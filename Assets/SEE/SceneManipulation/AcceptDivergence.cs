@@ -1,6 +1,6 @@
 ﻿using SEE.Graphs;
 using SEE.Extensions;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using UnityEngine;
 
 namespace SEE.SceneManipulation

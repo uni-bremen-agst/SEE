@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 
 namespace SEE.Graphs
 {

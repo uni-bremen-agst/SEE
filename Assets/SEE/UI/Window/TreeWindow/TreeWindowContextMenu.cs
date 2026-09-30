@@ -5,13 +5,13 @@ using Michsky.UI.ModernUIPack;
 using SEE.Graphs;
 using SEE.Graphs.GraphSearch;
 using SEE.Game.City;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.PopupMenus;
 using SEE.Utils;
 using SEE.Extensions;
 using UnityEngine;
 using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
-using State = SEE.Tools.ReflexionAnalysis.State;
+using State = SEE.Graphs.Reflexion.State;
 
 namespace SEE.UI.Window.TreeWindow
 {

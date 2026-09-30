@@ -8,7 +8,7 @@ using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.GraphElement;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenus;

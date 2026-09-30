@@ -6,10 +6,10 @@ using NUnit.Framework.Interfaces;
 using SEE.Graphs;
 using SEE.Graphs.IO.GXL;
 using SEE.Graphs.Events;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
+using static SEE.Graphs.Reflexion.ReflexionGraph;
 using Edge = SEE.Graphs.Edge;
 
 namespace SEE.Tools.Architecture

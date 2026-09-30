@@ -29,9 +29,9 @@ using SEE.Graphs;
 using SEE.Graphs.Events;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
+using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
-namespace SEE.Tools.ReflexionAnalysis
+namespace SEE.Graphs.Reflexion
 {
     /// <summary>
     /// State of a dependency in the architecture or implementation within the reflexion model.

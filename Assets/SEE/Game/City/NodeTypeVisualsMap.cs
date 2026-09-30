@@ -1,5 +1,5 @@
 ﻿using SEE.Graphs;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
