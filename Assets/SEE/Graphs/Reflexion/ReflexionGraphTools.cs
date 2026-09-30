@@ -9,38 +9,6 @@ using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
-    /// Type of a reflexion subgraph.
-    /// </summary>
-    [Flags]
-    public enum ReflexionSubgraphs
-    {
-        /// <summary>
-        /// No reflexion subgraph.
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// The implementation graph.
-        /// </summary>
-        Implementation = 1 << 0,
-
-        /// <summary>
-        /// The architecture graph.
-        /// </summary>
-        Architecture = 1 << 1,
-
-        /// <summary>
-        /// The mapping graph.
-        /// </summary>
-        Mapping = 1 << 2,
-
-        /// <summary>
-        /// The full reflexion graph.
-        /// </summary>
-        FullReflexion = 1 << 3
-    }
-
-    /// <summary>
     /// Reflexion graph consisting of architecture, implementation, and mapping nodes and edges.
     /// Nodes and edges are marked with toggles to differentiate these types.
     /// In the future, when the type system is more advanced, this should be handled via the graph elements' types.
