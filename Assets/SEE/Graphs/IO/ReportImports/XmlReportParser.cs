@@ -78,7 +78,7 @@ namespace SEE.Graphs.IO.ReportImports
         /// A <see cref="MetricSchema"/> that mirrors the parsed XML content.
         /// The returned schema is never null.
         /// </returns>
-        public async UniTask<MetricSchema> ParseAsync(DataPath path, CancellationToken token = default)
+        public async UniTask<MetricSchema> ParseAsync(IDataPath path, CancellationToken token = default)
         {
             token.ThrowIfCancellationRequested();
 

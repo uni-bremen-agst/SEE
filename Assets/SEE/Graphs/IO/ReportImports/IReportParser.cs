@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Threading;
-using SEE.Utils.Paths;
 
 namespace SEE.Graphs.IO.ReportImports
 {
@@ -25,6 +24,6 @@ namespace SEE.Graphs.IO.ReportImports
         /// <param name="path">Data source that describes how to load the report stream.</param>
         /// <param name="token">Optional cancellation token for long-running parses.</param>
         /// <returns>A populated <see cref="MetricSchema"/> describing the report contents.</returns>
-        UniTask<MetricSchema> ParseAsync(DataPath path, CancellationToken token = default);
+        UniTask<MetricSchema> ParseAsync(IDataPath path, CancellationToken token = default);
     }
 }

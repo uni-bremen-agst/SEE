@@ -61,7 +61,7 @@ namespace SEE.Graphs.IO.ReportImports
         /// <param name="path">The path to the report file.</param>
         /// <param name="token">Token to cancel the operation.</param>
         /// <returns>The parsed metrics schema.</returns>
-        public async UniTask<MetricSchema> ParseAsync(DataPath path, CancellationToken token = default)
+        public async UniTask<MetricSchema> ParseAsync(IDataPath path, CancellationToken token = default)
         {
             token.ThrowIfCancellationRequested();
 
