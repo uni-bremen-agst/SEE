@@ -1,5 +1,4 @@
 using SEE.Graphs.GraphIndex;
-using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -66,6 +65,16 @@ namespace SEE.Graphs.IO.ReportImports
         internal abstract IReportParser CreateParser();
 
         /// <summary>
+        /// Directory separator on Windows.
+        /// </summary>
+        private const char WindowsDirectorySeparator = '\\';
+
+        /// <summary>
+        /// Directory separator on Unix.
+        /// </summary>
+        private const char UnixDirectorySeparator = '/';
+
+        /// <summary>
         /// Converts the given full path into a relative path based on the <see cref="SourceRootMarker"/>.
         /// </summary>
         /// <param name="fullPath">The absolute path to be normalized.</param>
@@ -78,7 +87,7 @@ namespace SEE.Graphs.IO.ReportImports
             }
 
             // 1) Normalize path separators to a single canonical separator.
-            string normalized = fullPath.Replace(Filenames.WindowsDirectorySeparator, Filenames.UnixDirectorySeparator);
+            string normalized = fullPath.Replace(WindowsDirectorySeparator, UnixDirectorySeparator);
 
             // 2) Cut off everything before the configured source root marker, if available.
             if (!string.IsNullOrWhiteSpace(SourceRootMarker))
