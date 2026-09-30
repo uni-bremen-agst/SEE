@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel.DG
+﻿namespace SEE.Graphs.DG
 {
     /// <summary>
     /// A memento of elements of a graph.

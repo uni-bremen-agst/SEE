@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using SEE.DataModel.DG.GraphIndex;
-using SEE.DataModel.DG.IO.GXL;
+using SEE.Graphs.DG.GraphIndex;
+using SEE.Graphs.DG.IO.GXL;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO.ReportImports
+namespace SEE.Graphs.DG.IO.ReportImports
 {
     /// <summary>
     /// Abstract base class for testing report parsers and metric application against a graph.

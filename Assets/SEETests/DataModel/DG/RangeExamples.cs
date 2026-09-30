@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Examples of ranges for testing purposes.

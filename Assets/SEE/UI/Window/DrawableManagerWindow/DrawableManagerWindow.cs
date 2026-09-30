@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Extensions;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using SEE.DataModel.Events;
+using SEE.Graphs.Events;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {

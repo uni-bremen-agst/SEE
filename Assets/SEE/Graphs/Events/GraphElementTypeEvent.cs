@@ -1,7 +1,7 @@
 using System;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
     /// <summary>
     /// An event fired when the <see cref="GraphElement.Type"/> of a graph element changes.

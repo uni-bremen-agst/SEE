@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using MoreLinq;
-using SEE.DataModel.DG.GraphIndex;
+using SEE.Graphs.DG.GraphIndex;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.Graphs.DG.SourceRange
 {
     /// <summary>
     /// Tests <see cref="SortedRanges"/>.

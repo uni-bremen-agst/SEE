@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 
 namespace SEE.GraphProviders.VCS
 {

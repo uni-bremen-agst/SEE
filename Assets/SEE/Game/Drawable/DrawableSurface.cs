@@ -1,10 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel;
+using SEE.Graphs;
 using SEE.Game.Drawable.Configurations;
 using SEE.Events;
 using System;
 using UnityEngine;
-using SEE.DataModel.Events;
+using SEE.Graphs.Events;
 
 namespace SEE.Game.Drawable
 {

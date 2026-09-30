@@ -1,11 +1,11 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Game.City;
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.DataModel.DG.IO.ReportImports;
+using SEE.Graphs.DG.IO.ReportImports;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 

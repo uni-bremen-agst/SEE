@@ -6,7 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 
-namespace SEE.DataModel.DG.IO.GXL
+namespace SEE.Graphs.DG.IO.GXL
 {
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.

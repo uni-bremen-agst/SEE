@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG.GraphSearch;
+using SEE.Graphs.DG.GraphSearch;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Provides extensions to <see cref="Graph"/> and related classes.

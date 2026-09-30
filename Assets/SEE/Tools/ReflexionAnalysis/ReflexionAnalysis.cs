@@ -25,9 +25,9 @@ mapping graph simply consists of all Maps_To edges and their connected nodes.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.DataModel.Events;
+using SEE.Graphs;
+using SEE.Graphs.DG;
+using SEE.Graphs.Events;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;

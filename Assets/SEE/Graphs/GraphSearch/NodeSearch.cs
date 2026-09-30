@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
-using SEE.DataModel.Events;
+using SEE.Graphs.Events;
 
-namespace SEE.DataModel.DG.GraphSearch
+namespace SEE.Graphs.DG.GraphSearch
 {
     /// <summary>
     /// Allows searching for nodes by their source name.

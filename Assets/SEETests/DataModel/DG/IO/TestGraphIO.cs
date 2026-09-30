@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using SEE.DataModel.DG.IO.GXL;
+using SEE.Graphs.DG.IO.GXL;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.Graphs.DG.IO
 {
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.

@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Game.CityRendering;
 using SEE.Extensions;
 using SEE.Factories;

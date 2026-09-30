@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Utils;
 using SEE.Utils.Paths;
 
-namespace SEE.DataModel.DG.IO.GXL
+namespace SEE.Graphs.DG.IO.GXL
 {
     /// <summary>
     /// Loads and stores multiple GXL files from a directory.

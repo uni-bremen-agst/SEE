@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SEE.DataModel.DG.IO.ReportImports
+namespace SEE.Graphs.DG.IO.ReportImports
 {
     /// <summary>
     /// A factory for creating instances of <see cref="ParsingConfig"/>.

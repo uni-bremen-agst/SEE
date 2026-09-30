@@ -1,8 +1,8 @@
 using System;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
     /// <summary>
     /// An event fired when a node is added or removed as a child.

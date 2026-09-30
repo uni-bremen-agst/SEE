@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.Events;
+﻿using SEE.Graphs.Events;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// A graph with nodes and edges representing the data to be visualized
@@ -920,7 +920,7 @@ namespace SEE.DataModel.DG
         /// Sets the levels of all nodes and the maximal depth of the graph.
         ///
         /// Note: This method should be called only by <see cref="Node"/> and
-        /// <see cref="SEE.DataModel.DG.IO.GraphReader"/>.
+        /// <see cref="SEE.Graphs.DG.IO.GraphReader"/>.
         /// </summary>
         public void FinalizeNodeHierarchy()
         {

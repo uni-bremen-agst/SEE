@@ -1,13 +1,13 @@
-﻿using SEE.DataModel.DG.Utils;
-using SEE.DataModel.Events;
+﻿using SEE.Graphs.DG.Utils;
+using SEE.Graphs.Events;
 using SEE.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static SEE.DataModel.Events.ChangeType;
+using static SEE.Graphs.Events.ChangeType;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     // When you hit the play button in the editor, all the objects in the active scene are
     // serialized and saved, so that unity can deserialize and return them to their original

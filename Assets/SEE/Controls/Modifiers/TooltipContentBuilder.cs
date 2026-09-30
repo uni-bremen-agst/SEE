@@ -1,4 +1,4 @@
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Game.City;
 using System.Text;
 

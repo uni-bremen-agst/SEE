@@ -1,5 +1,5 @@
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;

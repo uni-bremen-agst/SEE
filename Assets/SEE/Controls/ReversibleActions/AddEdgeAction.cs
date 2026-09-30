@@ -5,7 +5,7 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 using SEE.Audio;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.SceneManipulation;
 using SEE.XR;
 using SEE.UserSettings;

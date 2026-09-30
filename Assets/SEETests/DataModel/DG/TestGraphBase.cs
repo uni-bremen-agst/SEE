@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using SEE.DataModel.DG.SourceRange;
+using SEE.Graphs.DG.SourceRange;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Super class of tests for <see cref="Graph"/>.

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.DataModel.Events;
+using SEE.Graphs;
+using SEE.Graphs.DG;
+using SEE.Graphs.Events;
 using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
 

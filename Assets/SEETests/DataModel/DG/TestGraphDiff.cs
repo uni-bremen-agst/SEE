@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Tests for <see cref="GraphExtensions.Diff"/>.

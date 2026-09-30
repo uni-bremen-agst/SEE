@@ -4,7 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.UI.Window.CodeWindow;
-using Range = SEE.DataModel.DG.Range;
+using Range = SEE.Graphs.DG.Range;
 
 namespace SEE.Tools.LSP
 {

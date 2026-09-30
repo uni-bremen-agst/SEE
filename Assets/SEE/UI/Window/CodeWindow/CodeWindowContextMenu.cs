@@ -13,7 +13,7 @@ using SEE.UI.PopupMenus;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Range = SEE.DataModel.DG.Range;
+using Range = SEE.Graphs.DG.Range;
 
 namespace SEE.UI.Window.CodeWindow
 {

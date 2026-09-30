@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using UnityEngine;
 
 namespace SEE.MetricScales

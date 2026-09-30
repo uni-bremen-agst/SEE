@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Utils;
 using SEE.Utils.Config;
 using UnityEngine;

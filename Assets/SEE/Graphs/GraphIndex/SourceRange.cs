@@ -1,6 +1,6 @@
 ﻿using SEE.Utils;
 
-namespace SEE.DataModel.DG.GraphIndex
+namespace SEE.Graphs.DG.GraphIndex
 {
     /// <summary>
     /// A representation of a source-code range in the index.

@@ -1,7 +1,7 @@
 ﻿/// <summary>
-/// <see cref="SEE.DataModel.DG.IO"/> provides input/output for persistent storage
-/// and retrieval of graph data structures in <see cref="SEE.DataModel.DG"/>.
+/// <see cref="SEE.Graphs.DG.IO"/> provides input/output for persistent storage
+/// and retrieval of graph data structures in <see cref="SEE.Graphs.DG"/>.
 /// </summary>
-namespace SEE.DataModel.DG.IO
+namespace SEE.Graphs.DG.IO
 {
 }

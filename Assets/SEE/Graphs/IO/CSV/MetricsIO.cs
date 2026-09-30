@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel.DG.IO.CSV
+﻿namespace SEE.Graphs.DG.IO.CSV
 {
     /// <summary>
     /// Input and output of node metrics in CSV.

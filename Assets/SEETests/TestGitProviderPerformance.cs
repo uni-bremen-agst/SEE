@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;

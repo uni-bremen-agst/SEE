@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Test of method Clone() of all Attributables.

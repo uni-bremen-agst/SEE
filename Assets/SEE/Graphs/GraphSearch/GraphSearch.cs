@@ -1,6 +1,6 @@
 ﻿/// <summary>
-/// Offers search capability for <see cref="SEE.DataModel.DG.GraphElement"/>s.
+/// Offers search capability for <see cref="SEE.Graphs.DG.GraphElement"/>s.
 /// </summary>
-namespace SEE.DataModel.DG.GraphSearch
+namespace SEE.Graphs.DG.GraphSearch
 {
 }

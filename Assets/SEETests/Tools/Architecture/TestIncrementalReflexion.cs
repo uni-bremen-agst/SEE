@@ -1,13 +1,13 @@
 ﻿using System;
 using NUnit.Framework;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
-using SEE.DataModel;
+using SEE.Graphs;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
-using SEE.DataModel.Events;
+using SEE.Graphs.Events;
 
 namespace SEE.Tools.Architecture
 {

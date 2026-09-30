@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SEE.DataModel.DG.GraphIndex;
+using SEE.Graphs.DG.GraphIndex;
 
-namespace SEE.DataModel.DG.IO.ReportImports
+namespace SEE.Graphs.DG.IO.ReportImports
 {
     /// <summary>
     /// Translates parsed findings into node metrics on a <see cref="Graph"/> instance.

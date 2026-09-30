@@ -4,7 +4,7 @@ using System.Globalization;
 /// <summary>
 /// Providers that load graph data from various sources (files, version control, etc.).
 /// </summary>
-namespace SEE.DataModel.DG.IO.ReportImports
+namespace SEE.Graphs.DG.IO.ReportImports
 {
     /// <summary>
     /// Tests for NUnit JSON coverage report with concrete expected metrics.

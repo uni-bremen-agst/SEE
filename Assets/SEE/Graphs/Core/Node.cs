@@ -1,10 +1,10 @@
-﻿using SEE.DataModel.Events;
+﻿using SEE.Graphs.Events;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Node of a graph.

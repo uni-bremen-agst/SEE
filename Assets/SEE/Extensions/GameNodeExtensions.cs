@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GraphElementRefs;
@@ -10,7 +10,7 @@ namespace SEE.Extensions
 {
     /// <summary>
     /// Extension methods for game nodes. A game node is a <see cref="GameObject"/>
-    /// representing a <see cref="SEE.DataModel.DG.Node"/>.
+    /// representing a <see cref="SEE.Graphs.DG.Node"/>.
     /// </summary>
     internal static class GameNodeExtensions
     {

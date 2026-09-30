@@ -1,4 +1,4 @@
-namespace SEE.DataModel.DG.IO.GXL
+namespace SEE.Graphs.DG.IO.GXL
 {
     /// <summary>
     /// Input and output of graph data in GXL format.

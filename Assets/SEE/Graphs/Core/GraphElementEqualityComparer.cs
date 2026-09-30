@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Compares two instances of <see cref="GraphElement"/> by their ID for equality.

@@ -2,11 +2,11 @@
 using NUnit.Framework;
 using System;
 using System.Text.RegularExpressions;
-using SEE.DataModel.DG.GraphIndex;
+using SEE.Graphs.DG.GraphIndex;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.Graphs.DG.SourceRange
 {
     /// <summary>
     /// Tests for <see cref="SourceRangeIndex"/>.

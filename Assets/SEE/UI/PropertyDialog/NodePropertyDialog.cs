@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.ReversibleActions;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 /// Reference in comment.
 using SEE.SceneManipulation;
 using SEE.Extensions;

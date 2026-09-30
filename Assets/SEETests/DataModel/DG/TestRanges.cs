@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using static SEE.DataModel.DG.RangeExamples;
+using static SEE.Graphs.DG.RangeExamples;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// Unit tests for the <see cref="Range"/> class.

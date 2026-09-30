@@ -1,7 +1,7 @@
 ﻿using System;
 using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
     /// <summary>
     /// The event information about the change of the state of the observed subject.

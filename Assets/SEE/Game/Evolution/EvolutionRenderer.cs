@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
 using SEE.UI.Notification;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SEE.DataModel.DG.GraphSearch
+namespace SEE.Graphs.DG.GraphSearch
 {
     /// <summary>
     /// Modifies a collection of graph elements by filtering, sorting, or otherwise transforming it.

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.DataModel.DG.GraphSearch
+namespace SEE.Graphs.DG.GraphSearch
 {
     /// <summary>
     /// A configurable filter for graph elements, mainly intended for use with <see cref="NodeSearch"/>.

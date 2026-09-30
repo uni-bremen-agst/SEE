@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using UnityEngine;
 
 namespace SEE.MetricScales

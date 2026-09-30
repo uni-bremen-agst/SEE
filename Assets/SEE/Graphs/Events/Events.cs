@@ -1,6 +1,6 @@
 ﻿/// <summary>
-/// Classes and structures related to change events in <see cref="SEE.DataModel"/>.
+/// Classes and structures related to change events in <see cref="SEE.Graphs"/>.
 /// </summary>
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
 }

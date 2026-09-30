@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using HighlightPlus;
-using SEE.DataModel;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Factories;
@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using ArgumentException = System.ArgumentException;
 using SEE.GraphElementRefs;
-using SEE.DataModel.Events;
+using SEE.Graphs.Events;
 
 namespace SEE.Game.Operator
 {

@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Game;
 using SEE.Extensions;
 using System.Collections.Generic;

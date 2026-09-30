@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs.DG;
 using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GraphElementRefs;
@@ -9,7 +9,7 @@ namespace SEE.Extensions
 {
     /// <summary>
     /// Extension methods for game edges. A game edge is a <see cref="GameObject"/>
-    /// representing a <see cref="SEE.DataModel.DG.Edge"/>.
+    /// representing a <see cref="SEE.Graphs.DG.Edge"/>.
     /// </summary>
     internal static class GameEdgeExtensions
     {

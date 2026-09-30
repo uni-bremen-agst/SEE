@@ -1,7 +1,7 @@
 using System;
 using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
     /// <summary>
     /// An event representing a change to a graph component.

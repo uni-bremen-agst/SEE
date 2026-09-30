@@ -85,7 +85,7 @@ namespace SEE.Net.Dashboard
         public IEnumerator TestDashboardMetricValue() => UniTask.ToCoroutine(async () =>
         {
             const string entity = "81"; // This entity does not exist.
-            const string metric = SEE.DataModel.DG.Metrics.Prefix + "LOC";
+            const string metric = SEE.Graphs.DG.Metrics.Prefix + "LOC";
             MetricValueRange range = await DashboardRetriever.Instance.GetMetricValueRangeAsync(entity, metric);
             Assert.That(range, Is.Not.Null, "The metric value range must have been retrieved.");
             Assert.That(range.Values, Is.Not.Empty);

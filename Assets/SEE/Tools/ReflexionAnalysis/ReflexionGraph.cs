@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
@@ -399,7 +399,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Adds a new mapping edge from <paramref name="from"/> to <paramref name="to"/>.
-        /// Convenience wrapper around <see cref="AddEdge(SEE.DataModel.DG.Node, SEE.DataModel.DG.Node, string)"/>.
+        /// Convenience wrapper around <see cref="AddEdge(SEE.Graphs.DG.Node, SEE.Graphs.DG.Node, string)"/>.
         /// </summary>
         public Edge AddMapsToEdge(Node from, Node to) => AddEdge(from, to, MapsToType);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Interactables;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Game.City;
 using SEE.GraphElementRefs;
 using SEE.Tools.OpenTelemetry;

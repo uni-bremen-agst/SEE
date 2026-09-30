@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.Controls.Interactables;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;

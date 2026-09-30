@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SEE.DataModel.DG.GraphIndex
+namespace SEE.Graphs.DG.GraphIndex
 {
     /// <summary>
     /// Represents sorted lists of <see cref="SourceRange"/>s.

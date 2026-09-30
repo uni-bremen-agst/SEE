@@ -1,8 +1,8 @@
-﻿using SEE.DataModel.Events;
+﻿using SEE.Graphs.Events;
 using SEE.Utils;
 using SEE.Utils.Paths;
 
-namespace SEE.DataModel.DG
+namespace SEE.Graphs.DG
 {
     /// <summary>
     /// A type graph element. Either a node or an edge.

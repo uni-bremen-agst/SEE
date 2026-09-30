@@ -1,7 +1,7 @@
 using System;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 
-namespace SEE.DataModel.Events
+namespace SEE.Graphs.Events
 {
     /// <summary>
     /// An event fired when an attribute in a graph element is changed.

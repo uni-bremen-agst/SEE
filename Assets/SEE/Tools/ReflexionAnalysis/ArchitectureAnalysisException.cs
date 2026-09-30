@@ -1,5 +1,5 @@
 using System;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using UnityEngine.Assertions;
 
 namespace SEE.Tools.ReflexionAnalysis

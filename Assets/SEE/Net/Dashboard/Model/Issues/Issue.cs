@@ -5,10 +5,10 @@ using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using SEE.DataModel.DG;
+using SEE.Graphs.DG;
 using SEE.UI.Window.CodeWindow;
 using UnityEngine;
-using Range = SEE.DataModel.DG.Range;
+using Range = SEE.Graphs.DG.Range;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {

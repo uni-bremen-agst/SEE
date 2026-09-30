@@ -1,5 +1,5 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.Events;
+﻿using SEE.Graphs;
+using SEE.Graphs.Events;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 
