@@ -1,6 +1,5 @@
 using System;
 using SEE.Graphs;
-using UnityEngine.Assertions;
 
 namespace SEE.Graphs.Reflexion
 {
@@ -32,28 +31,6 @@ namespace SEE.Graphs.Reflexion
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
         protected ArchitectureAnalysisException(string message, Exception innerException) : base(message, innerException)
         {
-        }
-    }
-
-    /// <summary>
-    /// Thrown if a node is not explicitly mapped, but was expected to.
-    /// </summary>
-    public class NotExplicitlyMappedException : ArchitectureAnalysisException
-    {
-        /// <summary>
-        /// The node that is not explicitly mapped.
-        /// </summary>
-        public readonly Node UnmappedNode;
-
-        /// <summary>
-        /// Constructs a new <see cref="NotExplicitlyMappedException"/> with the given <paramref name="unmappedNode"/>.
-        /// </summary>
-        /// <param name="unmappedNode">The node that is not explicitly mapped.</param>
-        public NotExplicitlyMappedException(Node unmappedNode)
-            : base($"Implementation node '{unmappedNode.ToShortString()}' is not explicitly mapped.")
-        {
-            Assert.IsTrue(unmappedNode.IsInImplementation());
-            UnmappedNode = unmappedNode;
         }
     }
 
