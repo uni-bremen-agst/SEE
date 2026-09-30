@@ -8,15 +8,23 @@ namespace SEE.DataModel.DG
     [Serializable]
     public class UnknownAttribute : Exception
     {
-        public UnknownAttribute()
-        {
-        }
-
+        /// <summary>
+        /// For an unknown attribute of an <see cref="Attributable"/>, this constructor
+        /// creates an exception with a message.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
         public UnknownAttribute(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// For an unknown attribute of an <see cref="Attributable"/>, this constructor
+        /// creates an exception with a message and an inner exception that is the cause
+        /// of this exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="inner">The inner exception that is the cause of this exception.</param>
         public UnknownAttribute(string message, Exception inner)
             : base(message, inner)
         {
