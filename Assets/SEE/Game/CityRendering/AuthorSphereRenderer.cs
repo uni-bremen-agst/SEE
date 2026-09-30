@@ -1,4 +1,4 @@
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Factories;
@@ -15,7 +15,7 @@ namespace SEE.Game.CityRendering
     /// Implements the methods for rendering author spheres in a branch city.
     ///
     /// This functionality is primarily needed for a <see cref="BranchCity"/> and builds on the precondition that
-    /// nodes have authors which are marked by the <see cref="Graphs.DG.VCS.AuthorsAttributeName"/> attribute.
+    /// nodes have authors which are marked by the <see cref="Graphs.VCS.AuthorsAttributeName"/> attribute.
     /// </summary>
     public partial class GraphRenderer
     {
@@ -24,7 +24,7 @@ namespace SEE.Game.CityRendering
         /// This method should be executed after the graph was rendered.
         ///
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
-        /// <see cref="Graphs.DG.VCS.AuthorsAttributeName"/> attribute which sets the author.
+        /// <see cref="Graphs.VCS.AuthorsAttributeName"/> attribute which sets the author.
         ///
         /// The collected authors are then rendered as spheres floating over the rectangular plane
         /// defined by <paramref name="planeCenterposition"/> and <paramref name="planeRectangle"/>.
@@ -62,10 +62,10 @@ namespace SEE.Game.CityRendering
             Vector2 planeRectangle)
         {
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
-            /// <see cref="Graphs.DG.VCS.AuthorsAttributeName"/> separated by commas.
+            /// <see cref="Graphs.VCS.AuthorsAttributeName"/> separated by commas.
             List<FileAuthor> authors =
-                nodeMap.Keys.Where(x => x.Type == Graphs.DG.NodeTypes.File)
-                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == Graphs.DG.VCS.AuthorsAttributeName))
+                nodeMap.Keys.Where(x => x.Type == Graphs.NodeTypes.File)
+                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == Graphs.VCS.AuthorsAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
                     .Select(x => new FileAuthor(x))
@@ -180,8 +180,8 @@ namespace SEE.Game.CityRendering
                 // Maps from the graph node (a file) onto the game object representing the (file) node.
                 // Looks like this can be simplified and optimized.
                 IEnumerable<KeyValuePair<Node, GameObject>> filesOfAuthor = nodeMap
-                    .Where(x => x.Key.StringAttributes.ContainsKey(Graphs.DG.VCS.AuthorsAttributeName))
-                    .Where(x => x.Key.StringAttributes[Graphs.DG.VCS.AuthorsAttributeName]
+                    .Where(x => x.Key.StringAttributes.ContainsKey(Graphs.VCS.AuthorsAttributeName))
+                    .Where(x => x.Key.StringAttributes[Graphs.VCS.AuthorsAttributeName]
                                    .Split(',').Contains(authorName.ToString()));
 
                 // For all files of the given author.
@@ -199,7 +199,7 @@ namespace SEE.Game.CityRendering
                     connectingLine.transform.parent = parent.transform;
 
                     // Specific churn of the current author for the current sphere.
-                    int churn = fileOfAuthor.Key.IntAttributes[Graphs.DG.VCS.Churn + ":" + authorName];
+                    int churn = fileOfAuthor.Key.IntAttributes[Graphs.VCS.Churn + ":" + authorName];
 
                     AddLOD(connectingLine);
 
@@ -233,7 +233,7 @@ namespace SEE.Game.CityRendering
 
             foreach (Node node in nodeMap.Keys)
             {
-                if (node.TryGetInt(Graphs.DG.VCS.Churn, out int churn))
+                if (node.TryGetInt(Graphs.VCS.Churn, out int churn))
                 {
                     if (churn > max)
                     {

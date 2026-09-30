@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SEE.Graphs.DG.IO.ReportImports;
+using SEE.Graphs.IO.ReportImports;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;

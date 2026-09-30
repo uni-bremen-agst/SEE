@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Tests for JaCoCo XML coverage report (JaCoCo core) with concrete expected metrics.

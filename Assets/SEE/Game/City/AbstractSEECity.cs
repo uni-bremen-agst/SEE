@@ -1,5 +1,5 @@
 using MoreLinq;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.CityRendering;
 using SEE.Game.Tables;
 using SEE.Extensions;

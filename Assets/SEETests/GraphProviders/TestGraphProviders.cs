@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
-using SEE.Graphs.DG;
-using SEE.Graphs.DG.IO.ReportImports;
-using SEE.Graphs.DG.IO.GXL;
+using SEE.Graphs;
+using SEE.Graphs.IO.ReportImports;
+using SEE.Graphs.IO.GXL;
 using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -60,7 +60,7 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestCSVJaCoCoGXLGraphProviderAsync()
         {
-            Graphs.DG.GraphIndex.FileRanges.ReportMissingSourceRange = false;
+            Graphs.GraphIndex.FileRanges.ReportMissingSourceRange = false;
 
             try
             {
@@ -113,7 +113,7 @@ namespace SEE.GraphProviders
             }
             finally
             {
-                Graphs.DG.GraphIndex.FileRanges.ReportMissingSourceRange = true;
+                Graphs.GraphIndex.FileRanges.ReportMissingSourceRange = true;
             }
         }
 
@@ -224,7 +224,7 @@ namespace SEE.GraphProviders
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == Graphs.DG.NodeTypes.File);
+            Node fileNode = graph.Nodes().First(t => t.Type == Graphs.NodeTypes.File);
             AssertTokenMetricsExist(fileNode);
         }
 
@@ -267,15 +267,15 @@ namespace SEE.GraphProviders
         // because the latter compares only the first commit to the second commit,
         // but does not include the commits in between. Our churn metrics, however,
         // are based on all commits between the two.
-        [TestCase(Graphs.DG.VCS.LinesAdded, 284)]
-        [TestCase(Graphs.DG.VCS.LinesRemoved, 320)]
+        [TestCase(Graphs.VCS.LinesAdded, 284)]
+        [TestCase(Graphs.VCS.LinesRemoved, 320)]
         // Should be equivalent to:
         // git log 0878f91f900dc90d89c594c521ac1d3b9edd7097 ^a5fe5e6a2692f41aeb8448d5114000e6f82e605e -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|grep ^Author|sort -u|wc -l
-        [TestCase(Graphs.DG.VCS.NumberOfDevelopers, 3)]
+        [TestCase(Graphs.VCS.NumberOfDevelopers, 3)]
         // Should be equivalent to:
         // git log 0878f91f900dc90d89c594c521ac1d3b9edd7097 ^a5fe5e6a2692f41aeb8448d5114000e6f82e605e --name-status| grep VCSGraphProvider.cs | wc -l
         // git rev-list --topo-order --reverse --no-merges a5fe5e6a2692f41aeb8448d5114000e6f82e605e..0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|wc -l
-        [TestCase(Graphs.DG.VCS.NumberOfCommits, 11)]
+        [TestCase(Graphs.VCS.NumberOfCommits, 11)]
         public async Task TestVCSMetricsAsync(string metric, int expected)
         {
             Graph graph = await GetVCSGraphAsync();

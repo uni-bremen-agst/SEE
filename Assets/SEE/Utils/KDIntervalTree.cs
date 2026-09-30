@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Supercluster.KDTree;
 using Supercluster.KDTree.Utilities;
-using Range = SEE.Graphs.DG.Range;
+using Range = SEE.Graphs.Range;
 
 namespace SEE.Utils
 {

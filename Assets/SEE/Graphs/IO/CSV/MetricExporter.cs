@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace SEE.Graphs.DG.IO.CSV
+namespace SEE.Graphs.IO.CSV
 {
     /// <summary>
     /// Exports node metrics of a graph to CSV files.

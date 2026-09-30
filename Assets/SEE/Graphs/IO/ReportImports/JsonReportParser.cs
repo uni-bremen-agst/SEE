@@ -8,7 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Generic JSON parser that uses a <see cref="JsonParsingConfig"/> to translate report files

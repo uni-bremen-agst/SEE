@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Graphs.DG;
-using SEE.Graphs.DG.GraphSearch;
+using SEE.Graphs;
+using SEE.Graphs.GraphSearch;
 using SEE.Utils;
 using UnityEngine;
 

@@ -2,7 +2,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// Represents a range in a source file, going from the <see cref="StartLine"/> to the <see cref="EndLine"/>

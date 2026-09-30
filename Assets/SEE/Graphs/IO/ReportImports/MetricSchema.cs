@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Container for all findings extracted from a single metrics report.

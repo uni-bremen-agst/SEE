@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static SEE.Graphs.DG.VCS;
+using static SEE.Graphs.VCS;
 
 namespace SEE.GraphProviders
 {

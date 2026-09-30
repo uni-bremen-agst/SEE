@@ -1,4 +1,4 @@
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 
 namespace SEE.Game.HolisticMetrics.Metrics
@@ -13,7 +13,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// This is the attribute name which we will try to get for each node. This should give us the lines of code
         /// metric for each node.
         /// </summary>
-        private const string attributeName = Graphs.DG.Metrics.Prefix + "Lines.LOC";
+        private const string attributeName = Graphs.Metrics.Prefix + "Lines.LOC";
 
         /// <summary>
         /// Returns the lines of code metric from each node of the graph underlying

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// This part of <see cref="Graph"/> provides the interface to all node and edge attribute names.

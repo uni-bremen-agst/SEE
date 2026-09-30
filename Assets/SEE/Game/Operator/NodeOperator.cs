@@ -1,6 +1,6 @@
 using DG.Tweening;
 using SEE.Controls;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.GraphElementRefs;

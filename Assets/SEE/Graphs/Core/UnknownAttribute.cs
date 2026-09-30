@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// An exception thrown in case a graph, node, or edge attribute is unknown.

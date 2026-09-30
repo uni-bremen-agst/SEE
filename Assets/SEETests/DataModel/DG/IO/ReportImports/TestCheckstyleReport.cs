@@ -5,7 +5,7 @@ using System.Globalization;
 /// <summary>
 /// Contains graph provider implementations and related integration tests.
 /// </summary>
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Integration-style tests for parsing a Checkstyle XML report and applying the resulting metrics to a graph.

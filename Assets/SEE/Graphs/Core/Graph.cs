@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// A graph with nodes and edges representing the data to be visualized
@@ -920,7 +920,7 @@ namespace SEE.Graphs.DG
         /// Sets the levels of all nodes and the maximal depth of the graph.
         ///
         /// Note: This method should be called only by <see cref="Node"/> and
-        /// <see cref="SEE.Graphs.DG.IO.GraphReader"/>.
+        /// <see cref="SEE.Graphs.IO.GraphReader"/>.
         /// </summary>
         public void FinalizeNodeHierarchy()
         {

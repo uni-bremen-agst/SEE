@@ -4,14 +4,13 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using SEE.Graphs;
-using SEE.Graphs.DG;
-using SEE.Graphs.DG.IO.GXL;
+using SEE.Graphs.IO.GXL;
 using SEE.Graphs.Events;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
-using Edge = SEE.Graphs.DG.Edge;
+using Edge = SEE.Graphs.Edge;
 
 namespace SEE.Tools.Architecture
 {

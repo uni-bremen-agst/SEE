@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// A comparer for <see cref="GraphElement"/> that considers only the

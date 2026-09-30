@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Integration-style tests for parsing an MSBuild (C# Compiler) text report and applying the

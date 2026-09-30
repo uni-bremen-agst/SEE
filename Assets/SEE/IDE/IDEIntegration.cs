@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.UI.Notification;

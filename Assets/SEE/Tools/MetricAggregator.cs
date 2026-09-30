@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 
 namespace SEE.Tools
 {

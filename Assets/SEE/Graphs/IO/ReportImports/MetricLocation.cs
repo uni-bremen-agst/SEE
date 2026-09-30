@@ -1,4 +1,4 @@
-﻿namespace SEE.Graphs.DG.IO.ReportImports
+﻿namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Optional source-code location for a finding.

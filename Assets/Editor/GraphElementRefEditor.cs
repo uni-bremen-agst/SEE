@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using UnityEditor;
 using UnityEngine;
 

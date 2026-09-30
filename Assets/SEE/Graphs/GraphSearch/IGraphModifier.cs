@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SEE.Graphs.DG.GraphSearch
+namespace SEE.Graphs.GraphSearch
 {
     /// <summary>
     /// Modifies a collection of graph elements by filtering, sorting, or otherwise transforming it.

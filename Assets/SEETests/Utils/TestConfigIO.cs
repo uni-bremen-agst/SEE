@@ -1004,7 +1004,7 @@ namespace SEE.Utils
         {
             settings.Shape = NodeShapes.Blocks;
             settings.IsRelevant = false;
-            settings.MetricToLength = new List<string> { "0.001", SEE.Graphs.DG.Metrics.Prefix + "LOC" };
+            settings.MetricToLength = new List<string> { "0.001", SEE.Graphs.Metrics.Prefix + "LOC" };
             settings.ColorProperty.ColorMetric = "X";
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;

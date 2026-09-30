@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// Attribute names for unique identification of nodes.

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.Graphs.DG.GraphSearch
+namespace SEE.Graphs.GraphSearch
 {
     /// <summary>
     /// A configurable sorter for graph elements, mainly intended for use with <see cref="NodeSearch"/>.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// Directed and typed edges of the graph with source and target node.

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Tools.LSP;
 using SEE.UI;

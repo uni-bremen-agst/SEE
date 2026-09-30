@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 #endif
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Configuration for parsing line-oriented text reports using regular expressions.

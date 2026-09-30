@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.Utils;

@@ -1,5 +1,5 @@
 ﻿using System;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;

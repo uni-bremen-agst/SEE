@@ -3,7 +3,7 @@
 using UnityEngine;
 #endif
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Configuration for parsing XML-based reports using XPath mappings.

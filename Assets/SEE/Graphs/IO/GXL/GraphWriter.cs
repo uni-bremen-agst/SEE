@@ -7,7 +7,7 @@ using SEE.Utils;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;
 
-namespace SEE.Graphs.DG.IO.GXL
+namespace SEE.Graphs.IO.GXL
 {
     /// <summary>
     /// Saves graphs in GXL format on disk.

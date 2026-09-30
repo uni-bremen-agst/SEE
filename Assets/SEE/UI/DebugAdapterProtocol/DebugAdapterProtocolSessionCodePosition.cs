@@ -1,4 +1,4 @@
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;

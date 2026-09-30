@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.MetricScales;

@@ -1,6 +1,6 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
 using SEE.Utils;
@@ -104,7 +104,7 @@ namespace SEE.GraphProviders.VCS
         #endregion Truck Factor
 
         /// <summary>
-        /// Adds nodes of type <see cref="Graphs.DG.NodeTypes.File"/> and <see cref="Graphs.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="Graphs.NodeTypes.File"/> and <see cref="Graphs.VCS.DirectoryType"/>
         /// to the <paramref name="graph"/> for the relevant files in the given <paramref name="repository"/>
         /// present at the given <paramref name="commitID"/>. Metrics are added, too. The <see cref="GitFileMetrics"/>
         /// are calulated relative to <paramref name="baselineCommitID"/>.
@@ -223,7 +223,7 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Adds nodes of type <see cref="Graphs.DG.NodeTypes.File"/> and <see cref="Graphs.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="Graphs.NodeTypes.File"/> and <see cref="Graphs.VCS.DirectoryType"/>
         /// for the relevant files specified in the given <paramref name="repositoryConfiguration"/> present after the given
         /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
         /// <see cref="GitFileMetrics"/> are calculated, too.
@@ -475,7 +475,7 @@ namespace SEE.GraphProviders.VCS
         {
             foreach (Node node in graph.Nodes())
             {
-                if (node.Type == Graphs.DG.NodeTypes.File)
+                if (node.Type == Graphs.NodeTypes.File)
                 {
                     string repositoryFilePath = node.ID;
                     AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
@@ -531,25 +531,25 @@ namespace SEE.GraphProviders.VCS
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
                 Node n = GraphUtils.GetOrAddFileNode(graph, file.Key);
-                n.SetInt(Graphs.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
-                n.SetInt(Graphs.DG.VCS.NumberOfCommits, file.Value.NumberOfCommits);
-                n.SetInt(Graphs.DG.VCS.LinesAdded, file.Value.LinesAdded);
-                n.SetInt(Graphs.DG.VCS.LinesRemoved, file.Value.LinesRemoved);
-                n.SetInt(Graphs.DG.VCS.Churn, file.Value.Churn);
-                n.SetInt(Graphs.DG.VCS.TruckNumber, file.Value.TruckFactor);
+                n.SetInt(Graphs.VCS.NumberOfDevelopers, file.Value.Authors.Count);
+                n.SetInt(Graphs.VCS.NumberOfCommits, file.Value.NumberOfCommits);
+                n.SetInt(Graphs.VCS.LinesAdded, file.Value.LinesAdded);
+                n.SetInt(Graphs.VCS.LinesRemoved, file.Value.LinesRemoved);
+                n.SetInt(Graphs.VCS.Churn, file.Value.Churn);
+                n.SetInt(Graphs.VCS.TruckNumber, file.Value.TruckFactor);
                 if (file.Value.Authors.Any())
                 {
-                    n.SetString(Graphs.DG.VCS.AuthorsAttributeName, String.Join(',', file.Value.Authors));
+                    n.SetString(Graphs.VCS.AuthorsAttributeName, String.Join(',', file.Value.Authors));
                 }
 
                 foreach (KeyValuePair<FileAuthor, int> authorChurn in file.Value.AuthorsChurn)
                 {
-                    n.SetInt(Graphs.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
+                    n.SetInt(Graphs.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
                 }
             }
 
             AddCodeMetrics(graph, repositorySession);
-            graph.AddSingleRoot(out Node _, repositoryName, Graphs.DG.VCS.RepositoryType);
+            graph.AddSingleRoot(out Node _, repositoryName, Graphs.VCS.RepositoryType);
             Simplify(graph, simplifyGraph);
         }
 
@@ -572,7 +572,7 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Simplifies a given graph by combining common directories (nodes of type
-        /// <see cref="Graphs.DG.VCS.DirectoryType"/>).
+        /// <see cref="Graphs.VCS.DirectoryType"/>).
         ///
         /// If a directory has only other directories as children, their paths will be combined.
         /// For instance the file structure:
@@ -602,7 +602,7 @@ namespace SEE.GraphProviders.VCS
         {
             Graph graph = root.ItsGraph;
             IList<Node> children = root.Children();
-            if (children.ToList().TrueForAll(x => x.Type != Graphs.DG.NodeTypes.File) && children.Any())
+            if (children.ToList().TrueForAll(x => x.Type != Graphs.NodeTypes.File) && children.Any())
             {
                 foreach (Node child in children.ToList())
                 {
@@ -617,7 +617,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                foreach (Node node in children.Where(x => x.Type == Graphs.DG.VCS.DirectoryType).ToList())
+                foreach (Node node in children.Where(x => x.Type == Graphs.VCS.DirectoryType).ToList())
                 {
                     SimplifyGraph(node);
                 }

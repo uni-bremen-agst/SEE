@@ -1,5 +1,5 @@
 using System.Linq;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 
 namespace SEE.Game.HolisticMetrics.Metrics

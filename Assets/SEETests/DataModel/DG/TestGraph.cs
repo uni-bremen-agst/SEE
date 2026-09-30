@@ -4,7 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// Unit tests for Graph.

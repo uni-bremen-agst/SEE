@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// A memento for a node tree including its incoming and outgoing edges (whose targets

@@ -1,4 +1,4 @@
-﻿namespace SEE.Graphs.DG
+﻿namespace SEE.Graphs
 {
     /// <summary>
     /// A memento of elements of a graph.

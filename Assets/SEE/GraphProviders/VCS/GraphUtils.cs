@@ -1,5 +1,5 @@
 using System;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Utils;
 
 namespace SEE.GraphProviders.VCS
@@ -50,8 +50,8 @@ namespace SEE.GraphProviders.VCS
         /// Along with the file node, it will also create the necessary directory
         /// containing the file if it does not already exist.
         ///
-        /// The file node will be created with the type <see cref="Graphs.DG.NodeTypes.File"/>
-        /// and directory nodes with the type <see cref="Graphs.DG.VCS.DirectoryType"/>.
+        /// The file node will be created with the type <see cref="Graphs.NodeTypes.File"/>
+        /// and directory nodes with the type <see cref="Graphs.VCS.DirectoryType"/>.
         /// </summary>
         /// <param name="graph">Where to look up or add the newly created file node.</param>
         /// <param name="path">The path of the file.</param>
@@ -76,7 +76,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                Node result = NewNode(graph, path, Graphs.DG.NodeTypes.File, separator);
+                Node result = NewNode(graph, path, Graphs.NodeTypes.File, separator);
                 Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
                 parent?.AddChild(result);
                 return result;
@@ -96,7 +96,7 @@ namespace SEE.GraphProviders.VCS
                 {
                     return node;
                 }
-                return NewNode(graph, path, Graphs.DG.VCS.DirectoryType, separator);
+                return NewNode(graph, path, Graphs.VCS.DirectoryType, separator);
             }
         }
     }

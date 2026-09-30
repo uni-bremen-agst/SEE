@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Extensions;

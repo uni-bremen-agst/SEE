@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;

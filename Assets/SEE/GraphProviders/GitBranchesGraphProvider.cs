@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
@@ -17,9 +17,9 @@ namespace SEE.GraphProviders
     /// The collected metrics are:
     /// <list type="bullet">
     /// <item>Metric.File.Commits</item>
-    /// <item><see cref="Graphs.DG.VCS.NumberOfDevelopers"/></item>
-    /// <item><see cref="Graphs.DG.VCS.Churn"/></item>
-    /// <item><see cref="Graphs.DG.VCS.TruckNumber"/></item>
+    /// <item><see cref="Graphs.VCS.NumberOfDevelopers"/></item>
+    /// <item><see cref="Graphs.VCS.Churn"/></item>
+    /// <item><see cref="Graphs.VCS.TruckNumber"/></item>
     /// </list>
     /// </summary>
     [Serializable]

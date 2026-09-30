@@ -1,4 +1,4 @@
-﻿namespace SEE.Graphs.DG.IO.ReportImports
+﻿namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Strategy interface for normalizing code element identifiers from external tools

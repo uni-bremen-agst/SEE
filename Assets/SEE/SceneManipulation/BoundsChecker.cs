@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Utils;
 
 namespace SEE.SceneManipulation

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Game.City;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Utils;
 using UnityEngine;
 using System.Collections.Generic;

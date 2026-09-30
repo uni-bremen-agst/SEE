@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// Tests for <see cref="MergeDiffGraphExtensions.MergeDiff"/>.

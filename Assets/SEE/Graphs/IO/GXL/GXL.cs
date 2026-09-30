@@ -1,6 +1,6 @@
 ﻿/// <summary>
 /// Import and export of graphs in GXL.
 /// </summary>
-namespace SEE.Graphs.DG.IO.GXL
+namespace SEE.Graphs.IO.GXL
 {
 }

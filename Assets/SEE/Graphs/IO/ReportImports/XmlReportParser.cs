@@ -12,7 +12,7 @@ using System.Xml.XPath;
 /// <summary>
 /// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
 /// </summary>
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Generic XML parser that uses a <see cref="XmlParsingConfig"/> to translate report files

@@ -1,5 +1,5 @@
 using System;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 
 namespace SEE.Graphs.Events
 {

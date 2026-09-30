@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using MoreLinq.Extensions;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Factories;

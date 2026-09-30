@@ -2,7 +2,7 @@
 using System.Threading;
 using SEE.Utils.Paths;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Defines the contract for components that transform raw report files into

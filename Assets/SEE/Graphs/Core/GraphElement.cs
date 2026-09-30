@@ -2,7 +2,7 @@
 using SEE.Utils;
 using SEE.Utils.Paths;
 
-namespace SEE.Graphs.DG
+namespace SEE.Graphs
 {
     /// <summary>
     /// A type graph element. Either a node or an edge.

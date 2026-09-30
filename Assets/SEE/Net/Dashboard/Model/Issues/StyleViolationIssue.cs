@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Utils;
 
 namespace SEE.Net.Dashboard.Model.Issues

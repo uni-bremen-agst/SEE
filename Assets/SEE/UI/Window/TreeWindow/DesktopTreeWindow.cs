@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenus;
@@ -16,8 +16,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
-using Edge = SEE.Graphs.DG.Edge;
-using Node = SEE.Graphs.DG.Node;
+using Edge = SEE.Graphs.Edge;
+using Node = SEE.Graphs.Node;
 using SEE.GraphElementRefs;
 using SEE.Controls.KeyActions;
 

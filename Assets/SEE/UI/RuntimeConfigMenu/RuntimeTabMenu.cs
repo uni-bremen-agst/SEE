@@ -2,7 +2,7 @@
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;

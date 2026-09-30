@@ -1,4 +1,4 @@
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 
 namespace SEE.Game.HolisticMetrics.Metrics
@@ -11,7 +11,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <summary>
         /// We will try to get this attribute for each node. Should be the comment density for each node.
         /// </summary>
-        private const string attributeName = SEE.Graphs.DG.Metrics.Prefix + "Comment.Density";
+        private const string attributeName = SEE.Graphs.Metrics.Prefix + "Comment.Density";
 
         /// <summary>
         /// Calculates the average comment density for the nodes of the given <paramref name="city"/>.

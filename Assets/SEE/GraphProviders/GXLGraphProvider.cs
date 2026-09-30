@@ -1,5 +1,5 @@
-﻿using SEE.Graphs.DG;
-using SEE.Graphs.DG.IO.GXL;
+﻿using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
 using SEE.Game.City;
 using System;
 using System.IO;

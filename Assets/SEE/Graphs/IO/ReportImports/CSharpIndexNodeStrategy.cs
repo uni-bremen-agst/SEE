@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Tool-agnostic index strategy for C# reports.

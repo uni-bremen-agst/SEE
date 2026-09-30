@@ -15,7 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using System.Collections.Generic;
 
 namespace SEE.Layout.Utils

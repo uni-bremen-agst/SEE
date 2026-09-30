@@ -1,5 +1,5 @@
 using SEE.Audio;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions;

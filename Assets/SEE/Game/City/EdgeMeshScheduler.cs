@@ -4,7 +4,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using MoreLinq.Extensions;
 using SEE.Graphs;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.UI;
 using UnityEngine;
 using SEE.GraphElementRefs;

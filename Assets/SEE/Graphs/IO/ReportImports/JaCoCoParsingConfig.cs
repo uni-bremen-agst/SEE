@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
 /// </summary>
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Parsing configuration for JaCoCo XML reports.

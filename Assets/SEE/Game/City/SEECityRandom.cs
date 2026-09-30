@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Tools.RandomGraphs;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;

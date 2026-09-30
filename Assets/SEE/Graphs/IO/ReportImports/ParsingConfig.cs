@@ -1,4 +1,4 @@
-using SEE.Graphs.DG.GraphIndex;
+using SEE.Graphs.GraphIndex;
 using SEE.Utils;
 using SEE.Utils.Config;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 #endif
 
-namespace SEE.Graphs.DG.IO.ReportImports
+namespace SEE.Graphs.IO.ReportImports
 {
     /// <summary>
     /// Base configuration that describes how a specific tool's report should be interpreted.

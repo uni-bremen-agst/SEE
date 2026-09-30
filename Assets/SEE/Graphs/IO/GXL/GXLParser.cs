@@ -7,7 +7,7 @@ using System.Xml;
 using Cysharp.Threading.Tasks;
 using SEE.Utils;
 
-namespace SEE.Graphs.DG.IO.GXL
+namespace SEE.Graphs.IO.GXL
 {
     /// <summary>
     /// Class responsible for parsing GXL files.

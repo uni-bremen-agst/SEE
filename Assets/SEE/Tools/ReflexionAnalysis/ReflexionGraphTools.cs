@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
 using SEE.Graphs;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Graphs.Events;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 

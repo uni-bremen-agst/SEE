@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;

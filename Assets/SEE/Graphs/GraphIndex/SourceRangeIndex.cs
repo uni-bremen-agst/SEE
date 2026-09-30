@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.Graphs.DG.GraphIndex
+namespace SEE.Graphs.GraphIndex
 {
     /// <summary>
     /// A source-location based node index that allows to search for graph nodes

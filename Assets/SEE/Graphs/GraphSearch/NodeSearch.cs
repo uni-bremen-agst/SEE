@@ -4,7 +4,7 @@ using System.Linq;
 using FuzzySharp;
 using SEE.Graphs.Events;
 
-namespace SEE.Graphs.DG.GraphSearch
+namespace SEE.Graphs.GraphSearch
 {
     /// <summary>
     /// Allows searching for nodes by their source name.

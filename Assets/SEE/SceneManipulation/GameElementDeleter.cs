@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
-using SEE.Graphs.DG;
+using SEE.Graphs;
 using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;

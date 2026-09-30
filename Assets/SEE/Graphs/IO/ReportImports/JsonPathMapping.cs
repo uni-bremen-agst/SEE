@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Graphs.DG.IO
+namespace SEE.Graphs.IO
 {
     /// <summary>
     /// Encapsulates the JSONPath expressions used to traverse and interpret a JSON report.

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Threading;
 
-namespace SEE.Graphs.DG.Utils
+namespace SEE.Graphs.Utils
 {
      /// <summary>
     /// Tests for <see cref="ThreadSafeHashSet{T}"/>.
