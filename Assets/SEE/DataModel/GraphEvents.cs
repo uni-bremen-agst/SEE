@@ -6,39 +6,21 @@ namespace SEE.DataModel
 {
     /// <summary>
     /// An event representing a change to a graph component.
-    /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraphs"/> will be
-    /// None.
+    /// May be used outside of reflexion analysis contexts, in which case
+    /// the <see cref="ReflexionSubgraphs"/> will be None.
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
-        protected GraphEvent(Guid version, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
+        /// <summary>
+        /// Creates a new instance of this graph event.
+        /// </summary>
+        /// <param name="version">The version ID associated with this event.</param>
+        /// <param name="affectedGraph">The graph affected by this event.</param>
+        /// <param name="change">The type of change this event represents.</param>
+        protected GraphEvent(Guid version, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
+            : base(version, affectedGraph, change)
         {
         }
-    }
-
-    /// <summary>
-    /// An event representing a new version being introduced.
-    /// Events following this one will have the new <see cref="VersionId"/>, while events before this
-    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="oldVersion"/>.
-    /// </summary>
-    public class VersionChangeEvent : GraphEvent
-    {
-        /// <summary>
-        /// The version before this one.
-        /// </summary>
-        private readonly Guid oldVersion;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="newVersion">New version ID.</param>
-        /// <param name="oldVersion">Old version ID.</param>
-        public VersionChangeEvent(Guid newVersion, Guid oldVersion) : base(newVersion)
-        {
-            this.oldVersion = oldVersion;
-        }
-
-        protected override string Description() => $"Changed version from {oldVersion} to {VersionId}.";
     }
 
     /// <summary>
