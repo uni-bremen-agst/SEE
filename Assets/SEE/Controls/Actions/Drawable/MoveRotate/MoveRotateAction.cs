@@ -151,6 +151,11 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         private readonly MoveRotateMoveOperation moveOperation = new();
 
         /// <summary>
+        /// Handles rotating the selected object.
+        /// </summary>
+        private readonly MoveRotateRotationOperation rotationOperation = new();
+
+        /// <summary>
         /// Deactivates the blink effect if it is still active
         /// and destroys the rigidbody and collision controller if there are still active.
         /// If the action was not completed in full (finish), the changes are reset.
@@ -175,13 +180,7 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
 
                 if (progressState == ProgressState.Rotate)
                 {
-                    GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                    GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
-                        RotationMenu.Instance.IncludeChildren);
-                    new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        oldObjectLocalEulerAngles.z, RotationMenu.Instance.IncludeChildren).Execute();
+                    rotationOperation.Restore(selectedObject, oldObjectLocalEulerAngles.z);
                 }
             }
 
@@ -252,13 +251,7 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
 
                     if (progressState == ProgressState.Rotate)
                     {
-                        GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                        string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                        GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
-                            RotationMenu.Instance.IncludeChildren);
-                        new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
-                            oldObjectLocalEulerAngles.z, RotationMenu.Instance.IncludeChildren).Execute();
+                        rotationOperation.Restore(selectedObject, oldObjectLocalEulerAngles.z);
                     }
                 }
                 RotationMenu.Instance.Destroy();
@@ -302,20 +295,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         }
 
         /// <summary>
-        /// Provides the functionality for moving the object.
-        /// The object either follows the mouse movement or the arrow keys can be used.
-        /// The mouse movement is stopped and blocked if a collision with any of the borders of the Drawable is detected.
-        /// (When moving mind map nodes with the setting that includes children,
-        /// the collision controllers of the children are also taken into account.)
-        /// Using the arrow keys locks moving with the mouse, which can be unlocked by a middle mouse click.
-        /// A middle mouse click toggles the move by mouse state.
-        /// There is a faster option for moving by key. It can be toggled by clicking the left Ctrl key down.
-        /// To end the move, the left mouse button must be pressed and released.
-        ///
-        /// Alternatively, through the menu, the object can be moved, and settings for speed, 'move by mouse'
-        /// and include children can be chosen as well.
-        /// </summary>
-        /// <summary>
         /// Moves the selected object.
         /// </summary>
         private void Move()
@@ -328,102 +307,14 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         }
 
         /// <summary>
-        /// With this block the user can rotate the selected object.
-        /// A rotation menu is opened.
-        /// Use the rotation menu or use the mouse wheel to rotate.
-        /// There is a faster option by holding down the left Ctrl key in addition to using the mouse wheel.
-        /// To end the rotation, the left mouse button must be pressed and released.
+        /// Rotates the selected object.
         /// </summary>
         private void Rotate()
         {
-            if (selectedObject.GetComponent<BlinkEffect>() != null)
-            {
-                /// Enables the rotation menu and provides the rotation via menu.
-                RotationMenu.Instance.Enable(selectedObject);
-
-                /// Checks for mouse wheel movement and sets the required data for rotation via wheel.
-                RotateByWheel();
-
-                /// Initializes the end of the rotation.
-                if (SEEInput.LeftMouseInteraction())
-                {
-                    selectedObject.GetComponent<BlinkEffect>().Deactivate();
-
-                }
-            }
-            /// Part 2 of initializing the end: The progress state is switched to finish.
-            if (SEEInput.MouseUp(MouseButton.Left))
+            if (rotationOperation.TryExecute(selectedObject, ref newObjectPosition, ref newObjectLocalEulerAngles))
             {
                 progressState = ProgressState.Finish;
             }
-        }
-
-        /// <summary>
-        /// Checks whether a mouse wheel movement is registered.
-        /// If yes, it performs the desired rotation.
-        /// The rotation can be accelerated using Left Control.
-        /// </summary>
-        private void RotateByWheel()
-        {
-            bool rotate = false;
-            Vector3 direction = Vector3.zero;
-            float degree = 0;
-
-            /// Rotates forward with normal speed.
-            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
-            {
-                direction = Vector3.forward;
-                degree = ValueHolder.Rotate;
-                rotate = true;
-            }
-            /// Rotates forward with fast speed.
-            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
-            {
-                direction = Vector3.forward;
-                degree = ValueHolder.RotateFast;
-                rotate = true;
-            }
-            /// Rotates back with normal speed.
-            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
-            {
-                direction = Vector3.back;
-                degree = ValueHolder.Rotate;
-                rotate = true;
-
-            }
-            /// Rotates back with fast speed.
-            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
-            {
-                direction = Vector3.back;
-                degree = ValueHolder.RotateFast;
-                rotate = true;
-            }
-
-            /// If a mouse wheel movement has been registered, perform the rotation.
-            if (rotate)
-            {
-                PerformRotate(direction, degree);
-            }
-        }
-
-        /// <summary>
-        /// Performs the desired rotation.
-        /// </summary>
-        /// <param name="direction">The direction of the rotation.</param>
-        /// <param name="degree">The degree by which the object is to be rotated.</param>
-        private void PerformRotate(Vector3 direction, float degree)
-        {
-            GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-            newObjectLocalEulerAngles = GameMoveRotator.RotateObject(selectedObject, direction,
-                degree, RotationMenu.Instance.IncludeChildren);
-            if (Tags.DrawableTypes.Contains(selectedObject.tag))
-            {
-                newObjectPosition = selectedObject.transform.localPosition;
-            }
-            new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, direction,
-                degree, RotationMenu.Instance.IncludeChildren).Execute();
         }
 
         /// <summary>
@@ -435,6 +326,9 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <returns>State of success.</returns>
         private bool Finish()
         {
+            newObjectPosition = selectedObject.transform.localPosition;
+            newObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
+
             if (oldObjectPosition != newObjectPosition
                 || oldObjectLocalEulerAngles != newObjectLocalEulerAngles)
             {
@@ -458,10 +352,9 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                 if (selectedObject.GetComponent<CollisionController>() != null
                     && !selectedObject.GetComponent<CollisionController>().IsInCollision() && !childInCollision)
                 {
-                    float degree = selectedObject.transform.localEulerAngles.z;
-                    bool includeChildren = RotationMenu.Instance.IncludeChildren
-                        && executedOperation == ProgressState.Rotate ||
-                        MoveMenu.Instance.IncludeChildren && executedOperation == ProgressState.Move;
+                    float degree = newObjectLocalEulerAngles.z;
+                    bool includeChildren = RotationMenu.Instance.IncludeChildren && executedOperation == ProgressState.Rotate
+                        || MoveMenu.Instance.IncludeChildren && executedOperation == ProgressState.Move;
                     memento = new Memento(selectedObject, GameFinder.GetDrawableSurface(selectedObject), selectedObject.name,
                         oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation,
                         includeChildren);
@@ -528,6 +421,14 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                         memento.IncludeChildren);
                     new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.OldObjectLocalEulerAngles.z, memento.IncludeChildren).Execute();
+
+                    if (memento.OldObjectPosition != memento.NewObjectPosition)
+                    {
+                        GameMoveRotator.SetPosition(memento.SelectedObject, memento.OldObjectPosition,
+                            memento.IncludeChildren);
+                        new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
+                            memento.OldObjectPosition, memento.IncludeChildren).Execute();
+                    }
                 }
 
                 GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(
@@ -562,7 +463,16 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                     GameMoveRotator.SetRotate(memento.SelectedObject, memento.Degree, memento.IncludeChildren);
                     new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.Degree, memento.IncludeChildren).Execute();
+
+                    if (memento.OldObjectPosition != memento.NewObjectPosition)
+                    {
+                        GameMoveRotator.SetPosition(memento.SelectedObject, memento.NewObjectPosition,
+                            memento.IncludeChildren);
+                        new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
+                            memento.NewObjectPosition, memento.IncludeChildren).Execute();
+                    }
                 }
+
                 GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
                 new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
