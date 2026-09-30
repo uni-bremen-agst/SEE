@@ -84,6 +84,11 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         private readonly StickyNoteTransformInteraction transformInteraction = new();
 
         /// <summary>
+        /// Handles spawning sticky notes.
+        /// </summary>
+        private readonly StickyNoteSpawnOperation spawnOperation = new();
+
+        /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
@@ -155,10 +160,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
                 switch(memento.Action)
                 {
                     case Operation.Spawn:
-                        if (stickyNote != null)
-                        {
-                            Destroyer.Destroy(stickyNote);
-                        }
+                        spawnOperation.Cancel();
                         break;
                     case Operation.Move:
                         GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
@@ -222,7 +224,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         /// </summary>
         private void Cancel()
         {
-            if ((stickyNote != null || stickyNoteHolder != null)
+            if ((stickyNote != null || stickyNoteHolder != null || spawnOperation.IsInProgress)
                 && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
@@ -246,10 +248,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
                     switch (selectedAction)
                     {
                         case Operation.Spawn:
-                            if (stickyNote != null)
-                            {
-                                Destroyer.Destroy(stickyNote);
-                            }
+                            spawnOperation.Cancel();
                             break;
                         case Operation.Move:
                             GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
@@ -281,62 +280,20 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         }
 
         /// <summary>
-        /// Through Spawn(), it is possible to create a new sticky note.
-        /// It will be positioned at the detected mouse click location.
-        /// For this, a collider is necessary at the target point.
+        /// Spawns a sticky note.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
         private bool Spawn()
         {
-            /// Invocation to place the sticky note at the desired location.
-            SpawnOnPosition();
-
-            /// Waits for the correct position and rotation of the sticky note placed from an unsuitable object.
-            SetPositionAndRotation(true);
-
-            /// When the spawning is finished,   create the sticky note on all clients and complete the current state.
-            if (finish)
+            if (!spawnOperation.TryExecute(out DrawableConfig config))
             {
-                DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(stickyNote));
-                new StickyNoteSpawnNetAction(config).Execute();
-                memento = new(config, selectedAction);
-                CurrentState = IReversibleAction.Progress.Completed;
-                return true;
+                return false;
             }
-            return false;
-        }
 
-        /// <summary>
-        /// Selects the position for the sticky note and spawns it there.
-        /// If the detected object is a drawable or has one or is part of a sticky note,
-        /// or is listed in the suitable objects list by name or tag,
-        /// it is not necessary to choose a rotation, as it can be inherited from the detected object.
-        /// Otherwise, a desired rotation must be selected for the sticky note.
-        /// </summary>
-        private void SpawnOnPosition()
-        {
-            if (SEEInput.LeftMouseDown() && !inProgress
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit))
-            {
-                inProgress = true;
-                stickyNote = GameStickyNoteManager.Spawn(raycastHit);
-
-                /// Block for the rotation of the suitable object.
-                if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
-                    || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
-                    || GameFinder.IsPartOfADrawable(raycastHit.collider.gameObject)
-                    || ValueHolder.IsASuitableObjectForStickyNote(raycastHit.collider.gameObject))
-                {
-                    finish = true;
-                }
-                else
-                {
-                    /// Block for selecting the rotation and the right position.
-                    StickyNoteMenu.Instance.Destroy();
-                    StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
-                    StickyNoteMoveMenu.Instance.Enable(stickyNote.GetRootParent(), true);
-                }
-            }
+            memento = new Memento(config, selectedAction);
+            finish = true;
+            CurrentState = IReversibleAction.Progress.Completed;
+            return true;
         }
 
         /// <summary>
@@ -344,7 +301,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         /// Additionally, as long as no finish is received from the menus,
         /// moving via key and rotating via mouse wheel are provided.
         /// </summary>
-        private void SetPositionAndRotation(bool spawnMode)
+        private void SetPositionAndRotation()
         {
             if (StickyNoteMoveMenu.Instance.TryGetFinish(out bool isFinished))
             {
@@ -352,7 +309,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             }
             else if (stickyNote != null && StickyNoteMoveMenu.Instance.IsOpen())
             {
-                transformInteraction.MoveByKey(stickyNote, !spawnMode);
+                transformInteraction.MoveByKey(stickyNote, true);
             }
 
             if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
@@ -361,7 +318,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             }
             else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
-                transformInteraction.RotateByWheel(stickyNote, !spawnMode);
+                transformInteraction.RotateByWheel(stickyNote, true);
             }
         }
 
@@ -392,7 +349,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             MoveByMouse();
 
             /// This block is executed after move by mouse and allows fine-tuning for the position and rotation.
-            SetPositionAndRotation(false);
+            SetPositionAndRotation();
 
             /// When the moving is finish completed the current state.
             /// And save the position and rotation in memento, because they could be changed with the menu's.
