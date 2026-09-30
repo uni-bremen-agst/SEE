@@ -136,11 +136,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (IdentifierNameSyntax reference in references)
             {
-                if (IsSupportedReadOnlySequenceObservation(
+                if (ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation(
                         reference,
                         semanticModel)
-                    || IsSupportedSequenceNullObservation(reference)
-                    || IsSourceHelperArgumentProvenToPreserveSequenceContents(
+                    || ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedSequenceNullObservation(reference)
+                    || ExceptionFlowSequenceContentPreservationFactsProvider.IsSourceHelperArgumentProvenToPreserveSequenceContents(
                         reference,
                         semanticModel))
                 {
@@ -341,7 +341,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 declaredMethod.Parameters[parameterIndex];
 
             if (parameterSymbol.RefKind != RefKind.None
-                || !DoesSourceParameterPreserveSequenceContents(
+                || !ExceptionFlowSequenceContentPreservationFactsProvider.DoesSourceParameterPreserveSequenceContents(
                     parameterSymbol,
                     declarationSemanticModel))
             {
@@ -619,7 +619,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel.GetSymbolInfo(memberAccess);
 
             return memberSymbolInfo.Symbol is IPropertySymbol propertySymbol
-                && IsFrameworkCollectionCountProperty(propertySymbol);
+                && ExceptionFlowSequenceCollectionFactsProvider.IsFrameworkCollectionCountProperty(propertySymbol);
         }
 
         /// <summary>

@@ -352,7 +352,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (symbolInfo.Symbol is not IMethodSymbol selectedMethod
                 || !string.Equals(selectedMethod.Name, "TryGetValue", StringComparison.Ordinal)
-                || !IsDictionaryType(selectedMethod.ContainingType)
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(selectedMethod.ContainingType)
                 || invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
             {
                 return false;
@@ -590,7 +590,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(semanticModel, declaration.SyntaxTree);
 
             if (propertySemanticModel == null
-                || !IsKnownEmptyDictionaryCreation(
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation(
                     declaration.Initializer.Value,
                     propertySemanticModel))
             {
@@ -618,7 +618,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsDictionaryOfListsType(ITypeSymbol typeSymbol)
         {
             if (typeSymbol is not INamedTypeSymbol dictionaryType
-                || !IsDictionaryType(dictionaryType)
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(dictionaryType)
                 || dictionaryType.TypeArguments.Length != 2)
             {
                 return false;
@@ -769,7 +769,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
             if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !IsDictionaryType(methodSymbol.ContainingType))
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(methodSymbol.ContainingType))
             {
                 return false;
             }
@@ -1027,8 +1027,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
 
-            if (IsSupportedReadOnlySequenceObservation(reference, semanticModel)
-                || IsSupportedSequenceNullObservation(reference))
+            if (ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation(reference, semanticModel)
+                || ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedSequenceNullObservation(reference))
             {
                 return true;
             }
@@ -1050,7 +1050,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return true;
                 }
 
-                return IsSourceHelperArgumentProvenToPreserveSequenceContents(
+                return ExceptionFlowSequenceContentPreservationFactsProvider.IsSourceHelperArgumentProvenToPreserveSequenceContents(
                     reference,
                     semanticModel);
             }

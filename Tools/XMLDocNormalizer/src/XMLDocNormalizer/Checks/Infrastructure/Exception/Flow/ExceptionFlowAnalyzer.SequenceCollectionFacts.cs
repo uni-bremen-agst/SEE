@@ -126,7 +126,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     if (declarationNode
                             is not VariableDeclaratorSyntax variableDeclarator ||
                         variableDeclarator.Initializer == null ||
-                        !IsLocalSequenceInitializerStillCurrent(
+                        !ExceptionFlowSequenceContentPreservationFactsProvider.IsLocalSequenceInitializerStillCurrent(
                             unwrappedExpression,
                             localSymbol,
                             variableDeclarator,
@@ -224,7 +224,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
-            if (IsSupportedReadOnlySequenceObservation(
+            if (ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation(
                     reference,
                     semanticModel))
             {

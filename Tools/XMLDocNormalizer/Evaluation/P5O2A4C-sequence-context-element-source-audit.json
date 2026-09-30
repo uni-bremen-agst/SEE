@@ -1,0 +1,1200 @@
+{
+    "Schema":  "P5O2A4C.SequenceContextElementSourceOwnership.v1",
+    "WorkPackage":  "P5O2A4C - Sequence Context / Element / Source Ownership Decomposition",
+    "Head":  "cc621e85d350457816493b69cc53d65bca19a01a",
+    "InitialStatus":  [
+                          "M ../../.gitignore"
+                      ],
+    "InitialCoreBuildChurn":  [
+
+                              ],
+    "Baseline":  {
+                     "AnalyzerOwnedDownstream":  49,
+                     "FactFamilies":  6,
+                     "SccToAnalyzer":  32,
+                     "SccToProviders":  61,
+                     "SccToSemanticScope":  18,
+                     "ProviderToAnalyzer":  0,
+                     "AnalyzerPartials":  42,
+                     "AnalyzerNonblankSloc":  20975,
+                     "SccMethods":  63,
+                     "SccInternalEdges":  112
+                 },
+    "SequenceGroupBefore":  {
+                                "Methods":  22,
+                                "SccToGroup":  20,
+                                "GroupToScc":  0,
+                                "GroupInternalEdges":  22,
+                                "GroupToOtherAnalyzerMethods":  0,
+                                "GroupToExistingProviders":  9,
+                                "GroupToSemanticScope":  1,
+                                "MethodSccs":  [
+                                                   {
+                                                       "Size":  1,
+                                                       "Count":  22
+                                                   }
+                                               ],
+                                "OriginalFamilies":  [
+                                                         {
+                                                             "Name":  "Sequence Context",
+                                                             "Methods":  5,
+                                                             "SccIncomingEdges":  4
+                                                         },
+                                                         {
+                                                             "Name":  "Sequence Element Facts",
+                                                             "Methods":  12,
+                                                             "SccIncomingEdges":  15
+                                                         },
+                                                         {
+                                                             "Name":  "Sequence Source Facts",
+                                                             "Methods":  5,
+                                                             "SccIncomingEdges":  1
+                                                         }
+                                                     ]
+                            },
+    "MethodInventory":  [
+                            {
+                                "Name":  "IsForeachIterationVariableProvenNonNullByCallContext",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsForeachIterationVariableProvenNonNullByCallContext(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceCallContext.cs",
+                                "OriginalLine":  157,
+                                "OriginalCondensationFamily":  "Sequence Context",
+                                "FinalResponsibilityFamily":  "Sequence call-context projection",
+                                "Responsibility":  "call-context non-null-element projection to foreach iteration variable",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowCallContextFactProjector",
+                                "CurrentFile":  "ExceptionFlowCallContextFactProjector.cs",
+                                "CurrentLine":  171,
+                                "DirectCallers":  [
+                                                      "IsLocalGuaranteedNonNull"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsSequenceParameterFactStillCurrent",
+                                                      "ExceptionFlowSymbolUsageFacts.cs:72:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax)"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsLocalGuaranteedNonNull"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsSequenceParameterFactStillCurrent"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  true,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsSequenceParameterFactStillCurrent",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceParameterFactStillCurrent(Microsoft.CodeAnalysis.CSharp.Syntax.ForEachStatementSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceCallContext.cs",
+                                "OriginalLine":  224,
+                                "OriginalCondensationFamily":  "Sequence Context",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "foreach-site parameter fact currentness",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  271,
+                                "DirectCallers":  [
+                                                      "GetDictionaryEntryValueFacts",
+                                                      "IsForeachIterationVariableProvenNonNullByCallContext"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsSequenceParameterFactStillCurrentAtUse",
+                                                      "ExceptionFlowSymbolUsageFacts.cs:50:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsForeachIterationVariableProvenNonNullByCallContext"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsSequenceParameterFactStillCurrentAtUse"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "GetDictionaryEntryValueFacts"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.ForEachStatementSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsSequenceParameterFactStillCurrentAtUse",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceParameterFactStillCurrentAtUse(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceCallContext.cs",
+                                "OriginalLine":  265,
+                                "OriginalCondensationFamily":  "Sequence Context",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "top-level parameter fact currentness",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  312,
+                                "DirectCallers":  [
+                                                      "IsSequenceExpressionProvenToExcludeNullElements",
+                                                      "IsSequenceParameterFactStillCurrent",
+                                                      "AreSequenceElementsProvenNonNull"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "DoesStatementPreserveSequenceParameterContents"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsSequenceExpressionProvenToExcludeNullElements",
+                                                   "AreSequenceElementsProvenNonNull"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsSequenceParameterFactStillCurrent"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "DoesStatementPreserveSequenceParameterContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "DoesStatementPreserveSequenceParameterContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesStatementPreserveSequenceParameterContents(Microsoft.CodeAnalysis.CSharp.Syntax.StatementSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceCallContext.cs",
+                                "OriginalLine":  319,
+                                "OriginalCondensationFamily":  "Sequence Context",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "parameter statement preservation",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  366,
+                                "DirectCallers":  [
+                                                      "IsSequenceParameterFactStillCurrentAtUse"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsSupportedSequenceNullObservation",
+                                                      "IsSupportedReadOnlySequenceObservation",
+                                                      "ExceptionFlowSymbolUsageFacts.cs:50:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsSequenceParameterFactStillCurrentAtUse"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsSupportedSequenceNullObservation",
+                                                     "IsSupportedReadOnlySequenceObservation"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.StatementSyntax, Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsSupportedSequenceNullObservation",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSupportedSequenceNullObservation(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceCallContext.cs",
+                                "OriginalLine":  362,
+                                "OriginalCondensationFamily":  "Sequence Context",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "null-comparison observation classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  409,
+                                "DirectCallers":  [
+                                                      "DoesStatementPreserveSequenceParameterContents",
+                                                      "IsDictionarySequenceAliasReferenceSafe",
+                                                      "DoesSourceParameterPreserveSequenceContents",
+                                                      "DoesStatementPreserveSequenceSymbolContents"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsDictionarySequenceAliasReferenceSafe"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesStatementPreserveSequenceParameterContents",
+                                                     "DoesSourceParameterPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "DoesStatementPreserveSequenceSymbolContents"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsLocalSequenceInitializerStillCurrent",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalSequenceInitializerStillCurrent(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.CSharp.Syntax.VariableDeclaratorSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  139,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "local initializer currentness",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  472,
+                                "DirectCallers":  [
+                                                      "IsGroupingSequenceProvenToContainNonNullElements",
+                                                      "IsLocalSequenceExpressionProvenToExcludeNullElements"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                                                      "DoesStatementPreserveLocalSequenceContents",
+                                                      "ExceptionFlowDereferenceFactDiscovery.cs:30:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDereferenceFactDiscovery.GetSafeContainingStatement(Microsoft.CodeAnalysis.CSharp.Syntax.BlockSyntax, Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsGroupingSequenceProvenToContainNonNullElements",
+                                                   "IsLocalSequenceExpressionProvenToExcludeNullElements"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+
+                                                 ],
+                                "GroupCallees":  [
+                                                     "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                                                     "DoesStatementPreserveLocalSequenceContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.CSharp.Syntax.VariableDeclaratorSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesContainingStatementEntryPreserveLocalSequenceContents(Microsoft.CodeAnalysis.CSharp.Syntax.BlockSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  237,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "nested statement-entry preservation",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  570,
+                                "DirectCallers":  [
+                                                      "IsLocalSequenceInitializerStillCurrent"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "DoesSyntaxPreserveLocalSequenceContents"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsLocalSequenceInitializerStillCurrent"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "DoesSyntaxPreserveLocalSequenceContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.BlockSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "DoesStatementPreserveLocalSequenceContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesStatementPreserveLocalSequenceContents(Microsoft.CodeAnalysis.CSharp.Syntax.StatementSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  281,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "local statement preservation",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  614,
+                                "DirectCallers":  [
+                                                      "IsLocalSequenceInitializerStillCurrent"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "DoesSyntaxPreserveLocalSequenceContents"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsLocalSequenceInitializerStillCurrent"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "DoesSyntaxPreserveLocalSequenceContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.StatementSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "DoesSyntaxPreserveLocalSequenceContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesSyntaxPreserveLocalSequenceContents(Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  305,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "local syntax preservation",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  638,
+                                "DirectCallers":  [
+                                                      "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                                                      "DoesStatementPreserveLocalSequenceContents"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsSupportedReadOnlySequenceObservation",
+                                                      "IsSourceHelperArgumentProvenToPreserveSequenceContents",
+                                                      "ExceptionFlowSymbolUsageFacts.cs:50:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                                                     "DoesStatementPreserveLocalSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsSupportedReadOnlySequenceObservation",
+                                                     "IsSourceHelperArgumentProvenToPreserveSequenceContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsSupportedReadOnlySequenceObservation",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSupportedReadOnlySequenceObservation(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  350,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "read-only Count/Length observation classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  683,
+                                "DirectCallers":  [
+                                                      "IsLocalListProvenToContainOnlyDefinedEnumValues",
+                                                      "DoesStatementPreserveSequenceParameterContents",
+                                                      "IsLocalListReferenceSafeForNonNullElements",
+                                                      "DoesSyntaxPreserveLocalSequenceContents",
+                                                      "IsDictionarySequenceAliasReferenceSafe",
+                                                      "DoesSourceParameterPreserveSequenceContents",
+                                                      "DoesStatementPreserveSequenceSymbolContents"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsFrameworkCollectionCountProperty"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsLocalListProvenToContainOnlyDefinedEnumValues",
+                                                   "IsLocalListReferenceSafeForNonNullElements",
+                                                   "IsDictionarySequenceAliasReferenceSafe"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesStatementPreserveSequenceParameterContents",
+                                                     "DoesSyntaxPreserveLocalSequenceContents",
+                                                     "DoesSourceParameterPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsFrameworkCollectionCountProperty"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "DoesStatementPreserveSequenceSymbolContents"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsFrameworkCollectionCountProperty",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsFrameworkCollectionCountProperty(Microsoft.CodeAnalysis.IPropertySymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  410,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "supported framework Count-property shape classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  192,
+                                "DirectCallers":  [
+                                                      "IsSupportedReadOnlySequenceObservation",
+                                                      "IsSequenceCountComparedEqualToZero"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsSupportedReadOnlySequenceObservation"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "IsSequenceCountComparedEqualToZero"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.IPropertySymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "TryGetElementPreservingSequenceSource",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetElementPreservingSequenceSource(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.IMethodSymbol, Microsoft.CodeAnalysis.IMethodSymbol, out Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax?)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  489,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "element-preserving LINQ source projection",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  263,
+                                "DirectCallers":  [
+                                                      "IsSequenceExpressionProvenToExcludeNullElements"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "TryGetSequenceSourceExpression",
+                                                      "IsElementPreservingSequenceMethod"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsSequenceExpressionProvenToExcludeNullElements"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsElementPreservingSequenceMethod"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.IMethodSymbol, Microsoft.CodeAnalysis.IMethodSymbol, out Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax?)",
+                                "Output":  "bool plus out ExpressionSyntax?",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsElementPreservingSequenceMethod",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsElementPreservingSequenceMethod(Microsoft.CodeAnalysis.IMethodSymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  521,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "element-preserving LINQ method classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  291,
+                                "DirectCallers":  [
+                                                      "TryGetElementPreservingSequenceSource"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "TryGetElementPreservingSequenceSource"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.IMethodSymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsDictionaryValuesProperty",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryValuesProperty(Microsoft.CodeAnalysis.IPropertySymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  611,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "framework dictionary Values-property classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  321,
+                                "DirectCallers":  [
+                                                      "IsDictionaryValuesExpressionProvenToExcludeNullElements",
+                                                      "IsDictionaryReferenceSafeForNonNullValues"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsDictionaryType"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsDictionaryValuesExpressionProvenToExcludeNullElements",
+                                                   "IsDictionaryReferenceSafeForNonNullValues"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsDictionaryType"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.IPropertySymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsKnownEmptyDictionaryCreation",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsKnownEmptyDictionaryCreation(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  746,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "empty framework dictionary creation classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  416,
+                                "DirectCallers":  [
+                                                      "IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues",
+                                                      "IsLocalDictionaryProvenToExcludeNullValues",
+                                                      "IsSupportedDictionarySequenceProperty"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsDictionaryType",
+                                                      "IsEqualityComparerType"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues",
+                                                   "IsLocalDictionaryProvenToExcludeNullValues"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsDictionaryType",
+                                                     "IsEqualityComparerType"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "IsSupportedDictionarySequenceProperty"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsDictionaryType",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryType(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  815,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "framework dictionary type classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  355,
+                                "DirectCallers":  [
+                                                      "IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues",
+                                                      "IsDictionarySourceHelperArgumentSafeForNonNullValues",
+                                                      "IsDictionaryValuesProperty",
+                                                      "IsLocalDictionaryProvenToExcludeNullValues",
+                                                      "IsKnownEmptyDictionaryCreation",
+                                                      "IsDictionaryMemberInvocationSafeForNonNullValues",
+                                                      "TryGetDictionaryReceiverFromTryGetValue",
+                                                      "IsDictionaryOfListsType",
+                                                      "IsDictionarySequencePropertyReferenceSafe"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues",
+                                                   "IsDictionarySourceHelperArgumentSafeForNonNullValues",
+                                                   "IsLocalDictionaryProvenToExcludeNullValues",
+                                                   "IsDictionaryMemberInvocationSafeForNonNullValues",
+                                                   "IsDictionarySequencePropertyReferenceSafe"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsDictionaryValuesProperty",
+                                                     "IsKnownEmptyDictionaryCreation"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "TryGetDictionaryReceiverFromTryGetValue",
+                                                             "IsDictionaryOfListsType"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsEqualityComparerType",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsEqualityComparerType(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceElementFacts.cs",
+                                "OriginalLine":  850,
+                                "OriginalCondensationFamily":  "Sequence Element Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "framework equality-comparer type classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  384,
+                                "DirectCallers":  [
+                                                      "IsKnownEmptyDictionaryCreation"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsKnownEmptyDictionaryCreation"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsSourceHelperArgumentProvenToPreserveSequenceContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSourceHelperArgumentProvenToPreserveSequenceContents(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs",
+                                "OriginalLine":  33,
+                                "OriginalCondensationFamily":  "Sequence Source Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "source-helper argument-to-parameter preservation proof",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  33,
+                                "DirectCallers":  [
+                                                      "DoesSyntaxPreserveLocalSequenceContents",
+                                                      "IsDictionarySequenceAliasReferenceSafe",
+                                                      "DoesStatementPreserveSequenceSymbolContents"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsKnownMaterializedSequenceType",
+                                                      "DoesSourceParameterPreserveSequenceContents",
+                                                      "ExceptionFlowArgumentMapper.cs:23:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowArgumentMapper.GetParameterIndex(Microsoft.CodeAnalysis.CSharp.Syntax.ArgumentSyntax, int, Microsoft.CodeAnalysis.IMethodSymbol)"
+                                                  ],
+                                "SccCallers":  [
+                                                   "IsDictionarySequenceAliasReferenceSafe"
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesSyntaxPreserveLocalSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsKnownMaterializedSequenceType",
+                                                     "DoesSourceParameterPreserveSequenceContents"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "DoesStatementPreserveSequenceSymbolContents"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsKnownMaterializedSequenceType",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsKnownMaterializedSequenceType(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs",
+                                "OriginalLine":  118,
+                                "OriginalCondensationFamily":  "Sequence Source Facts",
+                                "FinalResponsibilityFamily":  "Sequence collection shape and source projection",
+                                "Responsibility":  "materialized array/list type classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                                "CurrentLine":  341,
+                                "DirectCallers":  [
+                                                      "IsSourceHelperArgumentProvenToPreserveSequenceContents"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "IsListType"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsSourceHelperArgumentProvenToPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.ITypeSymbol)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "DoesSourceParameterPreserveSequenceContents",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesSourceParameterPreserveSequenceContents(Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs",
+                                "OriginalLine":  140,
+                                "OriginalCondensationFamily":  "Sequence Source Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "source helper parameter-use preservation proof",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  122,
+                                "DirectCallers":  [
+                                                      "IsSourceHelperArgumentProvenToPreserveSequenceContents",
+                                                      "MethodSuccessfulCompletionProvesParameterElementsNonNull"
+                                                  ],
+                                "DirectCallees":  [
+                                                      "GetSemanticModelForSyntaxTree",
+                                                      "IsSupportedSequenceNullObservation",
+                                                      "IsSupportedReadOnlySequenceObservation",
+                                                      "IsInsideNestedCallable",
+                                                      "IsDirectForeachSequenceObservation",
+                                                      "ExceptionFlowSymbolUsageFacts.cs:50:XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "IsSourceHelperArgumentProvenToPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+                                                     "IsSupportedSequenceNullObservation",
+                                                     "IsSupportedReadOnlySequenceObservation",
+                                                     "IsInsideNestedCallable",
+                                                     "IsDirectForeachSequenceObservation"
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+                                                             "MethodSuccessfulCompletionProvesParameterElementsNonNull"
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  true,
+                                "SemanticScopeDependency":  true,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsInsideNestedCallable",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsInsideNestedCallable(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SyntaxNode)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs",
+                                "OriginalLine":  218,
+                                "OriginalCondensationFamily":  "Sequence Source Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "captured/nested callable observation rejection",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  200,
+                                "DirectCallers":  [
+                                                      "DoesSourceParameterPreserveSequenceContents"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesSourceParameterPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SyntaxNode)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            },
+                            {
+                                "Name":  "IsDirectForeachSequenceObservation",
+                                "Signature":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDirectForeachSequenceObservation(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax)",
+                                "OriginalFile":  "ExceptionFlowAnalyzer.SequenceSourceHelpers.cs",
+                                "OriginalLine":  252,
+                                "OriginalCondensationFamily":  "Sequence Source Facts",
+                                "FinalResponsibilityFamily":  "Sequence content preservation",
+                                "Responsibility":  "direct foreach observation classification",
+                                "OwnerBefore":  "ExceptionFlowAnalyzer",
+                                "OwnerAfter":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                "CurrentFile":  "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+                                "CurrentLine":  234,
+                                "DirectCallers":  [
+                                                      "DoesSourceParameterPreserveSequenceContents"
+                                                  ],
+                                "DirectCallees":  [
+
+                                                  ],
+                                "SccCallers":  [
+
+                                               ],
+                                "SccCallees":  [
+
+                                               ],
+                                "GroupCallers":  [
+                                                     "DoesSourceParameterPreserveSequenceContents"
+                                                 ],
+                                "GroupCallees":  [
+
+                                                 ],
+                                "OtherAnalyzerCallers":  [
+
+                                                         ],
+                                "Inputs":  "(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax)",
+                                "Output":  "bool",
+                                "SemanticModelDependency":  false,
+                                "SemanticScopeDependency":  false,
+                                "CallContextDependency":  false,
+                                "ReturnFactDependency":  false,
+                                "CacheDependency":  false,
+                                "RecursiveCalleeAnalysis":  false
+                            }
+                        ],
+    "FamilyClassification":  [
+                                 {
+                                     "Name":  "Sequence collection shape and source projection",
+                                     "Methods":  8,
+                                     "Kind":  "leaf",
+                                     "Owner":  "ExceptionFlowSequenceCollectionFactsProvider",
+                                     "SemanticScope":  false,
+                                     "CallContext":  false,
+                                     "Cache":  false
+                                 },
+                                 {
+                                     "Name":  "Sequence content preservation",
+                                     "Methods":  13,
+                                     "Kind":  "intermediate",
+                                     "Owner":  "ExceptionFlowSequenceContentPreservationFactsProvider",
+                                     "SemanticScope":  true,
+                                     "CallContext":  false,
+                                     "Cache":  false
+                                 },
+                                 {
+                                     "Name":  "Sequence call-context projection",
+                                     "Methods":  1,
+                                     "Kind":  "hub-facing projection",
+                                     "Owner":  "ExceptionFlowCallContextFactProjector",
+                                     "SemanticScope":  false,
+                                     "CallContext":  true,
+                                     "Cache":  false
+                                 }
+                             ],
+    "FamilyDependencyGraph":  [
+                                  {
+                                      "From":  "Sequence call-context projection",
+                                      "To":  "Sequence content preservation",
+                                      "Edges":  1
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "Sequence collection shape and source projection",
+                                      "Edges":  2
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowSymbolUsageFacts",
+                                      "Edges":  4
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowDataFlowFactsProvider",
+                                      "Edges":  1
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowDereferenceFactDiscovery",
+                                      "Edges":  1
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowArgumentMapper",
+                                      "Edges":  1
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowRuntimeDispatchClassifier",
+                                      "Edges":  1
+                                  },
+                                  {
+                                      "From":  "Sequence content preservation",
+                                      "To":  "ExceptionFlowSemanticScope",
+                                      "Edges":  1
+                                  }
+                              ],
+    "ExtractionOrder":  [
+                            {
+                                "Ordinal":  1,
+                                "Family":  "Sequence collection shape and source projection",
+                                "Reason":  "leaf classifiers and projections extend the existing cohesive collection owner"
+                            },
+                            {
+                                "Ordinal":  2,
+                                "Family":  "Sequence content preservation",
+                                "Reason":  "acyclic after collection extraction and closed over all local/source currentness helpers"
+                            },
+                            {
+                                "Ordinal":  3,
+                                "Family":  "Sequence call-context projection",
+                                "Reason":  "single context consumer depends only on the extracted preservation owner"
+                            }
+                        ],
+    "After":  {
+                  "AnalyzerOwnedDownstream":  27,
+                  "FactFamilies":  3,
+                  "SccToAnalyzer":  12,
+                  "SccToProviders":  81,
+                  "SccToSemanticScope":  18,
+                  "ProviderToAnalyzer":  0,
+                  "AnalyzerPartials":  41,
+                  "AnalyzerNonblankSloc":  19948,
+                  "ExtractedAnalyzerNonblankSloc":  1027,
+                  "SccMethods":  63,
+                  "SccInternalEdges":  112,
+                  "SccChanged":  false,
+                  "ComponentCycles":  0
+              },
+    "RemainingAnalyzerFamilies":  [
+                                      {
+                                          "Name":  "Dictionary value facts",
+                                          "Methods":  4,
+                                          "SccIncomingEdges":  4
+                                      },
+                                      {
+                                          "Name":  "Sequence range and dictionary mutation",
+                                          "Methods":  9,
+                                          "SccIncomingEdges":  7
+                                      },
+                                      {
+                                          "Name":  "Successful sequence validation",
+                                          "Methods":  14,
+                                          "SccIncomingEdges":  1
+                                      }
+                                  ],
+    "Validation":  {
+                       "Focused":  "63/63",
+                       "BroadP5P6G":  "966/966",
+                       "FullSuite":  "2530/2530; 0 failed; 0 skipped",
+                       "Build":  "0 warnings; 0 errors",
+                       "SelfAnalysisDurationMilliseconds":  58778,
+                       "SelfAnalysisTotal":  16,
+                       "DOC610":  0,
+                       "DOC611":  1,
+                       "DOC631":  15,
+                       "DOC632":  0,
+                       "CanonicalAdded":  0,
+                       "CanonicalRemoved":  0,
+                       "CanonicalChangedEvidence":  0,
+                       "ExactFindingArraysEqual":  true,
+                       "BaselineHash":  "15BBAC06F82C233BCB652B2ADAA3A83322E7E626469F8C77E400C1259CA71B1B",
+                       "E1":  "7 candidates; 5 complete; 2 expected fail closed; 0 unexpected; 0 potential bugs",
+                       "Dapper":  "ConfigurationReconstructed / ConfigurationUnsupported; optimization=release-debug-plus",
+                       "OneOf":  "PdbValidated / MissingArtifact",
+                       "Semver":  "complete; source body, semantic model, and exception probe succeeded",
+                       "CrashObserved":  false,
+                       "FlakeObserved":  false
+                   },
+    "Readiness":  {
+                      "SccExtractionReady":  false,
+                      "P5O2BReady":  false,
+                      "SmallestNextBlocker":  "Four Analyzer-owned Dictionary value fact methods receiving four direct SCC edges",
+                      "RecommendedNextStep":  "Extract the four-method Dictionary value facts family, then remeasure the remaining Range and Successful-sequence families."
+                  }
+}

@@ -94,7 +94,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return true;
                 }
 
-                if (!IsLocalSequenceInitializerStillCurrent(
+                if (!ExceptionFlowSequenceContentPreservationFactsProvider.IsLocalSequenceInitializerStillCurrent(
                         expression,
                         localSymbol,
                         variableDeclarator,
@@ -115,429 +115,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
-        /// <summary>
-        /// Determines whether a local sequence has remained unchanged between
-        /// its declaration and the current use site.
-        /// </summary>
-        /// <param name="expression">
-        /// The current local-variable use.
-        /// </param>
-        /// <param name="localSymbol">
-        /// The local symbol whose writes, mutations, and escapes are inspected.
-        /// </param>
-        /// <param name="variableDeclarator">
-        /// The declaration containing the sequence initializer.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for data-flow and symbol analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when a supported path connects declaration
-        /// and use and no intervening operation can replace, mutate, or expose
-        /// the sequence; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsLocalSequenceInitializerStillCurrent(
-            ExpressionSyntax expression,
-            ILocalSymbol localSymbol,
-            VariableDeclaratorSyntax variableDeclarator,
-            SemanticModel semanticModel)
-        {
-            if (variableDeclarator.Parent?.Parent
-                    is not LocalDeclarationStatementSyntax declarationStatement)
-            {
-                return false;
-            }
 
-            StatementSyntax? useStatement =
-                expression.AncestorsAndSelf()
-                    .OfType<StatementSyntax>()
-                    .FirstOrDefault();
 
-            if (useStatement == null
-                || useStatement.SyntaxTree != declarationStatement.SyntaxTree
-                || useStatement.SpanStart <= declarationStatement.SpanStart)
-            {
-                return false;
-            }
 
-            StatementSyntax currentStatement = useStatement;
 
-            while (currentStatement.Parent is BlockSyntax containingBlock)
-            {
-                int currentIndex =
-                    containingBlock.Statements.IndexOf(currentStatement);
 
-                if (currentIndex < 0)
-                {
-                    return false;
-                }
 
-                for (int index = currentIndex - 1; index >= 0; index--)
-                {
-                    StatementSyntax precedingStatement =
-                        containingBlock.Statements[index];
 
-                    if (ReferenceEquals(precedingStatement, declarationStatement))
-                    {
-                        return true;
-                    }
-
-                    ExceptionFlowDataFlowFacts dataFlow =
-                        ExceptionFlowDataFlowFactsProvider.GetFacts(
-                            precedingStatement,
-                            semanticModel);
-                    if (!dataFlow.Succeeded
-                        || dataFlow.WrittenInside.Any(
-                            writtenSymbol =>
-                                SymbolEqualityComparer.Default.Equals(
-                                    writtenSymbol,
-                                    localSymbol))
-                        || !DoesStatementPreserveLocalSequenceContents(
-                            precedingStatement,
-                            localSymbol,
-                            semanticModel))
-                    {
-                        return false;
-                    }
-                }
-
-                StatementSyntax? containingStatement =
-                    ExceptionFlowDereferenceFactDiscovery.GetSafeContainingStatement(
-                        containingBlock,
-                        localSymbol,
-                        semanticModel);
-                if (containingStatement == null
-                    || !DoesContainingStatementEntryPreserveLocalSequenceContents(
-                        containingBlock,
-                        localSymbol,
-                        semanticModel))
-                {
-                    return false;
-                }
-
-                currentStatement = containingStatement;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether entering a supported nested statement can
-        /// mutate or expose a local sequence before the nested block executes.
-        /// </summary>
-        /// <param name="block">The nested block containing the use.</param>
-        /// <param name="localSymbol">The tracked local sequence.</param>
-        /// <param name="semanticModel">
-        /// The semantic model used for reference analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when entry into the block preserves the
-        /// sequence contents; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool DoesContainingStatementEntryPreserveLocalSequenceContents(
-            BlockSyntax block,
-            ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
-        {
-            SyntaxNode? entryExpression =
-                block.Parent switch
-                {
-                    IfStatementSyntax ifStatement => ifStatement.Condition,
-                    ElseClauseSyntax { Parent: IfStatementSyntax ifStatement } =>
-                        ifStatement.Condition,
-                    CommonForEachStatementSyntax forEachStatement =>
-                        forEachStatement.Expression,
-                    BlockSyntax => null,
-                    _ => block
-                };
-
-            return entryExpression == null
-                || !ReferenceEquals(entryExpression, block)
-                    && DoesSyntaxPreserveLocalSequenceContents(
-                        entryExpression,
-                        localSymbol,
-                        semanticModel);
-        }
-
-        /// <summary>
-        /// Determines whether an intervening statement preserves the contents
-        /// and ownership of a local sequence whose element facts are being
-        /// reused.
-        /// </summary>
-        /// <param name="statement">
-        /// The intervening statement to inspect.
-        /// </param>
-        /// <param name="localSymbol">
-        /// The sequence local whose contents must remain unchanged.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the statement does not reference the
-        /// sequence or only performs a supported read-only observation;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool DoesStatementPreserveLocalSequenceContents(
-            StatementSyntax statement,
-            ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
-        {
-            return DoesSyntaxPreserveLocalSequenceContents(
-                statement,
-                localSymbol,
-                semanticModel);
-        }
-
-        /// <summary>
-        /// Determines whether syntax only observes a local sequence without
-        /// mutating or exposing its contents.
-        /// </summary>
-        /// <param name="syntax">The syntax to inspect.</param>
-        /// <param name="localSymbol">The tracked local sequence.</param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when every reference is a supported
-        /// read-only use; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool DoesSyntaxPreserveLocalSequenceContents(
-            SyntaxNode syntax,
-            ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
-        {
-            IEnumerable<IdentifierNameSyntax> references =
-                syntax.DescendantNodesAndSelf()
-                    .OfType<IdentifierNameSyntax>()
-                    .Where(
-                        identifier =>
-                            ExpressionReferencesSymbol(
-                                identifier,
-                                localSymbol,
-                                semanticModel));
-
-            foreach (IdentifierNameSyntax reference in references)
-            {
-                if (IsSupportedReadOnlySequenceObservation(reference, semanticModel)
-                    || IsSourceHelperArgumentProvenToPreserveSequenceContents(reference, semanticModel))
-                {
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether a local sequence reference is a supported
-        /// read-only observation that cannot explicitly replace, mutate, or
-        /// expose the sequence contents.
-        /// </summary>
-        /// <param name="reference">
-        /// The local sequence reference to inspect.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for member resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the reference only reads a known
-        /// framework collection count or an array length; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsSupportedReadOnlySequenceObservation(
-            IdentifierNameSyntax reference,
-            SemanticModel semanticModel)
-        {
-            if (reference.Parent
-                    is not MemberAccessExpressionSyntax memberAccess ||
-                !ReferenceEquals(
-                    memberAccess.Expression,
-                    reference))
-            {
-                return false;
-            }
-
-            SymbolInfo memberSymbolInfo =
-                semanticModel.GetSymbolInfo(
-                    memberAccess);
-
-            if (memberSymbolInfo.Symbol
-                    is not IPropertySymbol propertySymbol)
-            {
-                return false;
-            }
-
-            if (IsFrameworkCollectionCountProperty(
-                    propertySymbol))
-            {
-                return true;
-            }
-
-            if (!string.Equals(
-                    propertySymbol.Name,
-                    "Length",
-                    StringComparison.Ordinal) ||
-                propertySymbol.GetMethod == null ||
-                propertySymbol.SetMethod != null ||
-                propertySymbol.Parameters.Length != 0)
-            {
-                return false;
-            }
-
-            TypeInfo receiverTypeInfo =
-                semanticModel.GetTypeInfo(
-                    reference);
-
-            return receiverTypeInfo.Type
-                is IArrayTypeSymbol;
-        }
-
-        /// <summary>
-        /// Determines whether a property is the read-only <c>Count</c>
-        /// property of a supported framework collection abstraction.
-        /// </summary>
-        /// <param name="propertySymbol">
-        /// The property symbol to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the property is a supported framework
-        /// collection count observation; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsFrameworkCollectionCountProperty(
-            IPropertySymbol propertySymbol)
-        {
-            if (!string.Equals(
-                    propertySymbol.Name,
-                    "Count",
-                    StringComparison.Ordinal) ||
-                propertySymbol.GetMethod == null ||
-                propertySymbol.SetMethod != null ||
-                propertySymbol.Parameters.Length != 0)
-            {
-                return false;
-            }
-
-            INamedTypeSymbol containingType =
-                propertySymbol.ContainingType.OriginalDefinition;
-
-            string namespaceName =
-                containingType.ContainingNamespace
-                    .ToDisplayString();
-
-            if (string.Equals(
-                    namespaceName,
-                    "System.Collections.Generic",
-                    StringComparison.Ordinal))
-            {
-                return string.Equals(
-                           containingType.Name,
-                           "IReadOnlyCollection",
-                           StringComparison.Ordinal) ||
-                       string.Equals(
-                           containingType.Name,
-                           "IReadOnlyList",
-                           StringComparison.Ordinal) ||
-                       string.Equals(
-                           containingType.Name,
-                           "ICollection",
-                           StringComparison.Ordinal) ||
-                       string.Equals(
-                           containingType.Name,
-                           "IList",
-                           StringComparison.Ordinal) ||
-                       string.Equals(
-                           containingType.Name,
-                           "List",
-                           StringComparison.Ordinal);
-            }
-
-            return string.Equals(
-                       namespaceName,
-                       "System.Collections",
-                       StringComparison.Ordinal) &&
-                   string.Equals(
-                       containingType.Name,
-                       "ICollection",
-                       StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Gets the source sequence of a supported element-preserving LINQ
-        /// invocation.
-        /// </summary>
-        /// <param name="invocation">
-        /// The invocation expression.
-        /// </param>
-        /// <param name="methodSymbol">
-        /// The method selected at the invocation site.
-        /// </param>
-        /// <param name="originalMethod">
-        /// The original definition of the selected method.
-        /// </param>
-        /// <param name="sourceExpression">
-        /// The resolved source sequence expression.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the invocation is a supported
-        /// element-preserving sequence operation and its source was resolved;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool TryGetElementPreservingSequenceSource(
-            InvocationExpressionSyntax invocation,
-            IMethodSymbol methodSymbol,
-            IMethodSymbol originalMethod,
-            out ExpressionSyntax? sourceExpression)
-        {
-            sourceExpression = null;
-
-            if (!IsElementPreservingSequenceMethod(
-                    originalMethod))
-            {
-                return false;
-            }
-
-            return ExceptionFlowSequenceCollectionFactsProvider.TryGetSequenceSourceExpression(
-                invocation,
-                methodSymbol,
-                out sourceExpression);
-        }
-
-        /// <summary>
-        /// Determines whether a framework sequence operation only filters, reorders,
-        /// or materializes its input elements and therefore preserves an existing
-        /// non-null element guarantee.
-        /// </summary>
-        /// <param name="methodSymbol">
-        /// The original framework method definition.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the method preserves the identity of its input
-        /// elements; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsElementPreservingSequenceMethod(
-            IMethodSymbol methodSymbol)
-        {
-            return string.Equals(
-                       methodSymbol.Name,
-                       "Where",
-                       StringComparison.Ordinal) ||
-                   string.Equals(
-                       methodSymbol.Name,
-                       "OrderBy",
-                       StringComparison.Ordinal) ||
-                   string.Equals(
-                       methodSymbol.Name,
-                       "ToArray",
-                       StringComparison.Ordinal) ||
-                   string.Equals(
-                       methodSymbol.Name,
-                       "ToList",
-                       StringComparison.Ordinal);
-        }
 
         /// <summary>
         /// Determines whether a dictionary <c>Values</c> expression is proven
@@ -570,7 +154,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (memberSymbolInfo.Symbol
                     is not IPropertySymbol propertySymbol ||
-                !IsDictionaryValuesProperty(
+                !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryValuesProperty(
                     propertySymbol))
             {
                 return false;
@@ -597,28 +181,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 inspectedSequenceSources);
         }
 
-        /// <summary>
-        /// Determines whether a property is the framework dictionary
-        /// <c>Values</c> property.
-        /// </summary>
-        /// <param name="propertySymbol">
-        /// The property symbol to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for the framework dictionary values
-        /// property; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsDictionaryValuesProperty(
-            IPropertySymbol propertySymbol)
-        {
-            return string.Equals(
-                       propertySymbol.Name,
-                       "Values",
-                       StringComparison.Ordinal) &&
-                   propertySymbol.Parameters.Length == 0 &&
-                   IsDictionaryType(
-                       propertySymbol.ContainingType);
-        }
 
         /// <summary>
         /// Determines whether a local dictionary is proven to exclude null
@@ -647,7 +209,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedSequenceSources)
         {
-            if (!IsDictionaryType(
+            if (!ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(
                     dictionaryLocal.Type) ||
                 dictionaryLocal.DeclaringSyntaxReferences.Length != 1 ||
                 !inspectedSequenceSources.Add(
@@ -675,7 +237,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         variableDeclarator.SyntaxTree);
 
                 if (declarationSemanticModel == null ||
-                    !IsKnownEmptyDictionaryCreation(
+                    !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation(
                         variableDeclarator.Initializer.Value,
                         declarationSemanticModel))
                 {
@@ -729,147 +291,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
         }
 
-        /// <summary>
-        /// Determines whether an expression creates an empty framework
-        /// dictionary without a collection initializer or source collection.
-        /// </summary>
-        /// <param name="creationExpression">
-        /// The dictionary creation expression.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for constructor resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the selected constructor cannot seed
-        /// dictionary entries; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsKnownEmptyDictionaryCreation(
-            ExpressionSyntax creationExpression,
-            SemanticModel semanticModel)
-        {
-            if (creationExpression
-                    is not ObjectCreationExpressionSyntax &&
-                creationExpression
-                    is not ImplicitObjectCreationExpressionSyntax)
-            {
-                return false;
-            }
 
-            InitializerExpressionSyntax? initializer =
-                creationExpression switch
-                {
-                    ObjectCreationExpressionSyntax objectCreation =>
-                        objectCreation.Initializer,
-                    ImplicitObjectCreationExpressionSyntax implicitCreation =>
-                        implicitCreation.Initializer,
-                    _ => null
-                };
 
-            if (initializer != null &&
-                initializer.Expressions.Count != 0)
-            {
-                return false;
-            }
-
-            SymbolInfo constructorSymbolInfo =
-                semanticModel.GetSymbolInfo(
-                    creationExpression);
-
-            if (constructorSymbolInfo.Symbol
-                    is not IMethodSymbol constructorSymbol ||
-                constructorSymbol.MethodKind !=
-                    MethodKind.Constructor ||
-                !IsDictionaryType(
-                    constructorSymbol.ContainingType))
-            {
-                return false;
-            }
-
-            foreach (IParameterSymbol parameter
-                     in constructorSymbol.Parameters)
-            {
-                if (parameter.Type.SpecialType ==
-                    SpecialType.System_Int32 ||
-                    IsEqualityComparerType(
-                        parameter.Type))
-                {
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether a type is the framework generic dictionary type.
-        /// </summary>
-        /// <param name="typeSymbol">
-        /// The type to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for the framework generic dictionary type;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsDictionaryType(
-            ITypeSymbol typeSymbol)
-        {
-            if (typeSymbol
-                is not INamedTypeSymbol namedType)
-            {
-                return false;
-            }
-
-            INamedTypeSymbol originalType =
-                namedType.OriginalDefinition;
-
-            return string.Equals(
-                       originalType.Name,
-                       "Dictionary",
-                       StringComparison.Ordinal) &&
-                   originalType.Arity == 2 &&
-                   string.Equals(
-                       originalType.ContainingNamespace
-                           .ToDisplayString(),
-                       "System.Collections.Generic",
-                       StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Determines whether a type is the framework generic equality
-        /// comparer interface.
-        /// </summary>
-        /// <param name="typeSymbol">
-        /// The type to inspect.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for the framework generic equality comparer;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsEqualityComparerType(
-            ITypeSymbol typeSymbol)
-        {
-            if (typeSymbol
-                is not INamedTypeSymbol namedType)
-            {
-                return false;
-            }
-
-            INamedTypeSymbol originalType =
-                namedType.OriginalDefinition;
-
-            return string.Equals(
-                       originalType.Name,
-                       "IEqualityComparer",
-                       StringComparison.Ordinal) &&
-                   originalType.Arity == 1 &&
-                   string.Equals(
-                       originalType.ContainingNamespace
-                           .ToDisplayString(),
-                       "System.Collections.Generic",
-                       StringComparison.Ordinal);
-        }
 
         /// <summary>
         /// Determines whether one dictionary reference preserves the invariant
@@ -910,7 +333,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (memberSymbolInfo.Symbol
                         is IPropertySymbol propertySymbol &&
-                    IsDictionaryValuesProperty(
+                    ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryValuesProperty(
                         propertySymbol))
                 {
                     return true;
@@ -972,7 +395,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     invocation);
 
             if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !IsDictionaryType(methodSymbol.ContainingType))
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(methodSymbol.ContainingType))
             {
                 return false;
             }
@@ -1119,7 +542,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (parameterSymbol.RefKind !=
                     RefKind.None ||
-                !IsDictionaryType(
+                !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(
                     parameterSymbol.Type))
             {
                 return false;

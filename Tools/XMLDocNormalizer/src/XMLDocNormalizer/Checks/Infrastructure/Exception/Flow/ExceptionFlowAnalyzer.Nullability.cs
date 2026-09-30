@@ -250,7 +250,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
-            if (IsForeachIterationVariableProvenNonNullByCallContext(
+            if (ExceptionFlowCallContextFactProjector.IsForeachIterationVariableProvenNonNullByCallContext(
                     expression,
                     localSymbol,
                     semanticModel,
@@ -499,7 +499,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (expressionSymbolInfo.Symbol is IParameterSymbol parameterSymbol
                 && callContext.GetParameterFacts(parameterSymbol)
                     .ContainsAll(ExceptionFlowValueFacts.NonNullElements)
-                && IsSequenceParameterFactStillCurrentAtUse(
+                && ExceptionFlowSequenceContentPreservationFactsProvider.IsSequenceParameterFactStillCurrentAtUse(
                     unwrappedExpression,
                     parameterSymbol,
                     semanticModel))
@@ -561,7 +561,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
-            if (TryGetElementPreservingSequenceSource(
+            if (ExceptionFlowSequenceCollectionFactsProvider.TryGetElementPreservingSequenceSource(
                     invocation,
                     methodSymbol,
                     originalMethod,

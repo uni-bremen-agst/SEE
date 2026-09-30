@@ -146,5 +146,75 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
         }
+
+        /// <summary>
+        /// Determines whether a foreach iteration variable is non-null because
+        /// its source parameter received a sequence-element fact at the call
+        /// site.
+        /// </summary>
+        /// <param name="expression">
+        /// The iteration-variable usage being analyzed.
+        /// </param>
+        /// <param name="localSymbol">
+        /// The iteration-variable symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model of the callable body.
+        /// </param>
+        /// <param name="callContext">
+        /// The parameter facts known for the callable.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the iteration variable is proven
+        /// non-null; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsForeachIterationVariableProvenNonNullByCallContext(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
+        {
+            IEnumerable<ForEachStatementSyntax> enclosingStatements =
+                expression.Ancestors()
+                    .OfType<ForEachStatementSyntax>();
+
+            foreach (ForEachStatementSyntax foreachStatement
+                     in enclosingStatements)
+            {
+                ISymbol? iterationVariable =
+                    semanticModel.GetDeclaredSymbol(
+                        foreachStatement);
+
+                if (!SymbolEqualityComparer.Default.Equals(
+                        iterationVariable,
+                        localSymbol))
+                {
+                    continue;
+                }
+
+                ExpressionSyntax sourceExpression =
+                    UnwrapParenthesizedExpression(
+                        foreachStatement.Expression);
+
+                SymbolInfo sourceSymbolInfo =
+                    semanticModel.GetSymbolInfo(sourceExpression);
+
+                if (sourceSymbolInfo.Symbol
+                        is not IParameterSymbol parameterSymbol
+                    || !callContext.GetParameterFacts(parameterSymbol)
+                        .ContainsAll(
+                            ExceptionFlowValueFacts.NonNullElements))
+                {
+                    return false;
+                }
+
+                return ExceptionFlowSequenceContentPreservationFactsProvider.IsSequenceParameterFactStillCurrent(
+                    foreachStatement,
+                    parameterSymbol,
+                    semanticModel);
+            }
+
+            return false;
+        }
     }
 }

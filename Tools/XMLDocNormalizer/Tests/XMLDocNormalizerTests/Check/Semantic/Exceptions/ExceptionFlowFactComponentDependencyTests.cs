@@ -34,6 +34,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 typeof(ExceptionFlowPrimitiveValueFactsProvider),
                 typeof(ExceptionFlowRuntimeDispatchClassifier),
                 typeof(ExceptionFlowSequenceCollectionFactsProvider),
+                typeof(ExceptionFlowSequenceContentPreservationFactsProvider),
                 typeof(ExceptionFlowSourcePositionValueFactsProvider),
                 typeof(ExceptionFlowStableMemberFacts),
                 typeof(ExceptionFlowStableSourceMemberFactsProvider),
@@ -69,6 +70,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "ExceptionFlowPrimitiveValueFactsProvider.cs",
                 "ExceptionFlowRuntimeDispatchClassifier.cs",
                 "ExceptionFlowSequenceCollectionFactsProvider.cs",
+                "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
                 "ExceptionFlowSourcePositionValueFactsProvider.cs",
                 "ExceptionFlowStableMemberFacts.cs",
                 "ExceptionFlowStableSourceMemberFactsProvider.cs",
@@ -131,6 +133,81 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 method => Assert.Contains(method, nullabilityMethods));
             Assert.All(
                 conditionMethods.Concat(frameworkMethods),
+                method => Assert.DoesNotContain(method, analyzerMethods));
+        }
+
+        /// <summary>
+        /// Ensures sequence shape, content-preservation, and call-context
+        /// projection methods have cohesive owners without Analyzer facades.
+        /// </summary>
+        [Fact]
+        public void SequenceHelpers_HaveDedicatedOwners()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] collectionMethods =
+            [
+                "IsFrameworkCollectionCountProperty",
+                "TryGetElementPreservingSequenceSource",
+                "IsElementPreservingSequenceMethod",
+                "IsDictionaryValuesProperty",
+                "IsKnownEmptyDictionaryCreation",
+                "IsDictionaryType",
+                "IsEqualityComparerType",
+                "IsKnownMaterializedSequenceType"
+            ];
+            string[] preservationMethods =
+            [
+                "IsSourceHelperArgumentProvenToPreserveSequenceContents",
+                "DoesSourceParameterPreserveSequenceContents",
+                "IsInsideNestedCallable",
+                "IsDirectForeachSequenceObservation",
+                "IsSequenceParameterFactStillCurrent",
+                "IsSequenceParameterFactStillCurrentAtUse",
+                "DoesStatementPreserveSequenceParameterContents",
+                "IsSupportedSequenceNullObservation",
+                "IsLocalSequenceInitializerStillCurrent",
+                "DoesContainingStatementEntryPreserveLocalSequenceContents",
+                "DoesStatementPreserveLocalSequenceContents",
+                "DoesSyntaxPreserveLocalSequenceContents",
+                "IsSupportedReadOnlySequenceObservation"
+            ];
+            const string projectionMethod =
+                "IsForeachIterationVariableProvenNonNullByCallContext";
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] collectionOwnerMethods =
+                typeof(ExceptionFlowSequenceCollectionFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] preservationOwnerMethods =
+                typeof(ExceptionFlowSequenceContentPreservationFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] projectorMethods =
+                typeof(ExceptionFlowCallContextFactProjector)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+
+            Assert.All(
+                collectionMethods,
+                method => Assert.Contains(method, collectionOwnerMethods));
+            Assert.All(
+                preservationMethods,
+                method => Assert.Contains(method, preservationOwnerMethods));
+            Assert.Contains(projectionMethod, projectorMethods);
+            Assert.All(
+                collectionMethods
+                    .Concat(preservationMethods)
+                    .Append(projectionMethod),
                 method => Assert.DoesNotContain(method, analyzerMethods));
         }
 

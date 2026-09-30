@@ -482,7 +482,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (IdentifierNameSyntax reference in references)
             {
-                if (IsSupportedReadOnlySequenceObservation(
+                if (ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation(
                         reference,
                         semanticModel))
                 {

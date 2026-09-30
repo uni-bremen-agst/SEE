@@ -152,7 +152,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             sourceParameter)
                         .ContainsAll(
                             ExceptionFlowValueFacts.NonNullDictionaryValues)
-                    || !IsSequenceParameterFactStillCurrent(
+                    || !ExceptionFlowSequenceContentPreservationFactsProvider.IsSequenceParameterFactStillCurrent(
                         foreachStatement,
                         sourceParameter,
                         semanticModel))
@@ -229,7 +229,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (normalizedField.DeclaredAccessibility != Accessibility.Private
                 || !normalizedField.IsReadOnly
                 || normalizedField.IsStatic
-                || !IsDictionaryType(normalizedField.Type)
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(normalizedField.Type)
                 || normalizedField.DeclaringSyntaxReferences.Length != 1
                 || normalizedField.ContainingType
                     .DeclaringSyntaxReferences.Length != 1
@@ -253,7 +253,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         variableDeclarator.SyntaxTree);
 
                 if (declarationSemanticModel == null
-                    || !IsKnownEmptyDictionaryCreation(
+                    || !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation(
                         variableDeclarator.Initializer.Value,
                         declarationSemanticModel))
                 {

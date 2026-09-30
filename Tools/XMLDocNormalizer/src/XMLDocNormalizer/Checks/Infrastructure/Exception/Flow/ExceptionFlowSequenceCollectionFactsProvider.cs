@@ -179,5 +179,288 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return true;
         }
+
+        /// <summary>
+        /// Determines whether a property is the read-only <c>Count</c>
+        /// property of a supported framework collection abstraction.
+        /// </summary>
+        /// <param name="propertySymbol">The property symbol to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> when the property is a supported framework
+        /// collection count observation; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsFrameworkCollectionCountProperty(
+            IPropertySymbol propertySymbol)
+        {
+            if (!string.Equals(
+                    propertySymbol.Name,
+                    "Count",
+                    StringComparison.Ordinal)
+                || propertySymbol.GetMethod == null
+                || propertySymbol.SetMethod != null
+                || propertySymbol.Parameters.Length != 0)
+            {
+                return false;
+            }
+
+            INamedTypeSymbol containingType =
+                propertySymbol.ContainingType.OriginalDefinition;
+            string namespaceName =
+                containingType.ContainingNamespace.ToDisplayString();
+
+            if (string.Equals(
+                    namespaceName,
+                    "System.Collections.Generic",
+                    StringComparison.Ordinal))
+            {
+                return string.Equals(
+                           containingType.Name,
+                           "IReadOnlyCollection",
+                           StringComparison.Ordinal)
+                    || string.Equals(
+                           containingType.Name,
+                           "IReadOnlyList",
+                           StringComparison.Ordinal)
+                    || string.Equals(
+                           containingType.Name,
+                           "ICollection",
+                           StringComparison.Ordinal)
+                    || string.Equals(
+                           containingType.Name,
+                           "IList",
+                           StringComparison.Ordinal)
+                    || string.Equals(
+                           containingType.Name,
+                           "List",
+                           StringComparison.Ordinal);
+            }
+
+            return string.Equals(
+                       namespaceName,
+                       "System.Collections",
+                       StringComparison.Ordinal)
+                && string.Equals(
+                       containingType.Name,
+                       "ICollection",
+                       StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets the source sequence of a supported element-preserving LINQ
+        /// invocation.
+        /// </summary>
+        /// <param name="invocation">The invocation expression.</param>
+        /// <param name="methodSymbol">The method selected at the call site.</param>
+        /// <param name="originalMethod">
+        /// The original definition of the selected method.
+        /// </param>
+        /// <param name="sourceExpression">The resolved source expression.</param>
+        /// <returns>
+        /// <see langword="true"/> when the invocation preserves element
+        /// identity and its source was resolved; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetElementPreservingSequenceSource(
+            InvocationExpressionSyntax invocation,
+            IMethodSymbol methodSymbol,
+            IMethodSymbol originalMethod,
+            out ExpressionSyntax? sourceExpression)
+        {
+            sourceExpression = null;
+
+            if (!IsElementPreservingSequenceMethod(originalMethod))
+            {
+                return false;
+            }
+
+            return TryGetSequenceSourceExpression(
+                invocation,
+                methodSymbol,
+                out sourceExpression);
+        }
+
+        /// <summary>
+        /// Determines whether a framework sequence operation preserves the
+        /// identity of its input elements.
+        /// </summary>
+        /// <param name="methodSymbol">The original method definition.</param>
+        /// <returns>
+        /// <see langword="true"/> for supported filtering, ordering, and
+        /// materialization methods; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsElementPreservingSequenceMethod(
+            IMethodSymbol methodSymbol)
+        {
+            return string.Equals(
+                       methodSymbol.Name,
+                       "Where",
+                       StringComparison.Ordinal)
+                || string.Equals(
+                       methodSymbol.Name,
+                       "OrderBy",
+                       StringComparison.Ordinal)
+                || string.Equals(
+                       methodSymbol.Name,
+                       "ToArray",
+                       StringComparison.Ordinal)
+                || string.Equals(
+                       methodSymbol.Name,
+                       "ToList",
+                       StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a property is the framework dictionary
+        /// <c>Values</c> property.
+        /// </summary>
+        /// <param name="propertySymbol">The property symbol to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> for the framework dictionary values
+        /// property; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsDictionaryValuesProperty(
+            IPropertySymbol propertySymbol)
+        {
+            return string.Equals(
+                       propertySymbol.Name,
+                       "Values",
+                       StringComparison.Ordinal)
+                && propertySymbol.Parameters.Length == 0
+                && IsDictionaryType(propertySymbol.ContainingType);
+        }
+
+        /// <summary>
+        /// Determines whether a sequence value has a concrete framework type
+        /// whose ordinary enumeration does not mutate its contents.
+        /// </summary>
+        /// <param name="typeSymbol">The compile-time source type.</param>
+        /// <returns>
+        /// <see langword="true"/> for arrays and framework
+        /// <see cref="List{T}"/> values; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsKnownMaterializedSequenceType(
+            ITypeSymbol typeSymbol)
+        {
+            return typeSymbol is IArrayTypeSymbol || IsListType(typeSymbol);
+        }
+
+        /// <summary>
+        /// Determines whether a type is the framework generic dictionary type.
+        /// </summary>
+        /// <param name="typeSymbol">The type to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> for the framework generic dictionary type;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsDictionaryType(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is not INamedTypeSymbol namedType)
+            {
+                return false;
+            }
+
+            INamedTypeSymbol originalType = namedType.OriginalDefinition;
+
+            return string.Equals(
+                       originalType.Name,
+                       "Dictionary",
+                       StringComparison.Ordinal)
+                && originalType.Arity == 2
+                && string.Equals(
+                       originalType.ContainingNamespace.ToDisplayString(),
+                       "System.Collections.Generic",
+                       StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a type is the framework generic equality
+        /// comparer interface.
+        /// </summary>
+        /// <param name="typeSymbol">The type to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> for the framework generic equality comparer;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsEqualityComparerType(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is not INamedTypeSymbol namedType)
+            {
+                return false;
+            }
+
+            INamedTypeSymbol originalType = namedType.OriginalDefinition;
+
+            return string.Equals(
+                       originalType.Name,
+                       "IEqualityComparer",
+                       StringComparison.Ordinal)
+                && originalType.Arity == 1
+                && string.Equals(
+                       originalType.ContainingNamespace.ToDisplayString(),
+                       "System.Collections.Generic",
+                       StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether an expression creates an empty framework
+        /// dictionary without a collection initializer or source collection.
+        /// </summary>
+        /// <param name="creationExpression">The creation expression.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for constructor resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the selected constructor cannot seed
+        /// dictionary entries; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsKnownEmptyDictionaryCreation(
+            ExpressionSyntax creationExpression,
+            SemanticModel semanticModel)
+        {
+            if (creationExpression is not ObjectCreationExpressionSyntax
+                && creationExpression is not ImplicitObjectCreationExpressionSyntax)
+            {
+                return false;
+            }
+
+            InitializerExpressionSyntax? initializer =
+                creationExpression switch
+                {
+                    ObjectCreationExpressionSyntax objectCreation =>
+                        objectCreation.Initializer,
+                    ImplicitObjectCreationExpressionSyntax implicitCreation =>
+                        implicitCreation.Initializer,
+                    _ => null
+                };
+
+            if (initializer != null
+                && initializer.Expressions.Count != 0)
+            {
+                return false;
+            }
+
+            SymbolInfo constructorSymbolInfo =
+                semanticModel.GetSymbolInfo(creationExpression);
+
+            if (constructorSymbolInfo.Symbol is not IMethodSymbol constructorSymbol
+                || constructorSymbol.MethodKind != MethodKind.Constructor
+                || !IsDictionaryType(constructorSymbol.ContainingType))
+            {
+                return false;
+            }
+
+            foreach (IParameterSymbol parameter in constructorSymbol.Parameters)
+            {
+                if (parameter.Type.SpecialType == SpecialType.System_Int32
+                    || IsEqualityComparerType(parameter.Type))
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
+            return true;
+        }
     }
 }
