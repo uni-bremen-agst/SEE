@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.MoveRotate
 {
     /// <summary>
     /// Moves or rotate a drawable type object.
@@ -498,10 +498,10 @@ namespace SEE.Controls.Actions.Drawable
                 && !selectedObject.GetComponent<CollisionController>().IsInCollision()
                 && !childInCollision)
             {
-                if ((hit.collider.gameObject.CompareTag(Tags.Drawable)
-                        && hit.collider.gameObject.Equals(surface))
-                    || (GameFinder.HasDrawableSurface(hit.collider.gameObject)
-                        && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(surface)))
+                if (hit.collider.gameObject.CompareTag(Tags.Drawable)
+                        && hit.collider.gameObject.Equals(surface)
+                    || GameFinder.HasDrawableSurface(hit.collider.gameObject)
+                        && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(surface))
                 {
                     newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject,
                         hit.point, MoveMenu.Instance.IncludeChildren);

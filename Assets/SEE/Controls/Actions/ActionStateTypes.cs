@@ -5,6 +5,7 @@ using SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions.Table;
 using SEE.Controls.Actions.Drawable.DrawShapes;
 using SEE.Controls.Actions.Drawable.StickyNote;
+using SEE.Controls.Actions.Drawable.MoveRotate;
 
 namespace SEE.Controls.Actions
 {

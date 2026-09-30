@@ -1,11 +1,10 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the position (<see cref="MoveRotateAction"/>) of an object on all clients.
+    /// Changes the position of a drawable object on all clients.
     /// </summary>
     public class MoveNetAction : DrawableNetAction
     {

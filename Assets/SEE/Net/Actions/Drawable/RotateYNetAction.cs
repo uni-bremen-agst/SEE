@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -20,7 +19,7 @@ namespace SEE.Net.Actions.Drawable
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
-        /// Used for undo / redo of <see cref="MoveRotateAction"/>
+        /// Used for undo and redo of Y rotation changes.
         /// </summary>
         /// <param name="drawableID">The ID of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The ID of the drawable parent.</param>
