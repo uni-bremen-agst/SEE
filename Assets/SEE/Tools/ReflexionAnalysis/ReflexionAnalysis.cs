@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Graphs;
-using SEE.Graphs;
 using SEE.Graphs.Events;
 using UnityEngine;
 using UnityEngine.Assertions;
