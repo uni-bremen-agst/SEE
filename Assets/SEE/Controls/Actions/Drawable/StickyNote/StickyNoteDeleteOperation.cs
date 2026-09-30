@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             {
                 ShowNotification.Warn(
                     "Wrong selection",
-                    "You don't selected a sticky note.");
+                    "You don't select a sticky note.");
 
                 return false;
             }
