@@ -45,8 +45,19 @@ namespace SEE.DataModel
         /// <returns>Textual representation of the event.</returns>
         protected abstract string Description();
 
+        /// <summary>
+        /// Returns a string representation of the event, including the name of the class
+        /// and the description of the event.
+        /// </summary>
+        /// <returns>String representation of the event.</returns>
         public override string ToString() => $"{GetType().Name}: {Description()}";
 
+        /// <summary>
+        /// Creates a new instance of this change event.
+        /// </summary>
+        /// <param name="versionId">The unique ID of the graph version this event is associated to.</param>
+        /// <param name="affectedGraph">Which graph was affected by this event.</param>
+        /// <param name="change">Type of change for this event.</param>
         protected ChangeEvent(Guid versionId, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
         {
             VersionId = versionId;
