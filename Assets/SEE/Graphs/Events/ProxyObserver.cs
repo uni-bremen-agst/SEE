@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SEE.Events
+namespace SEE.Graphs.Events
 {
     public abstract partial class Observable<T>
     {
