@@ -249,5 +249,4 @@ namespace SEE.Tools.ReflexionAnalysis
             Node = node;
         }
     }
-
 }
