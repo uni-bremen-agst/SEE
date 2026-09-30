@@ -79,6 +79,11 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         private readonly StickyNoteDeleteOperation deleteOperation = new();
 
         /// <summary>
+        /// Handles keyboard and mouse-wheel transformations of sticky notes.
+        /// </summary>
+        private readonly StickyNoteTransformInteraction transformInteraction = new();
+
+        /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
@@ -347,7 +352,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             }
             else if (stickyNote != null && StickyNoteMoveMenu.Instance.IsOpen())
             {
-                MoveByKey(stickyNote, spawnMode);
+                transformInteraction.MoveByKey(stickyNote, !spawnMode);
             }
 
             if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
@@ -356,7 +361,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             }
             else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
-                RotateByWheel(stickyNote, spawnMode);
+                transformInteraction.RotateByWheel(stickyNote, !spawnMode);
             }
         }
 
@@ -517,62 +522,6 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
                     StickyNoteMoveMenu.Instance.Enable(stickyNoteHolder);
                     moveMenuOpened = true;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Enables moving via the arrow keys, as well as in the <see cref="MoveRotateAction"/>.
-        /// In addition there are the keys page up for forward and page down for back moving.
-        /// </summary>
-        /// <param name="stickyNote">The object that should be moved.</param>
-        /// <param name="spawnMode">If this method will be called of the spawn method..</param>
-        private void MoveByKey(GameObject stickyNote, bool spawnMode)
-        {
-            if (SEEInput.MoveObjectLeft() || SEEInput.MoveObjectRight()
-                || SEEInput.MoveObjectUp() || SEEInput.MoveObjectDown()
-                || SEEInput.MoveObjectForward() || SEEInput.MoveObjectBackward())
-            {
-                ValueHolder.MoveDirection direction = GetDirection();
-                GameObject holder = stickyNote.GetRootParent();
-                Vector3 newPos = GameStickyNoteTransform.MoveByMenu(holder, direction, StickyNoteMoveMenu.Instance.GetSpeed());
-                if (!spawnMode)
-                {
-                    GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
-                    new StickyNoteMoveNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
-                    newPos, holder.transform.eulerAngles).Execute();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get the <see cref="ValueHolder.MoveDirection"/> of the pressed key.
-        /// </summary>
-        /// <returns>The <see cref="ValueHolder.MoveDirection"/> of the pressed key.</returns>
-        private ValueHolder.MoveDirection GetDirection()
-        {
-            if (SEEInput.MoveObjectLeft())
-            {
-                return ValueHolder.MoveDirection.Left;
-            }
-            else if (SEEInput.MoveObjectRight())
-            {
-                return ValueHolder.MoveDirection.Right;
-            }
-            else if (SEEInput.MoveObjectForward())
-            {
-                return ValueHolder.MoveDirection.Forward;
-            }
-            else if (SEEInput.MoveObjectBackward())
-            {
-                return ValueHolder.MoveDirection.Back;
-            }
-            else if (SEEInput.MoveObjectUp())
-            {
-                return ValueHolder.MoveDirection.Up;
-            }
-            else
-            {
-                return ValueHolder.MoveDirection.Down;
             }
         }
 
@@ -763,7 +712,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
                 stickyNoteHolder = stickyNote.GetRootParent();
-                RotateByWheel(stickyNoteHolder, true);
+                transformInteraction.RotateByWheel(stickyNoteHolder, false);
             }
 
             if (ScaleMenu.Instance.TryGetFinish(out bool isScaleFinished))
@@ -777,78 +726,11 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         }
 
         /// <summary>
-        /// The two different action types for the wheel interaction.
-        /// </summary>
-        private enum WheelInteractionType
-        {
-            Rotate,
-            Scale
-        }
-
-        /// <summary>
-        /// Calculates the value for the wheel interaction depending on the
-        /// direction of the mouse wheel interaction.
-        /// </summary>
-        /// <param name="state">The action state. Rotate or Scale.</param>
-        /// <param name="value">The calculated value for rotating or scaling.</param>
-        /// <returns>True if an interaction has taken place.</returns>
-        private bool WheelInteraction(WheelInteractionType state, out float value)
-        {
-            bool interaction = false;
-            value = 0;
-
-            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
-            {
-                value = state == WheelInteractionType.Rotate? ValueHolder.Rotate : ValueHolder.ScaleUp;
-                interaction = true;
-            }
-            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
-            {
-                value = state == WheelInteractionType.Rotate ? ValueHolder.RotateFast : ValueHolder.ScaleUpFast;
-                interaction = true;
-            }
-
-            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
-            {
-                value = state == WheelInteractionType.Rotate ? -ValueHolder.Rotate : ValueHolder.ScaleDown;
-                interaction = true;
-
-            }
-            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
-            {
-                value = state == WheelInteractionType.Rotate ? -ValueHolder.RotateFast : ValueHolder.ScaleDownFast;
-                interaction = true;
-            }
-            return interaction;
-        }
-
-        /// <summary>
-        /// Enables rotating via the mouse wheel, as well as in the <see cref="MoveRotateAction"/>.
-        /// </summary>
-        private void RotateByWheel(GameObject stickyNote, bool spawnMode)
-        {
-            GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
-            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-            if (WheelInteraction(WheelInteractionType.Rotate, out float degree))
-            {
-                stickyNoteHolder = stickyNote.GetRootParent();
-                float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
-                GameStickyNoteTransform.SetRotateY(stickyNoteHolder, newDegree);
-                StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
-                if (!spawnMode)
-                {
-                    new StickyNoteRoateYNetAction(surface.name, surfaceParentName, newDegree,
-                        stickyNoteHolder.transform.position).Execute();
-                }
-            }
-        }
-
-        /// <summary>
         /// Enables scaling via the mouse wheel, as well as in the <see cref="ScaleAction"/>.
         /// </summary>
         private void ScaleByWheel()
         {
-            if (WheelInteraction(WheelInteractionType.Scale, out float scaleFactor))
+            if (transformInteraction.TryGetScaleFactor(out float scaleFactor))
             {
                 memento.ChangedConfig.Scale = GameScaler.Scale(stickyNote, scaleFactor);
                 ScaleMenu.Instance.AssignValue(stickyNote);
