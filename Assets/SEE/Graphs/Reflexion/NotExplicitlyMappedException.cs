@@ -1,5 +1,3 @@
-using UnityEngine.Assertions;
-
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
@@ -19,7 +17,7 @@ namespace SEE.Graphs.Reflexion
         public NotExplicitlyMappedException(Node unmappedNode)
             : base($"Implementation node '{unmappedNode.ToShortString()}' is not explicitly mapped.")
         {
-            Assert.IsTrue(unmappedNode.IsInImplementation());
+            SEE.Utils.Assertion.IsTrue(unmappedNode.IsInImplementation());
             UnmappedNode = unmappedNode;
         }
     }

@@ -1,5 +1,3 @@
-using UnityEngine.Assertions;
-
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
@@ -26,7 +24,7 @@ namespace SEE.Graphs.Reflexion
         public AlreadyExplicitlyMappedException(Node alreadyMapped, Node mappedTo)
             : base($"Node '{alreadyMapped.ToShortString()}' is already explicitly mapped to '{mappedTo.ToShortString()}'.")
         {
-            Assert.IsNotNull(mappedTo);
+            SEE.Utils.Assertion.IsNotNull(mappedTo);
             AlreadyMapped = alreadyMapped;
             MappedTo = mappedTo;
         }
