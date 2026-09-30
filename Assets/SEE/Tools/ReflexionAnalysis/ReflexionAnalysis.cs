@@ -1,14 +1,4 @@
 ﻿/*
-Copyright (C) Axivion GmbH, 2011-2020
-
-@author Rainer Koschke, Falko Galperin
-Initially written in C++ on Jul 24, 2011.
-Rewritten in C# on Jan 14, 2020.
-Refactored to work on a single graph on Feb 17, 2022.
-Incremental Reflexion Analysis operations implemented in April 2022.
-Refactored to work as a subclass of the graph in November 2022.
-
-Purpose:
 Implements incremental reflexion analysis. For detailed documentation refer to
 the article:
 "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
