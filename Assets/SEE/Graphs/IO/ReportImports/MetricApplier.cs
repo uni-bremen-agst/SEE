@@ -1,8 +1,8 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using SEE.Graphs.GraphIndex;
+using SEE.Graphs.Utils;
 
 namespace SEE.Graphs.IO.ReportImports
 {

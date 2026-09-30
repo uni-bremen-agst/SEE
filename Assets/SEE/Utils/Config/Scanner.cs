@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Graphs.Utils;
+using System;
 
 namespace SEE.Utils.Config
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using SEE.Graphs.Utils;
 using SEE.Utils;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;

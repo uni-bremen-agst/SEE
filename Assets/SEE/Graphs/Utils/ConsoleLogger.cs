@@ -1,8 +1,7 @@
-using SEE.Graphs.Utils;
 using System;
 using System.IO;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// An <see cref="ILogger"/> writing to the standard output streams.

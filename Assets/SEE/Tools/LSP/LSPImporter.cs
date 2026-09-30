@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using MoreLinq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Graphs;
+using SEE.Graphs.Utils;
 using SEE.Tools;
 using SEE.Utils;
 using SEE.Utils.Markdown;

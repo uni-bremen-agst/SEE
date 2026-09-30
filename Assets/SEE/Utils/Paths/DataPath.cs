@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Graphs.IO;
 using SEE.Utils.Config;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -19,7 +20,7 @@ namespace SEE.Utils.Paths
     /// our server at <see cref="BackendServerAPI"/> or relate to other servers.
     /// </summary>
     [Serializable]
-    public class DataPath
+    public class DataPath : IDataPath
     {
         /// <summary>
         /// Yields the URL of our backend server, or null if none is known.

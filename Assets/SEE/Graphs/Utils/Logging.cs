@@ -1,6 +1,6 @@
-using SEE.Graphs.Utils;
+using SEE.Utils;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// The logger through which the layers of SEE below Unity emit their messages.

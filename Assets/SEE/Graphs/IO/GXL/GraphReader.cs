@@ -1,5 +1,4 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -52,7 +51,7 @@ namespace SEE.Graphs.IO.GXL
         /// <param name="token">Token with which the loading can be cancelled.</param>
         /// <param name="logger">Logger to log the output.</param>
         /// <returns>Loaded graph.</returns>
-        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,
+        public static async UniTask<Graph> LoadAsync(IDataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,
                                                      Action<float> changePercentage = null, CancellationToken token = default,
                                                      ILogger logger = null)
         {

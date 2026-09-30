@@ -5,8 +5,8 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
-using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.Graphs.Utils;
 
 namespace SEE.Graphs.IO.CSV
 {
@@ -25,7 +25,7 @@ namespace SEE.Graphs.IO.CSV
         /// <param name="token">The token to cancel the loading.</param>
         /// <returns>The number of errors that occurred.</returns>
         /// <returns>The number of errors.</returns>
-        public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';',
+        public static async UniTask<int> LoadCsvAsync(Graph graph, IDataPath path, char separator = ';',
                                                       CancellationToken token = default)
         {
             Stream stream = await path.LoadAsync();

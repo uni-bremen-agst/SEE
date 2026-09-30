@@ -16,6 +16,7 @@ using Range = SEE.Graphs.Range;
 using SEE.Utils;
 using System.Linq;
 using SEE.Tools;
+using SEE.Graphs.Utils;
 
 namespace SEE.GraphProviders
 {
