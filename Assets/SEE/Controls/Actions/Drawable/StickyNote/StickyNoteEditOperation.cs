@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
 
             if (SEEInput.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && IsSelectableStickyNoteObject(raycastHit.collider.gameObject))
+                && StickyNoteSelection.IsSelectableObject(raycastHit.collider.gameObject))
             {
                 GameObject surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
 
@@ -241,25 +241,6 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color)
                 && original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order)
                 && original.Lighting.Equals(changed.Lighting);
-        }
-
-        /// <summary>
-        /// Checks whether the selected object can belong to a sticky note.
-        /// </summary>
-        private static bool IsSelectableStickyNoteObject(GameObject selectedObject)
-        {
-            return selectedObject.CompareTag(Tags.Drawable)
-                || GameFinder.HasDrawableSurface(selectedObject)
-                || IsPartOfStickyNote(selectedObject);
-        }
-
-        /// <summary>
-        /// Checks whether the selected object is part of a sticky note.
-        /// </summary>
-        private static bool IsPartOfStickyNote(GameObject selectedObject)
-        {
-            return selectedObject.transform.parent != null
-                && selectedObject.transform.parent.name.StartsWith(ValueHolder.StickyNotePrefix);
         }
 
         /// <summary>

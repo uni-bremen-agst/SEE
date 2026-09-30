@@ -120,7 +120,7 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
-                    || IsPartOfStickyNote(raycastHit.collider.gameObject)))
+                    || StickyNoteSelection.IsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
 
@@ -184,7 +184,8 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
 
             Vector3 oldPosition = stickyNoteHolder.transform.position;
 
-            if (GameFinder.HasDrawableSurface(hit.collider.gameObject) || IsPartOfStickyNote(hit.collider.gameObject))
+            if (GameFinder.HasDrawableSurface(hit.collider.gameObject)
+                || StickyNoteSelection.IsPartOfStickyNote(hit.collider.gameObject))
             {
                 GameObject surface = GameFinder.GetDrawableSurface(hit.collider.gameObject);
                 hit.point = new Vector3(hit.point.x, hit.point.y, surface.transform.position.z);
@@ -280,17 +281,6 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
             {
                 collider.enabled = true;
             }
-        }
-
-        /// <summary>
-        /// Checks whether the selected object is part of a sticky note.
-        /// </summary>
-        /// <param name="selectedObject">The object to check.</param>
-        /// <returns>Whether the object is part of a sticky note.</returns>
-        private static bool IsPartOfStickyNote(GameObject selectedObject)
-        {
-            return selectedObject.transform.parent != null
-                && selectedObject.transform.parent.name.StartsWith(ValueHolder.StickyNotePrefix);
         }
 
         /// <summary>
