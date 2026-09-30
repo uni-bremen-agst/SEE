@@ -1,14 +1,9 @@
-using SEE.Utils;
-
 namespace SEE.Graphs.Utils
 {
     /// <summary>
-    /// The logger through which the layers of SEE below Unity emit their messages.
-    ///
-    /// Those layers must not call <c>UnityEngine.Debug</c> directly, because that
-    /// would tie them to Unity and prevent them from being shipped on their own.
-    /// They use <see cref="Logger"/> instead. A Unity host replaces it at start-up
-    /// by a logger forwarding to the Unity console; see <see cref="SEELogger"/>.
+    /// The logger to emit messages. The default is <see cref="ConsoleLogger"/>,
+    /// which writes to the standard output streams. It can be overridden via
+    /// <see cref="Logger"/>.
     /// </summary>
     public static class Logging
     {

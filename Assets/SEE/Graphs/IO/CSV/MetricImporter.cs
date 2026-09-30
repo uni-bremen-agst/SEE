@@ -5,7 +5,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
-using SEE.Utils.Paths;
 using SEE.Graphs.Utils;
 
 namespace SEE.Graphs.IO.CSV
