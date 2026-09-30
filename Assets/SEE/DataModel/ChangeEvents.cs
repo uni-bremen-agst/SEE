@@ -5,22 +5,6 @@ using SEE.Tools.ReflexionAnalysis;
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Type of change to a graph element (node or edge, including "part-of" edges).
-    /// </summary>
-    public enum ChangeType
-    {
-        /// <summary>
-        /// The graph element has been added.
-        /// </summary>
-        Addition,
-
-        /// <summary>
-        /// The graph element has been removed.
-        /// </summary>
-        Removal
-    }
-
-    /// <summary>
     /// The event information about the change of the state of the observed subject.
     /// This class is intended to be specialized for more specific change events.
     /// </summary>
