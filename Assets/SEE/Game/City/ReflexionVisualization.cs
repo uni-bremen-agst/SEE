@@ -11,6 +11,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Components.GameEdges;
+using SEE.DataModel.Events;
 
 namespace SEE.Game.City
 {

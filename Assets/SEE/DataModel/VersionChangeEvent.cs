@@ -1,6 +1,6 @@
 using System;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.Events
 {
     /// <summary>
     /// An event representing a new version being introduced.

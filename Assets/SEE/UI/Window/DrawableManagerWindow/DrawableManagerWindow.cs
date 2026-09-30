@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using SEE.DataModel.Events;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {

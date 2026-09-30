@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Events;
 using System;
 using UnityEngine;
+using SEE.DataModel.Events;
 
 namespace SEE.Game.Drawable
 {
@@ -12,6 +13,14 @@ namespace SEE.Game.Drawable
     /// </summary>
     public class DrawableSurface : Observable<ChangeEvent>
     {
+        /// <summary>
+        /// Creates a new <see cref="DrawableSurface"/> instance.
+        ///
+        /// If the <paramref name="surface"/> is not null has a <see cref="Tags.Drawable"/> tag,
+        /// the instantiation is considered incomplete and <see cref="InitAsync"/> will
+        /// be triggered to complete the instantiation asynchronously.
+        /// </summary>
+        /// <param name="surface">The depending surface for the instantiation.</param>
         public DrawableSurface(GameObject surface)
         {
             if (surface != null && surface.CompareTag(Tags.Drawable))

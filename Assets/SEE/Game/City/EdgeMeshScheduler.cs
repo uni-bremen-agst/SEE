@@ -9,6 +9,7 @@ using SEE.UI;
 using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.Components.GameEdges;
+using SEE.DataModel.Events;
 
 namespace SEE.Game.City
 {

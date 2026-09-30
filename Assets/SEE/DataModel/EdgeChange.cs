@@ -2,7 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.Events
 {
     /// <summary>
     /// A change event fired when the state of an edge changed.

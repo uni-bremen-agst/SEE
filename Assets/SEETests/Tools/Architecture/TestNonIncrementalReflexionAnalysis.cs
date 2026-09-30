@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.Events;
 using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
 
@@ -452,7 +453,7 @@ namespace SEE.Tools.Architecture
             // 0 absences
 
             // 0 divergences
-            
+
             AssertEventCountEquals<EdgeChange>(9);
             // 0 removed edges
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);

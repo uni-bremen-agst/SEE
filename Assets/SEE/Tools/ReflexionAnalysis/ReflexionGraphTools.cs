@@ -4,6 +4,7 @@ using System.Linq;
 using MoreLinq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.Events;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 
 namespace SEE.Tools.ReflexionAnalysis

@@ -13,6 +13,7 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.DataModel.Events;
 
 namespace SEE.Game.HolisticMetrics
 {

@@ -1,4 +1,5 @@
-﻿using SEE.Tools.ReflexionAnalysis;
+﻿using SEE.DataModel.Events;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

@@ -7,6 +7,7 @@ using MoreLinq;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
+using SEE.DataModel.Events;
 
 namespace SEE.Tools.Architecture
 {

@@ -6,6 +6,7 @@ using SEE.Controls.Players;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphSearch;
+using SEE.DataModel.Events;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
