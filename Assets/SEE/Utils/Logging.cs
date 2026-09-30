@@ -1,3 +1,5 @@
+using SEE.Graphs.Utils;
+
 namespace SEE.Utils
 {
     /// <summary>

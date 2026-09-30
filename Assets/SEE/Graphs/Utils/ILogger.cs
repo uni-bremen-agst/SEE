@@ -1,6 +1,6 @@
 using System;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// Interface for all loggers in SEE.

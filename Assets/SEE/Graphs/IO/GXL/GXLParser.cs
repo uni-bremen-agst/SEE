@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Xml;
 using Cysharp.Threading.Tasks;
-using SEE.Utils;
+using SEE.Graphs.Utils;
 
 namespace SEE.Graphs.IO.GXL
 {
