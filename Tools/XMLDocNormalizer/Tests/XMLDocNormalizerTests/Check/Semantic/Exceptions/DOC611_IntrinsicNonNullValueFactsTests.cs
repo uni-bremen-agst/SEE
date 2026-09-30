@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
@@ -339,6 +341,145 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 ExceptionAnalysisMode.ProjectTransitive);
 
             Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures the known-framework return classifiers retain their exact
+        /// assembly, containing-type, return-type, and signature checks.
+        /// </summary>
+        [Fact]
+        public void KnownFrameworkReturnClassifiers_RequireExactSupportedSignatures()
+        {
+            const string source =
+                """
+                using System;
+                using Microsoft.CodeAnalysis;
+                using Microsoft.CodeAnalysis.CSharp;
+                using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+                public sealed class Foreign
+                {
+                    public object? ParseText(string text) => null;
+
+                    public object? GetCompilationUnitRoot() => null;
+                }
+
+                public sealed class TestClass
+                {
+                    public SyntaxTree Parse(string text) =>
+                        CSharpSyntaxTree.ParseText(text);
+
+                    public CompilationUnitSyntax Root(SyntaxTree tree) =>
+                        tree.GetCompilationUnitRoot();
+
+                    public string EnumText(ConsoleColor value) =>
+                        value.ToString();
+
+                    public string FormattedEnumText(ConsoleColor value) =>
+                        value.ToString("G");
+
+                    public object? ForeignParse(Foreign value, string text) =>
+                        value.ParseText(text);
+
+                    public object? ForeignRoot(Foreign value) =>
+                        value.GetCompilationUnitRoot();
+                }
+                """;
+
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+            MetadataReference[] references =
+                MetadataReferences.Default
+                    .Concat(GetRoslynMetadataReferences())
+                    .ToArray();
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                "KnownFrameworkReturnClassification",
+                [syntaxTree],
+                references,
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary));
+            SemanticModel semanticModel =
+                compilation.GetSemanticModel(syntaxTree);
+            CompilationUnitSyntax root =
+                syntaxTree.GetCompilationUnitRoot();
+
+            IMethodSymbol parseText = GetInvokedMethod(
+                root,
+                semanticModel,
+                "Parse");
+            IMethodSymbol compilationUnitRoot = GetInvokedMethod(
+                root,
+                semanticModel,
+                "Root");
+            IMethodSymbol enumToString = GetInvokedMethod(
+                root,
+                semanticModel,
+                "EnumText");
+            IMethodSymbol formattedEnumToString = GetInvokedMethod(
+                root,
+                semanticModel,
+                "FormattedEnumText");
+            IMethodSymbol foreignParseText = GetInvokedMethod(
+                root,
+                semanticModel,
+                "ForeignParse");
+            IMethodSymbol foreignCompilationUnitRoot = GetInvokedMethod(
+                root,
+                semanticModel,
+                "ForeignRoot");
+
+            Assert.True(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsRoslynCSharpSyntaxTreeParseTextMethod(
+                        parseText));
+            Assert.True(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsRoslynCompilationUnitRootMethod(
+                        compilationUnitRoot));
+            Assert.True(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsSystemEnumToStringMethod(
+                        enumToString));
+            Assert.False(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsSystemEnumToStringMethod(
+                        formattedEnumToString));
+            Assert.False(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsRoslynCSharpSyntaxTreeParseTextMethod(
+                        foreignParseText));
+            Assert.False(
+                ExceptionFlowNullabilityFactsProvider
+                    .IsRoslynCompilationUnitRootMethod(
+                        foreignCompilationUnitRoot));
+        }
+
+        /// <summary>
+        /// Resolves the single invocation in the named source method to its
+        /// original framework or source definition.
+        /// </summary>
+        /// <param name="root">The parsed compilation unit.</param>
+        /// <param name="semanticModel">The semantic model for the source.</param>
+        /// <param name="methodName">The containing source-method name.</param>
+        /// <returns>The original invoked method definition.</returns>
+        private static IMethodSymbol GetInvokedMethod(
+            CompilationUnitSyntax root,
+            SemanticModel semanticModel,
+            string methodName)
+        {
+            InvocationExpressionSyntax invocation = root.DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .Single(
+                    method => method.Identifier.ValueText == methodName)
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Single();
+            IMethodSymbol? methodSymbol =
+                semanticModel.GetSymbolInfo(invocation).Symbol
+                    as IMethodSymbol;
+
+            Assert.NotNull(methodSymbol);
+            return methodSymbol.ReducedFrom?.OriginalDefinition
+                ?? methodSymbol.OriginalDefinition;
         }
 
         /// <summary>

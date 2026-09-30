@@ -216,6 +216,96 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Determines whether a method is Roslyn's compilation-unit-root accessor.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The method to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when successful invocation is guaranteed to return
+        /// a compilation-unit syntax node; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsRoslynCompilationUnitRootMethod(
+            IMethodSymbol methodSymbol)
+        {
+            return string.Equals(
+                    methodSymbol.Name,
+                    "GetCompilationUnitRoot",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingAssembly?.Name,
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingNamespace.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ReturnType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax",
+                    StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a method is one of Roslyn's C# syntax-tree text
+        /// parsers whose successful completion returns a syntax tree.
+        /// </summary>
+        /// <param name="methodSymbol">The method to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> when the method is a supported Roslyn
+        /// <c>CSharpSyntaxTree.ParseText</c> overload; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool IsRoslynCSharpSyntaxTreeParseTextMethod(
+            IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.IsStatic
+                && string.Equals(
+                    methodSymbol.Name,
+                    "ParseText",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingAssembly?.Name,
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ReturnType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.SyntaxTree",
+                    StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a method is the framework implementation of
+        /// <see cref="Enum.ToString()"/>.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The method to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the method returns the textual representation
+        /// of an enum value; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsSystemEnumToStringMethod(
+            IMethodSymbol methodSymbol)
+        {
+            return string.Equals(
+                    methodSymbol.Name,
+                    nameof(ToString),
+                    StringComparison.Ordinal)
+                && methodSymbol.Parameters.Length == 0
+                && methodSymbol.ReturnType.SpecialType ==
+                    SpecialType.System_String
+                && string.Equals(
+                    methodSymbol.ContainingType.ToDisplayString(),
+                    "System.Enum",
+                    StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Determines whether a type symbol represents the specified
         /// framework type.
         /// </summary>

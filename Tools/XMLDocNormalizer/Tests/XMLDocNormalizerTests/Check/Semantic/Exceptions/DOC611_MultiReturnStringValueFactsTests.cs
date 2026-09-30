@@ -96,6 +96,138 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that the false branch of a null-or-empty condition proves
+        /// the directly returned parameter to be non-null and non-empty.
+        /// </summary>
+        [Fact]
+        public void GuardedElseReturn_PreservesNonEmptyFact()
+        {
+            const string source =
+                """
+                using System;
+
+                public static class EntryPoint
+                {
+                    public static void M(string? value)
+                    {
+                        Validate(Resolve(value));
+                    }
+
+                    private static string Resolve(string? value)
+                    {
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            return "fallback";
+                        }
+                        else
+                        {
+                            return value;
+                        }
+                    }
+
+                    private static void Validate(string value)
+                    {
+                        ArgumentException.ThrowIfNullOrEmpty(value);
+                    }
+                }
+                """;
+
+            AssertArgumentExceptionAbsent(source);
+        }
+
+        /// <summary>
+        /// Ensures that a supported nested true condition preserves the facts
+        /// established by its null-or-whitespace operand.
+        /// </summary>
+        [Fact]
+        public void NestedGuardedReturn_PreservesNonWhiteSpaceFact()
+        {
+            const string source =
+                """
+                using System;
+
+                public static class EntryPoint
+                {
+                    public static void M(string? value, bool useValue)
+                    {
+                        Validate(Resolve(value, useValue));
+                    }
+
+                    private static string Resolve(string? value, bool useValue)
+                    {
+                        if (!string.IsNullOrWhiteSpace(value) && useValue)
+                        {
+                            return value;
+                        }
+
+                        return "fallback";
+                    }
+
+                    private static void Validate(string value)
+                    {
+                        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+                    }
+                }
+                """;
+
+            AssertArgumentExceptionAbsent(source);
+        }
+
+        /// <summary>
+        /// Ensures that a mutable property is not treated as stable between a
+        /// condition and the directly returned expression.
+        /// </summary>
+        [Fact]
+        public void GuardedMutablePropertyReturn_RemainsUnknown()
+        {
+            const string source =
+                """
+                using System;
+
+                public static class EntryPoint
+                {
+                    public static void M(Options options)
+                    {
+                        Validate(Resolve(options));
+                    }
+
+                    private static string? Resolve(Options options)
+                    {
+                        if (!string.IsNullOrWhiteSpace(options.OutputPath))
+                        {
+                            return options.OutputPath;
+                        }
+
+                        return "fallback";
+                    }
+
+                    private static void Validate(string? value)
+                    {
+                        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+                    }
+
+                    public sealed class Options
+                    {
+                        public string? OutputPath { get; set; }
+                    }
+                }
+                """;
+
+            ExceptionFlowAnalyzerTestRun run =
+                ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(
+                    source,
+                    "M");
+
+            INamedTypeSymbol argumentException =
+                run.GetRequiredType(
+                    "System.ArgumentException");
+
+            Assert.Single(
+                run.Result.GetExceptionPaths(
+                    argumentException));
+        }
+
+        /// <summary>
         /// Ensures that facts of an unchanged local initializer are preserved
         /// when the local is returned.
         /// </summary>

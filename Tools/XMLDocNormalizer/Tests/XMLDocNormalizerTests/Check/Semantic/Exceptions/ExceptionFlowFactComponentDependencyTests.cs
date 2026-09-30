@@ -84,6 +84,57 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures the return-condition slice remains owned directly by the
+        /// guard and nullability providers without Analyzer forwarding methods.
+        /// </summary>
+        [Fact]
+        public void ReturnConditionHelpers_HaveDedicatedProviderOwners()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] conditionMethods =
+            [
+                "GetFactsProvenByDirectContainingReturnBranch",
+                "TryGetDirectContainingIfBranch",
+                "GetStringFactsProvenForStableExpressionByCondition",
+                "AreEquivalentStableValueExpressions",
+                "IsStableGuardValueExpression"
+            ];
+            string[] frameworkMethods =
+            [
+                "IsRoslynCompilationUnitRootMethod",
+                "IsRoslynCSharpSyntaxTreeParseTextMethod",
+                "IsSystemEnumToStringMethod"
+            ];
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] guardMethods = typeof(ExceptionFlowGuardFactsProvider)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] nullabilityMethods =
+                typeof(ExceptionFlowNullabilityFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+
+            Assert.All(
+                conditionMethods,
+                method => Assert.Contains(method, guardMethods));
+            Assert.All(
+                frameworkMethods,
+                method => Assert.Contains(method, nullabilityMethods));
+            Assert.All(
+                conditionMethods.Concat(frameworkMethods),
+                method => Assert.DoesNotContain(method, analyzerMethods));
+        }
+
+        /// <summary>
         /// Ensures every partial declaration of the stateless table-fact
         /// provider remains free of Analyzer back references even though the
         /// cache owner remains in the same source file.
