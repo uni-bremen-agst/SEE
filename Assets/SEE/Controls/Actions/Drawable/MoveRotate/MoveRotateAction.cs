@@ -1,5 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -147,6 +146,11 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         private readonly MoveRotateSelectionController selectionController = new();
 
         /// <summary>
+        /// Handles moving the selected object.
+        /// </summary>
+        private readonly MoveRotateMoveOperation moveOperation = new();
+
+        /// <summary>
         /// Deactivates the blink effect if it is still active
         /// and destroys the rigidbody and collision controller if there are still active.
         /// If the action was not completed in full (finish), the changes are reset.
@@ -161,26 +165,26 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             }
             BlinkEffect.Deactivate(selectedObject);
             CollisionDetectionManager.Disable(selectedObject);
+
             if (progressState != ProgressState.Finish && selectedObject != null)
             {
-                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 if (progressState == ProgressState.Move)
                 {
-                    GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
-                        MoveMenu.Instance.IncludeChildren);
-                    new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        oldObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
+                    moveOperation.Restore(selectedObject, oldObjectPosition);
                 }
 
                 if (progressState == ProgressState.Rotate)
                 {
+                    GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
                     GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
                         RotationMenu.Instance.IncludeChildren);
                     new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
                         oldObjectLocalEulerAngles.z, RotationMenu.Instance.IncludeChildren).Execute();
                 }
             }
+
             RotationMenu.Instance.Destroy();
             MoveMenu.Instance.Destroy();
         }
@@ -241,18 +245,16 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                 CollisionDetectionManager.Disable(selectedObject);
                 if (progressState != ProgressState.Finish && selectedObject != null)
                 {
-                    GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                     if (progressState == ProgressState.Move)
                     {
-                        GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
-                            MoveMenu.Instance.IncludeChildren);
-                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                            oldObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
+                        moveOperation.Restore(selectedObject, oldObjectPosition);
                     }
 
                     if (progressState == ProgressState.Rotate)
                     {
+                        GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                        string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
                         GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
                             RotationMenu.Instance.IncludeChildren);
                         new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
@@ -313,126 +315,15 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// Alternatively, through the menu, the object can be moved, and settings for speed, 'move by mouse'
         /// and include children can be chosen as well.
         /// </summary>
+        /// <summary>
+        /// Moves the selected object.
+        /// </summary>
         private void Move()
         {
-            if (selectedObject.GetComponent<BlinkEffect>() != null)
+            if (moveOperation.TryExecute(selectedObject, out Vector3 position))
             {
-                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                MoveMenu.Instance.Enable(selectedObject);
-                SwitchManager speedUp = MoveMenu.Instance.GetSpeedUpManager();
-                SwitchManager moveByMouse = MoveMenu.Instance.GetMoveByMouseManager();
-                /// For switching the speed.
-                if (Input.GetKeyDown(KeyCode.LeftControl))
-                {
-                    speedUp.isOn = !speedUp.isOn;
-                    speedUp.UpdateUI();
-                }
-
-                /// Invocation for the option to move the object by key.
-                MoveByKey(moveByMouse, speedUp, surface, surfaceParentName);
-
-                /// For switching the move by mouse option.
-                if (SEEInput.MouseDown(MouseButton.Middle))
-                {
-                    moveByMouse.isOn = !moveByMouse.isOn;
-                    moveByMouse.UpdateUI();
-                }
-
-                /// Checks if any of the child nodes are involved in a collision.
-                bool childInCollision = CheckChildrenCollision();
-
-                /// Is executed when move by mouse is active and if the object and none of the children are in collision.
-                MoveByMouse(moveByMouse, childInCollision, surface, surfaceParentName);
-
-                /// Initializes the end of the movement.
-                if (SEEInput.LeftMouseInteraction())
-                {
-                    BlinkEffect.Deactivate(selectedObject);
-                }
-            }
-            /// Part 2 of initializing the end: The new position is saved, and the progress state is switched to finish.
-            if (SEEInput.MouseUp(MouseButton.Left))
-            {
-                newObjectPosition = selectedObject.transform.localPosition;
+                newObjectPosition = position;
                 progressState = ProgressState.Finish;
-            }
-        }
-
-        /// <summary>
-        /// To detect a move by key.
-        /// It locks the moving by mouse and
-        /// moves the object in the respective direction based on the chosen speed
-        /// </summary>
-        /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu.</param>
-        /// <param name="speedUp">The switch manager for the speed up option from the menu.</param>
-        /// <param name="surface">The drawable surface on which the object is displayed.</param>
-        /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
-        private void MoveByKey(SwitchManager moveByMouse, SwitchManager speedUp,
-            GameObject surface, string surfaceParentName)
-        {
-            if (SEEInput.MoveObjectLeft() || SEEInput.MoveObjectRight()
-                || SEEInput.MoveObjectUp() || SEEInput.MoveObjectDown())
-            {
-                ValueHolder.MoveDirection direction = GetDirection();
-                moveByMouse.isOn = false;
-                moveByMouse.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, direction,
-                    speedUp.isOn, MoveMenu.Instance.IncludeChildren);
-                new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                    newObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
-            }
-        }
-
-        /// <summary>
-        /// Checks if any of the child nodes are involved in a collision.
-        /// </summary>
-        /// <returns>True if a child node is involved in a collision; otherwise false.</returns>
-        private bool CheckChildrenCollision()
-        {
-            bool childInCollision = false;
-            if (selectedObject.CompareTag(Tags.MindMapNode))
-            {
-                CollisionController[] ccs = GameFinder.GetAttachedObjectsObject(selectedObject)
-                    .GetComponentsInChildren<CollisionController>();
-                foreach (CollisionController cc in ccs)
-                {
-                    childInCollision = childInCollision || cc.IsInCollision();
-                }
-            }
-            return childInCollision;
-        }
-
-        /// <summary>
-        /// Moves the selected object based on the mouse position.
-        /// This means it follows the mouse position.
-        /// Will be executed when move by mouse is active
-        /// and if the object and none of the children are in collision.
-        /// The children are only necessary for a mind map node with the
-        /// include children option.
-        /// </summary>
-        /// <param name="moveByMouse">The switch manager for the move-by-mouse option from the menu.</param>
-        /// <param name="childInCollision">Identifies whether any of the children are in collision.</param>
-        /// <param name="surface">The drawable surface on which the object is displayed.</param>
-        /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
-        private void MoveByMouse(SwitchManager moveByMouse, bool childInCollision,
-            GameObject surface, string surfaceParentName)
-        {
-            if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit)
-                && !selectedObject.GetComponent<CollisionController>().IsInCollision()
-                && !childInCollision)
-            {
-                if (hit.collider.gameObject.CompareTag(Tags.Drawable)
-                        && hit.collider.gameObject.Equals(surface)
-                    || GameFinder.HasDrawableSurface(hit.collider.gameObject)
-                        && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(surface))
-                {
-                    newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject,
-                        hit.point, MoveMenu.Instance.IncludeChildren);
-                    new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
-                        newObjectPosition, MoveMenu.Instance.IncludeChildren).Execute();
-                }
             }
         }
 
@@ -608,30 +499,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                 progressState = ProgressState.SelectObject;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Returns the pressed KeyCode of the arrow keys.
-        /// </summary>
-        /// <returns>The pressed arrow key.</returns>
-        private ValueHolder.MoveDirection GetDirection()
-        {
-            if (SEEInput.MoveObjectLeft())
-            {
-                return ValueHolder.MoveDirection.Left;
-            }
-            else if (SEEInput.MoveObjectRight())
-            {
-                return ValueHolder.MoveDirection.Right;
-            }
-            else if (SEEInput.MoveObjectUp())
-            {
-                return ValueHolder.MoveDirection.Up;
-            }
-            else
-            {
-                return ValueHolder.MoveDirection.Down;
-            }
         }
 
         /// <summary>
