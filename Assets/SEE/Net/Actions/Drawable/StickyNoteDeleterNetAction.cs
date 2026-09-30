@@ -1,12 +1,11 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.GO;
 using SEE.Utils;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for delete <see cref="StickyNoteAction"/> a sticky note on all clients.
+    /// Deletes a sticky note on all clients.
     /// </summary>
     public class StickyNoteDeleterNetAction : SurfaceNetAction
     {

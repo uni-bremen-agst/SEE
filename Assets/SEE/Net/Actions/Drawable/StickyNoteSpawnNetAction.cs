@@ -1,11 +1,10 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.StickyNote;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for spawn <see cref="StickyNoteAction"/> a sticky note on all clients.
+    /// Spawns a sticky note on all clients.
     /// </summary>
     public class StickyNoteSpawnNetAction : SurfaceNetAction
     {

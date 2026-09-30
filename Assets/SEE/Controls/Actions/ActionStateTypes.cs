@@ -4,6 +4,7 @@ using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions.Table;
 using SEE.Controls.Actions.Drawable.DrawShapes;
+using SEE.Controls.Actions.Drawable.StickyNote;
 
 namespace SEE.Controls.Actions
 {

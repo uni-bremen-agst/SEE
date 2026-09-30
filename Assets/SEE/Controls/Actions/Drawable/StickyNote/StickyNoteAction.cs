@@ -13,7 +13,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.StickyNote
 {
     /// <summary>
     /// This class provides all operations for sticky notes.
@@ -699,7 +699,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
                 {
                     stickyNote = surface.transform.parent.gameObject;
-                    Highlighter.EnableGlowOutline(stickyNote);
+                    stickyNote.EnableGlowOutline();
 
                     memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction)
                     {
