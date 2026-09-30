@@ -5,7 +5,6 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
-using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -123,12 +122,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         private GameObject selectedObject;
 
         /// <summary>
-        /// The old selected drawable type object, if the user selected a new one
-        /// in the same action run.
-        /// </summary>
-        private GameObject oldSelectedObj;
-
-        /// <summary>
         /// The old position of the selected object.
         /// </summary>
         private Vector3 oldObjectPosition;
@@ -137,21 +130,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// The old local euler angles of the selected object.
         /// </summary>
         private Vector3 oldObjectLocalEulerAngles;
-
-        /// <summary>
-        /// The prefab of the move menu.
-        /// </summary>
-        private const string switchMenuPrefab = "Prefabs/UI/Drawable/MoveRotatorSwitch";
-
-        /// <summary>
-        /// The instance of the switch menu
-        /// </summary>
-        private GameObject switchMenu;
-
-        /// <summary>
-        /// True if the left mouse button was released after selecting a object.
-        /// </summary>
-        private bool mouseWasReleased = true;
 
         /// <summary>
         /// The new object position.
@@ -164,6 +142,11 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         private Vector3 newObjectLocalEulerAngles;
 
         /// <summary>
+        /// Handles object selection and operation choice.
+        /// </summary>
+        private readonly MoveRotateSelectionController selectionController = new();
+
+        /// <summary>
         /// Deactivates the blink effect if it is still active
         /// and destroys the rigidbody and collision controller if there are still active.
         /// If the action was not completed in full (finish), the changes are reset.
@@ -172,6 +155,10 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         public override void Stop()
         {
             base.Stop();
+            if (selectionController.IsActive)
+            {
+                selectionController.Cancel();
+            }
             BlinkEffect.Deactivate(selectedObject);
             CollisionDetectionManager.Disable(selectedObject);
             if (progressState != ProgressState.Finish && selectedObject != null)
@@ -196,10 +183,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             }
             RotationMenu.Instance.Destroy();
             MoveMenu.Instance.Destroy();
-            if (switchMenu != null)
-            {
-                Destroyer.Destroy(switchMenu);
-            }
         }
 
         /// <summary>
@@ -245,9 +228,15 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// </summary>
         private void Cancel()
         {
-            if (selectedObject != null && SEEInput.Cancel())
+            if ((selectedObject != null || selectionController.IsActive) && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                if (selectionController.IsActive)
+                {
+                    selectionController.Cancel();
+                    progressState = ProgressState.SelectObject;
+                    return;
+                }
                 BlinkEffect.Deactivate(selectedObject);
                 CollisionDetectionManager.Disable(selectedObject);
                 if (progressState != ProgressState.Finish && selectedObject != null)
@@ -272,40 +261,10 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                 }
                 RotationMenu.Instance.Destroy();
                 MoveMenu.Instance.Destroy();
-                if (switchMenu != null)
-                {
-                    Destroyer.Destroy(switchMenu);
-                }
 
                 progressState = ProgressState.SelectObject;
                 selectedObject = null;
             }
-        }
-
-        /// <summary>
-        /// Creates the switch menu for selection of move or rotate.
-        /// </summary>
-        private void InitSwitchMenu()
-        {
-            switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                              UICanvas.Canvas.transform, false);
-            /// Adds the functionality to the move button
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
-                .AddListener(() =>
-                {
-                    progressState = ProgressState.Move;
-                    executedOperation = ProgressState.Move;
-                    Destroyer.Destroy(switchMenu);
-                });
-            /// Adds the funcitonality to the rotate button.
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
-                AddListener(() =>
-                {
-                    progressState = ProgressState.Rotate;
-                    executedOperation = ProgressState.Rotate;
-                    oldObjectPosition = selectedObject.transform.localPosition;
-                    Destroyer.Destroy(switchMenu);
-                });
         }
 
         /// <summary>
@@ -317,60 +276,26 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased,
-                true, false, true))
+            if (!selectionController.TrySelect(out MoveRotateSelectionController.Result result))
             {
-                oldObjectPosition = selectedObject.transform.localPosition;
-                oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
-                InitSwitchMenu();
+                return;
             }
 
-            /// To ensure a object change.
-            if (SEEInput.MouseUp(MouseButton.Left) && !mouseWasReleased)
+            selectedObject = result.SelectedObject;
+            oldObjectPosition = result.OldPosition;
+            oldObjectLocalEulerAngles = result.OldLocalEulerAngles;
+
+            switch (result.SelectedOperation)
             {
-                mouseWasReleased = true;
-            }
+                case MoveRotateSelectionController.Operation.Move:
+                    progressState = ProgressState.Move;
+                    executedOperation = ProgressState.Move;
+                    break;
 
-            /// This block ensures that a change of the <see cref="DrawableType"/> object is possible
-            /// before the operation selection.
-            EnableObjectChange();
-        }
-
-        /// <summary>
-        /// Ensures that a change of the <see cref="DrawableType"/> object is possible.
-        /// Deselects the current object.
-        /// The menu is closed.
-        /// The blink effect, rigidbody, and collision controller are removed.
-        /// Ensures that the visibility of the Renderer/Canvas is activated.
-        /// </summary>
-        private void EnableObjectChange()
-        {
-            if (SEEInput.LeftMouseInteraction()
-                && selectedObject != null && mouseWasReleased)
-            {
-                Destroyer.Destroy(switchMenu);
-                BlinkEffect.Deactivate(selectedObject);
-                CollisionDetectionManager.Disable(selectedObject);
-
-                /// The following part is needed to ensure that the renderer(s)/canvas is/are enabled.
-                if (selectedObject.GetComponent<Renderer>() != null)
-                {
-                    selectedObject.GetComponent<Renderer>().enabled = true;
-                }
-                else if (selectedObject.GetComponentsInChildren<Renderer>().Length > 0)
-                {
-                    foreach (Renderer renderer in selectedObject.GetComponentsInChildren<Renderer>())
-                    {
-                        renderer.enabled = true;
-                    }
-                }
-                if (selectedObject.GetComponent<Canvas>() != null)
-                {
-                    selectedObject.GetComponent<Canvas>().enabled = true;
-                }
-                oldSelectedObj = selectedObject;
-                selectedObject = null;
-                mouseWasReleased = false;
+                case MoveRotateSelectionController.Operation.Rotate:
+                    progressState = ProgressState.Rotate;
+                    executedOperation = ProgressState.Rotate;
+                    break;
             }
         }
 
