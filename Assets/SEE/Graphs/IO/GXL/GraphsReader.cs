@@ -50,7 +50,6 @@ namespace SEE.Graphs.IO.GXL
                                rootID: rootName,
                                logger: new SEELogger());
 
-            Performance p = Performance.Begin($"Loading GXL files from {directory}");
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
@@ -79,7 +78,6 @@ namespace SEE.Graphs.IO.GXL
                     break;
                 }
             }
-            p.End();
             Logging.Logger.LogInfo($"Number of graphs loaded: {Graphs.Count}\n");
         }
     }
