@@ -51,6 +51,10 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             /// <summary>
             /// Creates a selection result.
             /// </summary>
+            /// <param name="selectedObject">The selected object.</param>
+            /// <param name="oldPosition">The object's position before the operation starts.</param>
+            /// <param name="oldLocalEulerAngles">The object's local rotation before the operation starts.</param>
+            /// <param name="selectedOperation">The selected operation.</param>
             internal Result(GameObject selectedObject, Vector3 oldPosition,
                 Vector3 oldLocalEulerAngles, Operation selectedOperation)
             {

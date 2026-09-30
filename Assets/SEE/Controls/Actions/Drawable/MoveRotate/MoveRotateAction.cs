@@ -16,7 +16,7 @@ using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 namespace SEE.Controls.Actions.Drawable.MoveRotate
 {
     /// <summary>
-    /// Moves or rotate a drawable type object.
+    /// Moves or rotates a drawable type object.
     /// </summary>
     public class MoveRotateAction : DrawableAction
     {
@@ -77,7 +77,8 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             /// <param name="newObjectPosition">The new position of the selected object.</param>
             /// <param name="oldObjectLocalEulerAngles">The old local euler angles of the selected object.</param>
             /// <param name="degree">The degree on that the object was rotated. (Is the z value of the local euler angeles).</param>
-            /// <param name="moveOrRotate">The state if was moved or rotated.</param>
+            /// <param name="moveOrRotate">Whether the object was moved or rotated.</param>
+            /// <param name="includeChildren">Whether child nodes were included in the operation.</param>
             public Memento(GameObject selectedObject, GameObject surface, string id,
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles,
                 float degree, ProgressState moveOrRotate, bool includeChildren)
@@ -131,16 +132,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         private Vector3 oldObjectLocalEulerAngles;
 
         /// <summary>
-        /// The new object position.
-        /// </summary>
-        private Vector3 newObjectPosition;
-
-        /// <summary>
-        /// The new local euler angles.
-        /// </summary>
-        private Vector3 newObjectLocalEulerAngles;
-
-        /// <summary>
         /// Handles object selection and operation choice.
         /// </summary>
         private readonly MoveRotateSelectionController selectionController = new();
@@ -164,25 +155,15 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         public override void Stop()
         {
             base.Stop();
+
             if (selectionController.IsActive)
             {
                 selectionController.Cancel();
             }
+
             BlinkEffect.Deactivate(selectedObject);
             CollisionDetectionManager.Disable(selectedObject);
-
-            if (progressState != ProgressState.Finish && selectedObject != null)
-            {
-                if (progressState == ProgressState.Move)
-                {
-                    moveOperation.Restore(selectedObject, oldObjectPosition);
-                }
-
-                if (progressState == ProgressState.Rotate)
-                {
-                    rotationOperation.Restore(selectedObject, oldObjectLocalEulerAngles.z);
-                }
-            }
+            RestoreInProgressOperation();
 
             RotationMenu.Instance.Destroy();
             MoveMenu.Instance.Destroy();
@@ -234,31 +215,48 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             if ((selectedObject != null || selectionController.IsActive) && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
+
                 if (selectionController.IsActive)
                 {
                     selectionController.Cancel();
                     progressState = ProgressState.SelectObject;
                     return;
                 }
+
                 BlinkEffect.Deactivate(selectedObject);
                 CollisionDetectionManager.Disable(selectedObject);
-                if (progressState != ProgressState.Finish && selectedObject != null)
-                {
-                    if (progressState == ProgressState.Move)
-                    {
-                        moveOperation.Restore(selectedObject, oldObjectPosition);
-                    }
+                RestoreInProgressOperation();
 
-                    if (progressState == ProgressState.Rotate)
-                    {
-                        rotationOperation.Restore(selectedObject, oldObjectLocalEulerAngles.z);
-                    }
-                }
                 RotationMenu.Instance.Destroy();
                 MoveMenu.Instance.Destroy();
 
                 progressState = ProgressState.SelectObject;
                 selectedObject = null;
+            }
+        }
+
+        /// <summary>
+        /// Restores the state from before an unfinished move or rotation operation.
+        /// </summary>
+        private void RestoreInProgressOperation()
+        {
+            if (selectedObject == null || CurrentState == IReversibleAction.Progress.Completed)
+            {
+                return;
+            }
+
+            switch (executedOperation)
+            {
+                case ProgressState.Move:
+                    moveOperation.Restore(selectedObject, oldObjectPosition);
+                    break;
+
+                case ProgressState.Rotate:
+                    rotationOperation.Restore(
+                        selectedObject,
+                        oldObjectPosition,
+                        oldObjectLocalEulerAngles.z);
+                    break;
             }
         }
 
@@ -299,9 +297,8 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// </summary>
         private void Move()
         {
-            if (moveOperation.TryExecute(selectedObject, out Vector3 position))
+            if (moveOperation.TryExecute(selectedObject))
             {
-                newObjectPosition = position;
                 progressState = ProgressState.Finish;
             }
         }
@@ -311,7 +308,7 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// </summary>
         private void Rotate()
         {
-            if (rotationOperation.TryExecute(selectedObject, ref newObjectPosition, ref newObjectLocalEulerAngles))
+            if (rotationOperation.TryExecute(selectedObject))
             {
                 progressState = ProgressState.Finish;
             }
@@ -326,8 +323,8 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <returns>State of success.</returns>
         private bool Finish()
         {
-            newObjectPosition = selectedObject.transform.localPosition;
-            newObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
+            Vector3 newObjectPosition = selectedObject.transform.localPosition;
+            Vector3 newObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
 
             if (oldObjectPosition != newObjectPosition
                 || oldObjectLocalEulerAngles != newObjectLocalEulerAngles)

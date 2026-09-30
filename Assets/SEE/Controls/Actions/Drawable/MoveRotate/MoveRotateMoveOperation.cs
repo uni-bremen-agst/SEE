@@ -18,12 +18,9 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// Updates the movement of the selected object.
         /// </summary>
         /// <param name="selectedObject">The object to move.</param>
-        /// <param name="newPosition">The final position when the movement finishes.</param>
         /// <returns>Whether the movement was finished.</returns>
-        internal bool TryExecute(GameObject selectedObject, out Vector3 newPosition)
+        internal bool TryExecute(GameObject selectedObject)
         {
-            newPosition = selectedObject.transform.localPosition;
-
             if (selectedObject.GetComponent<BlinkEffect>() != null)
             {
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
@@ -61,7 +58,6 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
                 return false;
             }
 
-            newPosition = selectedObject.transform.localPosition;
             return true;
         }
 
@@ -84,6 +80,11 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <summary>
         /// Moves the selected object using the keyboard.
         /// </summary>
+        /// <param name="selectedObject">The object to move.</param>
+        /// <param name="moveByMouse">Controls whether movement by mouse is enabled.</param>
+        /// <param name="speedUp">Controls whether accelerated keyboard movement is enabled.</param>
+        /// <param name="surface">The drawable surface containing the selected object.</param>
+        /// <param name="surfaceParentName">The name of the drawable surface parent.</param>
         private static void MoveByKey(GameObject selectedObject, SwitchManager moveByMouse, SwitchManager speedUp,
             GameObject surface, string surfaceParentName)
         {
@@ -107,6 +108,8 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <summary>
         /// Checks whether any child node is involved in a collision.
         /// </summary>
+        /// <param name="selectedObject">The selected object whose child nodes are checked.</param>
+        /// <returns>Whether any child node is involved in a collision.</returns>
         private static bool CheckChildrenCollision(GameObject selectedObject)
         {
             bool childInCollision = false;
@@ -128,6 +131,11 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <summary>
         /// Moves the selected object based on the mouse position.
         /// </summary>
+        /// <param name="selectedObject">The object to move.</param>
+        /// <param name="moveByMouse">Controls whether movement by mouse is enabled.</param>
+        /// <param name="childInCollision">Whether a child node is currently involved in a collision.</param>
+        /// <param name="surface">The drawable surface containing the selected object.</param>
+        /// <param name="surfaceParentName">The name of the drawable surface parent.</param>
         private static void MoveByMouse(GameObject selectedObject, SwitchManager moveByMouse,
             bool childInCollision, GameObject surface, string surfaceParentName)
         {
@@ -153,6 +161,7 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// <summary>
         /// Gets the movement direction represented by the currently pressed key.
         /// </summary>
+        /// <returns>The movement direction represented by the currently pressed key.</returns>
         private static ValueHolder.MoveDirection GetDirection()
         {
             if (SEEInput.MoveObjectLeft())

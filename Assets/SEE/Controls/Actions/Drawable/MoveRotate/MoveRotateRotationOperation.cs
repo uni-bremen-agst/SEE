@@ -1,8 +1,6 @@
-﻿using SEE.Game;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable.MoveRotate
@@ -16,15 +14,13 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         /// Updates the rotation of the selected object.
         /// </summary>
         /// <param name="selectedObject">The object to rotate.</param>
-        /// <param name="newPosition">The position resulting from the rotation.</param>
-        /// <param name="newLocalEulerAngles">The local rotation resulting from the rotation.</param>
         /// <returns>Whether the rotation was finished.</returns>
-        internal bool TryExecute(GameObject selectedObject, ref Vector3 newPosition, ref Vector3 newLocalEulerAngles)
+        internal bool TryExecute(GameObject selectedObject)
         {
             if (selectedObject.GetComponent<BlinkEffect>() != null)
             {
                 RotationMenu.Instance.Enable(selectedObject);
-                RotateByWheel(selectedObject, ref newPosition, ref newLocalEulerAngles);
+                RotateByWheel(selectedObject);
 
                 if (SEEInput.LeftMouseInteraction())
                 {
@@ -36,11 +32,14 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
         }
 
         /// <summary>
-        /// Restores the rotation from before the operation.
+        /// Restores the transform state from before the rotation operation.
+        /// This includes the position if it was changed by collision handling
+        /// while the object was being rotated.
         /// </summary>
         /// <param name="selectedObject">The rotated object.</param>
+        /// <param name="oldPosition">The position to restore.</param>
         /// <param name="oldLocalEulerAngleZ">The rotation to restore.</param>
-        internal void Restore(GameObject selectedObject, float oldLocalEulerAngleZ)
+        internal void Restore(GameObject selectedObject, Vector3 oldPosition, float oldLocalEulerAngleZ)
         {
             GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
@@ -49,13 +48,20 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
             GameMoveRotator.SetRotate(selectedObject, oldLocalEulerAngleZ, includeChildren);
             new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
                 oldLocalEulerAngleZ, includeChildren).Execute();
+
+            if (selectedObject.transform.localPosition != oldPosition)
+            {
+                GameMoveRotator.SetPosition(selectedObject, oldPosition, includeChildren);
+                new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
+                    oldPosition, includeChildren).Execute();
+            }
         }
 
         /// <summary>
         /// Handles rotation through the mouse wheel.
         /// </summary>
-        private static void RotateByWheel(GameObject selectedObject, ref Vector3 newPosition,
-            ref Vector3 newLocalEulerAngles)
+        /// <param name="selectedObject">The object to rotate.</param>
+        private static void RotateByWheel(GameObject selectedObject)
         {
             bool rotate = false;
             Vector3 direction = Vector3.zero;
@@ -91,26 +97,22 @@ namespace SEE.Controls.Actions.Drawable.MoveRotate
 
             if (rotate)
             {
-                PerformRotate(selectedObject, direction, degree, ref newPosition, ref newLocalEulerAngles);
+                PerformRotate(selectedObject, direction, degree);
             }
         }
 
         /// <summary>
         /// Performs the requested rotation.
         /// </summary>
-        private static void PerformRotate(GameObject selectedObject, Vector3 direction, float degree,
-            ref Vector3 newPosition, ref Vector3 newLocalEulerAngles)
+        /// <param name="selectedObject">The object to rotate.</param>
+        /// <param name="direction">The direction of the rotation.</param>
+        /// <param name="degree">The degree by which the object is rotated.</param>
+        private static void PerformRotate(GameObject selectedObject, Vector3 direction, float degree)
         {
             GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-            newLocalEulerAngles = GameMoveRotator.RotateObject(selectedObject, direction, degree,
-                RotationMenu.Instance.IncludeChildren);
-
-            if (Tags.DrawableTypes.Contains(selectedObject.tag))
-            {
-                newPosition = selectedObject.transform.localPosition;
-            }
+            GameMoveRotator.RotateObject(selectedObject, direction, degree, RotationMenu.Instance.IncludeChildren);
 
             new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, direction,
                 degree, RotationMenu.Instance.IncludeChildren).Execute();
