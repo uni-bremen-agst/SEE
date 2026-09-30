@@ -40,6 +40,9 @@ namespace SEE.Graphs.Reflexion
     /// </summary>
     public class CyclicHierarchyException : ArchitectureAnalysisException
     {
+        /// <summary>
+        /// Constructs a new <see cref="CyclicHierarchyException"/>.
+        /// </summary>
         public CyclicHierarchyException() : base("The hierarchy must be a tree, that is, no cycles may exist!")
         {
         }
@@ -50,14 +53,26 @@ namespace SEE.Graphs.Reflexion
     /// </summary>
     public class CorruptStateException : ArchitectureAnalysisException
     {
+        /// <summary>
+        /// Constructs a new <see cref="CorruptStateException"/>.
+        /// </summary>
         public CorruptStateException()
         {
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="CorruptStateException"/> with the given <paramref name="message"/>.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
         public CorruptStateException(string message) : base(message)
         {
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="CorruptStateException"/> with the given <paramref name="message"/> and <paramref name="innerException"/>.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
         public CorruptStateException(string message, Exception innerException) : base(message, innerException)
         {
         }
@@ -79,6 +94,12 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Edge SecondEdge;
 
+        /// <summary>
+        /// Constructs a new <see cref="RedundantSpecifiedEdgeException"/> with the given <paramref name="firstEdge"/>
+        /// and <paramref name="secondEdge"/>.
+        /// </summary>
+        /// <param name="firstEdge">The first of the two redundant edges.</param>
+        /// <param name="secondEdge">The second of the two redundant edges.</param>
         public RedundantSpecifiedEdgeException(Edge firstEdge, Edge secondEdge)
             : base($"Edge '{firstEdge.ToShortString()}' would be redundant to '{secondEdge.ToShortString()}'!")
         {
@@ -102,6 +123,12 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly GraphElement Element;
 
+        /// <summary>
+        /// Constructs a new <see cref="NotInSubgraphException"/> with the given
+        /// <paramref name="expectedSubgraph"/> and <paramref name="element"/>.
+        /// </summary>
+        /// <param name="expectedSubgraph">The subgraph the <paramref name="element"/> was expected to be in.</param>
+        /// <param name="element">The graph element that was not contained in <paramref name="expectedSubgraph"/>.</param>
         public NotInSubgraphException(ReflexionSubgraphs expectedSubgraph, GraphElement element)
             : base($"Given {element.GetType().Name} '{element.ToShortString()}' must be contained in the {expectedSubgraph} graph!")
         {
@@ -120,6 +147,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Edge Edge;
 
+        /// <summary>
+        /// Constructs a new <see cref="ExpectedSpecifiedEdgeException"/> with the given <paramref name="edge"/>.
+        /// </summary>
+        /// <param name="edge">The edge that was unexpectedly unspecified.</param>
         public ExpectedSpecifiedEdgeException(Edge edge)
             : base($"Given edge '{edge.ToShortString()}' is not a specified edge!")
         {
@@ -137,6 +168,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Edge Edge;
 
+        /// <summary>
+        /// Constructs a new <see cref="ExpectedPropagatedEdgeException"/> with the given <paramref name="edge"/>.
+        /// </summary>
+        /// <param name="edge">The edge that was unexpectedly propagated.</param>
         public ExpectedPropagatedEdgeException(Edge edge)
             : base($"Given edge '{edge.ToShortString()}' is a specified (not propagated) edge!")
         {
@@ -162,6 +197,12 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Edge OriginatingEdge;
 
+        /// <summary>
+        /// Constructs a new <see cref="AlreadyPropagatedException"/> with the given <paramref name="propagatedEdge"/>
+        /// and <paramref name="originatingEdge"/>.
+        /// </summary>
+        /// <param name="propagatedEdge">The edge that was already propagated.</param>
+        /// <param name="originatingEdge">The edge from which <paramref name="propagatedEdge"/> originates.</param>
         public AlreadyPropagatedException(Edge propagatedEdge, Edge originatingEdge)
             : base($"Propagated edge already exists: '{propagatedEdge.ToShortString()}' "
                    + $"(originated from '{originatingEdge.ToShortString()}')!")
@@ -186,6 +227,12 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Node MappedTo;
 
+        /// <summary>
+        /// Constructs a new <see cref="AlreadyExplicitlyMappedException"/> with the given <paramref name="alreadyMapped"/>
+        /// and <paramref name="mappedTo"/>.
+        /// </summary>
+        /// <param name="alreadyMapped">The node that is already mapped to <paramref name="mappedTo"/>.</param>
+        /// <param name="mappedTo">The node that <paramref name="alreadyMapped"/> is mapped to.</param>
         public AlreadyExplicitlyMappedException(Node alreadyMapped, Node mappedTo)
             : base($"Node '{alreadyMapped.ToShortString()}' is already explicitly mapped to '{mappedTo.ToShortString()}'.")
         {
@@ -205,6 +252,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Node UnmappedNode;
 
+        /// <summary>
+        /// Constructs a new <see cref="NotExplicitlyMappedException"/> with the given <paramref name="unmappedNode"/>.
+        /// </summary>
+        /// <param name="unmappedNode">The node that is not explicitly mapped.</param>
         public NotExplicitlyMappedException(Node unmappedNode)
             : base($"Implementation node '{unmappedNode.ToShortString()}' is not explicitly mapped.")
         {
@@ -223,6 +274,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly GraphElement ExistingElement;
 
+        /// <summary>
+        /// Constructs a new <see cref="AlreadyContainedException"/> with the given <paramref name="existingElement"/>.
+        /// </summary>
+        /// <param name="existingElement">The element that already exists in the graph.</param>
         public AlreadyContainedException(GraphElement existingElement)
             : base($"'{existingElement.ToShortString()}' is already present in the graph!")
         {
@@ -240,6 +295,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Node Node;
 
+        /// <summary>
+        /// Constructs a new <see cref="NotAnOrphanException"/> with the given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">The node that is not an orphan.</param>
         public NotAnOrphanException(Node node)
             : base($"Node '{node.ToShortString()}' is already a child of '{node.Parent.ToShortString()}'!")
         {
@@ -257,6 +316,10 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public readonly Node Node;
 
+        /// <summary>
+        /// Constructs a new <see cref="IsAnOrphanException"/> with the given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">The node that is an orphan.</param>
         public IsAnOrphanException(Node node) : base($"Node '{node.ToShortString()}' does not have any parents!")
         {
             Node = node;
