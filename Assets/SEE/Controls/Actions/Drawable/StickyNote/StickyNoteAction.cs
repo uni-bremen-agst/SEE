@@ -74,6 +74,11 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         private Vector3 eulerAnglesBackup;
 
         /// <summary>
+        /// Handles deleting sticky notes.
+        /// </summary>
+        private readonly StickyNoteDeleteOperation deleteOperation = new();
+
+        /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
@@ -854,35 +859,22 @@ namespace SEE.Controls.Actions.Drawable.StickyNote
         }
 
         /// <summary>
-        /// Deletes the chosen sticky note.
-        /// If the chosen object is not a sticky note, an information will be shown.
+        /// Deletes the selected sticky note.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
         private bool Delete()
         {
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.HasDrawableSurface(raycastHit.collider.gameObject) ||
-                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
+            if (!deleteOperation.TryExecute(out DrawableConfig deletedConfig))
             {
-                GameObject surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
-                if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
-                {
-                    memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction);
-                    new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                    Destroyer.Destroy(surface.GetRootParent());
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    return true;
-                }
-                else
-                {
-                    ShowNotification.Warn("Wrong selection", "You don't selected a sticky note.");
-                    return false;
-                }
+                return false;
             }
-            return false;
+
+            memento = new Memento(deletedConfig, selectedAction);
+            CurrentState = IReversibleAction.Progress.Completed;
+
+            return true;
         }
+
         /// <summary>
         /// Checks if the values of the two given configurations are the same.
         /// </summary>
