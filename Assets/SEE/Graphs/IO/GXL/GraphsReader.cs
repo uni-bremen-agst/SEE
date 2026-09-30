@@ -70,20 +70,6 @@ namespace SEE.Graphs.IO.GXL
                 }
                 else
                 {
-                    string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
-                    if (File.Exists(csvFilename))
-                    {
-                        Logging.Logger.LogInfo($"Loading CSV file {csvFilename}.\n");
-                        int numberOfErrors = await CSV.MetricImporter.LoadCsvAsync(graph, csvFilename);
-                        if (numberOfErrors > 0)
-                        {
-                            Logging.Logger.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
-                        }
-                    }
-                    else
-                    {
-                        Logging.Logger.LogWarning($"CSV file {csvFilename} does not exist.\n");
-                    }
                     maxRevisionsToLoad--;
                     Graphs.Add(graph);
                 }
