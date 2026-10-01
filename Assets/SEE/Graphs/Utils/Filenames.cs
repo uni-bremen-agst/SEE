@@ -9,7 +9,7 @@ namespace SEE.Utils
     /// <summary>
     /// Utilities for pathnames.
     /// </summary>
-    public abstract class Filenames
+    public static class Filenames
     {
         /// <summary>
         /// Directory separator on Windows.
