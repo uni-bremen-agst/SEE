@@ -1,7 +1,7 @@
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
-    /// Thrown if a node is an orphan (i.e., has a parent) when it's not expected to be one.
+    /// Thrown if a node is an orphan (i.e., has no parent) when it's not expected to be one.
     /// </summary>
     public class IsAnOrphanException : ArchitectureAnalysisException
     {
