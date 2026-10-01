@@ -6,7 +6,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI;
 using SEE.UI.Menu.Drawable.MindMap;
@@ -40,6 +39,11 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
             SelectParent,
             Finish
         }
+
+        /// <summary>
+        /// Handles pasting non-mind-map drawable objects.
+        /// </summary>
+        private readonly CutCopyPastePrimitivePasteOperation primitivePasteOperation = new();
 
         /// <summary>
         /// Holds the current state.
@@ -356,19 +360,26 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
                 selectedObj.GetComponent<BlinkEffect>().Deactivate();
                 Vector3 newPosition = raycastHit.point;
                 newSurface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
+
                 switch (DrawableType.Get(selectedObj))
                 {
                     case LineConf:
                     case TextConf:
                     case ImageConf:
-                        ProcessPrimitiveType(newPosition);
+                        newObject = primitivePasteOperation.Execute(
+                            selectedObj,
+                            newSurface,
+                            newPosition);
                         break;
+
                     case MindMapNodeConf:
                         ProcessMindMapNode(newPosition);
                         break;
                 }
+
                 newValueHolder = DrawableType.Get(newObject);
                 Cut();
+
                 if (newObject.CompareTag(Tags.MindMapNode) &&
                     newObject.GetComponent<MMNodeValueHolder>().NodeKind != MindMapNodeKind.Theme)
                 {
@@ -444,35 +455,6 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         }
 
         /// <summary>
-        /// Draws a clone of the chosen line to the chosen position.
-        /// </summary>
-        /// <param name="newPosition">The new position for the clone.</param>
-        private void ProcessPrimitiveType(Vector3 newPosition)
-        {
-            DrawableType conf = DrawableType.Get(selectedObj);
-            conf.ID = "";
-            conf.AssociatedPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
-            newObject = DrawableType.Restore(conf, newSurface);
-            MoveWithWorldPosition(newPosition);
-        }
-
-        /// <summary>
-        ///  Moves the clone of the selected node to the destination (new position).
-        /// </summary>
-        /// <param name="newPosition">Destination position.</param>
-        private void MoveWithWorldPosition(Vector3 newPosition)
-        {
-            /// Moves the clone of the selected node to the destination (new position).
-            Vector3 newLocalPosition = newSurface.GetRootParent().transform.
-                InverseTransformPoint(newPosition);
-            newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
-                selectedObj.transform.localPosition.z);
-            GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
-            new MoveNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
-                newObject.name, newLocalPosition, true).Execute();
-        }
-
-        /// <summary>
         /// Adds a clone of the chosen node and its children to the chosen position.
         /// </summary>
         /// <param name="newPosition">The new position for the node.</param>
@@ -494,9 +476,16 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
                 DrawableType.Restore(type, newSurface);
             }
 
-            newObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
-            MoveWithWorldPosition(newPosition);
-            /// Updating positions.
+            newObject = GameFinder.FindAttachedOrLocalDescendant(
+                newSurface,
+                newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
+
+            CutCopyPastePositioning.MoveToWorldPosition(
+                selectedObj,
+                newObject,
+                newSurface,
+                newPosition);
+
             newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
         }
 
