@@ -1,6 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
+using SEE.Graphs.Utils;
 using SEE.UI.Notification;
-using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;

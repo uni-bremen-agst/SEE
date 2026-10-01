@@ -1,6 +1,7 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Graphs;
+using SEE.Graphs.Utils;
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
 using SEE.Utils;

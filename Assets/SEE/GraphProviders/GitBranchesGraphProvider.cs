@@ -7,6 +7,7 @@ using SEE.VCS;
 using System;
 using System.IO;
 using System.Threading;
+using SEE.Graphs.Utils;
 
 namespace SEE.GraphProviders
 {

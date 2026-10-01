@@ -14,6 +14,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static SEE.Graphs.VCS;
+using SEE.Graphs.Utils;
 
 namespace SEE.GraphProviders
 {
@@ -473,7 +474,7 @@ namespace SEE.GraphProviders
             repo?.Dispose();
             if (Directory.Exists(gitDirPath))
             {
-                Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
+                Filenames.DeleteReadOnlyDirectory(gitDirPath);
             }
         }
     }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using SEE.Graphs.Utils;
 
 namespace SEE.Game.Drawable
 {

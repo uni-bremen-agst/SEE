@@ -8,6 +8,7 @@ using SEE.Graphs.IO.GXL;
 using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.Graphs.Utils;
 
 namespace SEE.Tools.Architecture
 {

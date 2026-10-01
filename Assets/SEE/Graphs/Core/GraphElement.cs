@@ -1,6 +1,5 @@
 ﻿using SEE.Graphs.Events;
 using SEE.Graphs.Utils;
-using SEE.Utils;
 using SEE.Utils.Paths;
 
 namespace SEE.Graphs

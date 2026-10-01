@@ -28,6 +28,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Cities;
 using SEE.Components.GameNodes.BranchCity;
+using SEE.Graphs.Utils;
 
 namespace SEE.Game.City
 {

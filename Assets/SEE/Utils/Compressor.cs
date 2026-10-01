@@ -2,6 +2,8 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Joveler.Compression.XZ;
+using SEE.Graphs.Utils;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

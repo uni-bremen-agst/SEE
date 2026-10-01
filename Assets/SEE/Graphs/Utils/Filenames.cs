@@ -1,10 +1,10 @@
-﻿using SEE.Graphs.Utils;
+﻿using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// Utilities for pathnames.

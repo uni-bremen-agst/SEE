@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.CameraPaths;
+using SEE.Graphs.Utils;
 using SEE.Utils;
 using System;
 using System.IO;

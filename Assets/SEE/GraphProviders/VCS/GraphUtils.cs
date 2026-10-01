@@ -1,6 +1,6 @@
 using System;
 using SEE.Graphs;
-using SEE.Utils;
+using SEE.Graphs.Utils;
 
 namespace SEE.GraphProviders.VCS
 {
