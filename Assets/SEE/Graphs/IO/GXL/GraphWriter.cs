@@ -62,7 +62,7 @@ namespace SEE.Graphs.IO.GXL
             source.Flush();
             source.Position = 0;
 
-            SEE.Utils.Compressor.Save(filename, source);
+            Compressor.Save(filename, source);
         }
 
         /// <summary>
