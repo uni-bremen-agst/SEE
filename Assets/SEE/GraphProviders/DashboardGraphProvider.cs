@@ -63,6 +63,22 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
+        /// Returns the directory of the source file for this graph element relative to the project root directory.
+        /// The project root directory is determined by calling <see cref="DataPath.ProjectFolder"/> if it is not supplied
+        /// by <paramref name="projectFolder"/>.
+        /// Note that not all graph elements may have a source file.
+        /// If the graph element does not have this attribute, null is returned.
+        /// </summary>
+        /// <param name="node">The node for which to retrieve the relative path of its directory.</param>
+        /// <param name="projectFolder">The project's folder, containing the node's path.</param>
+        /// <returns>Relative directory of source file or null.</returns>
+        private static string RelativeDirectory(Node node, string projectFolder = null)
+        {
+            return node.Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty)
+                            .TrimStart(Filenames.UnixDirectorySeparator);
+        }
+
+        /// <summary>
         /// Loads metrics and issues from the Axivion dashboard and imports them to the graph.
         /// Issues are also aggregated along the node decomposition tree as a sum
         /// using the <see cref="MetricAggregator"/>.
@@ -97,7 +113,7 @@ namespace SEE.GraphProviders
                 token.ThrowIfCancellationRequested();
 
                 changePercentage?.Invoke(++i / nodes.Count);
-                string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
+                string nodePath = $"{RelativeDirectory(node, projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
                     foreach (MetricValueTableRow metricValue in metricValues)

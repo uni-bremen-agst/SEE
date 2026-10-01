@@ -1,6 +1,5 @@
 ﻿using SEE.Graphs.Events;
 using SEE.Graphs.Utils;
-using SEE.Utils.Paths;
 
 namespace SEE.Graphs
 {
@@ -150,22 +149,6 @@ namespace SEE.Graphs
             }
 
             set => SetString(sourcePathAttribute, value);
-        }
-
-        /// <summary>
-        /// Returns the directory of the source file for this graph element relative to the project root directory.
-        /// The project root directory is determined by calling <see cref="DataPath.ProjectFolder"/> if it is not supplied
-        /// by <paramref name="projectFolder"/>.
-        /// Note that not all graph elements may have a source file.
-        /// If the graph element does not have this attribute, null is returned.
-        /// </summary>
-        /// <param name="projectFolder">The project's folder, containing the node's path.</param>
-        /// <returns>Relative directory of source file or null.</returns>
-        public string RelativeDirectory(string projectFolder = null)
-        {
-            // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
-            return Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty)
-                            .TrimStart(Filenames.UnixDirectorySeparator);
         }
 
         /// <summary>
