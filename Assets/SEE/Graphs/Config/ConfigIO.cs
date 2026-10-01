@@ -44,8 +44,7 @@ namespace SEE.Graphs.Config
         /// receives the looked up value.
         ///
         /// Note: For types <typeparamref name="T"/> that are enums, use <see cref="RestoreEnum()"/>
-        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use
-        /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
+        /// instead. For int, use <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of <paramref name="value"/></typeparam>
         /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
@@ -134,7 +133,7 @@ namespace SEE.Graphs.Config
         /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists.</param>
         /// <returns>True if the <paramref name="label"/> was found.</returns>
-        internal static bool Restore(Dictionary<string, object> values, string label, ref int value)
+        public static bool Restore(Dictionary<string, object> values, string label, ref int value)
         {
             long v = value;
             bool result = Restore(values, label, ref v);
@@ -154,7 +153,7 @@ namespace SEE.Graphs.Config
         /// exists.</param>
         /// <returns>True if the <paramref name="label"/> was found.</returns>
         /// <exception cref="InvalidCastException">In case the looked up value is not the expected type List of string.</exception>
-        internal static bool Restore(Dictionary<string, object> attributes, string label, ref HashSet<string> value)
+        public static bool Restore(Dictionary<string, object> attributes, string label, ref HashSet<string> value)
         {
             if (attributes.TryGetValue(label, out object storedValue))
             {
@@ -213,7 +212,7 @@ namespace SEE.Graphs.Config
         /// <exception cref="InvalidCastException">Thrown if the looked up value is not
         /// of the expected data type.</exception>
         /// <exception cref="Exception">Thrown if the items stored do not form a pair.</exception>
-        internal static bool Restore(Dictionary<string, object> attributes, string label, ref Dictionary<string, bool> value)
+        public static bool Restore(Dictionary<string, object> attributes, string label, ref Dictionary<string, bool> value)
         {
             if (attributes.TryGetValue(label, out object list))
             {
