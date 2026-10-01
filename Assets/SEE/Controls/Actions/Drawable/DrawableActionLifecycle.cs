@@ -1,4 +1,6 @@
-﻿namespace SEE.Controls.Actions.Drawable
+﻿using SEE.Controls.Actions.Drawable.CutCopyPaste;
+
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// Manages state that is shared between consecutive instances of drawable actions

@@ -16,7 +16,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.CutCopyPaste
 {
     /// <summary>
     /// This action provides the cut, copy, and paste functionality

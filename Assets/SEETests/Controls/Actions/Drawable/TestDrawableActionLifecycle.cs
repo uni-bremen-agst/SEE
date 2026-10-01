@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
+using SEE.Controls.Actions.Drawable.CutCopyPaste;
 using SEE.Utils.History;
 using System;
 using System.Linq;
