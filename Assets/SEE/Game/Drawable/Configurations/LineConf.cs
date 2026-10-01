@@ -408,7 +408,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the primary color.
             Color loadedColor = Color.black;
-            if (ConfigIO.Restore(attributes, primaryColorLabel, ref loadedColor))
+            if (UnityConfigIO.RestoreColor(attributes, primaryColorLabel, ref loadedColor))
             {
                 PrimaryColor = loadedColor;
             }
@@ -420,7 +420,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the secondary color.
             Color loadedSecColor = Color.black;
-            if (ConfigIO.Restore(attributes, secondaryColorLabel, ref loadedSecColor))
+            if (UnityConfigIO.RestoreColor(attributes, secondaryColorLabel, ref loadedSecColor))
             {
                 SecondaryColor = loadedSecColor;
             }
@@ -443,7 +443,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the fill out color.
             Color loadedFOColor = Color.black;
-            if (ConfigIO.Restore(attributes, fillOutColorLabel, ref loadedFOColor))
+            if (UnityConfigIO.RestoreColor(attributes, fillOutColorLabel, ref loadedFOColor))
             {
                 FillOutColor = loadedFOColor;
             }

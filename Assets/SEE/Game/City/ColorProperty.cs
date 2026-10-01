@@ -56,7 +56,7 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.RestoreEnum(values, propertyLabel, ref Property);
-                ConfigIO.Restore(values, typeColorLabel, ref TypeColor);
+                UnityConfigIO.RestoreColor(values, typeColorLabel, ref TypeColor);
                 ConfigIO.Restore(values, byLevelLabel, ref ByLevel);
                 ConfigIO.Restore(values, colorMetricLabel, ref ColorMetric);
                 return true;

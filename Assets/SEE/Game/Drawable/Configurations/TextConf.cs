@@ -184,7 +184,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the font color.
             Color loadedFontColor = Color.black;
-            if (ConfigIO.Restore(attributes, fontColorLabel, ref loadedFontColor))
+            if (UnityConfigIO.RestoreColor(attributes, fontColorLabel, ref loadedFontColor))
             {
                 FontColor = loadedFontColor;
             }
@@ -196,7 +196,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the outline color.
             Color loadedOutlineColor = Color.clear;
-            if (ConfigIO.Restore(attributes, outlineColorLabel, ref loadedOutlineColor))
+            if (UnityConfigIO.RestoreColor(attributes, outlineColorLabel, ref loadedOutlineColor))
             {
                 OutlineColor = loadedOutlineColor;
             }

@@ -110,7 +110,7 @@ namespace SEE.Game.City
                     ConfigIO.Restore(values, showLabel, ref Show);
                     ConfigIO.Restore(values, distanceLabel, ref Distance);
                     ConfigIO.Restore(values, fontSizeLabel, ref FontSize);
-                    ConfigIO.Restore(values, fontColorLabel, ref FontColor);
+                    UnityConfigIO.RestoreColor(values, fontColorLabel, ref FontColor);
                     ConfigIO.Restore(values, animationFactorLabel, ref AnimationFactor);
                     ConfigIO.Restore(values, labelAlphaLabel, ref LabelAlpha);
                 }

@@ -431,7 +431,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color primary = Color.clear;
-            if (ConfigIO.Restore(attributes, primaryColorLabel, ref primary))
+            if (UnityConfigIO.RestoreColor(attributes, primaryColorLabel, ref primary))
             {
                 PrimaryColor = primary;
             }
@@ -442,7 +442,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color secondary = Color.clear;
-            if (ConfigIO.Restore(attributes, secondaryColorLabel, ref secondary))
+            if (UnityConfigIO.RestoreColor(attributes, secondaryColorLabel, ref secondary))
             {
                 SecondaryColor = secondary;
             }
@@ -494,7 +494,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color fillOut = Color.clear;
-            if (ConfigIO.Restore(attributes, fillOutColorLabel, ref fillOut))
+            if (UnityConfigIO.RestoreColor(attributes, fillOutColorLabel, ref fillOut))
             {
                 FillOutColor = fillOut;
             }

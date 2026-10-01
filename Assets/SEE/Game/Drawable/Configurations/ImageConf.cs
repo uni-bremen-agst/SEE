@@ -129,7 +129,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the image color.
             Color loadedimageColor = Color.black;
-            if (ConfigIO.Restore(attributes, colorLabel, ref loadedimageColor))
+            if (UnityConfigIO.RestoreColor(attributes, colorLabel, ref loadedimageColor))
             {
                 ImageColor = loadedimageColor;
             }

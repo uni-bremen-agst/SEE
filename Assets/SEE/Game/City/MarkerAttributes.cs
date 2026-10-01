@@ -119,9 +119,9 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.Restore(values, markerHeightLabel, ref MarkerHeight);
                 ConfigIO.Restore(values, markerWidthLabel, ref MarkerWidth);
-                ConfigIO.Restore(values, additionBeamColorLabel, ref AdditionBeamColor);
-                ConfigIO.Restore(values, changeBeamColorLabel, ref ChangeBeamColor);
-                ConfigIO.Restore(values, deletionBeamColorLabel, ref DeletionBeamColor);
+                UnityConfigIO.RestoreColor(values, additionBeamColorLabel, ref AdditionBeamColor);
+                UnityConfigIO.RestoreColor(values, changeBeamColorLabel, ref ChangeBeamColor);
+                UnityConfigIO.RestoreColor(values, deletionBeamColorLabel, ref DeletionBeamColor);
             }
         }
         #endregion

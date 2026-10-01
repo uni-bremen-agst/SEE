@@ -402,7 +402,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the color.
             Color color = Color.black;
-            if (ConfigIO.Restore(attributes, ColorLabel, ref color))
+            if (UnityConfigIO.RestoreColor(attributes, ColorLabel, ref color))
             {
                 Color = color;
             }

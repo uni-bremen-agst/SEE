@@ -93,7 +93,7 @@ namespace SEE.Game.Drawable.Configurations
             for (int i = 0; i < attributes.Count; i++)
             {
                 Color color = Color.black;
-                if (ConfigIO.Restore(attributes, presets[i], ref color))
+                if (UnityConfigIO.RestoreColor(attributes, presets[i], ref color))
                 {
                     Colors[i] = color;
                 }
