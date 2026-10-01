@@ -39,21 +39,6 @@ namespace SEE.Utils.Config
         protected const char CloseList = ']';
 
         /// <summary>
-        /// Label for the X coordinate of a Vector3.
-        /// </summary>
-        protected const string XLabel = "X";
-
-        /// <summary>
-        /// Label for the Y coordinate of a Vector3.
-        /// </summary>
-        protected const string YLabel = "Y";
-
-        /// <summary>
-        /// Label for the Z coordinate of a Vector3.
-        /// </summary>
-        protected const string ZLabel = "Z";
-
-        /// <summary>
         /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
@@ -158,6 +143,8 @@ namespace SEE.Utils.Config
             return result;
         }
 
+        #region Vector3
+
         /// <summary>
         /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the key <paramref name="label"/>.
         /// If no such <paramref name="label"/> exists, false is returned and <paramref name="value"/> remains unchanged.
@@ -256,6 +243,23 @@ namespace SEE.Utils.Config
             }
             return true;
         }
+
+        /// <summary>
+        /// Label for the X coordinate of a Vector3.
+        /// </summary>
+        protected const string XLabel = "X";
+
+        /// <summary>
+        /// Label for the Y coordinate of a Vector3.
+        /// </summary>
+        protected const string YLabel = "Y";
+
+        /// <summary>
+        /// Label for the Z coordinate of a Vector3.
+        /// </summary>
+        protected const string ZLabel = "Z";
+
+        #endregion Vector3
 
         /// <summary>
         /// Restores <paramref name="value"/> from <paramref name="attributes"/> using the given <paramref name="label"/>.
