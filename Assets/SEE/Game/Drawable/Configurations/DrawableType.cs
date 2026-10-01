@@ -306,7 +306,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the position.
             Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.RestoreVector(attributes, positionLabel, ref loadedPosition))
+            if (UnityConfigIO.RestoreVector(attributes, positionLabel, ref loadedPosition))
             {
                 Position = loadedPosition;
             }
@@ -318,7 +318,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.RestoreVector(attributes, eulerAnglesLabel, ref loadedEulerAngles))
+            if (UnityConfigIO.RestoreVector(attributes, eulerAnglesLabel, ref loadedEulerAngles))
             {
                 EulerAngles = loadedEulerAngles;
             }
@@ -330,7 +330,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the scale.
             Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.RestoreVector(attributes, scaleLabel, ref loadedScale))
+            if (UnityConfigIO.RestoreVector(attributes, scaleLabel, ref loadedScale))
             {
                 Scale = loadedScale;
             }

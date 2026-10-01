@@ -150,7 +150,7 @@ namespace SEE.Game.City
             ConfigurationPath.Restore(attributes, configurationPathLabel);
             SourceCodeDirectory.Restore(attributes, sourceCodeDirectoryLabel);
             SolutionPath.Restore(attributes, solutionPathLabel);
-            ConfigIO.RestoreVector(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
+            UnityConfigIO.RestoreVector(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
             ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, hiddenEdgesLabel, ref HiddenEdges);

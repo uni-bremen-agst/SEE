@@ -490,7 +490,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Vector3 loadedOriginalStartAnchor = Vector3.zero;
-            if (ConfigIO.RestoreVector(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
+            if (UnityConfigIO.RestoreVector(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
             {
                 OriginalStartAnchor = loadedOriginalStartAnchor;
             }
@@ -503,7 +503,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Vector3 loadedOriginalEndAnchor = Vector3.zero;
-            if (ConfigIO.RestoreVector(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
+            if (UnityConfigIO.RestoreVector(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
             {
                 OriginalEndAnchor = loadedOriginalEndAnchor;
             }
