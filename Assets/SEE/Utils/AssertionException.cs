@@ -1,7 +1,6 @@
-using SEE.Graphs.Utils;
 using System;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// Thrown when an assumption checked by one of <see cref="Assertion"/>'s
