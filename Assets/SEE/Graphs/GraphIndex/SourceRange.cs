@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+﻿using SEE.Graphs.Utils;
 
 namespace SEE.Graphs.GraphIndex
 {

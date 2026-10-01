@@ -1,7 +1,7 @@
-using SEE.Graphs.Utils;
+using SEE.Utils;
 using System.Diagnostics;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// The assertions used by the layers of SEE that must not depend on Unity.

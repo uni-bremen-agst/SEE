@@ -1,3 +1,5 @@
+using SEE.Graphs.Utils;
+
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
@@ -24,7 +26,7 @@ namespace SEE.Graphs.Reflexion
         public AlreadyExplicitlyMappedException(Node alreadyMapped, Node mappedTo)
             : base($"Node '{alreadyMapped.ToShortString()}' is already explicitly mapped to '{mappedTo.ToShortString()}'.")
         {
-            SEE.Utils.Assertion.IsNotNull(mappedTo);
+            Assertion.IsNotNull(mappedTo);
             AlreadyMapped = alreadyMapped;
             MappedTo = mappedTo;
         }

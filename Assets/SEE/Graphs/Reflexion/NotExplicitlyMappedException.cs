@@ -1,3 +1,5 @@
+using SEE.Graphs.Utils;
+
 namespace SEE.Graphs.Reflexion
 {
     /// <summary>
@@ -17,7 +19,7 @@ namespace SEE.Graphs.Reflexion
         public NotExplicitlyMappedException(Node unmappedNode)
             : base($"Implementation node '{unmappedNode.ToShortString()}' is not explicitly mapped.")
         {
-            SEE.Utils.Assertion.IsTrue(unmappedNode.IsInImplementation());
+            Assertion.IsTrue(unmappedNode.IsInImplementation());
             UnmappedNode = unmappedNode;
         }
     }
