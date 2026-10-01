@@ -1,4 +1,3 @@
-using SEE.Utils;
 using System.Diagnostics;
 
 namespace SEE.Graphs.Utils

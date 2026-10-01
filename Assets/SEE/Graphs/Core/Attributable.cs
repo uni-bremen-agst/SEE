@@ -1,6 +1,5 @@
 ﻿using SEE.Graphs.Utils;
 using SEE.Graphs.Events;
-using SEE.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
