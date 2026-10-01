@@ -118,12 +118,6 @@ namespace SEE.Graphs.IO.ReportImports
         /// </returns>
         public abstract IIndexNodeStrategy CreateIndexNodeStrategy();
 
-#if UNITY_5_3_OR_NEWER
-
-        /// The following code is only compiled in Unity environments, where we can use the
-        /// <see cref="Config.ConfigWriter"/> and <see cref="SEE.Utils.Config.ConfigReader"/>
-        /// to persist and restore configuration settings. Saving and restoring of configurations is
-        /// not required for the core functionality of the parsing configuration,
         #region Config I/O
 
         /// <summary>
@@ -200,6 +194,6 @@ namespace SEE.Graphs.IO.ReportImports
         protected virtual void RestoreAdditional(Dictionary<string, object> groupDict) { }
 
         #endregion
-#endif
+
     }
 }
