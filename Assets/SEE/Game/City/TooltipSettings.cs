@@ -13,7 +13,7 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [HideReferenceObjectPicker]
-    public class TooltipSettings : ConfigIO.IPersistentConfigItem
+    public class TooltipSettings : IPersistentConfigItem
     {
         #region Content Options
 

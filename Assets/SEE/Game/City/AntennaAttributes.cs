@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [HideReferenceObjectPicker]
-    public sealed class AntennaAttributes : ConfigIO.IPersistentConfigItem
+    public sealed class AntennaAttributes : IPersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.

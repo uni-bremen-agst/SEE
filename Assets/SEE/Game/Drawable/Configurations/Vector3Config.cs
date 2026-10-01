@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for <see cref="Vector3"/>.
     /// </summary>
-    public class Vector3Config : ConfigIO.IPersistentConfigItem
+    public class Vector3Config : IPersistentConfigItem
     {
         /// <summary>
         /// Is the value of the configuration.

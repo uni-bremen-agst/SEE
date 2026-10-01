@@ -965,7 +965,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case BoardAttributes:
                 case IncrementalTreeMapAttributes:
                 case VisualAttributes:
-                case ConfigIO.IPersistentConfigItem:
+                case IPersistentConfigItem:
                 case LabelAttributes:
                     parent = CreateNestedSetting(settingName, parent, removable);
                     createdObj = parent.transform.parent.gameObject;

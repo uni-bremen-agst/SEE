@@ -16,7 +16,7 @@ namespace SEE.Tools.RandomGraphs
     /// SEECityRandomEditor.
     /// </summary>
     [Serializable]
-    public class RandomAttributeDescriptor : ConfigIO.IPersistentConfigItem
+    public class RandomAttributeDescriptor : IPersistentConfigItem
     {
         public RandomAttributeDescriptor()
         { }
