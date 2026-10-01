@@ -6,12 +6,9 @@ using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Shapes;
-using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable.DrawShapes
@@ -45,7 +42,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         }
 
         /// <summary>
-        /// The positions of the line in local space.
+        /// The calculated positions of the currently previewed or created non-line shape.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
 
@@ -79,18 +76,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 Shape = shape;
             }
         }
-
-        /// <summary>
-        /// True if the action is drawing.
-        /// Also necessary to identify whether the line shape was successfully drawn.
-        /// </summary>
-        private bool drawing = false;
-
-        /// <summary>
-        /// True if the user finished the line shape drawing via menu.
-        /// </summary>
-        private bool finishDrawingViaButton = false;
-
         /// <summary>
         /// Manages line-cap configuration and state for the current preview.
         /// </summary>
@@ -102,18 +87,14 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         private readonly DrawShapePreviewController previewController = new();
 
         /// <summary>
+        /// Handles the interactive workflow for drawing line shapes.
+        /// </summary>
+        private readonly DrawShapeLineOperation lineOperation = new();
+
+        /// <summary>
         /// Status if the line menu was changes to edit mode.
         /// </summary>
         private bool editMode = false;
-
-        /// <summary>
-        /// Status indicating whether the edit mode has been fully initialized.
-        /// When a <see cref="ShapePointsCalculator.Shape.Line"> is being drawn and fill out is enabled,
-        /// the fill out status will not be activated if there are fewer than three points, as the fill out functionality
-        /// is only allowed with three points or more.
-        /// When this status is set, the edit menu must be re-initialized once three points are reached.
-        /// </summary>
-        private bool needRefreshEditMode = false;
 
         /// <summary>
         /// Status and color if a shape has activates the fill out option.
@@ -136,14 +117,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         {
             base.Awake();
             ShapeMenu.SetCurrentPreviewShape(null);
-            ShapeMenu.AssignFinishButton(() =>
-            {
-                if (drawing && positions.Length > 1
-                    && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
-                {
-                    finishDrawingViaButton = true;
-                }
-            });
+            ShapeMenu.AssignFinishButton(lineOperation.RequestFinish);
         }
 
         /// <summary>
@@ -155,13 +129,14 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             base.Stop();
             ShapeMenu.DisablePartUndo();
 
-            if (drawing && Shape != null
+            if (lineOperation.IsDrawing && Shape != null
                 || Shape != null && previewController.IsActiveOrFixed)
             {
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
             }
             Shape = null;
+            lineOperation.Reset();
             ResetPreviewState();
         }
 
@@ -176,7 +151,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         public override bool Update()
         {
             /// Offers a preview for a shape representation on a fixed chosen position.
-            if (previewController.TryGetFixedPosition(drawing, out Vector3 fixedPreviewPosition))
+            if (previewController.TryGetFixedPosition(lineOperation.IsDrawing, out Vector3 fixedPreviewPosition))
             {
                 ShapePreview(fixedPreviewPosition);
             }
@@ -188,40 +163,50 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             {
                 editMode = true;
 
-                if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                    && LineMenu.GetFillOutColorForDrawing() != null
-                    && GameLineGeometry.DifferentPositionCounter(Shape) < 3)
+                if (lineOperation.IsDrawing)
                 {
-                    needRefreshEditMode = true;
+                    lineOperation.PrepareEditModeRefresh(Shape);
                 }
 
                 ShapeMenu.OpenLineMenuInCorrectMode();
-                RegisterLinePreviewFillOutCallbacks();
+
+                if (lineOperation.IsDrawing)
+                {
+                    lineOperation.RegisterFillOutCallbacks(Shape, Surface);
+                }
             }
-            else if (needRefreshEditMode && GameLineGeometry.DifferentPositionCounter(Shape) > 2)
+            else if (lineOperation.ShouldRefreshEditMode(Shape))
             {
-                needRefreshEditMode = false;
+                lineOperation.AcknowledgeEditModeRefresh();
                 ShapeMenu.OpenLineMenuInCorrectMode();
-                RegisterLinePreviewFillOutCallbacks();
+                lineOperation.RegisterFillOutCallbacks(Shape, Surface);
             }
             else if (Shape == null && LineMenu.Instance.IsInEditMode() && !editMode)
             {
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
 
+            Vector3[] previewPositions = lineOperation.IsDrawing
+                ? lineOperation.PreviewPositions
+                : currentPreviewPositions;
+
+            Color? previewFillOutColor = lineOperation.IsDrawing
+                ? lineOperation.FillOutColor
+                : shapeFillOut;
+
             lineCapController.RefreshPreviewIfMenuChanged(
                 Shape,
                 Surface,
-                currentPreviewPositions,
-                shapeFillOut,
-                drawing || previewController.IsActiveOrFixed);
+                previewPositions,
+                previewFillOutColor,
+                lineOperation.IsDrawing || previewController.IsActiveOrFixed);
 
             previewController.UpdateAssociatedPage(Shape, Surface);
 
             if (!Raycasting.IsMouseOverGUI())
             {
                 /// Offers a preview for shape representation.
-                if (previewController.TryGetUnfixedHit(drawing, out RaycastHit previewHit))
+                if (previewController.TryGetUnfixedHit(lineOperation.IsDrawing, out RaycastHit previewHit))
                 {
                     Surface = GameFinder.GetDrawableSurface(previewHit.collider.gameObject);
                     ShapePreview(previewHit.point);
@@ -242,16 +227,16 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 /// Block for initiating shape drawing.
                 /// All shapes, except for straight lines, are also completed within this block.
                 if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, true, true)
-                    && !drawing)
+                    && !lineOperation.IsDrawing)
                 {
                     return ShapeDrawing(raycastHit);
                 }
 
                 /// This block provides a line preview to select the desired position of the next line point.
-                LineShapePreview();
+                lineOperation.UpdatePreview(Shape, Surface, lineCapController);
 
                 /// With this block, the user can add a new point to the line.
-                AddLineShapePoint();
+                lineOperation.AddPoint(Shape, Surface, lineCapController);
 
                 /// With left shift key can the loop option of the shape menu be toggled.
                 if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -262,51 +247,39 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 /// Block for successfully completing the line.
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
-                if (SEEInput.MouseUp(MouseButton.Left)
-                    && Input.GetKey(KeyCode.LeftControl)
-                    && drawing
-                    && positions.Length > 0
-                    && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                    && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit hit))
+                if (lineOperation.TryAddFinalPoint(Shape, Surface))
                 {
-                    Vector3 newPosition = Shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
-                    Vector3[] newPositions = new Vector3[positions.Length + 1];
-                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                    newPositions[newPositions.Length - 1] = newPosition;
-                    positions = newPositions;
-
-                    GameLineDrawer.Drawing(Shape, positions);
-                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                         Shape.name, newPosition, newPositions.Length - 1).Execute();
-                    FinishDrawing();
+                    FinishLineDrawing();
                     return true;
                 }
 
                 /// Block for successfully completing the line without adding a new point.
                 /// It requires a wheel-click.
-                if (SEEInput.MouseUp(MouseButton.Middle)
-                    && drawing
-                    && positions.Length > 1
-                    && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
+                if (lineOperation.ShouldFinishWithoutFinalPoint())
                 {
-                    FinishDrawing();
+                    FinishLineDrawing();
                     return true;
                 }
             }
             /// This block is outside the !Raycasting.IsMouseOverGUI check to allow
             /// the immediate detection of a click on the Finish button of the menu,
             /// even if the mouse cursor is still over the GUI.
-            if (finishDrawingViaButton)
+            if (lineOperation.ConsumeFinishRequest())
             {
-                FinishDrawing();
+                FinishLineDrawing();
                 return true;
             }
 
             /// Block for canceling the drawing of a line shape.
-            CancelDrawing();
+            if (lineOperation.TryCancel(Shape, Surface))
+            {
+                Shape = null;
+                editMode = false;
+                ResetPreviewState();
+            }
 
             /// Block for removing the last point during the drawing of a line shape.
-            RemoveLastPoint();
+            RemoveLastLinePoint();
 
             return false;
         }
@@ -314,122 +287,74 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
 
         #region Drawing State
         /// <summary>
-        /// Provides the option to cancel drawing a line shape with the escape button.
+        /// Finishes the currently drawn line and completes this action.
         /// </summary>
-        private void CancelDrawing()
+        private void FinishLineDrawing()
         {
-            if (drawing && SEEInput.Cancel())
-            {
-                ShowNotification.Info("Line-Shape drawing canceled.",
-                    "The drawing of the shape art line has been canceled.");
-                new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                Destroyer.Destroy(Shape);
-                ShapeMenu.DisablePartUndo();
-                positions = new Vector3[1];
-                ResetPreviewState();
-                drawing = false;
-                Shape = null;
-                editMode = false;
-                shapeFillOut = null;
-                if (LineMenu.Instance.IsInEditMode())
-                {
-                    LineMenu.Instance.Disable();
-                    ShapeMenu.OpenLineMenuInCorrectMode();
-                }
-            }
-        }
+            (GameObject finishedShape, LineConf finalShape) =
+                lineOperation.Finish(Shape, Surface, lineCapController);
 
-        /// <summary>
-        /// Finish the drawing of the line shape.
-        /// It must be a separate method as it can be called from two different points.
-        /// </summary>
-        private void FinishDrawing()
-        {
-            GameLineDrawer.Drawing(Shape, positions);
-            Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
-            Shape = GameLineGeometry.SetPivot(Shape, shapeFillOut);
-            LineConf finalShape = lineCapController.ApplyFinal(Shape, Surface, LineConf.GetLine(Shape));
+            Shape = finishedShape;
             memento = new Memento(Surface, finalShape);
-            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, finalShape).Execute();
+
+            new DrawNetAction(
+                memento.Surface.ID,
+                memento.Surface.ParentID,
+                finalShape).Execute();
+
             CurrentState = IReversibleAction.Progress.Completed;
-            drawing = false;
             ResetPreviewState();
         }
 
         /// <summary>
-        /// Provides the option to remove the last added point.
-        /// Press the caps lock key for this action.
-        /// If the line does not have enough points to remove, it will be deleted.
+        /// Removes the last point from the currently drawn line.
+        /// If too few points remain, the line is canceled and the action state is cleaned up.
         /// </summary>
-        /// <param name="ignorePartUndoButton">True if the key input should be ignored.
-        /// Will be used for the part undo button of the <see cref="ShapeMenu"/>.</param>
-        private void RemoveLastPoint(bool ignorePartUndoButton = false)
+        /// <param name="ignorePartUndoButton">
+        /// Whether the keyboard input should be ignored because this call originates
+        /// from the part-undo button.
+        /// </param>
+        private void RemoveLastLinePoint(bool ignorePartUndoButton = false)
         {
-            if (drawing && (SEEInput.PartUndo() || ignorePartUndoButton))
+            if (!lineOperation.RemoveLastPoint(
+                    Shape,
+                    Surface,
+                    ignorePartUndoButton))
             {
-                if (Shape.GetComponent<LineRenderer>().positionCount >= 3)
-                {
-                    ShowNotification.Info("Last point removed.",
-                        "The last placed point of the line has been removed.");
-                    LineRenderer renderer = Shape.GetComponent<LineRenderer>();
-                    renderer.positionCount -= 2;
-                    positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
-                    currentPreviewPositions = positions;
-                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                    if (positions.Length > 1)
-                    {
-                        GameLineDrawer.Drawing(Shape, positions, shapeFillOut);
-                    }
-                    else
-                    {
-                        if (shapeFillOut != null)
-                        {
-                            UnityEngine.Object.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
-                            new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                            LineMenu.AssignFillOutForEditing(null, null, () => { });
-                        }
-                        GameLineDrawer.Drawing(Shape, positions);
-                    }
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
-                }
-                else
-                {
-                    ShowNotification.Info("Line-shape drawing canceled.",
-                        "The drawing of the shape-art line has been canceled.");
-                    new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                    Destroyer.Destroy(Shape);
-                    ShapeMenu.DisablePartUndo();
-                    positions = new Vector3[1];
-                    drawing = false;
-                    Shape = null;
-                    ResetPreviewState();
-                    editMode = false;
-                    shapeFillOut = null;
-                }
+                return;
             }
+
+            Shape = null;
+            editMode = false;
+            ResetPreviewState();
         }
         #endregion
 
         #region Creation
         /// <summary>
-        /// Performs the drawing of shapes.
-        /// However, for straight lines, only the drawing is initialized.
-        /// To do this, the <see cref="GetSelectedShapePosition(Vector3, Vector3)"/> method is
-        /// first called to determine the positions.
-        /// Subsequently, for the selected shape (if it is not a line), the <see cref="DrawShape(Vector3)"/> method is called.
+        /// Starts drawing the selected shape or immediately completes a calculated non-line shape.
         /// </summary>
-        /// <param name="raycastHit">The raycast hit of the selection.</param>
-        /// <returns>Whatever the shape creation is completed.</returns>
+        /// <param name="raycastHit">The raycast hit defining the selected position.</param>
+        /// <returns>Whether the shape creation was completed.</returns>
         private bool ShapeDrawing(RaycastHit raycastHit)
         {
             Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
-            drawing = true;
+
+            if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
+            {
+                Shape = lineOperation.Start(Surface, raycastHit.point);
+                ShapeMenu.ActivatePartUndo(() => RemoveLastLinePoint(true));
+                return false;
+            }
+
             Vector3 convertedHitPoint;
 
             if (!previewController.IsFixed)
             {
-                convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, raycastHit.point);
-                GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
+                convertedHitPoint =
+                    GameLineGeometry.GetConvertedPosition(Surface, raycastHit.point);
+
+                GetSelectedShapePosition(convertedHitPoint);
             }
             else
             {
@@ -438,40 +363,20 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                     previewController.FixedPosition);
             }
 
-            /// This block draws and completes the action for all shapes except lines.
-            if (ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
-            {
-                return DrawShape(convertedHitPoint);
-            }
-            return false;
+            return DrawShape(convertedHitPoint);
         }
 
         /// <summary>
-        /// Calculates the points for the selected shape based
-        /// on the chosen values in the <see cref="ShapeMenu"/>.
-        /// For the Line shape, only the first point is set,
-        /// as the others cannot be calculated and must be chosen by the user.
+        /// Calculates the points for the selected non-line shape based
+        /// on the values configured in the <see cref="ShapeMenu"/>.
         /// </summary>
-        /// <param name="convertedHitPoint">The hit point in local space, depending on the chosen drawable.</param>
-        /// <param name="hitpoint">The hit point of the raycast hit.</param>
-        private void GetSelectedShapePosition(Vector3 convertedHitPoint, Vector3 hitpoint)
+        /// <param name="convertedHitPoint">
+        /// The selected position in local space of the drawable surface.
+        /// </param>
+        private void GetSelectedShapePosition(Vector3 convertedHitPoint)
         {
             switch (ShapeMenu.GetSelectedShape())
             {
-                case ShapePointsCalculator.Shape.Line:
-                    positions[0] = hitpoint;
-                    Shape = GameLineDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
-                        ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
-                        ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
-                        ValueHolder.CurrentTiling);
-                    positions[0] = Shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
-                    currentPreviewPositions = positions;
-                    ShapeMenu.ActivatePartUndo(() => RemoveLastPoint(true));
-                    LineConf conf = LineConf.GetLine(Shape);
-                    conf.RendererPositions = positions;
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), conf).Execute();
-                    shapeFillOut = LineMenu.GetFillOutColorForDrawing();
-                    break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
                     break;
@@ -608,7 +513,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                     currentShape).Execute();
 
                 CurrentState = IReversibleAction.Progress.Completed;
-                drawing = false;
                 ResetPreviewState();
 
                 return true;
@@ -617,7 +521,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             {
                 positions = new Vector3[1];
                 ResetPreviewState();
-                drawing = false;
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
                 Shape = null;
@@ -633,12 +536,11 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         /// </summary>
         private void DisableShapePreview()
         {
-            if (!previewController.ShouldDisable(drawing))
+            if (!previewController.ShouldDisable(lineOperation.IsDrawing))
             {
                 return;
             }
 
-            drawing = false;
             editMode = false;
             previewController.Reset();
 
@@ -650,6 +552,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             Destroyer.Destroy(Shape);
 
             positions = new Vector3[1];
+            lineOperation.Reset();
             ResetPreviewState();
         }
 
@@ -660,7 +563,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         private void ShapePreview(Vector3 position)
         {
             Vector3 convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, position);
-            GetSelectedShapePosition(convertedHitPoint, position);
+            GetSelectedShapePosition(convertedHitPoint);
             currentPreviewPositions = positions;
 
             if (Shape == null)
@@ -691,95 +594,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
 
         #region Line Preview
         /// <summary>
-        /// This method provides a line preview for the user
-        /// to select the desired position of the next line point.
-        /// </summary>
-        private void LineShapePreview()
-        {
-            if (drawing && !SEEInput.LeftMouseInteraction()
-                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
-                && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
-            {
-                Vector3 newPosition = Shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
-                Vector3[] newPositions = new Vector3[positions.Length + 1];
-                Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                newPosition.z = 0;
-                newPositions[^1] = newPosition;
-                currentPreviewPositions = newPositions;
-                if (GameLineGeometry.DifferentPositionCounter(newPositions) > 2)
-                {
-                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
-                    GameLineDrawer.Drawing(Shape, newPositions, shapeFillOut);
-                    lineCapController.ApplyPreview(Shape, newPositions, shapeFillOut);
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                        LineConf.GetLine(Shape)).Execute();
-                    if (shapeFillOut != null)
-                    {
-                        RegisterPreviewFillOutCallbacks();
-                        new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name,
-                            shapeFillOut.Value).Execute();
-                    }
-                }
-                else
-                {
-                    GameLineDrawer.Drawing(Shape, newPositions);
-                    lineCapController.ApplyPreview(Shape, newPositions, shapeFillOut);
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                        LineConf.GetLine(Shape)).Execute();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Provides the function to add a new point in the Line shape.
-        /// However, the new point must be different from the previous one.
-        /// This requires a left mouse click, with neither the left Shift
-        /// nor the left Ctrl key pressed.
-        /// </summary>
-        private void AddLineShapePoint()
-        {
-            if (SEEInput.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift)
-                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
-                && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
-            {
-                Vector3 newPosition = Shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
-                if (newPosition != positions.Last())
-                {
-                    Vector3[] newPositions = new Vector3[positions.Length + 1];
-                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                    newPositions[newPositions.Length - 1] = newPosition;
-                    positions = newPositions;
-                    currentPreviewPositions = newPositions;
-
-                    if (positions.Length > 2)
-                    {
-                        shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                        GameLineDrawer.Drawing(Shape, positions, shapeFillOut);
-                        lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
-                        new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                            LineConf.GetLine(Shape)).Execute();
-                        if (shapeFillOut != null)
-                        {
-                            RegisterPreviewFillOutCallbacks();
-                            new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                Shape.name, shapeFillOut.Value).Execute();
-                        }
-                    }
-                    else
-                    {
-                        GameLineDrawer.Drawing(Shape, positions);
-                        lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
-                        new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                            LineConf.GetLine(Shape)).Execute();
-                    }
-
-                }
-            }
-        }
-
-        /// <summary>
         /// Resets the cached preview state and prepares the selected line caps
         /// for the next shape.
         /// </summary>
@@ -789,22 +603,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             lineCapController.Reset();
             ShapeMenu.ResetLineCapVisualOverrides();
         }
-
-        /// <summary>
-        /// Registers the fill-out callbacks of the currently drawn line at the line menu.
-        /// </summary>
-        private void RegisterLinePreviewFillOutCallbacks()
-        {
-            if (Shape == null
-                || ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line
-                || shapeFillOut == null)
-            {
-                return;
-            }
-
-            RegisterPreviewFillOutCallbacks();
-        }
-
 
         /// <summary>
         /// Registers the fill-out callbacks of the current preview at the line menu.
