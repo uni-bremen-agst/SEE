@@ -244,7 +244,7 @@ namespace SEE.Utils.Config
         /// </summary>
         /// <param name="label">Label to be emitted.</param>
         /// <param name="vector">Value to be emitted.</param>
-        internal void Save(Vector3 vector, string label = "")
+        internal void SaveVector(Vector3 vector, string label = "")
         {
             BeginGroup(label);
             Save(vector.x, XLabel);

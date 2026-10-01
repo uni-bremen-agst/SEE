@@ -282,9 +282,9 @@ namespace SEE.Game.Drawable.Configurations
         {
             writer.Save(ID, SurfaceNameLabel);
             writer.Save(ParentID, SurfaceParentNameLabel);
-            writer.Save(Position, PositionLabel);
-            writer.Save(Rotation, RotationLabel);
-            writer.Save(Scale, ScaleLabel);
+            writer.SaveVector(Position, PositionLabel);
+            writer.SaveVector(Rotation, RotationLabel);
+            writer.SaveVector(Scale, ScaleLabel);
             writer.Save(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
             writer.Save(Lighting, LightingLabel);

@@ -367,8 +367,8 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
-            writer.Save(OriginalStartAnchor, originalStartAnchorLabel);
-            writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
+            writer.SaveVector(OriginalStartAnchor, originalStartAnchorLabel);
+            writer.SaveVector(OriginalEndAnchor, originalEndAnchorLabel);
             writer.Save(FreehandLine, freehandLineLabel);
 
             List<Vector3Config> rendererPositionConfigs = RendererPositions

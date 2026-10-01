@@ -259,9 +259,9 @@ namespace SEE.Game.Drawable.Configurations
             writer.BeginGroup();
             writer.Save(ID, idLabel);
             writer.Save(AssociatedPage, associatedPageLabel);
-            writer.Save(Position, positionLabel);
-            writer.Save(EulerAngles, eulerAnglesLabel);
-            writer.Save(Scale, scaleLabel);
+            writer.SaveVector(Position, positionLabel);
+            writer.SaveVector(EulerAngles, eulerAnglesLabel);
+            writer.SaveVector(Scale, scaleLabel);
             writer.Save(OrderInLayer, orderInLayerLabel);
             SaveAttributes(writer);
             writer.EndGroup();

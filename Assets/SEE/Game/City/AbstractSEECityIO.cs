@@ -118,7 +118,7 @@ namespace SEE.Game.City
             ConfigurationPath.Save(writer, configurationPathLabel);
             SourceCodeDirectory.Save(writer, sourceCodeDirectoryLabel);
             SolutionPath.Save(writer, solutionPathLabel);
-            writer.Save(TableWorldScale, tableWorldScaleLabel);
+            writer.SaveVector(TableWorldScale, tableWorldScaleLabel);
             writer.Save(LODCulling, lodCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
             writer.Save(HiddenEdges.ToList(), hiddenEdgesLabel);

@@ -63,7 +63,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         public void Save(ConfigWriter writer, string label = "")
         {
-            writer.Save(Value, label);
+            writer.SaveVector(Value, label);
         }
 
         #endregion
