@@ -3,20 +3,14 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.MindMap;
-using SEE.Game.Drawable.StickyNote;
-using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
-using SEE.Net.Actions.Drawable;
 using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
-using SEE.Utils.Paths;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -37,6 +31,7 @@ namespace SEE.Controls.Actions.Drawable.Load
             /// Loaded the drawable(s) from file one-to-one into the same drawable.
             /// </summary>
             Regular,
+
             /// <summary>
             /// Loaded the drawable(s) from the given file to one specific drawable.
             /// </summary>
@@ -60,60 +55,19 @@ namespace SEE.Controls.Actions.Drawable.Load
         }
 
         /// <summary>
-        /// Saves all the information needed to revert or repeat this action.
+        /// Handles execution, undo, and redo of the actual loading operation.
         /// </summary>
-        private Memento memento;
+        private readonly LoadOperation loadOperation = new();
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="LoadAction"/>
+        /// Stores all information required to undo or redo the current load operation.
         /// </summary>
-        private class Memento
-        {
-            /// <summary>
-            /// The load state of the action
-            /// </summary>
-            public readonly LoadState State;
-            /// <summary>
-            /// The page handling mode of this load action.
-            /// </summary>
-            public readonly LoadPageMode PageMode;
-            /// <summary>
-            /// The specific chosen drawable surface (needed for LoadState.Specific)
-            /// </summary>
-            public DrawableConfig SpecificSurface;
-            /// <summary>
-            /// The drawable configurations.
-            /// </summary>
-            public DrawablesConfigs Configs;
-            /// <summary>
-            /// Are the drawable surfaces that are created during the loading process.
-            /// </summary>
-            public List<DrawableConfig> AddedSurface;
-            /// <summary>
-            /// Holder for the old <see cref="DrawableConfig"/>.
-            /// </summary>
-            public Dictionary<GameObject,  DrawableConfig> OldConfig;
-
-            /// <summary>
-            /// The constructor, which assigns the load state and page handling mode.
-            /// </summary>
-            /// <param name="state">The kind how the file was loaded.</param>
-            /// <param name="pageMode">The mode defining how loaded page indices should be handled.</param>
-            public Memento(LoadState state, LoadPageMode pageMode = LoadPageMode.KeepStoredPages)
-            {
-                State = state;
-                PageMode = pageMode;
-                SpecificSurface = null;
-                Configs = null;
-                AddedSurface = new();
-                OldConfig = new();
-            }
-        }
+        private LoadOperation.State memento;
 
         /// <summary>
         /// Ensures that we save only once per click.
         /// </summary>
-        private bool clicked = false;
+        private bool clicked;
 
         /// <summary>
         /// The selected drawable surface for specific loading.
@@ -126,11 +80,12 @@ namespace SEE.Controls.Actions.Drawable.Load
         private DrawableFileBrowser browser;
 
         /// <summary>
-        /// Creates the load menu and adds the neccressary handler for the buttons.
+        /// Creates the load menu and adds the necessary handlers for the buttons.
         /// </summary>
         public override void Awake()
         {
             base.Awake();
+
             /// The load button for loading onto the original drawable.
             UnityAction loadButtonCall = () =>
             {
@@ -138,7 +93,7 @@ namespace SEE.Controls.Actions.Drawable.Load
                 {
                     browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
-                    memento = new(LoadState.Regular);
+                    memento = new LoadOperation.State(LoadState.Regular);
                 }
             };
 
@@ -151,11 +106,13 @@ namespace SEE.Controls.Actions.Drawable.Load
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadDrawableConfiguration(LoadState.Specific);
-                        memento = new(LoadState.Specific);
+                        memento = new LoadOperation.State(LoadState.Specific);
                     }
                     else
                     {
-                        ShowNotification.Warn("No drawable selected.", "Select a drawable to load specifically.");
+                        ShowNotification.Warn(
+                            "No drawable selected.",
+                            "Select a drawable to load specifically.");
                     }
                 }
             };
@@ -168,8 +125,13 @@ namespace SEE.Controls.Actions.Drawable.Load
                     if (selectedSurface != null)
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        browser.LoadDrawableConfiguration(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
-                        memento = new(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
+                        browser.LoadDrawableConfiguration(
+                            LoadState.Specific,
+                            LoadPageMode.CurrentSelectedPage);
+
+                        memento = new LoadOperation.State(
+                            LoadState.Specific,
+                            LoadPageMode.CurrentSelectedPage);
                     }
                     else
                     {
@@ -180,7 +142,10 @@ namespace SEE.Controls.Actions.Drawable.Load
                 }
             };
 
-            LoadMenu.Instance.Enable(loadButtonCall, loadSpecificButtonCall, loadSpecificCurrentPageButtonCall);
+            LoadMenu.Instance.Enable(
+                loadButtonCall,
+                loadSpecificButtonCall,
+                loadSpecificCurrentPageButtonCall);
         }
 
         /// <summary>
@@ -199,10 +164,8 @@ namespace SEE.Controls.Actions.Drawable.Load
         }
 
         /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.Load"/>.
-        /// It provides the user with two loading options.
-        /// One is to load onto the original drawable,
-        /// and the other is to load onto a specifically selected drawable.
+        /// Manages the player's interaction with the mode <see cref="ActionStateType.Load"/>.
+        /// It provides the user with the available loading options and manages the target surface.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
         public override bool Update()
@@ -212,62 +175,65 @@ namespace SEE.Controls.Actions.Drawable.Load
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                /// This block marks the selected drawable.
-                /// If it has already been selected, the marking is cleared.
-                /// For execution, no open file browser should exist.
                 if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                     && !clicked
-                    && (browser == null || browser != null && !browser.IsOpen()))
+                    && (browser == null || !browser.IsOpen()))
                 {
                     clicked = true;
-                    ManageHighlightEffect(GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
+                    ManageHighlightEffect(
+                        GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
                 }
 
-                /// It is needed to enable the switching of the drawable for the specific load.
                 if (SEEInput.MouseUp(MouseButton.Left))
                 {
                     clicked = false;
                 }
 
-                /// This block will be executed when a file was successfully chosen.
-                if (browser != null && browser.TryGetFilePath(out string filePath) && memento != null)
+                if (browser != null
+                    && browser.TryGetFilePath(out string filePath)
+                    && memento != null
+                    && loadOperation.Execute(memento, selectedSurface, filePath))
                 {
-                    Load(ref result, filePath);
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    result = true;
                 }
             }
+
             return result;
         }
 
         /// <summary>
-        /// Deactivates the selected drawable
+        /// Deactivates the selected drawable.
         /// </summary>
         private void Cancel()
         {
             if (SEEInput.Cancel()
                 && selectedSurface != null
                 && selectedSurface.GetComponent<HighlightEffect>() != null
-                && (browser == null || browser != null && !browser.IsOpen()))
+                && (browser == null || !browser.IsOpen()))
             {
-                ShowNotification.Info("Unselect drawable", "The marked drawable was unselected.");
+                ShowNotification.Info(
+                    "Unselect drawable",
+                    "The marked drawable was unselected.");
+
                 selectedSurface.Destroy<HighlightEffect>();
                 selectedSurface = null;
             }
         }
 
         /// <summary>
-        /// Manages the highlight effect for drawables.
-        /// Only one drawable can be highlighted at a time.
-        /// When a new selection is made, the highlight of the previous drawable is cleared.
-        /// Additionally, the option to deselect the drawable is provided.
+        /// Manages the highlight effect for drawable surfaces.
+        /// Only one surface can be highlighted at a time.
+        /// Selecting an already highlighted surface deselects it.
         /// </summary>
-        /// <param name="surface">The drawable surface to be highlighted.</param>
+        /// <param name="surface">The drawable surface whose highlight should be toggled.</param>
         private void ManageHighlightEffect(GameObject surface)
         {
             if (surface.GetComponent<HighlightEffect>() == null)
             {
                 selectedSurface?.Destroy<HighlightEffect>();
                 selectedSurface = surface;
-                selectedSurface.EnableGlowOverlay();
+                Highlighter.EnableGlowOverlay(selectedSurface);
             }
             else
             {
@@ -277,242 +243,21 @@ namespace SEE.Controls.Actions.Drawable.Load
         }
 
         /// <summary>
-        /// Executes the corresponding loading option based on the user's choice
-        /// (load onto the original drawable / load onto a specific drawable).
-        /// Additionally, when loading onto the original drawable,
-        /// sticky notes are spawned if the drawable does not yet exist in the game world.
-        /// </summary>
-        /// <param name="result">The referenced bool Result variable from Update to represent the success of the action.</param>
-        /// <param name="filePath">The chosen file path.</param>
-        private void Load(ref bool result, string filePath)
-        {
-            switch (memento.State)
-            {
-                /// This block loads one drawable onto the specific chosen drawable.
-                case LoadState.Specific:
-                    memento.SpecificSurface = DrawableConfigManager.GetDrawableConfig(selectedSurface);
-                    DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new DataPath(filePath));
-                    if (memento.PageMode == LoadPageMode.CurrentSelectedPage)
-                    {
-                        int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
-
-                        foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
-                        {
-                            DrawableConfigManager.RemapAllTypesToPage(drawableConfig, targetPage);
-                        }
-                    }
-
-                    foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
-                    {
-                        Restore(memento.SpecificSurface.GetDrawableSurface(), drawableConfig);
-                    }
-
-                    if (memento.PageMode == LoadPageMode.CurrentSelectedPage)
-                    {
-                        int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
-                        GameDrawablePageManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), targetPage);
-                        GameDrawablePageManager.ChangeMaxPage(
-                            memento.SpecificSurface.GetDrawableSurface(),
-                            Mathf.Max(selectedSurface.GetComponent<DrawableHolder>().MaxPageSize, targetPage + 1));
-                    }
-                    else
-                    {
-                        GameDrawablePageManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
-
-                        int max = DrawableConfigManager.GetDrawableConfig(selectedSurface)
-                            .GetAllDrawableTypes()
-                            .Select(type => type.AssociatedPage)
-                            .DefaultIfEmpty(0)
-                            .Max();
-
-                        GameDrawablePageManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
-                    }
-
-                    memento.Configs = configsSpecific;
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    result = true;
-                    break;
-
-                /// This block loads one or more drawables onto the drawables of the configuration.
-                case LoadState.Regular:
-                    DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new DataPath(filePath));
-                    foreach (DrawableConfig drawableConfig in configs.Drawables)
-                    {
-                        GameObject surfaceOfFile = GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
-                        /// If the sticky note already exists, create a new one.
-                        if (surfaceOfFile != null && GameFinder.IsStickyNote(surfaceOfFile)) {
-                            surfaceOfFile = null;
-                            drawableConfig.ParentID = GameStickyNoteManager.CreateUnusedName();
-                        }
-                        /// If the drawable does not exist it will be spawned as a sticky note.
-                        if (surfaceOfFile == null)
-                        {
-                            memento.AddedSurface.Add(drawableConfig);
-                            GameObject stickyNote = GameStickyNoteManager.Spawn(drawableConfig);
-                            surfaceOfFile = GameFinder.GetDrawableSurface(stickyNote);
-                            new StickyNoteSpawnNetAction(drawableConfig).Execute();
-                        } else
-                        {
-                            memento.OldConfig.Add(surfaceOfFile, DrawableConfigManager.GetDrawableConfig(surfaceOfFile));
-                        }
-                        Restore(surfaceOfFile, drawableConfig);
-                        DrawableConfig.Restore(surfaceOfFile, drawableConfig);
-                    }
-                    memento.Configs = configs;
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    result = true;
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Restores all the <see cref="DrawableType"/> objects of the configuration.
-        /// </summary>
-        /// <param name="surface">The drawable surface on which the configuration should restore.</param>
-        /// <param name="config">The configuration that holds the drawable type configuration to restore.</param>
-        private void Restore(GameObject surface, DrawableConfig config)
-        {
-            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(surface);
-            if (attachedObject != null)
-            {
-                GameMindMap.RenameMindMap(config, attachedObject);
-            }
-            foreach (DrawableType type in config.GetAllDrawableTypes())
-            {
-                if (attachedObject != null && type is not MindMapNodeConf)
-                {
-                    CheckAndChangeID(type, attachedObject, DrawableType.GetPrefix(type));
-                }
-                DrawableType.Restore(type, surface);
-            }
-        }
-
-        /// <summary>
-        /// When the ID of the given config already exist on the drawable, the id will be changed.
-        /// </summary>
-        /// <param name="conf">The configuration to restore.</param>
-        /// <param name="attachedObjects">The objects that are attached on a drawable.</param>
-        /// <param name="prefix">The prefix for the drawable type object.</param>
-        private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
-        {
-            if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ID) != null
-                && !conf.ID.Contains(ValueHolder.MindMapBranchLine))
-            {
-                string newName = prefix + "-" + RandomStrings.GetRandomString(8);
-                while (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newName) != null)
-                {
-                    newName = prefix + "-" + RandomStrings.GetRandomString(8);
-                }
-                conf.ID = newName;
-            }
-        }
-
-        /// <summary>
-        /// Destroys the objects that were loaded from the configuration.
-        /// </summary>
-        /// <param name="attachedObjects">The objects that are attached on a drawable.</param>
-        /// <param name="config">Configuration that contains all objects to be removed.</param>
-        private void DestroyLoadedObjects(GameObject attachedObjects, DrawableConfig config)
-        {
-            if (attachedObjects != null)
-            {
-                GameObject surface = GameFinder.GetDrawableSurface(attachedObjects);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                foreach (DrawableType type in config.GetAllDrawableTypes())
-                {
-                    GameObject typeObj = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, type.ID);
-                    if (typeObj != null)
-                    {
-                        new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
-                        Destroyer.Destroy(typeObj);
-                    }
-                }
-
-                int order = 1;
-                foreach (DrawableType type in DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes() )
-                {
-                    if (type.OrderInLayer >= order)
-                    {
-                        order = type.OrderInLayer + 1;
-                    }
-                }
-                surface.GetComponent<DrawableHolder>().OrderInLayer = order;
-                new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-            }
-        }
-
-        /// <summary>
-        /// Reverts this instance of the action, i.e., deletes the objects that were loaded from the file.
+        /// Reverts this instance of the action.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            switch (memento.State)
-            {
-                case LoadState.Specific:
-                    GameObject attachedObjs = GameFinder.GetAttachedObjectsObject(
-                        memento.SpecificSurface.GetDrawableSurface());
-                    foreach (DrawableConfig config in memento.Configs.Drawables)
-                    {
-                        DestroyLoadedObjects(attachedObjs, config);
-                    }
-                    break;
-                case LoadState.Regular:
-                    foreach (DrawableConfig config in memento.Configs.Drawables)
-                    {
-                        /// Deletes the sticky note if it was created by the corresponding load action.
-                        if (memento.AddedSurface.Contains(config))
-                        {
-                            GameObject surface = GameFinder.FindDrawableSurface(config.ID,
-                                config.ParentID);
-                            new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                            Destroyer.Destroy(surface.GetRootParent());
-                        }
-                        else
-                        {
-                            GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
-                            GameObject attachedObj = GameFinder.GetAttachedObjectsObject(surface);
-                            DestroyLoadedObjects(attachedObj, config);
-                        }
-                    }
-                    foreach (KeyValuePair<GameObject, DrawableConfig> pair in memento.OldConfig)
-                    {
-                        DrawableConfig.Restore(pair.Key, pair.Value);
-                    }
-                    break;
-            }
+            loadOperation.Undo(memento);
         }
 
         /// <summary>
-        /// Repeats this action, i.e., loads the configuration again.
+        /// Repeats this instance of the action.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
-            switch (memento.State)
-            {
-                case LoadState.Specific:
-                    GameObject specificSurface = memento.SpecificSurface.GetDrawableSurface();
-                    foreach (DrawableConfig config in memento.Configs.Drawables)
-                    {
-                        Restore(specificSurface, config);
-                    }
-                    break;
-                case LoadState.Regular:
-                    foreach (DrawableConfig config in memento.Configs.Drawables)
-                    {
-                        GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
-                        /// Spawns the sticky note if the drawable can't be found.
-                        if (surface == null)
-                        {
-                            surface = GameFinder.GetDrawableSurface(GameStickyNoteManager.Spawn(config));
-                            new StickyNoteSpawnNetAction(config).Execute();
-                        }
-                        Restore(surface, config);
-                        DrawableConfig.Restore(surface, config);
-                    }
-                    break;
-            }
+            loadOperation.Redo(memento);
         }
 
         /// <summary>
@@ -557,33 +302,35 @@ namespace SEE.Controls.Actions.Drawable.Load
             {
                 return new();
             }
+
+            HashSet<string> changedObjects = new();
+
+            if (memento.Mode == LoadState.Regular)
+            {
+                foreach (DrawableConfig config in memento.Configs.Drawables)
+                {
+                    changedObjects.Add(config.ID);
+
+                    foreach (DrawableType type in config.GetAllDrawableTypes())
+                    {
+                        changedObjects.Add(type.ID);
+                    }
+                }
+            }
             else
             {
-                HashSet<string> changedObjects = new();
-                if (memento.State == LoadState.Regular)
+                changedObjects.Add(memento.SpecificSurface.ID);
+
+                foreach (DrawableConfig config in memento.Configs.Drawables)
                 {
-                    foreach(DrawableConfig config in memento.Configs.Drawables)
+                    foreach (DrawableType type in config.GetAllDrawableTypes())
                     {
-                        changedObjects.Add(config.ID);
-                        foreach(DrawableType type in config.GetAllDrawableTypes())
-                        {
-                            changedObjects.Add(type.ID);
-                        }
+                        changedObjects.Add(type.ID);
                     }
                 }
-                else
-                {
-                    changedObjects.Add(memento.SpecificSurface.ID);
-                    foreach (DrawableConfig config in memento.Configs.Drawables)
-                    {
-                        foreach (DrawableType type in config.GetAllDrawableTypes())
-                        {
-                            changedObjects.Add(type.ID);
-                        }
-                    }
-                }
-                return changedObjects;
             }
+
+            return changedObjects;
         }
     }
 }
