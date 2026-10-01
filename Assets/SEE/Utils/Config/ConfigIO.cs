@@ -204,7 +204,7 @@ namespace SEE.Utils.Config
         /// This variant allows direct use with properties or methods that encapsulate setting logic,
         /// such as Unity objects with local or world-space transformations.
         /// </remarks>
-        internal static bool Restore(Dictionary<string, object> attributes, string label, Action<Vector3> setter)
+        internal static bool RestoreVector(Dictionary<string, object> attributes, string label, Action<Vector3> setter)
         {
             if (TryRestoreVector3(attributes, label, out Vector3 temp))
             {
