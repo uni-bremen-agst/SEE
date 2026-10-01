@@ -142,7 +142,7 @@ namespace SEE.Graphs.IO.ReportImports
         /// <remarks>
         /// Preconditions: <see cref="LinePatterns"/> and <see cref="ParsingConfig.ToolId"/> must be initialized.
         /// </remarks>
-        internal override IReportParser CreateParser()
+        public override IReportParser CreateParser()
         {
             return new TextReportParser(this);
         }

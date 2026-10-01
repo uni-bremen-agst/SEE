@@ -413,7 +413,7 @@ namespace SEE.Graphs
         /// <returns>True if this node is a descendant of <paramref name="node"/>.</returns>
         /// <remarks>For clarity: A node is considered its own descendant, i.e.,
         /// n.IsDescendantOf(n) is always true.</remarks>
-        internal bool IsDescendantOf(Node node)
+        public bool IsDescendantOf(Node node)
         {
             if (node == null)
             {

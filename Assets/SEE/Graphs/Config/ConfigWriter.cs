@@ -119,7 +119,7 @@ namespace SEE.Graphs.Config
         /// </summary>
         /// <param name="value">Value to be emitted.</param>
         /// <param name="label">Label to be emitted.</param>
-        internal void Save(float value, string label = "")
+        public void Save(float value, string label = "")
         {
             InternalSave(label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture));
         }
@@ -129,7 +129,7 @@ namespace SEE.Graphs.Config
         /// </summary>
         /// <param name="value">Value to be emitted.</param>
         /// <param name="label">Label to be emitted.</param>
-        internal void Save(int value, string label = "")
+        public void Save(int value, string label = "")
         {
             InternalSave(label, value.ToString());
         }
@@ -139,7 +139,7 @@ namespace SEE.Graphs.Config
         /// </summary>
         /// <param name="value">Value to be emitted.</param>
         /// <param name="label">Label to be emitted.</param>
-        internal void Save(string value, string label = "")
+        public void Save(string value, string label = "")
         {
             InternalSave(label, "\"" + Escape(value) + "\"");
         }
@@ -149,7 +149,7 @@ namespace SEE.Graphs.Config
         /// </summary>
         /// <param name="value">Value to be emitted.</param>
         /// <param name="label">Label to be emitted.</param>
-        internal void Save(bool value, string label = "")
+        public void Save(bool value, string label = "")
         {
             InternalSave(label, value.ToString());
         }
@@ -159,7 +159,7 @@ namespace SEE.Graphs.Config
         /// </summary>
         /// <param name="collection">Items to be saved.</param>
         /// <param name="label">Label to be emitted.</param>
-        internal void Save(ICollection<string> collection, string label = "")
+        public void Save(ICollection<string> collection, string label = "")
         {
             BeginList(label);
             foreach (string item in collection)
@@ -179,7 +179,7 @@ namespace SEE.Graphs.Config
         /// <typeparam name="V">type of the value of <paramref name="collection"/></typeparam>
         /// <param name="collection">The dictionary to be saved.</param>
         /// <param name="label">The label to be added in front of the value.</param>
-        internal void Save<T>(ICollection<T> collection, string label = "") where T : IPersistentConfigItem
+        public void Save<T>(ICollection<T> collection, string label = "") where T : IPersistentConfigItem
         {
             BeginList(label);
             foreach (var item in collection)
@@ -199,7 +199,7 @@ namespace SEE.Graphs.Config
         /// in that the key is not saved as a string but as a boolean literal (no quotes around it).
         /// <param name="dictionary">the dictionary to be saved</param>
         /// <param name="label">the label to be added in front of the value</param>
-        internal void Save(Dictionary<string, bool> dictionary, string label = "")
+        public void Save(Dictionary<string, bool> dictionary, string label = "")
         {
             BeginList(label);
             foreach (var item in dictionary)
@@ -224,7 +224,7 @@ namespace SEE.Graphs.Config
         /// <typeparam name="V">type of the value of <paramref name="dictionary"/></typeparam>
         /// <param name="dictionary">The dictionary to be saved.</param>
         /// <param name="label">The label to be added in front of the value.</param>
-        internal void SaveAsStrings<K,V>(Dictionary<K,V> dictionary, string label = "")
+        public void SaveAsStrings<K,V>(Dictionary<K,V> dictionary, string label = "")
         {
             BeginList(label);
             foreach (var item in dictionary)

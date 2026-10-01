@@ -28,7 +28,7 @@ namespace SEE.Graphs.IO.ReportImports
         /// </summary>
         /// <remarks>Preconditions: <see cref="XPathMapping"/> and <see cref="ParsingConfig.ToolId"/> must be initialized.</remarks>
         /// <returns>An <see cref="IReportParser"/> instance for XML reports.</returns>
-        internal override IReportParser CreateParser()
+        public override IReportParser CreateParser()
         {
             return new XmlReportParser(this);
         }

@@ -22,7 +22,7 @@ namespace SEE.Graphs.IO.ReportImports
 #endif
         public JsonPathMapping JsonMapping = new();
 
-        internal override IReportParser CreateParser()
+        public override IReportParser CreateParser()
         {
             return new JsonReportParser(this);
         }

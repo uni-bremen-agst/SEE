@@ -7,7 +7,7 @@ namespace SEE.Graphs
     /// <see cref="GraphElement.ID"/>. It can be used to compare graph
     /// elements from different graphs.
     /// </summary>
-    internal class GraphElementIDComparer : IEqualityComparer<GraphElement>
+    public class GraphElementIDComparer : IEqualityComparer<GraphElement>
     {
         /// <summary>
         /// Returns true if <paramref name="it"/> and <paramref name="other"/>

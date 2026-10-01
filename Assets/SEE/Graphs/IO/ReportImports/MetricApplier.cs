@@ -16,7 +16,7 @@ namespace SEE.Graphs.IO.ReportImports
     /// <item><description>The supplied <see cref="ParsingConfig"/> must be compatible with the schema's findings.</description></item>
     /// </list>
     /// </remarks>
-    internal static class MetricApplier
+    public static class MetricApplier
     {
         /// <summary>
         /// Adds all metrics from <paramref name="schema"/> to the provided <paramref name="graph"/>

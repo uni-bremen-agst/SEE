@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-// Internals must be visible to SEE and our tests.
-[assembly: InternalsVisibleTo("SEE")]
+// Internals must be visible to our tests.
 [assembly: InternalsVisibleTo("SEETests")]
 [assembly: InternalsVisibleTo("SEEPlayModeTests")]
 [assembly: InternalsVisibleTo("SEE_Editor")]

@@ -198,7 +198,7 @@ namespace SEE.Graphs
         /// </summary>
         /// <param name="graphs">Graphs for which to yield the metric names.</param>
         /// <returns>Union of the names of all numeric node attributes.</returns>
-        internal static ISet<string> AllNodeMetrics(ICollection<Graph> graphs)
+        public static ISet<string> AllNodeMetrics(ICollection<Graph> graphs)
         {
             HashSet<string> result = new();
             foreach (Graph graph in graphs)

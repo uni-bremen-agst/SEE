@@ -6,7 +6,7 @@ namespace SEE.Graphs
     /// <summary>
     /// Merges the differences between an old and a new graph into the new graph.
     /// </summary>
-    internal static class MergeDiffGraphExtension
+    public static class MergeDiffGraphExtension
     {
         /// <summary>
         /// This postfix will be added at the end of the name of an attribute whose

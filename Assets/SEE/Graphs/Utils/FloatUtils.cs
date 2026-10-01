@@ -6,7 +6,7 @@ namespace SEE.Graphs.Utils
     /// <summary>
     /// Utilities for floats.
     /// </summary>
-    internal static class FloatUtils
+    public static class FloatUtils
     {
         /// <summary>
         /// Tries to parse <paramref name="floatString"/> as a floating point number.

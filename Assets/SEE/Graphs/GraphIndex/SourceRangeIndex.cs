@@ -9,7 +9,7 @@ namespace SEE.Graphs.GraphIndex
     /// A source-location based node index that allows to search for graph nodes
     /// based on a file path and source line.
     /// </summary>
-    internal class SourceRangeIndex
+    public class SourceRangeIndex
     {
         /// <summary>
         /// Creates the index for <paramref name="graph"/>.

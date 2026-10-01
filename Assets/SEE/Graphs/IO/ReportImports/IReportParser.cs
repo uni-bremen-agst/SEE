@@ -8,7 +8,7 @@ namespace SEE.Graphs.IO.ReportImports
     /// <see cref="MetricSchema"/> instances that can be applied to a graph.
     /// Preconditions: Implementations must be initialized via <see cref="Prepare"/> before calling <see cref="ParseAsync"/>.
     /// </summary>
-    internal interface IReportParser
+    public interface IReportParser
     {
         /// <summary>
         /// Initializes parser-internal state (for example, XML reader settings) so that a

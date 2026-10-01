@@ -64,7 +64,7 @@ namespace SEE.Graphs.IO.ReportImports
         /// <returns>
         /// A concrete <see cref="IReportParser"/> that can interpret reports described by this configuration.
         /// </returns>
-        internal abstract IReportParser CreateParser();
+        public abstract IReportParser CreateParser();
 
         /// <summary>
         /// Converts the given full path into a relative path based on the <see cref="SourceRootMarker"/>.

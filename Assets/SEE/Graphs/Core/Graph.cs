@@ -538,7 +538,7 @@ namespace SEE.Graphs
         /// Returns the names of all node types of this graph.
         /// </summary>
         /// <returns>Node types of this graph.</returns>
-        internal HashSet<string> AllNodeTypes() => Nodes().Select(n => n.Type).ToHashSet();
+        public HashSet<string> AllNodeTypes() => Nodes().Select(n => n.Type).ToHashSet();
 
         /// <summary>
         /// Returns the names of all edge types of this graph.
@@ -550,7 +550,7 @@ namespace SEE.Graphs
         /// Returns the names of all element types of this graph.
         /// </summary>
         /// <returns>Element types of this graph.</returns>
-        internal HashSet<string> AllElementTypes() => Elements().Select(e => e.Type).ToHashSet();
+        public HashSet<string> AllElementTypes() => Elements().Select(e => e.Type).ToHashSet();
 
         /// <summary>
         /// The number of nodes of the graph.

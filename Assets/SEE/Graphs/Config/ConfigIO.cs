@@ -187,7 +187,7 @@ namespace SEE.Graphs.Config
         /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists.</param>
         /// <returns>True if the <paramref name="label"/> was found.</returns>
-        internal static bool RestoreStringList(Dictionary<string, object> attributes, string label, ref IList<string> value)
+        public static bool RestoreStringList(Dictionary<string, object> attributes, string label, ref IList<string> value)
         {
             if (attributes.TryGetValue(label, out object storedValue))
             {
