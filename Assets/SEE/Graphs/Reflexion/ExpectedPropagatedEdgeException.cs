@@ -13,7 +13,7 @@ namespace SEE.Graphs.Reflexion
         /// <summary>
         /// Constructs a new <see cref="ExpectedPropagatedEdgeException"/> with the given <paramref name="edge"/>.
         /// </summary>
-        /// <param name="edge">The edge that was unexpectedly propagated.</param>
+        /// <param name="edge">The edge that was unexpectedly specified.</param>
         public ExpectedPropagatedEdgeException(Edge edge)
             : base($"Given edge '{edge.ToShortString()}' is a specified (not propagated) edge!")
         {
