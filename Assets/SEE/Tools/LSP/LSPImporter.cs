@@ -470,7 +470,7 @@ namespace SEE.Tools.LSP
             {
                 if (diagnostic.Severity.HasValue && IncludeDiagnostics.HasFlag(diagnostic.Severity.Value.ToDiagnosticKind()))
                 {
-                    IEnumerable<Node> diagnosticNodes = FindNodesByLocation(path, Range.FromLspRange(diagnostic.Range));
+                    IEnumerable<Node> diagnosticNodes = FindNodesByLocation(path, LSPRange.FromLspRange(diagnostic.Range));
                     foreach (Node node in diagnosticNodes)
                     {
                         DiagnosticSeverity severity = diagnostic.Severity.Value;
@@ -502,19 +502,19 @@ namespace SEE.Tools.LSP
             {
                 token.ThrowIfCancellationRequested();
 
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
-                edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
             }
             return;
 
             bool SelectItem(CallHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && Range.FromLspRange(item.Range) == node.SourceRange;
+                return item.Uri.Path == node.Path() && LSPRange.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -532,19 +532,19 @@ namespace SEE.Tools.LSP
             {
                 token.ThrowIfCancellationRequested();
 
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
-                edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
+                edge.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
             }
             return;
 
             bool SelectItem(TypeHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && Range.FromLspRange(item.Range) == node.SourceRange;
+                return item.Uri.Path == node.Path() && LSPRange.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -586,10 +586,10 @@ namespace SEE.Tools.LSP
                 node.Directory = Path.GetDirectoryName(path);
                 Assert.AreEqual(path, node.Path());
                 node.Type = symbol.Kind.ToNodeKind().ToString();
-                node.SourceRange = Range.FromLspRange(symbol.Range);
+                node.SourceRange = LSPRange.FromLspRange(symbol.Range);
                 node.SourceLine = symbol.SelectionRange.Start.Line + 1;
                 node.SourceColumn = symbol.SelectionRange.Start.Character + 1;
-                node.SetRange(SelectionRangeAttribute, Range.FromLspRange(symbol.SelectionRange));
+                node.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(symbol.SelectionRange));
                 node.SetInt(NumericAttributeNames.LOC.Name(), symbol.Range.End.Line - symbol.Range.Start.Line);
                 if (symbol.Tags != null && symbol.Tags.Contains(SymbolTag.Deprecated))
                 {
@@ -713,17 +713,17 @@ namespace SEE.Tools.LSP
                 if (location.IsLocation)
                 {
                     // NOTE: We assume only local files are used.
-                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri.Path, Range.FromLspRange(location.Location.Range)))
+                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri.Path, LSPRange.FromLspRange(location.Location.Range)))
                     {
                         AddEdge(node, targetNode, type, reverseDirection, graph);
                     }
                 }
                 else
                 {
-                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri.Path, Range.FromLspRange(location.LocationLink.TargetRange)))
+                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri.Path, LSPRange.FromLspRange(location.LocationLink.TargetRange)))
                     {
                         Edge edge = AddEdge(node, targetNode, type, reverseDirection, graph);
-                        edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(location.LocationLink.TargetSelectionRange));
+                        edge?.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(location.LocationLink.TargetSelectionRange));
                     }
                 }
             }

@@ -111,7 +111,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 const string name = "Outgoing Calls";
                 MenuEntriesForLocationsAsync(lspHandler.OutgoingCalls(_ => true, path, line, column)
-                                                       .Select(x => (x.Uri.ToUri(), Range.FromLspRange(x.Range), x.Name)),
+                                                       .Select(x => (x.Uri.ToUri(), LSPRange.FromLspRange(x.Range), x.Name)),
                                              name, contextWord)
                     .ContinueWith(entries => ShowEntries(entries, name, contextWord)).Forget();
             }
@@ -126,7 +126,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 const string name = "Supertypes";
                 MenuEntriesForLocationsAsync(lspHandler.Supertypes(_ => true, path, line, column)
-                                                       .Select(x => (x.Uri.ToUri(), Range.FromLspRange(x.Range), x.Name)),
+                                                       .Select(x => (x.Uri.ToUri(), LSPRange.FromLspRange(x.Range), x.Name)),
                                              name, contextWord)
                     .ContinueWith(entries => ShowEntries(entries, name, contextWord)).Forget();
             }
@@ -201,13 +201,13 @@ namespace SEE.UI.Window.CodeWindow
                 if (location.IsLocation)
                 {
                     Location loc = location.Location!;
-                    targetRange = Range.FromLspRange(loc.Range);
+                    targetRange = LSPRange.FromLspRange(loc.Range);
                     targetUri = loc.Uri.ToUri();
                 }
                 else
                 {
                     LocationLink locLink = location.LocationLink!;
-                    targetRange = Range.FromLspRange(locLink.TargetRange);
+                    targetRange = LSPRange.FromLspRange(locLink.TargetRange);
                     targetUri = locLink.TargetUri.ToUri();
                 }
                 return (targetUri, targetRange, null);

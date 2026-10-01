@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 using MoreLinq;
 using SEE.Graphs;
 using SEE.Graphs.Utils;
@@ -745,22 +744,19 @@ namespace SEE.Graphs.Reflexion
             /// <summary>
             /// Set of dependencies whose source is in the subtree, but whose target is outside of the subtree.
             /// </summary>
-            [NotNull]
             public readonly ISet<Edge> OutgoingCross;
 
             /// <summary>
             /// Set of dependencies whose source is outside of the subtree, but whose target is in the subtree.
             /// </summary>
-            [NotNull]
             public readonly ISet<Edge> IncomingCross;
 
             /// <summary>
             /// Set of dependencies whose source is in the subtree and whose target is also in the subtree.
             /// </summary>
-            [NotNull]
             public readonly ISet<Edge> Inner;
 
-            public PartitionedDependencies([NotNull] ISet<Edge> outgoingCross, [NotNull] ISet<Edge> incomingCross, [NotNull] ISet<Edge> inner)
+            public PartitionedDependencies(ISet<Edge> outgoingCross, ISet<Edge> incomingCross, ISet<Edge> inner)
             {
                 OutgoingCross = outgoingCross ?? throw new ArgumentNullException(nameof(outgoingCross));
                 IncomingCross = incomingCross ?? throw new ArgumentNullException(nameof(incomingCross));

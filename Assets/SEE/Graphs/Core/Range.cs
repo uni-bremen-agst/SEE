@@ -149,21 +149,6 @@ namespace SEE.Graphs
         }
 
         /// <summary>
-        /// Converts the given <paramref name="lspRange"/> (i.e., from OmniSharp) to a <see cref="Range"/>.
-        /// </summary>
-        /// <param name="lspRange">The LSP range to convert.</param>
-        /// <returns>The converted range.</returns>
-        public static Range FromLspRange(OmniSharp.Extensions.LanguageServer.Protocol.Models.Range lspRange)
-        {
-            if (lspRange == null)
-            {
-                return null;
-            }
-            return new Range(lspRange.Start.Line+1, lspRange.End.Line+1,
-                             lspRange.Start.Character+1, lspRange.End.Character+1);
-        }
-
-        /// <summary>
         /// Compares this range to the given <paramref name="other"/> range.
         ///
         /// Note that this comparison is not transitive, since we do not know the length of each line!

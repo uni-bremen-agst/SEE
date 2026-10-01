@@ -1,0 +1,23 @@
+{
+    "name": "SEE.Graphs",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "CsvHelper.dll",
+        "FuzzySharp.dll",
+        "Joveler.Compression.XZ.dll",
+        "MoreLinq.dll",
+        "Newtonsoft.Json.dll",
+        "System.Collections.Immutable.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -94,11 +94,11 @@ namespace SEE.Tools.LSP
             {
                 List<(string Path, Range Range)> occurrences = new()
                 {
-                    (Path, Range.FromLspRange(Diagnostic.Range))
+                    (Path, LSPRange.FromLspRange(Diagnostic.Range))
                 };
                 if (Diagnostic.RelatedInformation != null)
                 {
-                    occurrences.AddRange(Diagnostic.RelatedInformation.Select(x => (x.Location.Uri.GetFileSystemPath(), Range.FromLspRange(x.Location.Range))));
+                    occurrences.AddRange(Diagnostic.RelatedInformation.Select(x => (x.Location.Uri.GetFileSystemPath(), LSPRange.FromLspRange(x.Location.Range))));
                 }
                 return occurrences;
             }
