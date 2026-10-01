@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using SEE.Graphs.Utils;
-using SEE.Utils;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;
 
@@ -63,7 +62,7 @@ namespace SEE.Graphs.IO.GXL
             source.Flush();
             source.Position = 0;
 
-            Compressor.Save(filename, source);
+            SEE.Utils.Compressor.Save(filename, source);
         }
 
         /// <summary>
