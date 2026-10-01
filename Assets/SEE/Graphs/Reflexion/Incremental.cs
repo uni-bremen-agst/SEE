@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using MoreLinq;
 using SEE.Graphs;
-using UnityEngine.Assertions;
+using SEE.Graphs.Utils;
 using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
 namespace SEE.Graphs.Reflexion
@@ -130,7 +130,7 @@ namespace SEE.Graphs.Reflexion
                 }
 
                 bool implRemoved = propagationTable[propagated.ID].Remove(edge);
-                Assert.IsTrue(implRemoved, "Originating edge must be present in propagation table!");
+                Assertion.IsTrue(implRemoved, "Originating edge must be present in propagation table!");
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
 

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using SEE.Graphs;
-using UnityEngine;
-using UnityEngine.Assertions;
+using SEE.Graphs.Utils;
 using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
 namespace SEE.Graphs.Reflexion
@@ -174,7 +173,7 @@ namespace SEE.Graphs.Reflexion
             // (Mapping is indicated by moving the implementation node, not by a separate edge.)
             foreach (Edge mapsTo in mappingGraph.Edges())
             {
-                Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
+                Assertion.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
                 mapsTo.SetToggle(GraphElement.IsVirtualToggle);
             }
 
@@ -196,8 +195,8 @@ namespace SEE.Graphs.Reflexion
             if (edgesOverlap.Count > 0)
             {
                 suffix = "-A";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
+                Logging.Logger.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
+                                          + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
             if (implementationGraph is not ReflexionGraph)
@@ -212,8 +211,8 @@ namespace SEE.Graphs.Reflexion
             if (edgesOverlap.Count > 0)
             {
                 suffix = "-M";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
+                Logging.Logger.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
+                                          + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
             mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(mappingGraph, suffix);
