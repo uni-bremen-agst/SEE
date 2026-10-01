@@ -175,7 +175,7 @@ namespace SEE.Utils.Config
         /// This method is intended specifically for Vector3 values. For enums, use <see cref="RestoreEnum()"/>,
         /// and for all other types, use <see cref="Restore{T}()"/> instead.
         /// </remarks>
-        internal static bool Restore(Dictionary<string, object> attributes, string label, ref Vector3 value)
+        internal static bool RestoreVector(Dictionary<string, object> attributes, string label, ref Vector3 value)
         {
             if (TryRestoreVector3(attributes, label, out Vector3 temp))
             {

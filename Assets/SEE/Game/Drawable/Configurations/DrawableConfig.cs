@@ -366,7 +366,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the position.
             Vector3 position = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref position))
+            if (ConfigIO.RestoreVector(attributes, PositionLabel, ref position))
             {
                 Position = position;
             }
@@ -378,7 +378,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the rotation.
             Vector3 rotation = Vector3.zero;
-            if (ConfigIO.Restore(attributes, RotationLabel, ref rotation))
+            if (ConfigIO.RestoreVector(attributes, RotationLabel, ref rotation))
             {
                 Rotation = rotation;
             }
@@ -390,7 +390,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the scale.
             Vector3 scale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref scale))
+            if (ConfigIO.RestoreVector(attributes, ScaleLabel, ref scale))
             {
                 Scale = scale;
             }
