@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using SEE.Graphs.Utils;
 using SEE.Graphs.Config;
 
-
 #if UNITY_5_3_OR_NEWER
 using UnityEngine;
 #endif
