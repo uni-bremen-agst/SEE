@@ -48,6 +48,11 @@ namespace SEE.UI.Menu.Drawable.Line
         private readonly EditLineColorMenu colorMenu;
 
         /// <summary>
+        /// Manages fill-out editing for the main line and its line caps.
+        /// </summary>
+        private readonly EditLineFillOutMenu fillOutMenu;
+
+        /// <summary>
         /// Whether the editing UI is currently updated programmatically.
         /// During this time UI callbacks must not modify the edited line.
         /// </summary>
@@ -110,6 +115,15 @@ namespace SEE.UI.Menu.Drawable.Line
                 getSelectedColorKind,
                 ensureValidSecondaryColor,
                 () => IsRefreshingUI);
+
+            fillOutMenu = new EditLineFillOutMenu(
+                lineMenu,
+                controls,
+                lineCapMenu,
+                colorMenu.AssignColorArea,
+                colorMenu.ClearColorArea,
+                colorMenu.IsColorAreaAssigned,
+                () => IsRefreshingUI);
         }
 
         /// <summary>
@@ -119,13 +133,17 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="lineHolder">The configuration containing the current edited values.</param>
         /// <param name="isFreehandLine">Whether the line was created through freehand drawing.</param>
         /// <param name="returnCall">An optional callback returning to the parent menu.</param>
+        /// <param name="lineCapsChanged">
+        /// Optional callback invoked when a start or end line-cap configuration changes.
+        /// </param>
         internal void Enable(
             GameObject selectedLine,
             LineConf lineHolder,
             bool isFreehandLine,
-            UnityAction returnCall = null)
+            UnityAction returnCall = null,
+            UnityAction<LineConf> lineCapsChanged = null)
         {
-            lineCapMenu.BeginEditing(lineHolder);
+            lineCapMenu.BeginEditing(lineHolder, lineCapsChanged);
 
             if (returnCall != null)
             {
@@ -187,10 +205,31 @@ namespace SEE.UI.Menu.Drawable.Line
             objectMenu.SetUpOrderInLayerSlider(selectedLine, lineHolder, surface, surfaceParentName);
             objectMenu.SetUpLoopSwitch(selectedLine, lineHolder, surface, surfaceParentName);
 
-            colorMenu.SetUpColorPicker(selectedLine, lineHolder, surface, surfaceParentName);
-            colorMenu.SetUpColorKindTypeButton(selectedLine, lineHolder, surface, surfaceParentName);
-            colorMenu.SetUpFillOutTypeButton(selectedLine, lineHolder, surface, surfaceParentName);
-            colorMenu.SetUpFillOutSwitch(selectedLine, lineHolder, surface, surfaceParentName);
+            colorMenu.SetUpColorPicker(
+                selectedLine,
+                lineHolder,
+                surface,
+                surfaceParentName);
+
+            colorMenu.SetUpColorKindTypeButton(
+                selectedLine,
+                lineHolder,
+                surface,
+                surfaceParentName,
+                fillOutMenu.HideControls);
+
+            fillOutMenu.SetUpFillOutTypeButton(
+                selectedLine,
+                lineHolder,
+                surface,
+                surfaceParentName,
+                colorMenu.HideControls);
+
+            fillOutMenu.SetUpFillOutSwitch(
+                selectedLine,
+                lineHolder,
+                surface,
+                surfaceParentName);
         }
 
         /// <summary>
@@ -201,6 +240,7 @@ namespace SEE.UI.Menu.Drawable.Line
             styleMenu.RemoveListeners();
             objectMenu.RemoveListeners();
             colorMenu.RemoveListeners();
+            fillOutMenu.RemoveListeners();
         }
 
         /// <summary>
@@ -223,7 +263,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 return;
             }
 
-            colorMenu.AssignFillOut(
+            fillOutMenu.AssignFillOut(
                 fillOut,
                 setFillOutAction,
                 clearFillOutAction);
@@ -322,7 +362,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     styleMenu.RefreshThickness(lineHolder);
 
-                    colorMenu.AssignFillOutStatus(lineHolder.FillOutStatus);
+                    fillOutMenu.AssignFillOutStatus(lineHolder.FillOutStatus);
                 }
                 else
                 {
@@ -334,7 +374,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     if (capConf.CapKind == LineCap.None)
                     {
-                        colorMenu.AssignFillOutStatus(false);
+                        fillOutMenu.AssignFillOutStatus(false);
                     }
                     else
                     {
@@ -344,7 +384,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                         styleMenu.RefreshThickness(capConf);
 
-                        colorMenu.AssignFillOutStatus(capConf.FillOutStatus);
+                        fillOutMenu.AssignFillOutStatus(capConf.FillOutStatus);
                     }
                 }
             }
@@ -378,6 +418,12 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             styleMenu.ShowControls();
             objectMenu.ShowControls(IsMainSegment);
+
+            controls.ColorTypeSelectorObject.SetActive(true);
+            controls.ColorPickerObject.SetActive(true);
+
+            colorMenu.ResetColorTypeSelectionToDefault();
+            fillOutMenu.HideControls();
             colorMenu.ShowControls();
         }
 
@@ -388,7 +434,12 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             styleMenu.HideControls();
             objectMenu.HideControls();
+
             colorMenu.HideControls();
+            fillOutMenu.HideControls();
+
+            controls.ColorTypeSelectorObject.SetActive(false);
+            controls.ColorPickerObject.SetActive(false);
         }
     }
 }

@@ -98,7 +98,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
             {
                 LineMenu.Instance.EnableForEditing(
                     currentPreviewShape,
-                    LineConf.Get(currentPreviewShape));
+                    LineConf.Get(currentPreviewShape),
+                    lineCapsChanged: SynchronizePreviewLineCaps);
             }
 
             MenuHelper.CalculateHeight(
@@ -107,6 +108,22 @@ namespace SEE.UI.Menu.Drawable.Shapes
             BindLineMenu();
 
             controls.MenuObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Synchronizes edited preview line caps with the shape-menu state.
+        /// </summary>
+        /// <param name="line">The updated preview line configuration.</param>
+        private static void SynchronizePreviewLineCaps(LineConf line)
+        {
+            if (line == null)
+            {
+                return;
+            }
+
+            ShapeMenu.SetLineCaps(
+                line.LineCapStart,
+                line.LineCapEnd);
         }
 
         /// <summary>

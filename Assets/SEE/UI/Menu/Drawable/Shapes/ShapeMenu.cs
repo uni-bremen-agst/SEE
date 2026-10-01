@@ -1,7 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -117,7 +116,9 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
             switcher.Initialize();
             InitShapeMenu();
-            InitConfigMenu();
+
+            menuObject.SetActive(false);
+            switchObject.SetActive(false);
         }
 
         #region Getters and Setters
@@ -146,16 +147,6 @@ namespace SEE.UI.Menu.Drawable.Shapes
         internal static void SetCurrentPreviewShape(GameObject shape)
         {
             currentPreviewShape = shape;
-        }
-
-        /// <summary>
-        /// Determines whether the given shape is the current drawing preview.
-        /// </summary>
-        /// <param name="shape">The shape to check.</param>
-        /// <returns>True if the given shape is the current preview shape.</returns>
-        internal static bool IsCurrentPreviewShape(GameObject shape)
-        {
-            return currentPreviewShape != null && currentPreviewShape == shape;
         }
 
         /// <summary>
@@ -316,11 +307,13 @@ namespace SEE.UI.Menu.Drawable.Shapes
         }
 
         /// <summary>
-        /// Disables the shape menu, the line menu and their switch.
+        /// Disables the shape menu, the line menu and their switch
+        /// and clears the current drawing preview.
         /// </summary>
         public static void Disable()
         {
             DisablePartUndo();
+            SetCurrentPreviewShape(null);
             switcher.Disable();
         }
         #endregion
@@ -428,15 +421,6 @@ namespace SEE.UI.Menu.Drawable.Shapes
             });
 
             SetSelectedShape(Shape.Line);
-        }
-
-        /// <summary>
-        /// Initializes the line configuration menu used by the shape menu.
-        /// </summary>
-        private static void InitConfigMenu()
-        {
-            LineMenu.Instance.EnableForDrawing();
-            LineMenu.Instance.Enable();
         }
 
         /// <summary>

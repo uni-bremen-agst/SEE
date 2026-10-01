@@ -388,10 +388,14 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="returnCall">
         /// An optional callback that returns to the parent menu.
         /// </param>
+        /// <param name="lineCapsChanged">
+        /// Optional callback invoked when a start or end line-cap configuration changes.
+        /// </param>
         public void EnableForEditing(
             GameObject selectedLine,
             DrawableType newValueHolder,
-            UnityAction returnCall = null)
+            UnityAction returnCall = null,
+            UnityAction<LineConf> lineCapsChanged = null)
         {
             if (newValueHolder is LineConf lineHolder)
             {
@@ -416,7 +420,8 @@ namespace SEE.UI.Menu.Drawable.Line
                     selectedLine,
                     lineHolder,
                     isFreehandLine,
-                    returnCall);
+                    returnCall,
+                    lineCapsChanged);
 
                 mode = Mode.Edit;
 
