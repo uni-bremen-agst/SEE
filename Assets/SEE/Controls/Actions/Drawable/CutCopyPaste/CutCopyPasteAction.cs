@@ -8,7 +8,6 @@ using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI;
-using SEE.UI.Menu.Drawable.MindMap;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -44,6 +43,11 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         /// Handles pasting non-mind-map drawable objects.
         /// </summary>
         private readonly CutCopyPastePrimitivePasteOperation primitivePasteOperation = new();
+
+        /// <summary>
+        /// Handles pasting mind-map subtrees and integrating them into the target mind map.
+        /// </summary>
+        private readonly CutCopyPasteMindMapPasteOperation mindMapPasteOperation = new();
 
         /// <summary>
         /// Holds the current state.
@@ -192,10 +196,6 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         /// The configuration of the old branch line to parent.
         /// </summary>
         private LineConf oldBranchLineConf = null;
-        /// <summary>
-        /// Query that ensures the visual data from the previous branch line is taken over.
-        /// </summary>
-        private bool editToOldBranchLine = false;
 
         /// <summary>
         /// Resets the old selected object, if the action state will be left.
@@ -303,7 +303,21 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         /// </summary>
         private void Cancel()
         {
-            if (selectedObj != null && SEEInput.Cancel())
+            if (!SEEInput.Cancel())
+            {
+                return;
+            }
+
+            if (progressState == ProgressState.OpenSelectParentMenu
+                || progressState == ProgressState.SelectParent)
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                mindMapPasteOperation.Cancel();
+                SetToInitialState();
+                return;
+            }
+
+            if (selectedObj != null)
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 SetToInitialState();
@@ -370,14 +384,25 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
                             selectedObj,
                             newSurface,
                             newPosition);
+
+                        newValueHolder = DrawableType.Get(newObject);
                         break;
 
                     case MindMapNodeConf:
-                        ProcessMindMapNode(newPosition);
+                        mindMapPasteOperation.Paste(
+                            selectedObj,
+                            oldSurface,
+                            oldValueHolder,
+                            oldNodesBranchLineHolder,
+                            newNodesBranchLineHolder,
+                            newSurface,
+                            newPosition,
+                            state == CutCopy.Cut);
+
+                        ApplyMindMapPasteResult();
                         break;
                 }
 
-                newValueHolder = DrawableType.Get(newObject);
                 Cut();
 
                 if (newObject.CompareTag(Tags.MindMapNode) &&
@@ -400,15 +425,33 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         }
 
         /// <summary>
-        /// Resets the action to the initial state.
+        /// Applies the current mind-map paste result to the action state.
+        /// </summary>
+        private void ApplyMindMapPasteResult()
+        {
+            CutCopyPasteMindMapPasteOperation.Result result =
+                mindMapPasteOperation.CurrentResult;
+
+            newObject = result.NewObject;
+            newValueHolder = result.NewValueHolder;
+            newNodesBranchLineHolder = result.NewNodesHolder;
+            oldBranchLineConf = result.OldBranchLineConfig;
+        }
+
+        /// <summary>
+        /// Resets the action to its initial state.
         /// </summary>
         private void SetToInitialState()
         {
             Destroyer.Destroy(cutCopyPasteMenu);
-            BlinkEffect.Deactivate(selectedObj);
+
+            if (selectedObj != null)
+            {
+                BlinkEffect.Deactivate(selectedObj);
+            }
+
             selectedObj = null;
             mouseWasReleased = false;
-            editToOldBranchLine = false;
             state = CutCopy.None;
             progressState = ProgressState.SelectObject;
         }
@@ -455,122 +498,34 @@ namespace SEE.Controls.Actions.Drawable.CutCopyPaste
         }
 
         /// <summary>
-        /// Adds a clone of the chosen node and its children to the chosen position.
-        /// </summary>
-        /// <param name="newPosition">The new position for the node.</param>
-        private void ProcessMindMapNode(Vector3 newPosition)
-        {
-            if (selectedObj.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
-            {
-                oldBranchLineConf = LineConf.GetLine(selectedObj.GetComponent<MMNodeValueHolder>()
-                    .GetParentBranchLine());
-            }
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].BranchLineToParent = "";
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].ParentNode = "";
-            GameMindMap.RenameMindMap(newNodesBranchLineHolder,
-                GameFinder.GetAttachedObjectsObject(newSurface));
-
-            foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
-            {
-                type.AssociatedPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
-                DrawableType.Restore(type, newSurface);
-            }
-
-            newObject = GameFinder.FindAttachedOrLocalDescendant(
-                newSurface,
-                newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
-
-            CutCopyPastePositioning.MoveToWorldPosition(
-                selectedObj,
-                newObject,
-                newSurface,
-                newPosition);
-
-            newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
-        }
-
-        /// <summary>
-        /// Opens the selected parent menu and switches the progress state to select the parent.
-        /// Is executed only if a subtheme or leaf node has been chosen for Cut/Copy.
+        /// Opens the parent-selection menu for the pasted mind-map node.
         /// </summary>
         private void OpenSelectParent()
         {
-            GameObject newAttachedObjects = GameFinder.GetAttachedObjectsObject(newSurface);
-            if (newAttachedObjects != null)
+            if (mindMapPasteOperation.TryOpenParentSelection())
             {
-                MindMapParentSelectionMenu.EnableForEditing(newAttachedObjects, newObject,
-                    MindMapNodeConf.GetNodeConf(newObject), null, true);
                 progressState = ProgressState.SelectParent;
             }
         }
 
         /// <summary>
-        /// Waits for user selection.
-        /// A node can only be added if it is a theme node
-        /// or if the drawable already has a theme node that qualifies as a parent node.
-        /// If the node cannot be added, the action is canceled and reset.
+        /// Updates the parent selection for the pasted mind-map node.
         /// </summary>
         private void SelectParent()
         {
-            if (MindMapParentSelectionMenu.TryGetParent(out GameObject parent))
+            switch (mindMapPasteOperation.UpdateParentSelection())
             {
-                MindMapParentSelectionMenu.Instance.Destroy();
-                /// Block for the case when the node can be added.
-                if (newValueHolder is MindMapNodeConf conf)
-                {
-                    conf.ParentNode = parent.name;
-                    GameObject branchLineToParent = parent.GetComponent<MMNodeValueHolder>().GetChildren()[newObject];
-                    conf.BranchLineToParent = branchLineToParent.name;
-                    if (oldBranchLineConf != null)
-                    {
-                        GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                        new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
-                            LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
-                    }
-                    newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
-                }
-                progressState = ProgressState.Finish;
-            }
-            else if (!MindMapParentSelectionMenu.Instance.IsOpen())
-            { /// Block for the case when the node cannot be added.
-              /// The previous changes are reverted.
-              /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).
-                foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
-                {
-                    GameObject typeObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, type.ID);
-                    new EraseNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
-                        typeObject.name).Execute();
-                    Destroyer.Destroy(typeObject);
-                }
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.Completed:
+                    ApplyMindMapPasteResult();
+                    progressState = ProgressState.Finish;
+                    break;
 
-                if (state == CutCopy.Cut)
-                {
-                    foreach (DrawableType type in oldNodesBranchLineHolder.GetAllDrawableTypes())
-                    {
-                        DrawableType.Restore(type, oldSurface);
-                    }
-                    if (oldBranchLineConf != null)
-                    {
-                        GameObject branchLineToParent = GameFinder.FindAttachedOrLocalDescendant(oldSurface, oldValueHolder.ID).
-                            GetComponent<MMNodeValueHolder>().GetParentBranchLine();
-                        GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                        new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
-                            LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
-                    }
-                }
-                SetToInitialState();
-            }
-            else
-            {
-                /// This block is needed to restore the appearance of the parent branch line.
-                if (oldBranchLineConf != null && !editToOldBranchLine)
-                {
-                    GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
-                    GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                    new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
-                        LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
-                    editToOldBranchLine = true;
-                }
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.Reset:
+                    SetToInitialState();
+                    break;
+
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.InProgress:
+                    break;
             }
         }
 
