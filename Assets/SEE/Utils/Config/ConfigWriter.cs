@@ -47,10 +47,19 @@ namespace SEE.Utils.Config
             }
         }
 
+        /// <summary>
+        /// The context of the current processing/emission.
+        /// </summary>
         private enum ContextInfo
         {
-            InComposite, // if we are about to emit the values of a composite data structure
-            InList,      // if we are about to emit the values of a list
+            /// <summary>
+            /// We are about to emit the values of a composite data structure.
+            /// </summary>
+            InComposite,
+            /// <summary>
+            /// We are about to emit the values of a list.
+            /// </summary>
+            InList,
         }
 
         /// <summary>
