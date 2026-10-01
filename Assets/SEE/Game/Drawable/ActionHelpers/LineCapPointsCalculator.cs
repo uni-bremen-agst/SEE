@@ -299,8 +299,23 @@ namespace SEE.Game.Drawable.ActionHelpers
                     }
                 case LineCapPosition.End:
                     {
-                        segmentStart = line.RendererPositions[line.RendererPositions.Length - 2];
-                        segmentEnd = line.RendererPositions[line.RendererPositions.Length - 1];
+                        if (line.Loop)
+                        {
+                            segmentStart =
+                                line.RendererPositions[line.RendererPositions.Length - 1];
+
+                            segmentEnd =
+                                line.RendererPositions[0];
+                        }
+                        else
+                        {
+                            segmentStart =
+                                line.RendererPositions[line.RendererPositions.Length - 2];
+
+                            segmentEnd =
+                                line.RendererPositions[line.RendererPositions.Length - 1];
+                        }
+
                         return true;
                     }
                 default:

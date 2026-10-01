@@ -408,6 +408,9 @@ namespace SEE.Game.Drawable.Line
                 lineConf.OriginalEndAnchor;
 
             anchorHolder.HasOriginalAnchors = true;
+
+            anchorHolder.UsesExplicitLoopCapGeometry = false;
+            anchorHolder.OriginalRendererPositions = null;
         }
 
         /// <summary>

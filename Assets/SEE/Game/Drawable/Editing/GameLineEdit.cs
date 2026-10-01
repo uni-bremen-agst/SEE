@@ -29,18 +29,69 @@ namespace SEE.Game.Drawable.Editing
         }
 
         /// <summary>
-        /// Changes the loop state of a line.
+        /// Changes the loop state of a line and reapplies its line caps
+        /// based on the original, unshortened line geometry.
         /// </summary>
-        /// <param name="line">The line whose loop should be changed.</param>
+        /// <param name="line">The line whose loop state should be changed.</param>
         /// <param name="loop">The new loop state.</param>
         internal static void ChangeLoop(GameObject line, bool loop)
         {
-            if (line.CompareTag(Tags.Line))
+            if (line == null || !line.CompareTag(Tags.Line))
             {
-                LineRenderer renderer = line.GetComponent<LineRenderer>();
-                renderer.loop = loop;
-                GameLineGeometry.RefreshCollider(line);
+                return;
             }
+
+            Vector3[] originalPositions =
+                GameLineGeometry.GetOriginalLinePositions(line);
+
+            if (originalPositions == null)
+            {
+                return;
+            }
+
+            LineConf currentConf = LineConf.GetLine(line);
+
+            if (currentConf == null)
+            {
+                return;
+            }
+
+            Color? fillOutColor =
+                LineConf.GetFillOutColor(currentConf);
+
+            LineAnchorValueHolder anchorHolder =
+                line.GetComponent<LineAnchorValueHolder>();
+
+            GameLineDrawer.Drawing(
+                line,
+                originalPositions,
+                fillOutColor,
+                preserveFillOutColliderState: true);
+
+            if (anchorHolder != null)
+            {
+                anchorHolder.UsesExplicitLoopCapGeometry = false;
+                anchorHolder.OriginalRendererPositions = null;
+            }
+
+            LineRenderer renderer =
+                line.GetComponent<LineRenderer>();
+
+            renderer.loop = loop;
+
+            GameLineGeometry.UpdateOriginalAnchors(
+                line,
+                originalPositions);
+
+            GameLineCapApplicator.ApplyLineCaps(
+                line,
+                currentConf.LineCapStart,
+                currentConf.LineCapEnd,
+                fillOutColor,
+                currentConf.LineCapStart.UseOwnVisuals,
+                currentConf.LineCapEnd.UseOwnVisuals);
+
+            GameLineGeometry.RefreshCollider(line);
         }
 
         /// <summary>

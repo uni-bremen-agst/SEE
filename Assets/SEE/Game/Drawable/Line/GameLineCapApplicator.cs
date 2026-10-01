@@ -84,12 +84,67 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            Vector3[] shortenedPositions = new Vector3[originalPositions.Length];
+            bool hasStartCap =
+                startConf != null
+                && startConf.CapKind != LineCap.None;
 
-            Array.Copy(
-                originalPositions,
-                shortenedPositions,
-                originalPositions.Length);
+            bool hasEndCap =
+                endConf != null
+                && endConf.CapKind != LineCap.None;
+
+            bool useExplicitLoopCapGeometry =
+                line.Loop
+                && (hasStartCap || hasEndCap);
+
+            LineAnchorValueHolder anchorHolder = shape.GetComponent<LineAnchorValueHolder>();
+
+            if (anchorHolder == null)
+            {
+                anchorHolder = shape.AddComponent<LineAnchorValueHolder>();
+            }
+
+            Vector3[] shortenedPositions;
+
+            if (useExplicitLoopCapGeometry)
+            {
+                anchorHolder.UsesExplicitLoopCapGeometry = true;
+                anchorHolder.OriginalRendererPositions =
+                    new Vector3[originalPositions.Length];
+
+                Array.Copy(
+                    originalPositions,
+                    anchorHolder.OriginalRendererPositions,
+                    originalPositions.Length);
+
+                shortenedPositions =
+                    new Vector3[originalPositions.Length + 1];
+
+                Array.Copy(
+                    originalPositions,
+                    shortenedPositions,
+                    originalPositions.Length);
+
+                /// Explicitly represents the virtual closing point of the loop.
+                shortenedPositions[shortenedPositions.Length - 1] =
+                    originalPositions[0];
+
+                shape.GetComponent<LineRenderer>().loop = false;
+            }
+            else
+            {
+                shortenedPositions =
+                    new Vector3[originalPositions.Length];
+
+                Array.Copy(
+                    originalPositions,
+                    shortenedPositions,
+                    originalPositions.Length);
+
+                anchorHolder.UsesExplicitLoopCapGeometry = false;
+                anchorHolder.OriginalRendererPositions = null;
+
+                shape.GetComponent<LineRenderer>().loop = line.Loop;
+            }
 
             line.RendererPositions = originalPositions;
 
@@ -159,8 +214,18 @@ namespace SEE.Game.Drawable.Line
             if (position == LineCapPosition.Start)
             {
                 anchor = line.RendererPositions[0];
+
                 direction =
-                    line.RendererPositions[0] - line.RendererPositions[1];
+                    line.RendererPositions[0]
+                    - line.RendererPositions[1];
+            }
+            else if (line.Loop)
+            {
+                anchor = line.RendererPositions[0];
+
+                direction =
+                    line.RendererPositions[0]
+                    - line.RendererPositions[line.RendererPositions.Length - 1];
             }
             else
             {

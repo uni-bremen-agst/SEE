@@ -184,6 +184,28 @@ namespace SEE.Game.Drawable.Configurations
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
                 LineAnchorValueHolder anchorHolder = lineGameObject.GetComponent<LineAnchorValueHolder>();
 
+                bool usesExplicitLoopCapGeometry = anchorHolder != null
+                    && anchorHolder.UsesExplicitLoopCapGeometry
+                    && anchorHolder.OriginalRendererPositions != null;
+
+                Vector3[] rendererPositions;
+
+                if (usesExplicitLoopCapGeometry)
+                {
+                    rendererPositions =
+                        new Vector3[anchorHolder.OriginalRendererPositions.Length];
+
+                    Array.Copy(
+                        anchorHolder.OriginalRendererPositions,
+                        rendererPositions,
+                        rendererPositions.Length);
+                }
+                else
+                {
+                    rendererPositions = new Vector3[renderer.positionCount];
+                    renderer.GetPositions(rendererPositions);
+                }
+
                 line = new()
                 {
                     ID = lineGameObject.name,
@@ -191,16 +213,14 @@ namespace SEE.Game.Drawable.Configurations
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
                     OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Loop = renderer.loop,
+                    Loop = renderer.loop || usesExplicitLoopCapGeometry,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
-                    RendererPositions = new Vector3[renderer.positionCount],
+                    RendererPositions = rendererPositions,
                     LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
                     LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject),
                     FreehandLine = lineGameObject.TryGetComponent(out LineValueHolder holder)
                                     && holder.FreehandLine,
                 };
-
-                renderer.GetPositions(line.RendererPositions);
 
                 if (anchorHolder != null && anchorHolder.HasOriginalAnchors)
                 {

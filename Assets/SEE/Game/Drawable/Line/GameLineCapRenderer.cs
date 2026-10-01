@@ -219,12 +219,25 @@ namespace SEE.Game.Drawable.Line
                 direction = line.RendererPositions[0] - line.RendererPositions[1];
                 prefix = ValueHolder.LineStartCapPrefix;
             }
+            else if (line.Loop)
+            {
+                anchor = line.RendererPositions[0];
+
+                direction =
+                    line.RendererPositions[0]
+                    - line.RendererPositions[line.RendererPositions.Length - 1];
+
+                prefix = ValueHolder.LineEndCapPrefix;
+            }
             else
             {
-                anchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                anchor =
+                    line.RendererPositions[line.RendererPositions.Length - 1];
+
                 direction =
                     line.RendererPositions[line.RendererPositions.Length - 1]
                     - line.RendererPositions[line.RendererPositions.Length - 2];
+
                 prefix = ValueHolder.LineEndCapPrefix;
             }
 
