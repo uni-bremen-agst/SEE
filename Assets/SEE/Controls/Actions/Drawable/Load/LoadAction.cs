@@ -20,7 +20,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.Load
 {
     /// <summary>
     /// Adds the <see cref="DrawableType"/> to the scene from one or more drawable configs saved
@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// For execution, no open file browser should exist.
                 if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                     && !clicked
-                    && (browser == null || (browser != null && !browser.IsOpen())))
+                    && (browser == null || browser != null && !browser.IsOpen()))
                 {
                     clicked = true;
                     ManageHighlightEffect(GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
@@ -246,7 +246,7 @@ namespace SEE.Controls.Actions.Drawable
             if (SEEInput.Cancel()
                 && selectedSurface != null
                 && selectedSurface.GetComponent<HighlightEffect>() != null
-                && (browser == null || (browser != null && !browser.IsOpen())))
+                && (browser == null || browser != null && !browser.IsOpen()))
             {
                 ShowNotification.Info("Unselect drawable", "The marked drawable was unselected.");
                 selectedSurface.Destroy<HighlightEffect>();
@@ -267,7 +267,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 selectedSurface?.Destroy<HighlightEffect>();
                 selectedSurface = surface;
-                Highlighter.EnableGlowOverlay(selectedSurface);
+                selectedSurface.EnableGlowOverlay();
             }
             else
             {

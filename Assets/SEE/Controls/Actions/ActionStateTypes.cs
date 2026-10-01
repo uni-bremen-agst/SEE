@@ -7,6 +7,7 @@ using SEE.Controls.Actions.Drawable.DrawShapes;
 using SEE.Controls.Actions.Drawable.StickyNote;
 using SEE.Controls.Actions.Drawable.MoveRotate;
 using SEE.Controls.Actions.Drawable.CutCopyPaste;
+using SEE.Controls.Actions.Drawable.Load;
 
 namespace SEE.Controls.Actions
 {
