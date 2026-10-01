@@ -6,8 +6,8 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Graphs.IO.ReportImports;
-using SEE.Utils.Config;
 using System.Collections.Generic;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

@@ -8,6 +8,7 @@ using System;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.HolisticMetrics
 {

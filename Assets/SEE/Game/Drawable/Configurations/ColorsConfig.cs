@@ -1,4 +1,5 @@
-﻿using SEE.UI.Menu.Drawable;
+﻿using SEE.Graphs.Config;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;

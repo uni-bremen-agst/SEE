@@ -4,7 +4,6 @@ using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SEE.Graphs.Config;
 
 namespace SEE.Net
 {

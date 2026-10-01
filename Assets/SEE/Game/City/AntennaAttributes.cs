@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

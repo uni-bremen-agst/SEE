@@ -1,6 +1,6 @@
 ﻿using SEE.GraphProviders.VCS;
+using SEE.Graphs.Config;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils.Config;
 using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;

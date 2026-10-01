@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Graphs.Config;
 using SEE.Graphs.IO;
 using SEE.Graphs.Utils;
-using SEE.Utils.Config;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif

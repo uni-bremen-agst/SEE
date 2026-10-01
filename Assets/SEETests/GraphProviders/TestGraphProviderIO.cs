@@ -8,6 +8,7 @@ using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SEE.Graphs;
 using SEE.Game.City;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using UnityEngine;
 using System.Threading;
 using SEE.VCS;
 using SEE.GraphProviders.VCS;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

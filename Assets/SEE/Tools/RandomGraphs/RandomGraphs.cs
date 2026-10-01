@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.Graphs;
+using SEE.Graphs.Config;
 using SEE.Utils;
-using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Tools.RandomGraphs

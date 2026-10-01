@@ -13,7 +13,6 @@ using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SimpleFileBrowser;
 using Sirenix.OdinInspector;
@@ -27,6 +26,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.KeyActions;
+using SEE.Graphs.Config;
 
 namespace SEE.UI.RuntimeConfigMenu
 {

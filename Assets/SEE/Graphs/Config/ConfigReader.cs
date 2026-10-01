@@ -1,7 +1,8 @@
-﻿using System;
+﻿using SEE.Graphs.Config;
+using System;
 using System.Collections.Generic;
 
-namespace SEE.Utils.Config
+namespace SEE.Graphs.Config
 {
     /// <summary>
     /// Thrown in case of syntax errors.

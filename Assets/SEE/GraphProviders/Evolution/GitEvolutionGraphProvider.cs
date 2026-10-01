@@ -9,11 +9,11 @@ using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders.Evolution
 {

@@ -1,4 +1,4 @@
-﻿namespace SEE.Utils.Config
+﻿namespace SEE.Graphs.Config
 {
     public partial class ConfigReader
     {

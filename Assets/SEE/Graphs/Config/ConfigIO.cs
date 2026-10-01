@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Utils.Config
+namespace SEE.Graphs.Config
 {
     /// <summary>
     /// Abstract super class of input/output of configuration attributes.
@@ -277,13 +277,13 @@ namespace SEE.Utils.Config
         {
             // enum values are stored as string
             string stringValue = "";
-            if (Restore<string>(attributes, label, ref stringValue))
+            if (Restore(attributes, label, ref stringValue))
             {
                 if (string.IsNullOrEmpty(stringValue))
                 {
                     throw new Exception("Enum value must neither be null nor the empty string.");
                 }
-                else if (Enum.TryParse<E>(stringValue, out E enumValue))
+                else if (Enum.TryParse(stringValue, out E enumValue))
                 {
                     value = enumValue;
                     return true;
@@ -323,7 +323,7 @@ namespace SEE.Utils.Config
                         if (pair.Count == 2)
                         {
                             // value part of pair is expected to be of enum type E
-                            if (Enum.TryParse<E>((string)pair[1], out E enumValue))
+                            if (Enum.TryParse((string)pair[1], out E enumValue))
                             {
                                 try
                                 {

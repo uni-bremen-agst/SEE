@@ -6,7 +6,6 @@ using SEE.Graphs;
 using SEE.Graphs.IO.CSV;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils.Config;
 using UnityEngine;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Metric;
@@ -17,6 +16,7 @@ using SEE.Utils;
 using System.Linq;
 using SEE.Tools;
 using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

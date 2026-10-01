@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SEE.Graphs;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

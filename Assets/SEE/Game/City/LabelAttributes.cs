@@ -1,4 +1,5 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;

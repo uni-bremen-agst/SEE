@@ -8,6 +8,7 @@ using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
 using SEE.Extensions;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.Utils
 {

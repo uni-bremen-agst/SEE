@@ -14,7 +14,6 @@ using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UserSettings;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
@@ -25,6 +24,7 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using SEE.SceneManipulation;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

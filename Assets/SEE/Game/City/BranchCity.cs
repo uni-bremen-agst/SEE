@@ -7,13 +7,13 @@ using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Components.GameNodes.BranchCity;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

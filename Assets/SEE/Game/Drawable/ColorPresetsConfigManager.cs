@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.Configurations;
+using SEE.Graphs.Config;
 using SEE.Graphs.Utils;
 using SEE.UI.Notification;
 using SEE.Utils.Config;

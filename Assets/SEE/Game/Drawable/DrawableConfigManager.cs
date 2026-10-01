@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.Drawable
 {

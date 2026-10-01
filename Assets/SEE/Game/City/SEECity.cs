@@ -15,7 +15,6 @@ using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UserSettings;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -29,6 +28,7 @@ using UnityEngine.Assertions;
 using SEE.Cities;
 using SEE.Components.GameNodes.BranchCity;
 using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

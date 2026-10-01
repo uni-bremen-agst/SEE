@@ -1,7 +1,7 @@
 using LibGit2Sharp;
 using SEE.Game.City;
+using SEE.Graphs.Config;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;

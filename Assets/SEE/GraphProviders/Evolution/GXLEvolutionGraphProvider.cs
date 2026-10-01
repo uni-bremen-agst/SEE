@@ -1,11 +1,11 @@
 using Cysharp.Threading.Tasks;
 using SEE.Game.City;
 using SEE.Graphs;
+using SEE.Graphs.Config;
 using SEE.Graphs.IO.GXL;
 using SEE.Graphs.Utils;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;

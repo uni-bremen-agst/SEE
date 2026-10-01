@@ -1,7 +1,7 @@
 ﻿using SEE.Graphs.Utils;
 using System;
 
-namespace SEE.Utils.Config
+namespace SEE.Graphs.Config
 {
     public partial class ConfigReader
     {

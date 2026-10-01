@@ -13,8 +13,8 @@ using SEE.Game.CityRendering;
 using SEE.GraphProviders;
 using SEE.UI;
 using SEE.UI.Notification;
-using SEE.Utils.Config;
 using Sirenix.Serialization;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

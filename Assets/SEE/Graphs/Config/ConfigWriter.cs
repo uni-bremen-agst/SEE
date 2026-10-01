@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace SEE.Utils.Config
+namespace SEE.Graphs.Config
 {
     /// <summary>
     /// A writer for configuration settings.

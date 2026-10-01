@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Utils.Config
+namespace SEE.Graphs.Config
 {
     /// <summary>
     /// Defines the interface for a configuration item that can be persisted and restored.

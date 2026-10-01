@@ -2,9 +2,10 @@ using SEE.Graphs.GraphIndex;
 using System;
 using System.Collections.Generic;
 using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
+
 
 #if UNITY_5_3_OR_NEWER
-using SEE.Utils.Config;
 using UnityEngine;
 #endif
 
@@ -120,7 +121,7 @@ namespace SEE.Graphs.IO.ReportImports
 #if UNITY_5_3_OR_NEWER
 
         /// The following code is only compiled in Unity environments, where we can use the
-        /// <see cref="SEE.Utils.Config.ConfigWriter"/> and <see cref="SEE.Utils.Config.ConfigReader"/>
+        /// <see cref="Config.ConfigWriter"/> and <see cref="SEE.Utils.Config.ConfigReader"/>
         /// to persist and restore configuration settings. Saving and restoring of configurations is
         /// not required for the core functionality of the parsing configuration,
         #region Config I/O

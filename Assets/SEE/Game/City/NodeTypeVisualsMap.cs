@@ -1,6 +1,6 @@
 ﻿using SEE.Graphs;
+using SEE.Graphs.Config;
 using SEE.Graphs.Reflexion;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
