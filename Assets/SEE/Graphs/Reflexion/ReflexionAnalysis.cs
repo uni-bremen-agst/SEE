@@ -27,8 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Graphs;
 using SEE.Graphs.Events;
-using UnityEngine;
-using UnityEngine.Assertions;
+using SEE.Graphs.Utils;
 using static SEE.Graphs.Reflexion.ReflexionSubgraphs;
 
 namespace SEE.Graphs.Reflexion
@@ -509,7 +508,7 @@ namespace SEE.Graphs.Reflexion
                         // We need to remove the implementation edge from the propagation table, because it's no longer
                         // mapped to the propagated edge.
                         bool implRemoved = propagationTable[propagatedEdge.ID].Remove(implementationDependency);
-                        Assert.IsTrue(implRemoved, "Originating edge should have been present in propagation table!");
+                        Assertion.IsTrue(implRemoved, "Originating edge should have been present in propagation table!");
                         // Not every originating dependency has been unmapped, only the one passed in here.
                         Transition(implementationDependency, State.Unmapped);
                     }
@@ -587,7 +586,7 @@ namespace SEE.Graphs.Reflexion
             string[] stateNames = Enum.GetNames(typeof(State));
             foreach (int stateValue in Enum.GetValues(typeof(State)))
             {
-                Debug.Log($"number of edges in state {stateNames[stateValue]} = {summary[stateValue]}\n");
+                Logging.Logger.LogDebug($"number of edges in state {stateNames[stateValue]} = {summary[stateValue]}\n");
             }
         }
 
@@ -1377,10 +1376,10 @@ namespace SEE.Graphs.Reflexion
         /// <param name="message">Message to be emitted before the nodes.</param>
         private static void DumpNodeSet(List<Node> nodeSet, string message)
         {
-            Debug.Log(message + "\n");
+            Logging.Logger.LogDebug(message + "\n");
             foreach (Node node in nodeSet)
             {
-                Debug.Log(QualifiedNodeName(node, true) + "\n");
+                Logging.Logger.LogDebug(QualifiedNodeName(node, true) + "\n");
             }
         }
 
@@ -1392,7 +1391,7 @@ namespace SEE.Graphs.Reflexion
         {
             foreach (Edge edge in edgeSet)
             {
-                Debug.Log(AsQualifiedClause(edge) + "\n");
+                Logging.Logger.LogDebug(AsQualifiedClause(edge) + "\n");
             }
         }
 
@@ -1402,26 +1401,26 @@ namespace SEE.Graphs.Reflexion
         /// </summary>
         public static void DumpGraph(Graph graph)
         {
-            Debug.Log($"Graph {graph.Name} with {graph.NodeCount} nodes and {graph.EdgeCount} edges: \n");
-            Debug.Log("NODES\n");
+            Logging.Logger.LogDebug($"Graph {graph.Name} with {graph.NodeCount} nodes and {graph.EdgeCount} edges: \n");
+            Logging.Logger.LogDebug("NODES\n");
             foreach (Node node in graph.Nodes())
             {
-                Debug.Log(node.ToString());
+                Logging.Logger.LogDebug(node.ToString());
             }
 
-            Debug.Log("EDGES\n");
+            Logging.Logger.LogDebug("EDGES\n");
             foreach (Edge edge in graph.Edges())
             {
                 // edge counter state
-                Debug.Log($"{AsClause(edge)} {GetArchCounter(edge)} {edge.State()}\n");
+                Logging.Logger.LogDebug($"{AsClause(edge)} {GetArchCounter(edge)} {edge.State()}\n");
             }
         }
 
         public void DumpMapping()
         {
-            Debug.Log("EXPLICITLY MAPPED NODES\n");
+            Logging.Logger.LogDebug("EXPLICITLY MAPPED NODES\n");
             DumpTable(explicitMapsToTable);
-            Debug.Log("IMPLICITLY MAPPED NODES\n");
+            Logging.Logger.LogDebug("IMPLICITLY MAPPED NODES\n");
             DumpTable(implicitMapsToTable);
         }
 
@@ -1429,7 +1428,7 @@ namespace SEE.Graphs.Reflexion
         {
             foreach (KeyValuePair<string, Node> entry in table)
             {
-                Debug.Log($"  {entry.Key} -> {entry.Value.ID}\n");
+                Logging.Logger.LogDebug($"  {entry.Key} -> {entry.Value.ID}\n");
             }
         }
 
