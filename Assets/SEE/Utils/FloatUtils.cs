@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// Utilities for floats.
@@ -73,7 +73,7 @@ namespace SEE.Utils
                 throw new ArgumentException($"{nameof(tolerance)} must not be negative.");
             }
             // This handles both "left < right" and "left is roughly equal to right"
-            return left <= (right + tolerance);
+            return left <= right + tolerance;
         }
     }
 }

@@ -3,7 +3,6 @@ using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Factories;
 using SEE.Factories.NodeFactories;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
 using SEE.GraphElementRefs;
 using SEE.Components.GraphElements;
+using SEE.Graphs.Utils;
 
 namespace SEE.Game.CityRendering
 {
