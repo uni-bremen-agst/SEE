@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SEE.Utils
+namespace SEE.Graph.Utils
 {
     /// <summary>
     /// Extension for IEnumerable<string>, that sorts by numbers in the string.
