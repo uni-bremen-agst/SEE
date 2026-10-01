@@ -11,6 +11,9 @@ namespace SEE.Utils.Config
     /// </summary>
     public abstract class ConfigIO
     {
+        /// <summary>
+        /// Defines the interface for a configuration item that can be persisted and restored.
+        /// </summary>
         public interface IPersistentConfigItem
         {
             /// <summary>
@@ -20,6 +23,7 @@ namespace SEE.Utils.Config
             /// <param name="writer">The configuration writer to be used for the output.</param>
             /// <param name="label">The label to be emitted in front of the configuration attributes.</param>
             void Save(ConfigWriter writer, string label = "");
+
             /// <summary>
             /// Restores the attributes of this instance from <paramref name="attributes"/> as follows:
             /// If label is neither empty nor null, <paramref name="attributes"/>[<paramref name="label"/>]
