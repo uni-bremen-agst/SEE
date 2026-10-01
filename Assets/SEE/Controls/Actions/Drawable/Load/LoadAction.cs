@@ -290,12 +290,12 @@ namespace SEE.Controls.Actions.Drawable.Load
         }
 
         /// <summary>
-        /// The set of IDs of all gameObjects changed by this action.
-        /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object,
-        /// an empty set is always returned.
+        /// Returns the IDs of the drawable surfaces and drawable objects affected by this load action.
         /// </summary>
-        /// <returns>An empty set.</returns>
+        /// <returns>
+        /// The IDs of the affected drawable surfaces and drawable objects,
+        /// or an empty set if no load operation has been prepared.
+        /// </returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento == null)
