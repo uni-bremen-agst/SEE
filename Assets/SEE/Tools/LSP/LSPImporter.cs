@@ -13,9 +13,8 @@ using SEE.Tools;
 using SEE.Utils;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
-// While this file lived in SEE.DataModel.DG.IO, the enclosing namespace made
-// every unqualified Range the graph's one, in preference to the imported
-// OmniSharp range of the same name. The alias keeps that meaning here.
+// Every unqualified Range should be the graph's one, in preference to the imported
+// OmniSharp range of the same name. The alias enables that meaning here.
 using Range = SEE.Graphs.Range;
 
 namespace SEE.Tools.LSP
