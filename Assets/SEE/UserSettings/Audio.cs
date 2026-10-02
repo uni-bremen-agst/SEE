@@ -39,7 +39,7 @@ namespace SEE.UserSettings
         /// <summary>
         /// Stores the microphone settings.
         /// </summary>
-        public Microphone Microphone;
+        public Microphone Microphone = new();
 
         #region Configuration I/O
         /// <summary>
@@ -105,7 +105,7 @@ namespace SEE.UserSettings
                 ConfigIO.Restore(values, musicMutedLabel, ref MusicMuted);
                 ConfigIO.Restore(values, soundEffectsMutedLabel, ref SoundEffectsMuted);
                 ConfigIO.Restore(values, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
-                ConfigIO.Restore(values, microphoneLabel, ref Microphone);
+                Microphone.Restore(attributes, microphoneLabel);
             }
         }
         #endregion

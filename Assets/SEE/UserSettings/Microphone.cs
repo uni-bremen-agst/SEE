@@ -12,15 +12,30 @@ namespace SEE.UserSettings
 
         public ulong MaxBitrate = 64000;
 
+        public bool EchoCancellation;
+
+        public bool NoiseSuppression;
+
+        public bool AutoGainControl;
+
         private const string microphoneDeviceLabel = "microphoneDevice";
 
         private const string maxBitrateLabel = "maxBitrate";
+
+        private const string echoCancellationLabel = "echoCancellation";
+
+        private const string noiseSuppressionLabel = "noiseSuppression";
+
+        private const string autoGainControlLabel = "autoGainControl";
 
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(MicrophoneDevice, microphoneDeviceLabel);
             writer.Save(MaxBitrate, maxBitrateLabel);
+            writer.Save(EchoCancellation, echoCancellationLabel);
+            writer.Save(NoiseSuppression, noiseSuppressionLabel);
+            writer.Save(AutoGainControl, autoGainControlLabel);
             writer.EndGroup();
 
         }
@@ -33,6 +48,9 @@ namespace SEE.UserSettings
 
                 ConfigIO.Restore(values, microphoneDeviceLabel, ref MicrophoneDevice);
                 ConfigIO.Restore(values, maxBitrateLabel, ref MaxBitrate);
+                ConfigIO.Restore(values, echoCancellationLabel, ref EchoCancellation);
+                ConfigIO.Restore(values, noiseSuppressionLabel, ref NoiseSuppression);
+                ConfigIO.Restore(values, autoGainControlLabel, ref AutoGainControl);
             }
         }
     }

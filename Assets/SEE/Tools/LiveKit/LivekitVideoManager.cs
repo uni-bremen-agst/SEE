@@ -49,6 +49,16 @@ namespace SEE.Tools.LiveKit
 
         private LocalAudioTrack publishedAudioTrack = null;
 
+        private PlatformAudio platformAudio;
+
+        /// <summary>
+        /// The platform microphone source backing <see cref="publishedAudioTrack"/>.
+        /// It must stay alive for as long as the track is published.
+        /// </summary>
+        private PlatformAudioSource platformAudioSource;
+
+        private GameObject localAudioObject;
+
         /// <summary>
         /// The WebCamTexture used to capture the video stream from the selected camera.
         /// </summary>
@@ -65,6 +75,14 @@ namespace SEE.Tools.LiveKit
         /// A list of video streams from remote participants in the LiveKit room.
         /// </summary>
         private readonly List<VideoStream> videoStreams = new();
+
+        /// <summary>
+        /// Unity playback streams used only when PlatformAudio is unavailable.
+        /// PlatformAudio plays remote tracks automatically.
+        /// </summary>
+        private readonly Dictionary<string, AudioStream> audioStreams = new();
+
+        private readonly Dictionary<string, GameObject> audioOutputObjects = new();
 
         /// <summary>
         /// Gets the current connection status to the LiveKit room.
@@ -103,6 +121,34 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private void Start()
         {
+            try
+            {
+                platformAudio = new PlatformAudio();
+                Debug.Log($"PlatformAudio initialized: {platformAudio.RecordingDeviceCount} mics, " +
+                   $"{platformAudio.PlayoutDeviceCount} speakers");
+
+                var (recording, playout) = platformAudio.GetDevices();
+                Debug.Log("Recording devices:");
+                foreach (var device in recording)
+                    Debug.Log($"  [{device.Index}] {device.Name}");
+
+                Debug.Log("Playout devices:");
+                foreach (var device in playout)
+                    Debug.Log($"  [{device.Index}] {device.Name}");
+
+                if (platformAudio.RecordingDeviceCount > 0)
+                    platformAudio.SetRecordingDevice(0);
+                if (platformAudio.PlayoutDeviceCount > 0)
+                    platformAudio.SetPlayoutDevice(0);
+
+                Debug.Log($"PlatformAudio ready");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to initialize PlatformAudio, falling back to Unity audio: {e.Message}");
+                platformAudio = null;
+            }
+
             if (!UserSetting.IsDesktop)
             {
                 gameObject.SetActive(false);
@@ -116,6 +162,8 @@ namespace SEE.Tools.LiveKit
         private void OnDestroy()
         {
             Disconnect();
+            platformAudio?.Dispose();
+            platformAudio = null;
         }
 
         /// <summary>
@@ -130,7 +178,7 @@ namespace SEE.Tools.LiveKit
                 {
                     if (room == null || !room.IsConnected)
                     {
-                        StartCoroutine(ConnectAndPublish());
+                        StartCoroutine(ConnectAndPublish(publishVideo: true, publishAudio: false));
                     }
                     else
                     {
@@ -149,7 +197,7 @@ namespace SEE.Tools.LiveKit
                 {
                     if (room == null || !room.IsConnected)
                     {
-                        StartCoroutine(ConnectAndPublish());
+                        StartCoroutine(ConnectAndPublish(publishVideo: false, publishAudio: true));
                     }
                     else
                     {
@@ -165,24 +213,38 @@ namespace SEE.Tools.LiveKit
 
         private IEnumerator UnpublishAudio()
         {
-            foreach (RtcAudioSource source in rtcAudioSources)
+            if (publishedAudioTrack == null)
             {
-                source.Stop();
+                yield break;
             }
-            rtcAudioSources.Clear();
-            yield return null;
 
             // Unpublish the audio track from the room.
             UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedAudioTrack, true);
             yield return unpublish;
 
-            // Check if the unpublishing was successful.
-            if (!unpublish.IsError)
+            if (unpublish.IsError)
             {
-                publishedAudioTrack = null;
-
-                UIOverlay.ToggleLiveKit();
+                Debug.LogError($"Failed to unpublish microphone track: {unpublish}");
+                yield break;
             }
+
+            foreach (RtcAudioSource source in rtcAudioSources)
+            {
+                source.Stop();
+                source.Dispose();
+            }
+            rtcAudioSources.Clear();
+
+            if (localAudioObject != null)
+            {
+                Destroy(localAudioObject);
+                localAudioObject = null;
+            }
+
+            platformAudioSource?.Dispose();
+            platformAudioSource = null;
+            publishedAudioTrack = null;
+            UIOverlay.ToggleLiveKitAudio();
         }
 
         /// <summary>
@@ -282,7 +344,8 @@ namespace SEE.Tools.LiveKit
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{UserSetting.BackendServerAPI}" +
-                $"server/livekitToken?id={Network.ServerId}";
+                $"server/livekitToken?id={Network.ServerId}" +
+                $"&participantId={NetworkManager.Singleton.LocalClientId}";
             Net.Util.Logger.Log($"Try Connecting to Livekit server at: {uri}");
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
@@ -354,10 +417,10 @@ namespace SEE.Tools.LiveKit
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
                     room.Disconnect();
                     room = null;
-                    break;
+                    return;
                 }
                 elapsed += Time.deltaTime;
-                return;
+                await UniTask.Yield();
             }
 
             // Check if the connection was successful.
@@ -485,10 +548,30 @@ namespace SEE.Tools.LiveKit
 
         private IEnumerator PublishAudio()
         {
-            Debug.Log("Publishing microphone using Unity Audio");
+            if (room == null || !room.IsConnected)
+            {
+                ShowNotification.Error("LiveKit", "Not connected.");
+                yield break;
+            }
+
+            if (publishedAudioTrack != null)
+            {
+                yield break;
+            }
+
+            Debug.Log("Publishing microphone using Unity Audio\n");
+
             GameObject microphoneObject = new GameObject("my-audio-source");
             string microphone = UnityEngine.Microphone.devices.FirstOrDefault(x => x == UserSetting.Instance.Audio.Microphone.MicrophoneDevice) ?? UnityEngine.Microphone.devices[0];
-            MicrophoneSource rtcSource = new MicrophoneSource(microphone, microphoneObject);
+
+            AudioProcessingOptions processing = new AudioProcessingOptions
+            {
+                EchoCancellation = UserSetting.Instance.Audio.Microphone.EchoCancellation,
+                NoiseSuppression = UserSetting.Instance.Audio.Microphone.NoiseSuppression,
+                AutoGainControl = UserSetting.Instance.Audio.Microphone.AutoGainControl
+            };
+
+            MicrophoneSource rtcSource = new MicrophoneSource(microphone, microphoneObject, processing);
             publishedAudioTrack = LocalAudioTrack.CreateAudioTrack($"{UserSetting.Instance.Player.PlayerName}-audio-track", rtcSource, room);
 
             TrackPublishOptions options = new TrackPublishOptions
@@ -521,7 +604,7 @@ namespace SEE.Tools.LiveKit
         /// <returns>
         /// A coroutine that yields while the connection and publishing process is ongoing.
         /// </returns>
-        private IEnumerator ConnectAndPublish()
+        private IEnumerator ConnectAndPublish(bool publishVideo, bool publishAudio)
         {
             using (LoadingSpinner.ShowIndeterminate("Establishing LiveKit connection..."))
             {
@@ -534,8 +617,14 @@ namespace SEE.Tools.LiveKit
 
                 if (IsConnected())
                 {
-                    yield return StartCoroutine(PublishVideo());
-                    yield return StartCoroutine(PublishAudio());
+                    if (publishVideo)
+                    {
+                        yield return StartCoroutine(PublishVideo());
+                    }
+                    if (publishAudio)
+                    {
+                        yield return StartCoroutine(PublishAudio());
+                    }
                 }
             }
         }
@@ -627,9 +716,18 @@ namespace SEE.Tools.LiveKit
             else if (track is RemoteAudioTrack audioTrack)
             {
                 Debug.Log("[LiveKit] Audio TrackSubscribed for " + participant.Identity);
+
+                // // PlatformAudio's ADM plays subscribed remote audio automatically.
+                // if (platformAudio != null)
+                // {
+                //     return;
+                // }
+
                 GameObject audioOutputObject = new GameObject(audioTrack.Sid);
-                var source = audioOutputObject.AddComponent<AudioSource>();
-                var stream = new AudioStream(audioTrack, source);
+                AudioSource source = audioOutputObject.AddComponent<AudioSource>();
+                AudioStream stream = new AudioStream(audioTrack, source);
+                audioOutputObjects[audioTrack.Sid] = audioOutputObject;
+                audioStreams[audioTrack.Sid] = stream;
             }
         }
 
@@ -648,6 +746,17 @@ namespace SEE.Tools.LiveKit
             {
                 renderer.enabled = false;
                 renderer.material.mainTexture = null;
+            }
+            else if (track is RemoteAudioTrack audioTrack)
+            {
+                if (audioStreams.Remove(audioTrack.Sid, out AudioStream stream))
+                {
+                    stream.Dispose();
+                }
+                if (audioOutputObjects.Remove(audioTrack.Sid, out GameObject audioOutputObject))
+                {
+                    Destroy(audioOutputObject);
+                }
             }
         }
 
@@ -693,6 +802,35 @@ namespace SEE.Tools.LiveKit
                 videoStream.Stop();
             }
             videoStreams.Clear();
+
+            foreach (RtcAudioSource rtcAudioSource in rtcAudioSources)
+            {
+                rtcAudioSource.Stop();
+                rtcAudioSource.Dispose();
+            }
+            rtcAudioSources.Clear();
+
+            platformAudioSource?.Dispose();
+            platformAudioSource = null;
+            publishedAudioTrack = null;
+
+            if (localAudioObject != null)
+            {
+                Destroy(localAudioObject);
+                localAudioObject = null;
+            }
+
+            foreach (AudioStream audioStream in audioStreams.Values)
+            {
+                audioStream.Dispose();
+            }
+            audioStreams.Clear();
+
+            foreach (GameObject audioOutputObject in audioOutputObjects.Values)
+            {
+                Destroy(audioOutputObject);
+            }
+            audioOutputObjects.Clear();
 
             // Disable all LiveKitVideo renderers (local + remote) from the registry
             foreach (LiveKitVideo liveKitVideo in LiveKitVideoRegistry.GetAll())

@@ -90,6 +90,12 @@ namespace SEE.UI
 
         private Dropdown microphoneDropdown;
 
+        private Toggle echoCancellationToggle;
+
+        private Toggle noiseSuppressionToggle;
+
+        private Toggle autoGainControlToggle;
+
         /// <summary>
         /// The slider that allows to change the sound effect volume.
         /// </summary>
@@ -431,6 +437,10 @@ namespace SEE.UI
             remoteSfxToggle = settingsMenuGameObject.FindDescendant("RemoteSFXToggle").MustGetComponent<Toggle>();
 
             microphoneDropdown = settingsMenuGameObject.FindDescendant("MicrophoneSelectDropdown").MustGetComponent<Dropdown>();
+            echoCancellationToggle = settingsMenuGameObject.FindDescendant("EchoCancellationToggle").MustGetComponent<Toggle>();
+            noiseSuppressionToggle = settingsMenuGameObject.FindDescendant("NoiseSuppressionToggle").MustGetComponent<Toggle>();
+            autoGainControlToggle = settingsMenuGameObject.FindDescendant("AutoGainControlToggle").MustGetComponent<Toggle>();
+
 
             audioManager = AudioManagerImpl.Instance();
             musicVolumeSlider.value = audioManager.MusicVolume;
@@ -450,6 +460,23 @@ namespace SEE.UI
             microphoneDropdown.onValueChanged.AddListener((value) =>
             {
                 UserSetting.Instance.Audio.Microphone.MicrophoneDevice = UnityEngine.Microphone.devices[value];
+            });
+
+            echoCancellationToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.EchoCancellation = value;
+            });
+
+            noiseSuppressionToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.NoiseSuppression = value;
+
+            });
+
+            autoGainControlToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.AutoGainControl = value;
+
             });
 
             sfxVolumeSlider.onValueChanged.AddListener((value) =>
