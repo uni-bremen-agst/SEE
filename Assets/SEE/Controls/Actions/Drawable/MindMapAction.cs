@@ -409,10 +409,10 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This method checks for validity by verifying
-        /// if at least one theme exists on the drawable.
-        /// If not, it provides an appropriate prompt
-        /// when attempting to add a node that is not a theme.
+        /// This method checks for validity by verifying whether at least one
+        /// parent-capable Mind Map node exists on the active drawable page.
+        /// If not, it provides an appropriate prompt when attempting to add a
+        /// node that is not a theme.
         /// </summary>
         /// <param name="attachedObjects">The attached objects of the drawable.</param>
         /// <returns>The result of the validation.</returns>
@@ -423,16 +423,22 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null
-                && attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null)
             {
-                return true;
-            }
-            else
-            {
-                ShowNotification.Warn("Cannot add", "First you need to add a theme.");
+                foreach (GameObject candidate in
+                         attachedObjects.FindAllDescendantsWithTag(
+                             Tags.MindMapNode,
+                             false))
+                {
+                    if (candidate.TryGetComponent(out MMNodeValueHolder valueHolder)
+                        && valueHolder.NodeKind != MindMapNodeKind.Leaf)
+                    {
+                        return true;
+                    }
+                }
             }
 
+            ShowNotification.Warn("Cannot add", "First you need to add a theme.");
             return false;
         }
 

@@ -149,7 +149,7 @@ namespace SEE.Game.Drawable.MindMap
                         lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
                         lineKind, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
 
-            shape = GameLineGeometry.SetPivotShape(shape, convertedHitPoint);
+            shape = GameLineGeometry.SetPivotShape(shape, convertedHitPoint, updateOriginalAnchors: true);
             return shape;
         }
 
@@ -187,7 +187,12 @@ namespace SEE.Game.Drawable.MindMap
             GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
 
             Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
-            GameLineDrawer.Drawing(node.FindDescendantWithTag(Tags.Line), positions);
+
+            GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);
+
+            GameLineDrawer.Drawing(nodeBorder, positions);
+
+            GameLineGeometry.UpdateOriginalAnchors(nodeBorder, positions);
 
             ChangeBoxSize(node);
         }
@@ -326,7 +331,10 @@ namespace SEE.Game.Drawable.MindMap
             DisableTextAndBorderCollider(node);
 
             Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
+
             GameLineDrawer.Drawing(nodeBorder, positions);
+
+            GameLineGeometry.UpdateOriginalAnchors(nodeBorder, positions);
 
             ChangeBoxSize(node);
 

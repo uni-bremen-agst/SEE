@@ -146,7 +146,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             foreach (GameObject node in nodes)
             {
                 parentSelector.CreateNewItem(
-                    node.GetComponentInChildren<TextMeshPro>().text);
+                    node.GetComponentInChildren<TextMeshPro>(true).text);
             }
         }
 
@@ -176,7 +176,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 CollectParentCandidates(
                     attachedObjects,
                     addedNode,
-                    true);
+                    false);
 
             /// Create an item in the parent selector for the collected nodes.
             PopulateParentSelector(parentSelector, nodes);
