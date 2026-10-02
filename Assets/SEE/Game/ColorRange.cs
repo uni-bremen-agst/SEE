@@ -87,8 +87,8 @@ namespace SEE.Game
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Lower, lowerLabel);
-            writer.Save(Upper, upperLabel);
+            writer.SaveColor(Lower, lowerLabel);
+            writer.SaveColor(Upper, upperLabel);
             writer.Save((int)NumberOfColors, numberOfColorsLabel);
             writer.EndGroup();
         }

@@ -286,7 +286,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.SaveVector(Position, PositionLabel);
             writer.SaveVector(Rotation, RotationLabel);
             writer.SaveVector(Scale, ScaleLabel);
-            writer.Save(Color, ColorLabel);
+            writer.SaveColor(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
             writer.Save(Lighting, LightingLabel);
             writer.Save(OrderInLayer, OrderInLayerLabel);

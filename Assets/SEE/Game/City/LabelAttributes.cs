@@ -89,7 +89,7 @@ namespace SEE.Game.City
             writer.Save(Show, showLabel);
             writer.Save(Distance, distanceLabel);
             writer.Save(FontSize, fontSizeLabel);
-            writer.Save(FontColor, fontColorLabel);
+            writer.SaveColor(FontColor, fontColorLabel);
             writer.Save(AnimationFactor, animationFactorLabel);
             writer.Save(LabelAlpha, labelAlphaLabel);
             writer.EndGroup();

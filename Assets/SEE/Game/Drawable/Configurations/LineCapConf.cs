@@ -388,13 +388,13 @@ namespace SEE.Game.Drawable.Configurations
             writer.BeginGroup(label);
             writer.Save(CapKind.ToString(), capKindLabel);
             writer.Save(ColorKind.ToString(), colorKindLabel);
-            writer.Save(PrimaryColor, primaryColorLabel);
-            writer.Save(SecondaryColor, secondaryColorLabel);
+            writer.SaveColor(PrimaryColor, primaryColorLabel);
+            writer.SaveColor(SecondaryColor, secondaryColorLabel);
             writer.Save(Thickness, thicknessLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
             writer.Save(FillOutStatus, fillOutStatusLabel);
-            writer.Save(FillOutColor, fillOutColorLabel);
+            writer.SaveColor(FillOutColor, fillOutColorLabel);
             writer.EndGroup();
         }
 

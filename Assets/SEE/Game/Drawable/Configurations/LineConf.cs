@@ -360,10 +360,10 @@ namespace SEE.Game.Drawable.Configurations
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(ColorKind.ToString(), colorKindLabel);
-            writer.Save(PrimaryColor, primaryColorLabel);
-            writer.Save(SecondaryColor, secondaryColorLabel);
+            writer.SaveColor(PrimaryColor, primaryColorLabel);
+            writer.SaveColor(SecondaryColor, secondaryColorLabel);
             writer.Save(FillOutStatus, fillOutStatusLabel);
-            writer.Save(FillOutColor, fillOutColorLabel);
+            writer.SaveColor(FillOutColor, fillOutColorLabel);
             writer.Save(Thickness, thicknessLabel);
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);

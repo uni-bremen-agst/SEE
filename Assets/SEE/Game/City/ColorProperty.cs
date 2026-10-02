@@ -78,7 +78,7 @@ namespace SEE.Game.City
         {
             writer.BeginGroup(label);
             writer.Save(Property.ToString(), propertyLabel);
-            writer.Save(TypeColor, typeColorLabel);
+            writer.SaveColor(TypeColor, typeColorLabel);
             writer.Save(ByLevel, byLevelLabel);
             writer.Save(ColorMetric, colorMetricLabel);
             writer.EndGroup();

@@ -110,7 +110,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(ImageColor, colorLabel);
+            writer.SaveColor(ImageColor, colorLabel);
             writer.Save(Path, pathLabel);
             writer.Save(URL, urlLabel);
         }

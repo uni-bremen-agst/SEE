@@ -63,7 +63,7 @@ namespace SEE.Utils.Config
         /// </summary>
         /// <param name="label">Label to be emitted.</param>
         /// <param name="color">Value to be emitted.</param>
-        internal static void Save(this ConfigWriter writer, Color color, string label = "")
+        internal static void SaveColor(this ConfigWriter writer, Color color, string label = "")
         {
             writer.BeginGroup(label);
             writer.Save(color.r, RedLabel);
@@ -93,7 +93,6 @@ namespace SEE.Utils.Config
         #endregion Color
 
         #region Vector3
-
 
         /// <summary>
         /// Writes <paramref name="label"/> and its <paramref name="vector"/> to <see cref="stream"/>

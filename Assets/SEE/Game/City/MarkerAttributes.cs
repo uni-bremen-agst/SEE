@@ -103,9 +103,9 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(MarkerHeight, markerHeightLabel);
             writer.Save(MarkerWidth, markerWidthLabel);
-            writer.Save(AdditionBeamColor, additionBeamColorLabel);
-            writer.Save(ChangeBeamColor, changeBeamColorLabel);
-            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
+            writer.SaveColor(AdditionBeamColor, additionBeamColorLabel);
+            writer.SaveColor(ChangeBeamColor, changeBeamColorLabel);
+            writer.SaveColor(DeletionBeamColor, deletionBeamColorLabel);
             writer.EndGroup();
         }
 

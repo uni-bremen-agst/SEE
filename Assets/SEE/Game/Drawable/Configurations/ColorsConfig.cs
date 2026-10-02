@@ -78,7 +78,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             for (int i = 0; i < Colors.Length; i++)
             {
-                writer.Save(Colors[i], presets[i]);
+                writer.SaveColor(Colors[i], presets[i]);
             }
         }
 

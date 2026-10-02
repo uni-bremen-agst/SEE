@@ -152,9 +152,9 @@ namespace SEE.Game.Drawable.Configurations
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(Text, textLabel);
-            writer.Save(FontColor, fontColorLabel);
+            writer.SaveColor(FontColor, fontColorLabel);
             writer.Save(IsOutlined, outlineStatusLabel);
-            writer.Save(OutlineColor, outlineColorLabel);
+            writer.SaveColor(OutlineColor, outlineColorLabel);
             writer.Save(OutlineThickness, outlineThicknessColorLabel);
             writer.Save(FontSize, fontSizeLabel);
             writer.Save(FontStyles.ToString(), fontStylesLabel);
