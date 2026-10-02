@@ -351,7 +351,7 @@ namespace SEE.Graphs
             }
             else
             {
-                root = roots.First();
+                root = roots.FirstOrDefault();
                 return false;
             }
         }
