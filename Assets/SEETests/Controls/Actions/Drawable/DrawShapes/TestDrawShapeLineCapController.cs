@@ -1,13 +1,12 @@
 ﻿using NUnit.Framework;
-using SEE.Controls.Actions.Drawable.DrawShapes;
 using SEE.Game.Drawable.Line;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable.DrawShapes
 {
     /// Tests line-cap-related preview state handling of
     /// <see cref="DrawShapeLineCapController"/>.
     [TestFixture]
-    public class TestDrawShapesActionLineCaps
+    public class TestDrawShapeLineCapController
     {
         /// <summary>
         /// Verifies that a normal preview update preserves a line kind that was
