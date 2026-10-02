@@ -159,8 +159,19 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             /// Disables the preview if the user selects <see cref="ShapePointsCalculator.Shape.Line"/>.
             DisableShapePreview();
 
-            if (Shape != null && LineMenu.Instance.IsInDrawingMode() && !editMode)
+            if (editMode && !LineMenu.Instance.IsInEditMode())
             {
+                editMode = false;
+            }
+
+            if (Shape != null
+                && !editMode
+                && (LineMenu.Instance.IsInDrawingMode()
+                    || LineMenu.Instance.IsInEditMode()))
+            {
+                bool switchToEditMode =
+                    LineMenu.Instance.IsInDrawingMode();
+
                 editMode = true;
 
                 if (lineOperation.IsDrawing)
@@ -168,18 +179,18 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                     lineOperation.PrepareEditModeRefresh(Shape);
                 }
 
-                ShapeMenu.OpenLineMenuInCorrectMode();
-
-                if (lineOperation.IsDrawing)
+                if (switchToEditMode)
                 {
-                    lineOperation.RegisterFillOutCallbacks(Shape, Surface);
+                    ShapeMenu.OpenLineMenuInCorrectMode();
                 }
+
+                RegisterCurrentPreviewFillOutCallbacks();
             }
             else if (lineOperation.ShouldRefreshEditMode(Shape))
             {
                 lineOperation.AcknowledgeEditModeRefresh();
                 ShapeMenu.OpenLineMenuInCorrectMode();
-                lineOperation.RegisterFillOutCallbacks(Shape, Surface);
+                RegisterCurrentPreviewFillOutCallbacks();
             }
             else if (Shape == null && LineMenu.Instance.IsInEditMode() && !editMode)
             {
@@ -363,6 +374,14 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                     previewController.FixedPosition);
             }
 
+            if (Shape == null)
+            {
+                ShapePreview(
+                    previewController.IsFixed
+                        ? previewController.FixedPosition
+                        : raycastHit.point);
+            }
+
             return DrawShape(convertedHitPoint);
         }
 
@@ -484,6 +503,12 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 BlinkEffect.Deactivate(Shape);
 
                 LineConf currentShape = LineConf.GetLine(Shape);
+
+                if (currentShape == null)
+                {
+                    return false;
+                }
+
                 Color? fillOutColor = LineConf.GetFillOutColor(currentShape);
 
                 // Restore the original, unshortened shape geometry before moving the pivot.
@@ -568,10 +593,20 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
 
             if (Shape == null)
             {
-                Shape = GameLineDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
-                    ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
-                    ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, fillOutColor: LineMenu.GetFillOutColorForDrawing());
                 shapeFillOut = LineMenu.GetFillOutColorForDrawing();
+
+                Shape = GameLineDrawer.DrawLine(
+                    Surface,
+                    "",
+                    positions,
+                    ValueHolder.CurrentColorKind,
+                    ValueHolder.CurrentPrimaryColor,
+                    ValueHolder.CurrentSecondaryColor,
+                    ValueHolder.CurrentThickness,
+                    false,
+                    ValueHolder.CurrentLineKind,
+                    ValueHolder.CurrentTiling,
+                    fillOutColor: shapeFillOut);
                 Shape.GetComponent<LineRenderer>().loop = false;
                 Shape.AddOrGetComponent<BlinkEffect>();
                 lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
@@ -600,6 +635,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         private void ResetPreviewState()
         {
             currentPreviewPositions = null;
+            shapeFillOut = null;
             lineCapController.Reset();
             ShapeMenu.ResetLineCapVisualOverrides();
         }
@@ -619,10 +655,10 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 color =>
                 {
                     shapeFillOut = color;
-                    ValueHolder.CurrentFillOutStatus = true;
-                    ValueHolder.CurrentTertiaryColor = color;
 
-                    GameLineFillOut.ChangeFillOutColor(Shape, color);
+                    GameLineFillOut.ChangeFillOutColor(
+                        Shape,
+                        color);
 
                     new EditLineFillOutColorNetAction(
                         Surface.name,
@@ -633,8 +669,26 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 () =>
                 {
                     shapeFillOut = null;
-                    ValueHolder.CurrentFillOutStatus = false;
                 });
+        }
+
+        /// <summary>
+        /// Registers the fill-out callbacks for the currently edited shape preview.
+        /// Line shapes keep their fill-out state in the line operation, while all
+        /// other shape previews keep it directly in this action.
+        /// </summary>
+        private void RegisterCurrentPreviewFillOutCallbacks()
+        {
+            if (lineOperation.IsDrawing)
+            {
+                lineOperation.RegisterFillOutCallbacks(
+                    Shape,
+                    Surface);
+            }
+            else
+            {
+                RegisterPreviewFillOutCallbacks();
+            }
         }
         #endregion
 

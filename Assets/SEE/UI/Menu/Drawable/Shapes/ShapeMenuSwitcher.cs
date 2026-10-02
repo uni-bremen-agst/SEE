@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
 using UnityEngine;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.UI.Menu.Drawable.Shapes
 {
@@ -96,14 +97,20 @@ namespace SEE.UI.Menu.Drawable.Shapes
             }
             else
             {
-                LineMenu.Instance.EnableForEditing(
-                    currentPreviewShape,
-                    LineConf.Get(currentPreviewShape),
-                    lineCapsChanged: SynchronizePreviewLineCaps);
-            }
+                LineConf currentPreviewConf = LineConf.GetLine(currentPreviewShape);
 
-            MenuHelper.CalculateHeight(
-                LineMenu.Instance.GameObject);
+                if (currentPreviewConf == null)
+                {
+                    LineMenu.Instance.EnableForDrawing();
+                }
+                else
+                {
+                    LineMenu.Instance.EnableForEditing(
+                        currentPreviewShape,
+                        currentPreviewConf,
+                        lineCapsChanged: SynchronizePreviewLineCaps);
+                }
+            }
 
             BindLineMenu();
 
@@ -122,8 +129,32 @@ namespace SEE.UI.Menu.Drawable.Shapes
             }
 
             ShapeMenu.SetLineCaps(
-                line.LineCapStart,
-                line.LineCapEnd);
+                PreserveReferenceSelection(
+                    ShapeMenu.GetLineStartCapConf(),
+                    line.LineCapStart),
+                PreserveReferenceSelection(
+                    ShapeMenu.GetLineEndCapConf(),
+                    line.LineCapEnd));
+        }
+
+        /// <summary>
+        /// Preserves a logical <see cref="LineCap.Reference"/> selection while its
+        /// rendered representation is exposed by the line editor as an arrow.
+        /// </summary>
+        /// <param name="selectedCap">The cap currently selected in the shape menu.</param>
+        /// <param name="editedCap">The cap configuration reported by the line editor.</param>
+        /// <returns>The cap configuration that should be stored in the shape menu.</returns>
+        private static LineCapConf PreserveReferenceSelection(
+            LineCapConf selectedCap,
+            LineCapConf editedCap)
+        {
+            if (selectedCap?.CapKind == LineCap.Reference
+                && editedCap?.CapKind == LineCap.Arrow)
+            {
+                return selectedCap;
+            }
+
+            return editedCap;
         }
 
         /// <summary>

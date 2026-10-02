@@ -589,10 +589,10 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 color =>
                 {
                     fillOutColor = color;
-                    ValueHolder.CurrentFillOutStatus = true;
-                    ValueHolder.CurrentTertiaryColor = color;
 
-                    GameLineFillOut.ChangeFillOutColor(shape, color);
+                    GameLineFillOut.ChangeFillOutColor(
+                        shape,
+                        color);
 
                     new EditLineFillOutColorNetAction(
                         surface.name,
@@ -603,7 +603,6 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 () =>
                 {
                     fillOutColor = null;
-                    ValueHolder.CurrentFillOutStatus = false;
                 });
         }
 

@@ -24,6 +24,12 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
         private LineCap lastPreviewEndCap = LineCap.None;
 
         /// <summary>
+        /// The regular line kind of the preview before a reference cap temporarily
+        /// forces the main line to use <see cref="LineKind.Dashed25"/>.
+        /// </summary>
+        private LineKind regularPreviewLineKind;
+
+        /// <summary>
         /// The previously applied line kind of the preview.
         /// </summary>
         private LineKind lastPreviewLineKind;
@@ -62,11 +68,15 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 return;
             }
 
+            RememberRegularPreviewLineKind(
+                hadReference,
+                currentShape.LineKind);
+
             LineKind previewLineKind = ResolvePreviewLineKind(
                 hasReference,
                 hadReference,
                 currentShape.LineKind,
-                ValueHolder.CurrentLineKind);
+                regularPreviewLineKind);
 
             if (startCap == lastPreviewStartCap
                 && endCap == lastPreviewEndCap
@@ -161,6 +171,7 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             lastPreviewStartCap = LineCap.None;
             lastPreviewEndCap = LineCap.None;
             lastPreviewLineKind = ValueHolder.CurrentLineKind;
+            regularPreviewLineKind = ValueHolder.CurrentLineKind;
         }
 
         /// <summary>
@@ -193,11 +204,15 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 lastPreviewStartCap == LineCap.Reference
                 || lastPreviewEndCap == LineCap.Reference;
 
+            RememberRegularPreviewLineKind(
+                hadReference,
+                shapeConf.LineKind);
+
             LineKind lineKind = ResolvePreviewLineKind(
                 hasReference,
                 hadReference,
                 shapeConf.LineKind,
-                ValueHolder.CurrentLineKind);
+                regularPreviewLineKind);
 
             GameLineAppearance.ChangeLineKind(shape, lineKind, shapeConf.Tiling);
             shapeConf.LineKind = lineKind;
@@ -278,6 +293,26 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
             capConf.Tiling = ValueHolder.StandardLineTiling;
             capConf.FillOutStatus = false;
             capConf.FillOutColor = Color.clear;
+        }
+
+        /// <summary>
+        /// Remembers the regular preview line kind before a reference cap temporarily
+        /// replaces it with <see cref="LineKind.Dashed25"/>.
+        /// </summary>
+        /// <param name="hadReference">
+        /// Whether the previously applied line-cap selection contained a reference cap.
+        /// </param>
+        /// <param name="currentLineKind">
+        /// The line kind currently applied to the preview.
+        /// </param>
+        private void RememberRegularPreviewLineKind(
+            bool hadReference,
+            LineKind currentLineKind)
+        {
+            if (!hadReference)
+            {
+                regularPreviewLineKind = currentLineKind;
+            }
         }
 
         /// <summary>

@@ -340,8 +340,6 @@ namespace SEE.UI.Menu.Drawable.Line
             }
 
             Enable();
-
-            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         #region Drawing

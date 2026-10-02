@@ -112,8 +112,6 @@ namespace SEE.UI.Menu.Drawable.Line
             SetUpFillOutSwitch();
 
             SelectPrimaryColor();
-
-            MenuHelper.CalculateHeight(lineMenu, true);
         }
 
         /// <summary>
@@ -160,7 +158,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </returns>
         internal Color? GetFillOutColor()
         {
-            return controls.FillOutManager.isOn
+            return ValueHolder.CurrentFillOutStatus
                 ? ValueHolder.CurrentTertiaryColor
                 : null;
         }
