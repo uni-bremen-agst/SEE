@@ -480,11 +480,15 @@ namespace SEE.GraphProviders.VCS
                     ISet<string> touched = new HashSet<string>();
                     foreach (PatchEntryChanges change in patch)
                     {
-                        if (!criteria.InScope(change.Path) && !criteria.InScope(change.OldPath))
+                        string target = Follow(renamedTo, change.Path);
+                        // Judged by the name the file carries at the end
+                        // rather than the one it carries here, so that a file
+                        // renamed into scope keeps the history it has under
+                        // its former name.
+                        if (!criteria.InScope(target) && !criteria.InScope(change.OldPath))
                         {
                             continue;
                         }
-                        string target = Follow(renamedTo, change.Path);
                         Record(result, target, change.LinesAdded, change.LinesDeleted,
                                commit.Sha, mailmap.AuthorOf(author));
                         touched.Add(target);
@@ -525,11 +529,15 @@ namespace SEE.GraphProviders.VCS
                                                compareOptions);
                     foreach (TreeEntryChanges change in treeChanges)
                     {
-                        if (change.Status == ChangeKind.Renamed
-                            && (criteria.InScope(change.Path) || criteria.InScope(change.OldPath)))
+                        if (change.Status == ChangeKind.Renamed)
                         {
-                            Note(renamedTo, formerNames, surviving, change.OldPath,
-                                 Follow(renamedTo, change.Path));
+                            // Judged by the name at the end, as above, so that a chain
+                            // of renames leading into scope is not broken.
+                            string target = Follow(renamedTo, change.Path);
+                            if (criteria.InScope(target) || criteria.InScope(change.OldPath))
+                            {
+                                Note(renamedTo, formerNames, surviving, change.OldPath, target);
+                            }
                         }
                     }
                 }
