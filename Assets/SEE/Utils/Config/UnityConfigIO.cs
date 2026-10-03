@@ -170,7 +170,7 @@ namespace SEE.Utils.Config
 
         /// <summary>
         /// Core helper method that extracts a Vector3 from <paramref name="attributes"/> using <paramref name="label"/>.
-        /// Only the components x, y, and z found in the attributes are updated; missing components remain zero.
+        /// The values of x, y, and z are updated if found in the <paramref name="attributes"/>; missing components will be zero.
         /// </summary>
         /// <param name="attributes">The dictionary to look up the label in.</param>
         /// <param name="label">The key representing the Vector3 in <paramref name="attributes"/>.</param>
