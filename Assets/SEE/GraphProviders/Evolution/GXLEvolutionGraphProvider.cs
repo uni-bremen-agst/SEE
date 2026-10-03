@@ -71,7 +71,7 @@ namespace SEE.GraphProviders
             public readonly List<Graph> Graphs = new();
 
             /// <summary>
-            /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many
+            /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many
             /// files) from <paramref name="directory"/> and saves these in <see cref="Graphs"/>.
             ///
             /// For every GXL file, F.gxl , contained in <paramref name="directory"/>, the graph
