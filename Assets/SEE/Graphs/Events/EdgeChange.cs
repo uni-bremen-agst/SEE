@@ -39,6 +39,9 @@ namespace SEE.Graphs.Events
             NewState = newState;
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         protected override string Description()
         {
             return $"edge '{Edge.ToShortString()}' changed from {OldState} to {NewState}.";
