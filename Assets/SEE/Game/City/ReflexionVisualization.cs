@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.Operator;
 using SEE.UI.Notification;
 using SEE.Extensions;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Components.GameEdges;
+using SEE.Graphs.Events;
 
 namespace SEE.Game.City
 {

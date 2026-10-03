@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.Utils.Config;
+using SEE.Graphs;
+using SEE.Graphs.Config;
 using UnityEngine;
 using UnityEngine.Serialization;
 

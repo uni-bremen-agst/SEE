@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.GraphElementRefs;
 using UnityEditor;
 using UnityEngine;

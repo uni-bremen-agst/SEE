@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
+using SEE.Graphs.Utils;
 using UnityEngine;
 
 namespace SEE.MetricScales
@@ -78,7 +79,7 @@ namespace SEE.MetricScales
         /// <returns>The value of <paramref name="node"/>'s metric <paramref name="metricName"/>.</returns>
         public float GetMetricValue(Node node, string metricName)
         {
-            if (Utils.FloatUtils.TryGetFloat(metricName, out float value))
+            if (FloatUtils.TryGetFloat(metricName, out float value))
             {
                 return value;
             }

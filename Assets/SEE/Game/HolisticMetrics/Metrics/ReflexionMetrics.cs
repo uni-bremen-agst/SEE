@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Game.City;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 
 namespace SEE.Game.HolisticMetrics.Metrics
 {

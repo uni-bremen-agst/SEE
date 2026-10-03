@@ -33,7 +33,7 @@ namespace SEE.UI.Drawable
         private ButtonManagerBasic display;
 
         /// <summary>
-        /// Text for displaying the currentl< selected page.
+        /// Text for displaying the currently selected page.
         /// </summary>
         private TextMeshProUGUI displayMesh;
 

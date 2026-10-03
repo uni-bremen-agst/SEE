@@ -4,7 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.UI.Window.CodeWindow;
-using Range = SEE.DataModel.DG.Range;
+using Range = SEE.Graphs.Range;
 
 namespace SEE.Tools.LSP
 {
@@ -94,11 +94,11 @@ namespace SEE.Tools.LSP
             {
                 List<(string Path, Range Range)> occurrences = new()
                 {
-                    (Path, Range.FromLspRange(Diagnostic.Range))
+                    (Path, LSPRange.FromLspRange(Diagnostic.Range))
                 };
                 if (Diagnostic.RelatedInformation != null)
                 {
-                    occurrences.AddRange(Diagnostic.RelatedInformation.Select(x => (x.Location.Uri.GetFileSystemPath(), Range.FromLspRange(x.Location.Range))));
+                    occurrences.AddRange(Diagnostic.RelatedInformation.Select(x => (x.Location.Uri.GetFileSystemPath(), LSPRange.FromLspRange(x.Location.Range))));
                 }
                 return occurrences;
             }

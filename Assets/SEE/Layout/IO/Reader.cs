@@ -1,4 +1,5 @@
-﻿using SEE.Layout.NodeLayouts;
+﻿using SEE.Graphs.Utils;
+using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

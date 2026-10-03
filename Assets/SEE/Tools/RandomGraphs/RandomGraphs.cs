@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG;
+using SEE.Graphs;
+using SEE.Graphs.Config;
 using SEE.Utils;
-using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Tools.RandomGraphs
@@ -16,7 +16,7 @@ namespace SEE.Tools.RandomGraphs
     /// SEECityRandomEditor.
     /// </summary>
     [Serializable]
-    public class RandomAttributeDescriptor : ConfigIO.IPersistentConfigItem
+    public class RandomAttributeDescriptor : IPersistentConfigItem
     {
         public RandomAttributeDescriptor()
         { }

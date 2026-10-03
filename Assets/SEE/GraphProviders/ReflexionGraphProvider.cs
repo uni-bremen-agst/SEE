@@ -1,15 +1,15 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.GXL;
+using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
 using SEE.Game.City;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils.Config;
+using SEE.Graphs.Reflexion;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

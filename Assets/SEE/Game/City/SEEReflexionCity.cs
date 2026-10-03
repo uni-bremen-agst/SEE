@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.GXL;
+using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
 using SEE.Game.CityRendering;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
@@ -9,12 +9,11 @@ using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Net;
 using SEE.Net.Util;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UserSettings;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
@@ -25,6 +24,7 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using SEE.SceneManipulation;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

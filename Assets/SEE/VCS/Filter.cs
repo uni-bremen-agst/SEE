@@ -1,7 +1,7 @@
 ﻿using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
+using SEE.Graphs.Config;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;

@@ -1,6 +1,6 @@
-﻿using SEE.DataModel.DG;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils.Config;
+﻿using SEE.Graphs;
+using SEE.Graphs.Config;
+using SEE.Graphs.Reflexion;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -13,7 +13,7 @@ namespace SEE.Game.City
     /// A mapping of node types onto <see cref="VisualNodeAttributes"/>.
     /// </summary>
     [Serializable]
-    public class NodeTypeVisualsMap : ConfigIO.IPersistentConfigItem, IEnumerable<KeyValuePair<string, VisualNodeAttributes>>
+    public class NodeTypeVisualsMap : IPersistentConfigItem, IEnumerable<KeyValuePair<string, VisualNodeAttributes>>
     {
         /// <summary>
         /// Mapping of node type name onto <see cref="VisualNodeAttributes"/>.

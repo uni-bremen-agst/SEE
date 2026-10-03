@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using SEE.Graphs;
+using SEE.Graphs.Events;
 using SEE.Events;
 
 namespace SEE.Game.Drawable

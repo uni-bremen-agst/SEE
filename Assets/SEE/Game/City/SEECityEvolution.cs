@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Extensions;
@@ -13,8 +13,8 @@ using SEE.Game.CityRendering;
 using SEE.GraphProviders;
 using SEE.UI;
 using SEE.UI.Notification;
-using SEE.Utils.Config;
 using Sirenix.Serialization;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

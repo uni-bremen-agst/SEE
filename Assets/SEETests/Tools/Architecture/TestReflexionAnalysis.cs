@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.GXL;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
+using SEE.Graphs.Events;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
-using Edge = SEE.DataModel.DG.Edge;
+using static SEE.Graphs.Reflexion.ReflexionGraph;
+using Edge = SEE.Graphs.Edge;
 
 namespace SEE.Tools.Architecture
 {

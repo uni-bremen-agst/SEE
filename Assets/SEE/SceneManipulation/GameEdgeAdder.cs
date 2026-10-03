@@ -1,5 +1,5 @@
 ﻿using System;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using UnityEngine;

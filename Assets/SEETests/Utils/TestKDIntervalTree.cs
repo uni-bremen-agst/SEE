@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using static SEE.DataModel.DG.RangeExamples;
-using Range = SEE.DataModel.DG.Range;
+using static SEE.Graphs.RangeExamples;
+using Range = SEE.Graphs.Range;
 
 namespace SEE.Utils
 {
