@@ -9,6 +9,11 @@ namespace SEE.Graphs
     public class UnknownAttribute : Exception
     {
         /// <summary>
+        /// Constructor.
+        /// </summary>
+        public UnknownAttribute() : base() { }
+
+        /// <summary>
         /// For an unknown attribute of an <see cref="Attributable"/>, this constructor
         /// creates an exception with a message.
         /// </summary>
