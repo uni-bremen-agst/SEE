@@ -22,10 +22,10 @@ namespace SEE.Graphs.Config
         /// exists, the data available in <paramref name="attributes"/>[<paramref name="label"/>] will
         /// be used to restore the attributes of this instance. If at least one such attribute was
         /// restored, true is returned; otherwise false is returned.
-        /// If the label is empty or null, <paramref name="attributes"/> direclty is assumed to hold the
+        /// If the label is empty or null, <paramref name="attributes"/> directly is assumed to hold the
         /// data to restore the attributes of this instance.
         /// </summary>
-        /// <param name="attributes">If <paramref name="label"/> is null or empty,  holds the data
+        /// <param name="attributes">If <paramref name="label"/> is null or empty, it holds the data
         /// for restoring the attributes; otherwise <paramref name="attributes"/>[<paramref name="label"/>]
         /// is assumed to hold the necessary data.</param>
         /// <param name="label">The label for the lookup of the data to restore the attributes,
