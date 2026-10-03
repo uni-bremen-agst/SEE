@@ -810,7 +810,7 @@ namespace SEE.GraphProviders.VCS
             int coreDevs = 0;
             foreach (int churn in authorsChurn.Values.OrderByDescending(value => value))
             {
-if (cumulative >= truckFactorCoreDevRatio)
+                if (cumulative >= truckFactorCoreDevRatio)
                 {
                     break;
                 }
@@ -851,9 +851,10 @@ if (cumulative >= truckFactorCoreDevRatio)
         {
             try
             {
-AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
-using System.IO.Stream stream = repositorySession.GetStream(repositoryFilePath);
-return AntlrToken.FromStream(stream, language).ToList();
+                AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
+                using System.IO.Stream stream = repositorySession.GetStream(repositoryFilePath);
+                return AntlrToken.FromStream(stream, language).ToList();
+            }
             catch (Exception e)
             {
                 Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}\n");
