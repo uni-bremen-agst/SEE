@@ -105,14 +105,14 @@ namespace SEE.Graphs.Utils
         }
 
         /// <summary>
-        /// Saves the content of <paramref name="sourceFile"/> compressed in
-        /// <paramref name="targetFile"/> based on the files extension.
+        /// Saves the content of <paramref name="sourceFile"/> (possibly compressed) in
+        /// <paramref name="targetFile"/> based on the files' extensions.
         ///
         /// Wrapper method for <see cref="Compressor.Save(string, Stream)"/>.
         /// </summary>
-        /// <param name="sourceFile">The file which should be compressed.</param>
-        /// <param name="targetFile">The file to write the compressed content to.</param>
-        public static void UncompressTo(string sourceFile, string targetFile)
+        /// <param name="sourceFile">The file which should be saved.</param>
+        /// <param name="targetFile">The file to write the content of <paramref name="sourceFile"/> to.</param>
+        public static void Save(string sourceFile, string targetFile)
             => Save(targetFile, new MemoryStream(File.ReadAllBytes(sourceFile)));
     }
 }
