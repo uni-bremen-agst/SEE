@@ -17,8 +17,10 @@ namespace SEE.Utils.Config
         /// alpha) will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>;
         /// all others remain unchanged.
         ///
-        /// Note: This method is intended specifically for Color. For enums use <see cref="RestoreEnum()"/>
-        /// and for all other types, use <see cref="Restore{T}()"/> instead.
+        /// Note: This method is intended specifically for Color. For enums use
+        /// <see cref="ConfigIO.RestoreEnum{E}(Dictionary{string, object}, string, ref E)"/>
+        /// and for all other types, use <see cref="ConfigIO.RestoreList{T}(Dictionary{string, object}, string, ref IList{T})"/>
+        /// instead.
         /// </summary>
         /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
         /// <param name="label">The label to look up.</param>
@@ -58,9 +60,11 @@ namespace SEE.Utils.Config
         }
 
         /// <summary>
-        /// Writes <paramref name="label"/> and its <paramref name="color"/> to <see cref="stream"/>
-        /// as a composite value of its constituents (Red, Green, Blue, Alpha).
+        /// Writes <paramref name="label"/> and its <paramref name="color"/>
+        /// as a composite value of its constituents (Red, Green, Blue, Alpha)
+        /// and using <paramref name="writer"/>.
         /// </summary>
+        /// <param name="writer">The writer to be used for saving the data.</param>
         /// <param name="label">Label to be emitted.</param>
         /// <param name="color">Value to be emitted.</param>
         internal static void SaveColor(this ConfigWriter writer, Color color, string label = "")
@@ -95,9 +99,10 @@ namespace SEE.Utils.Config
         #region Vector3
 
         /// <summary>
-        /// Writes <paramref name="label"/> and its <paramref name="vector"/> to <see cref="stream"/>
-        /// as a composite value of its constituents (X, Y, Z).
+        /// Writes <paramref name="label"/> and its <paramref name="vector"/> as a composite value
+        /// of its constituents (X, Y, Z) using the given <paramref name="configWriter"/>.
         /// </summary>
+        /// <param name="configWriter">The writer to be used to save the data.</param>
         /// <param name="label">Label to be emitted.</param>
         /// <param name="vector">Value to be emitted.</param>
         internal static void SaveVector(this ConfigWriter configWriter, Vector3 vector, string label = "")
@@ -123,8 +128,9 @@ namespace SEE.Utils.Config
         /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{String, Object}"/>.
         /// </exception>
         /// <remarks>
-        /// This method is intended specifically for Vector3 values. For enums, use <see cref="RestoreEnum()"/>,
-        /// and for all other types, use <see cref="Restore{T}()"/> instead.
+        /// This method is intended specifically for Vector3 values. For enums, use
+        /// <see cref="ConfigIO.RestoreEnum{E}(Dictionary{string, object}, string, ref E)"/>,
+        /// and for all other types, use <see cref="ConfigIO.Restore{T}(Dictionary{string, object}, string, ref T)"/> instead.
         /// </remarks>
         internal static bool RestoreVector(Dictionary<string, object> attributes, string label, ref Vector3 value)
         {
