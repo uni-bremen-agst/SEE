@@ -1,6 +1,5 @@
 using JetBrains.Profiler.Api;
 using System;
-using System.Threading;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -33,13 +32,27 @@ namespace SEE.Utils
     /// one capture at a time. Nested and overlapping captures are counted; only the
     /// outermost one starts the collection and saves it, and the resulting snapshot
     /// covers the union of their extents.
+    ///
+    /// Captures may be started and closed on different threads, for instance when
+    /// a capture encloses an <c>await</c>. Every transition, including the call
+    /// to the profiler, is therefore made while holding <see cref="captureLock"/>.
     /// </remarks>
     internal static class DeepProfiler
     {
         /// <summary>
+        /// Serializes starting and closing captures. A transition consists of
+        /// updating <see cref="activeCaptures"/> and <see cref="activeAction"/>
+        /// and talking to the profiler; all of that must happen as one step, or a
+        /// capture started while another one is being saved would have its data
+        /// and action name consumed by that save.
+        /// </summary>
+        private static readonly object captureLock = new();
+
+        /// <summary>
         /// The number of captures currently in progress. Only the outermost
         /// capture, that is, the one raising this from zero to one and later
         /// lowering it back to zero, talks to the profiler.
+        /// Guarded by <see cref="captureLock"/>.
         /// </summary>
         private static int activeCaptures;
 
@@ -47,6 +60,7 @@ namespace SEE.Utils
         /// The name of the action of the outermost capture currently in progress,
         /// or null if no capture is in progress. Used only to name the action in
         /// the message reporting that the snapshot was saved.
+        /// Guarded by <see cref="captureLock"/>.
         /// </summary>
         private static string activeAction;
 
@@ -54,6 +68,7 @@ namespace SEE.Utils
         /// Whether <see cref="WarnIfNotReady(string)"/> has already emitted its
         /// warning. It is emitted only once per session so that a capture in a
         /// frequently executed code path cannot flood the console.
+        /// Guarded by <see cref="captureLock"/>.
         /// </summary>
         private static bool warningEmitted;
 
@@ -75,14 +90,17 @@ namespace SEE.Utils
         /// the name of the collected data block in dotTrace. Must not be null.</param>
         internal static void Start(string action)
         {
-            if (Interlocked.Increment(ref activeCaptures) > 1)
+            lock (captureLock)
             {
-                // A capture is already in progress and will save the data.
-                return;
+                if (++activeCaptures > 1)
+                {
+                    // A capture is already in progress and will save the data.
+                    return;
+                }
+                activeAction = action;
+                WarnIfNotReady(action);
+                MeasureProfiler.StartCollectingData(action);
             }
-            activeAction = action;
-            WarnIfNotReady(action);
-            MeasureProfiler.StartCollectingData(action);
         }
 
         /// <summary>
@@ -92,15 +110,18 @@ namespace SEE.Utils
         /// </summary>
         internal static void Save()
         {
-            if (!Close(out string action))
+            lock (captureLock)
             {
-                return;
-            }
-            bool ready = IsReady;
-            MeasureProfiler.SaveData();
-            if (ready)
-            {
-                Debug.Log($"Profiling snapshot for {action} was saved.\n");
+                if (!Close(out string action))
+                {
+                    return;
+                }
+                bool ready = IsReady;
+                MeasureProfiler.SaveData();
+                if (ready)
+                {
+                    Debug.Log($"Profiling snapshot for {action} was saved.\n");
+                }
             }
         }
 
@@ -114,11 +135,14 @@ namespace SEE.Utils
         /// </summary>
         internal static void Drop()
         {
-            if (!Close(out string _))
+            lock (captureLock)
             {
-                return;
+                if (!Close(out string _))
+                {
+                    return;
+                }
+                MeasureProfiler.DropData();
             }
-            MeasureProfiler.DropData();
         }
 
         /// <summary>
@@ -139,6 +163,9 @@ namespace SEE.Utils
         /// <summary>
         /// Closes one capture and tells whether it was the outermost one, that is,
         /// whether the caller is the one that must talk to the profiler.
+        ///
+        /// The caller must hold <see cref="captureLock"/> and keep holding it
+        /// until it has talked to the profiler.
         /// </summary>
         /// <param name="action">The name of the action of the capture just closed,
         /// or null if it was not the outermost one.</param>
@@ -146,7 +173,7 @@ namespace SEE.Utils
         private static bool Close(out string action)
         {
             action = null;
-            int remaining = Interlocked.Decrement(ref activeCaptures);
+            int remaining = --activeCaptures;
             if (remaining > 0)
             {
                 return false;
@@ -154,7 +181,7 @@ namespace SEE.Utils
             if (remaining < 0)
             {
                 // More captures were closed than were ever started.
-                Interlocked.Exchange(ref activeCaptures, 0);
+                activeCaptures = 0;
                 Debug.LogError("A profiling capture was closed that was never started.\n");
                 return false;
             }
@@ -167,6 +194,8 @@ namespace SEE.Utils
         /// Emits a warning if no profiler is attached, because a capture will then
         /// yield no snapshot at all. The warning is emitted at most once per
         /// session.
+        ///
+        /// The caller must hold <see cref="captureLock"/>.
         /// </summary>
         /// <param name="action">The name of the action that was to be profiled.</param>
         private static void WarnIfNotReady(string action)
