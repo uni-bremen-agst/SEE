@@ -851,9 +851,9 @@ if (cumulative >= truckFactorCoreDevRatio)
         {
             try
             {
-                AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
-                return AntlrToken.FromStream(repositorySession.GetStream(repositoryFilePath), language);
-            }
+AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
+using System.IO.Stream stream = repositorySession.GetStream(repositoryFilePath);
+return AntlrToken.FromStream(stream, language).ToList();
             catch (Exception e)
             {
                 Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}\n");
