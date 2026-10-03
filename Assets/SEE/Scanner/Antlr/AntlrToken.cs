@@ -31,6 +31,18 @@ namespace SEE.Scanner.Antlr
         }
 
         /// <summary>
+        /// Returns the <see cref="AntlrLanguage"/> corresponding to the file extension of the given
+        /// <paramref name="filePath"/>.
+        /// </summary>
+        /// <param name="filePath">Path to the source code file.</param>
+        /// <returns>The <see cref="AntlrLanguage"/> corresponding to the file extension of the given
+        /// <paramref name="filePath"/>.</returns>
+        public static AntlrLanguage GetLanguage(string filePath)
+        {
+            return AntlrLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]);
+        }
+
+        /// <summary>
         /// Returns a stream of <see cref="AntlrToken"/>s created by parsing the file at the supplied
         /// <paramref name="filePath"/>.
         /// </summary>
@@ -44,8 +56,29 @@ namespace SEE.Scanner.Antlr
         /// </remarks>
         public static async UniTask<IEnumerable<AntlrToken>> FromFileAsync(string filePath)
         {
-            AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]);
+            AntlrLanguage language = GetLanguage(filePath);
             Lexer lexer = language.CreateLexer(await File.ReadAllTextAsync(filePath));
+            CommonTokenStream tokenStream = new(lexer);
+            tokenStream.Fill();
+            // Generate list of SEETokens using the token stream and its language
+            return tokenStream.GetTokens().Select(x => FromAntlrIToken(x, lexer, language));
+        }
+
+        /// <summary>
+        /// Returns a stream of <see cref="AntlrToken"/>s created by parsing the file at the supplied
+        /// <paramref name="filePath"/>.
+        /// </summary>
+        /// <param name="filePath">Path to the source code file which shall be read and parsed.</param>
+        /// <returns>A list of tokens created from the source code file.</returns>
+        /// <remarks>
+        /// <ul>
+        /// <li>The language of the file will be determined by checking its file extension.</li>
+        /// <li>Each token will be created by using <see cref="FromAntlrToken"/>.</li>
+        /// </ul>
+        /// </remarks>
+        public static IEnumerable<AntlrToken> FromStream(Stream stream, AntlrLanguage language)
+        {
+            Lexer lexer = language.CreateLexer(stream);
             CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language

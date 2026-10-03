@@ -1,11 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.VCS
@@ -38,6 +41,78 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// The mapping the .mailmap file at the root of this repository states,
+        /// read when first asked for. Where there is no such file, it maps
+        /// nothing and every author is named as their commits name them.
+        /// </summary>
+        internal Mailmap Mailmap
+            => mailmap ??= Mailmap.Read(Path.Combine(repositoryConfig.RepositoryPath.Path,
+                                                     Mailmap.Filename));
+
+        /// <summary>
+        /// Backs <see cref="Mailmap"/>. Null until that is first asked for.
+        /// </summary>
+        private Mailmap mailmap;
+
+        /// <summary>
+        /// The commits <paramref name="filter"/> selects, in the order it asks
+        /// for.
+        /// </summary>
+        /// <remarks>
+        /// Anything <paramref name="filter"/> names a commit by -- a SHA, a
+        /// <see cref="Commit"/>, a <see cref="Branch"/> -- must belong to this
+        /// session. One taken from another session names an object of another
+        /// native repository, and what libgit2 makes of that is not defined.
+        /// </remarks>
+        /// <param name="filter">States which commits are wanted and in which order.</param>
+        /// <returns>The commits selected.</returns>
+        internal IEnumerable<Commit> Commits(CommitFilter filter)
+        {
+            return repository.Commits.QueryBy(filter);
+        }
+
+        /// <summary>
+        /// The comparison of <paramref name="newTree"/> against
+        /// <paramref name="oldTree"/>, narrowed to <paramref name="pathspec"/>
+        /// where there is one.
+        /// </summary>
+        /// <remarks>
+        /// Unlike the comparisons this class used to offer, the caller states
+        /// the <paramref name="options"/>, which is what lets it ask for rename
+        /// detection.
+        /// </remarks>
+        /// <typeparam name="T">What the comparison is to yield, a <see cref="Patch"/>
+        /// or a <see cref="TreeChanges"/>.</typeparam>
+        /// <param name="oldTree">The tree compared against; null denotes the empty tree.</param>
+        /// <param name="newTree">The tree to be compared.</param>
+        /// <param name="pathspec">The directories or files to be compared, or null for all
+        /// of them.</param>
+        /// <param name="options">The options of the comparison.</param>
+        /// <returns>The comparison.</returns>
+        internal T Compare<T>(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree,
+                              IEnumerable<string> pathspec, CompareOptions options)
+            where T : class, IDiffResult
+        {
+            // The overload taking no pathspec is used where there is none,
+            // rather than handing it a null, which libgit2 is not documented
+            // to accept.
+            return pathspec == null
+                   ? repository.Diff.Compare<T>(oldTree, newTree, options)
+                   : repository.Diff.Compare<T>(oldTree, newTree, pathspec, options);
+        }
+
+        /// <summary>
+        /// The commit <paramref name="sha"/> names, or null where this
+        /// repository holds none.
+        /// </summary>
+        /// <param name="sha">The SHA naming the commit.</param>
+        /// <returns>The commit, or null.</returns>
+        internal Commit Lookup(string sha)
+        {
+            return repository.Lookup<Commit>(sha);
+        }
+
+        /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
         /// <returns>True if there are any changes (new, deleted, or changed remote branches); false otherwise.</returns>
@@ -45,6 +120,9 @@ namespace SEE.VCS
         public bool FetchRemotes()
         {
             bool result = false;
+            // A fetch may add, remove or move a branch, so what was held as relevant
+            // is no longer to be trusted.
+            relevantBranches = null;
 
             // Fetch all remotes; this is needed if there are multiple remotes.
             // As a matter of fact, a repository may have multiple remotes.
@@ -162,81 +240,63 @@ namespace SEE.VCS
 
 
         /// <summary>
-        /// Runs <paramref name="apply"/> for each non-merge commit between the two given commits.
-        ///
-        /// The callback <paramref name="apply"/> is called with the current repository and the
-        /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback.
-        /// </summary>
-        /// <param name="baselineCommitID">Older commit used as the baseline.</param>
-        /// <param name="newCommitId">.</param>
-        /// <param name="apply">Callback to be called for each commit.</param>
-        internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
-        {
-            foreach (Commit commit in CommitsBetween(baselineCommitID, newCommitId))
-            {
-                apply(repository, commit);
-            }
-        }
-
-        /// <summary>
-        /// Yields the SHAs of all commits (excluding merge commits) after <paramref name="startDate"/>
+        /// Yields the SHAs of all commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>, which denotes the instant its day begins at, in UTC,
         /// until today across all branches.
         /// </summary>
-        /// <param name="startDate">The date after which commits should be retrieved.</param>
-        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
+        /// <param name="startDate">The date from which on commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>.</returns>
         public IList<string> CommitsAfter(DateTime startDate)
         {
             return CommitsAfter(repository, startDate).Select(c => c.Sha).ToList();
         }
 
         /// <summary>
-        /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
-        /// until today across all branches.
+        /// Yields all commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/> until today across all branches.
+        ///
+        /// A date denotes the instant it begins at, in UTC, and a commit authored at that
+        /// very instant is yielded. The day named is thus taken in, not left out, and the
+        /// boundary is one moment for every commit rather than one per author.
         /// </summary>
+        /// <remarks>
+        /// Every commit reachable from a branch is looked at. The walk used to stop at the
+        /// first commit committed before <paramref name="startDate"/>, on the grounds that
+        /// no commit beyond it could qualify. That holds only where the dates increase along
+        /// the walk, and they need not: a rebase, a cherry-pick or a clock out of step all
+        /// let a parent carry a later date than its child, and a commit that should have
+        /// counted was then silently passed over. What the stopping saved has in any case
+        /// dwindled, the commits being walked once over the union of the branches rather
+        /// than once for each of them.
+        ///
+        /// Formerly the date of a commit was compared to <paramref name="startDate"/> by the
+        /// day, and only a later day passed. Two shortcomings went with that. The day of a
+        /// commit was the day in the offset of its own author, so two commits made at the
+        /// same instant in different parts of the world could fall on either side of the
+        /// boundary; and the day named was excluded entire, so a date of the first of
+        /// January yielded commits from the second onwards.
+        /// </remarks>
         /// <param name="repository">The repository from which to retrieve the commits.</param>
-        /// <param name="startDate">The date after which commits should be retrieved.</param>
-        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
+        /// <param name="startDate">The date from which on commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) authored at or after
+        /// <paramref name="startDate"/>.</returns>
         private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
+            DateTimeOffset since = new(startDate.Date, TimeSpan.Zero);
+
             foreach (Commit commit in repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = repository.Branches,
                 SortBy = CommitSortStrategies.Time
             }))
             {
-                // The tricky thing here is that we -- on the one hand -- want to stop early
-                // once we hit the cutoff date for performance reasons, but -- on the other hand --
-                // also have to account for rebased commits.
-                // This approach assumes that the user has not manipulated the dates of their repository.
-                if (commit.Author.When.Date > startDate && commit.Parents.Count() <= 1)
+                // Every commit is looked at, the walk never stopping early. See
+                // the remarks above for why.
+                if (commit.Author.When >= since && commit.Parents.Count() <= 1)
                 {
                     yield return commit;
                 }
-
-                // Hard cutoff criteria - all parent commits should not be newer than this.
-                if (commit.Committer.When.Date <= startDate)
-                {
-                    yield break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Runs <paramref name="apply"/> for each non-merge commit after the given <paramref name="startDate"/>
-        /// until today.
-        ///
-        /// The callback <paramref name="apply"/> is called with the current repository and the
-        /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback.
-        /// </summary>
-        /// <param name = "startDate" > The date after which commits should be retrieved.</param>
-        /// <param name="apply">Callback to be called for each commit.</param>
-        public void ForEachCommitAfter(DateTime startDate, Action<Repository, Commit> apply)
-        {
-            foreach (Commit commit in CommitsAfter(repository, startDate))
-            {
-                apply(repository, commit);
             }
         }
 
@@ -259,138 +319,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the commit log between the two given commits.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit ID.</param>
-        /// <param name="newCommit">Later commit ID.</param>
-        /// <returns>Commit log between the two given commits.</returns>
-        private ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
-        {
-            return repository.Commits.QueryBy(new CommitFilter
-            {
-                IncludeReachableFrom = newCommit,
-                ExcludeReachableFrom = oldCommit
-            });
-        }
-
-        /// <summary>
-        /// Returns the commit log of the repository, sorted topologically.
-        /// </summary>
-        /// <returns>Commit log of the repository in topological order.</returns>
-        private ICommitLog CommitLog()
-        {
-            return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> for <see cref="repository"/> as a <see cref="Patch"/>.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
-        /// <param name="newCommit">Later commit ID; must not be null.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        public Patch Diff(Commit oldCommit, Commit newCommit)
-        {
-            return Diff(oldCommit, newCommit, new List<string>());
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
-        /// </summary>
-        /// <param name="repository">The repository containing the commits.</param>
-        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
-        /// <param name="newCommit">Later commit ID; must not be null.</param>
-        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> paths)
-        {
-            if (newCommit == null)
-            {
-                throw new ArgumentNullException(nameof(newCommit), "New commit must not be null.");
-            }
-            return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree, paths);
-        }
-
-        /// <summary>
-        /// Returns true if the diff between <paramref name="oldCommit"/> and <paramref name="newCommit"/>
-        /// contains any changes to files matching the given <paramref name="matcher"/>.
-        /// Uses <see cref="TreeChanges"/> which is significantly cheaper than <see cref="Patch"/>
-        /// because it only enumerates changed file paths without computing line-level diffs.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit; can be null for the initial commit.</param>
-        /// <param name="newCommit">Later commit; must not be null.</param>
-        /// <param name="matcher">File glob matcher to check relevance. If null, any change is relevant.</param>
-        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
-        /// <returns>True if at least one changed file matches the matcher.</returns>
-        public bool HasRelevantChanges(Commit oldCommit, Commit newCommit, Matcher matcher, out IEnumerable<string> paths)
-        {
-            if (matcher == null)
-            {
-                // If there is nothing to match, all files should be included.
-                paths = new List<string>();
-                return true;
-            }
-            using TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
-
-            List<string> filePaths = new();
-            foreach (TreeEntryChanges change in changes)
-            {
-                if (matcher.Match(change.Path).HasMatches)
-                {
-                    filePaths.Add(change.Path);
-                }
-            }
-            paths = filePaths;
-            return filePaths.Any();
-        }
-
-        /// <summary>
-        /// Generates a patch representing the differences between two commits.
-        /// Analogous to <see cref="Diff(Commit, Commit)"/>, but takes commit IDs as strings.
-        /// </summary>
-        /// <param name="oldCommitID">The identifier of the older commit to compare.</param>
-        /// <param name="newCommitID">The identifier of the newer commit to compare.</param>
-        /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
-        private Patch Diff(string oldCommitID, string newCommitID)
-        {
-            return Diff(GetCheckedCommit(oldCommitID), GetCheckedCommit(newCommitID));
-        }
-
-        /// <summary>
-        /// Returns the <see cref="Patch"/> needed to turn the parent of <paramref name="commit"/>
-        /// into the <paramref name="commit"/> itself. If <paramref name="commit"/> has no
-        /// parent (very first commit in the version history), the <see cref="Patch"/> f
-        /// rom the empty tree to <paramref name="commit"/> is returned. If <paramref name="commit"/>
-        /// has multiple parents, the <see cref="Patch"/> from the first parent to <paramref name="commit"/>
-        /// is returned.
-        /// </summary>
-        /// <param name="commit">The commit whose <see cref="Patch"/> is to be returned.</param>
-        /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/>.</returns>
-        private Patch GetPatchRelativeToParent(Commit commit)
-        {
-            if (commit.Parents.Any())
-            {
-                return repository.Diff.Compare<Patch>(commit.Parents.First().Tree, commit.Tree);
-            }
-            return repository.Diff.Compare<Patch>(null, commit.Tree);
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="parent"/>
-        /// and <paramref name="commit"/> as <see cref="TreeChanges"/>.
-        /// </summary>
-        /// <param name="parent">Earlier commit ID.</param>
-        /// <param name="commit">Later commit ID.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        private TreeChanges TreeDiff(Commit parent, Commit commit)
-        {
-            return repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
-        }
-
-        /// <summary>
         /// Returns the content of the file at <paramref name="repositoryFilePath"/>
         /// present in the repository in any of the branches passing the filter.
         ///
@@ -399,24 +327,54 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
         /// <returns>The content of the file.</returns>
-        /// <exception cref="Exception">Thrown if the file does not exist.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
         public string GetFileContent(string repositoryFilePath)
+        {
+           return GetBlob(repositoryFilePath).GetContentText();
+        }
+
+        /// <summary>
+        /// Returns the content of the file at <paramref name="repositoryFilePath"/> (as a stream)
+        /// present in the repository in any of the branches passing the filter.
+        ///
+        /// Note: A file may exist in multiple branches, but this method will
+        /// return the content of the first file found in the branches.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <returns>The content of the file as a stream.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
+        public Stream GetStream(string repositoryFilePath)
+        {
+            return GetBlob(repositoryFilePath).GetContentStream();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="Blob"/> object representing the file at <paramref name="repositoryFilePath"/>
+        /// in any of <see cref="RelevantBranches"/>. The file can exist in multiple branches, but this method
+        /// will return the first one found.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <returns>The <see cref="Blob"/> object representing the file.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
+        private Blob GetBlob(string repositoryFilePath)
         {
             if (string.IsNullOrWhiteSpace(repositoryFilePath))
             {
                 throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
             }
-
             foreach (Branch branch in RelevantBranches())
             {
                 Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
                 if (blob != null)
                 {
-                    return blob.GetContentText();
+                    return blob;
                 }
             }
             // Blob does not exist.
-            throw new Exception($"File {repositoryFilePath} does not exist.\n");
+            throw new FileNotFoundException($"File {repositoryFilePath} does not exist.\n");
         }
 
         /// <summary>
@@ -438,18 +396,56 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// If <see cref="VCSFilter"/> is null, all branches of <see cref="repository"/> are
-        /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
+        /// If <see cref="Filter.Branches"/> of the <see cref="GitRepository.VCSFilter"/> this
+        /// session was opened for is null, all branches of the repository are returned.
+        /// Otherwise, yields all branches passing that filter, that is, those whose FriendlyName
+        /// is matched as a whole by at least one of its regular expressions; see
+        /// <see cref="Filter.Matches(Branch)"/>.
+        ///
+        /// The result is a collection rather than an enumeration, so that a caller may count
+        /// the branches without walking them twice.
+        ///
+        /// It is worked out once and held. Neither the repository nor the filter changes
+        /// while a session lasts, save through <see cref="FetchRemotes"/>, which discards
+        /// what is held. This matters: <see cref="GetBlob"/> asks for the relevant branches
+        /// once for every file it is asked about, and working them out anew each time means
+        /// materialising every branch of the repository and matching it against every
+        /// expression of the filter, over and over.
         /// </summary>
-        /// <returns>All relevant branches of the <see cref="repository"/>.</returns>
-        private IList<Branch> RelevantBranches()
+        /// <remarks>
+        /// A <see cref="Branch"/> is a handle into the native repository this session holds
+        /// and must not outlive it. One that does refers to memory that has been freed, and
+        /// asking such a one for its <see cref="Branch.Tip"/> brings the editor down where
+        /// it stands rather than raising anything that could be caught. Read out of a branch
+        /// whatever is wanted -- its name, the SHA of its tip -- while the session is open,
+        /// and hand out that instead of the branch.
+        ///
+        /// What is returned is read-only, the held collection being the session's own.
+        /// </remarks>
+        /// <returns>All relevant branches of the repository.</returns>
+        public ICollection<Branch> RelevantBranches()
         {
-            if (repositoryConfig.VCSFilter == null)
+            return relevantBranches ??= new ReadOnlyCollection<Branch>(Selected());
+
+            // The branches of the repository the filter holds relevant.
+            IList<Branch> Selected()
             {
-                return repository.Branches.ToList();
+                if (repositoryConfig.VCSFilter == null)
+                {
+                    return repository.Branches.ToList();
+                }
+                return repository.Branches
+                                 .Where(branch => repositoryConfig.VCSFilter.Matches(branch))
+                                 .ToList();
             }
-            return repository.Branches.Where(branch => repositoryConfig.VCSFilter.Matches(branch)).ToList();
         }
+
+        /// <summary>
+        /// Backs <see cref="RelevantBranches"/>. Null until first asked for, and again
+        /// after <see cref="FetchRemotes"/>, which may have altered what there is to select
+        /// from.
+        /// </summary>
+        private ICollection<Branch> relevantBranches;
 
         /// <summary>
         /// Yields all distinct file paths of the given <paramref name="repository"/>
@@ -480,7 +476,7 @@ namespace SEE.VCS
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
             HashSet<string> result = new();
-            IList<Branch> branches = RelevantBranches();
+            ICollection<Branch> branches = RelevantBranches();
             if (branches.Count == 0)
             {
                 Debug.LogWarning("There are no branches matching the branch filter.\n");
@@ -547,7 +543,7 @@ namespace SEE.VCS
         /// <summary>
         /// Adds the distinct filenames in the given <paramref name="tree"/> passing
         /// the criteria <see cref="Filter.RepositoryPaths"/> and <see cref="Filter.Matcher"/>
-        /// of the given <paramref name="filter"/>.
+        /// to given set of <paramref name="paths"/>.
         ///
         /// If <see cref="Filter.RepositoryPaths"/> is null or empty, all files in the entire
         /// <paramref name="tree"/> are retrieved. Otherwise, only the files in the subtrees
@@ -641,39 +637,7 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
-        /// will be returned.
-        /// Otherwise: Returns the alias of the specified <paramref name="author"/> if it exists in the alias mapping;
-        /// or else returns the original <paramref name="author"/>.
-        ///
-        /// For two <see cref="FileAuthor"/>s to match, they must have same name and email address,
-        /// where the string comparison for both facets is case-insensitive.
-        /// </summary>
-        /// <param name="author">The author whose alias is to be retrieved.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
-        /// <returns>A <see cref="FileAuthor"/> instance representing the alias of the author if found,
-        /// or the original author if no alias exists or if <paramref name="consultAliasMap"/> is false.</returns>
-        public static FileAuthor GetAuthorAliasIfExists(FileAuthor author, bool consultAliasMap, AuthorMapping authorAliasMap)
-        {
-            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
-            return ResolveAuthorAliasIfEnabled(author, consultAliasMap, authorAliasMap) ?? author;
-
-            static FileAuthor ResolveAuthorAliasIfEnabled(FileAuthor author, bool combineSimilarAuthors, AuthorMapping authorAliasMap)
-            {
-                if (!combineSimilarAuthors)
-                {
-                    return null;
-                }
-                return authorAliasMap
-                    .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
-                                                               && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
-            }
-        }
-
-        /// <summary>
-        /// Disposes of the LibGit2Sharp git repository instance.
+        /// Disposes the LibGit2Sharp git repository instance.
         /// </summary>
         public void Dispose()
         {

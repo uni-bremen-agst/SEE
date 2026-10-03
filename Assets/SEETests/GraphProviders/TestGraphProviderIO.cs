@@ -208,15 +208,6 @@ namespace SEE.GraphProviders
             };
         }
 
-        private GitEvolutionGraphProvider GetGitEvolutionProvider()
-        {
-            return new GitEvolutionGraphProvider()
-            {
-                Date = "2024/01/05",
-                GitRepository = GetGitRepository()
-            };
-        }
-
         private static void AreEqualGXLProviders(GXLSingleGraphProvider expected, SingleGraphProvider actual)
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
@@ -325,6 +316,15 @@ namespace SEE.GraphProviders
         #endregion
 
         #region GitProvider
+
+        private GitEvolutionGraphProvider GetGitEvolutionProvider()
+        {
+            return new GitEvolutionGraphProvider()
+            {
+                Date = "2024/01/05",
+                GitRepository = GetGitRepository()
+            };
+        }
 
         [Test]
         public void TestGitEvolutionProvider()
