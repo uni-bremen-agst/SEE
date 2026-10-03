@@ -810,7 +810,7 @@ namespace SEE.GraphProviders.VCS
             int coreDevs = 0;
             foreach (int churn in authorsChurn.Values.OrderByDescending(value => value))
             {
-                if (cumulative > truckFactorCoreDevRatio)
+if (cumulative >= truckFactorCoreDevRatio)
                 {
                     break;
                 }
