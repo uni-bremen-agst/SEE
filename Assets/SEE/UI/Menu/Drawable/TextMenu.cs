@@ -401,7 +401,7 @@ namespace SEE.UI.Menu.Drawable
         /// Otherwise it will be opened for the WriteTextAction.</param>
         public static void Enable(bool reset = true, bool showEditMode = false)
         {
-            /// Resets the handlers, if desired (depending on <paramref name="reset").
+            /// Resets the handlers, if desired (depending on <paramref name="reset"/>).
             if (reset)
             {
                 Reset();
@@ -439,7 +439,7 @@ namespace SEE.UI.Menu.Drawable
         private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true,
             bool showEditMode = false)
         {
-            /// Resets the handlers, if desired (depending on <paramref name="reset").
+            /// Resets the handlers, if desired (depending on <paramref name="reset"/>).
             if (reset)
             {
                 Reset();

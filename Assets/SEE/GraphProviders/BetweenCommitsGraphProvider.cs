@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using UnityEngine;
 using System.Threading;
 using SEE.VCS;
 using SEE.GraphProviders.VCS;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {
@@ -81,7 +81,7 @@ namespace SEE.GraphProviders
             string repositoryPath = GitRepository.RepositoryPath.Path;
             ChurnGraphGenerator.AddNodesForCommit
                 (graph, SimplifyGraph, GitRepository,
-                 Utils.Filenames.InnermostDirectoryName(repositoryPath),
+                 Graphs.Utils.Filenames.InnermostDirectoryName(repositoryPath),
                  CommitID, BaselineCommitID, AddCoChangeEdges, changePercentage, token);
             return graph;
         }

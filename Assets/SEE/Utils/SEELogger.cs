@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SEE.Graphs.Utils;
+using System;
 using UnityEngine;
+using ILogger = SEE.Graphs.Utils.ILogger;
 
 namespace SEE.Utils
 {
@@ -31,6 +33,15 @@ namespace SEE.Utils
         public void LogWarning(string message)
         {
             Debug.LogWarning(message);
+        }
+
+        /// <summary>
+        /// Logs <paramref name="message"/> with Unity's assertion log type.
+        /// </summary>
+        /// <param name="message">A message describing the assumption that was violated.</param>
+        public void LogAssertion(string message)
+        {
+            Debug.LogAssertion(message);
         }
     }
 }

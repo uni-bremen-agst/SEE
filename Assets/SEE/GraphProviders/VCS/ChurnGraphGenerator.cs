@@ -1,6 +1,7 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
-using SEE.DataModel.DG;
+using SEE.Graphs;
+using SEE.Graphs.Utils;
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
 using SEE.Utils;
@@ -313,7 +314,7 @@ namespace SEE.GraphProviders.VCS
                 if (graph.GetRoots().Count == 0)
                 {
                     graph.AddSingleRoot(out Node _, repositoryName,
-                                        DataModel.DG.VCS.RepositoryType, initialGraph: true);
+                                        Graphs.VCS.RepositoryType, initialGraph: true);
                 }
                 changePercentage?.Invoke(1f);
                 return;
@@ -354,12 +355,12 @@ namespace SEE.GraphProviders.VCS
             // edge has is not a group, so that the account would fall silent
             // just when the number is nought.
             int coChanges
-                = graph.Edges().Count(edge => edge.Type == DataModel.DG.VCS.CoChangeType);
+                = graph.Edges().Count(edge => edge.Type == Graphs.VCS.CoChangeType);
             Debug.Log($"{present.Count} files have a node, being what survived; "
                       + $"{churn.Count} of them were changed in the period, of {withChurn} "
                       + "changed in all, the rest having been deleted since. "
                       + $"{walked} commits were walked. "
-                      + $"{coChanges} edges of type {DataModel.DG.VCS.CoChangeType} join two "
+                      + $"{coChanges} edges of type {Graphs.VCS.CoChangeType} join two "
                       + "files a commit changed together.\n");
         }
 
@@ -700,21 +701,21 @@ namespace SEE.GraphProviders.VCS
             {
                 GitFileMetrics metrics = MetricsOf(file.Value);
                 Node node = GraphUtils.GetOrAddFileNode(graph, file.Key);
-                node.SetInt(DataModel.DG.VCS.NumberOfDevelopers, metrics.Authors.Count);
-                node.SetInt(DataModel.DG.VCS.NumberOfCommits, metrics.NumberOfCommits);
-                node.SetInt(DataModel.DG.VCS.LinesAdded, metrics.LinesAdded);
-                node.SetInt(DataModel.DG.VCS.LinesRemoved, metrics.LinesRemoved);
-                node.SetInt(DataModel.DG.VCS.Churn, metrics.Churn);
-                node.SetInt(DataModel.DG.VCS.TruckNumber, metrics.TruckFactor);
+                node.SetInt(Graphs.VCS.NumberOfDevelopers, metrics.Authors.Count);
+                node.SetInt(Graphs.VCS.NumberOfCommits, metrics.NumberOfCommits);
+                node.SetInt(Graphs.VCS.LinesAdded, metrics.LinesAdded);
+                node.SetInt(Graphs.VCS.LinesRemoved, metrics.LinesRemoved);
+                node.SetInt(Graphs.VCS.Churn, metrics.Churn);
+                node.SetInt(Graphs.VCS.TruckNumber, metrics.TruckFactor);
                 if (metrics.Authors.Any())
                 {
-                    node.SetString(DataModel.DG.VCS.AuthorsAttributeName,
+                    node.SetString(Graphs.VCS.AuthorsAttributeName,
                                    string.Join(',', metrics.Authors));
                 }
                 // One attribute per author, named for them.
                 foreach (KeyValuePair<FileAuthor, int> authorChurn in metrics.AuthorsChurn)
                 {
-                    node.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
+                    node.SetInt(Graphs.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
                 }
                 nodes[file.Key] = node;
                 // Joined into one attribute, as the authors above are. Should
@@ -722,7 +723,7 @@ namespace SEE.GraphProviders.VCS
                 // one place to say so.
                 if (formerNames.TryGetValue(file.Key, out ISet<string> names))
                 {
-                    node.SetString(DataModel.DG.VCS.FormerNames, string.Join(',', names));
+                    node.SetString(Graphs.VCS.FormerNames, string.Join(',', names));
                 }
             }
 
@@ -730,7 +731,7 @@ namespace SEE.GraphProviders.VCS
             // each file rather than from its history.
             AddCodeMetrics(graph, session);
             AddCoChanges(graph, churn, nodes);
-            graph.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
+            graph.AddSingleRoot(out Node _, repositoryName, Graphs.VCS.RepositoryType);
             // After the root, which the collapsing starts from. Only directory
             // nodes are affected, so the edges drawn above outlive it.
             Simplify(graph, simplifyGraph);
@@ -738,7 +739,7 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Draws an edge of type <see cref="DataModel.DG.VCS.CoChangeType"/> between every two
+        /// Draws an edge of type <see cref="Graphs.VCS.CoChangeType"/> between every two
         /// files of <paramref name="churn"/> that a commit changed together,
         /// counting on it how often that happened.
         /// </summary>
@@ -768,8 +769,8 @@ namespace SEE.GraphProviders.VCS
                         continue;
                     }
                     Edge edge = graph.AddEdge(nodes[file.Key], nodes[coChange.Key],
-                                              DataModel.DG.VCS.CoChangeType);
-                    edge.SetInt(DataModel.DG.VCS.ChangedTogether, coChange.Value);
+                                              Graphs.VCS.CoChangeType);
+                    edge.SetInt(Graphs.VCS.ChangedTogether, coChange.Value);
                 }
             }
         }
@@ -871,7 +872,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
         private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
         {
-            foreach (Node node in graph.Nodes().Where(n => n.Type == DataModel.DG.NodeTypes.File))
+            foreach (Node node in graph.Nodes().Where(n => n.Type == Graphs.NodeTypes.File))
             {
                 string repositoryFilePath = node.ID;
                 if (AntlrLanguage.HasLexer(Filenames.Extension(repositoryFilePath)))
@@ -932,7 +933,7 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Simplifies a given graph by combining common directories (nodes of type
-        /// <see cref="DataModel.DG.VCS.DirectoryType"/>).
+        /// <see cref="Graphs.VCS.DirectoryType"/>).
         ///
         /// If a directory has only other directories as children, their paths will be combined.
         /// For instance the file structure:
@@ -962,7 +963,7 @@ namespace SEE.GraphProviders.VCS
         {
             Graph graph = root.ItsGraph;
             IList<Node> children = root.Children();
-            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.NodeTypes.File) && children.Any())
+            if (children.ToList().TrueForAll(x => x.Type != Graphs.NodeTypes.File) && children.Any())
             {
                 foreach (Node child in children.ToList())
                 {
@@ -977,7 +978,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                foreach (Node node in children.Where(x => x.Type == DataModel.DG.VCS.DirectoryType).ToList())
+                foreach (Node node in children.Where(x => x.Type == Graphs.VCS.DirectoryType).ToList())
                 {
                     SimplifyGraph(node);
                 }

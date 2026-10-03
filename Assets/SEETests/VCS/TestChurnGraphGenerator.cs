@@ -1,7 +1,8 @@
 using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.DataModel.DG;
 using SEE.GraphProviders.VCS;
+using SEE.Graphs;
+using SEE.Graphs.Utils;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -134,7 +135,7 @@ namespace SEE.VCS
         public void TestChurn(DateTime startDate, GitRepository repositoryConfiguration)
         {
             string repositoryPath = repositoryConfiguration.RepositoryPath.Path;
-            string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
+            string repositoryName = Graphs.Utils.Filenames.InnermostDirectoryName(repositoryPath);
             Graph graph = new(repositoryPath, repositoryName);
 
             Performance p = Performance.Begin($"Adding nodes for {repositoryName} commits since "

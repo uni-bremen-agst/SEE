@@ -4,16 +4,16 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders.Evolution
 {

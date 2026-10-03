@@ -1,4 +1,5 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for <see cref="Vector3"/>.
     /// </summary>
-    public class Vector3Config : ConfigIO.IPersistentConfigItem
+    public class Vector3Config : IPersistentConfigItem
     {
         /// <summary>
         /// Is the value of the configuration.
@@ -63,7 +64,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         public void Save(ConfigWriter writer, string label = "")
         {
-            writer.Save(Value, label);
+            writer.SaveVector(Value, label);
         }
 
         #endregion

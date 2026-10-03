@@ -4,7 +4,6 @@ using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SEE.Graphs.Config;
 
 namespace SEE.Net
 {
@@ -257,7 +257,7 @@ namespace SEE.Net
         /// the command-line arguments (if not running in the editor mode).
         ///
         /// This method does not really start any server or client. Use <see cref="StartClient(CallBack)"/>,
-        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)/> instead.
+        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)"/> instead.
         /// </summary>
         public void SetUp()
         {

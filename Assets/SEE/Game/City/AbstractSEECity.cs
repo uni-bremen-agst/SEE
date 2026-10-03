@@ -1,5 +1,5 @@
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.CityRendering;
 using SEE.Game.Tables;
 using SEE.Extensions;
@@ -18,6 +18,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Plane = SEE.Cities.Plane;
 using SEE.GraphElementRefs;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

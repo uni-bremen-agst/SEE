@@ -1,5 +1,5 @@
-﻿using SEE.UI;
-using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.UI;
 using System.Collections.Generic;
 
 namespace SEE.UserSettings

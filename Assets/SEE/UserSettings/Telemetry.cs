@@ -1,5 +1,5 @@
-﻿using SEE.Tools.OpenTelemetry;
-using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.Tools.OpenTelemetry;
 using System.Collections.Generic;
 using UnityEngine;
 

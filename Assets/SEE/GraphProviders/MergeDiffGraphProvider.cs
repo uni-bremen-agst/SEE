@@ -1,11 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

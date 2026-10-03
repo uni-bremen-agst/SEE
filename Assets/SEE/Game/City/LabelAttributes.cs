@@ -1,4 +1,5 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ namespace SEE.Game.City
             writer.Save(Show, showLabel);
             writer.Save(Distance, distanceLabel);
             writer.Save(FontSize, fontSizeLabel);
-            writer.Save(FontColor, fontColorLabel);
+            writer.SaveColor(FontColor, fontColorLabel);
             writer.Save(AnimationFactor, animationFactorLabel);
             writer.Save(LabelAlpha, labelAlphaLabel);
             writer.EndGroup();
@@ -110,7 +111,7 @@ namespace SEE.Game.City
                     ConfigIO.Restore(values, showLabel, ref Show);
                     ConfigIO.Restore(values, distanceLabel, ref Distance);
                     ConfigIO.Restore(values, fontSizeLabel, ref FontSize);
-                    ConfigIO.Restore(values, fontColorLabel, ref FontColor);
+                    UnityConfigIO.RestoreColor(values, fontColorLabel, ref FontColor);
                     ConfigIO.Restore(values, animationFactorLabel, ref AnimationFactor);
                     ConfigIO.Restore(values, labelAlphaLabel, ref LabelAlpha);
                 }

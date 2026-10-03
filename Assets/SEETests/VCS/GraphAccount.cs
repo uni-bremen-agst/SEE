@@ -1,4 +1,4 @@
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,12 +39,12 @@ namespace SEE.VCS
             {
                 result.AppendLine($"{ofType.Count(),8}  nodes of type {ofType.Key}");
             }
-            foreach (string metric in new string[] { DataModel.DG.VCS.NumberOfDevelopers,
-                                                     DataModel.DG.VCS.NumberOfCommits,
-                                                     DataModel.DG.VCS.LinesAdded,
-                                                     DataModel.DG.VCS.LinesRemoved,
-                                                     DataModel.DG.VCS.Churn,
-                                                     DataModel.DG.VCS.TruckNumber,
+            foreach (string metric in new string[] { Graphs.VCS.NumberOfDevelopers,
+                                                     Graphs.VCS.NumberOfCommits,
+                                                     Graphs.VCS.LinesAdded,
+                                                     Graphs.VCS.LinesRemoved,
+                                                     Graphs.VCS.Churn,
+                                                     Graphs.VCS.TruckNumber,
                                                      Metrics.LOC,
                                                      Metrics.Comments,
                                                      Metrics.NumberOfTokens,
@@ -55,7 +55,7 @@ namespace SEE.VCS
             }
             // One attribute per author of a file, so neither their number nor
             // their sum is had by asking for a name known beforehand.
-            string perAuthor = DataModel.DG.VCS.Churn + ":";
+            string perAuthor = Graphs.VCS.Churn + ":";
             IEnumerable<KeyValuePair<string, int>> churnOfAuthors
                 = graph.Nodes().SelectMany(node => node.IntAttributes)
                        .Where(attribute => attribute.Key.StartsWith(perAuthor, StringComparison.Ordinal));
@@ -75,9 +75,9 @@ namespace SEE.VCS
             }
             int together
                 = graph.Edges()
-                       .Sum(edge => edge.TryGetInt(DataModel.DG.VCS.ChangedTogether, out int value)
+                       .Sum(edge => edge.TryGetInt(Graphs.VCS.ChangedTogether, out int value)
                                     ? value : 0);
-            result.AppendLine($"{together,8}  {DataModel.DG.VCS.ChangedTogether} over all edges");
+            result.AppendLine($"{together,8}  {Graphs.VCS.ChangedTogether} over all edges");
             return result.ToString();
         }
 

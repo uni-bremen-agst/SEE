@@ -1,3 +1,4 @@
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,7 +119,7 @@ namespace SEE.Game.City
             ConfigurationPath.Save(writer, configurationPathLabel);
             SourceCodeDirectory.Save(writer, sourceCodeDirectoryLabel);
             SolutionPath.Save(writer, solutionPathLabel);
-            writer.Save(TableWorldScale, tableWorldScaleLabel);
+            writer.SaveVector(TableWorldScale, tableWorldScaleLabel);
             writer.Save(LODCulling, lodCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
             writer.Save(HiddenEdges.ToList(), hiddenEdgesLabel);
@@ -150,7 +151,7 @@ namespace SEE.Game.City
             ConfigurationPath.Restore(attributes, configurationPathLabel);
             SourceCodeDirectory.Restore(attributes, sourceCodeDirectoryLabel);
             SolutionPath.Restore(attributes, solutionPathLabel);
-            ConfigIO.Restore(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
+            UnityConfigIO.RestoreVector(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
             ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, hiddenEdgesLabel, ref HiddenEdges);

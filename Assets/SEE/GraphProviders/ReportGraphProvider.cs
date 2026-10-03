@@ -1,13 +1,13 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs;
 using SEE.Game.City;
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.DataModel.DG.IO.ReportImports;
-using SEE.Utils.Config;
+using SEE.Graphs.IO.ReportImports;
 using System.Collections.Generic;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

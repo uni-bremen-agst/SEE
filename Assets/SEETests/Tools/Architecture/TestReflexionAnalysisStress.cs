@@ -3,11 +3,12 @@ using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.GXL;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.Graphs.Utils;
 
 namespace SEE.Tools.Architecture
 {

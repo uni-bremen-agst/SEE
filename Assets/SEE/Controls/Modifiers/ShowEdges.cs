@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
-using Node = SEE.DataModel.DG.Node;
+using Node = SEE.Graphs.Node;
 
 namespace SEE.Controls.Modifiers
 {

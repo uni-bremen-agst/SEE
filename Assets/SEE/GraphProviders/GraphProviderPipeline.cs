@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.City;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using System;
 using System.Collections;
 using System.Collections.Generic;

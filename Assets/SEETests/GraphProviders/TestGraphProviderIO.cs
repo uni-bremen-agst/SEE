@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel.DG.IO.ReportImports;
+using SEE.Graphs.IO.ReportImports;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -8,6 +8,7 @@ using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

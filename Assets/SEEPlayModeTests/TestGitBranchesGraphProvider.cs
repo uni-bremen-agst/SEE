@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
 using SEE.Game.City;
-using SEE.DataModel.DG;
-using SEE.Utils;
+using SEE.Graphs;
 using UnityEngine;
 using System.Collections.Generic;
 using SEE.Utils.Paths;
 using System.Threading.Tasks;
+using SEE.Graphs.Utils;
 
 namespace SEE.GraphProviders
 {

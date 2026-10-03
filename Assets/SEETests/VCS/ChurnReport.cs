@@ -1,6 +1,6 @@
 using NUnit.Framework;
-using SEE.DataModel.DG;
 using SEE.GraphProviders.VCS;
+using SEE.Graphs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +39,7 @@ namespace SEE.VCS
         {
             IList<Node> files = Files(graph);
             IList<Node> changed
-                = files.Where(node => Number(node, DataModel.DG.VCS.NumberOfCommits) > 0).ToList();
+                = files.Where(node => Number(node, Graphs.VCS.NumberOfCommits) > 0).ToList();
 
             StringBuilder result = new();
             result.Append(GraphAccount.Of(graph));
@@ -58,9 +58,9 @@ namespace SEE.VCS
             result.AppendLine($"{"added",8}  {"deleted",8}  {"commits",8}  {"file".PadRight(width)}  authors");
             foreach (Node node in changed)
             {
-                result.AppendLine($"{Number(node, DataModel.DG.VCS.LinesAdded),8}  "
-                                  + $"{Number(node, DataModel.DG.VCS.LinesRemoved),8}  "
-                                  + $"{Number(node, DataModel.DG.VCS.NumberOfCommits),8}  "
+                result.AppendLine($"{Number(node, Graphs.VCS.LinesAdded),8}  "
+                                  + $"{Number(node, Graphs.VCS.LinesRemoved),8}  "
+                                  + $"{Number(node, Graphs.VCS.NumberOfCommits),8}  "
                                   + $"{node.ID.PadRight(width)}  "
                                   + string.Join(", ", Authors(node)));
                 // On a line of its own: a file that has been renamed is the
@@ -87,24 +87,24 @@ namespace SEE.VCS
                         + "reported on hold none, or the paths the session reports differ in "
                         + "form from the paths a comparison of two commits yields.");
 
-            foreach (Node node in files.Where(node => Number(node, DataModel.DG.VCS.NumberOfCommits) > 0))
+            foreach (Node node in files.Where(node => Number(node, Graphs.VCS.NumberOfCommits) > 0))
             {
                 IList<KeyValuePair<string, int>> churnOfAuthors = ChurnOfAuthors(node);
                 Assert.That(Authors(node), Is.Not.Empty,
                             $"{node.ID} is reported without any author.");
-                Assert.That(Number(node, DataModel.DG.VCS.NumberOfDevelopers),
+                Assert.That(Number(node, Graphs.VCS.NumberOfDevelopers),
                             Is.EqualTo(churnOfAuthors.Count),
                             $"{node.ID} has churn of a number of authors differing from the "
                             + "number of developers counted for it.");
                 // What the authors of a file churned between them is what the
                 // file was churned, every change being made by one of them.
                 Assert.That(churnOfAuthors.Sum(author => author.Value),
-                            Is.EqualTo(Number(node, DataModel.DG.VCS.LinesAdded)
-                                       + Number(node, DataModel.DG.VCS.LinesRemoved)),
+                            Is.EqualTo(Number(node, Graphs.VCS.LinesAdded)
+                                       + Number(node, Graphs.VCS.LinesRemoved)),
                             $"The churn of {node.ID} is not what its authors churned.");
                 // Its core developers are some of its authors, and where it has
                 // any they cannot be none: somebody churned what was churned.
-                Assert.That(Number(node, DataModel.DG.VCS.TruckNumber),
+                Assert.That(Number(node, Graphs.VCS.TruckNumber),
                             Is.InRange(1, churnOfAuthors.Count),
                             $"The truck factor of {node.ID} is not a number of its authors.");
             }
@@ -115,7 +115,7 @@ namespace SEE.VCS
             // with itself, so neither is an edge a loop.
             HashSet<string> joined = new();
             foreach (Edge edge in graph.Edges()
-                                       .Where(edge => edge.Type == DataModel.DG.VCS.CoChangeType))
+                                       .Where(edge => edge.Type == Graphs.VCS.CoChangeType))
             {
                 Assert.That(edge.Source, Is.Not.SameAs(edge.Target),
                             $"The co-change edge {edge.ID} is a self loop at {edge.Source.ID}.");
@@ -138,7 +138,7 @@ namespace SEE.VCS
         {
             return graph.Nodes()
                         .Where(node => node.Type == NodeTypes.File)
-                        .OrderByDescending(node => Number(node, DataModel.DG.VCS.LinesAdded))
+                        .OrderByDescending(node => Number(node, Graphs.VCS.LinesAdded))
                         .ThenBy(node => node.ID, StringComparer.Ordinal)
                         .ToList();
         }
@@ -163,7 +163,7 @@ namespace SEE.VCS
         /// <returns>What each author churned of the file.</returns>
         private static IList<KeyValuePair<string, int>> ChurnOfAuthors(Node node)
         {
-            string prefix = DataModel.DG.VCS.Churn + ":";
+            string prefix = Graphs.VCS.Churn + ":";
             return node.IntAttributes
                        .Where(attribute => attribute.Key.StartsWith(prefix, StringComparison.Ordinal))
                        .ToList();
@@ -182,7 +182,7 @@ namespace SEE.VCS
         /// <returns>The names of the authors.</returns>
         private static IEnumerable<string> Authors(Node node)
         {
-            return node.TryGetString(DataModel.DG.VCS.AuthorsAttributeName, out string authors)
+            return node.TryGetString(Graphs.VCS.AuthorsAttributeName, out string authors)
                    ? authors.Split(',').Select(NameOf) : Enumerable.Empty<string>();
         }
 
@@ -213,7 +213,7 @@ namespace SEE.VCS
         /// <returns>The former names.</returns>
         private static IEnumerable<string> FormerNames(Node node)
         {
-            return node.TryGetString(DataModel.DG.VCS.FormerNames, out string names)
+            return node.TryGetString(Graphs.VCS.FormerNames, out string names)
                    ? names.Split(',') : Enumerable.Empty<string>();
         }
     }
