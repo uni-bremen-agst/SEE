@@ -186,26 +186,45 @@ namespace SEE.VCS
 
             IDictionary<string, string> before = Tips(File.ReadAllText(file));
             IDictionary<string, string> now = Tips(context + marker);
-            ICollection<string> moved
-                = now.Where(tip => !before.TryGetValue(tip.Key, out string sha)
-                                   || sha != tip.Value)
-                     .Select(tip => tip.Key).ToList();
-            if (moved.Count == 0)
+            // Every branch recorded either time, not just those there now: one
+            // deleted since changes the history as much as one added or moved,
+            // the commits only it reached having dropped out of the walk.
+            ICollection<string> changed
+                = before.Keys.Union(now.Keys)
+                        .Where(branch => !before.TryGetValue(branch, out string beforeSha)
+                                         || !now.TryGetValue(branch, out string nowSha)
+                                         || beforeSha != nowSha)
+                        .OrderBy(branch => branch, StringComparer.Ordinal)
+                        .Select(branch => $"{branch} ({Change(branch)})")
+                        .ToList();
+            if (changed.Count == 0)
             {
-                result.AppendLine("No branch has moved since, so the difference is not one "
-                                  + "of history: the code deriving the report has changed "
-                                  + "its answer.");
+                result.AppendLine("No branch has been added, deleted or moved since, so the "
+                                  + "difference is not one of history: the code deriving the "
+                                  + "report has changed its answer.");
             }
             else
             {
-                result.AppendLine($"{moved.Count} of {now.Count} branches have moved "
+                result.AppendLine($"{changed.Count} "
+                                  + (changed.Count == 1 ? "branch has" : "branches have")
+                                  + " been added, deleted or moved "
                                   + "since the baseline was written, which may account for "
                                   + "the difference: "
-                                  + string.Join(", ", moved.Take(5))
-                                  + (moved.Count > 5 ? ", ..." : string.Empty));
+                                  + string.Join(", ", changed.Take(5))
+                                  + (changed.Count > 5 ? ", ..." : string.Empty));
             }
             result.AppendLine($"Delete {file} to accept the report of this run instead.");
             return result.ToString();
+
+            // What has become of a branch whose tip differs between the two.
+            string Change(string branch)
+            {
+                if (!before.ContainsKey(branch))
+                {
+                    return "added";
+                }
+                return now.ContainsKey(branch) ? "moved" : "deleted";
+            }
         }
 
         /// <summary>
