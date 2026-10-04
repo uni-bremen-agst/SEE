@@ -14,13 +14,18 @@ using UnityEngine.TestTools;
 
 namespace SEE.GraphProviders
 {
+    /// <summary>
+    /// A performance test for the <see cref="GitBranchesGraphProvider"/> class.
+    /// </summary>
     public class TestGitProviderPerformance
     {
+        /// <summary>
+        /// The date in the version history at which to start adding nodes to the graph.
+        /// </summary>
         private const string defaultDate = "2026/06/01";
 
-        public async UniTask ProvideAsync(string gitDir, Globbing glob, List<string> repoPaths, string branch, string repoName)
+        public async UniTask ProvideAsync(string gitDir, Globbing glob, string branch, string repoName)
         {
-
             GameObject go = new();
 
             BranchCity city = go.AddComponent<BranchCity>();
@@ -31,8 +36,6 @@ namespace SEE.GraphProviders
             {
                 // Do nothing here
             }
-
-            ChurnGraphGenerator.AddNodesAfterDate(new Graph(), false, gitRepository, repoName, DateTime.Now, false, ReportProgress, default);
 
             GitBranchesGraphProvider provider = new()
             {
@@ -55,7 +58,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    ProvideAsync("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, null, "origin/main", "bubbletea").ToCoroutine();
+                    ProvideAsync("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, "origin/main", "bubbletea").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -70,7 +73,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    ProvideAsync("TestRepos/express", new Globbing() { { "**/*.js", true } }, null, "origin/master", "express").ToCoroutine();
+                    ProvideAsync("TestRepos/express", new Globbing() { { "**/*.js", true } }, "origin/master", "express").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -85,7 +88,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    ProvideAsync("TestRepos/node", new Globbing() { { "**/*.js", true }, }, null, "origin/main", "node").ToCoroutine();
+                    ProvideAsync("TestRepos/node", new Globbing() { { "**/*.js", true }, }, "origin/main", "node").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
