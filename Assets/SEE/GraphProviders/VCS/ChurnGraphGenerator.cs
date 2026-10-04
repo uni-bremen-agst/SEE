@@ -160,8 +160,9 @@ namespace SEE.GraphProviders.VCS
             // the session reports them, which is to say already passing the
             // globbing and the repository paths of the filter. A file deleted
             // meanwhile is not among them and is therefore left out of the
-            // graph, however much churn its history holds.
-            AddNodes(graph, criteria, session, session.AllFiles(token),
+            // graph, however much churn its history holds. Their code is
+            // read from the tips of the relevant branches, hence no commit.
+            AddNodes(graph, criteria, session, session.AllFiles(token), null,
                      repositoryName, simplifyGraph, addCoChangeEdges,
                      changePercentage, token);
         }
@@ -233,8 +234,9 @@ namespace SEE.GraphProviders.VCS
             // them, which is to say already passing the globbing and the
             // repository paths of the filter. A file deleted before it is not
             // among them and is therefore left out of the graph, however much
-            // churn the range holds against it.
-            AddNodes(graph, criteria, session, session.AllFiles(commitID, token),
+            // churn the range holds against it. Their code is read from the
+            // named commit, too, so that it is the version the churn leads up to.
+            AddNodes(graph, criteria, session, session.AllFiles(commitID, token), commitID,
                      repositoryName, simplifyGraph, addCoChangeEdges,
                      changePercentage, token);
         }
@@ -282,6 +284,9 @@ namespace SEE.GraphProviders.VCS
         /// file from, which the metrics of its code are gathered from.</param>
         /// <param name="present">The files that survived, which are those a node is made
         /// for.</param>
+        /// <param name="commitID">The commit whose version of the files the metrics of their
+        /// code are gathered from; if null, the version at the tips of the relevant branches
+        /// is used (see <see cref="AddCodeMetrics"/>).</param>
         /// <param name="repositoryName">The name of the root node standing for the
         /// repository.</param>
         /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
@@ -295,6 +300,7 @@ namespace SEE.GraphProviders.VCS
                Criteria criteria,
                GitRepositorySession session,
                HashSet<string> present,
+               string commitID,
                string repositoryName,
                bool simplifyGraph,
                bool addCoChangeEdges,
@@ -348,7 +354,7 @@ namespace SEE.GraphProviders.VCS
                                        path => churn.TryGetValue(path, out Churn known)
                                                ? known : new Churn());
 
-            Fill(graph, all, formerNames, repositoryName, session, simplifyGraph);
+            Fill(graph, all, formerNames, repositoryName, session, commitID, simplifyGraph);
             changePercentage?.Invoke(1f);
 
             // Counted rather than read off the graph by group, where a type no
@@ -693,12 +699,14 @@ namespace SEE.GraphProviders.VCS
         /// repository.</param>
         /// <param name="session">Used to read the content of a file, which the metrics of its
         /// code are gathered from.</param>
+        /// <param name="commitID">The commit whose version of the files the metrics of their
+        /// code are gathered from; may be null (see <see cref="AddCodeMetrics"/>).</param>
         /// <param name="simplifyGraph">Whether a chain of directory nodes holding nothing but
         /// one another is to be collapsed into its innermost one.</param>
         private static void Fill(Graph graph, IDictionary<string, Churn> churn,
                                  IDictionary<string, ISet<string>> formerNames,
                                  string repositoryName, GitRepositorySession session,
-                                 bool simplifyGraph)
+                                 string commitID, bool simplifyGraph)
         {
             // The node standing for each file, so that the edges between files
             // changed together can be drawn once every node exists.
@@ -736,7 +744,7 @@ namespace SEE.GraphProviders.VCS
 
             // The metrics of the code itself, gathered from the content of
             // each file rather than from its history.
-            AddCodeMetrics(graph, session);
+            AddCodeMetrics(graph, session, commitID);
             AddCoChanges(graph, churn, nodes);
             graph.AddSingleRoot(out Node _, repositoryName, Graphs.VCS.RepositoryType);
             // After the root, which the collapsing starts from. Only directory
@@ -851,15 +859,21 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
         /// in the syntax of the repository regarding the directory separator.</param>
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
+        /// <param name="commitID">The commit whose version of the file is retrieved; if null, the
+        /// version at the tips of the relevant branches is retrieved
+        /// (see <see cref="GitRepositorySession.GetStream(string)"/>).</param>
         /// <returns>The token stream for the specified file and commit.</returns>
         private static IEnumerable<AntlrToken> RetrieveTokens
                                                  (string repositoryFilePath,
-                                                  GitRepositorySession repositorySession)
+                                                  GitRepositorySession repositorySession,
+                                                  string commitID)
         {
             try
             {
                 AntlrLanguage language = AntlrToken.GetLanguage(repositoryFilePath);
-                using System.IO.Stream stream = repositorySession.GetStream(repositoryFilePath);
+                using System.IO.Stream stream = commitID == null
+                    ? repositorySession.GetStream(repositoryFilePath)
+                    : repositorySession.GetStream(repositoryFilePath, commitID);
                 return AntlrToken.FromStream(stream, language).ToList();
             }
             catch (Exception e)
@@ -874,11 +888,17 @@ namespace SEE.GraphProviders.VCS
         /// to the corresponding node for the supported TokenLanguages in <paramref name="graph"/>.
         /// Otherwise, metrics are not available.
         ///
-        /// Note: A file may exist in multiple branches. We will pick the first one we find.
+        /// If <paramref name="commitID"/> is given, the metrics are calculated for the version
+        /// of the files in that commit. Otherwise, they are calculated for the version at the
+        /// tips of the relevant branches. Because a file may exist in multiple branches with
+        /// different content, the default branch of origin and then the branch currently
+        /// checked out are preferred in that case
+        /// (see <see cref="GitRepositorySession.RelevantBranches"/>).
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
         /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
-        private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
+        /// <param name="commitID">The commit whose version of the files is to be analyzed; may be null.</param>
+        private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession, string commitID)
         {
             foreach (Node node in graph.Nodes().Where(n => n.Type == Graphs.NodeTypes.File))
             {
@@ -889,7 +909,7 @@ namespace SEE.GraphProviders.VCS
                     if (language != AntlrLanguage.Plain)
                     {
                         //ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
-                        IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession);
+                        IEnumerable<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, commitID);
                         TokenMetrics.Gather(tokens,
                                             out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
                                             out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);

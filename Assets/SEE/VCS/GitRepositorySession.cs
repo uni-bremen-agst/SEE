@@ -320,10 +320,12 @@ namespace SEE.VCS
 
         /// <summary>
         /// Returns the content of the file at <paramref name="repositoryFilePath"/>
-        /// present in the repository in any of the branches passing the filter.
+        /// present in the repository at the tip of any of the branches passing the filter.
         ///
-        /// Note: A file may exist in multiple branches, but this method will
-        /// return the content of the first file found in the branches.
+        /// Note: A file may exist in multiple branches with different content. In that
+        /// case, the branches are searched in the order of <see cref="RelevantBranches"/>,
+        /// that is, the default branch of origin is preferred, followed by the branch
+        /// currently checked out, and the content of the first file found is returned.
         /// </summary>
         /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
         /// <returns>The content of the file.</returns>
@@ -335,11 +337,29 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// Returns the content of the file at <paramref name="repositoryFilePath"/>
+        /// as it is present in the commit with the given <paramref name="commitID"/>.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <param name="commitID">The commit whose version of the file is to be returned.</param>
+        /// <returns>The content of the file.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/>
+        /// or <paramref name="commitID"/> is null or empty or if the repository does not have a
+        /// commit with the given <paramref name="commitID"/>.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist in the commit.</exception>
+        public string GetFileContent(string repositoryFilePath, string commitID)
+        {
+            return GetBlob(repositoryFilePath, commitID).GetContentText();
+        }
+
+        /// <summary>
         /// Returns the content of the file at <paramref name="repositoryFilePath"/> (as a stream)
-        /// present in the repository in any of the branches passing the filter.
+        /// present in the repository at the tip of any of the branches passing the filter.
         ///
-        /// Note: A file may exist in multiple branches, but this method will
-        /// return the content of the first file found in the branches.
+        /// Note: A file may exist in multiple branches with different content. In that
+        /// case, the branches are searched in the order of <see cref="RelevantBranches"/>,
+        /// that is, the default branch of origin is preferred, followed by the branch
+        /// currently checked out, and the content of the first file found is returned.
         /// </summary>
         /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
         /// <returns>The content of the file as a stream.</returns>
@@ -351,9 +371,26 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// Returns the content of the file at <paramref name="repositoryFilePath"/> (as a stream)
+        /// as it is present in the commit with the given <paramref name="commitID"/>.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <param name="commitID">The commit whose version of the file is to be returned.</param>
+        /// <returns>The content of the file as a stream.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/>
+        /// or <paramref name="commitID"/> is null or empty or if the repository does not have a
+        /// commit with the given <paramref name="commitID"/>.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist in the commit.</exception>
+        public Stream GetStream(string repositoryFilePath, string commitID)
+        {
+            return GetBlob(repositoryFilePath, commitID).GetContentStream();
+        }
+
+        /// <summary>
         /// Returns the <see cref="Blob"/> object representing the file at <paramref name="repositoryFilePath"/>
-        /// in any of <see cref="RelevantBranches"/>. The file can exist in multiple branches, but this method
-        /// will return the first one found.
+        /// in any of <see cref="RelevantBranches"/>. The file can exist in multiple branches, in which
+        /// case the branches are searched in the order of <see cref="RelevantBranches"/> and the first
+        /// one found is returned.
         /// </summary>
         /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
         /// <returns>The <see cref="Blob"/> object representing the file.</returns>
@@ -361,20 +398,52 @@ namespace SEE.VCS
         /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
         private Blob GetBlob(string repositoryFilePath)
         {
-            if (string.IsNullOrWhiteSpace(repositoryFilePath))
-            {
-                throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
-            }
+            CheckRepositoryFilePath(repositoryFilePath);
             foreach (Branch branch in RelevantBranches())
             {
-                Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
-                if (blob != null)
+                if (branch.Tip.Tree[repositoryFilePath]?.Target is Blob blob)
                 {
                     return blob;
                 }
             }
             // Blob does not exist.
             throw new FileNotFoundException($"File {repositoryFilePath} does not exist.\n");
+        }
+
+        /// <summary>
+        /// Returns the <see cref="Blob"/> object representing the file at <paramref name="repositoryFilePath"/>
+        /// in the commit with the given <paramref name="commitID"/>.
+        /// </summary>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <param name="commitID">The commit in which the file is looked up.</param>
+        /// <returns>The <see cref="Blob"/> object representing the file.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/>
+        /// or <paramref name="commitID"/> is null or empty or if the repository does not have a
+        /// commit with the given <paramref name="commitID"/>.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file does not exist in the commit.</exception>
+        private Blob GetBlob(string repositoryFilePath, string commitID)
+        {
+            CheckRepositoryFilePath(repositoryFilePath);
+            if (GetCheckedCommit(commitID).Tree[repositoryFilePath]?.Target is Blob blob)
+            {
+                return blob;
+            }
+            // Blob does not exist.
+            throw new FileNotFoundException($"File {repositoryFilePath} does not exist in commit {commitID}.\n");
+        }
+
+        /// <summary>
+        /// Throws an exception if <paramref name="repositoryFilePath"/> is null or empty.
+        /// </summary>
+        /// <param name="repositoryFilePath">The path to be checked.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="repositoryFilePath"/>
+        /// is null or empty.</exception>
+        private static void CheckRepositoryFilePath(string repositoryFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(repositoryFilePath))
+            {
+                throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
+            }
         }
 
         /// <summary>
@@ -405,6 +474,21 @@ namespace SEE.VCS
         /// The result is a collection rather than an enumeration, so that a caller may count
         /// the branches without walking them twice.
         ///
+        /// The branches are ordered by preference, which is what <see cref="GetBlob(string)"/>
+        /// relies on when a file exists in more than one of them:
+        ///
+        /// 1. the default branch of the remote origin, that is, the branch
+        ///    <c>origin/HEAD</c> refers to (usually <c>origin/master</c> or <c>origin/main</c>);
+        /// 2. the local branch HEAD refers to, that is, the branch currently checked out;
+        /// 3. all other branches in the ordinal order of their canonical names.
+        ///
+        /// A branch takes its position only if it passes the filter at all. The default
+        /// branch of the remote is preferred because, unlike the local HEAD, it does not
+        /// depend on what happens to be checked out, so that the result is the same for every
+        /// clone. It is unknown if <c>origin/HEAD</c> is not set, which is the case, for
+        /// instance, if the repository was not created by <c>git clone</c>. If HEAD is
+        /// detached, it does not refer to any branch either.
+        ///
         /// It is worked out once and held. Neither the repository nor the filter changes
         /// while a session lasts, save through <see cref="FetchRemotes"/>, which discards
         /// what is held. This matters: <see cref="GetBlob"/> asks for the relevant branches
@@ -425,19 +509,53 @@ namespace SEE.VCS
         /// <returns>All relevant branches of the repository.</returns>
         public ICollection<Branch> RelevantBranches()
         {
-            return relevantBranches ??= new ReadOnlyCollection<Branch>(Selected());
+            return relevantBranches ??= new ReadOnlyCollection<Branch>(InPreferenceOrder(Selected()));
 
             // The branches of the repository the filter holds relevant.
-            IList<Branch> Selected()
+            IEnumerable<Branch> Selected()
             {
                 if (repositoryConfig.VCSFilter == null)
                 {
-                    return repository.Branches.ToList();
+                    return repository.Branches;
                 }
                 return repository.Branches
-                                 .Where(branch => repositoryConfig.VCSFilter.Matches(branch))
-                                 .ToList();
+                                 .Where(branch => repositoryConfig.VCSFilter.Matches(branch));
             }
+
+            // The given branches in the order of preference stated above.
+            IList<Branch> InPreferenceOrder(IEnumerable<Branch> branches)
+            {
+                string remoteDefaultBranch = RemoteDefaultBranchName();
+                return branches.OrderBy(Rank)
+                               .ThenBy(branch => branch.CanonicalName, StringComparer.Ordinal)
+                               .ToList();
+
+                int Rank(Branch branch)
+                {
+                    if (branch.CanonicalName == remoteDefaultBranch)
+                    {
+                        return 0;
+                    }
+                    return branch.IsCurrentRepositoryHead ? 1 : 2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The canonical name of the symbolic reference denoting the default branch
+        /// of the remote repository named origin.
+        /// </summary>
+        private const string remoteDefaultBranchReference = "refs/remotes/origin/HEAD";
+
+        /// <summary>
+        /// Returns the canonical name of the branch <c>origin/HEAD</c> refers to,
+        /// for instance, <c>refs/remotes/origin/master</c>, or null if
+        /// <c>origin/HEAD</c> is not set.
+        /// </summary>
+        /// <returns>The canonical name of the default branch of origin or null.</returns>
+        private string RemoteDefaultBranchName()
+        {
+            return (repository.Refs[remoteDefaultBranchReference] as SymbolicReference)?.Target?.CanonicalName;
         }
 
         /// <summary>
