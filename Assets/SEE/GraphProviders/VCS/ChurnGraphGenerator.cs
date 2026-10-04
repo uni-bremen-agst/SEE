@@ -151,7 +151,11 @@ namespace SEE.GraphProviders.VCS
         {
             using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
 
-            Criteria criteria = new(new DateTimeOffset(startDate.Date, TimeSpan.Zero),
+            // The day named by startDate is taken as a UTC day, whatever its kind.
+            // The kind is dropped first, because DateTimeOffset rejects a local
+            // time paired with an offset other than the local one.
+            DateTime startDay = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Unspecified);
+            Criteria criteria = new(new DateTimeOffset(startDay, TimeSpan.Zero),
                                     repositoryConfiguration.VCSFilter,
                                     SelectedBranches(session, repositoryConfiguration.VCSFilter));
             changePercentage?.Invoke(0.1f);
@@ -470,8 +474,7 @@ namespace SEE.GraphProviders.VCS
 
                 if (criteria.Counts(commit))
                 {
-                    using Patch patch = Compare<Patch>(session, criteria, parent, commit.Tree,
-                                                       compareOptions);
+                    using Patch patch = Compare<Patch>(session, criteria, parent, commit.Tree, compareOptions);
                     // The files this one commit changed, under the names they
                     // carry at the end. Gathered as they are recorded, because
                     // which files changed together is known only once they all
