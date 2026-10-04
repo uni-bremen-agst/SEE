@@ -4,6 +4,7 @@ using LiveKit;
 using LiveKit.Proto;
 using Newtonsoft.Json;
 using SEE.Controls.KeyActions;
+using SEE.Game.Avatars;
 using SEE.Net;
 using SEE.Net.Util;
 using SEE.Net.Util.FileSync;
@@ -82,7 +83,11 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private readonly Dictionary<string, AudioStream> audioStreams = new();
 
-        private readonly Dictionary<string, GameObject> audioOutputObjects = new();
+        /// <summary>
+        /// Maps remote audio tracks to their playback sources. Each source is attached directly
+        /// to the corresponding player's game object.
+        /// </summary>
+        private readonly Dictionary<string, AudioSource> audioOutputSources = new();
 
         /// <summary>
         /// Gets the current connection status to the LiveKit room.
@@ -723,11 +728,21 @@ namespace SEE.Tools.LiveKit
                 //     return;
                 // }
 
-                GameObject audioOutputObject = new GameObject(audioTrack.Sid);
-                AudioSource source = audioOutputObject.AddComponent<AudioSource>();
-                AudioStream stream = new AudioStream(audioTrack, source);
-                audioOutputObjects[audioTrack.Sid] = audioOutputObject;
-                audioStreams[audioTrack.Sid] = stream;
+                ulong clientId = ParseIdentity(participant);
+                if (LiveKitVideoRegistry.TryGet(clientId, out LiveKitVideo liveKitVideo)
+                    && liveKitVideo.GetComponentInParent<AvatarAdapter>() is AvatarAdapter avatar)
+                {
+                    AudioSource source = avatar.gameObject.AddComponent<AudioSource>();
+                    AudioStream stream = new AudioStream(audioTrack, source);
+                    audioOutputSources[audioTrack.Sid] = source;
+                    audioStreams[audioTrack.Sid] = stream;
+                    avatar.SetLiveKitAudioSource(source);
+                }
+                else
+                {
+                    Debug.LogWarning($"No avatar registered for LiveKit participant {participant.Identity}; "
+                                     + "audio playback and SALSA lip sync cannot be connected.\n");
+                }
             }
         }
 
@@ -749,13 +764,19 @@ namespace SEE.Tools.LiveKit
             }
             else if (track is RemoteAudioTrack audioTrack)
             {
+                if (audioOutputSources.TryGetValue(audioTrack.Sid, out AudioSource source)
+                    && source != null
+                    && source.TryGetComponent(out AvatarAdapter avatar))
+                {
+                    avatar.ClearLiveKitAudioSource(source);
+                }
                 if (audioStreams.Remove(audioTrack.Sid, out AudioStream stream))
                 {
                     stream.Dispose();
                 }
-                if (audioOutputObjects.Remove(audioTrack.Sid, out GameObject audioOutputObject))
+                if (audioOutputSources.Remove(audioTrack.Sid, out source))
                 {
-                    Destroy(audioOutputObject);
+                    Destroy(source);
                 }
             }
         }
@@ -826,11 +847,15 @@ namespace SEE.Tools.LiveKit
             }
             audioStreams.Clear();
 
-            foreach (GameObject audioOutputObject in audioOutputObjects.Values)
+            foreach (AudioSource source in audioOutputSources.Values)
             {
-                Destroy(audioOutputObject);
+                if (source != null && source.TryGetComponent(out AvatarAdapter avatar))
+                {
+                    avatar.ClearLiveKitAudioSource(source);
+                }
+                Destroy(source);
             }
-            audioOutputObjects.Clear();
+            audioOutputSources.Clear();
 
             // Disable all LiveKitVideo renderers (local + remote) from the registry
             foreach (LiveKitVideo liveKitVideo in LiveKitVideoRegistry.GetAll())
