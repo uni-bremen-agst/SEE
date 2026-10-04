@@ -151,11 +151,7 @@ namespace SEE.GraphProviders.VCS
         {
             using GitRepositorySession session = repositoryConfiguration.OpenGitSession();
 
-            // The day named by startDate is taken as a UTC day, whatever its kind.
-            // The kind is dropped first, because DateTimeOffset rejects a local
-            // time paired with an offset other than the local one.
-            DateTime startDay = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Unspecified);
-            Criteria criteria = new(new DateTimeOffset(startDay, TimeSpan.Zero),
+            Criteria criteria = new(SEEDate.StartOfUtcDay(startDate),
                                     repositoryConfiguration.VCSFilter,
                                     SelectedBranches(session, repositoryConfiguration.VCSFilter));
             changePercentage?.Invoke(0.1f);

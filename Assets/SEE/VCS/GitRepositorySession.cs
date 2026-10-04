@@ -283,11 +283,7 @@ namespace SEE.VCS
         /// <paramref name="startDate"/>.</returns>
         private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
-            // The day named by startDate is taken as a UTC day, whatever its kind.
-            // The kind is dropped first, because DateTimeOffset rejects a local
-            // time paired with an offset other than the local one.
-            DateTime startDay = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Unspecified);
-            DateTimeOffset since = new(startDay, TimeSpan.Zero);
+            DateTimeOffset since = SEEDate.StartOfUtcDay(startDate);
 
             foreach (Commit commit in repository.Commits.QueryBy(new CommitFilter
             {
