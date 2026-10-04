@@ -177,8 +177,9 @@ namespace SEE.GraphProviders.VCS
         /// The commits taken into account are those reachable from
         /// <paramref name="commitID"/> and not from
         /// <paramref name="baselineCommitID"/>, so the baseline itself is left
-        /// out and the named commit is taken in. Merges are passed over, having
-        /// no churn of their own.
+        /// out and the named commit is taken in. Merges add no churn, having
+        /// none of their own, but the renames they show against each of their
+        /// parents are followed.
         ///
         /// Which files are taken into account is stated by
         /// <see cref="GitRepository.VCSFilter"/> of
@@ -467,6 +468,19 @@ namespace SEE.GraphProviders.VCS
                 if (commit.Parents.Skip(1).Any())
                 {
                     // A merge has no churn of its own, exactly as for --no-merges.
+                    // Its renames however are needed, relative to every one of its
+                    // parents. A topological walk orders a commit before its
+                    // ancestors only, not the commits of two lines merged here
+                    // against one another, so a commit on one line still using a
+                    // name another line gave up may be reached before the commit
+                    // giving it up; that one may even lie outside a range, being
+                    // reachable from the baseline. The merge is reached before
+                    // both, and compared against the parent on the line still
+                    // using the former name, it shows the rename.
+                    foreach (Commit mergedParent in commit.Parents)
+                    {
+                        NoteRenames(mergedParent.Tree, commit.Tree);
+                    }
                     continue;
                 }
                 // A commit without any parent is the initial one; it is compared
@@ -527,24 +541,8 @@ namespace SEE.GraphProviders.VCS
                     // The churn of a commit out of the period taken into account
                     // is never needed, its renames however are: leaving them out
                     // would break the chain of names and split a file over two
-                    // nodes. A tree comparison yields them and is much cheaper
-                    // than the line counts a patch would have to produce.
-                    using TreeChanges treeChanges
-                        = Compare<TreeChanges>(session, criteria, parent, commit.Tree,
-                                               compareOptions);
-                    foreach (TreeEntryChanges change in treeChanges)
-                    {
-                        if (change.Status == ChangeKind.Renamed)
-                        {
-                            // Judged by the name at the end, as above, so that a chain
-                            // of renames leading into scope is not broken.
-                            string target = Follow(renamedTo, change.Path);
-                            if (criteria.InScope(target) || criteria.InScope(change.OldPath))
-                            {
-                                Note(renamedTo, formerNames, surviving, change.OldPath, target);
-                            }
-                        }
-                    }
+                    // nodes.
+                    NoteRenames(parent, commit.Tree);
                 }
             }
 
@@ -552,6 +550,28 @@ namespace SEE.GraphProviders.VCS
             // file taken into account.
             return result.Where(file => criteria.InScope(file.Key))
                          .ToDictionary(file => file.Key, file => file.Value);
+
+            // Notes the renames turning oldTree into newTree. A tree comparison
+            // yields them and is much cheaper than the line counts a patch would
+            // have to produce.
+            void NoteRenames(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree)
+            {
+                using TreeChanges treeChanges
+                    = Compare<TreeChanges>(session, criteria, oldTree, newTree, compareOptions);
+                foreach (TreeEntryChanges change in treeChanges)
+                {
+                    if (change.Status == ChangeKind.Renamed)
+                    {
+                        // Judged by the name at the end, as above, so that a chain
+                        // of renames leading into scope is not broken.
+                        string target = Follow(renamedTo, change.Path);
+                        if (criteria.InScope(target) || criteria.InScope(change.OldPath))
+                        {
+                            Note(renamedTo, formerNames, surviving, change.OldPath, target);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
