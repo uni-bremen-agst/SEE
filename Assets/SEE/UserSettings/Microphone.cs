@@ -6,16 +6,28 @@ namespace SEE.UserSettings
     public class Microphone
     {
         /// <summary>
-        /// The microphone which should be used for the voice chat.
+        /// The microphone which should be used for voice chat.
         /// </summary>
         public string MicrophoneDevice = "";
 
+        /// <summary>
+        /// Maximal bitrate to use for microphone.
+        /// </summary>
         public ulong MaxBitrate = 64000;
 
+        /// <summary>
+        /// Whenever echo cancellation should be enabled.
+        /// </summary>
         public bool EchoCancellation;
 
+        /// <summary>
+        /// Whenever noise suppression should be enabled.
+        /// </summary>
         public bool NoiseSuppression;
 
+        /// <summary>
+        /// Whenever auto gain controll should be enabled.
+        /// </summary>
         public bool AutoGainControl;
 
         private const string microphoneDeviceLabel = "microphoneDevice";
