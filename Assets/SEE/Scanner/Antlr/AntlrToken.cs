@@ -39,7 +39,7 @@ namespace SEE.Scanner.Antlr
         /// <paramref name="filePath"/>.</returns>
         public static AntlrLanguage GetLanguage(string filePath)
         {
-            return AntlrLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]);
+            return AntlrLanguage.FromFileExtension(Path.GetExtension(filePath)?.TrimStart('.'));
         }
 
         /// <summary>
