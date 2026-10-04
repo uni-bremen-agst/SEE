@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using SEE.Graphs.Utils;
 
-namespace SEE.Utils
+namespace SEE.Graphs.Utils
 {
     /// <summary>
     /// Tests for <see cref="Filenames"/>.
