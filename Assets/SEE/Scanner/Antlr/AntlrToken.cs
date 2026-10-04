@@ -65,17 +65,11 @@ namespace SEE.Scanner.Antlr
         }
 
         /// <summary>
-        /// Returns a stream of <see cref="AntlrToken"/>s created by parsing the file at the supplied
-        /// <paramref name="filePath"/>.
+        /// Returns a stream of <see cref="AntlrToken"/>s created by parsing the <paramref name="stream"/>.
         /// </summary>
-        /// <param name="filePath">Path to the source code file which shall be read and parsed.</param>
-        /// <returns>A list of tokens created from the source code file.</returns>
-        /// <remarks>
-        /// <ul>
-        /// <li>The language of the file will be determined by checking its file extension.</li>
-        /// <li>Each token will be created by using <see cref="FromAntlrToken"/>.</li>
-        /// </ul>
-        /// </remarks>
+        /// <param name="stream">The stream containing the source code to be parsed.</param>
+        /// <param name="language">The language of the source code in the stream.</param>
+        /// <returns>A list of tokens created from the source code in the stream.</returns>
         public static IEnumerable<AntlrToken> FromStream(Stream stream, AntlrLanguage language)
         {
             Lexer lexer = language.CreateLexer(stream);
