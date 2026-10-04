@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -24,8 +24,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private const string defaultDate = "2026/06/01";
 
-        public async UniTask ProvideAsync(string gitDir, Globbing glob, string branch, string repoName)
+        private async UniTask ProvideAsync(string gitDir, Globbing glob, string branch, string repoName)
         {
+
             GameObject go = new();
 
             BranchCity city = go.AddComponent<BranchCity>();
@@ -51,49 +52,56 @@ namespace SEE.GraphProviders
             );
         }
 
-        [Performance]
-        public IEnumerator TestProvideSmallRepo()
+        /// <summary>
+        /// Number of times <see cref="ProvideAsync"/> is run and measured per test.
+        /// </summary>
+        private const int measurementCount = 5;
+
+        /// <summary>
+        /// Runs <see cref="ProvideAsync"/> <see cref="measurementCount"/> times and
+        /// records the duration of each run, including all of its asynchronous
+        /// work, in <paramref name="sampleGroup"/>.
+        /// </summary>
+        /// <param name="sampleGroup">The sample group the measurements are recorded in.</param>
+        /// <param name="gitDir">The directory of the git repository.</param>
+        /// <param name="glob">The globbing filter for the files to be considered.</param>
+        /// <param name="branch">The branch to be analyzed.</param>
+        /// <param name="repoName">The name of the repository.</param>
+        /// <returns>A coroutine running the measurements.</returns>
+        private IEnumerator MeasureProvide(string sampleGroup, string gitDir, Globbing glob, string branch, string repoName)
         {
             return UniTask.ToCoroutine(async () =>
             {
-                Measure.Method(() =>
+                SampleGroup group = new(sampleGroup, SampleUnit.Microsecond);
+                for (int i = 0; i < measurementCount; i++)
                 {
-                    ProvideAsync("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, "origin/main", "bubbletea").ToCoroutine();
-                })
-                .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
-                .MeasurementCount(5)
-                .Run();
+                    using (Measure.Scope(group))
+                    {
+                        await ProvideAsync(gitDir, glob, branch, repoName);
+                    }
+                }
             });
+        }
+
+        [Performance]
+        public IEnumerator TestProvideSmallRepo()
+        {
+            return MeasureProvide("GitPerformance.SmallRepo", "TestRepos/bubbletea",
+                                  new Globbing() { { "**/*.go", true } }, "origin/main", "bubbletea");
         }
 
         [Performance]
         public IEnumerator TestProvideMedium1Repo()
         {
-            return UniTask.ToCoroutine(async () =>
-            {
-                Measure.Method(() =>
-                {
-                    ProvideAsync("TestRepos/express", new Globbing() { { "**/*.js", true } }, "origin/master", "express").ToCoroutine();
-                })
-                .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
-                .MeasurementCount(5)
-                .Run();
-            });
+            return MeasureProvide("GitPerformance.SmallRepo", "TestRepos/express",
+                                  new Globbing() { { "**/*.js", true } }, "origin/master", "express");
         }
 
         [Performance]
         public IEnumerator TestProvideBig2Repo()
         {
-            return UniTask.ToCoroutine(async () =>
-            {
-                Measure.Method(() =>
-                {
-                    ProvideAsync("TestRepos/node", new Globbing() { { "**/*.js", true }, }, "origin/main", "node").ToCoroutine();
-                })
-                .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
-                .MeasurementCount(5)
-                .Run();
-            });
+            return MeasureProvide("GitPerformance.SmallRepo", "TestRepos/node",
+                                  new Globbing() { { "**/*.js", true } }, "origin/main", "node");
         }
     }
 }
