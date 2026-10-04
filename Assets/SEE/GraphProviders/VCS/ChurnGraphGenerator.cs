@@ -458,6 +458,10 @@ namespace SEE.GraphProviders.VCS
                     RenameThreshold = renameThreshold
                 }
             };
+            // Narrows every comparison to the directories taken into account,
+            // widened by the former names of the files renamed into them as
+            // those renames are found; see Compared.
+            Narrowing narrowing = new(criteria.Pathspec);
             Mailmap mailmap = session.Mailmap;
             walked = 0;
             foreach (Commit commit in session.Commits(criteria.Commits))
@@ -490,7 +494,10 @@ namespace SEE.GraphProviders.VCS
 
                 if (criteria.Counts(commit))
                 {
-                    using Patch patch = Compare<Patch>(session, criteria, parent, commit.Tree, compareOptions);
+                    using Patch patch
+                        = Compared<Patch>(parent, commit.Tree,
+                                          changes => changes.Where(change => change.Status == ChangeKind.Added)
+                                                            .Select(change => change.Path));
                     // The files this one commit changed, under the names they
                     // carry at the end. Gathered as they are recorded, because
                     // which files changed together is known only once they all
@@ -557,7 +564,8 @@ namespace SEE.GraphProviders.VCS
             void NoteRenames(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree)
             {
                 using TreeChanges treeChanges
-                    = Compare<TreeChanges>(session, criteria, oldTree, newTree, compareOptions);
+                    = Compared<TreeChanges>(oldTree, newTree,
+                                            changes => changes.Added.Select(change => change.Path));
                 foreach (TreeEntryChanges change in treeChanges)
                 {
                     if (change.Status == ChangeKind.Renamed)
@@ -572,26 +580,55 @@ namespace SEE.GraphProviders.VCS
                     }
                 }
             }
-        }
 
-        /// <summary>
-        /// The comparison of <paramref name="newTree"/> against
-        /// <paramref name="oldTree"/>, narrowed to the directories taken into
-        /// account where there are any.
-        /// </summary>
-        /// <typeparam name="T">What the comparison is to yield.</typeparam>
-        /// <param name="session">The repository the trees belong to.</param>
-        /// <param name="criteria">States the directories taken into account.</param>
-        /// <param name="oldTree">The tree compared against; null denotes the empty tree.</param>
-        /// <param name="newTree">The tree to be compared.</param>
-        /// <param name="compareOptions">The options of the comparison.</param>
-        /// <returns>The comparison.</returns>
-        private static T Compare<T>(GitRepositorySession session, Criteria criteria,
-                                    LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree,
-                                    CompareOptions compareOptions)
-            where T : class, IDiffResult
-        {
-            return session.Compare<T>(oldTree, newTree, criteria.Pathspec, compareOptions);
+            // The comparison of newTree against oldTree, narrowed by the
+            // narrowing. addedPaths yields the files a comparison shows as added.
+            //
+            // libgit2 applies the pathspec before it detects renames, so a file
+            // renamed from outside the pathspec into it shows as added, the file
+            // it was renamed from never having been compared. Where a file shows
+            // as added that is taken into account, now or under the name it
+            // carries at the end, the trees are therefore compared once more
+            // without narrowing, for the renames alone. A rename found that way
+            // widens the narrowing by the former name, which lets this
+            // comparison, made anew, show the rename along with the lines it
+            // changes, and lets every older commit show the changes made under
+            // that name. A commit adding no such file costs no more than before.
+            T Compared<T>(LibGit2Sharp.Tree oldTree, LibGit2Sharp.Tree newTree,
+                          Func<T, IEnumerable<string>> addedPaths)
+                where T : class, IDiffResult, IDisposable
+            {
+                T comparison = session.Compare<T>(oldTree, newTree, narrowing.Pathspec, compareOptions);
+                if (narrowing.Pathspec == null)
+                {
+                    return comparison;
+                }
+                ISet<string> added = addedPaths(comparison)
+                                     .Where(path => criteria.InScope(Follow(renamedTo, path)))
+                                     .ToHashSet();
+                if (added.Count == 0)
+                {
+                    return comparison;
+                }
+                bool widened = false;
+                using (TreeChanges whole
+                           = session.Compare<TreeChanges>(oldTree, newTree, null, compareOptions))
+                {
+                    foreach (TreeEntryChanges change in whole.Renamed)
+                    {
+                        if (added.Contains(change.Path))
+                        {
+                            widened |= narrowing.Widen(change.OldPath);
+                        }
+                    }
+                }
+                if (!widened)
+                {
+                    return comparison;
+                }
+                comparison.Dispose();
+                return session.Compare<T>(oldTree, newTree, narrowing.Pathspec, compareOptions);
+            }
         }
 
         /// <summary>
@@ -1077,9 +1114,10 @@ namespace SEE.GraphProviders.VCS
             internal string Walked { get; }
 
             /// <summary>
-            /// The pathspec narrowing every comparison of a commit against its
-            /// parent to the directories taken into account, or null where the
-            /// whole repository is taken into account.
+            /// The directories taken into account, or null where the whole
+            /// repository is taken into account. What every comparison of a
+            /// commit against its parent is narrowed to, at first; see
+            /// <see cref="Narrowing"/> for how that widens.
             /// </summary>
             internal IEnumerable<string> Pathspec { get; }
 
@@ -1195,6 +1233,63 @@ namespace SEE.GraphProviders.VCS
                         || Pathspec.Any(directory =>
                                         path.StartsWith(directory + "/", StringComparison.Ordinal)))
                     && (matcher == null || matcher.Matches(path));
+            }
+        }
+
+        /// <summary>
+        /// The pathspec every comparison of a commit against its parent is
+        /// narrowed to: the directories taken into account, along with the
+        /// former names, lying outside them, of the files renamed into them.
+        /// </summary>
+        /// <remarks>
+        /// Narrowing a comparison to the directories alone would lose a file
+        /// renamed into them from elsewhere: every change made to it under its
+        /// former name lies outside them. The former name is not known in
+        /// advance, though, but only once the rename has been found, which the
+        /// walk does before reaching any older commit using that name.
+        /// </remarks>
+        private class Narrowing
+        {
+            /// <summary>
+            /// The directories and files every comparison is narrowed to, or null
+            /// where the whole repository is taken into account.
+            /// </summary>
+            private readonly List<string> pathspec;
+
+            /// <summary>
+            /// Starts out with <paramref name="directories"/>.
+            /// </summary>
+            /// <param name="directories">The directories taken into account, or null where the
+            /// whole repository is taken into account.</param>
+            internal Narrowing(IEnumerable<string> directories)
+            {
+                pathspec = directories?.ToList();
+            }
+
+            /// <summary>
+            /// The pathspec to narrow a comparison to, or null where the whole
+            /// repository is taken into account. It may grow over the walk, so it
+            /// is to be asked for anew for every comparison.
+            /// </summary>
+            internal IEnumerable<string> Pathspec => pathspec;
+
+            /// <summary>
+            /// Widens the pathspec by <paramref name="path"/>, the former name of a
+            /// file renamed into it, unless the pathspec covers it already or
+            /// there is no pathspec at all.
+            /// </summary>
+            /// <param name="path">The former name of the file.</param>
+            /// <returns>True if and only if the pathspec was widened.</returns>
+            internal bool Widen(string path)
+            {
+                if (pathspec == null
+                    || pathspec.Any(covered => path == covered
+                                               || path.StartsWith(covered + "/", StringComparison.Ordinal)))
+                {
+                    return false;
+                }
+                pathspec.Add(path);
+                return true;
             }
         }
 

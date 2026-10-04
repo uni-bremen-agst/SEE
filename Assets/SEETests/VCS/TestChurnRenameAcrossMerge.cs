@@ -2,12 +2,7 @@ using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.GraphProviders.VCS;
 using SEE.Graphs;
-using SEE.Graphs.Utils;
-using SEE.Utils;
-using SEE.Utils.Paths;
 using System;
-using System.IO;
-using System.Text;
 using static SEE.Graphs.VCS;
 
 namespace SEE.VCS
@@ -38,10 +33,6 @@ namespace SEE.VCS
     /// reached before either, has revealed it: compared against S1, M renames
     /// the file. Were it not followed there, the churn of S1 would be filed
     /// under the former name, which does not survive, and be dropped.
-    ///
-    /// The commits are made directly in the object database rather than
-    /// through the working tree, so that their parents and their dates are
-    /// exactly as stated, and no merge has to be carried out.
     /// </remarks>
     internal class TestChurnRenameAcrossMerge
     {
@@ -96,14 +87,9 @@ namespace SEE.VCS
         private const string featureDeveloper = "Jan Mueller";
 
         /// <summary>
-        /// Path to the temporary repository.
-        /// </summary>
-        private string gitDirPath;
-
-        /// <summary>
         /// The temporary repository.
         /// </summary>
-        private Repository repo;
+        private ThrowawayRepository repository;
 
         /// <summary>
         /// The commit renaming the file, R.
@@ -122,22 +108,13 @@ namespace SEE.VCS
         [SetUp]
         public void Setup()
         {
-            gitDirPath = Path.Combine(Path.GetTempPath(), "seeChurnRenameAcrossMergeTest");
-            if (Directory.Exists(gitDirPath))
-            {
-                Filenames.DeleteReadOnlyDirectory(gitDirPath);
-            }
-            Directory.CreateDirectory(gitDirPath);
-            repo = new Repository(Repository.Init(gitDirPath));
+            repository = new ThrowawayRepository("seeChurnRenameAcrossMergeTest", start);
 
-            Commit initial = Make("C0", formerName, initialContent, mainDeveloper, 0);
-            rename = Make("R", laterName, initialContent, mainDeveloper, 1, initial);
-            Commit edit = Make("S1", formerName, editedContent, featureDeveloper, 2, initial);
-            merge = Make("M", laterName, editedContent, mainDeveloper, 3, rename, edit);
-
-            // The branch HEAD refers to, whatever its name, which depends on
-            // the configuration of git. It is the only branch there is.
-            repo.Refs.Add(repo.Refs.Head.TargetIdentifier, merge.Id);
+            Commit initial = repository.Make("C0", formerName, initialContent, mainDeveloper, 0);
+            rename = repository.Make("R", laterName, initialContent, mainDeveloper, 1, initial);
+            Commit edit = repository.Make("S1", formerName, editedContent, featureDeveloper, 2, initial);
+            merge = repository.Make("M", laterName, editedContent, mainDeveloper, 3, rename, edit);
+            repository.Branch(merge);
         }
 
         /// <summary>
@@ -146,11 +123,7 @@ namespace SEE.VCS
         [TearDown]
         public void TearDown()
         {
-            repo?.Dispose();
-            if (Directory.Exists(gitDirPath))
-            {
-                Filenames.DeleteReadOnlyDirectory(gitDirPath);
-            }
+            repository?.Dispose();
         }
 
         /// <summary>
@@ -160,11 +133,11 @@ namespace SEE.VCS
         [Test]
         public void TestPeriod()
         {
-            Graph graph = new(gitDirPath, nameof(TestPeriod));
+            Graph graph = new(repository.Location, nameof(TestPeriod));
             ChurnGraphGenerator.AddNodesAfterDate
                 (graph: graph,
                  simplifyGraph: false,
-                 repositoryConfiguration: Configuration(),
+                 repositoryConfiguration: repository.Configuration(),
                  repositoryName: nameof(TestPeriod),
                  startDate: start.UtcDateTime.Date,
                  addCoChangeEdges: false,
@@ -182,11 +155,11 @@ namespace SEE.VCS
         [Test]
         public void TestRange()
         {
-            Graph graph = new(gitDirPath, nameof(TestRange));
+            Graph graph = new(repository.Location, nameof(TestRange));
             ChurnGraphGenerator.AddNodesForCommit
                 (graph: graph,
                  simplifyGraph: false,
-                 repositoryConfiguration: Configuration(),
+                 repositoryConfiguration: repository.Configuration(),
                  repositoryName: nameof(TestRange),
                  commitID: merge.Sha,
                  baselineCommitID: rename.Sha,
@@ -213,48 +186,6 @@ namespace SEE.VCS
             Assert.That(node.IntAttributes[NumberOfCommits], Is.EqualTo(commits),
                         "The churn of S1 is missing unless the rename is followed across the merge.");
             Assert.That(node.IntAttributes[NumberOfDevelopers], Is.EqualTo(developers));
-        }
-
-        /// <summary>
-        /// The configuration of the temporary repository: every C# file,
-        /// every branch.
-        /// </summary>
-        /// <returns>The configuration.</returns>
-        private GitRepository Configuration()
-        {
-            Filter filter = new(globbing: new Globbing() { { "**/*.cs", true } },
-                                repositoryPaths: null,
-                                branches: null);
-            return new GitRepository(new DataPath(gitDirPath), filter);
-        }
-
-        /// <summary>
-        /// Makes a commit whose tree holds a single file.
-        /// </summary>
-        /// <param name="message">The message of the commit.</param>
-        /// <param name="path">The name of the file.</param>
-        /// <param name="content">The content of the file.</param>
-        /// <param name="developer">The author and committer of the commit.</param>
-        /// <param name="day">The number of days after <see cref="start"/> the commit is
-        /// made at.</param>
-        /// <param name="parents">The parents of the commit.</param>
-        /// <returns>The commit.</returns>
-        private Commit Make(string message, string path, string content, string developer,
-                            int day, params Commit[] parents)
-        {
-            Blob blob;
-            using (MemoryStream stream = new(Encoding.UTF8.GetBytes(content)))
-            {
-                blob = repo.ObjectDatabase.CreateBlob(stream);
-            }
-            TreeDefinition definition = new();
-            definition.Add(path, blob, Mode.NonExecutableFile);
-            LibGit2Sharp.Tree tree = repo.ObjectDatabase.CreateTree(definition);
-
-            Signature signature = new(developer, developer.Replace(' ', '.') + "@example.com",
-                                      start.AddDays(day));
-            return repo.ObjectDatabase.CreateCommit(signature, signature, message, tree,
-                                                    parents, prettifyMessage: false);
         }
     }
 }
