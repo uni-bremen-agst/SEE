@@ -84,23 +84,26 @@ namespace SEE.VCS
         /// If null or empty, all currently existing branches will be considered. Otherwise
         /// only files that exist in at least one of those branches will pass the filter.
         ///
-        /// The names in this set can be regular expressions.
+        /// The names in this set can be regular expressions. Such an expression must
+        /// match the friendly name as a whole, so "master" denotes the local master
+        /// alone; write ".*master" to catch "origin/master" along with it.
         /// </summary>
         /// <remarks>Can be null.</remarks>
         [Tooltip("The set of branches whose files are to be considered. "
             + "If null or empty, all currently existing branches will be considered. "
             + "Otherwise only files that exist in at least one of those branches will pass the filter. "
-            + "The names in this set can be regular expressions. "
+            + "The names in this set can be regular expressions, each matching a name as a whole. "
             + "The comparison is made against the friendly name of a branch.")]
         public HashSet<string> Branches;
 
         /// <summary>
         /// True if any of the regular expressions in <see cref="Branches"/>
-        /// matches a part the FriendlyName of the given <paramref name="branch"/>.
+        /// matches the FriendlyName of the given <paramref name="branch"/> as a whole.
         ///
-        /// For instance, if "71" is in <see cref="Branches"/>, then every branch
-        /// containing "71" in its FriendlyName will match, such as "feature/710-fix-bug"
-        /// or "feature/fix-bug-711".
+        /// For instance, "master" matches the local master and nothing else, and
+        /// "origin/.*" matches every remote-tracking branch of origin. To match a
+        /// part of a name, say so: ".*71.*" matches "feature/710-fix-bug" as well
+        /// as "feature/fix-bug-711".
         /// </summary>
         /// <param name="branch">Branch whose FriendlyName is to be matched.</param>
         /// <returns>True if there is at least one regular expressions
@@ -116,7 +119,10 @@ namespace SEE.VCS
 
             bool Matches(string branchName)
             {
-                return Branches.Any(b => Regex.IsMatch(branchName, b));
+                // The anchors make this a match of the whole name; the group
+                // keeps them from binding to only the first and the last
+                // alternative of an alternation within b.
+                return Branches.Any(b => Regex.IsMatch(branchName, $"^(?:{b})$"));
             }
         }
 

@@ -51,5 +51,24 @@ namespace SEE.Utils
         {
             return DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _);
         }
+
+        /// <summary>
+        /// Returns the instant the day of <paramref name="date"/> begins at, in UTC.
+        /// The time of day of <paramref name="date"/> is ignored, and so is its
+        /// <see cref="DateTime.Kind"/>: the day named is taken as a UTC day even if
+        /// <paramref name="date"/> is a local time.
+        /// </summary>
+        /// <remarks>
+        /// The kind is dropped before the result is built, because
+        /// <see cref="DateTimeOffset"/> rejects a local time paired with an offset
+        /// other than the local one, which would make callers passing, for instance,
+        /// <see cref="DateTime.Now"/> fail on every machine not running on UTC.
+        /// </remarks>
+        /// <param name="date">The date whose day is meant.</param>
+        /// <returns>The start of the day of <paramref name="date"/> in UTC.</returns>
+        internal static DateTimeOffset StartOfUtcDay(DateTime date)
+        {
+            return new DateTimeOffset(DateTime.SpecifyKind(date.Date, DateTimeKind.Unspecified), TimeSpan.Zero);
+        }
     }
 }

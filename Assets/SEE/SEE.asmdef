@@ -46,6 +46,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "JetBrains.Profiler.Api.dll",
         "SALSA-LipSync.dll",
         "FuzzySharp.dll",
         "HtmlAgilityPack.dll",

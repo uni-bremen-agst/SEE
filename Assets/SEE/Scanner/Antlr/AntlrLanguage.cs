@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 
@@ -567,6 +568,16 @@ namespace SEE.Scanner.Antlr
         }
 
         /// <summary>
+        /// Returns true if a lexer is defined for the given <paramref name="extension"/>, false otherwise.
+        /// </summary>
+        /// <param name="extension">The file extension to check for a defined lexer.</param>
+        /// <returns>True if a lexer is defined for the given extension, false otherwise.</returns>
+        public static bool HasLexer(string extension)
+        {
+            return AllAntlrLanguages.Any(x => x.FileExtensions.Contains(extension));
+        }
+
+        /// <summary>
         /// Returns the matching token language for the given <paramref name="extension"/>.
         /// If no matching token language is found, the <see cref="PlainTextLexer"/> will be used, unless
         /// <paramref name="throwOnUnkown"/> is true.
@@ -605,7 +616,28 @@ namespace SEE.Scanner.Antlr
         /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
         public Lexer CreateLexer(string content)
         {
-            ICharStream input = CharStreams.fromString(content);
+            return CreateLexer(CharStreams.fromString(content));
+        }
+
+        /// <summary>
+        /// Creates a new lexer matching the <see cref="LexerFileName"/> of this language.
+        /// </summary>
+        /// <param name="stream">The stream which shall be parsed by the lexer.</param>
+        /// <returns>The new matching lexer.</returns>
+        /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
+        public Lexer CreateLexer(Stream stream)
+        {
+            return CreateLexer(CharStreams.fromStream(stream));
+        }
+
+        /// <summary>
+        /// Returns a new lexer matching the <see cref="LexerFileName"/> of this language.
+        /// </summary>
+        /// <param name="input">The character stream to be parsed by the lexer.</param>
+        /// <returns>The new matching lexer.</returns>
+        /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
+        private Lexer CreateLexer(ICharStream input)
+        {
             return LexerFileName switch
             {
                 javaFileName => new Java9Lexer(input),
