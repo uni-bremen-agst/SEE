@@ -523,5 +523,104 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return true;
         }
+
+        /// <summary>
+        /// Resolves the receiver of a framework dictionary
+        /// <c>TryGetValue</c> invocation.
+        /// </summary>
+        /// <param name="invocation">The invocation to inspect.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for method resolution.
+        /// </param>
+        /// <param name="dictionaryExpression">
+        /// The resolved dictionary receiver.
+        /// </param>
+        /// <param name="methodSymbol">
+        /// The resolved <c>TryGetValue</c> method.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the invocation is a supported framework
+        /// dictionary <c>TryGetValue</c>; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetDictionaryReceiverFromTryGetValue(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            out ExpressionSyntax? dictionaryExpression,
+            out IMethodSymbol? methodSymbol)
+        {
+            dictionaryExpression = null;
+            methodSymbol = null;
+
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
+
+            if (symbolInfo.Symbol is not IMethodSymbol selectedMethod
+                || !string.Equals(selectedMethod.Name, "TryGetValue", StringComparison.Ordinal)
+                || !IsDictionaryType(selectedMethod.ContainingType)
+                || invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+            {
+                return false;
+            }
+
+            dictionaryExpression =
+                ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression(
+                    memberAccess.Expression);
+            methodSymbol = selectedMethod;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether a type is a framework dictionary whose values
+        /// are framework lists.
+        /// </summary>
+        /// <param name="typeSymbol">The dictionary type.</param>
+        /// <returns>
+        /// <see langword="true"/> for
+        /// <c>Dictionary&lt;TKey, List&lt;T&gt;&gt;</c>; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool IsDictionaryOfListsType(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is not INamedTypeSymbol dictionaryType
+                || !IsDictionaryType(dictionaryType)
+                || dictionaryType.TypeArguments.Length != 2)
+            {
+                return false;
+            }
+
+            return IsListType(dictionaryType.TypeArguments[1]);
+        }
+
+        /// <summary>
+        /// Determines whether an alias is passed as the read-only source of a
+        /// framework list <c>AddRange</c> invocation.
+        /// </summary>
+        /// <param name="argument">The possible source argument.</param>
+        /// <param name="invocation">The containing invocation.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for method resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the alias is only enumerated by
+        /// <c>AddRange</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsListAddRangeSourceArgument(
+            ArgumentSyntax argument,
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel)
+        {
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
+
+            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
+                || !IsListType(methodSymbol.ContainingType)
+                || !string.Equals(methodSymbol.Name, "AddRange", StringComparison.Ordinal)
+                || invocation.ArgumentList.Arguments.Count != 1)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(invocation.ArgumentList.Arguments[0], argument);
+        }
     }
 }

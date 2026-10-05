@@ -284,7 +284,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (outArgument == null
                 || !outArgument.RefKindKeyword.IsKind(SyntaxKind.OutKeyword)
                 || outArgument.Parent?.Parent is not InvocationExpressionSyntax invocation
-                || !TryGetDictionaryReceiverFromTryGetValue(
+                || !ExceptionFlowSequenceCollectionFactsProvider.TryGetDictionaryReceiverFromTryGetValue(
                     invocation,
                     semanticModel,
                     out ExpressionSyntax? dictionaryExpression,
@@ -299,7 +299,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (argumentIndex < 0
                 || ExceptionFlowArgumentMapper.GetParameterIndex(outArgument, argumentIndex, tryGetValueMethod) != 1
-                || !IsUseGuardedBySuccessfulTryGetValue(expression, invocation))
+                || !ExceptionFlowGuardFactsProvider.IsUseGuardedBySuccessfulTryGetValue(
+                    expression,
+                    invocation))
             {
                 return false;
             }
@@ -311,185 +313,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return DoesOutSequenceRemainUnchangedBeforeUse(
+            return ExceptionFlowSequenceContentPreservationFactsProvider.DoesOutSequenceRemainUnchangedBeforeUse(
                 expression,
                 localSymbol,
                 invocation,
                 semanticModel);
-        }
-
-        /// <summary>
-        /// Resolves the receiver of a framework dictionary
-        /// <c>TryGetValue</c> invocation.
-        /// </summary>
-        /// <param name="invocation">
-        /// The invocation to inspect.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for method resolution.
-        /// </param>
-        /// <param name="dictionaryExpression">
-        /// The resolved dictionary receiver.
-        /// </param>
-        /// <param name="methodSymbol">
-        /// The resolved <c>TryGetValue</c> method.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the invocation is a supported framework
-        /// dictionary <c>TryGetValue</c>; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool TryGetDictionaryReceiverFromTryGetValue(
-            InvocationExpressionSyntax invocation,
-            SemanticModel semanticModel,
-            out ExpressionSyntax? dictionaryExpression,
-            out IMethodSymbol? methodSymbol)
-        {
-            dictionaryExpression = null;
-            methodSymbol = null;
-
-            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
-
-            if (symbolInfo.Symbol is not IMethodSymbol selectedMethod
-                || !string.Equals(selectedMethod.Name, "TryGetValue", StringComparison.Ordinal)
-                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(selectedMethod.ContainingType)
-                || invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-            {
-                return false;
-            }
-
-            dictionaryExpression = UnwrapParenthesizedExpression(memberAccess.Expression);
-            methodSymbol = selectedMethod;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether the current use lies on a branch that can only be
-        /// entered after the specified <c>TryGetValue</c> invocation returned
-        /// <see langword="true"/>.
-        /// </summary>
-        /// <param name="expression">
-        /// The current out-local use.
-        /// </param>
-        /// <param name="invocation">
-        /// The dictionary <c>TryGetValue</c> invocation.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the use is inside the true branch of a
-        /// condition that requires the invocation to be true; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsUseGuardedBySuccessfulTryGetValue(
-            ExpressionSyntax expression,
-            InvocationExpressionSyntax invocation)
-        {
-            IfStatementSyntax? ifStatement =
-                invocation.Ancestors()
-                    .OfType<IfStatementSyntax>()
-                    .FirstOrDefault(candidate => candidate.Condition.Span.Contains(invocation.Span));
-
-            if (ifStatement == null || !ifStatement.Statement.Span.Contains(expression.Span))
-            {
-                return false;
-            }
-
-            return ConditionRequiresInvocationTrue(ifStatement.Condition, invocation);
-        }
-
-        /// <summary>
-        /// Determines whether a condition can be true only when a specified
-        /// invocation evaluates to <see langword="true"/>.
-        /// </summary>
-        /// <param name="condition">
-        /// The condition to inspect.
-        /// </param>
-        /// <param name="invocation">
-        /// The invocation whose successful result is required.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for a direct invocation or a supported
-        /// logical-and condition containing it; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool ConditionRequiresInvocationTrue(
-            ExpressionSyntax condition,
-            InvocationExpressionSyntax invocation)
-        {
-            ExpressionSyntax unwrappedCondition = UnwrapParenthesizedExpression(condition);
-
-            if (unwrappedCondition.SyntaxTree == invocation.SyntaxTree
-                && unwrappedCondition.Span == invocation.Span)
-            {
-                return true;
-            }
-
-            if (unwrappedCondition is not BinaryExpressionSyntax logicalAnd
-                || !logicalAnd.IsKind(SyntaxKind.LogicalAndExpression))
-            {
-                return false;
-            }
-
-            if (logicalAnd.Left.Span.Contains(invocation.Span))
-            {
-                return ConditionRequiresInvocationTrue(logicalAnd.Left, invocation);
-            }
-
-            if (logicalAnd.Right.Span.Contains(invocation.Span))
-            {
-                return ConditionRequiresInvocationTrue(logicalAnd.Right, invocation);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether the out sequence is untouched between the
-        /// successful <c>TryGetValue</c> and the current use.
-        /// </summary>
-        /// <param name="expression">
-        /// The current sequence use.
-        /// </param>
-        /// <param name="localSymbol">
-        /// The out-local symbol.
-        /// </param>
-        /// <param name="invocation">
-        /// The originating <c>TryGetValue</c> invocation.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when no earlier reference after the
-        /// invocation can change or expose the sequence; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool DoesOutSequenceRemainUnchangedBeforeUse(
-            ExpressionSyntax expression,
-            ILocalSymbol localSymbol,
-            InvocationExpressionSyntax invocation,
-            SemanticModel semanticModel)
-        {
-            SyntaxNode? containingCallable =
-                invocation.Ancestors().FirstOrDefault(
-                    static node => node is MethodDeclarationSyntax || node is LocalFunctionStatementSyntax);
-
-            if (containingCallable == null)
-            {
-                return false;
-            }
-
-            IEnumerable<IdentifierNameSyntax> precedingReferences =
-                containingCallable.DescendantNodes(
-                        static node => node is not AnonymousFunctionExpressionSyntax
-                            && node is not LocalFunctionStatementSyntax)
-                    .OfType<IdentifierNameSyntax>()
-                    .Where(identifier =>
-                        identifier.SpanStart > invocation.Span.End
-                        && identifier.SpanStart < expression.SpanStart
-                        && ExpressionReferencesSymbol(identifier, localSymbol, semanticModel));
-
-            return !precedingReferences.Any();
         }
 
         /// <summary>
@@ -520,7 +348,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             IPropertySymbol normalizedProperty = propertySymbol.OriginalDefinition;
 
-            if (!IsSupportedDictionarySequenceProperty(
+            if (!ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedDictionarySequenceProperty(
                     normalizedProperty,
                     semanticModel,
                     out PropertyDeclarationSyntax? propertyDeclaration,
@@ -539,93 +367,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 propertyDeclaration,
                 declarationSemanticModel,
                 inspectedDictionaries);
-        }
-
-        /// <summary>
-        /// Determines whether a property is a supported get-only dictionary of
-        /// lists whose complete set of usages can be inspected.
-        /// </summary>
-        /// <param name="propertySymbol">
-        /// The dictionary property.
-        /// </param>
-        /// <param name="semanticModel">
-        /// A semantic model from the current compilation.
-        /// </param>
-        /// <param name="propertyDeclaration">
-        /// The resolved property declaration.
-        /// </param>
-        /// <param name="declarationSemanticModel">
-        /// The semantic model associated with the property declaration.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the property has a supported immutable
-        /// reference and empty dictionary initializer; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsSupportedDictionarySequenceProperty(
-            IPropertySymbol propertySymbol,
-            SemanticModel semanticModel,
-            out PropertyDeclarationSyntax? propertyDeclaration,
-            out SemanticModel? declarationSemanticModel)
-        {
-            propertyDeclaration = null;
-            declarationSemanticModel = null;
-
-            if (propertySymbol.IsStatic
-                || propertySymbol.IsIndexer
-                || propertySymbol.SetMethod != null
-                || propertySymbol.ContainingType.ContainingType == null
-                || propertySymbol.ContainingType.DeclaredAccessibility != Accessibility.Private
-                || propertySymbol.DeclaringSyntaxReferences.Length != 1
-                || !IsDictionaryOfListsType(propertySymbol.Type)
-                || propertySymbol.DeclaringSyntaxReferences[0].GetSyntax()
-                    is not PropertyDeclarationSyntax declaration
-                || !IsSupportedGetOnlyAutoProperty(declaration)
-                || declaration.Initializer == null)
-            {
-                return false;
-            }
-
-            SemanticModel? propertySemanticModel =
-                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(semanticModel, declaration.SyntaxTree);
-
-            if (propertySemanticModel == null
-                || !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation(
-                    declaration.Initializer.Value,
-                    propertySemanticModel))
-            {
-                return false;
-            }
-
-            propertyDeclaration = declaration;
-            declarationSemanticModel = propertySemanticModel;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether a type is a framework dictionary whose values
-        /// are framework lists.
-        /// </summary>
-        /// <param name="typeSymbol">
-        /// The dictionary type.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> for
-        /// <c>Dictionary&lt;TKey, List&lt;T&gt;&gt;</c>; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsDictionaryOfListsType(ITypeSymbol typeSymbol)
-        {
-            if (typeSymbol is not INamedTypeSymbol dictionaryType
-                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType(dictionaryType)
-                || dictionaryType.TypeArguments.Length != 2)
-            {
-                return false;
-            }
-
-            return ExceptionFlowSequenceCollectionFactsProvider.IsListType(
-                dictionaryType.TypeArguments[1]);
         }
 
         /// <summary>
@@ -915,7 +656,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            ISymbol? aliasSymbol = GetOutArgumentSymbol(outArgument, semanticModel);
+            ISymbol? aliasSymbol =
+                ExceptionFlowSymbolUsageFacts.GetOutArgumentSymbol(
+                    outArgument,
+                    semanticModel);
 
             if (aliasSymbol is not ILocalSymbol aliasLocal)
             {
@@ -956,32 +700,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Resolves the symbol introduced or referenced by an out argument.
-        /// </summary>
-        /// <param name="argument">
-        /// The out argument.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model associated with the argument.
-        /// </param>
-        /// <returns>
-        /// The corresponding local symbol, or <see langword="null"/> when no
-        /// supported local could be resolved.
-        /// </returns>
-        private static ISymbol? GetOutArgumentSymbol(
-            ArgumentSyntax argument,
-            SemanticModel semanticModel)
-        {
-            if (argument.Expression is DeclarationExpressionSyntax declarationExpression
-                && declarationExpression.Designation is SingleVariableDesignationSyntax designation)
-            {
-                return semanticModel.GetDeclaredSymbol(designation);
-            }
-
-            return semanticModel.GetSymbolInfo(argument.Expression).Symbol;
-        }
-
-        /// <summary>
         /// Determines whether one use of a list alias obtained from a
         /// dictionary preserves the stored sequence invariant.
         /// </summary>
@@ -1018,7 +736,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 if (ReferenceEquals(assignment.Right, reference)
-                    && AssignmentTargetsDictionaryProperty(
+                    && ExceptionFlowSymbolUsageFacts.AssignmentTargetsDictionaryProperty(
                         assignment.Left,
                         dictionaryProperty,
                         semanticModel))
@@ -1045,7 +763,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 && ReferenceEquals(argument.Expression, reference)
                 && argument.Parent?.Parent is InvocationExpressionSyntax sourceInvocation)
             {
-                if (IsListAddRangeSourceArgument(argument, sourceInvocation, semanticModel))
+                if (ExceptionFlowSequenceCollectionFactsProvider.IsListAddRangeSourceArgument(
+                        argument,
+                        sourceInvocation,
+                        semanticModel))
                 {
                     return true;
                 }
@@ -1119,79 +840,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 GetExpressionValueFacts(valueExpression, semanticModel, valueContext);
 
             return valueFacts.ContainsAll(ExceptionFlowValueFacts.NonNull);
-        }
-
-        /// <summary>
-        /// Determines whether an alias is passed as the read-only source of a
-        /// framework list <c>AddRange</c> invocation.
-        /// </summary>
-        /// <param name="argument">
-        /// The possible source argument.
-        /// </param>
-        /// <param name="invocation">
-        /// The containing invocation.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for method resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the alias is only enumerated by
-        /// <c>AddRange</c>; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsListAddRangeSourceArgument(
-            ArgumentSyntax argument,
-            InvocationExpressionSyntax invocation,
-            SemanticModel semanticModel)
-        {
-            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
-
-            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || !ExceptionFlowSequenceCollectionFactsProvider.IsListType(
-                    methodSymbol.ContainingType)
-                || !string.Equals(methodSymbol.Name, "AddRange", StringComparison.Ordinal)
-                || invocation.ArgumentList.Arguments.Count != 1)
-            {
-                return false;
-            }
-
-            return ReferenceEquals(invocation.ArgumentList.Arguments[0], argument);
-        }
-
-        /// <summary>
-        /// Determines whether an assignment writes an alias back into the same
-        /// dictionary property from which it originated.
-        /// </summary>
-        /// <param name="targetExpression">
-        /// The assignment target.
-        /// </param>
-        /// <param name="dictionaryProperty">
-        /// The expected dictionary property.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for property resolution.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the target is an indexer on the same
-        /// dictionary property; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool AssignmentTargetsDictionaryProperty(
-            ExpressionSyntax targetExpression,
-            IPropertySymbol dictionaryProperty,
-            SemanticModel semanticModel)
-        {
-            ExpressionSyntax unwrappedTarget = UnwrapParenthesizedExpression(targetExpression);
-
-            if (unwrappedTarget is not ElementAccessExpressionSyntax elementAccess)
-            {
-                return false;
-            }
-
-            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(elementAccess.Expression);
-
-            return symbolInfo.Symbol is IPropertySymbol targetProperty
-                && SymbolEqualityComparer.Default.Equals(
-                    targetProperty.OriginalDefinition,
-                    dictionaryProperty.OriginalDefinition);
         }
     }
 }

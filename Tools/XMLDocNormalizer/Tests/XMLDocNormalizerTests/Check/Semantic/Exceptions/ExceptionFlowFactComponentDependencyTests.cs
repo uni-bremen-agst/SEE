@@ -266,6 +266,84 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures sequence-range and dictionary-mutation facts have their
+        /// cohesive existing owners without Analyzer forwarding methods.
+        /// </summary>
+        [Fact]
+        public void SequenceRangeDictionaryMutationFacts_HaveDedicatedOwners()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] collectionMethods =
+            [
+                "TryGetDictionaryReceiverFromTryGetValue",
+                "IsDictionaryOfListsType",
+                "IsListAddRangeSourceArgument"
+            ];
+            string[] guardMethods =
+            [
+                "IsUseGuardedBySuccessfulTryGetValue",
+                "ConditionRequiresInvocationTrue"
+            ];
+            string[] preservationMethods =
+            [
+                "DoesOutSequenceRemainUnchangedBeforeUse",
+                "IsSupportedDictionarySequenceProperty"
+            ];
+            string[] symbolUsageMethods =
+            [
+                "GetOutArgumentSymbol",
+                "AssignmentTargetsDictionaryProperty"
+            ];
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] collectionOwnerMethods =
+                typeof(ExceptionFlowSequenceCollectionFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] guardOwnerMethods =
+                typeof(ExceptionFlowGuardFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] preservationOwnerMethods =
+                typeof(ExceptionFlowSequenceContentPreservationFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] symbolUsageOwnerMethods =
+                typeof(ExceptionFlowSymbolUsageFacts)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+
+            Assert.All(
+                collectionMethods,
+                method => Assert.Contains(method, collectionOwnerMethods));
+            Assert.All(
+                guardMethods,
+                method => Assert.Contains(method, guardOwnerMethods));
+            Assert.All(
+                preservationMethods,
+                method => Assert.Contains(method, preservationOwnerMethods));
+            Assert.All(
+                symbolUsageMethods,
+                method => Assert.Contains(method, symbolUsageOwnerMethods));
+            Assert.All(
+                collectionMethods
+                    .Concat(guardMethods)
+                    .Concat(preservationMethods)
+                    .Concat(symbolUsageMethods),
+                method => Assert.DoesNotContain(method, analyzerMethods));
+        }
+
+        /// <summary>
         /// Ensures every partial declaration of the stateless table-fact
         /// provider remains free of Analyzer back references even though the
         /// cache owner remains in the same source file.

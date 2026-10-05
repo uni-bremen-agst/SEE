@@ -1013,5 +1013,90 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return false;
         }
+
+        /// <summary>
+        /// Determines whether the current use lies on a branch that can only be
+        /// entered after the specified <c>TryGetValue</c> invocation returned
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <param name="expression">The current out-local use.</param>
+        /// <param name="invocation">
+        /// The dictionary <c>TryGetValue</c> invocation.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the use is inside the true branch of a
+        /// condition that requires the invocation to be true; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool IsUseGuardedBySuccessfulTryGetValue(
+            ExpressionSyntax expression,
+            InvocationExpressionSyntax invocation)
+        {
+            IfStatementSyntax? ifStatement =
+                invocation.Ancestors()
+                    .OfType<IfStatementSyntax>()
+                    .FirstOrDefault(
+                        candidate =>
+                            candidate.Condition.Span.Contains(invocation.Span));
+
+            if (ifStatement == null
+                || !ifStatement.Statement.Span.Contains(expression.Span))
+            {
+                return false;
+            }
+
+            return ConditionRequiresInvocationTrue(
+                ifStatement.Condition,
+                invocation);
+        }
+
+        /// <summary>
+        /// Determines whether a condition can be true only when a specified
+        /// invocation evaluates to <see langword="true"/>.
+        /// </summary>
+        /// <param name="condition">The condition to inspect.</param>
+        /// <param name="invocation">
+        /// The invocation whose successful result is required.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for a direct invocation or a supported
+        /// logical-and condition containing it; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool ConditionRequiresInvocationTrue(
+            ExpressionSyntax condition,
+            InvocationExpressionSyntax invocation)
+        {
+            ExpressionSyntax unwrappedCondition =
+                UnwrapParenthesizedExpression(condition);
+
+            if (unwrappedCondition.SyntaxTree == invocation.SyntaxTree
+                && unwrappedCondition.Span == invocation.Span)
+            {
+                return true;
+            }
+
+            if (unwrappedCondition is not BinaryExpressionSyntax logicalAnd
+                || !logicalAnd.IsKind(SyntaxKind.LogicalAndExpression))
+            {
+                return false;
+            }
+
+            if (logicalAnd.Left.Span.Contains(invocation.Span))
+            {
+                return ConditionRequiresInvocationTrue(
+                    logicalAnd.Left,
+                    invocation);
+            }
+
+            if (logicalAnd.Right.Span.Contains(invocation.Span))
+            {
+                return ConditionRequiresInvocationTrue(
+                    logicalAnd.Right,
+                    invocation);
+            }
+
+            return false;
+        }
     }
 }

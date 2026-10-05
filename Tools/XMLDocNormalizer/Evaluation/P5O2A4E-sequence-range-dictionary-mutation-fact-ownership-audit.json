@@ -1,0 +1,249 @@
+{
+  "Schema": "P5O2A4E.SequenceRangeDictionaryMutationFactOwnership.v1",
+  "WorkPackage": "P5O2A4E - Sequence Range / Dictionary Mutation Fact Ownership",
+  "Head": "beb5777d5381ee3807eda0ff5bd2f31a159bccec",
+  "Baseline": {
+    "WorkPackage": "P5O2A4D - Dictionary Value-Fact Ownership",
+    "Audit": "Evaluation/P5O2A4D-dictionary-value-fact-ownership-audit.json",
+    "SelfAnalysis": "artifacts/p5o2a4d/final-self-analysis.json"
+  },
+  "InitialStatus": [
+    "M ../../.gitignore",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/bin/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/ref/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/refint/XMLDocNormalizer.ExceptionFlow.Core.dll"
+  ],
+  "Scope": {
+    "InspectedTargetMethods": 9,
+    "InspectedDirectSccIncomingEdges": 7,
+    "MovedRecursiveSccMethods": 0,
+    "ChangedCacheOwnership": false,
+    "ExtractedSuccessfulSequenceValidation": false,
+    "AddedProviderTypes": 0,
+    "AddedInterfaces": 0,
+    "AddedAnalyzerForwarders": 0
+  },
+  "Before": {
+    "AnalyzerOwnedDownstream": 23,
+    "FactFamilies": 2,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 8,
+    "SccToProviders": 85,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 41,
+    "AnalyzerNonblankSloc": 19693
+  },
+  "Methods": [
+    {
+      "Name": "TryGetDictionaryReceiverFromTryGetValue",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceCollectionFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceCollectionFactsProvider.cs",
+      "CurrentLine": 546,
+      "Responsibility": "Framework Dictionary.TryGetValue receiver and selected-method classification",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionaryTryGetValueOutSequenceProvenNonNullElements"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType",
+        "ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression"
+      ]
+    },
+    {
+      "Name": "IsDictionaryOfListsType",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceCollectionFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceCollectionFactsProvider.cs",
+      "CurrentLine": 583,
+      "Responsibility": "Framework Dictionary<TKey, List<T>> shape classification",
+      "DirectSccCallers": [],
+      "DirectGroupCallers": [
+        "ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedDictionarySequenceProperty"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryType",
+        "ExceptionFlowSequenceCollectionFactsProvider.IsListType"
+      ]
+    },
+    {
+      "Name": "IsListAddRangeSourceArgument",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceCollectionFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceCollectionFactsProvider.cs",
+      "CurrentLine": 608,
+      "Responsibility": "Framework List<T>.AddRange source-argument classification",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSequenceCollectionFactsProvider.IsListType"
+      ]
+    },
+    {
+      "Name": "IsUseGuardedBySuccessfulTryGetValue",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowGuardFactsProvider",
+      "CurrentFile": "ExceptionFlowGuardFactsProvider.cs",
+      "CurrentLine": 1031,
+      "Responsibility": "Successful TryGetValue true-branch proof at a use site",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionaryTryGetValueOutSequenceProvenNonNullElements"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowGuardFactsProvider.ConditionRequiresInvocationTrue"
+      ]
+    },
+    {
+      "Name": "ConditionRequiresInvocationTrue",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowGuardFactsProvider",
+      "CurrentFile": "ExceptionFlowGuardFactsProvider.cs",
+      "CurrentLine": 1066,
+      "Responsibility": "Direct and logical-and condition implication for one invocation",
+      "DirectSccCallers": [],
+      "DirectGroupCallers": [
+        "ExceptionFlowGuardFactsProvider.IsUseGuardedBySuccessfulTryGetValue"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression"
+      ]
+    },
+    {
+      "Name": "DoesOutSequenceRemainUnchangedBeforeUse",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceContentPreservationFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+      "CurrentLine": 748,
+      "Responsibility": "Out-local sequence preservation between TryGetValue and use",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionaryTryGetValueOutSequenceProvenNonNullElements"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol"
+      ]
+    },
+    {
+      "Name": "IsSupportedDictionarySequenceProperty",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceContentPreservationFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+      "CurrentLine": 802,
+      "Responsibility": "Inspectability, immutable reference, list-valued shape, and empty initialization of a dictionary property",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionaryOfSequencesProvenToExcludeNullElements"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryOfListsType",
+        "ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation",
+        "ExceptionFlowStableMemberFacts.IsSupportedGetOnlyAutoProperty",
+        "ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree"
+      ]
+    },
+    {
+      "Name": "GetOutArgumentSymbol",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSymbolUsageFacts",
+      "CurrentFile": "ExceptionFlowSymbolUsageFacts.cs",
+      "CurrentLine": 227,
+      "Responsibility": "Generic declared or referenced out-argument symbol resolution",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.DoesDictionaryTryGetValueAliasPreserveNonNullElements"
+      ],
+      "DirectCallees": []
+    },
+    {
+      "Name": "AssignmentTargetsDictionaryProperty",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSymbolUsageFacts",
+      "CurrentFile": "ExceptionFlowSymbolUsageFacts.cs",
+      "CurrentLine": 257,
+      "Responsibility": "Symbol-equal dictionary-property element-assignment target classification",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression"
+      ]
+    }
+  ],
+  "DirectSccEdgesAfter": [
+    "IsDictionaryTryGetValueOutSequenceProvenNonNullElements -> ExceptionFlowSequenceCollectionFactsProvider.TryGetDictionaryReceiverFromTryGetValue",
+    "IsDictionaryTryGetValueOutSequenceProvenNonNullElements -> ExceptionFlowGuardFactsProvider.IsUseGuardedBySuccessfulTryGetValue",
+    "IsDictionaryTryGetValueOutSequenceProvenNonNullElements -> ExceptionFlowSequenceContentPreservationFactsProvider.DoesOutSequenceRemainUnchangedBeforeUse",
+    "IsDictionaryOfSequencesProvenToExcludeNullElements -> ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedDictionarySequenceProperty",
+    "DoesDictionaryTryGetValueAliasPreserveNonNullElements -> ExceptionFlowSymbolUsageFacts.GetOutArgumentSymbol",
+    "IsDictionarySequenceAliasReferenceSafe -> ExceptionFlowSymbolUsageFacts.AssignmentTargetsDictionaryProperty",
+    "IsDictionarySequenceAliasReferenceSafe -> ExceptionFlowSequenceCollectionFactsProvider.IsListAddRangeSourceArgument"
+  ],
+  "RemainingSccToAnalyzerEdge": "AreSequenceElementsProvenNonNull -> IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper",
+  "After": {
+    "AnalyzerOwnedDownstream": 14,
+    "FactFamilies": 1,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 1,
+    "SccToProviders": 92,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 41,
+    "AnalyzerNonblankSloc": 19376,
+    "SccChanged": false
+  },
+  "RemainingAnalyzerFamilies": [
+    {
+      "Name": "Successful sequence validation",
+      "Methods": 14,
+      "SccIncomingEdges": 1
+    }
+  ],
+  "Tests": {
+    "AddedTestCases": 4,
+    "ArchitectureGuard": "SequenceRangeDictionaryMutationFacts_HaveDedicatedOwners",
+    "SemanticCoverage": [
+      "framework TryGetValue receiver recognition and lookalike rejection",
+      "Dictionary<TKey, List<T>> classification",
+      "supported AddRange source argument and unrelated argument rejection",
+      "positive successful guard and negated-branch rejection",
+      "untouched out sequence and intervening-use invalidation",
+      "supported and unsupported dictionary-sequence properties",
+      "declared and existing out-symbol resolution",
+      "same-property and different-property assignment targets",
+      "existing end-to-end mutation invalidation"
+    ]
+  },
+  "Validation": {
+    "Focused": "18/18",
+    "RelevantRegression": "80/80",
+    "BroadP5P6G": "1748/1748",
+    "FullSuite": "2540/2540; 0 failed; 0 skipped",
+    "Build": "0 warnings; 0 errors",
+    "SelfAnalysisDurationMilliseconds": 61118,
+    "SelfAnalysisTotal": 16,
+    "DOC610": 0,
+    "DOC611": 1,
+    "DOC631": 15,
+    "DOC632": 0,
+    "CanonicalAdded": 0,
+    "CanonicalRemoved": 0,
+    "CanonicalChangedEvidence": 0,
+    "ExactFindingArraysEqualToP5O2A4D": true,
+    "RetainedCanonicalBaselineHash": "15BBAC06F82C233BCB652B2ADAA3A83322E7E626469F8C77E400C1259CA71B1B",
+    "CrashObserved": false,
+    "FlakeObserved": false
+  },
+  "Readiness": {
+    "P5O2A4FReady": true,
+    "SccExtractionReady": false,
+    "P5O2BReady": false,
+    "BlockingDirectSccToAnalyzerEdges": 1,
+    "RequiredNextWork": "Extract the remaining Successful sequence validation family in P5O2A4F before moving the intact SCC."
+  }
+}

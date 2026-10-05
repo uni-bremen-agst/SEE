@@ -212,5 +212,69 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return currentExpression;
         }
+
+        /// <summary>
+        /// Resolves the symbol introduced or referenced by an out argument.
+        /// </summary>
+        /// <param name="argument">The out argument.</param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the argument.
+        /// </param>
+        /// <returns>
+        /// The corresponding local symbol, or <see langword="null"/> when no
+        /// supported local could be resolved.
+        /// </returns>
+        internal static ISymbol? GetOutArgumentSymbol(
+            ArgumentSyntax argument,
+            SemanticModel semanticModel)
+        {
+            if (argument.Expression
+                    is DeclarationExpressionSyntax declarationExpression
+                && declarationExpression.Designation
+                    is SingleVariableDesignationSyntax designation)
+            {
+                return semanticModel.GetDeclaredSymbol(designation);
+            }
+
+            return semanticModel.GetSymbolInfo(argument.Expression).Symbol;
+        }
+
+        /// <summary>
+        /// Determines whether an assignment writes an alias back into the same
+        /// dictionary property from which it originated.
+        /// </summary>
+        /// <param name="targetExpression">The assignment target.</param>
+        /// <param name="dictionaryProperty">
+        /// The expected dictionary property.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for property resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the target is an indexer on the same
+        /// dictionary property; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool AssignmentTargetsDictionaryProperty(
+            ExpressionSyntax targetExpression,
+            IPropertySymbol dictionaryProperty,
+            SemanticModel semanticModel)
+        {
+            ExpressionSyntax unwrappedTarget =
+                UnwrapParenthesizedExpression(targetExpression);
+
+            if (unwrappedTarget
+                    is not ElementAccessExpressionSyntax elementAccess)
+            {
+                return false;
+            }
+
+            SymbolInfo symbolInfo =
+                semanticModel.GetSymbolInfo(elementAccess.Expression);
+
+            return symbolInfo.Symbol is IPropertySymbol targetProperty
+                && SymbolEqualityComparer.Default.Equals(
+                    targetProperty.OriginalDefinition,
+                    dictionaryProperty.OriginalDefinition);
+        }
     }
 }

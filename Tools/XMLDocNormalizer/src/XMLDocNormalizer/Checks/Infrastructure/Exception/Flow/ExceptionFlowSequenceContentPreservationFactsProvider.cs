@@ -727,5 +727,122 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return receiverTypeInfo.Type
                 is IArrayTypeSymbol;
         }
+
+        /// <summary>
+        /// Determines whether the out sequence is untouched between the
+        /// successful <c>TryGetValue</c> and the current use.
+        /// </summary>
+        /// <param name="expression">The current sequence use.</param>
+        /// <param name="localSymbol">The out-local symbol.</param>
+        /// <param name="invocation">
+        /// The originating <c>TryGetValue</c> invocation.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when no earlier reference after the
+        /// invocation can change or expose the sequence; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool DoesOutSequenceRemainUnchangedBeforeUse(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel)
+        {
+            SyntaxNode? containingCallable =
+                invocation.Ancestors().FirstOrDefault(
+                    static node =>
+                        node is MethodDeclarationSyntax
+                            or LocalFunctionStatementSyntax);
+
+            if (containingCallable == null)
+            {
+                return false;
+            }
+
+            IEnumerable<IdentifierNameSyntax> precedingReferences =
+                containingCallable.DescendantNodes(
+                        static node =>
+                            node is not AnonymousFunctionExpressionSyntax
+                                && node is not LocalFunctionStatementSyntax)
+                    .OfType<IdentifierNameSyntax>()
+                    .Where(
+                        identifier =>
+                            identifier.SpanStart > invocation.Span.End
+                                && identifier.SpanStart < expression.SpanStart
+                                && ExpressionReferencesSymbol(
+                                    identifier,
+                                    localSymbol,
+                                    semanticModel));
+
+            return !precedingReferences.Any();
+        }
+
+        /// <summary>
+        /// Determines whether a property is a supported get-only dictionary of
+        /// lists whose complete set of usages can be inspected.
+        /// </summary>
+        /// <param name="propertySymbol">The dictionary property.</param>
+        /// <param name="semanticModel">
+        /// A semantic model from the current compilation.
+        /// </param>
+        /// <param name="propertyDeclaration">
+        /// The resolved property declaration.
+        /// </param>
+        /// <param name="declarationSemanticModel">
+        /// The semantic model associated with the property declaration.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the property has a supported immutable
+        /// reference and empty dictionary initializer; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool IsSupportedDictionarySequenceProperty(
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel,
+            out PropertyDeclarationSyntax? propertyDeclaration,
+            out SemanticModel? declarationSemanticModel)
+        {
+            propertyDeclaration = null;
+            declarationSemanticModel = null;
+
+            if (propertySymbol.IsStatic
+                || propertySymbol.IsIndexer
+                || propertySymbol.SetMethod != null
+                || propertySymbol.ContainingType.ContainingType == null
+                || propertySymbol.ContainingType.DeclaredAccessibility
+                    != Accessibility.Private
+                || propertySymbol.DeclaringSyntaxReferences.Length != 1
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsDictionaryOfListsType(
+                    propertySymbol.Type)
+                || propertySymbol.DeclaringSyntaxReferences[0].GetSyntax()
+                    is not PropertyDeclarationSyntax declaration
+                || !ExceptionFlowStableMemberFacts.IsSupportedGetOnlyAutoProperty(
+                    declaration)
+                || declaration.Initializer == null)
+            {
+                return false;
+            }
+
+            SemanticModel? propertySemanticModel =
+                ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                    semanticModel,
+                    declaration.SyntaxTree);
+
+            if (propertySemanticModel == null
+                || !ExceptionFlowSequenceCollectionFactsProvider.IsKnownEmptyDictionaryCreation(
+                    declaration.Initializer.Value,
+                    propertySemanticModel))
+            {
+                return false;
+            }
+
+            propertyDeclaration = declaration;
+            declarationSemanticModel = propertySemanticModel;
+
+            return true;
+        }
     }
 }
