@@ -459,7 +459,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedValueSources)
         {
-            if (!TryResolveDelegateTarget(
+            if (!ExceptionFlowDelegateTargetResolver.TryResolveDelegateTarget(
                     factory,
                     semanticModel,
                     out IMethodSymbol? targetMethod)

@@ -24,6 +24,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 typeof(ExceptionFlowCallContextFactProjector),
                 typeof(ExceptionFlowConditionalWeakTableValueFactsProvider),
                 typeof(ExceptionFlowDataFlowFactsProvider),
+                typeof(ExceptionFlowDelegateTargetResolver),
                 typeof(ExceptionFlowDereferenceFactDiscovery),
                 typeof(ExceptionFlowEnumValueFactsProvider),
                 typeof(ExceptionFlowGuardFactsProvider),
@@ -60,6 +61,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "ExceptionFlowArgumentMapper.cs",
                 "ExceptionFlowCallContextFactProjector.cs",
                 "ExceptionFlowDataFlowFactsProvider.cs",
+                "ExceptionFlowDelegateTargetResolver.cs",
                 "ExceptionFlowDereferenceFactDiscovery.Callee.cs",
                 "ExceptionFlowDereferenceFactDiscovery.cs",
                 "ExceptionFlowEnumValueFactsProvider.cs",
@@ -412,6 +414,92 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures delegate-target resolution has one Analyzer-independent
+        /// owner and that every production caller uses it directly.
+        /// </summary>
+        [Fact]
+        public void DelegateTargetResolution_HasDedicatedOwnerAndDirectUsers()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] resolverMethods =
+            [
+                "TryResolveDelegateTarget",
+                "UnwrapDelegateExpression",
+                "TryResolveStableDelegateLocal",
+                "HasDelegateLocalWrites"
+            ];
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] ownerMethods = typeof(ExceptionFlowDelegateTargetResolver)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string flowDirectory = GetFlowDirectory();
+            string resolverSource = File.ReadAllText(
+                Path.Combine(
+                    flowDirectory,
+                    "ExceptionFlowDelegateTargetResolver.cs"));
+            string[] callerFiles =
+            [
+                "ExceptionFlowAnalyzer.SummaryGraphCalls.cs",
+                "ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts.cs",
+                "ExceptionFlowLocalSourceAnalyzer.LocalCallables.cs"
+            ];
+            string[] dependencyFiles =
+            [
+                "ExceptionFlowCatchSemantics.cs",
+                "ExceptionFlowSemanticScope.cs"
+            ];
+
+            Assert.All(
+                resolverMethods,
+                method => Assert.Contains(method, ownerMethods));
+            Assert.Equal(5, ownerMethods.Length);
+            Assert.Equal(
+                2,
+                ownerMethods.Count(
+                    static method =>
+                        method == "TryResolveDelegateTarget"));
+            Assert.Empty(
+                typeof(ExceptionFlowDelegateTargetResolver)
+                    .GetFields(flags));
+            Assert.All(
+                resolverMethods,
+                method => Assert.DoesNotContain(method, analyzerMethods));
+            Assert.DoesNotContain(
+                nameof(ExceptionFlowAnalyzer),
+                resolverSource,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "Func<",
+                resolverSource,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "Action<",
+                resolverSource,
+                StringComparison.Ordinal);
+            Assert.All(
+                callerFiles,
+                file => Assert.Contains(
+                    nameof(ExceptionFlowDelegateTargetResolver) +
+                        ".TryResolveDelegateTarget(",
+                    File.ReadAllText(Path.Combine(flowDirectory, file)),
+                    StringComparison.Ordinal));
+            Assert.All(
+                dependencyFiles,
+                file => Assert.DoesNotContain(
+                    nameof(ExceptionFlowDelegateTargetResolver),
+                    File.ReadAllText(Path.Combine(flowDirectory, file)),
+                    StringComparison.Ordinal));
+        }
+
+        /// <summary>
         /// Ensures every partial declaration of the stateless table-fact
         /// provider remains free of Analyzer back references even though the
         /// cache owner remains in the same source file.
@@ -498,6 +586,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                         Path.Combine(
                             flowDirectory,
                             "ExceptionFlowCallContextFactProjector.cs"))
+                    .Append(
+                        Path.Combine(
+                            flowDirectory,
+                            "ExceptionFlowDelegateTargetResolver.cs"))
                     .Append(
                         Path.Combine(
                             flowDirectory,

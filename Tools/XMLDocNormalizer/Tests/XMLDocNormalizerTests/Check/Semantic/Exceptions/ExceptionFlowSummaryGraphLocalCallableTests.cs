@@ -511,6 +511,66 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures explicit and target-typed delegate creation retain their
+        /// concrete lambda targets through supported syntax wrappers.
+        /// </summary>
+        [Fact]
+        public void DelegateObjectCreationAndSuppression_ResolveTargets()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class TestClass
+                {
+                    public void M()
+                    {
+                        new Action(() =>
+                            throw new ArgumentException())();
+
+                        Action? action = new(() =>
+                            throw new InvalidOperationException());
+
+                        action!();
+                    }
+                }
+                """;
+
+            ExceptionFlowSummaryGraphTestRun run =
+                ExceptionFlowSummaryGraphTestHelper.Build(
+                    source,
+                    "M");
+
+            Assert.Equal(
+                2,
+                run.RootSummary.CallEdges.Count);
+            Assert.All(
+                run.RootSummary.CallEdges,
+                edge => Assert.Equal(
+                    ExceptionFlowPathStepKind.DelegateInvocation,
+                    edge.CallSiteStep.Kind));
+
+            string[] exceptionNames = run.RootSummary.CallEdges
+                .Select(
+                    edge => Assert.Single(
+                        run.GetRequiredSummary(
+                                edge.Target)
+                            .Sources)
+                        .ExceptionType
+                        .Name)
+                .OrderBy(static name => name, StringComparer.Ordinal)
+                .ToArray();
+
+            Assert.Equal(
+                [
+                    "ArgumentException",
+                    "InvalidOperationException"
+                ],
+                exceptionNames);
+        }
+
+        /// <summary>
         /// Ensures that a directly invoked lambda is resolved without an
         /// intermediate local variable.
         /// </summary>

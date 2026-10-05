@@ -1,0 +1,133 @@
+{
+  "Schema": "P5O2A4G.DelegateTargetResolverOwnership.v1",
+  "WorkPackage": "P5O2A4G - Delegate Target Resolver Ownership",
+  "Head": "7204c01c0d146c8c3863a14ec610f3bb7d8e04db",
+  "Baseline": {
+    "WorkPackage": "P5O2A4F - Successful Sequence Validation Fact Ownership",
+    "Audit": "Evaluation/P5O2A4F-successful-sequence-validation-fact-ownership-audit.json",
+    "SelfAnalysis": "artifacts/p5o2a4f/final-self-analysis.json"
+  },
+  "Scope": {
+    "InspectedResolverMethods": 5,
+    "MovedResolverMethods": 5,
+    "DirectProductionCallers": 3,
+    "AddedResolverTypes": 1,
+    "AddedArchitectureTests": 1,
+    "AddedSemanticTests": 1,
+    "AddedInterfaces": 0,
+    "AddedAnalyzerForwarders": 0,
+    "AddedCallbacks": 0,
+    "AddedCaches": 0,
+    "ChangedDelegateResolutionSemantics": false
+  },
+  "Methods": [
+    {
+      "Name": "TryResolveDelegateTarget",
+      "Overload": "ExpressionSyntax, SemanticModel, out IMethodSymbol",
+      "Visibility": "internal"
+    },
+    {
+      "Name": "TryResolveDelegateTarget",
+      "Overload": "ExpressionSyntax, SemanticModel, HashSet<ISymbol>, out IMethodSymbol",
+      "Visibility": "internal"
+    },
+    {
+      "Name": "UnwrapDelegateExpression",
+      "Visibility": "private"
+    },
+    {
+      "Name": "TryResolveStableDelegateLocal",
+      "Visibility": "private"
+    },
+    {
+      "Name": "HasDelegateLocalWrites",
+      "Visibility": "private"
+    }
+  ],
+  "Owner": {
+    "Before": "ExceptionFlowAnalyzer",
+    "After": "ExceptionFlowDelegateTargetResolver",
+    "StateFields": 0,
+    "CacheFields": 0
+  },
+  "DirectCallers": [
+    "ExceptionFlowAnalyzer.AnalyzeSummaryDelegateInvocation",
+    "ExceptionFlowAnalyzer.IsCallbackReturnDefinitelyNonNull",
+    "ExceptionFlowLocalSourceAnalyzer.AnalyzeDelegateInvocation"
+  ],
+  "Dependencies": [
+    "Microsoft.CodeAnalysis symbols and SemanticModel",
+    "Microsoft.CodeAnalysis.CSharp syntax and SyntaxKind",
+    "Microsoft.CodeAnalysis.Operations.IAnonymousFunctionOperation",
+    "ExceptionFlowSemanticScope",
+    "ExceptionFlowCatchSemantics"
+  ],
+  "Before": {
+    "AnalyzerOwnedDownstream": 0,
+    "FactFamilies": 0,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzerFactDependencies": 0,
+    "SccToAnalyzerDelegateResolutionEdges": 1,
+    "SccToComponents": 93,
+    "SccToSemanticScope": 18,
+    "ComponentToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 40,
+    "AnalyzerNonblankSloc": 18631
+  },
+  "After": {
+    "AnalyzerOwnedDownstream": 0,
+    "FactFamilies": 0,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzerFactDependencies": 0,
+    "SccToAnalyzerDelegateResolutionEdges": 0,
+    "SccToComponents": 94,
+    "SccToSemanticScope": 18,
+    "ComponentToAnalyzer": 0,
+    "ResolverToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 40,
+    "AnalyzerNonblankSloc": 18316,
+    "ResolverNonblankSloc": 327,
+    "SccChanged": false
+  },
+  "BehaviorCoverage": {
+    "DirectTarget": "ImmediatelyInvokedLambda_CreatesDelegateEdge",
+    "ConversionAndUnwrapping": "DelegateObjectCreationAndSuppression_ResolveTargets and ImmediatelyInvokedLambda_CreatesDelegateEdge",
+    "StableLocal": "InvokedLocalLambda_CreatesDelegateEdge and LocalFunctionMethodGroup_ResolvesDelegateTarget",
+    "LocalWrite": "ReassignedDelegate_IsMarkedUncertain and ReassignedDelegate_RemainsUncertain",
+    "Unresolved": "UnknownCallback_PropagatesDownstreamGuard",
+    "Ambiguous": "MultipleCallbackTargets_PropagateDownstreamGuard",
+    "SummaryPath": "ExceptionFlowSummaryGraphLocalCallableTests",
+    "CallbackPath": "DOC611_ConditionalWeakTableReturnFactsTests"
+  },
+  "Validation": {
+    "Focused": "43/43",
+    "RelevantRegression": "311/311",
+    "BroadP5P6G": "1755/1755",
+    "FullSuite": "2547/2547; 0 failed; 0 skipped",
+    "TransientTestObservation": "MultiModuleAssembly_FailsClosed failed in two parallel aggregate invocations, passed both isolated verification and unchanged aggregate retries, and is unrelated to A4G",
+    "Build": "0 warnings; 0 errors",
+    "SelfAnalysisDurationMilliseconds": 62237,
+    "SelfAnalysisTotal": 16,
+    "DOC610": 0,
+    "DOC611": 1,
+    "DOC631": 15,
+    "DOC632": 0,
+    "CanonicalAdded": 0,
+    "CanonicalRemoved": 0,
+    "CanonicalChangedEvidence": 0,
+    "ExactFindingArraysEqualToP5O2A4F": true,
+    "RetainedCanonicalBaselineHash": "15BBAC06F82C233BCB652B2ADAA3A83322E7E626469F8C77E400C1259CA71B1B",
+    "A4GFormatGate": "pass",
+    "GlobalFormatGate": "7 pre-existing out-of-scope whitespace diagnostics in 4 unchanged files"
+  },
+  "Readiness": {
+    "P5O2A5AReady": true,
+    "SccExtractionReady": false,
+    "P5O2BReady": false,
+    "RequiredNextWork": "Perform P5O2A5A Contextual Evaluator Boundary Audit before any SCC extraction."
+  }
+}

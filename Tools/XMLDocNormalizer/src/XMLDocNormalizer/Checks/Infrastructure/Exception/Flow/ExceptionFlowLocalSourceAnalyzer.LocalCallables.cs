@@ -157,7 +157,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callerContext)
         {
-            if (!TryResolveDelegateTarget(
+            if (!ExceptionFlowDelegateTargetResolver.TryResolveDelegateTarget(
                     invocation.Expression,
                     semanticModel,
                     out IMethodSymbol? targetMethod) ||
