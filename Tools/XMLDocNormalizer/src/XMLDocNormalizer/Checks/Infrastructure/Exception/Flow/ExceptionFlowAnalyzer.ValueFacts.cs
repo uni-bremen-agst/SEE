@@ -311,7 +311,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         inspectedImmutableMembers);
 
                     facts |=
-                        GetDictionaryEntryValueFacts(
+                        ExceptionFlowCallContextFactProjector.GetDictionaryEntryValueFacts(
                             unwrappedExpression,
                             propertySymbol,
                             semanticModel,

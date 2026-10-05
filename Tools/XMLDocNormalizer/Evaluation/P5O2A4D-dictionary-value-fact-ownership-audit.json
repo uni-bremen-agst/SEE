@@ -1,0 +1,216 @@
+{
+  "Schema": "P5O2A4D.DictionaryValueFactOwnership.v1",
+  "WorkPackage": "P5O2A4D - Dictionary Value-Fact Ownership",
+  "Head": "8b1ef706b5f96541e5f69f9387334fe14c5f7391",
+  "InitialStatus": [
+    "M ../../.gitignore",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache"
+  ],
+  "Scope": {
+    "ReconstructedFull252MethodGraph": false,
+    "InspectedTargetMethods": 4,
+    "InspectedDirectSccIncomingEdges": 4,
+    "MovedRecursiveSccMethods": 0,
+    "ChangedCacheOwnership": false
+  },
+  "Before": {
+    "AnalyzerOwnedDownstream": 27,
+    "FactFamilies": 3,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 12,
+    "SccToProviders": 81,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 41,
+    "AnalyzerNonblankSloc": 19948
+  },
+  "Methods": [
+    {
+      "Name": "GetDictionaryEntryValueFacts",
+      "Signature": "ExceptionFlowValueFacts GetDictionaryEntryValueFacts(ExpressionSyntax, IPropertySymbol, SemanticModel, ExceptionFlowCallContext)",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowCallContextFactProjector",
+      "CurrentFile": "ExceptionFlowCallContextFactProjector.cs",
+      "CurrentLine": 240,
+      "Responsibility": "Call-context NonNullDictionaryValues projection to KeyValuePair.Value",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.GetExpressionValueFacts(ExpressionSyntax, SemanticModel, ExceptionFlowCallContext, HashSet<ISymbol>)"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowCallContextFactProjector.IsKeyValuePairValueProperty",
+        "ExceptionFlowSequenceContentPreservationFactsProvider.IsSequenceParameterFactStillCurrent",
+        "ExceptionFlowSymbolUsageFacts.UnwrapParenthesizedExpression",
+        "ExceptionFlowCallContext.GetParameterFacts"
+      ],
+      "ReadsCallContext": true,
+      "ReadsAnalyzerState": false,
+      "CacheDependency": false
+    },
+    {
+      "Name": "IsKeyValuePairValueProperty",
+      "Signature": "bool IsKeyValuePairValueProperty(IPropertySymbol)",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowCallContextFactProjector",
+      "CurrentFile": "ExceptionFlowCallContextFactProjector.cs",
+      "CurrentLine": 325,
+      "Responsibility": "Framework KeyValuePair.Value shape classification",
+      "DirectSccCallers": [],
+      "DirectGroupCallers": [
+        "ExceptionFlowCallContextFactProjector.GetDictionaryEntryValueFacts"
+      ],
+      "ReadsCallContext": false,
+      "ReadsAnalyzerState": false,
+      "CacheDependency": false
+    },
+    {
+      "Name": "IsReadOnlyDictionaryWrapperConstruction",
+      "Signature": "bool IsReadOnlyDictionaryWrapperConstruction(ArgumentSyntax, ObjectCreationExpressionSyntax, SemanticModel)",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSequenceCollectionFactsProvider",
+      "CurrentFile": "ExceptionFlowSequenceCollectionFactsProvider.cs",
+      "CurrentLine": 350,
+      "Responsibility": "Framework ReadOnlyDictionary wrapped-source argument classification",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsPrivateDictionaryFieldReferenceSafeForNonNullValues"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowArgumentMapper.GetParameterIndex"
+      ],
+      "ReadsCallContext": false,
+      "ReadsAnalyzerState": false,
+      "CacheDependency": false
+    },
+    {
+      "Name": "TryGetPrecedingSimpleLocalAssignment",
+      "Signature": "bool TryGetPrecedingSimpleLocalAssignment(ExpressionSyntax, ILocalSymbol, SemanticModel, out ExpressionSyntax?)",
+      "OwnerBefore": "ExceptionFlowAnalyzer",
+      "OwnerAfter": "ExceptionFlowSymbolUsageFacts",
+      "CurrentFile": "ExceptionFlowSymbolUsageFacts.cs",
+      "CurrentLine": 117,
+      "Responsibility": "Generic nearest preceding straight-line simple local assignment discovery",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.IsDictionaryInsertionValueProvenNonNull",
+        "ExceptionFlowAnalyzer.IsStoredSequenceExpressionProvenNonNullElements"
+      ],
+      "DirectCallees": [
+        "ExceptionFlowDataFlowFactsProvider.GetFacts",
+        "ExceptionFlowSymbolUsageFacts.ExpressionReferencesSymbol"
+      ],
+      "ReadsCallContext": false,
+      "ReadsAnalyzerState": false,
+      "CacheDependency": false
+    }
+  ],
+  "ResponsibilitySplit": [
+    {
+      "Owner": "ExceptionFlowCallContextFactProjector",
+      "Methods": 2,
+      "Reason": "Projects a parameter fact carried by ExceptionFlowCallContext onto the corresponding foreach entry value."
+    },
+    {
+      "Owner": "ExceptionFlowSequenceCollectionFactsProvider",
+      "Methods": 1,
+      "Reason": "Classifies a stateless framework collection wrapper and its wrapped source argument."
+    },
+    {
+      "Owner": "ExceptionFlowSymbolUsageFacts",
+      "Methods": 1,
+      "Reason": "Performs dictionary-independent syntax, symbol, and data-flow assignment discovery."
+    }
+  ],
+  "DirectSccEdgesAfter": [
+    "GetExpressionValueFacts -> ExceptionFlowCallContextFactProjector.GetDictionaryEntryValueFacts",
+    "IsPrivateDictionaryFieldReferenceSafeForNonNullValues -> ExceptionFlowSequenceCollectionFactsProvider.IsReadOnlyDictionaryWrapperConstruction",
+    "IsDictionaryInsertionValueProvenNonNull -> ExceptionFlowSymbolUsageFacts.TryGetPrecedingSimpleLocalAssignment",
+    "IsStoredSequenceExpressionProvenNonNullElements -> ExceptionFlowSymbolUsageFacts.TryGetPrecedingSimpleLocalAssignment"
+  ],
+  "DependencyGraph": [
+    {
+      "From": "Dictionary entry call-context projection",
+      "To": "ExceptionFlowSequenceContentPreservationFactsProvider",
+      "Edges": 1
+    },
+    {
+      "From": "Dictionary entry call-context projection",
+      "To": "ExceptionFlowSymbolUsageFacts",
+      "Edges": 2
+    },
+    {
+      "From": "ReadOnlyDictionary wrapper classification",
+      "To": "ExceptionFlowArgumentMapper",
+      "Edges": 1
+    },
+    {
+      "From": "Preceding local assignment discovery",
+      "To": "ExceptionFlowDataFlowFactsProvider",
+      "Edges": 1
+    }
+  ],
+  "After": {
+    "AnalyzerOwnedDownstream": 23,
+    "FactFamilies": 2,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 8,
+    "SccToProviders": 85,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 41,
+    "AnalyzerNonblankSloc": 19693,
+    "SccChanged": false
+  },
+  "RemainingAnalyzerFamilies": [
+    {
+      "Name": "Sequence range and dictionary mutation",
+      "Methods": 9,
+      "SccIncomingEdges": 7
+    },
+    {
+      "Name": "Successful sequence validation",
+      "Methods": 14,
+      "SccIncomingEdges": 1
+    }
+  ],
+  "Tests": {
+    "AddedTestCases": 6,
+    "ArchitectureGuard": "DictionaryValueFactHelpers_HaveDedicatedOwners",
+    "SemanticCoverage": [
+      "NonNullDictionaryValues projection to KeyValuePair.Value",
+      "unrelated Value property rejection",
+      "ReadOnlyDictionary wrapper source recognition",
+      "unrelated constructor and argument rejection",
+      "nearest preceding simple assignment",
+      "conditional and compound write rejection"
+    ]
+  },
+  "Validation": {
+    "InitialFocused": "14/14",
+    "Focused": "67/67",
+    "BroadP5P6G": "1694/1694",
+    "FullSuite": "2536/2536; 0 failed; 0 skipped",
+    "Build": "0 warnings; 0 errors",
+    "SelfAnalysisDurationMilliseconds": 62103,
+    "SelfAnalysisTotal": 16,
+    "DOC610": 0,
+    "DOC611": 1,
+    "DOC631": 15,
+    "DOC632": 0,
+    "CanonicalAdded": 0,
+    "CanonicalRemoved": 0,
+    "CanonicalChangedEvidence": 0,
+    "ExactFindingArraysEqual": true,
+    "BaselineHash": "15BBAC06F82C233BCB652B2ADAA3A83322E7E626469F8C77E400C1259CA71B1B",
+    "CrashObserved": false,
+    "FlakeObserved": false
+  },
+  "Readiness": {
+    "SccExtractionReady": false,
+    "P5O2BReady": false,
+    "BlockingDirectSccToAnalyzerEdges": 8,
+    "RequiredNextWork": "Extract the remaining Sequence range/dictionary mutation and Successful sequence validation families before moving the intact SCC."
+  }
+}

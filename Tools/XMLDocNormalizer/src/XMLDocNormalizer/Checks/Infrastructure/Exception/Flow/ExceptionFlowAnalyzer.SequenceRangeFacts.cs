@@ -840,7 +840,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(expression);
 
             if (symbolInfo.Symbol is not ILocalSymbol localSymbol
-                || !TryGetPrecedingSimpleLocalAssignment(
+                || !ExceptionFlowSymbolUsageFacts.TryGetPrecedingSimpleLocalAssignment(
                     expression,
                     localSymbol,
                     semanticModel,

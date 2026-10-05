@@ -212,6 +212,60 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures dictionary value-fact projection, collection classification,
+        /// and generic local-assignment discovery have their dedicated owners
+        /// without Analyzer forwarding methods.
+        /// </summary>
+        [Fact]
+        public void DictionaryValueFactHelpers_HaveDedicatedOwners()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] projectionMethods =
+            [
+                "GetDictionaryEntryValueFacts",
+                "IsKeyValuePairValueProperty"
+            ];
+            const string collectionMethod =
+                "IsReadOnlyDictionaryWrapperConstruction";
+            const string symbolUsageMethod =
+                "TryGetPrecedingSimpleLocalAssignment";
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] projectorMethods =
+                typeof(ExceptionFlowCallContextFactProjector)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] collectionMethods =
+                typeof(ExceptionFlowSequenceCollectionFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] symbolUsageMethods =
+                typeof(ExceptionFlowSymbolUsageFacts)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+
+            Assert.All(
+                projectionMethods,
+                method => Assert.Contains(method, projectorMethods));
+            Assert.Contains(collectionMethod, collectionMethods);
+            Assert.Contains(symbolUsageMethod, symbolUsageMethods);
+            Assert.All(
+                projectionMethods
+                    .Append(collectionMethod)
+                    .Append(symbolUsageMethod),
+                method => Assert.DoesNotContain(method, analyzerMethods));
+        }
+
+        /// <summary>
         /// Ensures every partial declaration of the stateless table-fact
         /// provider remains free of Analyzer back references even though the
         /// cache owner remains in the same source file.

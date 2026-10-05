@@ -330,6 +330,67 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Determines whether a dictionary is supplied to a framework
+        /// <see cref="System.Collections.ObjectModel.ReadOnlyDictionary{TKey,TValue}"/>
+        /// constructor.
+        /// </summary>
+        /// <param name="argument">
+        /// The constructor argument containing the dictionary expression.
+        /// </param>
+        /// <param name="objectCreation">
+        /// The object creation expression containing the argument.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the object creation.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the dictionary is passed as the wrapped
+        /// dictionary argument; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool IsReadOnlyDictionaryWrapperConstruction(
+            ArgumentSyntax argument,
+            ObjectCreationExpressionSyntax objectCreation,
+            SemanticModel semanticModel)
+        {
+            SymbolInfo constructorSymbolInfo =
+                semanticModel.GetSymbolInfo(
+                    objectCreation);
+
+            if (constructorSymbolInfo.Symbol
+                    is not IMethodSymbol constructorSymbol
+                || constructorSymbol.MethodKind != MethodKind.Constructor)
+            {
+                return false;
+            }
+
+            INamedTypeSymbol containingType =
+                constructorSymbol.ContainingType.OriginalDefinition;
+
+            if (!string.Equals(
+                    containingType.Name,
+                    "ReadOnlyDictionary",
+                    StringComparison.Ordinal)
+                || containingType.Arity != 2
+                || !string.Equals(
+                    containingType.ContainingNamespace.ToDisplayString(),
+                    "System.Collections.ObjectModel",
+                    StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            int argumentIndex =
+                objectCreation.ArgumentList?.Arguments.IndexOf(argument)
+                ?? -1;
+
+            return argumentIndex >= 0
+                && ExceptionFlowArgumentMapper.GetParameterIndex(
+                    argument,
+                    argumentIndex,
+                    constructorSymbol) == 0;
+        }
+
+        /// <summary>
         /// Determines whether a sequence value has a concrete framework type
         /// whose ordinary enumeration does not mutate its contents.
         /// </summary>

@@ -216,5 +216,132 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return false;
         }
+
+        /// <summary>
+        /// Gets value facts for the <c>Value</c> property of a
+        /// <see cref="KeyValuePair{TKey,TValue}"/> produced by a dictionary
+        /// parameter whose stored values are known non-null.
+        /// </summary>
+        /// <param name="expression">
+        /// The property access expression to inspect.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The property symbol represented by <paramref name="expression"/>.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the expression.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known while analyzing the current call.
+        /// </param>
+        /// <returns>
+        /// The facts proven for the dictionary entry value.
+        /// </returns>
+        internal static ExceptionFlowValueFacts GetDictionaryEntryValueFacts(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
+        {
+            if (!IsKeyValuePairValueProperty(propertySymbol))
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            ExpressionSyntax unwrappedExpression =
+                UnwrapParenthesizedExpression(expression);
+
+            if (unwrappedExpression
+                    is not MemberAccessExpressionSyntax memberAccess)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            SymbolInfo receiverSymbolInfo =
+                semanticModel.GetSymbolInfo(
+                    memberAccess.Expression);
+
+            if (receiverSymbolInfo.Symbol
+                    is not ILocalSymbol iterationLocal)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            foreach (ForEachStatementSyntax foreachStatement
+                     in expression.Ancestors()
+                         .OfType<ForEachStatementSyntax>())
+            {
+                ISymbol? declaredIterationSymbol =
+                    semanticModel.GetDeclaredSymbol(
+                        foreachStatement);
+
+                if (!SymbolEqualityComparer.Default.Equals(
+                        declaredIterationSymbol,
+                        iterationLocal))
+                {
+                    continue;
+                }
+
+                ExpressionSyntax sourceExpression =
+                    UnwrapParenthesizedExpression(
+                        foreachStatement.Expression);
+
+                SymbolInfo sourceSymbolInfo =
+                    semanticModel.GetSymbolInfo(
+                        sourceExpression);
+
+                if (sourceSymbolInfo.Symbol
+                        is not IParameterSymbol sourceParameter
+                    || !callContext.GetParameterFacts(
+                            sourceParameter)
+                        .ContainsAll(
+                            ExceptionFlowValueFacts.NonNullDictionaryValues)
+                    || !ExceptionFlowSequenceContentPreservationFactsProvider.IsSequenceParameterFactStillCurrent(
+                        foreachStatement,
+                        sourceParameter,
+                        semanticModel))
+                {
+                    return ExceptionFlowValueFacts.None;
+                }
+
+                return ExceptionFlowValueFacts.NonNull;
+            }
+
+            return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether a property is
+        /// <see cref="KeyValuePair{TKey,TValue}.Value"/>.
+        /// </summary>
+        /// <param name="propertySymbol">
+        /// The property symbol to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the property is the framework
+        /// <c>KeyValuePair&lt;TKey, TValue&gt;.Value</c> property; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        internal static bool IsKeyValuePairValueProperty(
+            IPropertySymbol propertySymbol)
+        {
+            INamedTypeSymbol containingType =
+                propertySymbol.ContainingType.OriginalDefinition;
+
+            return string.Equals(
+                       propertySymbol.Name,
+                       "Value",
+                       StringComparison.Ordinal)
+                && propertySymbol.Parameters.Length == 0
+                && string.Equals(
+                    containingType.Name,
+                    "KeyValuePair",
+                    StringComparison.Ordinal)
+                && containingType.Arity == 2
+                && string.Equals(
+                    containingType.ContainingNamespace.ToDisplayString(),
+                    "System.Collections.Generic",
+                    StringComparison.Ordinal);
+        }
     }
 }

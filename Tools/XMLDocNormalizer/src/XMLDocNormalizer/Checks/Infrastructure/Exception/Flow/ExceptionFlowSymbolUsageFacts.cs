@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -90,6 +92,106 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 && SymbolEqualityComparer.Default.Equals(
                     symbolInfo.Symbol,
                     symbol);
+        }
+
+        /// <summary>
+        /// Gets the nearest preceding straight-line assignment to a local.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression whose preceding statements are inspected.
+        /// </param>
+        /// <param name="localSymbol">
+        /// The local symbol whose assignment is requested.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for data-flow and symbol analysis.
+        /// </param>
+        /// <param name="assignedExpression">
+        /// Receives the right-hand expression of the nearest qualifying
+        /// assignment when one is found; otherwise <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when a qualifying preceding assignment is
+        /// found; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetPrecedingSimpleLocalAssignment(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel,
+            out ExpressionSyntax? assignedExpression)
+        {
+            assignedExpression = null;
+
+            StatementSyntax? currentStatement =
+                expression.AncestorsAndSelf()
+                    .OfType<StatementSyntax>()
+                    .FirstOrDefault();
+
+            if (currentStatement?.Parent
+                    is not BlockSyntax containingBlock)
+            {
+                return false;
+            }
+
+            int currentIndex =
+                containingBlock.Statements.IndexOf(
+                    currentStatement);
+
+            if (currentIndex < 0)
+            {
+                return false;
+            }
+
+            for (int index = currentIndex - 1;
+                 index >= 0;
+                 index--)
+            {
+                StatementSyntax precedingStatement =
+                    containingBlock.Statements[index];
+
+                ExceptionFlowDataFlowFacts dataFlow =
+                    ExceptionFlowDataFlowFactsProvider.GetFacts(
+                        precedingStatement,
+                        semanticModel);
+
+                if (!dataFlow.Succeeded)
+                {
+                    return false;
+                }
+
+                bool writesLocal =
+                    dataFlow.WrittenInside.Any(
+                        writtenSymbol =>
+                            SymbolEqualityComparer.Default.Equals(
+                                writtenSymbol,
+                                localSymbol));
+
+                if (!writesLocal)
+                {
+                    continue;
+                }
+
+                if (precedingStatement
+                        is not ExpressionStatementSyntax expressionStatement
+                    || expressionStatement.Expression
+                        is not AssignmentExpressionSyntax assignment
+                    || !assignment.IsKind(
+                        SyntaxKind.SimpleAssignmentExpression)
+                    || !ExpressionReferencesSymbol(
+                        assignment.Left,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return false;
+                }
+
+                assignedExpression =
+                    assignment.Right;
+
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
