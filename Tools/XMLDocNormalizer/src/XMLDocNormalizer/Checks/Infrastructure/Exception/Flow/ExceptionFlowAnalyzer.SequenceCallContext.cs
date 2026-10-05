@@ -118,7 +118,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if ((sequenceSymbol is ILocalSymbol
                     || sequenceSymbol is IParameterSymbol)
-                && IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper(
+                && ExceptionFlowSuccessfulSequenceValidationFactsProvider.IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper(
                     unwrappedExpression,
                     sequenceSymbol,
                     semanticModel))

@@ -1,0 +1,211 @@
+{
+  "Schema": "P5O2A4F.SuccessfulSequenceValidationFactOwnership.v1",
+  "WorkPackage": "P5O2A4F - Successful Sequence Validation Fact Ownership",
+  "Head": "2ed48624923179dfdd96775d5e037b2d7b4c1fce",
+  "Baseline": {
+    "WorkPackage": "P5O2A4E - Sequence Range / Dictionary Mutation Fact Ownership",
+    "Audit": "Evaluation/P5O2A4E-sequence-range-dictionary-mutation-fact-ownership-audit.json",
+    "SelfAnalysis": "artifacts/p5o2a4e/final-self-analysis.json"
+  },
+  "InitialStatus": [
+    "M ../../.gitignore",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/bin/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/ref/XMLDocNormalizer.ExceptionFlow.Core.dll",
+    "M src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/refint/XMLDocNormalizer.ExceptionFlow.Core.dll"
+  ],
+  "Scope": {
+    "InspectedTargetMethods": 14,
+    "MovedToSuccessfulSequenceValidationProvider": 13,
+    "MovedToContentPreservationProvider": 1,
+    "InspectedDirectSccIncomingEdges": 1,
+    "MovedRecursiveSccMethods": 0,
+    "ChangedCacheOwnership": false,
+    "AddedProviderTypes": 1,
+    "AddedInterfaces": 0,
+    "AddedAnalyzerForwarders": 0
+  },
+  "Before": {
+    "AnalyzerOwnedDownstream": 14,
+    "FactFamilies": 1,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 1,
+    "SccToProviders": 92,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 41,
+    "AnalyzerNonblankSloc": 19376
+  },
+  "Methods": [
+    {
+      "Name": "IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 33,
+      "Responsibility": "Find an earlier successful validation and ensure all intervening statements preserve the sequence",
+      "DirectSccCallers": [
+        "ExceptionFlowAnalyzer.AreSequenceElementsProvenNonNull"
+      ]
+    },
+    {
+      "Name": "DoesStatementPreserveSequenceSymbolContents",
+      "OwnerAfter": "ExceptionFlowSequenceContentPreservationFactsProvider",
+      "CurrentLine": 868,
+      "Responsibility": "Data-flow, mutation, observation, and escape preservation for a sequence symbol"
+    },
+    {
+      "Name": "StatementSuccessfulCompletionProvesSequenceElementsNonNull",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 107,
+      "Responsibility": "Expression-statement validation invocation recognition"
+    },
+    {
+      "Name": "InvocationSuccessfulCompletionProvesSequenceElementsNonNull",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 143,
+      "Responsibility": "Exact source helper, dispatch, argument, and sequence-symbol validation"
+    },
+    {
+      "Name": "MethodSuccessfulCompletionProvesParameterElementsNonNull",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 231,
+      "Responsibility": "Source method body and parameter validation on every non-vacuous normal path"
+    },
+    {
+      "Name": "ForeachDirectlyEnumeratesParameter",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 332,
+      "Responsibility": "Direct foreach source-to-parameter symbol identity"
+    },
+    {
+      "Name": "AllPrecedingReturnsAreVacuousSequenceGuards",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 370,
+      "Responsibility": "Early-return restriction to null or empty sequences"
+    },
+    {
+      "Name": "IsSingleVoidReturn",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 422,
+      "Responsibility": "Direct or single-block void return classification"
+    },
+    {
+      "Name": "ConditionTrueImpliesSequenceHasNoElements",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 453,
+      "Responsibility": "Null-or-empty early-return condition implication"
+    },
+    {
+      "Name": "IsSequenceCountComparedEqualToZero",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 525,
+      "Responsibility": "Framework collection Count equals constant zero classification"
+    },
+    {
+      "Name": "ForeachBodyNecessarilyDereferencesEveryIteration",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 574,
+      "Responsibility": "Necessary iteration-variable dereference on every completed iteration"
+    },
+    {
+      "Name": "ForeachBodyCanExitBeforeRemainingElementsAreValidated",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 638,
+      "Responsibility": "Premature loop exit or skip detection"
+    },
+    {
+      "Name": "BreakTargetsForeach",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 695,
+      "Responsibility": "Break target classification across nested switches and loops"
+    },
+    {
+      "Name": "ContinueTargetsForeach",
+      "OwnerAfter": "ExceptionFlowSuccessfulSequenceValidationFactsProvider",
+      "CurrentLine": 736,
+      "Responsibility": "Continue target classification across nested loops"
+    }
+  ],
+  "ProviderDependencies": [
+    "ExceptionFlowSequenceContentPreservationFactsProvider",
+    "ExceptionFlowRuntimeDispatchClassifier",
+    "ExceptionFlowArgumentMapper",
+    "ExceptionFlowDereferenceFactDiscovery",
+    "ExceptionFlowSemanticScope",
+    "ExceptionFlowGuardFactsProvider",
+    "ExceptionFlowSequenceCollectionFactsProvider",
+    "ExceptionFlowSymbolUsageFacts"
+  ],
+  "ContentPreservationDependencies": [
+    "ExceptionFlowDataFlowFactsProvider",
+    "ExceptionFlowSymbolUsageFacts",
+    "ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation",
+    "ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedSequenceNullObservation",
+    "ExceptionFlowSequenceContentPreservationFactsProvider.IsSourceHelperArgumentProvenToPreserveSequenceContents"
+  ],
+  "DirectSccEdgesAfter": [
+    "AreSequenceElementsProvenNonNull -> ExceptionFlowSuccessfulSequenceValidationFactsProvider.IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper"
+  ],
+  "After": {
+    "AnalyzerOwnedDownstream": 0,
+    "FactFamilies": 0,
+    "SccMethods": 63,
+    "SccInternalEdges": 112,
+    "SccToAnalyzer": 0,
+    "SccToProviders": 93,
+    "SccToSemanticScope": 18,
+    "ProviderToAnalyzer": 0,
+    "ComponentCycles": 0,
+    "AnalyzerPartials": 40,
+    "AnalyzerNonblankSloc": 18631,
+    "SccChanged": false
+  },
+  "Tests": {
+    "AddedTestCases": 5,
+    "ArchitectureGuard": "SuccessfulSequenceValidationFacts_HaveDedicatedOwners",
+    "SemanticCoverage": [
+      "successful complete helper validation",
+      "early foreach break rejection",
+      "non-vacuous conditional-return rejection",
+      "post-validation mutation invalidation",
+      "nested switch break acceptance",
+      "different sequence-symbol rejection",
+      "non-validating helper rejection",
+      "runtime-dispatched receiver rejection",
+      "read-only observation preservation"
+    ]
+  },
+  "Validation": {
+    "Focused": "20/20",
+    "RelevantRegression": "85/85",
+    "BroadP5P6G": "1753/1753",
+    "FullSuite": "2545/2545; 0 failed; 0 skipped",
+    "Build": "0 warnings; 0 errors",
+    "SelfAnalysisDurationMilliseconds": 55986,
+    "SelfAnalysisTotal": 16,
+    "DOC610": 0,
+    "DOC611": 1,
+    "DOC631": 15,
+    "DOC632": 0,
+    "CanonicalAdded": 0,
+    "CanonicalRemoved": 0,
+    "CanonicalChangedEvidence": 0,
+    "ExactFindingArraysEqualToP5O2A4E": true,
+    "RetainedCanonicalBaselineHash": "15BBAC06F82C233BCB652B2ADAA3A83322E7E626469F8C77E400C1259CA71B1B",
+    "InitialSelfAnalysisAttempt": "Artifactless exit before completion output; isolated identical retry succeeded",
+    "CrashObserved": false,
+    "FlakeObserved": true
+  },
+  "Readiness": {
+    "P5O2A4GReady": true,
+    "SccExtractionReady": false,
+    "P5O2A5RequiredBeforeSccMove": true,
+    "P5O2BReady": false,
+    "BlockingDirectSccToAnalyzerEdges": 0,
+    "RequiredNextWork": "Perform the authorized P5O2A4G follow-up and P5O2A5 boundary work before moving the intact SCC."
+  }
+}

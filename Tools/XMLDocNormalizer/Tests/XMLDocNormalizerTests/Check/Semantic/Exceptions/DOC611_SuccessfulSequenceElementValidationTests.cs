@@ -317,6 +317,227 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures validation of a different sequence cannot establish facts
+        /// for the sequence that is subsequently consumed.
+        /// </summary>
+        [Fact]
+        public void ValidationOfDifferentSequence_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates one sequence and consumes another.
+                    /// </summary>
+                    public static void M(
+                        List<object?> values,
+                        List<object?> other)
+                    {
+                        ValidateAll(other);
+                        Consume(values);
+                    }
+
+                    private static void ValidateAll(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            _ = value.ToString();
+                        }
+                    }
+
+                    private static void Consume(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a helper that only enumerates without dereferencing its
+        /// elements cannot establish a non-null element fact.
+        /// </summary>
+        [Fact]
+        public void NonValidatingHelper_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Observes and consumes sequence elements.
+                    /// </summary>
+                    public static void M(List<object?> values)
+                    {
+                        ObserveAll(values);
+                        Consume(values);
+                    }
+
+                    private static void ObserveAll(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            _ = value;
+                        }
+                    }
+
+                    private static void Consume(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a virtual helper invocation whose runtime receiver may
+        /// dispatch elsewhere cannot establish a successful validation fact.
+        /// </summary>
+        [Fact]
+        public void RuntimeDispatchedValidationHelper_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public class Validator
+                {
+                    public virtual void ValidateAll(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            _ = value.ToString();
+                        }
+                    }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Invokes a dispatchable validator and consumes values.
+                    /// </summary>
+                    public static void M(
+                        List<object?> values,
+                        Validator validator)
+                    {
+                        validator.ValidateAll(values);
+                        Consume(values);
+                    }
+
+                    private static void Consume(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a supported read-only sequence observation between
+        /// validation and consumption preserves the established fact.
+        /// </summary>
+        [Fact]
+        public void ReadOnlyObservationAfterValidation_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates, observes, and consumes sequence elements.
+                    /// </summary>
+                    public static void M(List<object?> values)
+                    {
+                        ValidateAll(values);
+                        _ = values.Count;
+                        Consume(values);
+                    }
+
+                    private static void ValidateAll(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            _ = value.ToString();
+                        }
+                    }
+
+                    private static void Consume(
+                        IReadOnlyList<object?> values)
+                    {
+                        foreach (object? value in values)
+                        {
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
         /// Verifies that an ArgumentNullException finding remains present.
         /// </summary>
         private static void AssertArgumentNullFinding(string source)

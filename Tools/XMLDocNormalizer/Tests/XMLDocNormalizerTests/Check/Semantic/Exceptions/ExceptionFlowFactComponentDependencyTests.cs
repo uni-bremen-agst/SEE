@@ -38,6 +38,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 typeof(ExceptionFlowSourcePositionValueFactsProvider),
                 typeof(ExceptionFlowStableMemberFacts),
                 typeof(ExceptionFlowStableSourceMemberFactsProvider),
+                typeof(ExceptionFlowSuccessfulSequenceValidationFactsProvider),
                 typeof(ExceptionFlowSymbolUsageFacts)
             ];
 
@@ -74,6 +75,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "ExceptionFlowSourcePositionValueFactsProvider.cs",
                 "ExceptionFlowStableMemberFacts.cs",
                 "ExceptionFlowStableSourceMemberFactsProvider.cs",
+                "ExceptionFlowSuccessfulSequenceValidationFactsProvider.cs",
                 "ExceptionFlowSymbolUsageFacts.cs"
             ];
 
@@ -341,6 +343,72 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     .Concat(preservationMethods)
                     .Concat(symbolUsageMethods),
                 method => Assert.DoesNotContain(method, analyzerMethods));
+        }
+
+        /// <summary>
+        /// Ensures successful sequence-validation facts and the related
+        /// content-preservation fact have their dedicated owners without an
+        /// Analyzer facade or a component cycle.
+        /// </summary>
+        [Fact]
+        public void SuccessfulSequenceValidationFacts_HaveDedicatedOwners()
+        {
+            BindingFlags flags =
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly;
+            string[] validationMethods =
+            [
+                "IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper",
+                "StatementSuccessfulCompletionProvesSequenceElementsNonNull",
+                "InvocationSuccessfulCompletionProvesSequenceElementsNonNull",
+                "MethodSuccessfulCompletionProvesParameterElementsNonNull",
+                "ForeachDirectlyEnumeratesParameter",
+                "AllPrecedingReturnsAreVacuousSequenceGuards",
+                "IsSingleVoidReturn",
+                "ConditionTrueImpliesSequenceHasNoElements",
+                "IsSequenceCountComparedEqualToZero",
+                "ForeachBodyNecessarilyDereferencesEveryIteration",
+                "ForeachBodyCanExitBeforeRemainingElementsAreValidated",
+                "BreakTargetsForeach",
+                "ContinueTargetsForeach"
+            ];
+            const string preservationMethod =
+                "DoesStatementPreserveSequenceSymbolContents";
+            string[] analyzerMethods = typeof(ExceptionFlowAnalyzer)
+                .GetMethods(flags)
+                .Select(static method => method.Name)
+                .ToArray();
+            string[] validationOwnerMethods =
+                typeof(ExceptionFlowSuccessfulSequenceValidationFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string[] preservationOwnerMethods =
+                typeof(ExceptionFlowSequenceContentPreservationFactsProvider)
+                    .GetMethods(flags)
+                    .Select(static method => method.Name)
+                    .ToArray();
+            string flowDirectory = GetFlowDirectory();
+            string preservationSource = File.ReadAllText(
+                Path.Combine(
+                    flowDirectory,
+                    "ExceptionFlowSequenceContentPreservationFactsProvider.cs"));
+
+            Assert.All(
+                validationMethods,
+                method => Assert.Contains(method, validationOwnerMethods));
+            Assert.Contains(
+                preservationMethod,
+                preservationOwnerMethods);
+            Assert.All(
+                validationMethods.Append(preservationMethod),
+                method => Assert.DoesNotContain(method, analyzerMethods));
+            Assert.DoesNotContain(
+                nameof(ExceptionFlowSuccessfulSequenceValidationFactsProvider),
+                preservationSource,
+                StringComparison.Ordinal);
         }
 
         /// <summary>

@@ -2,7 +2,6 @@ using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlow
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowDataFlowFactsProvider.ExceptionFlowDataFlowFacts;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -10,7 +9,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Contains sequence-element facts established by successful completion of
     /// source-level helper calls.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static class ExceptionFlowSuccessfulSequenceValidationFactsProvider
     {
         /// <summary>
         /// Determines whether an earlier successfully completed source helper
@@ -31,7 +30,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// every current sequence element and no intervening statement can
         /// invalidate that fact; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper(
+        internal static bool IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper(
             ExpressionSyntax expression,
             ISymbol sequenceSymbol,
             SemanticModel semanticModel)
@@ -75,7 +74,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return true;
                 }
 
-                if (!DoesStatementPreserveSequenceSymbolContents(
+                if (!ExceptionFlowSequenceContentPreservationFactsProvider.DoesStatementPreserveSequenceSymbolContents(
                         precedingStatement,
                         sequenceSymbol,
                         semanticModel))
@@ -85,72 +84,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Determines whether a statement preserves the identity, contents, and
-        /// ownership assumptions of a sequence whose element facts are being
-        /// reused.
-        /// </summary>
-        /// <param name="statement">
-        /// The intervening statement to inspect.
-        /// </param>
-        /// <param name="sequenceSymbol">
-        /// The local or parameter sequence symbol.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol and data-flow analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the statement does not modify, replace,
-        /// or expose the sequence through an unsupported operation; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool DoesStatementPreserveSequenceSymbolContents(
-            StatementSyntax statement,
-            ISymbol sequenceSymbol,
-            SemanticModel semanticModel)
-        {
-            ExceptionFlowDataFlowFacts dataFlow =
-                ExceptionFlowDataFlowFactsProvider.GetFacts(statement, semanticModel);
-
-            if (!dataFlow.Succeeded
-                || dataFlow.WrittenInside.Any(
-                    writtenSymbol =>
-                        SymbolEqualityComparer.Default.Equals(
-                            writtenSymbol,
-                            sequenceSymbol)))
-            {
-                return false;
-            }
-
-            IEnumerable<IdentifierNameSyntax> references =
-                statement.DescendantNodes()
-                    .OfType<IdentifierNameSyntax>()
-                    .Where(
-                        identifier =>
-                            ExpressionReferencesSymbol(
-                                identifier,
-                                sequenceSymbol,
-                                semanticModel));
-
-            foreach (IdentifierNameSyntax reference in references)
-            {
-                if (ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedReadOnlySequenceObservation(
-                        reference,
-                        semanticModel)
-                    || ExceptionFlowSequenceContentPreservationFactsProvider.IsSupportedSequenceNullObservation(reference)
-                    || ExceptionFlowSequenceContentPreservationFactsProvider.IsSourceHelperArgumentProvenToPreserveSequenceContents(
-                        reference,
-                        semanticModel))
-                {
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
