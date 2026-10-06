@@ -167,7 +167,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     unreducedMethod.OriginalDefinition,
                     analysisTarget.OriginalDefinition))
             {
-                return CreateCallContext(
+                return ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     selectedMethod,
                     invocation.ArgumentList.Arguments,
                     semanticModel,
@@ -206,7 +206,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowCallContext reducedContext =
-                CreateCallContext(
+                ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     selectedMethod,
                     invocation.ArgumentList.Arguments,
                     semanticModel,

@@ -63,7 +63,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 ExceptionFlowCallContext targetContext =
-                    CreateCallContext(
+                    ExceptionFlowContextualFactEvaluator.CreateCallContext(
                         constructorSymbol,
                         creation.ArgumentList.Arguments,
                         semanticModel,

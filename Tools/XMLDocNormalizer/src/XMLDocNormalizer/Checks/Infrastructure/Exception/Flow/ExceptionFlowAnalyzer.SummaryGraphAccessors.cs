@@ -285,7 +285,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowCallContext getterContext =
-                CreateCallContext(
+                ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     getterSymbol,
                     arguments,
                     semanticModel,

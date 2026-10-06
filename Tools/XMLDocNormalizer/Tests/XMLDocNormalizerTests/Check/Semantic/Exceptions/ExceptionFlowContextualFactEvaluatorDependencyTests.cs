@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.Json;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
@@ -27,10 +29,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     .Replace("?", "", StringComparison.Ordinal)).Order(StringComparer.Ordinal).ToArray();
             Type evaluator = typeof(ExceptionFlowContextualFactEvaluator);
             MethodInfo[] methods = evaluator.GetMethods(Declared);
+            MethodInfo[] seeds = methods.Where(method =>
+                method.Name == "CreateCallContext" && method.GetParameters().Length == 4
+                || method.Name == "IsDefinitelyNonNull" && method.GetParameters().Length == 3).ToArray();
 
             Assert.Equal(63, expected.Length);
-            Assert.Equal(expected, methods.Select(Signature).Order(StringComparer.Ordinal).ToArray());
-            Assert.Equal(4, methods.Count(method => method.IsAssembly));
+            Assert.Equal(2, seeds.Length);
+            Assert.All(seeds, method => Assert.True(method.IsAssembly));
+            Assert.Equal(expected, methods.Except(seeds).Select(Signature).Order(StringComparer.Ordinal).ToArray());
+            Assert.Equal(6, methods.Count(method => method.IsAssembly));
             Assert.All(methods, method => Assert.True(method.IsAssembly || method.IsPrivate));
             Assert.All(methods, method => Assert.True(method.IsStatic));
             Assert.True(evaluator.IsAbstract && evaluator.IsSealed && evaluator.IsNotPublic);
@@ -38,6 +45,64 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.DoesNotContain(typeof(ExceptionFlowAnalyzer).GetMethods(Declared), method =>
                 expected.Contains(Signature(method).Replace("ExceptionFlowAnalyzer",
                     "ExceptionFlowContextualFactEvaluator", StringComparison.Ordinal), StringComparer.Ordinal));
+            Assert.DoesNotContain(typeof(ExceptionFlowAnalyzer).GetMethods(Declared), method =>
+                seeds.Select(Signature).Contains(Signature(method).Replace("ExceptionFlowAnalyzer",
+                    "ExceptionFlowContextualFactEvaluator", StringComparison.Ordinal), StringComparer.Ordinal));
+        }
+
+        /// <summary>
+        /// Rejects return-only and guard-seed-only Analyzer proxies structurally,
+        /// while retaining genuine transformations and fail-closed orchestration.
+        /// </summary>
+        [Fact]
+        public void Composition_HasNoThinAnalyzerForwarderAndOwnsFreshGuardSeeds()
+        {
+            string directory = Path.Combine(GetRoot(), "src", "XMLDocNormalizer", "Checks",
+                "Infrastructure", "Exception", "Flow");
+            ClassDeclarationSyntax[] types = Directory.EnumerateFiles(directory, "*.cs")
+                .SelectMany(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file)).GetRoot()
+                    .DescendantNodes().OfType<ClassDeclarationSyntax>()).ToArray();
+            bool IsEvaluatorCall(ExpressionSyntax? expression) => expression is InvocationExpressionSyntax invocation
+                && invocation.Expression is MemberAccessExpressionSyntax access
+                && access.Expression.ToString() == nameof(ExceptionFlowContextualFactEvaluator);
+            MethodDeclarationSyntax[] analyzerMethods = types
+                .Where(type => type.Identifier.ValueText == nameof(ExceptionFlowAnalyzer))
+                .SelectMany(type => type.Members.OfType<MethodDeclarationSyntax>()).ToArray();
+            Assert.NotEmpty(analyzerMethods);
+            Assert.DoesNotContain(types, type => type.Identifier.ValueText == nameof(ExceptionFlowAnalyzer)
+                && type.Members.Count == 0);
+            Assert.All(analyzerMethods, method =>
+            {
+                Assert.False(IsEvaluatorCall(method.ExpressionBody?.Expression));
+                if (method.Body?.Statements is { Count: 1 } single && single[0] is ReturnStatementSyntax returned)
+                {
+                    Assert.False(IsEvaluatorCall(returned.Expression));
+                }
+                if (method.Body?.Statements is { Count: 2 } pair
+                    && pair[0] is LocalDeclarationStatementSyntax local
+                    && local.Declaration.Type.ToString() == "HashSet<ISymbol>"
+                    && pair[1] is ReturnStatementSyntax seedReturn)
+                {
+                    Assert.False(IsEvaluatorCall(seedReturn.Expression));
+                }
+            });
+
+            MethodDeclarationSyntax[] seeds = types
+                .Where(type => type.Identifier.ValueText == nameof(ExceptionFlowContextualFactEvaluator))
+                .SelectMany(type => type.Members.OfType<MethodDeclarationSyntax>())
+                .Where(method => method.Identifier.ValueText == "CreateCallContext" && method.ParameterList.Parameters.Count == 4
+                    || method.Identifier.ValueText == "IsDefinitelyNonNull" && method.ParameterList.Parameters.Count == 3).ToArray();
+            Assert.Equal(2, seeds.Length);
+            Assert.All(seeds, method =>
+            {
+                Assert.Equal(2, method.Body!.Statements.Count);
+                LocalDeclarationStatementSyntax seed = Assert.IsType<LocalDeclarationStatementSyntax>(method.Body.Statements[0]);
+                Assert.Equal("HashSet<ISymbol>", seed.Declaration.Type.ToString());
+                ImplicitObjectCreationExpressionSyntax creation = Assert.IsType<ImplicitObjectCreationExpressionSyntax>(
+                    Assert.Single(seed.Declaration.Variables).Initializer!.Value);
+                Assert.Equal("SymbolEqualityComparer.Default", Assert.Single(creation.ArgumentList.Arguments).Expression.ToString());
+                Assert.True(IsEvaluatorCall(Assert.IsType<ReturnStatementSyntax>(method.Body.Statements[1]).Expression));
+            });
         }
 
         /// <summary>

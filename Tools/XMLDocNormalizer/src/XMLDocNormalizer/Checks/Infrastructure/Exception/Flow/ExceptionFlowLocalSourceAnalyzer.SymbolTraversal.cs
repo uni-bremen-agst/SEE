@@ -68,7 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     creation.ArgumentList?.Arguments ?? default;
 
                 ExceptionFlowCallContext constructorContext =
-                    CreateCallContext(
+                    ExceptionFlowContextualFactEvaluator.CreateCallContext(
                         constructorSymbol,
                         arguments,
                         semanticModel,
@@ -184,7 +184,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 ExceptionFlowCallContext indexerContext =
                     indexerGetter != null
-                        ? CreateCallContext(
+                        ? ExceptionFlowContextualFactEvaluator.CreateCallContext(
                             indexerGetter,
                             elementAccess.ArgumentList.Arguments,
                             semanticModel,

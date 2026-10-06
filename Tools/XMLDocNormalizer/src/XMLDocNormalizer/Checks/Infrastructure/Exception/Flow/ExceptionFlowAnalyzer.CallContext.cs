@@ -34,41 +34,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 memberSymbol);
         }
 
-        /// <summary>
-        /// Creates the call context for an invoked method or constructor.
-        /// </summary>
-        /// <param name="methodSymbol">
-        /// The invoked method or constructor.
-        /// </param>
-        /// <param name="arguments">
-        /// The arguments supplied at the call site.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for expression and constant analysis.
-        /// </param>
-        /// <param name="callerContext">
-        /// The value facts known while analyzing the caller.
-        /// </param>
-        /// <returns>
-        /// The call context containing the value facts proven for the target
-        /// parameters.
-        /// </returns>
-        internal static ExceptionFlowCallContext CreateCallContext(
-            IMethodSymbol methodSymbol,
-            SeparatedSyntaxList<ArgumentSyntax> arguments,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext)
-        {
-            HashSet<ISymbol> inspectedValueSources =
-                new(SymbolEqualityComparer.Default);
-
-            return ExceptionFlowContextualFactEvaluator.CreateCallContext(
-                methodSymbol,
-                arguments,
-                semanticModel,
-                callerContext,
-                inspectedValueSources);
-        }
 
 
         /// <summary>
@@ -105,7 +70,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowCallContext callerContext)
         {
             ExceptionFlowCallContext callSiteContext =
-                CreateCallContext(
+                ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     callSiteMethodSymbol,
                     arguments,
                     semanticModel,

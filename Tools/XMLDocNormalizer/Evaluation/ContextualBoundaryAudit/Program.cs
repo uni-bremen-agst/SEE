@@ -7,12 +7,13 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 if (args.Length is not (2 or 3))
 {
-    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json> [--extraction-plan | --verify-extraction=<baseline-ref>]");
+    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json> [--extraction-plan | --verify-extraction=<baseline-ref> | --composition-baseline=<ref>]");
     return 2;
 }
 
 if (args.Length == 3 && args[2] != "--extraction-plan"
-    && !args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal))
+    && !args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal)
+    && !args[2].StartsWith("--composition-baseline=", StringComparison.Ordinal))
 {
     Console.Error.WriteLine("Unknown audit option: " + args[2]);
     return 2;
@@ -27,6 +28,10 @@ string rootDirectory = Path.GetDirectoryName(solutionPath)!;
 Solution solution = await workspace.OpenSolutionAsync(solutionPath);
 Project project = solution.Projects.Single(p => p.Name == "XMLDocNormalizer");
 Compilation compilation = (await project.GetCompilationAsync())!;
+if (args.Length == 3 && args[2].StartsWith("--composition-baseline=", StringComparison.Ordinal))
+{
+    compilation = CompositionBaseline.Load(compilation, rootDirectory, args[2]["--composition-baseline=".Length..]);
+}
 Dictionary<string, Callable> nodes = new(StringComparer.Ordinal);
 Dictionary<string, ISymbol> referencedSymbols = new(StringComparer.Ordinal);
 List<Reference> references = [];
@@ -299,6 +304,7 @@ var output = new
 {
     Schema = "ContextualBoundary.MeasuredBoundary.v2",
     EvaluationOwner = evaluationOwner,
+    Composition = CompositionAudit.Measure(compilation, nodes.Values, uniqueCalls),
     ExtractionVerification = args.Length == 3 && args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal)
         ? ExtractionVerification.Measure(compilation, rootDirectory, args[2]["--verify-extraction=".Length..]) : null,
     Solution = Path.GetFileName(solutionPath),
@@ -372,11 +378,11 @@ var output = new
     DelegateSites = delegateSites,
     AllSourceNodes = nodes.Values.OrderBy(n => n.Id, StringComparer.Ordinal).Select(Describe),
     AllStateAccesses = references.Where(r => r.Kind != "Parameter").DistinctBy(r => (r.Caller, r.Id, r.Read, r.Write)),
-    AnalyzerPartials = Directory.EnumerateFiles(Path.Combine(rootDirectory,
-        "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow"), "ExceptionFlowAnalyzer*.cs").Count(),
-    AnalyzerNonblankSloc = Directory.EnumerateFiles(Path.Combine(rootDirectory,
-        "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow"), "ExceptionFlowAnalyzer*.cs")
-        .Sum(f => File.ReadLines(f).Count(l => !string.IsNullOrWhiteSpace(l)))
+    AnalyzerPartials = compilation.SyntaxTrees.Count(tree =>
+        Path.GetFileName(tree.FilePath).StartsWith("ExceptionFlowAnalyzer", StringComparison.Ordinal)),
+    AnalyzerNonblankSloc = compilation.SyntaxTrees.Where(tree =>
+        Path.GetFileName(tree.FilePath).StartsWith("ExceptionFlowAnalyzer", StringComparison.Ordinal))
+        .Sum(tree => tree.GetText().Lines.Count(line => !string.IsNullOrWhiteSpace(line.ToString())))
 };
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))!);
 await File.WriteAllTextAsync(args[1], JsonSerializer.Serialize(output,

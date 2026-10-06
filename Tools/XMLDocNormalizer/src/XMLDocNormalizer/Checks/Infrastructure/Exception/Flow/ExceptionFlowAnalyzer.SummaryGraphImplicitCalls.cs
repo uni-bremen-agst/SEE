@@ -686,7 +686,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (!hasImplicitExtensionReceiver)
             {
-                return CreateCallContext(
+                return ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     targetMethod,
                     default,
                     semanticModel,

@@ -821,7 +821,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             ExceptionFlowCallContext selectedContext =
-                CreateCallContext(
+                ExceptionFlowContextualFactEvaluator.CreateCallContext(
                     disposalMethod,
                     default,
                     semanticModel,

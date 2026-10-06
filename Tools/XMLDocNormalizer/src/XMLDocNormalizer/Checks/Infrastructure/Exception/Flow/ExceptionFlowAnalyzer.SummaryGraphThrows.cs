@@ -378,7 +378,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<INamedTypeSymbol> addedExceptionTypes,
             ExceptionFlowCallContext callContext)
         {
-            if (IsDefinitelyNonNull(
+            if (ExceptionFlowContextualFactEvaluator.IsDefinitelyNonNull(
                     expression,
                     semanticModel,
                     callContext))
