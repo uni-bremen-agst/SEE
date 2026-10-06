@@ -6,10 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact reasoning for enum values and sequences whose values
-    /// are restricted to explicitly declared enum constants.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Gets facts proving that an expression contains a declared value of

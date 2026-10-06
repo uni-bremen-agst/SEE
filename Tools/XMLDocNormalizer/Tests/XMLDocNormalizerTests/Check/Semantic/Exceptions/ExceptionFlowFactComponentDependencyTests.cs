@@ -448,7 +448,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             string[] callerFiles =
             [
                 "ExceptionFlowAnalyzer.SummaryGraphCalls.cs",
-                "ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts.cs",
+                "ExceptionFlowContextualFactEvaluator.ConditionalWeakTableValueFacts.cs",
                 "ExceptionFlowLocalSourceAnalyzer.LocalCallables.cs"
             ];
             string[] dependencyFiles =
@@ -501,8 +501,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
         /// <summary>
         /// Ensures every partial declaration of the stateless table-fact
-        /// provider remains free of Analyzer back references even though the
-        /// cache owner remains in the same source file.
+        /// provider remains free of Analyzer back references after the
+        /// contextual cache owner moves to the evaluator.
         /// </summary>
         [Fact]
         public void ConditionalWeakTableProvider_DoesNotDependOnAnalyzer()

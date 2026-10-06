@@ -88,7 +88,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                ExceptionFlowValueFacts facts = GetExpressionValueFacts(
+                ExceptionFlowValueFacts facts = ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     argument.Expression,
                     semanticModel,
                     callContext);

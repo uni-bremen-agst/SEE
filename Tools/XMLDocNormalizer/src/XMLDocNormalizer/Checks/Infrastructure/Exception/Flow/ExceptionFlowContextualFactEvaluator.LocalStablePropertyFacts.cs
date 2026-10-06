@@ -6,10 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact reasoning for stable properties of locally created
-    /// objects.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Gets facts established for a stable property by the still-current

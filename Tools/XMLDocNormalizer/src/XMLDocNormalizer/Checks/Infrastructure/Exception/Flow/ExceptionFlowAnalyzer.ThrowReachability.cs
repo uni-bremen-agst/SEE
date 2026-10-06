@@ -140,7 +140,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         throwExpression.Span))
                 {
                     ExceptionFlowValueFacts leftFacts =
-                        GetExpressionValueFacts(
+                        ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                             coalesceExpression.Left,
                             semanticModel,
                             callContext);
@@ -419,7 +419,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowValueFacts facts =
-                GetExpressionValueFacts(
+                ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     valueExpression,
                     semanticModel,
                     callContext);
@@ -458,7 +458,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowValueFacts facts =
-                GetExpressionValueFacts(
+                ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     isPatternExpression.Expression,
                     semanticModel,
                     callContext);
@@ -537,7 +537,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 invocation.ArgumentList.Arguments[0].Expression;
 
             ExceptionFlowValueFacts facts =
-                GetExpressionValueFacts(
+                ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     argumentExpression,
                     semanticModel,
                     callContext);

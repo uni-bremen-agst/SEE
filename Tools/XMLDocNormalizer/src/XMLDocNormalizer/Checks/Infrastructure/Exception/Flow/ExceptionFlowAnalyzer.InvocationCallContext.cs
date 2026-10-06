@@ -192,7 +192,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (receiver != null)
             {
                 ExceptionFlowValueFacts receiverFacts =
-                    GetExpressionValueFacts(
+                    ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                         receiver,
                         semanticModel,
                         callerContext);

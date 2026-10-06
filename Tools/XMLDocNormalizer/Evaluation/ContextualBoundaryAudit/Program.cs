@@ -5,9 +5,16 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 
-if (args.Length != 2)
+if (args.Length is not (2 or 3))
 {
-    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json>");
+    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json> [--extraction-plan | --verify-extraction=<baseline-ref>]");
+    return 2;
+}
+
+if (args.Length == 3 && args[2] != "--extraction-plan"
+    && !args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal))
+{
+    Console.Error.WriteLine("Unknown audit option: " + args[2]);
     return 2;
 }
 
@@ -225,8 +232,10 @@ HashSet<string> methodIds = nodes.Values.Where(n => n.Kind == "MethodDeclaration
 List<Edge> primary = uniqueCalls.Where(e => e.Kind == "Invocation"
     && methodIds.Contains(e.Caller) && methodIds.Contains(e.Callee)).ToList();
 List<List<string>> primarySccs = Tarjan(methodIds, primary);
+string evaluationOwner = nodes.Values.Any(n => n.Symbol.ContainingType.Name == "ExceptionFlowContextualFactEvaluator")
+    ? "ExceptionFlowContextualFactEvaluator" : "ExceptionFlowAnalyzer";
 List<string> core = primarySccs.Single(c => c.Any(id =>
-    id.Contains("ExceptionFlowAnalyzer.GetExpressionValueFacts(", StringComparison.Ordinal))
+    id.Contains(evaluationOwner + ".GetExpressionValueFacts(", StringComparison.Ordinal))
     && c.Count > 1);
 HashSet<string> coreIds = core.ToHashSet(StringComparer.Ordinal);
 List<List<string>> expandedSccs = Tarjan(nodes.Keys,
@@ -288,7 +297,10 @@ List<Edge> logicalEdges = typeEdges.Select(e => e with
 }).Where(e => e.Caller != e.Callee).DistinctBy(e => (e.Caller, e.Callee)).ToList();
 var output = new
 {
-    Schema = "P5O2A5A.MeasuredBoundary.v1",
+    Schema = "ContextualBoundary.MeasuredBoundary.v2",
+    EvaluationOwner = evaluationOwner,
+    ExtractionVerification = args.Length == 3 && args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal)
+        ? ExtractionVerification.Measure(compilation, rootDirectory, args[2]["--verify-extraction=".Length..]) : null,
     Solution = Path.GetFileName(solutionPath),
     MethodGraphScope = "All source MethodDeclarationSyntax in the active XMLDocNormalizer compilation; normalized bound InvocationExpressionSyntax targets; distinct directed caller/callee edges",
     ExpandedScope = "All source methods, constructors, accessors and local functions; invocations, constructions, property access and method references; lambdas attributed to enclosing callable; reachable closure includes referenced field initializer targets",
@@ -370,7 +382,13 @@ Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))!);
 await File.WriteAllTextAsync(args[1], JsonSerializer.Serialize(output,
     new JsonSerializerOptions { WriteIndented = true }) + Environment.NewLine);
 Console.WriteLine($"SCC {core.Count}/{output.Scc.InternalEdgeCount}; expanded {expandedCore.Count}; ingress {ingress.Count}; egress {egress.Count}; reachable Analyzer outside SCC {output.ReachableAnalyzerOutsideScc.Count()}");
-Console.WriteLine($"Compilation errors {output.CompilationErrors.Length}; component cycles {output.ComponentCycles.Count()}");
+Console.WriteLine($"Compilation errors {output.CompilationErrors.Length}; expanded type cycles {output.ComponentCycles.Count()}; inter-component cycles {output.LogicalComponentCycles.Count()}");
+if (args.Length == 3 && args[2] == "--extraction-plan")
+{
+    ExtractionPlan.Write(compilation, coreIds, ingress.Select(e => e.Callee).ToHashSet(StringComparer.Ordinal),
+        rootDirectory, Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "extraction-plan.json"));
+}
+
 return output.CompilationErrors.Length == 0 ? 0 : 1;
 
 static object Describe(Callable node) => new

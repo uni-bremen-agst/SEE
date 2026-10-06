@@ -7,10 +7,9 @@ using ExceptionFlowDataFlowFacts = XMLDocNormalizer.Checks.Infrastructure.Except
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains sequence-element non-null reasoning used by exception-flow
-    /// analysis.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Determines whether a local sequence expression still represents an

@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact reasoning for framework dictionary values.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Determines whether every value stored in a dictionary expression is
@@ -270,7 +270,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the inserted value is proven non-null;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        internal static bool IsDictionaryInsertionValueProvenNonNull(
+        private static bool IsDictionaryInsertionValueProvenNonNull(
             ExpressionSyntax expression,
             SemanticModel semanticModel)
         {
@@ -316,6 +316,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return assignedFacts.ContainsAll(
                 ExceptionFlowValueFacts.NonNull);
         }
-
     }
 }

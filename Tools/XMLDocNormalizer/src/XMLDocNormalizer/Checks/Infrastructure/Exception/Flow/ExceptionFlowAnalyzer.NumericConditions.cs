@@ -42,7 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     out int rightConstant))
             {
-                ExceptionFlowValueFacts leftFacts = GetExpressionValueFacts(
+                ExceptionFlowValueFacts leftFacts = ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     expression.Left,
                     semanticModel,
                     callContext);
@@ -61,7 +61,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     out int leftConstant))
             {
-                ExceptionFlowValueFacts rightFacts = GetExpressionValueFacts(
+                ExceptionFlowValueFacts rightFacts = ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     expression.Right,
                     semanticModel,
                     callContext);

@@ -6,10 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains propagation and validation of sequence-element facts across
-    /// callable boundaries.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Determines whether an argument expression is proven to produce only
@@ -132,10 +131,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 callerContext,
                 inspectedValueSources);
         }
-
-
-
-
-
     }
 }

@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact reasoning used during exception-flow analysis.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Gets the value facts that are proven for an expression at its
@@ -26,7 +26,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The facts proven for the expression.
         /// </returns>
-        private static ExceptionFlowValueFacts GetExpressionValueFacts(
+        internal static ExceptionFlowValueFacts GetExpressionValueFacts(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callContext)
@@ -407,6 +407,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return facts.Normalize();
         }
-
     }
 }

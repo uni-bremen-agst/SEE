@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains value-fact analysis for immutable fields and properties.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Gets value facts guaranteed by the initialization of an immutable
@@ -535,6 +535,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return true;
         }
-
     }
 }

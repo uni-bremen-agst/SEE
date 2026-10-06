@@ -46,7 +46,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowValueFacts governingFacts =
-                GetExpressionValueFacts(
+                ExceptionFlowContextualFactEvaluator.GetExpressionValueFacts(
                     switchExpression.GoverningExpression,
                     semanticModel,
                     callContext);

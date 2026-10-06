@@ -4,10 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains analysis of invocation return values for proven non-null
-    /// results.
+    /// Evaluates contextual value, symbol, sequence, and call facts.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal static partial class ExceptionFlowContextualFactEvaluator
     {
         /// <summary>
         /// Determines whether an invocation is guaranteed to return a
@@ -271,6 +270,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return true;
         }
-
     }
 }
