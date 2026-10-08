@@ -45,15 +45,15 @@ permanent rejection; status and resolution package identify the active path.
 ## BND-P6-002 — Historical worker integration
 
 - Pipeline Stage: P6 / Worker Boundary
-- Status: Partially Resolved (P5O2B4 explicit Main analysis boundary complete; selection/full external routing open)
+- Status: Partially Resolved (P5O2B5 explicit Current/Historical selection and central Main routing complete; automatic policy/full external routing open)
 - First Observed: P5O1
-- Current Root Cause: P5O2B4 supplies a productive Main-owned HistoricalWorkerClient with validated protocol-2 input/provenance and existing canonical-result import. Real Main E2E, Current/Historical controlled parity, deterministic fresh requests and runtime isolation are proven. Automatic selection, full external inputs and CLI/reporting routing remain separate work.
+- Current Root Cause: P5O2B4 supplies the productive validated HistoricalWorkerClient. P5O2B5 adds a central Main-owned ExceptionFlowAnalysisRouter and explicit strongly typed Current/Historical choice. Current reuses its caller-owned SummarySession; Historical exclusively delegates to the unchanged client. Routed real E2E, parity, fail-closed selection and runtime isolation are proven. Automatic policy, full external inputs and CLI/reporting adoption remain separate work.
 - Current Fail-Closed Behavior: ordinary ToolRunner analysis continues in Current; explicit Historical requests accept only the bounded profile and fail without results on unsupported/incomplete input or process/protocol/identity failures. No external compilation is approximated by the smoke profile.
 - Affected Evaluation Cases: artifacts requiring an unavailable historical compiler execution context
 - Scientific Relevance: process isolation and compiler provenance are required before historical Roslyn can be trusted.
-- Resolution Package: P5O2B4 explicit Main boundary complete; next explicit routing/selection integration (when Current versus Historical), reusing the proven client/build/worker
+- Resolution Package: P5O2B4 Main boundary and P5O2B5 explicit selection/routing complete; next separately authorized validated external input projection/routing or automatic selection policy, reusing the proven router/client/build/worker
 - Last Verified: 2026-10-08
-- Evidence / Report: `Evaluation/P5O1-canonical-exception-flow-ir.md`, `Evaluation/P5O2B3-historical-worker-host.md`, `Evaluation/P5O2B3-historical-worker-host-audit.json`, `Evaluation/P5O2B4-main-worker-analysis-boundary.md`, `Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json`
+- Evidence / Report: `Evaluation/P5O1-canonical-exception-flow-ir.md`, `Evaluation/P5O2B3-historical-worker-host.md`, `Evaluation/P5O2B3-historical-worker-host-audit.json`, `Evaluation/P5O2B4-main-worker-analysis-boundary.md`, `Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json`, `Evaluation/P5O2B5-explicit-analyzer-routing.md`, `Evaluation/P5O2B5-explicit-analyzer-routing-audit.json`
 
 ## BND-P6-003 — Historical analyzer dependency separation
 
@@ -102,22 +102,22 @@ permanent rejection; status and resolution package identify the active path.
 - Current Fail-Closed Behavior: Worker stays outside the normal solution/Main runtime graph and accepts only its bounded protocol-2 source profile (P5O2B4). Invalid requests, build inputs, incomplete analysis and unexpected failures produce structured failure with no optimistic result. External supporting source is unavailable, never approximated. Main explicitly invokes it only through the validated B4 client, never loads Historical and does not automatically route to it; existing external compiler-mismatch boundaries remain fail closed.
 - Affected Evaluation Cases: future exact-historical source-backed Analyzer execution and S1 probes
 - Scientific Relevance: semantic/symbol/cache identities must stay within one Roslyn universe; only neutral canonical results may cross the later process boundary.
-- Resolution Package: P5O2B3 host and P5O2B4 explicit Main/input/result boundary complete. Next explicit routing/selection integration; do not repeat proven build/runtime isolation.
+- Resolution Package: P5O2B3 host, P5O2B4 Main/input/result boundary and P5O2B5 explicit routing/selection complete. Validated full external input projection and automatic policy remain separate; do not repeat proven build/runtime isolation.
 - Last Verified: 2026-10-08
 - Evidence / Report: Evaluation/P5O2B1A2-runtime-await-call-site-contract.md, Evaluation/P5O2B2-dual-version-build-scaffold.md, Evaluation/P5O2B2-dual-version-build-scaffold-audit.json, Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json
 
 ## BND-P5O2B-003 — Main routing / validated external Worker analysis boundary
 
 - Pipeline Stage: P5O2B / Main-Process Integration
-- Status: Partially Resolved (P5O2B4 productive bounded Main client complete; automatic selection/full external routing open)
+- Status: Partially Resolved (P5O2B5 explicit Current/Historical Main routing complete; automatic selection/full external routing open)
 - First Observed: P5O2B3 executable isolated host closure
-- Current Root Cause: P5O2B4 protocol 2 imports the existing canonical result through the productive Main client, binds source SHA256/root/profile provenance and rejects untrusted/incomplete responses. One controlled C#12/net8 compilation is supported. Additional documents/reference images/supporting compilations/dependency provenance/canonical selectors/compiler option entries are typed and transportable but explicitly rejected until validated integration. External acquisition/equivalence projection, automatic selection and full reporting route remain open.
-- Current Fail-Closed Behavior: no automatic ToolRunner -> Worker routing or Current/Historical selection; no larger external artifact is treated as equivalent to the smoke reference profile. Existing reconstruction/provenance failures remain intact.
+- Current Root Cause: P5O2B5 provides one Main entry for explicit Current/Historical selection, above the existing session/client. Default/unknown selections, absent or inconsistent branch inputs and unavailable Historical endpoints fail without fallback. P5O2B4 protocol-2 provenance/completeness/import validation is unchanged. One controlled C#12/net8 compilation is supported. Additional documents/reference images/supporting compilations/dependency provenance/canonical selectors/compiler option entries remain explicitly rejected. External acquisition/equivalence projection, automatic policy and full reporting route remain open.
+- Current Fail-Closed Behavior: explicit routes only; invalid selection never means Current. Historical errors preserve the original B4 failure and expose no result. Current retains its existing uncertainties and sequential session lifetime, not the Worker's stronger completeness policy. Ordinary ToolRunner remains Current; no automatic routing and no larger external artifact is approximated by the smoke profile. Existing reconstruction/provenance failures remain intact.
 - Affected Evaluation Cases: future historical external analysis integration, including S1 and compiler-mismatched artifacts
 - Scientific Relevance: exact compiler identity alone cannot prove exact external input binding or canonical-result provenance. Only Roslyn-free values may cross the eventual process boundary.
-- Resolution Package: P5O2B4 Main boundary complete; next explicit Current/Historical routing and selection, with validated external input projection as required; no repeated isolation analysis
+- Resolution Package: P5O2B4 Main boundary and P5O2B5 explicit selection/routing complete; next separately authorized validated full external input/reporting integration or automatic policy, not a repeat of selection/build/runtime isolation
 - Last Verified: 2026-10-08
-- Evidence / Report: Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json, Evaluation/P5O2B4-main-worker-analysis-boundary.md, Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json
+- Evidence / Report: Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json, Evaluation/P5O2B4-main-worker-analysis-boundary.md, Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json, Evaluation/P5O2B5-explicit-analyzer-routing.md, Evaluation/P5O2B5-explicit-analyzer-routing-audit.json
 
 ## BND-P4P7-001 — OneOf exact PDB
 
