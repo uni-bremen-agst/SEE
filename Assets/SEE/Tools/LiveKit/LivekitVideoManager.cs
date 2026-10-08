@@ -120,10 +120,13 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private void Start()
         {
-
             if (!UserSetting.IsDesktop)
             {
                 gameObject.SetActive(false);
+            }
+            if (UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
+            {
+                StartCoroutine(ConnectAndPublish(publishAudio: false, publishVideo: false));
             }
         }
 
