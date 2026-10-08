@@ -1,0 +1,33 @@
+name: XMLDocNormalizer dual-version build
+
+on:
+  pull_request:
+    paths:
+      - 'Tools/XMLDocNormalizer/**'
+      - '.github/workflows/xml-doc-normalizer-dual-build.yml'
+  push:
+    paths:
+      - 'Tools/XMLDocNormalizer/**'
+      - '.github/workflows/xml-doc-normalizer-dual-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  same-source-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Current and exact Historical compile regression
+        shell: pwsh
+        run: ./Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1
+      - name: Retain build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xml-doc-normalizer-dual-build
+          path: Tools/XMLDocNormalizer/artifacts/dual-version-build/

@@ -1,0 +1,6 @@
+# Version only the permanent dual-build infrastructure in the otherwise ignored build directory.
+!/build/
+/build/*
+!/build/ExceptionFlow.HistoricalSources.props
+!/build/Verify-DualVersionBuild.ps1
+!/build/README.md

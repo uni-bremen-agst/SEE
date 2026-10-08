@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <!-- Imported before SDK props: assets and generated sources never share Main/Core obj. -->
+    <HistoricalArtifactsRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../artifacts/exception-flow-historical/'))</HistoricalArtifactsRoot>
+    <BaseIntermediateOutputPath>$(HistoricalArtifactsRoot)$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(HistoricalArtifactsRoot)$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <RestorePackagesPath>$(HistoricalArtifactsRoot)packages/</RestorePackagesPath>
+    <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.Config</RestoreConfigFile>
+  </PropertyGroup>
+</Project>
