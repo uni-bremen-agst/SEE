@@ -50,14 +50,6 @@ namespace SEE.Tools.LiveKit
 
         private LocalAudioTrack publishedAudioTrack = null;
 
-        private PlatformAudio platformAudio;
-
-        /// <summary>
-        /// The platform microphone source backing <see cref="publishedAudioTrack"/>.
-        /// It must stay alive for as long as the track is published.
-        /// </summary>
-        private PlatformAudioSource platformAudioSource;
-
         private GameObject localAudioObject;
 
         /// <summary>
@@ -94,6 +86,8 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         public ConnectionStatus ConnectionState { get; private set; }
 
+        private GameObject livekitMicrophone;
+
         /// <summary>
         /// Livekit Topic name on which file sync messages will be sent.
         /// </summary>
@@ -126,33 +120,6 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private void Start()
         {
-            try
-            {
-                platformAudio = new PlatformAudio();
-                Debug.Log($"PlatformAudio initialized: {platformAudio.RecordingDeviceCount} mics, " +
-                   $"{platformAudio.PlayoutDeviceCount} speakers");
-
-                var (recording, playout) = platformAudio.GetDevices();
-                Debug.Log("Recording devices:");
-                foreach (var device in recording)
-                    Debug.Log($"  [{device.Index}] {device.Name}");
-
-                Debug.Log("Playout devices:");
-                foreach (var device in playout)
-                    Debug.Log($"  [{device.Index}] {device.Name}");
-
-                if (platformAudio.RecordingDeviceCount > 0)
-                    platformAudio.SetRecordingDevice(0);
-                if (platformAudio.PlayoutDeviceCount > 0)
-                    platformAudio.SetPlayoutDevice(0);
-
-                Debug.Log($"PlatformAudio ready");
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"Failed to initialize PlatformAudio, falling back to Unity audio: {e.Message}");
-                platformAudio = null;
-            }
 
             if (!UserSetting.IsDesktop)
             {
@@ -167,8 +134,6 @@ namespace SEE.Tools.LiveKit
         private void OnDestroy()
         {
             Disconnect();
-            platformAudio?.Dispose();
-            platformAudio = null;
         }
 
         /// <summary>
@@ -246,9 +211,8 @@ namespace SEE.Tools.LiveKit
                 localAudioObject = null;
             }
 
-            platformAudioSource?.Dispose();
-            platformAudioSource = null;
             publishedAudioTrack = null;
+            Destroy(livekitMicrophone);
             UIOverlay.ToggleLiveKitAudio();
         }
 
@@ -566,7 +530,7 @@ namespace SEE.Tools.LiveKit
 
             Debug.Log("Publishing microphone using Unity Audio\n");
 
-            GameObject microphoneObject = new GameObject("my-audio-source");
+            livekitMicrophone = new GameObject("my-audio-source");
             string microphone = UnityEngine.Microphone.devices.FirstOrDefault(x => x == UserSetting.Instance.Audio.Microphone.MicrophoneDevice) ?? UnityEngine.Microphone.devices[0];
 
             AudioProcessingOptions processing = new AudioProcessingOptions
@@ -576,7 +540,7 @@ namespace SEE.Tools.LiveKit
                 AutoGainControl = UserSetting.Instance.Audio.Microphone.AutoGainControl
             };
 
-            MicrophoneSource rtcSource = new MicrophoneSource(microphone, microphoneObject, processing);
+            MicrophoneSource rtcSource = new MicrophoneSource(microphone, livekitMicrophone, processing);
             publishedAudioTrack = LocalAudioTrack.CreateAudioTrack($"{UserSetting.Instance.Player.PlayerName}-audio-track", rtcSource, room);
 
             TrackPublishOptions options = new TrackPublishOptions
@@ -722,12 +686,6 @@ namespace SEE.Tools.LiveKit
             {
                 Debug.Log("[LiveKit] Audio TrackSubscribed for " + participant.Identity);
 
-                // // PlatformAudio's ADM plays subscribed remote audio automatically.
-                // if (platformAudio != null)
-                // {
-                //     return;
-                // }
-
                 ulong clientId = ParseIdentity(participant);
                 if (LiveKitVideoRegistry.TryGet(clientId, out LiveKitVideo liveKitVideo)
                     && liveKitVideo.GetComponentInParent<AvatarAdapter>() is AvatarAdapter avatar)
@@ -830,9 +788,6 @@ namespace SEE.Tools.LiveKit
                 rtcAudioSource.Dispose();
             }
             rtcAudioSources.Clear();
-
-            platformAudioSource?.Dispose();
-            platformAudioSource = null;
             publishedAudioTrack = null;
 
             if (localAudioObject != null)
