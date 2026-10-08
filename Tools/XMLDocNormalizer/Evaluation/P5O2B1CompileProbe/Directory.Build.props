@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <B1ArtifactsRoot>$(MSBuildThisFileDirectory)../../artifacts/p5o2b1/</B1ArtifactsRoot>
+    <BaseIntermediateOutputPath>$(B1ArtifactsRoot)$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(B1ArtifactsRoot)$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <RestorePackagesPath>$(B1ArtifactsRoot)packages/</RestorePackagesPath>
+    <!-- Offline compile evidence; no network vulnerability service is used. -->
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+</Project>

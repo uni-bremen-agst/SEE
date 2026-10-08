@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>XMLDocNormalizer.B1.HistoricalCompileProbe</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[5.0.0-2.25451.107]" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[5.0.0-2.25451.107]" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="[3.11.0]" PrivateAssets="all" />
+    <PackageReference Include="System.Collections.Immutable" Version="[9.0.0]" />
+    <PackageReference Include="System.Reflection.Metadata" Version="[9.0.0]" />
+    <Compile Include="CompileOnlySemanticEnvironment.cs" />
+  </ItemGroup>
+  <Import Project="HistoricalSources.props" />
+</Project>
