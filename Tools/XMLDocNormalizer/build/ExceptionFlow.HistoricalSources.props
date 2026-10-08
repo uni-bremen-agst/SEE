@@ -112,7 +112,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowValueFacts.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowValueFacts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/KnownFrameworkExceptionContract.cs" Link="Checks/Infrastructure/Exception/KnownFrameworkExceptionContract.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/KnownFrameworkExceptionModel.cs" Link="Checks/Infrastructure/Exception/KnownFrameworkExceptionModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Models/DTO/ExceptionFlowAnalysisResult.cs" Link="Models/DTO/ExceptionFlowAnalysisResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Models/Dto/ExceptionFlowAnalysisResult.cs" Link="Models/Dto/ExceptionFlowAnalysisResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Models/ExceptionFlowDetails.cs" Link="Models/ExceptionFlowDetails.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Models/ExceptionFlowPath.cs" Link="Models/ExceptionFlowPath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Models/ExceptionFlowPathDeduplicationKey.cs" Link="Models/ExceptionFlowPathDeduplicationKey.cs" />
