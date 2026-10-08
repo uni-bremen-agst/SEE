@@ -172,6 +172,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="awaitInfo">
         /// Roslyn's semantic information for the await operation.
         /// </param>
+        /// <param name="runtimeAwait">
+        /// The separately acquired runtime-helper information, including API availability.
+        /// </param>
         /// <param name="sourceNode">
         /// The source syntax responsible for the await operation.
         /// </param>
@@ -197,6 +200,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         private static void AddSummaryExplicitAwaitEdges(
             AwaitExpressionInfo awaitInfo,
+            ExceptionFlowRuntimeAwaitCapability.Information runtimeAwait,
             SyntaxNode sourceNode,
             ExpressionSyntax awaitedExpression,
             string description,
@@ -215,10 +219,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            if (awaitInfo.RuntimeAwaitMethod != null)
+            if (!runtimeAwait.IsAvailable)
+            {
+                fragment.AddUncertainTarget(
+                    description + " runtime-await information is unavailable.");
+
+                return;
+            }
+
+            if (runtimeAwait.Method != null)
             {
                 AddSummaryImplicitMethodEdge(
-                    awaitInfo.RuntimeAwaitMethod,
+                    runtimeAwait.Method,
                     ExceptionFlowPathStepKind.RuntimeAwaitCall,
                     sourceNode,
                     reducedExtensionReceiver: null,

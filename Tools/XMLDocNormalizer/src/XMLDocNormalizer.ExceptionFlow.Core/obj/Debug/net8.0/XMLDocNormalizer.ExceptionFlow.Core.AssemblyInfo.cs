@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XMLDocNormalizer.ExceptionFlow.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cbb99f21f22a1785abedef7e101e597ae4646e62")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87f07fc5801bd2dd3948a475e7fa05dddd10a936")]
 [assembly: System.Reflection.AssemblyProductAttribute("XMLDocNormalizer.ExceptionFlow.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XMLDocNormalizer.ExceptionFlow.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

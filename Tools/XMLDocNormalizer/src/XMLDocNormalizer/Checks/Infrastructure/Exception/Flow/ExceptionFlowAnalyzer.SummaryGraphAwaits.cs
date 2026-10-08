@@ -51,6 +51,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 AddSummaryExplicitAwaitDispatchEdges(
                     awaitInfo,
+                    ExceptionFlowRuntimeAwaitCapability.Read(awaitInfo),
                     awaitExpression,
                     awaitExpression.Expression,
                     "Await expression",
