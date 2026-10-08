@@ -45,15 +45,15 @@ permanent rejection; status and resolution package identify the active path.
 ## BND-P6-002 — Historical worker integration
 
 - Pipeline Stage: P6 / Worker Boundary
-- Status: Planned
+- Status: Partially Resolved (P5O2B4 explicit Main analysis boundary complete; selection/full external routing open)
 - First Observed: P5O1
-- Current Root Cause: P5O1 supplies neutral canonical IR and P5O2B3 now proves a real bounded Historical worker endpoint with one-request JSON transport and separate native Roslyn runtime. Main-process worker selection/routing, validated external compilation inputs and final canonical import/reporting policy are not integrated.
-- Current Fail-Closed Behavior: analysis continues in the active process and active Roslyn compilation only.
+- Current Root Cause: P5O2B4 supplies a productive Main-owned HistoricalWorkerClient with validated protocol-2 input/provenance and existing canonical-result import. Real Main E2E, Current/Historical controlled parity, deterministic fresh requests and runtime isolation are proven. Automatic selection, full external inputs and CLI/reporting routing remain separate work.
+- Current Fail-Closed Behavior: ordinary ToolRunner analysis continues in Current; explicit Historical requests accept only the bounded profile and fail without results on unsupported/incomplete input or process/protocol/identity failures. No external compilation is approximated by the smoke profile.
 - Affected Evaluation Cases: artifacts requiring an unavailable historical compiler execution context
 - Scientific Relevance: process isolation and compiler provenance are required before historical Roslyn can be trusted.
-- Resolution Package: next proposed P5O2B4 Main-Process / Worker Integration and Final Roslyn-free Analysis Boundary; reuse completed B2/B3 build/runtime proof
+- Resolution Package: P5O2B4 explicit Main boundary complete; next explicit routing/selection integration (when Current versus Historical), reusing the proven client/build/worker
 - Last Verified: 2026-10-08
-- Evidence / Report: `Evaluation/P5O1-canonical-exception-flow-ir.md`, `Evaluation/P5O2B3-historical-worker-host.md`, `Evaluation/P5O2B3-historical-worker-host-audit.json`
+- Evidence / Report: `Evaluation/P5O1-canonical-exception-flow-ir.md`, `Evaluation/P5O2B3-historical-worker-host.md`, `Evaluation/P5O2B3-historical-worker-host-audit.json`, `Evaluation/P5O2B4-main-worker-analysis-boundary.md`, `Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json`
 
 ## BND-P6-003 — Historical analyzer dependency separation
 
@@ -61,7 +61,7 @@ permanent rejection; status and resolution package identify the active path.
 - Status: Resolved (P5O2A architecture closure, P5O2B2 permanent build and P5O2B3 bounded executable isolated host complete)
 - First Observed: P5O2 readiness audit
 - Current Root Cause: Architectural dependency separation remains resolved by P5O2A6F; the explicit semantic-host cut and existing fact/evaluator SCC/cache/guard behavior are retained. B1A2 closed the RuntimeAwaitMethod API gap and B2 supplied the permanent source-linked isolated build. B3 now supplies a genuine single-compilation semantic host and executable one-request HistoricalWorker. Actual historical runtime identity and canonical-only transitive analysis are proven in separate processes, without changing the 121 shared Analyzer sources. Six library/two Worker build pairs pass 0/0; fresh full tests 2636/2636. A2 self 16/canonical 0/0/0 are explicitly inherited after all 362 Current source hashes were reverified. Main/full external-input integration remains open, not Analyzer dependency separation.
-- Current Fail-Closed Behavior: Main does not select or invoke the Worker; compiler-mismatched external reconstruction remains fail closed. Explicit B3 tests/admin commands invoke only the bounded isolated endpoint, which rejects incomplete/unsupported input and returns neutral canonical results only for completed analysis.
+- Current Fail-Closed Behavior: Main does not automatically select the Worker; compiler-mismatched external reconstruction remains fail closed. P5O2B4 permits explicit bounded Main-client requests only, with version/identity/completeness/source-provenance validation and no partial result on failure. No Analyzer dependency redesign.
 - Affected Evaluation Cases: source-backed external analysis that requires an exact historical compiler, including the planned S1 probes
 - Scientific Relevance: historical parsing and analysis must use one internally consistent Roslyn type universe while returning only canonical IR.
 - Resolution Progress: P5O2A2 through the Return/condition slice reduced the residual to 49 Analyzer methods in six families, with SCC-to-Analyzer 32, SCC-to-components 61, SCC-to-SemanticScope 18, and provider-to-Analyzer zero. The Sequence Context / Element / Source slice then reduced the residual to 27 Analyzer methods in three families, with SCC-to-Analyzer 12 and SCC-to-components 81. P5O2A4D reduced the residual to 23 Analyzer methods in two families, with SCC-to-Analyzer eight and SCC-to-components 85. P5O2A4E reduced it to 14 Analyzer methods in the single Successful sequence validation family, with SCC-to-Analyzer one and SCC-to-components 92. P5O2A4F moved 13 methods to ExceptionFlowSuccessfulSequenceValidationFactsProvider and the statement-preservation method to ExceptionFlowSequenceContentPreservationFactsProvider. Analyzer-owned downstream methods and residual fact families are now zero; SCC-to-Analyzer is zero, SCC-to-components is 93, SCC-to-SemanticScope is 18, provider-to-Analyzer is zero, and component cycles are zero. Analyzer partials fall to 40 and nonblank Analyzer SLOC to 18,631. The 63-method SCC and 112 internal edges are unchanged. Self analysis remains 16 with zero finding/evidence diff. P5O2A4G moved the five delegate-target-resolution methods into ExceptionFlowDelegateTargetResolver. The SCC remains 63/112, SCC-to-Analyzer fact dependencies remain zero, the former SCC-to-Analyzer delegate-resolution edge is zero, SCC-to-components is 94, SCC-to-SemanticScope is 18, component-to-Analyzer and component cycles remain zero, and Analyzer SLOC falls to 18,316 across the same 40 partials. Self analysis remains 16 with zero finding/evidence diff.
@@ -99,25 +99,25 @@ permanent rejection; status and resolution package identify the active path.
 - Status: Resolved (P5O2B3 bounded real semantic host and process isolation complete; Main/full external analysis remains separate)
 - First Observed: P5O2B2 permanent build closure
 - Current Root Cause: resolved for the authorized bounded path by P5O2B3. The permanent library now selects a real compile-local single-source-compilation host and the standalone HistoricalWorker executes its genuine productive SummarySession/canonical adapter. Actual loaded Common/CSharp version, MVID and image hashes prove exact historical runtime, while the Current caller's engine remains unchanged and separate. Full external input/acquisition/import/routing is not claimed.
-- Current Fail-Closed Behavior: Worker stays outside the normal solution/Main runtime graph and accepts only its bounded version-1 source profile. Invalid requests, build inputs, incomplete analysis and unexpected failures produce structured failure with no optimistic result. External supporting source is unavailable, never approximated. Main does not load Historical or automatically invoke the endpoint; existing external compiler-mismatch boundaries remain fail closed.
+- Current Fail-Closed Behavior: Worker stays outside the normal solution/Main runtime graph and accepts only its bounded protocol-2 source profile (P5O2B4). Invalid requests, build inputs, incomplete analysis and unexpected failures produce structured failure with no optimistic result. External supporting source is unavailable, never approximated. Main explicitly invokes it only through the validated B4 client, never loads Historical and does not automatically route to it; existing external compiler-mismatch boundaries remain fail closed.
 - Affected Evaluation Cases: future exact-historical source-backed Analyzer execution and S1 probes
 - Scientific Relevance: semantic/symbol/cache identities must stay within one Roslyn universe; only neutral canonical results may cross the later process boundary.
-- Resolution Package: P5O2B3 complete. Next proposed P5O2B4 integrates Main with a validated Roslyn-free input/result boundary; do not repeat proven build/runtime isolation.
+- Resolution Package: P5O2B3 host and P5O2B4 explicit Main/input/result boundary complete. Next explicit routing/selection integration; do not repeat proven build/runtime isolation.
 - Last Verified: 2026-10-08
 - Evidence / Report: Evaluation/P5O2B1A2-runtime-await-call-site-contract.md, Evaluation/P5O2B2-dual-version-build-scaffold.md, Evaluation/P5O2B2-dual-version-build-scaffold-audit.json, Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json
 
 ## BND-P5O2B-003 — Main routing / validated external Worker analysis boundary
 
 - Pipeline Stage: P5O2B / Main-Process Integration
-- Status: Open (bounded executable endpoint proven; production integration not begun)
+- Status: Partially Resolved (P5O2B4 productive bounded Main client complete; automatic selection/full external routing open)
 - First Observed: P5O2B3 executable isolated host closure
-- Current Root Cause: Worker version 1 deliberately analyzes one controlled C#12 source compilation using a bounded net8 runtime-reference profile. A validated external source/reference/options/provenance request and exact canonical-result import/reporting/selection boundary are not integrated into Main.
+- Current Root Cause: P5O2B4 protocol 2 imports the existing canonical result through the productive Main client, binds source SHA256/root/profile provenance and rejects untrusted/incomplete responses. One controlled C#12/net8 compilation is supported. Additional documents/reference images/supporting compilations/dependency provenance/canonical selectors/compiler option entries are typed and transportable but explicitly rejected until validated integration. External acquisition/equivalence projection, automatic selection and full reporting route remain open.
 - Current Fail-Closed Behavior: no automatic ToolRunner -> Worker routing or Current/Historical selection; no larger external artifact is treated as equivalent to the smoke reference profile. Existing reconstruction/provenance failures remain intact.
 - Affected Evaluation Cases: future historical external analysis integration, including S1 and compiler-mismatched artifacts
 - Scientific Relevance: exact compiler identity alone cannot prove exact external input binding or canonical-result provenance. Only Roslyn-free values may cross the eventual process boundary.
-- Resolution Package: next proposed P5O2B4 Main-Process / Worker Integration and Final Roslyn-free Analysis Boundary, reusing the completed permanent build/executable-process proof
+- Resolution Package: P5O2B4 Main boundary complete; next explicit Current/Historical routing and selection, with validated external input projection as required; no repeated isolation analysis
 - Last Verified: 2026-10-08
-- Evidence / Report: Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json
+- Evidence / Report: Evaluation/P5O2B3-historical-worker-host.md, Evaluation/P5O2B3-historical-worker-host-audit.json, Evaluation/P5O2B4-main-worker-analysis-boundary.md, Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json
 
 ## BND-P4P7-001 — OneOf exact PDB
 

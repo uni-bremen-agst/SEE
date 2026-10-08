@@ -1,4 +1,5 @@
-param([ValidateSet('Debug', 'Release')][string]$Configuration = 'Debug')
+param([ValidateSet('Debug', 'Release')][string]$Configuration = 'Debug',
+    [switch]$RunMainBoundaryTests, [switch]$BuildTestProjectReferences)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -18,8 +19,13 @@ function Require([bool]$Condition, [string]$Message) {
 }
 
 function Invoke-DotNet([string]$Name, [string[]]$Arguments) {
-    $output = & dotnet @Arguments 2>&1 | Out-String
-    $exitCode = $LASTEXITCODE
+    # PS5 wraps native stderr as ErrorRecords; retain failing test diagnostics before checking the exit code.
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $output = & dotnet @Arguments 2>&1 | Out-String
+        $exitCode = $LASTEXITCODE
+    } finally { $ErrorActionPreference = $previousPreference }
     $output | Set-Content -LiteralPath (Join-Path $evidenceRoot ($Name + '.log')) -Encoding UTF8
     Write-Host $output
     Require ($exitCode -eq 0) "$Name failed with exit code $exitCode."
@@ -207,7 +213,7 @@ try {
         Require ((Get-FileHash -LiteralPath $copy).Hash -eq $reference.Sha256) 'Worker dependency copy does not match Historical Roslyn.'
     }
     Require ((Get-FileHash -LiteralPath (Join-Path $workerBin 'XMLDocNormalizer.ExceptionFlow.Historical.dll')).Hash -eq $images[1].Image.Sha256) 'Worker historical-library copy differs.'
-    $identityRun = Invoke-Worker 'worker-identity' $w.Properties.TargetPath '{"protocolVersion":1,"operation":"identity"}'
+    $identityRun = Invoke-Worker 'worker-identity' $w.Properties.TargetPath '{"protocolVersion":2,"operation":"identity"}'
     Require ($identityRun.ExitCode -eq 0 -and $identityRun.Response.Success -and -not $identityRun.Stderr) 'Worker identity failed.'
     $engines = @($identityRun.Response.Identity.LoadedRoslyn)
     Require ($engines.Count -eq 2 -and -not $identityRun.Response.Identity.RuntimeAwaitInformationAvailable) 'Historical capability/universe mismatch.'
@@ -215,7 +221,7 @@ try {
         Require ($engine.InformationalVersion.StartsWith('5.0.0-2.25451.107+', [StringComparison]::Ordinal)) 'Worker loaded non-historical Roslyn.'
         Require ($historicalReferences.Sha256 -contains $engine.Sha256) 'Runtime image differs from historical compile references.'
     }
-    $request = '{"protocolVersion":1,"operation":"analyze","payload":{"source":"public static class Fixture { public static void Root() { Thrower(); } static void Thrower() { throw null; } }","typeMetadataName":"Fixture","methodName":"Root"}}'
+    $request = '{"protocolVersion":2,"operation":"analyze","payload":{"source":"public static class Fixture { public static void Root() { Thrower(); } static void Thrower() { throw null; } }","typeMetadataName":"Fixture","methodName":"Root"}}'
     $firstSmoke = Invoke-Worker 'worker-smoke-first' $w.Properties.TargetPath $request
     $secondSmoke = Invoke-Worker 'worker-smoke-repeat' $w.Properties.TargetPath $request
     Require ($firstSmoke.ExitCode -eq 0 -and $secondSmoke.ExitCode -eq 0 -and $firstSmoke.Response.Success -and $secondSmoke.Response.Success) 'Real Historical analysis smoke failed.'
@@ -224,6 +230,17 @@ try {
     Require (@($firstSmoke.Response.Result.Uncertainties).Count -eq 0 -and @($firstSmoke.Response.Result.Entries[0].Paths[0].Steps).Count -eq 2) 'Expected complete transitive call/throw path.'
     $invalidVersion = Invoke-Worker 'worker-invalid-version' $w.Properties.TargetPath '{"protocolVersion":99,"operation":"identity"}'
     Require ($invalidVersion.ExitCode -eq 1 -and -not $invalidVersion.Response.Success -and $invalidVersion.Response.Failure.Code -eq 'unsupportedProtocolVersion') 'Worker failed-open protocol version.'
+    # One existing gate/CI owner; this fixture is only an adversarial pipe peer, never another Analyzer.
+    Invoke-DotNet 'boundary-test-process-build' @('build', (Join-Path $repoRoot 'Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj'), "-p:Configuration=$Configuration", '-warnaserror')
+    $mainBoundaryExecuted = $false
+    if ($RunMainBoundaryTests) {
+        $testProject = Join-Path $repoRoot 'Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj'
+        $testBuild = @('build', $testProject, "-p:Configuration=$Configuration", '-warnaserror')
+        if (-not $BuildTestProjectReferences) { $testBuild += @('--no-restore', '-p:BuildProjectReferences=false') }
+        Invoke-DotNet 'main-boundary-tests-build' $testBuild
+        Invoke-DotNet 'main-boundary-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests', '--logger', 'trx;LogFileName=main-boundary.trx', '--results-directory', $evidenceRoot)
+        $mainBoundaryExecuted = $true
+    }
     $result = [ordered]@{
         StartedUtc = $startedUtc; CompletedUtc = [DateTime]::UtcNow.ToString('o')
         Configuration = $Configuration; Sdk = (& dotnet --version); HistoricalVersion = '5.0.0-2.25451.107'
@@ -235,6 +252,7 @@ try {
         SharedSourceFingerprints = $fingerprints; SharedCount = 121; HostCount = 1
         Steps = @($steps.ToArray()); BuildImages = @($images.ToArray()); Passed = $true
         RuntimeExecuted = $true
+        MainBoundaryExecuted = $mainBoundaryExecuted
     }
     $result | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $evidenceRoot 'audit.json') -Encoding UTF8
     Write-Host 'PASS: Current/Historical/Worker build, exact runtime identities, real deterministic isolated analysis and fail-closed protocol.'

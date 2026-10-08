@@ -26,7 +26,7 @@ namespace XMLDocNormalizerTests.Worker
             string infoBefore = common.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
             Assert.DoesNotContain(HistoricalVersion, infoBefore);
 
-            ProcessResult execution = await Run(new(1, "identity"));
+            ProcessResult execution = await Run(new(WorkerProtocol.Version, "identity"));
             Assert.NotEqual(Environment.ProcessId, execution.ProcessId);
             Assert.Equal(0, execution.ExitCode);
             Assert.Empty(execution.Stderr);
@@ -72,7 +72,7 @@ namespace XMLDocNormalizerTests.Worker
         [Fact]
         public async Task RealTransitiveAnalysis_IsCanonicalAndDeterministicAcrossFreshWorkers()
         {
-            WorkerRequest request = new(1, "analyze", new(Source, "Fixture", "Root"));
+            WorkerRequest request = new(WorkerProtocol.Version, "analyze", new(Source, "Fixture", "Root"));
             ProcessResult first = await Run(request);
             ProcessResult second = await Run(request);
             Assert.NotEqual(first.ProcessId, second.ProcessId);
@@ -101,9 +101,11 @@ namespace XMLDocNormalizerTests.Worker
         [InlineData("null", "invalidRequest")]
         [InlineData("{}", "invalidRequest")]
         [InlineData("{\"protocolVersion\":99,\"operation\":\"identity\"}", "unsupportedProtocolVersion")]
-        [InlineData("{\"protocolVersion\":1,\"operation\":\"other\"}", "invalidRequest")]
-        [InlineData("{\"protocolVersion\":1,\"operation\":\"analyze\"}", "invalidRequest")]
-        [InlineData("{\"protocolVersion\":1,\"operation\":\"identity\",\"extra\":1}", "malformedInput")]
+        [InlineData("{\"protocolVersion\":1,\"operation\":\"identity\"}", "unsupportedProtocolVersion")]
+        [InlineData("{\"protocolVersion\":2,\"operation\":\"other\"}", "invalidRequest")]
+        [InlineData("{\"protocolVersion\":2,\"operation\":\"analyze\"}", "invalidRequest")]
+        [InlineData("{\"protocolVersion\":2,\"operation\":\"analyze\",\"payload\":{\"source\":\"public class C {}\",\"typeMetadataName\":\"C\",\"methodName\":\"M\",\"context\":{\"references\":[]}}}", "invalidRequest")]
+        [InlineData("{\"protocolVersion\":2,\"operation\":\"identity\",\"extra\":1}", "malformedInput")]
         public async Task InvalidTransport_IsStructuredFailClosed(string request, string code)
         {
             AssertFailure(await RunRaw(request), code);
@@ -112,21 +114,21 @@ namespace XMLDocNormalizerTests.Worker
         [Fact]
         public async Task CompilationErrors_AreStructuredAndNeverSuccessful()
         {
-            ProcessResult result = await Run(new(1, "analyze", new("public class Broken {", "Broken", "Root")));
+            ProcessResult result = await Run(new(WorkerProtocol.Version, "analyze", new("public class Broken {", "Broken", "Root")));
             AssertFailure(result, "compilationFailure");
         }
 
         [Fact]
         public async Task AmbiguousOrMissingRoot_IsRejectedRatherThanReturningAnEmptySuccess()
         {
-            AssertFailure(await Run(new(1, "analyze", new(Source, "Fixture", "Missing"))), "invalidRequest");
+            AssertFailure(await Run(new(WorkerProtocol.Version, "analyze", new(Source, "Fixture", "Missing"))), "invalidRequest");
         }
 
         [Fact]
         public async Task HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure()
         {
             const string source = "public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }";
-            ProcessResult result = await Run(new(1, "analyze", new(source, "Fixture", "Root")));
+            ProcessResult result = await Run(new(WorkerProtocol.Version, "analyze", new(source, "Fixture", "Root")));
             AssertFailure(result, "analysisFailure");
             using JsonDocument json = JsonDocument.Parse(result.Stdout);
             Assert.Contains(json.RootElement.GetProperty("failure").GetProperty("details").EnumerateArray(),
@@ -137,7 +139,7 @@ namespace XMLDocNormalizerTests.Worker
         public async Task RealCatchTransfer_SuppressesOnlyTheCaughtProvenException()
         {
             const string source = "public static class Fixture { public static void Root() { try { Thrower(); } catch (System.NullReferenceException) {} } static void Thrower() { throw null; } }";
-            ProcessResult result = await Run(new(1, "analyze", new(source, "Fixture", "Root")));
+            ProcessResult result = await Run(new(WorkerProtocol.Version, "analyze", new(source, "Fixture", "Root")));
             Assert.Equal(0, result.ExitCode);
             using JsonDocument json = JsonDocument.Parse(result.Stdout);
             Assert.Empty(json.RootElement.GetProperty("result").GetProperty("entries").EnumerateArray());

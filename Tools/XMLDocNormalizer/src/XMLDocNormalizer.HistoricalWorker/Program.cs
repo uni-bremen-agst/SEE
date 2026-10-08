@@ -75,11 +75,7 @@ namespace XMLDocNormalizer.HistoricalWorker
                 return Failure(WorkerFailureCode.InvalidRequest, "Identity does not accept an analysis payload.");
             }
 
-            if (request.Operation == "analyze" && (request.Payload == null
-                || string.IsNullOrWhiteSpace(request.Payload.Source)
-                || request.Payload.Source.Length > WorkerProtocol.MaximumSourceCharacters
-                || string.IsNullOrWhiteSpace(request.Payload.TypeMetadataName) || request.Payload.TypeMetadataName.Length > 256
-                || string.IsNullOrWhiteSpace(request.Payload.MethodName) || request.Payload.MethodName.Length > 256))
+            if (request.Operation == "analyze" && !WorkerInputValidation.IsSupported(request.Payload))
             {
                 return Failure(WorkerFailureCode.InvalidRequest, "Analyze requires bounded source and a type/method selector.");
             }

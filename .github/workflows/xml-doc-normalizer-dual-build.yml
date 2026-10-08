@@ -24,10 +24,7 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Current, exact Historical and executable Worker regression
         shell: pwsh
-        run: ./Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1
-      - name: Current-host protocol and real process-isolation tests
-        shell: pwsh
-        run: dotnet test Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj -warnaserror --filter "FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests"
+        run: ./Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1 -RunMainBoundaryTests -BuildTestProjectReferences
       - name: Retain build evidence
         if: always()
         uses: actions/upload-artifact@v4

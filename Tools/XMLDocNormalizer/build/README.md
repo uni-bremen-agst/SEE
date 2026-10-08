@@ -6,6 +6,7 @@ Run from `Tools/XMLDocNormalizer` with .NET SDK 8:
 dotnet build src/XMLDocNormalizer/XMLDocNormalizer.csproj -warnaserror
 dotnet build src/XMLDocNormalizer.ExceptionFlow.Historical/XMLDocNormalizer.ExceptionFlow.Historical.csproj -warnaserror
 powershell -NoProfile -ExecutionPolicy Bypass -File build/Verify-DualVersionBuild.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File build/Verify-DualVersionBuild.ps1 -RunMainBoundaryTests
 ```
 
 On Linux/macOS use `pwsh -File build/Verify-DualVersionBuild.ps1`. The gate supports
@@ -42,7 +43,7 @@ properties/package universe, with project-named separate bin/obj. Build/run:
 
 ```powershell
 dotnet build src/XMLDocNormalizer.HistoricalWorker/XMLDocNormalizer.HistoricalWorker.csproj -warnaserror
-'{"protocolVersion":1,"operation":"identity"}' | dotnet artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin/Debug/net8.0/XMLDocNormalizer.HistoricalWorker.dll
+'{"protocolVersion":2,"operation":"identity"}' | dotnet artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin/Debug/net8.0/XMLDocNormalizer.HistoricalWorker.dll
 ```
 
 The real compile-local `HistoricalSemanticEnvironment` owns exactly one tree,
@@ -52,7 +53,7 @@ EnableDefaultCompileItems=false and the exact Compile item prevent it executing.
 The 121 productive sources, RuntimeAwait availability and existing caches are unchanged.
 
 One UTF-8 JSON object through stdin until EOF produces one JSON stdout response
-and process exit (0 success / 1 structured failure); diagnostics use stderr. Version 1
+and process exit (0 success / 1 structured failure); diagnostics use stderr. Version 2
 supports `identity` and `analyze`, with payload `{source,typeMetadataName,methodName}`.
 Analysis is bounded to one source (32768 characters/8192 syntax nodes), a source-owned
 non-generic type and a parameterless static non-generic method. Its fixed C#12/net8
@@ -61,9 +62,17 @@ The real summary graph returns the existing canonical exception-flow result owne
 including paths/identities; any uncertainty/truncation rejects successful completion.
 No emitted source code is executed. The request frame limit is 65536 characters.
 
-Main/normal tests never reference or load historical assemblies; the tests link only
-the neutral protocol source against their existing Current canonical domain owner
-and launch fresh owned child processes. No routing, worker pool/daemon or ALC.
+Main/normal tests never reference or load historical assemblies. P5O2B4 Main compiles
+only the same neutral WorkerProtocol source (no runtime ProjectReference), with the
+explicit HistoricalWorkerClient under Execution/Historical. Tests use that productive
+client and its existing Current canonical domain. Successful responses require input
+SHA256/selector/profile provenance; v1 is rejected rather than best-effort imported.
+The optional typed context transports source/reference/supporting compilation data,
+but the current bounded profile explicitly rejects these not-yet-supported inputs.
+No routing, worker pool/daemon or ALC. The expanded gate builds the adversarial pipe
+fixture and -RunMainBoundaryTests executes Main E2E/parity/identity/lifecycle tests.
+Local tests use BuildProjectReferences=false to preserve Core WIP; on a clean CI
+checkout, additionally use -BuildTestProjectReferences. CI enables both switches.
 See `Evaluation/P5O2B3-historical-worker-host.md` for the runtime proof and limits.
 
 The older B1/B1A/B1A2 Evaluation compile probes are retained historical evidence;

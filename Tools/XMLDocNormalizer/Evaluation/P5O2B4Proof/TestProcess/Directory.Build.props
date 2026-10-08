@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../artifacts/p5o2b4/test-process/obj/'))</BaseIntermediateOutputPath>
+    <BaseOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../artifacts/p5o2b4/test-process/bin/'))</BaseOutputPath>
+  </PropertyGroup>
+</Project>

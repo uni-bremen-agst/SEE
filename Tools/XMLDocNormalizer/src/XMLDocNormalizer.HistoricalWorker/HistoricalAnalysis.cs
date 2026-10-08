@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -79,7 +81,10 @@ namespace XMLDocNormalizer.HistoricalWorker
                     result.Uncertainties.Select(item => item.DisplayText).OrderBy(text => text, StringComparer.Ordinal).ToArray());
             }
 
-            return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result);
+            return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
+                Provenance: new(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))),
+                    input.TypeMetadataName!, input.MethodName!, "worker-input.cs", "solution-transitive",
+                    "net8-runtime-bounded-v1", "12", "enable"));
         }
 
         /// <summary>Bounded framework-only reference profile; never imports Worker/Analyzer/Roslyn as input metadata.</summary>

@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <Compile Remove="..\..\Tests\XMLDocNormalizerTests\**\*.cs" />
+    <!-- Neutral same-source protocol only: no Worker/Historical runtime reference. -->
+    <Compile Include="../XMLDocNormalizer.HistoricalWorker/WorkerProtocol.cs" Link="Execution/Historical/WorkerProtocol.cs" />
   </ItemGroup>
 
 <ItemGroup>

@@ -21,7 +21,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             Assert.Equal(120, original.Length);
             Assert.Equal(121, shared.Length);
             Assert.Equal(121, shared.Distinct(StringComparer.OrdinalIgnoreCase).Count());
-            Assert.All(original, source => Assert.Contains(source, shared));
+            // The retained B1 Windows probe spells the same tracked Models/Dto path as Models/DTO.
+            Assert.All(original, source => Assert.Contains(source, shared, StringComparer.OrdinalIgnoreCase));
             Assert.Single(shared.Except(original, StringComparer.OrdinalIgnoreCase),
                 source => source.EndsWith("ExceptionFlowRuntimeAwaitCapability.cs", StringComparison.Ordinal));
             string mainRoot = Path.Combine(root, "src", "XMLDocNormalizer") + Path.DirectorySeparatorChar;

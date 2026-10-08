@@ -33,8 +33,6 @@
 
   <ItemGroup>
     <Compile Remove="OldFiles\**\*.cs" />
-    <!-- Share only the Roslyn-free protocol source; never reference/load the historical project. -->
-    <Compile Include="../../src/XMLDocNormalizer.HistoricalWorker/WorkerProtocol.cs" Link="Worker/WorkerProtocol.cs" />
   </ItemGroup>
 
 </Project>
