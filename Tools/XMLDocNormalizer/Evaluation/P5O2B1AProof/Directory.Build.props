@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <B1AArtifactsRoot>$(MSBuildThisFileDirectory)../../artifacts/p5o2b1a/</B1AArtifactsRoot>
+    <BaseIntermediateOutputPath>$(B1AArtifactsRoot)$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(B1AArtifactsRoot)$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <RestorePackagesPath>$(B1AArtifactsRoot)packages/</RestorePackagesPath>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+</Project>

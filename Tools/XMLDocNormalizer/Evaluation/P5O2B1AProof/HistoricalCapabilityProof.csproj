@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>XMLDocNormalizer.B1A.HistoricalCapabilityProof</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[5.0.0-2.25451.107]" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[5.0.0-2.25451.107]" />
+    <Compile Include="RuntimeAwaitCapability.cs" />
+  </ItemGroup>
+</Project>
