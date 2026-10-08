@@ -7,14 +7,15 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 if (args.Length is not (2 or 3))
 {
-    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json> [--extraction-plan | --verify-extraction=<baseline-ref> | --composition-baseline=<ref> | --architecture-closure]");
+    Console.Error.WriteLine("Usage: ContextualBoundaryAudit <solution> <output-json> [--extraction-plan | --verify-extraction=<baseline-ref> | --composition-baseline=<ref> | --architecture-closure | --summary-closure=<ref>]");
     return 2;
 }
 
 if (args.Length == 3 && args[2] != "--extraction-plan"
     && !args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal)
     && !args[2].StartsWith("--composition-baseline=", StringComparison.Ordinal)
-    && args[2] != "--architecture-closure")
+    && args[2] != "--architecture-closure"
+    && !args[2].StartsWith("--summary-closure=", StringComparison.Ordinal))
 {
     Console.Error.WriteLine("Unknown audit option: " + args[2]);
     return 2;
@@ -306,8 +307,11 @@ var output = new
     Schema = "ContextualBoundary.MeasuredBoundary.v2",
     EvaluationOwner = evaluationOwner,
     Composition = CompositionAudit.Measure(compilation, nodes.Values, uniqueCalls),
-    ArchitectureClosure = args.Length == 3 && args[2] == "--architecture-closure"
+    ArchitectureClosure = args.Length == 3 && (args[2] == "--architecture-closure"
+        || args[2].StartsWith("--summary-closure=", StringComparison.Ordinal))
         ? ArchitectureClosureAudit.Measure(compilation, nodes.Values, uniqueCalls, rootDirectory) : null,
+    SummaryClosureVerification = args.Length == 3 && args[2].StartsWith("--summary-closure=", StringComparison.Ordinal)
+        ? SummaryClosureVerification.Measure(compilation, rootDirectory, args[2]["--summary-closure=".Length..]) : null,
     ExtractionVerification = args.Length == 3 && args[2].StartsWith("--verify-extraction=", StringComparison.Ordinal)
         ? ExtractionVerification.Measure(compilation, rootDirectory, args[2]["--verify-extraction=".Length..]) : null,
     Solution = Path.GetFileName(solutionPath),

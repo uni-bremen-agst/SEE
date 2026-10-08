@@ -269,7 +269,7 @@ namespace XMLDocNormalizerTests.Helpers
                                 exceptionFlowEnvironment),
 
                     TestAnalysisKind.SummaryGraphTransitive =>
-                        ExceptionFlowAnalyzer
+                        ExceptionFlowSummaryAnalysisSession
                             .AnalyzeSolutionTransitivelyThrownExceptions(
                                 matchingMethods[0],
                                 exceptionFlowEnvironment),

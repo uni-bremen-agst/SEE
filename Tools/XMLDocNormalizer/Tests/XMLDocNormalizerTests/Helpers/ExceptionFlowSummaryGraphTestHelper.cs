@@ -200,7 +200,7 @@ namespace XMLDocNormalizerTests.Helpers
                         compilation);
 
             bool built =
-                new ExceptionFlowSummaryGraphBuilder(
+                new ExceptionFlowSummaryAnalysisSession(
                     new ExceptionFlowSemanticEnvironment(semanticContext))
                     .TryBuildTransitiveSummaryGraph(
                         matchingMembers[0],

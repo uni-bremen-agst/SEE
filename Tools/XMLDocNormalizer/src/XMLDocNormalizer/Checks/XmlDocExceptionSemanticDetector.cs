@@ -118,7 +118,7 @@ namespace XMLDocNormalizer.Checks
             ExceptionFlowSummaryAnalysisSession?
                 summaryAnalysisSession =
                     IsTransitiveMode(options)
-                        ? ExceptionFlowAnalyzer
+                        ? ExceptionFlowSummaryAnalysisSession
                             .CreateSummaryAnalysisSession(
                                 new ExceptionFlowSemanticEnvironment(
                                     semanticContext))
@@ -383,7 +383,7 @@ namespace XMLDocNormalizer.Checks
 
             ExceptionFlowSummaryAnalysisSession session =
                 summaryAnalysisSession ??
-                ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(
+                ExceptionFlowSummaryAnalysisSession.CreateSummaryAnalysisSession(
                     exceptionFlowEnvironment);
 
             return session.Analyze(

@@ -287,7 +287,7 @@ namespace XMLDocNormalizerTests.Helpers
                 Assert.True(context.TryRegisterExternalSupportingSource(source, out _));
             }
 
-            Assert.True(new ExceptionFlowSummaryGraphBuilder(
+            Assert.True(new ExceptionFlowSummaryAnalysisSession(
                     new ExceptionFlowSemanticEnvironment(context))
                 .TryBuildTransitiveSummaryGraph(
                 root,

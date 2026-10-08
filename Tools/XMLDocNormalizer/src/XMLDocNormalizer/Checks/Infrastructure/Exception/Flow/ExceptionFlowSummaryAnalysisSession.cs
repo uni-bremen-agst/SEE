@@ -13,7 +13,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// not thread-safe. Graph state is reused between analyzed roots; each
     /// evaluation keeps its mutable traversal state local to the call.
     /// </remarks>
-    internal sealed class ExceptionFlowSummaryAnalysisSession
+    internal sealed partial class ExceptionFlowSummaryAnalysisSession
     {
         /// <summary>
         /// The semantic environment shared by all analyzed roots.
@@ -77,7 +77,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return new ExceptionFlowAnalysisResult();
             }
 
-            builder.BuildPendingSummaryNodes(
+            BuildPendingSummaryNodes(
                 graph);
 
             return evaluator.Evaluate(

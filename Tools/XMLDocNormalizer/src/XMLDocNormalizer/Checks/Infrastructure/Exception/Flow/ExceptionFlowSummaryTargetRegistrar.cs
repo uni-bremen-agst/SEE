@@ -11,7 +11,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// semantic capability seam; Main/P6 orchestration is supplied by an
     /// external adapter. It is safe for concurrent use.
     /// </remarks>
-    internal static class ExceptionFlowSummaryTargetRegistrar
+    internal static partial class ExceptionFlowSummaryTargetRegistrar
     {
         /// <summary>
         /// Registers a method target under its canonical supporting source

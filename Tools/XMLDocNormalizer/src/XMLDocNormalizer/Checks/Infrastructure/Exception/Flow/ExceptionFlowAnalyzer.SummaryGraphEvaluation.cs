@@ -6,7 +6,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// <summary>
     /// Provides summary-graph analysis orchestration entry points.
     /// </summary>
-    internal static partial class ExceptionFlowAnalyzer
+    internal sealed partial class ExceptionFlowSummaryAnalysisSession
     {
         /// <summary>
         /// Creates a reusable productive analysis session for transitive

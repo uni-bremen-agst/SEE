@@ -1,5 +1,10 @@
 # P5O2A6 - Historical Core Readiness Matrix
 
+Historical A6 snapshot; its NOT READY blocker is closed by P5O2A6F. The current
+READY source/category/dependency inventory is
+[P5O2A6F-historical-core-readiness-matrix.md](P5O2A6F-historical-core-readiness-matrix.md).
+The original inventory below is retained as before-evidence.
+
 HEAD: `4ee61abee61b7677857100aa46173977d64283f0`. NOT READY: upper orchestration cycle; no production changes.
 
 Exact candidate: 100 top-level source owners / 117 physical source files. A=historical algorithms, B=source-shared infrastructure, C=Main-only host/composition, D=neutral boundary values, E=blocked current orchestration (intended A). Mixed files carry all categories; a neutral declaration does not make its containing file neutral. Roslyn=no means no direct bound Roslyn use, not proven transitive binary independence.
