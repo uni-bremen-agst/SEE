@@ -15,10 +15,14 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="[3.11.0]" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="[9.0.0]" />
     <PackageReference Include="System.Reflection.Metadata" Version="[9.0.0]" />
-    <Compile Include="BuildOnlySemanticEnvironment.cs" />
+    <!-- Retained B2 BuildOnlySemanticEnvironment.cs is evidence only, not a Compile item. -->
+    <Compile Include="HistoricalSemanticEnvironment.cs" />
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>XMLDocNormalizer.HistoricalWorker</_Parameter1>
+    </AssemblyAttribute>
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadata">
       <_Parameter1>ExecutionContract</_Parameter1>
-      <_Parameter2>BuildOnly; requires an isolated runtime host</_Parameter2>
+      <_Parameter2>Isolated process; bounded single-compilation semantic host</_Parameter2>
     </AssemblyAttribute>
   </ItemGroup>
   <Import Project="../../build/ExceptionFlow.HistoricalSources.props" />

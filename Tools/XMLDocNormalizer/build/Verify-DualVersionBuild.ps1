@@ -10,6 +10,7 @@ $startedUtc = [DateTime]::UtcNow.ToString('o')
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidenceRoot 'audit.json') -Encoding UTF8
 $current = Join-Path $repoRoot 'src/XMLDocNormalizer/XMLDocNormalizer.csproj'
 $historical = Join-Path $repoRoot 'src/XMLDocNormalizer.ExceptionFlow.Historical/XMLDocNormalizer.ExceptionFlow.Historical.csproj'
+$worker = Join-Path $repoRoot 'src/XMLDocNormalizer.HistoricalWorker/XMLDocNormalizer.HistoricalWorker.csproj'
 $steps = [Collections.Generic.List[object]]::new()
 
 function Require([bool]$Condition, [string]$Message) {
@@ -31,12 +32,47 @@ function Get-Project([string]$Project) {
     return ($json -join "`n" | ConvertFrom-Json)
 }
 
-function Get-PackageGraph([string]$AssetsPath) {
+function Get-PackageGraph([string]$AssetsPath, [bool]$AllowHistoricalProject = $false) {
     $assets = Get-Content -LiteralPath $AssetsPath -Raw | ConvertFrom-Json
     return @($assets.libraries.PSObject.Properties | ForEach-Object {
+        if ($_.Value.type -eq 'project') {
+            Require ($AllowHistoricalProject -and $_.Name -eq 'XMLDocNormalizer.ExceptionFlow.Historical/1.0.0') 'Unexpected worker project dependency.'
+            return
+        }
         Require ($_.Value.type -eq 'package') "Unexpected non-package dependency: $($_.Name)"
         [ordered]@{ Identity = $_.Name; Sha512 = $_.Value.sha512; Path = $_.Value.path }
     })
+}
+
+function Invoke-Worker([string]$Name, [string]$WorkerPath, [string]$Request) {
+    $start = New-Object Diagnostics.ProcessStartInfo
+    $start.FileName = 'dotnet'
+    $start.Arguments = '"' + $WorkerPath + '"'
+    $start.UseShellExecute = $false
+    $start.CreateNoWindow = $true
+    $start.RedirectStandardInput = $true
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    $process = New-Object Diagnostics.Process
+    $process.StartInfo = $start
+    try {
+        Require ($process.Start()) 'Could not start the owned Historical Worker.'
+        $stdout = $process.StandardOutput.ReadToEndAsync()
+        $stderr = $process.StandardError.ReadToEndAsync()
+        $process.StandardInput.Write($Request)
+        $process.StandardInput.Close()
+        if (-not $process.WaitForExit(30000)) {
+            $process.Kill()
+            throw 'Owned Historical Worker exceeded its deadline.'
+        }
+        $text = $stdout.Result.Trim()
+        $errors = $stderr.Result.Trim()
+        $text | Set-Content -LiteralPath (Join-Path $evidenceRoot ($Name + '.json')) -Encoding UTF8
+        $errors | Set-Content -LiteralPath (Join-Path $evidenceRoot ($Name + '.stderr.log')) -Encoding UTF8
+        return [ordered]@{ Name = $Name; ExitCode = $process.ExitCode; Response = ($text | ConvertFrom-Json); Stdout = $text; Stderr = $errors }
+    } finally {
+        $process.Dispose()
+    }
 }
 
 function Get-RoslynReferences([string]$Project, [string]$ExpectedVersion) {
@@ -70,8 +106,10 @@ Push-Location $repoRoot
 try {
     Invoke-DotNet 'restore-current' @('restore', $current, '-warnaserror')
     Invoke-DotNet 'restore-historical' @('restore', $historical, '-warnaserror')
+    Invoke-DotNet 'restore-worker' @('restore', $worker, '-warnaserror')
     $c = Get-Project $current
     $h = Get-Project $historical
+    $w = Get-Project $worker
     if (-not $c.Properties.RestorePackagesPath) {
         $currentAssets = Get-Content -LiteralPath $c.Properties.ProjectAssetsFile -Raw | ConvertFrom-Json
         $c.Properties.RestorePackagesPath = @($currentAssets.packageFolders.PSObject.Properties.Name)[0]
@@ -88,7 +126,8 @@ try {
     }
     $mainSourceRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'src/XMLDocNormalizer')) + [IO.Path]::DirectorySeparatorChar
     $shared = @($h.Items.Compile | Where-Object { $_.FullPath.StartsWith($mainSourceRoot, [StringComparison]::OrdinalIgnoreCase) })
-    Require ($shared.Count -eq 121 -and @($h.Items.Compile).Count -eq 122) 'Expected original 120 + capability + one build-only host.'
+    Require ($shared.Count -eq 121 -and @($h.Items.Compile).Count -eq 122) 'Expected original 120 + capability + one compile-local semantic host.'
+    Require (@($h.Items.Compile | Where-Object { $_.Identity -eq 'HistoricalSemanticEnvironment.cs' }).Count -eq 1) 'Executable Historical host missing.'
     Require (@($shared.FullPath | Sort-Object -Unique).Count -eq 121) 'Duplicate shared sources.'
     Require (@($shared | Where-Object { $_.FullPath.EndsWith('ExceptionFlowRuntimeAwaitCapability.cs') }).Count -eq 1) 'Shared capability missing.'
     $fingerprints = @($shared | Sort-Object FullPath | ForEach-Object {
@@ -97,8 +136,18 @@ try {
     })
     $cg = Get-PackageGraph $c.Properties.ProjectAssetsFile
     $hg = Get-PackageGraph $h.Properties.ProjectAssetsFile
+    $wg = Get-PackageGraph $w.Properties.ProjectAssetsFile $true
     $expectedHistorical = @('Microsoft.CodeAnalysis.Analyzers/3.11.0', 'Microsoft.CodeAnalysis.Common/5.0.0-2.25451.107', 'Microsoft.CodeAnalysis.CSharp/5.0.0-2.25451.107', 'System.Collections.Immutable/9.0.0', 'System.Reflection.Metadata/9.0.0')
     Require ((@($hg.Identity | Sort-Object) -join ';') -eq (($expectedHistorical | Sort-Object) -join ';')) 'Historical package graph drift.'
+    $expectedWorker = @($expectedHistorical | Where-Object { $_ -notlike 'Microsoft.CodeAnalysis.Analyzers/*' })
+    Require ((@($wg.Identity | Sort-Object) -join ';') -eq (($expectedWorker | Sort-Object) -join ';')) 'Worker package graph drift.'
+    Require (@($w.Items.ProjectReference).Count -eq 1 -and $w.Items.ProjectReference[0].FullPath -eq $historical) 'Worker must reference only Historical.'
+    Require ($w.Properties.TargetFramework -eq 'net8.0' -and $w.Properties.AssemblyName -eq 'XMLDocNormalizer.HistoricalWorker') 'Worker identity/TFM drift.'
+    foreach ($property in @('TargetPath', 'ProjectAssetsFile', 'MSBuildProjectExtensionsPath', 'BaseOutputPath')) {
+        $path = [IO.Path]::GetFullPath($w.Properties.$property)
+        Require ($path.StartsWith($expectedRoot, [StringComparison]::OrdinalIgnoreCase)) "Worker $property not isolated."
+        Require ($path -ne [IO.Path]::GetFullPath($h.Properties.$property) -and $path -ne [IO.Path]::GetFullPath($c.Properties.$property)) "Worker $property collision."
+    }
     foreach ($package in @('Microsoft.CodeAnalysis.Common/5.0.0', 'Microsoft.CodeAnalysis.CSharp/5.0.0')) {
         Require ($cg.Identity -contains $package) "Current Roslyn version changed: $package"
     }
@@ -138,18 +187,57 @@ try {
         Require (@($ownerImages.Image.Sha256 | Sort-Object -Unique).Count -eq 1) "$owner DLL is not repeatable."
         Require (@($ownerImages.Image.PdbSha256 | Sort-Object -Unique).Count -eq 1) "$owner PDB is not repeatable."
     }
+    $workerImages = @()
+    $currentBin = Split-Path $c.Properties.TargetPath -Parent
+    $historicalBin = Split-Path $h.Properties.TargetPath -Parent
+    $currentBeforeWorker = Get-TreeFingerprint $currentBin
+    $historicalBeforeWorker = Get-TreeFingerprint $historicalBin
+    for ($index = 0; $index -lt 2; $index++) {
+        Invoke-DotNet "worker-$index-clean" @('clean', $worker, "-p:Configuration=$Configuration", '-p:BuildProjectReferences=false', '-warnaserror', '-v:minimal')
+        Require (-not (Test-Path -LiteralPath $w.Properties.TargetPath)) 'Worker clean failed to remove its image.'
+        Invoke-DotNet "worker-$index-build" @('build', $worker, '--no-restore', "-p:Configuration=$Configuration", '-p:BuildProjectReferences=false', '-warnaserror')
+        $workerImages += Get-Image $w.Properties.TargetPath
+        Require ((Get-TreeFingerprint $currentBin) -eq $currentBeforeWorker) 'Worker build changed Current bin.'
+        Require ((Get-TreeFingerprint $historicalBin) -eq $historicalBeforeWorker) 'Worker-only build changed Historical library bin.'
+    }
+    Require (@($workerImages.Sha256 | Sort-Object -Unique).Count -eq 1 -and @($workerImages.PdbSha256 | Sort-Object -Unique).Count -eq 1) 'Worker DLL/PDB not repeatable.'
+    $workerBin = Split-Path $w.Properties.TargetPath -Parent
+    foreach ($reference in $historicalReferences) {
+        $copy = Join-Path $workerBin ([IO.Path]::GetFileName($reference.Path))
+        Require ((Get-FileHash -LiteralPath $copy).Hash -eq $reference.Sha256) 'Worker dependency copy does not match Historical Roslyn.'
+    }
+    Require ((Get-FileHash -LiteralPath (Join-Path $workerBin 'XMLDocNormalizer.ExceptionFlow.Historical.dll')).Hash -eq $images[1].Image.Sha256) 'Worker historical-library copy differs.'
+    $identityRun = Invoke-Worker 'worker-identity' $w.Properties.TargetPath '{"protocolVersion":1,"operation":"identity"}'
+    Require ($identityRun.ExitCode -eq 0 -and $identityRun.Response.Success -and -not $identityRun.Stderr) 'Worker identity failed.'
+    $engines = @($identityRun.Response.Identity.LoadedRoslyn)
+    Require ($engines.Count -eq 2 -and -not $identityRun.Response.Identity.RuntimeAwaitInformationAvailable) 'Historical capability/universe mismatch.'
+    foreach ($engine in $engines) {
+        Require ($engine.InformationalVersion.StartsWith('5.0.0-2.25451.107+', [StringComparison]::Ordinal)) 'Worker loaded non-historical Roslyn.'
+        Require ($historicalReferences.Sha256 -contains $engine.Sha256) 'Runtime image differs from historical compile references.'
+    }
+    $request = '{"protocolVersion":1,"operation":"analyze","payload":{"source":"public static class Fixture { public static void Root() { Thrower(); } static void Thrower() { throw null; } }","typeMetadataName":"Fixture","methodName":"Root"}}'
+    $firstSmoke = Invoke-Worker 'worker-smoke-first' $w.Properties.TargetPath $request
+    $secondSmoke = Invoke-Worker 'worker-smoke-repeat' $w.Properties.TargetPath $request
+    Require ($firstSmoke.ExitCode -eq 0 -and $secondSmoke.ExitCode -eq 0 -and $firstSmoke.Response.Success -and $secondSmoke.Response.Success) 'Real Historical analysis smoke failed.'
+    Require (-not $firstSmoke.Stderr -and -not $secondSmoke.Stderr -and $firstSmoke.Stdout -eq $secondSmoke.Stdout) 'Worker response not clean/deterministic.'
+    Require (@($firstSmoke.Response.Result.Entries).Count -eq 1 -and $firstSmoke.Response.Result.Entries[0].ExceptionType.MetadataName -eq 'NullReferenceException') 'Real exception flow missing.'
+    Require (@($firstSmoke.Response.Result.Uncertainties).Count -eq 0 -and @($firstSmoke.Response.Result.Entries[0].Paths[0].Steps).Count -eq 2) 'Expected complete transitive call/throw path.'
+    $invalidVersion = Invoke-Worker 'worker-invalid-version' $w.Properties.TargetPath '{"protocolVersion":99,"operation":"identity"}'
+    Require ($invalidVersion.ExitCode -eq 1 -and -not $invalidVersion.Response.Success -and $invalidVersion.Response.Failure.Code -eq 'unsupportedProtocolVersion') 'Worker failed-open protocol version.'
     $result = [ordered]@{
         StartedUtc = $startedUtc; CompletedUtc = [DateTime]::UtcNow.ToString('o')
         Configuration = $Configuration; Sdk = (& dotnet --version); HistoricalVersion = '5.0.0-2.25451.107'
         CurrentProperties = $c.Properties; HistoricalProperties = $h.Properties
+        WorkerProperties = $w.Properties; WorkerPackages = $wg; WorkerBuildImages = $workerImages
+        WorkerRuntimeChecks = @($identityRun, $firstSmoke, $secondSmoke, $invalidVersion)
         CurrentPackages = $cg; HistoricalPackages = $hg; HistoricalPackageSources = $provenance
         CurrentCompilerReferences = $currentReferences; HistoricalCompilerReferences = $historicalReferences
         SharedSourceFingerprints = $fingerprints; SharedCount = 121; HostCount = 1
         Steps = @($steps.ToArray()); BuildImages = @($images.ToArray()); Passed = $true
-        RuntimeExecuted = $false
+        RuntimeExecuted = $true
     }
     $result | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $evidenceRoot 'audit.json') -Encoding UTF8
-    Write-Host 'PASS: permanent Current/Historical same-source build, pins, repeatability and output isolation.'
+    Write-Host 'PASS: Current/Historical/Worker build, exact runtime identities, real deterministic isolated analysis and fail-closed protocol.'
 } finally {
     Pop-Location
 }

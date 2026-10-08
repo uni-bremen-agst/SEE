@@ -10,11 +10,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File build/Verify-DualVersionBuil
 
 On Linux/macOS use `pwsh -File build/Verify-DualVersionBuild.ps1`. The gate supports
 `-Configuration Release`. It restores independent graphs and forces six clean/build
-steps (Current, Historical, Current, Historical, Historical, Current). It checks all
+steps (Current, Historical, Current, Historical, Historical, Current), then two
+Worker-only clean/build pairs. It checks all
 121 physical shared files, actual package versions, separate assembly/assets/bin,
 unchanged opposite output trees and deterministic DLL/PDB hashes. Evidence goes to
-`artifacts/dual-version-build/`. GitHub's dedicated dual-build workflow runs this gate
-once per change, not once per unit test. Normal solution tests remain Current-only.
+`artifacts/dual-version-build/`. The same gate checks real Worker identity, two
+fresh deterministic transitive analysis processes and a fail-closed protocol version.
+GitHub's dedicated dual-build workflow runs this gate once per change and the
+Current-host process/contract integration tests. No per-unit-test full compilation.
 
 `ExceptionFlow.HistoricalSources.props` is the explicit original 120-file boundary
 plus the productive RuntimeAwait capability. Main continues to compile those same
@@ -33,13 +36,35 @@ without editing the protected repository-wide `*.csproj` rule. The tool-local
 `.gitignore` exposes only the three named infrastructure files inside the otherwise
 ignored `build/` directory.
 
-This is a **build target, not a runnable historical analyzer**. The compile-local
-`BuildOnlySemanticEnvironment` completes the existing five-member host contract,
-rejects construction/execution and contains no analyzer/source-resolution policy.
-No historical assembly is loaded (the gate reads assembly names as file metadata).
-Per the A2 recommendation, the next isolated-runtime/worker package must supply a
-real semantic host and prove historical execution before runtime integration.
-Nothing here modifies the RuntimeAwait availability contract, scopes or caches.
+P5O2B3 adds `src/XMLDocNormalizer.HistoricalWorker`, an executable net8.0 process
+referencing only this Historical library. It reuses the same early B2 build
+properties/package universe, with project-named separate bin/obj. Build/run:
+
+```powershell
+dotnet build src/XMLDocNormalizer.HistoricalWorker/XMLDocNormalizer.HistoricalWorker.csproj -warnaserror
+'{"protocolVersion":1,"operation":"identity"}' | dotnet artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin/Debug/net8.0/XMLDocNormalizer.HistoricalWorker.dll
+```
+
+The real compile-local `HistoricalSemanticEnvironment` owns exactly one tree,
+stable SemanticModel and compilation scope. No external supporting-source registry
+or approximation. B2's old BuildOnly host is retained as uncompiled evidence;
+EnableDefaultCompileItems=false and the exact Compile item prevent it executing.
+The 121 productive sources, RuntimeAwait availability and existing caches are unchanged.
+
+One UTF-8 JSON object through stdin until EOF produces one JSON stdout response
+and process exit (0 success / 1 structured failure); diagnostics use stderr. Version 1
+supports `identity` and `analyze`, with payload `{source,typeMetadataName,methodName}`.
+Analysis is bounded to one source (32768 characters/8192 syntax nodes), a source-owned
+non-generic type and a parameterless static non-generic method. Its fixed C#12/net8
+runtime-reference profile cannot import metadata paths or Compiler/Analyzer assemblies.
+The real summary graph returns the existing canonical exception-flow result owner,
+including paths/identities; any uncertainty/truncation rejects successful completion.
+No emitted source code is executed. The request frame limit is 65536 characters.
+
+Main/normal tests never reference or load historical assemblies; the tests link only
+the neutral protocol source against their existing Current canonical domain owner
+and launch fresh owned child processes. No routing, worker pool/daemon or ALC.
+See `Evaluation/P5O2B3-historical-worker-host.md` for the runtime proof and limits.
 
 The older B1/B1A/B1A2 Evaluation compile probes are retained historical evidence;
 their compile-regression role is superseded by this permanent target. No probe

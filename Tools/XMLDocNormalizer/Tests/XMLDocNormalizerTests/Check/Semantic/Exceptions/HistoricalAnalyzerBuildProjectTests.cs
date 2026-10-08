@@ -54,12 +54,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
 
         /// <summary>No production source substitution or Evaluation dependency is allowed.</summary>
         [Fact]
-        public void HistoricalProject_UsesPermanentManifestAndOnlyBuildHostLocally()
+        public void HistoricalProject_UsesPermanentManifestAndOnlySemanticHostLocally()
         {
             XDocument project = ReadHistoricalProject();
             Assert.Equal("../../build/ExceptionFlow.HistoricalSources.props",
                 (string)project.Descendants("Import").Single().Attribute("Project")!);
-            Assert.Equal("BuildOnlySemanticEnvironment.cs",
+            Assert.Equal("HistoricalSemanticEnvironment.cs",
                 (string)project.Descendants("Compile").Single().Attribute("Include")!);
             Assert.DoesNotContain("Evaluation", project.ToString());
             Assert.Empty(project.Descendants("Compile").Where(item => item.Attribute("Remove") != null));
@@ -98,16 +98,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                 ReadHistoricalProject().Descendants("AssemblyName").Single().Value);
         }
 
-        /// <summary>The build target declares and enforces its non-executable host contract.</summary>
+        /// <summary>The bounded host preserves exact ownership and has no Main dependencies.</summary>
         [Fact]
-        public void BuildHost_IsExplicitlyNonExecutableAndContainsNoAnalyzerPolicy()
+        public void HistoricalHost_IsCompilationLocalAndContainsNoAnalyzerPolicy()
         {
-            string host = File.ReadAllText(Path.Combine(HistoricalDirectory(), "BuildOnlySemanticEnvironment.cs"));
-            Assert.Equal(6, host.Split("throw new NotSupportedException", StringSplitOptions.None).Length - 1);
-            Assert.Contains("internal ExceptionFlowSemanticEnvironment()", host);
+            string host = File.ReadAllText(Path.Combine(HistoricalDirectory(), "HistoricalSemanticEnvironment.cs"));
+            Assert.Contains("internal ExceptionFlowSemanticEnvironment(Compilation compilation)", host);
+            Assert.Contains("ReferenceEquals(tree, model.SyntaxTree)", host);
+            Assert.Contains("ReferenceEquals(bindingCompilation, scope.Compilation)", host);
             Assert.DoesNotContain("ProjectClosure", host);
             Assert.DoesNotContain("Assembly.Load", host);
-            Assert.Contains("BuildOnly; requires an isolated runtime host", ReadHistoricalProject().ToString());
+            Assert.DoesNotContain("ExceptionFlowSummary", host);
+            Assert.Contains("Isolated process; bounded single-compilation semantic host", ReadHistoricalProject().ToString());
         }
 
         /// <summary>Historical compiler packages have a dedicated source mapping.</summary>

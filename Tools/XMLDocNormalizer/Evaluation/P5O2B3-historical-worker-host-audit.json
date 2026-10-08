@@ -1,0 +1,1942 @@
+{
+  "Schema": "P5O2B3-worker-host-audit-v1",
+  "Date": "2026-10-08",
+  "Head": "a4a533c823ee909aadb25cf6660c688101f90618",
+  "Decision": "COMPLETE: Historical Analyzer executes reproducibly in its own process; Current/Historical Roslyn runtime universes isolated",
+  "WorkerProject": "src/XMLDocNormalizer.HistoricalWorker/XMLDocNormalizer.HistoricalWorker.csproj",
+  "HistoricalProject": "src/XMLDocNormalizer.ExceptionFlow.Historical/XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+  "Integration": {
+    "ReusesB2BuildConfiguration": true,
+    "WorkerInNormalSolution": false,
+    "MainRoutingImplemented": false,
+    "HistoricalReferenceInCurrentProjects": false,
+    "ProtocolSourceLinkedByTestsOnly": true,
+    "WorkerRuntimeReference": "Historical library only",
+    "Ci": "../../.github/workflows/xml-doc-normalizer-dual-build.yml",
+    "RemoteCiExecuted": false
+  },
+  "Protocol": {
+    "Version": 1,
+    "WorkerVersion": "1.0",
+    "Transport": "one UTF-8 JSON object until stdin EOF; one stdout JSON response; diagnostics on stderr",
+    "Operations": [
+      "identity",
+      "analyze"
+    ],
+    "ExitCodes": {
+      "Success": 0,
+      "Failure": 1
+    },
+    "Payload": [
+      "source",
+      "typeMetadataName",
+      "methodName"
+    ],
+    "ResultOwner": "existing CanonicalExceptionFlowAnalysisResult (same-source P5O1 domain)",
+    "RoslynFreeContractGraphTestPassed": true,
+    "FailureCodes": [
+      "invalidRequest",
+      "unsupportedProtocolVersion",
+      "malformedInput",
+      "compilationFailure",
+      "analysisFailure",
+      "unexpectedWorkerFailure"
+    ],
+    "MaximumRequestCharacters": 65536,
+    "MaximumSourceCharacters": 32768,
+    "MaximumSyntaxNodes": 8192,
+    "Root": "one body-bearing ordinary static parameterless non-generic method in a source-owned non-generic type",
+    "InputProfile": "CSharp12 / net8-runtime-bounded-v1; seven framework-only references",
+    "AbsolutePathsInStableContract": false,
+    "RoslynObjectsInContract": false
+  },
+  "Smoke": {
+    "Entry": "ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions",
+    "Adapter": "RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult",
+    "Fixture": "Root -> Thrower -> throw null",
+    "ProvenException": "System.NullReferenceException",
+    "PathKinds": [
+      "MethodCall",
+      "ExplicitThrow"
+    ],
+    "FreshProcesses": 2,
+    "FullStdoutEqual": true,
+    "SourceCodeEmittedOrExecuted": false,
+    "ActualAwaitUnavailableFailureTestPassed": true,
+    "CatchTransferTestPassed": true
+  },
+  "DualBuildAndWorkerGate": {
+    "StartedUtc": "2026-10-08T15:56:23.4751408Z",
+    "CompletedUtc": "2026-10-08T15:57:26.2731718Z",
+    "Configuration": "Debug",
+    "Sdk": "8.0.418",
+    "HistoricalVersion": "5.0.0-2.25451.107",
+    "CurrentProperties": {
+      "TargetFramework": "net8.0",
+      "AssemblyName": "XMLDocNormalizer",
+      "TargetPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\bin\\Debug\\net8.0\\XMLDocNormalizer.dll",
+      "ProjectAssetsFile": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\obj\\project.assets.json",
+      "RestorePackagesPath": "C:\\Users\\Krause\\.nuget\\packages\\",
+      "MSBuildProjectExtensionsPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\obj\\",
+      "BaseOutputPath": "bin\\"
+    },
+    "HistoricalProperties": {
+      "TargetFramework": "net8.0",
+      "AssemblyName": "XMLDocNormalizer.ExceptionFlow.Historical",
+      "TargetPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Historical.dll",
+      "ProjectAssetsFile": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical\\obj\\project.assets.json",
+      "RestorePackagesPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\packages/",
+      "MSBuildProjectExtensionsPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical/obj/",
+      "BaseOutputPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical/bin/"
+    },
+    "WorkerProperties": {
+      "TargetFramework": "net8.0",
+      "AssemblyName": "XMLDocNormalizer.HistoricalWorker",
+      "TargetPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker\\bin\\Debug\\net8.0\\XMLDocNormalizer.HistoricalWorker.dll",
+      "ProjectAssetsFile": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker\\obj\\project.assets.json",
+      "RestorePackagesPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\packages/",
+      "MSBuildProjectExtensionsPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker/obj/",
+      "BaseOutputPath": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker/bin/"
+    },
+    "WorkerPackages": [
+      {
+        "Identity": "Microsoft.CodeAnalysis.Common/5.0.0-2.25451.107",
+        "Sha512": "ejaCtuT5uKvQJXmbFazZAFMRaIeznUQ+/SFslqxU1eOmx+n1YOS05cZ1Qg5pfiMfSRYH1miOorwzXW46+xN3BQ==",
+        "Path": "microsoft.codeanalysis.common/5.0.0-2.25451.107"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.CSharp/5.0.0-2.25451.107",
+        "Sha512": "gq6uN/5eIFJ8F/vkr79rncDV+NNWeoY1u2W7y0esPeIw9GWcAVE6woLMoyieMhhuPDw7XLPfdOKSc+tKigQdFA==",
+        "Path": "microsoft.codeanalysis.csharp/5.0.0-2.25451.107"
+      },
+      {
+        "Identity": "System.Collections.Immutable/9.0.0",
+        "Sha512": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+        "Path": "system.collections.immutable/9.0.0"
+      },
+      {
+        "Identity": "System.Reflection.Metadata/9.0.0",
+        "Sha512": "ANiqLu3DxW9kol/hMmTWbt3414t9ftdIuiIU7j80okq2YzAueo120M442xk1kDJWtmZTqWQn7wHDvMRipVOEOQ==",
+        "Path": "system.reflection.metadata/9.0.0"
+      }
+    ],
+    "WorkerBuildImages": [
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker\\bin\\Debug\\net8.0\\XMLDocNormalizer.HistoricalWorker.dll",
+        "Identity": "XMLDocNormalizer.HistoricalWorker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083",
+        "PdbSha256": "DF39BCFACC4C47005B4FE5D3FEDA4B9C0C7AC806CAFBD9FB1DC5661103D52659"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.HistoricalWorker\\bin\\Debug\\net8.0\\XMLDocNormalizer.HistoricalWorker.dll",
+        "Identity": "XMLDocNormalizer.HistoricalWorker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083",
+        "PdbSha256": "DF39BCFACC4C47005B4FE5D3FEDA4B9C0C7AC806CAFBD9FB1DC5661103D52659"
+      }
+    ],
+    "WorkerRuntimeChecks": [
+      {
+        "Name": "worker-identity",
+        "ExitCode": 0,
+        "Response": {
+          "protocolVersion": 1,
+          "operation": "identity",
+          "success": true,
+          "identity": {
+            "workerVersion": "1.0",
+            "protocolVersion": 1,
+            "worker": {
+              "name": "XMLDocNormalizer.HistoricalWorker",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "02dfa132-8450-49ae-949a-44dccac61bee",
+              "sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083"
+            },
+            "analyzer": {
+              "name": "XMLDocNormalizer.ExceptionFlow.Historical",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "1dacf649-2f22-4c5f-9df9-9e8648d5a97c",
+              "sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058"
+            },
+            "loadedRoslyn": [
+              {
+                "name": "Microsoft.CodeAnalysis",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+                "sha256": "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+              },
+              {
+                "name": "Microsoft.CodeAnalysis.CSharp",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+                "sha256": "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+              }
+            ],
+            "runtimeAwaitInformationAvailable": false,
+            "referenceProfile": "net8-runtime-bounded-v1"
+          }
+        },
+        "Stdout": "{\"protocolVersion\":1,\"operation\":\"identity\",\"success\":true,\"identity\":{\"workerVersion\":\"1.0\",\"protocolVersion\":1,\"worker\":{\"name\":\"XMLDocNormalizer.HistoricalWorker\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"02dfa132-8450-49ae-949a-44dccac61bee\",\"sha256\":\"AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083\"},\"analyzer\":{\"name\":\"XMLDocNormalizer.ExceptionFlow.Historical\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"1dacf649-2f22-4c5f-9df9-9e8648d5a97c\",\"sha256\":\"4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058\"},\"loadedRoslyn\":[{\"name\":\"Microsoft.CodeAnalysis\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"dc7738cc-6dca-4d34-9c44-29b53a7caa93\",\"sha256\":\"660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1\"},{\"name\":\"Microsoft.CodeAnalysis.CSharp\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"0f9c1dcf-4eb1-47f8-81b2-733db5887be7\",\"sha256\":\"B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D\"}],\"runtimeAwaitInformationAvailable\":false,\"referenceProfile\":\"net8-runtime-bounded-v1\"}}",
+        "Stderr": ""
+      },
+      {
+        "Name": "worker-smoke-first",
+        "ExitCode": 0,
+        "Response": {
+          "protocolVersion": 1,
+          "operation": "analyze",
+          "success": true,
+          "identity": {
+            "workerVersion": "1.0",
+            "protocolVersion": 1,
+            "worker": {
+              "name": "XMLDocNormalizer.HistoricalWorker",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "02dfa132-8450-49ae-949a-44dccac61bee",
+              "sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083"
+            },
+            "analyzer": {
+              "name": "XMLDocNormalizer.ExceptionFlow.Historical",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "1dacf649-2f22-4c5f-9df9-9e8648d5a97c",
+              "sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058"
+            },
+            "loadedRoslyn": [
+              {
+                "name": "Microsoft.CodeAnalysis",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+                "sha256": "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+              },
+              {
+                "name": "Microsoft.CodeAnalysis.CSharp",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+                "sha256": "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+              }
+            ],
+            "runtimeAwaitInformationAvailable": false,
+            "referenceProfile": "net8-runtime-bounded-v1"
+          },
+          "result": {
+            "entries": [
+              {
+                "exceptionType": {
+                  "kind": "named",
+                  "namedTypeKind": "class",
+                  "assembly": {
+                    "name": "System.Private.CoreLib",
+                    "versionMajor": 8,
+                    "versionMinor": 0,
+                    "versionBuild": 0,
+                    "versionRevision": 0,
+                    "cultureName": "",
+                    "publicKeyOrToken": "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                    "hasPublicKey": true,
+                    "isRetargetable": false,
+                    "contentType": "default"
+                  },
+                  "module": {
+                    "assembly": {
+                      "name": "System.Private.CoreLib",
+                      "versionMajor": 8,
+                      "versionMinor": 0,
+                      "versionBuild": 0,
+                      "versionRevision": 0,
+                      "cultureName": "",
+                      "publicKeyOrToken": "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                      "hasPublicKey": true,
+                      "isRetargetable": false,
+                      "contentType": "default"
+                    },
+                    "name": "System.Private.CoreLib.dll",
+                    "ordinal": 0
+                  },
+                  "namespaceName": "System",
+                  "metadataName": "NullReferenceException",
+                  "typeArguments": [],
+                  "isUnboundGenericType": false,
+                  "isNativeIntegerType": false,
+                  "arrayRank": 0,
+                  "functionPointerParameters": []
+                },
+                "evidenceKind": "proven",
+                "paths": [
+                  {
+                    "steps": [
+                      {
+                        "kind": "methodCall",
+                        "symbolName": "Fixture.Thrower()",
+                        "filePath": "worker-input.cs",
+                        "line": 1,
+                        "column": 59
+                      },
+                      {
+                        "kind": "explicitThrow",
+                        "symbolName": "System.NullReferenceException",
+                        "filePath": "worker-input.cs",
+                        "line": 1,
+                        "column": 96
+                      }
+                    ]
+                  }
+                ],
+                "pathsTruncated": false
+              }
+            ],
+            "uncertainties": []
+          }
+        },
+        "Stdout": "{\"protocolVersion\":1,\"operation\":\"analyze\",\"success\":true,\"identity\":{\"workerVersion\":\"1.0\",\"protocolVersion\":1,\"worker\":{\"name\":\"XMLDocNormalizer.HistoricalWorker\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"02dfa132-8450-49ae-949a-44dccac61bee\",\"sha256\":\"AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083\"},\"analyzer\":{\"name\":\"XMLDocNormalizer.ExceptionFlow.Historical\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"1dacf649-2f22-4c5f-9df9-9e8648d5a97c\",\"sha256\":\"4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058\"},\"loadedRoslyn\":[{\"name\":\"Microsoft.CodeAnalysis\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"dc7738cc-6dca-4d34-9c44-29b53a7caa93\",\"sha256\":\"660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1\"},{\"name\":\"Microsoft.CodeAnalysis.CSharp\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"0f9c1dcf-4eb1-47f8-81b2-733db5887be7\",\"sha256\":\"B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D\"}],\"runtimeAwaitInformationAvailable\":false,\"referenceProfile\":\"net8-runtime-bounded-v1\"},\"result\":{\"entries\":[{\"exceptionType\":{\"kind\":\"named\",\"namedTypeKind\":\"class\",\"assembly\":{\"name\":\"System.Private.CoreLib\",\"versionMajor\":8,\"versionMinor\":0,\"versionBuild\":0,\"versionRevision\":0,\"cultureName\":\"\",\"publicKeyOrToken\":\"00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB\",\"hasPublicKey\":true,\"isRetargetable\":false,\"contentType\":\"default\"},\"module\":{\"assembly\":{\"name\":\"System.Private.CoreLib\",\"versionMajor\":8,\"versionMinor\":0,\"versionBuild\":0,\"versionRevision\":0,\"cultureName\":\"\",\"publicKeyOrToken\":\"00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB\",\"hasPublicKey\":true,\"isRetargetable\":false,\"contentType\":\"default\"},\"name\":\"System.Private.CoreLib.dll\",\"ordinal\":0},\"namespaceName\":\"System\",\"metadataName\":\"NullReferenceException\",\"typeArguments\":[],\"isUnboundGenericType\":false,\"isNativeIntegerType\":false,\"arrayRank\":0,\"functionPointerParameters\":[]},\"evidenceKind\":\"proven\",\"paths\":[{\"steps\":[{\"kind\":\"methodCall\",\"symbolName\":\"Fixture.Thrower()\",\"filePath\":\"worker-input.cs\",\"line\":1,\"column\":59},{\"kind\":\"explicitThrow\",\"symbolName\":\"System.NullReferenceException\",\"filePath\":\"worker-input.cs\",\"line\":1,\"column\":96}]}],\"pathsTruncated\":false}],\"uncertainties\":[]}}",
+        "Stderr": ""
+      },
+      {
+        "Name": "worker-smoke-repeat",
+        "ExitCode": 0,
+        "Response": {
+          "protocolVersion": 1,
+          "operation": "analyze",
+          "success": true,
+          "identity": {
+            "workerVersion": "1.0",
+            "protocolVersion": 1,
+            "worker": {
+              "name": "XMLDocNormalizer.HistoricalWorker",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "02dfa132-8450-49ae-949a-44dccac61bee",
+              "sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083"
+            },
+            "analyzer": {
+              "name": "XMLDocNormalizer.ExceptionFlow.Historical",
+              "assemblyVersion": "1.0.0.0",
+              "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+              "mvid": "1dacf649-2f22-4c5f-9df9-9e8648d5a97c",
+              "sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058"
+            },
+            "loadedRoslyn": [
+              {
+                "name": "Microsoft.CodeAnalysis",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+                "sha256": "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+              },
+              {
+                "name": "Microsoft.CodeAnalysis.CSharp",
+                "assemblyVersion": "5.0.0.0",
+                "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                "mvid": "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+                "sha256": "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+              }
+            ],
+            "runtimeAwaitInformationAvailable": false,
+            "referenceProfile": "net8-runtime-bounded-v1"
+          },
+          "result": {
+            "entries": [
+              {
+                "exceptionType": {
+                  "kind": "named",
+                  "namedTypeKind": "class",
+                  "assembly": {
+                    "name": "System.Private.CoreLib",
+                    "versionMajor": 8,
+                    "versionMinor": 0,
+                    "versionBuild": 0,
+                    "versionRevision": 0,
+                    "cultureName": "",
+                    "publicKeyOrToken": "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                    "hasPublicKey": true,
+                    "isRetargetable": false,
+                    "contentType": "default"
+                  },
+                  "module": {
+                    "assembly": {
+                      "name": "System.Private.CoreLib",
+                      "versionMajor": 8,
+                      "versionMinor": 0,
+                      "versionBuild": 0,
+                      "versionRevision": 0,
+                      "cultureName": "",
+                      "publicKeyOrToken": "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                      "hasPublicKey": true,
+                      "isRetargetable": false,
+                      "contentType": "default"
+                    },
+                    "name": "System.Private.CoreLib.dll",
+                    "ordinal": 0
+                  },
+                  "namespaceName": "System",
+                  "metadataName": "NullReferenceException",
+                  "typeArguments": [],
+                  "isUnboundGenericType": false,
+                  "isNativeIntegerType": false,
+                  "arrayRank": 0,
+                  "functionPointerParameters": []
+                },
+                "evidenceKind": "proven",
+                "paths": [
+                  {
+                    "steps": [
+                      {
+                        "kind": "methodCall",
+                        "symbolName": "Fixture.Thrower()",
+                        "filePath": "worker-input.cs",
+                        "line": 1,
+                        "column": 59
+                      },
+                      {
+                        "kind": "explicitThrow",
+                        "symbolName": "System.NullReferenceException",
+                        "filePath": "worker-input.cs",
+                        "line": 1,
+                        "column": 96
+                      }
+                    ]
+                  }
+                ],
+                "pathsTruncated": false
+              }
+            ],
+            "uncertainties": []
+          }
+        },
+        "Stdout": "{\"protocolVersion\":1,\"operation\":\"analyze\",\"success\":true,\"identity\":{\"workerVersion\":\"1.0\",\"protocolVersion\":1,\"worker\":{\"name\":\"XMLDocNormalizer.HistoricalWorker\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"02dfa132-8450-49ae-949a-44dccac61bee\",\"sha256\":\"AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083\"},\"analyzer\":{\"name\":\"XMLDocNormalizer.ExceptionFlow.Historical\",\"assemblyVersion\":\"1.0.0.0\",\"informationalVersion\":\"1.0.0\\u002Ba4a533c823ee909aadb25cf6660c688101f90618\",\"mvid\":\"1dacf649-2f22-4c5f-9df9-9e8648d5a97c\",\"sha256\":\"4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058\"},\"loadedRoslyn\":[{\"name\":\"Microsoft.CodeAnalysis\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"dc7738cc-6dca-4d34-9c44-29b53a7caa93\",\"sha256\":\"660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1\"},{\"name\":\"Microsoft.CodeAnalysis.CSharp\",\"assemblyVersion\":\"5.0.0.0\",\"informationalVersion\":\"5.0.0-2.25451.107\\u002B2db1f5ee2bdda2e8d873769325fabede32e420e0\",\"mvid\":\"0f9c1dcf-4eb1-47f8-81b2-733db5887be7\",\"sha256\":\"B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D\"}],\"runtimeAwaitInformationAvailable\":false,\"referenceProfile\":\"net8-runtime-bounded-v1\"},\"result\":{\"entries\":[{\"exceptionType\":{\"kind\":\"named\",\"namedTypeKind\":\"class\",\"assembly\":{\"name\":\"System.Private.CoreLib\",\"versionMajor\":8,\"versionMinor\":0,\"versionBuild\":0,\"versionRevision\":0,\"cultureName\":\"\",\"publicKeyOrToken\":\"00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB\",\"hasPublicKey\":true,\"isRetargetable\":false,\"contentType\":\"default\"},\"module\":{\"assembly\":{\"name\":\"System.Private.CoreLib\",\"versionMajor\":8,\"versionMinor\":0,\"versionBuild\":0,\"versionRevision\":0,\"cultureName\":\"\",\"publicKeyOrToken\":\"00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB\",\"hasPublicKey\":true,\"isRetargetable\":false,\"contentType\":\"default\"},\"name\":\"System.Private.CoreLib.dll\",\"ordinal\":0},\"namespaceName\":\"System\",\"metadataName\":\"NullReferenceException\",\"typeArguments\":[],\"isUnboundGenericType\":false,\"isNativeIntegerType\":false,\"arrayRank\":0,\"functionPointerParameters\":[]},\"evidenceKind\":\"proven\",\"paths\":[{\"steps\":[{\"kind\":\"methodCall\",\"symbolName\":\"Fixture.Thrower()\",\"filePath\":\"worker-input.cs\",\"line\":1,\"column\":59},{\"kind\":\"explicitThrow\",\"symbolName\":\"System.NullReferenceException\",\"filePath\":\"worker-input.cs\",\"line\":1,\"column\":96}]}],\"pathsTruncated\":false}],\"uncertainties\":[]}}",
+        "Stderr": ""
+      },
+      {
+        "Name": "worker-invalid-version",
+        "ExitCode": 1,
+        "Response": {
+          "protocolVersion": 1,
+          "operation": "invalid",
+          "success": false,
+          "failure": {
+            "code": "unsupportedProtocolVersion",
+            "message": "Unsupported protocol version.",
+            "details": []
+          }
+        },
+        "Stdout": "{\"protocolVersion\":1,\"operation\":\"invalid\",\"success\":false,\"failure\":{\"code\":\"unsupportedProtocolVersion\",\"message\":\"Unsupported protocol version.\",\"details\":[]}}",
+        "Stderr": ""
+      }
+    ],
+    "CurrentPackages": [
+      {
+        "Identity": "Humanizer.Core/2.14.1",
+        "Sha512": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
+        "Path": "humanizer.core/2.14.1"
+      },
+      {
+        "Identity": "Microsoft.Bcl.AsyncInterfaces/9.0.0",
+        "Sha512": "owmu2Cr3IQ8yQiBleBHlGk8dSQ12oaF2e7TpzwJKEl4m84kkZJjEY1n33L67Y3zM5jPOjmmbdHjbfiL0RqcMRQ==",
+        "Path": "microsoft.bcl.asyncinterfaces/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Build.Framework/17.11.31",
+        "Sha512": "9bGe48OGm0EO69HHpex0shnNLH7ZEB4Nwj7mofeLUoQcl9NeuIJe9F9dawKJF3E0bf5qPTwH/v3eyCXgMD4HuA==",
+        "Path": "microsoft.build.framework/17.11.31"
+      },
+      {
+        "Identity": "Microsoft.Build.Locator/1.11.2",
+        "Sha512": "tY+/S54G29CGsbL3slVu4vqtpciwVnb3fKOmrhgzEQmu/VziFaWmD/E1e/2KH7cDucuycGSkWsSXndBs5Uawow==",
+        "Path": "microsoft.build.locator/1.11.2"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis/5.0.0",
+        "Sha512": "X7vItpZDkGm4NS2wp4P1S07Z1e61LaBWDW5tPXE1c6z5/x9KbF2RymhAPoYg7Qoiyk7odEZ6EjBEJ47p3dBpYQ==",
+        "Path": "microsoft.codeanalysis/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Analyzers/3.11.0",
+        "Sha512": "v/EW3UE8/lbEYHoC2Qq7AR/DnmvpgdtAMndfQNmpuIMx/Mto8L5JnuCfdBYtgvalQOtfNCnxFejxuRrryvUTsg==",
+        "Path": "microsoft.codeanalysis.analyzers/3.11.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Common/5.0.0",
+        "Sha512": "ZXRAdvH6GiDeHRyd3q/km8Z44RoM6FBWHd+gen/la81mVnAdHTEsEkO5J0TCNXBymAcx5UYKt5TvgKBhaLJEow==",
+        "Path": "microsoft.codeanalysis.common/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.CSharp/5.0.0",
+        "Sha512": "5DSyJ9bk+ATuDy7fp2Zt0mJStDVKbBoiz1DyfAwSa+k4H4IwykAUcV3URelw5b8/iVbfSaOwkwmPUZH6opZKCw==",
+        "Path": "microsoft.codeanalysis.csharp/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.CSharp.Workspaces/5.0.0",
+        "Sha512": "Al/Q8B+yO8odSqGVpSvrShMFDvlQdIBU//F3E6Rb0YdiLSALE9wh/pvozPNnfmh5HDnvU+mkmSjpz4hQO++jaA==",
+        "Path": "microsoft.codeanalysis.csharp.workspaces/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.VisualBasic/5.0.0",
+        "Sha512": "sUBWvHs2HgHGA+b716dgjS7JiXGen5ntyohAurPLR1ZiZzFp3FlnVA7GrMTqVGdVJTVqiC3c4K8k1bk0gj6IPg==",
+        "Path": "microsoft.codeanalysis.visualbasic/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.VisualBasic.Workspaces/5.0.0",
+        "Sha512": "Nom4UuZVEZGaV6Qa+joJR/BawXZMtflvQJFKc0SaUc3LrZr/8LmRY5cn8mbvLOWIVfwWkQz+cVE6eQKu9qa65g==",
+        "Path": "microsoft.codeanalysis.visualbasic.workspaces/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Workspaces.Common/5.0.0",
+        "Sha512": "ZbUmIvT6lqTNKiv06Jl5wf0MTMi1vQ1oH7ou4CLcs2C/no/L7EhP3T8y3XXvn9VbqMcJaJnEsNA1jwYUMgc5jg==",
+        "Path": "microsoft.codeanalysis.workspaces.common/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Workspaces.MSBuild/5.0.0",
+        "Sha512": "/G+LVoAGMz6Ae8nm+PGLxSw+F5RjYx/J7irbTO5uKAPw1bxHyQJLc/YOnpDxt+EpPtYxvC9wvBsg/kETZp1F9Q==",
+        "Path": "microsoft.codeanalysis.workspaces.msbuild/5.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.DependencyInjection/9.0.0",
+        "Sha512": "MCPrg7v3QgNMr0vX4vzRXvkNGgLg8vKWX0nKCWUxu2uPyMsaRgiRc1tHBnbTcfJMhMKj2slE/j2M9oGkd25DNw==",
+        "Path": "microsoft.extensions.dependencyinjection/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.0",
+        "Sha512": "+6f2qv2a3dLwd5w6JanPIPs47CxRbnk+ZocMJUhv9NxP88VlOcJYZs9jY+MYSjxvady08bUZn6qgiNh7DadGgg==",
+        "Path": "microsoft.extensions.dependencyinjection.abstractions/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.Logging/9.0.0",
+        "Sha512": "crjWyORoug0kK7RSNJBTeSE6VX8IQgLf3nUpTB9m62bPXp/tzbnOsnbe8TXEG0AASNaKZddnpHKw7fET8E++Pg==",
+        "Path": "microsoft.extensions.logging/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.Logging.Abstractions/9.0.0",
+        "Sha512": "g0UfujELzlLbHoVG8kPKVBaW470Ewi+jnptGS9KUi6jcb+k2StujtK3m26DFSGGwQ/+bVgZfsWqNzlP6YOejvw==",
+        "Path": "microsoft.extensions.logging.abstractions/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.Options/9.0.0",
+        "Sha512": "y2146b3jrPI3Q0lokKXdKLpmXqakYbDIPDV6r3M8SqvSf45WwOTzkyfDpxnZXJsJQEpAsAqjUq5Pu8RCJMjubg==",
+        "Path": "microsoft.extensions.options/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.Extensions.Primitives/9.0.0",
+        "Sha512": "N3qEBzmLMYiASUlKxxFIISP4AiwuPTHF5uCh+2CWSwwzAJiIYx0kBJsS30cp1nvhSySFAVi30jecD307jV+8Kg==",
+        "Path": "microsoft.extensions.primitives/9.0.0"
+      },
+      {
+        "Identity": "Microsoft.VisualStudio.SolutionPersistence/1.0.52",
+        "Sha512": "oNv2JtYXhpdJrX63nibx1JT3uCESOBQ1LAk7Dtz/sr0+laW0KRM6eKp4CZ3MHDR2siIkKsY8MmUkeP5DKkQQ5w==",
+        "Path": "microsoft.visualstudio.solutionpersistence/1.0.52"
+      },
+      {
+        "Identity": "Newtonsoft.Json/13.0.3",
+        "Sha512": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+        "Path": "newtonsoft.json/13.0.3"
+      },
+      {
+        "Identity": "NuGet.Frameworks/6.5.0",
+        "Sha512": "QWINE2x3MbTODsWT1Gh71GaGb5icBz4chS8VYvTgsBnsi8esgN6wtHhydd7fvToWECYGq7T4cgBBDiKD/363fg==",
+        "Path": "nuget.frameworks/6.5.0"
+      },
+      {
+        "Identity": "System.Buffers/4.6.0",
+        "Sha512": "lN6tZi7Q46zFzAbRYXTIvfXcyvQQgxnY7Xm6C6xQ9784dEL1amjM6S6Iw4ZpsvesAKnRVsM4scrDQaDqSClkjA==",
+        "Path": "system.buffers/4.6.0"
+      },
+      {
+        "Identity": "System.Collections.Immutable/9.0.0",
+        "Sha512": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+        "Path": "system.collections.immutable/9.0.0"
+      },
+      {
+        "Identity": "System.Composition/9.0.0",
+        "Sha512": "3Djj70fFTraOarSKmRnmRy/zm4YurICm+kiCtI0dYRqGJnLX6nJ+G3WYuFJ173cAPax/gh96REcbNiVqcrypFQ==",
+        "Path": "system.composition/9.0.0"
+      },
+      {
+        "Identity": "System.Composition.AttributedModel/9.0.0",
+        "Sha512": "iri00l/zIX9g4lHMY+Nz0qV1n40+jFYAmgsaiNn16xvt2RDwlqByNG4wgblagnDYxm3YSQQ0jLlC/7Xlk9CzyA==",
+        "Path": "system.composition.attributedmodel/9.0.0"
+      },
+      {
+        "Identity": "System.Composition.Convention/9.0.0",
+        "Sha512": "+vuqVP6xpi582XIjJi6OCsIxuoTZfR0M7WWufk3uGDeCl3wGW6KnpylUJ3iiXdPByPE0vR5TjJgR6hDLez4FQg==",
+        "Path": "system.composition.convention/9.0.0"
+      },
+      {
+        "Identity": "System.Composition.Hosting/9.0.0",
+        "Sha512": "OFqSeFeJYr7kHxDfaViGM1ymk7d4JxK//VSoNF9Ux0gpqkLsauDZpu89kTHHNdCWfSljbFcvAafGyBoY094btQ==",
+        "Path": "system.composition.hosting/9.0.0"
+      },
+      {
+        "Identity": "System.Composition.Runtime/9.0.0",
+        "Sha512": "w1HOlQY1zsOWYussjFGZCEYF2UZXgvoYnS94NIu2CBnAGMbXFAX8PY8c92KwUItPmowal68jnVLBCzdrWLeEKA==",
+        "Path": "system.composition.runtime/9.0.0"
+      },
+      {
+        "Identity": "System.Composition.TypedParts/9.0.0",
+        "Sha512": "aRZlojCCGEHDKqh43jaDgaVpYETsgd7Nx4g1zwLKMtv4iTo0627715ajEFNpEEBTgLmvZuv8K0EVxc3sM4NWJA==",
+        "Path": "system.composition.typedparts/9.0.0"
+      },
+      {
+        "Identity": "System.Diagnostics.DiagnosticSource/9.0.0",
+        "Sha512": "ddppcFpnbohLWdYKr/ZeLZHmmI+DXFgZ3Snq+/E7SwcdW4UnvxmaugkwGywvGVWkHPGCSZjCP+MLzu23AL5SDw==",
+        "Path": "system.diagnostics.diagnosticsource/9.0.0"
+      },
+      {
+        "Identity": "System.IO.Pipelines/9.0.0",
+        "Sha512": "eA3cinogwaNB4jdjQHOP3Z3EuyiDII7MT35jgtnsA4vkn0LUrrSHsU0nzHTzFzmaFYeKV7MYyMxOocFzsBHpTw==",
+        "Path": "system.io.pipelines/9.0.0"
+      },
+      {
+        "Identity": "System.Memory/4.6.0",
+        "Sha512": "OEkbBQoklHngJ8UD8ez2AERSk2g+/qpAaSWWCBFbpH727HxDq5ydVkuncBaKcKfwRqXGWx64dS6G1SUScMsitg==",
+        "Path": "system.memory/4.6.0"
+      },
+      {
+        "Identity": "System.Numerics.Vectors/4.6.0",
+        "Sha512": "t+SoieZsRuEyiw/J+qXUbolyO219tKQQI0+2/YI+Qv7YdGValA6WiuokrNKqjrTNsy5ABWU11bdKOzUdheteXg==",
+        "Path": "system.numerics.vectors/4.6.0"
+      },
+      {
+        "Identity": "System.Reflection.Metadata/9.0.0",
+        "Sha512": "ANiqLu3DxW9kol/hMmTWbt3414t9ftdIuiIU7j80okq2YzAueo120M442xk1kDJWtmZTqWQn7wHDvMRipVOEOQ==",
+        "Path": "system.reflection.metadata/9.0.0"
+      },
+      {
+        "Identity": "System.Runtime.CompilerServices.Unsafe/6.1.0",
+        "Sha512": "5o/HZxx6RVqYlhKSq8/zronDkALJZUT2Vz0hx43f0gwe8mwlM0y2nYlqdBwLMzr262Bwvpikeb/yEwkAa5PADg==",
+        "Path": "system.runtime.compilerservices.unsafe/6.1.0"
+      },
+      {
+        "Identity": "System.Text.Encoding.CodePages/8.0.0",
+        "Sha512": "OZIsVplFGaVY90G2SbpgU7EnCoOO5pw1t4ic21dBF3/1omrJFpAGoNAVpPyMVOC90/hvgkGG3VFqR13YgZMQfg==",
+        "Path": "system.text.encoding.codepages/8.0.0"
+      },
+      {
+        "Identity": "System.Threading.Channels/8.0.0",
+        "Sha512": "CMaFr7v+57RW7uZfZkPExsPB6ljwzhjACWW1gfU35Y56rk72B/Wu+sTqxVmGSk4SFUlPc3cjeKND0zktziyjBA==",
+        "Path": "system.threading.channels/8.0.0"
+      },
+      {
+        "Identity": "System.Threading.Tasks.Extensions/4.6.0",
+        "Sha512": "I5G6Y8jb0xRtGUC9Lahy7FUvlYlnGMMkbuKAQBy8Jb7Y6Yn8OlBEiUOY0PqZ0hy6Ua8poVA1ui1tAIiXNxGdsg==",
+        "Path": "system.threading.tasks.extensions/4.6.0"
+      }
+    ],
+    "HistoricalPackages": [
+      {
+        "Identity": "Microsoft.CodeAnalysis.Analyzers/3.11.0",
+        "Sha512": "v/EW3UE8/lbEYHoC2Qq7AR/DnmvpgdtAMndfQNmpuIMx/Mto8L5JnuCfdBYtgvalQOtfNCnxFejxuRrryvUTsg==",
+        "Path": "microsoft.codeanalysis.analyzers/3.11.0"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Common/5.0.0-2.25451.107",
+        "Sha512": "ejaCtuT5uKvQJXmbFazZAFMRaIeznUQ+/SFslqxU1eOmx+n1YOS05cZ1Qg5pfiMfSRYH1miOorwzXW46+xN3BQ==",
+        "Path": "microsoft.codeanalysis.common/5.0.0-2.25451.107"
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.CSharp/5.0.0-2.25451.107",
+        "Sha512": "gq6uN/5eIFJ8F/vkr79rncDV+NNWeoY1u2W7y0esPeIw9GWcAVE6woLMoyieMhhuPDw7XLPfdOKSc+tKigQdFA==",
+        "Path": "microsoft.codeanalysis.csharp/5.0.0-2.25451.107"
+      },
+      {
+        "Identity": "System.Collections.Immutable/9.0.0",
+        "Sha512": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+        "Path": "system.collections.immutable/9.0.0"
+      },
+      {
+        "Identity": "System.Reflection.Metadata/9.0.0",
+        "Sha512": "ANiqLu3DxW9kol/hMmTWbt3414t9ftdIuiIU7j80okq2YzAueo120M442xk1kDJWtmZTqWQn7wHDvMRipVOEOQ==",
+        "Path": "system.reflection.metadata/9.0.0"
+      }
+    ],
+    "HistoricalPackageSources": [
+      {
+        "Identity": "Microsoft.CodeAnalysis.Analyzers/3.11.0",
+        "Source": "https://api.nuget.org/v3/index.json",
+        "ContentHash": "v/EW3UE8/lbEYHoC2Qq7AR/DnmvpgdtAMndfQNmpuIMx/Mto8L5JnuCfdBYtgvalQOtfNCnxFejxuRrryvUTsg=="
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.Common/5.0.0-2.25451.107",
+        "Source": "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/d1622942-d16f-48e5-bc83-96f4539e7601/nuget/v3/index.json",
+        "ContentHash": "ejaCtuT5uKvQJXmbFazZAFMRaIeznUQ+/SFslqxU1eOmx+n1YOS05cZ1Qg5pfiMfSRYH1miOorwzXW46+xN3BQ=="
+      },
+      {
+        "Identity": "Microsoft.CodeAnalysis.CSharp/5.0.0-2.25451.107",
+        "Source": "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/d1622942-d16f-48e5-bc83-96f4539e7601/nuget/v3/index.json",
+        "ContentHash": "gq6uN/5eIFJ8F/vkr79rncDV+NNWeoY1u2W7y0esPeIw9GWcAVE6woLMoyieMhhuPDw7XLPfdOKSc+tKigQdFA=="
+      },
+      {
+        "Identity": "System.Collections.Immutable/9.0.0",
+        "Source": "https://api.nuget.org/v3/index.json",
+        "ContentHash": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w=="
+      },
+      {
+        "Identity": "System.Reflection.Metadata/9.0.0",
+        "Source": "https://api.nuget.org/v3/index.json",
+        "ContentHash": "ANiqLu3DxW9kol/hMmTWbt3414t9ftdIuiIU7j80okq2YzAueo120M442xk1kDJWtmZTqWQn7wHDvMRipVOEOQ=="
+      }
+    ],
+    "CurrentCompilerReferences": [
+      {
+        "Package": "Microsoft.CodeAnalysis.CSharp",
+        "Version": "5.0.0",
+        "Path": "C:\\Users\\Krause\\.nuget\\packages\\microsoft.codeanalysis.csharp\\5.0.0\\lib\\net8.0\\Microsoft.CodeAnalysis.CSharp.dll",
+        "Sha256": "04A501010F76FC98E6430DFAB912A094D6E2952718989B56EE8BDD703F2F191B"
+      },
+      {
+        "Package": "Microsoft.CodeAnalysis.Common",
+        "Version": "5.0.0",
+        "Path": "C:\\Users\\Krause\\.nuget\\packages\\microsoft.codeanalysis.common\\5.0.0\\lib\\net8.0\\Microsoft.CodeAnalysis.dll",
+        "Sha256": "5C1E3821A4504801FA7F4C1E652FD8B9BD7FD54A8A07F4D205B809A8ABAC2F32"
+      }
+    ],
+    "HistoricalCompilerReferences": [
+      {
+        "Package": "Microsoft.CodeAnalysis.CSharp",
+        "Version": "5.0.0-2.25451.107",
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\packages\\microsoft.codeanalysis.csharp\\5.0.0-2.25451.107\\lib\\net8.0\\Microsoft.CodeAnalysis.CSharp.dll",
+        "Sha256": "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+      },
+      {
+        "Package": "Microsoft.CodeAnalysis.Common",
+        "Version": "5.0.0-2.25451.107",
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\packages\\microsoft.codeanalysis.common\\5.0.0-2.25451.107\\lib\\net8.0\\Microsoft.CodeAnalysis.dll",
+        "Sha256": "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+      }
+    ],
+    "SharedSourceFingerprints": [
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/ExternalDocumentationExceptionModel.cs",
+        "Sha256": "DDEAF91EB7CF120C41C06CE62B92C067B4EC50F1CD672838E6906AEE68A1FF3D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalAssemblyIdentity.cs",
+        "Sha256": "E29FF2DDB884C833810E165278A0773EFE8798A396DA25987F5C024BBAE73B6F"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalCallableIdentity.cs",
+        "Sha256": "E61C9F1916CF03B80A35B8786B9F88640908FE40204D2286C685AE85C42AAD80"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalExceptionFlowAnalysisResult.cs",
+        "Sha256": "AAB6FB2B48284E30DFDEE79D9D029F4C479CA6522860BC4035F266E8E85ADBE5"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalExceptionFlowCallContext.cs",
+        "Sha256": "FB0B70C7158486D3CF0BFACF4849E24C5799BF52F2475A5178765CBA4A20F07D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalExceptionFlowSummary.cs",
+        "Sha256": "3F242467928301422268E4269AFF45B9F3756944CED15704AF45B2A1D44A9452"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalIdentityKeyWriter.cs",
+        "Sha256": "6BEF3CBCC3ABF37AA0EB904CCD41E555A9B5393F7DAAE03DA67754B6379CE973"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalModuleIdentity.cs",
+        "Sha256": "7295A2AEF77BD0B5C0DFD1D13F24BA3FB8EF93889766CA5C445AC6637951DD5D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalNamespaceIdentity.cs",
+        "Sha256": "3EE1CFD378EB71C4DE34277B576F7C8888C370E536CE494BBF336E371BC34953"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalSourceLocationIdentity.cs",
+        "Sha256": "D1BC2AC070F912ECD45C9DD0C7044C09BAA130F0961046A4F09797A7639F656C"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalStableMemberIdentity.cs",
+        "Sha256": "76AF4145C208143619931417BE5B9F03E82C5B5B3FFDF9FA18547F622B137F7A"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/CanonicalTypeIdentity.cs",
+        "Sha256": "6CC788AB80A258AB86BFDAF8835369D6AC8797E6B397A4C168064E6FF81283BA"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/NamespaceDoc.cs",
+        "Sha256": "09D92BC0A1F18FB5E8A621DE51315529B879CA95630DEE098A6A5EB58201B9BC"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/RoslynCanonicalExceptionFlowAdapter.cs",
+        "Sha256": "62745F8D830980F201817E2CB948095B98234245FB52355E11FAFA0170F37272"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/RoslynCanonicalIdentityFactory.cs",
+        "Sha256": "5DAA9FAC39788A7C23A0ABDEBDF0BF28F485FD513EF2469397E373D9A22D6961"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/RoslynCanonicalIdentityResolver.cs",
+        "Sha256": "C64A210F7E844EAD9A0CEA0F8A0FD92F7DFB8C57CFD58A7B7F26EF67CB781C1C"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.CallContext.cs",
+        "Sha256": "BD78BD346E2886A2F556DD02BE2C5131247D060A00C0FE51753A18262BC101AF"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.ConditionalWeakTableValueFacts.cs",
+        "Sha256": "25D2EE2F1B87BB719F4FB28EE4D1E0F16C032B39AC24336E9B4FF1B8CD4C772D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.EnumSwitchReachability.cs",
+        "Sha256": "D98B57D6EF676C102AA61F7C34FE28334153B07734E68506106A39FA4786E590"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.InvocationCallContext.cs",
+        "Sha256": "1895DE8D81DDE86635AD4879D3CE17BC5DA4824DC1A8A3CAA01605A8538738AD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.KnownFrameworkContracts.cs",
+        "Sha256": "935C3F0E550083010EF82F260EA84CAEF6CE0024F58DD3835BD439F88095846C"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.LocalSourceFacts.cs",
+        "Sha256": "E6A3BB0F75166D2AE3795AFCCB46D7A1F9618361B72210E7819791DF6D72A5D7"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.NumericConditions.cs",
+        "Sha256": "228C7F410B04BAD4909B626D9C9A545A84E556EC3D8BA9C3ED797538116D5F7A"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessorDispatch.cs",
+        "Sha256": "84C92A3859217E815017003A14C5BC094A8ABAFFBDF44B71D28040419F1408B2"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessors.cs",
+        "Sha256": "F0F6019FD80D146F504EF994B5C4F3DD3A579B548C7C562D77EB14F58CF6BDF4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAwaits.cs",
+        "Sha256": "1291945E62CF65900FCA99043300BD3CB13399A37CFA2CD0ED188BE761D78BBE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCalls.cs",
+        "Sha256": "4578222E6C558476D3F30A3AE080B92F541D827098A486B5615FC38D9F482034"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCollectionInitializers.cs",
+        "Sha256": "98C8A14B3D790412D421A6F3D5400C724DEDF63CFA8822E871477D1556CD5ECE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphConstructors.cs",
+        "Sha256": "085B928FC80CD01F7692F28D1DBE85B36EC438E60744A4F29E71B9BA28DBEC89"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeclarations.cs",
+        "Sha256": "DA5C32AC86E9DD3E8A911BE5CBBED0BE952B8790DD9A5C0C97B8BEE31C9C56FE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeconstruction.cs",
+        "Sha256": "26F5859CF56ABB181FAD4431ABEDE889D8A12D3D1EF5B5148EA6151EAF85E2FE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDispatch.cs",
+        "Sha256": "0F68132390828BE1B66324D08AC5571A9D3FCEB0916866C706D658874CC6BD77"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDispatchCompleteness.cs",
+        "Sha256": "3674CC1EAD1A49FDDACE9BB89EBD75FEBE766A279B1F51B00402408A7A11829D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDisposalResolution.cs",
+        "Sha256": "D528E24D3B5AD00D7BC91DB97A17B1F7547116B25453BB10835AD20D7E549A02"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDisposals.cs",
+        "Sha256": "634AF05B7460B258D0F53C85B767E5326F21558959DCEACF73062D2C13D5FCE3"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDynamicBindings.cs",
+        "Sha256": "C1C0FB930726CC3C2BCCD296AEB45BC8DB964E18CCC5CDBDD336C449D145068B"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphEvaluation.cs",
+        "Sha256": "477DD613276AB4DB7666FE0B25B723343E987388B2D4BF63F2235F76506C564E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphForEach.cs",
+        "Sha256": "0755E58F622CC6F0C42024E7B0E162508901F316FA245D30C618DE0AE6E3404E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitCalls.cs",
+        "Sha256": "CE0366DD77EDF7F44B5BF219BE9F87E0E1C38BE9693FADD99082B0E4F9064E4B"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitDispatch.cs",
+        "Sha256": "3D7FF57B6BBB8AAEEC3E27EF34E003C23F2CFDE925C36B3A7D82F806F00002DA"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitObjectCreations.cs",
+        "Sha256": "829F06EFD358BBF49D51CDBA2FB13531A5A0D33C25497F268A2CD8A2366685EB"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphOperators.cs",
+        "Sha256": "B35E1211E66D2F814A2112359B76C20B5CCE6315B56B5477232347177AFEA0CD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphThrows.cs",
+        "Sha256": "C3A62A62EE58CEB15AB92574D1A9335E9E51D68C5131D603AC4BAC50EA53A512"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphTraversal.cs",
+        "Sha256": "69B5ED1F1D5E8097A9AACCFEFA6BA3A1C38DAE3E0996BD06B9735B68CACFBB42"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.ThrowReachability.cs",
+        "Sha256": "3E4A2D12AD8F9EEB172E0F110E520A52E1298FCBBCD570C363E6522C48E2FFCC"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowArgumentMapper.cs",
+        "Sha256": "91DDC607874D5288A27A929407BFF2196AEF38F627536971FA8ADABCFE34E873"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallableKey.cs",
+        "Sha256": "2E7FB00D0918380FD14CF7580F8FFB78BC2C4804C28561009B6B0E29C0BEE79B"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallContext.cs",
+        "Sha256": "03439F6E1B3476671A09355C245EB605A51F0C2378B5F0F82F47B4FEED4DF962"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallContextFactProjector.cs",
+        "Sha256": "0F7FFD9CC58029823727754498D199FAA5EAAAF5F2CB2BB8D76A6DC7ABE124F7"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCatchSemantics.cs",
+        "Sha256": "D33D6C4846D27DFFE0A58ABA64948069B6895EACFA1A3E10115BB2B4D9CBF00A"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCaughtTypeFilter.cs",
+        "Sha256": "91B84908804471F42057B388B580C045E4E5CBDA65A9D6054A7BE0AD78162BD4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.CallContext.cs",
+        "Sha256": "329554EE8DF91AECF5398385574BBBE028D4129C6AF16230B6992E6BD63CB39D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.ConditionalWeakTableValueFacts.cs",
+        "Sha256": "392C4AB55F8190017BD189AC68B2EF66732B12DDF045127E05738C8C97E6FA39"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.DictionaryValueFacts.cs",
+        "Sha256": "6A7281630EB8180E40AF65584E7B1373759D1CABFC835D5DBF4E12573AE133F9"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.EnumValueFacts.cs",
+        "Sha256": "DE6CD9CD89B4924D04B017591890C19CA05FCBC3BC602B3EA5076D4D70B2464D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.ImmutableMembers.cs",
+        "Sha256": "0ACBA82145F7BE4257812D032C0D886368DE9DC45620A1FBED4AC62EE46482C1"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.LocalStablePropertyFacts.cs",
+        "Sha256": "D921FFE5C69607D2D34B885707FEE582FF0B68CD6EA664C27D529A16A0A65CF4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.Nullability.cs",
+        "Sha256": "33BA8ABD4A31A65C0F34FE1420053BA0DF7F11772084822E22B37CFE45C4F249"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.ReturnNullability.cs",
+        "Sha256": "8861EA1644C85EC4ECB0CAA41459BDDFE50BCE612554D18E0E75149602A506C3"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.ReturnValueFacts.cs",
+        "Sha256": "DBF412447FAD06D4538002F873BAA6652250ABA5796C517B882A6F466D5B09FE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.SequenceCallContext.cs",
+        "Sha256": "40066A03C42CB4338B3A91238435107112A819684B502D7B7B4B5E470CF1342A"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.SequenceCollectionFacts.cs",
+        "Sha256": "558AE5E1A6D61CA6FCE475ADC3EEFCF2351B31F2434011F9BD3F2FEA32C41DC7"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.SequenceElementFacts.cs",
+        "Sha256": "7E51C13586CB64D367B94F4EDC3684BE61A88AB969DFE05D93E0ED18412841BB"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.SequenceRangeFacts.cs",
+        "Sha256": "BCEBD4ECC9556E37A1B7456E5282B4B6D1C4E91CB7258043E099A47A4A2F20BD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowContextualFactEvaluator.ValueFacts.cs",
+        "Sha256": "6FE91423DB7303D1E98A5E71B7EB6BB6F930A3293602F22B526AF631D3F807A4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCrossCompilationResolver.cs",
+        "Sha256": "C451DD1B48F835AC7A4362FAE6685A27D6E7DE4A4CE297873CBA9E5EE02ECC67"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowDataFlowFactsProvider.cs",
+        "Sha256": "D4C10B4F424B3A4A2621E8B7480D24F133485E935D20CEDFFBF051B1329A73C4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowDelegateTargetResolver.cs",
+        "Sha256": "A5803A0516648D1F927B4306E3117D2499A6F5218CB3CB54D165168A7738B72A"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowDereferenceFactDiscovery.Callee.cs",
+        "Sha256": "AC46256F2AAA595A609CB9FFF0585B10B31E0FC91CEB29D486CE84D0846DD037"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowDereferenceFactDiscovery.cs",
+        "Sha256": "69AFA032B91782C2B06F9D41FC620CA517810669CD632115B0096E495F9EED89"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowEnumValueFactsProvider.cs",
+        "Sha256": "13B78B0E588664A19F9C9BCBDA5F14D851D61BF33D488F47FFC7156DBBB0ED31"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowExternalDocumentationEvidence.cs",
+        "Sha256": "22AB790B7AC064CA7719A559B56C067AECE91B44ECFEBC577D120B4C025CBCCD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowGuardFactsProvider.cs",
+        "Sha256": "157EA4CEB07341A1414F5506D0BF8D5D21E883CE8157B7E16DCC747D09B61F0E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowImmutableMemberValueFactsProvider.cs",
+        "Sha256": "8F5FCA46BE0ACFDBF64FD19A08705E17A58A034C1ADAEB6C894812D5BBC27DC2"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowKnownPropertyValueFactsProvider.cs",
+        "Sha256": "66C2F02217E6A4D77D3A80CAB7BFCEB61FC51F8ACDCB5A8967E1348029E9ACB9"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalInitializerFactsProvider.cs",
+        "Sha256": "215249BCBC8F2792363AAC16D274DE1114F3871A1B7F08F3F762AF4A49FE8DF5"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalSourceAnalyzer.cs",
+        "Sha256": "676778F605D68F43C4599FD56668E91BCD2C31EFE8750CDB533EF167FE0FE861"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalSourceAnalyzer.Invocations.cs",
+        "Sha256": "85DFEAEEF8C8CB4E6BC44ABBC2115DE4B5ACE484DB1CC0E9DE2792A978917026"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalSourceAnalyzer.LocalCallables.cs",
+        "Sha256": "6EFBADA232BB70378EEC2E85FBF8C41F022D9DCFBEC8BCB670A8E4F4662E2F5E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalSourceAnalyzer.RecursiveDispatch.cs",
+        "Sha256": "CC29F77D4C4337E2E1C798EF2FDFA5CA84FAC871D99B57EB026ABEAB1A000AF2"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowLocalSourceAnalyzer.SymbolTraversal.cs",
+        "Sha256": "9AC012938F39B8B78E3E61663675DE9AB345A517B56665B59FF9B66247091B80"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowNullabilityFactsProvider.cs",
+        "Sha256": "A430C3FF49CC234A9B76FA4B635DB0A5E0D05284C04F7EA170CCAC278C81A6DE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowPathFactory.cs",
+        "Sha256": "F4C1D4AADC4AFAE6EF22399BC1AE3EAF7EE23B55B800E8C657F43BC9BB761C83"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowPrimitiveValueFactsProvider.cs",
+        "Sha256": "FF5E1BA687B4718D9CE3A866BDE1BC9B38178DC770838682E655E6A88878A912"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowRuntimeAwaitCapability.cs",
+        "Sha256": "C0B87F11CDD1081132F53F45E7B006676CFC068324233927EC24343DB641362F"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowRuntimeDispatchClassifier.cs",
+        "Sha256": "F41A6E9292576AB824B89D4208CB976CB8A9C12E64ADF95D82A9719C3E50FAC7"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSemanticEnvironment.cs",
+        "Sha256": "1CB5E79A4A9C466F29174A9A0E3231DF2D4AB0DEA327000DE2F94ADF78A54F72"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSemanticScope.cs",
+        "Sha256": "44E164AFA935916EF92B4E4F50BD89562B42B968A0491040B972D257425FFC5E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSequenceCollectionFactsProvider.cs",
+        "Sha256": "E337E4F5F52C32D2358E9C9C48347A3DE25E67E7FE784F1E4A793A99A69ECB9E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSequenceContentPreservationFactsProvider.cs",
+        "Sha256": "41C4D7D6D6828D193C8A28D6572A117DE25E261632BC8FCF46020893C2BD5172"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSourcePositionValueFactsProvider.cs",
+        "Sha256": "BD48848B49BAAB116DA23DF324445F418323B28849384B9576200DF6B1D86B97"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowStableMemberFacts.cs",
+        "Sha256": "1B867DB3BB32C29D48430F1FE72ACAA858E5D073FEE317216B9FB07878421D61"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowStableSourceMemberFactsProvider.cs",
+        "Sha256": "1E5EAE74BB420785A2C63ADAF89C7254399C4DEC9D2E03F120BE38E6C70D57BE"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSuccessfulSequenceValidationFactsProvider.cs",
+        "Sha256": "72D84BD5BB912DF69D2D0D39C0172DAFFF303A4F7D698D8C94489A62B881C6D9"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummary.cs",
+        "Sha256": "EB2CFA2FAF32613A30E9881AA03141A3BFF4151598CC2818A51D4EF84835BB94"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.cs",
+        "Sha256": "EFD22919B48A6452871B7F80554FCC5477BAA4A5725C42DA891C0EF3C98E0159"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.GraphConstruction.cs",
+        "Sha256": "1138F9F7C3B2259079657BC9C1C750CD8AB61482C4F1C31402E0F9537897AA1E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryCallEdge.cs",
+        "Sha256": "2A86E4C888EF87AB7B35BB0781CF46421891C55B4C11FF6C209B31A6C2F4DFED"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryFragment.cs",
+        "Sha256": "49C789500FDFAAC5A1282B6784294F34BE556DB3F98D353FA6093AA46DFF8070"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraph.cs",
+        "Sha256": "9EF482CA6B1EFB48CDC064BC47367DDF0E6E35A5EC7EE26C755FEB9C750ED5FA"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphBuilder.cs",
+        "Sha256": "99A68BEA46902D219BD14E21887A17E00D12AB03D2E69199946D04C65C8C95D3"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs",
+        "Sha256": "5D9DFB2E20E2296262F1D27F346DB5D4F4FED582CF536E3C9E653512DD7ECE01"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummarySource.cs",
+        "Sha256": "F58C3960F01B8D9BB84B940699E4DF4F7C169531F9B0EB2787E9F82AD1272D80"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryTargetRegistrar.BodyResolution.cs",
+        "Sha256": "7CB0B885B13DAAAD6F995F165A58D8046C8B2577BC662F29DA3709EB799F6A85"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryTargetRegistrar.cs",
+        "Sha256": "F4DBF1F6D8BFFACA5E3CA65B0C43DC2D5D2CE6E52A18F4EC9AE858BFE573677E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSupportingSourceMethod.cs",
+        "Sha256": "722318EA247208FDC9C371C9980722FB8066FA0BB1004852EAFF3E141CA3B9AD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSymbolUsageFacts.cs",
+        "Sha256": "A00F0B6818267D22FD2E2887CC4F41FB6FFD3AAD3A9FB4948C6B0483FA476094"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowTraversalState.cs",
+        "Sha256": "1674908A666123F6FCD9391E5F6DD81B1C25232DE8D9C12A3DC7E4488CB033F9"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowUncertaintyRecorder.cs",
+        "Sha256": "3AAB1AA52BDF8DFC9C11082AE78F4C5C0C43DC3A12A5F1D6F3B90864191747C8"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowValueFacts.cs",
+        "Sha256": "89412216376849C05F4DA28CA10EDC9A10C248CB9E8DD852E7E135F884F1AB05"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/KnownFrameworkExceptionContract.cs",
+        "Sha256": "EB06E54C226A311D29C223CDB152E4DDA98FA7EA982326C23DFFC2E2F3AF8F4D"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Checks/Infrastructure/Exception/KnownFrameworkExceptionModel.cs",
+        "Sha256": "3F3F35BF242387BCED556701395EA361923229ABA00D03EBC2FA60407D261BF4"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/DTO/ExceptionFlowAnalysisResult.cs",
+        "Sha256": "F8D686F973C7725791A67F60664DFC19CE4A40BB601E22F163B15BB38A100AD2"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowDetails.cs",
+        "Sha256": "1AA9D1A45D8F1B84F15D3A1E41FEC4C77B03B7813053FEE05B1BC5FBCFC5DADD"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowPath.cs",
+        "Sha256": "683A8366A306AAFB1554F5F7445DB26CE01739CFFCA3E5C988D64154DEECAB7C"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowPathDeduplicationKey.cs",
+        "Sha256": "86AC6A22C986C6D45BEF5F44A5BA045DC7E4262332EF8C48C3E9C74736B9182E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowPathStep.cs",
+        "Sha256": "DB98E5609DB323A1D1D32782D6151B246490E17BD8804376896F51E4DC30EAF6"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowPathStepKind.cs",
+        "Sha256": "66C0EDBC48FFBD6ED802CC7BBD6243D944985BC5163C89C2AB89518083BE19C0"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Models/ExceptionFlowSourceKind.cs",
+        "Sha256": "BD6EE4D5E269A56FE26AE9F00ECE24F4D5EE4694442212E68EDCBC687F5C704E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Utils/SymbolUtils.cs",
+        "Sha256": "CDFFD8E725BB3BFDFE21D2D7C131CCAAE6658D23D4C5F277EB0FC2B5428CB97E"
+      },
+      {
+        "Path": "src/XMLDocNormalizer/Utils/SyntaxUtils.cs",
+        "Sha256": "244BECB9D0717D08757F26095A19CB330769522F7CEC20CD119B6CDE95FCFF60"
+      }
+    ],
+    "SharedCount": 121,
+    "HostCount": 1,
+    "Steps": [
+      {
+        "Name": "restore-current",
+        "Arguments": [
+          "restore",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "restore-historical",
+        "Arguments": [
+          "restore",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "restore-worker",
+        "Arguments": [
+          "restore",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\XMLDocNormalizer.HistoricalWorker.csproj",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "0-current-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "0-current-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "1-historical-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "1-historical-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "2-current-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "2-current-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "3-historical-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "3-historical-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "4-historical-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "4-historical-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Historical\\XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "5-current-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "-p:Configuration=Debug",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "5-current-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\XMLDocNormalizer.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "worker-0-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\XMLDocNormalizer.HistoricalWorker.csproj",
+          "-p:Configuration=Debug",
+          "-p:BuildProjectReferences=false",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "worker-0-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\XMLDocNormalizer.HistoricalWorker.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-p:BuildProjectReferences=false",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "worker-1-clean",
+        "Arguments": [
+          "clean",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\XMLDocNormalizer.HistoricalWorker.csproj",
+          "-p:Configuration=Debug",
+          "-p:BuildProjectReferences=false",
+          "-warnaserror",
+          "-v:minimal"
+        ],
+        "ExitCode": 0
+      },
+      {
+        "Name": "worker-1-build",
+        "Arguments": [
+          "build",
+          "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\XMLDocNormalizer.HistoricalWorker.csproj",
+          "--no-restore",
+          "-p:Configuration=Debug",
+          "-p:BuildProjectReferences=false",
+          "-warnaserror"
+        ],
+        "ExitCode": 0
+      }
+    ],
+    "BuildImages": [
+      {
+        "Step": 0,
+        "Owner": "current",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\bin\\Debug\\net8.0\\XMLDocNormalizer.dll",
+          "Identity": "XMLDocNormalizer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "097A822687E8FD1C93890D2522D57EDE81AD62F422DF85BFA0AC636213716EA7",
+          "PdbSha256": "4B6BD5FAABA136BF9A2F31E9E7262C24BC7ECC66CBFDC05CFDF596A904FC90CF"
+        },
+        "OtherBinAndAssetsUntouched": true
+      },
+      {
+        "Step": 1,
+        "Owner": "historical",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Historical.dll",
+          "Identity": "XMLDocNormalizer.ExceptionFlow.Historical, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058",
+          "PdbSha256": "BA0FE51320379147009B8C19610A8BBF30420A75846CC154057CAF6D03D46114"
+        },
+        "OtherBinAndAssetsUntouched": true
+      },
+      {
+        "Step": 2,
+        "Owner": "current",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\bin\\Debug\\net8.0\\XMLDocNormalizer.dll",
+          "Identity": "XMLDocNormalizer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "097A822687E8FD1C93890D2522D57EDE81AD62F422DF85BFA0AC636213716EA7",
+          "PdbSha256": "4B6BD5FAABA136BF9A2F31E9E7262C24BC7ECC66CBFDC05CFDF596A904FC90CF"
+        },
+        "OtherBinAndAssetsUntouched": true
+      },
+      {
+        "Step": 3,
+        "Owner": "historical",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Historical.dll",
+          "Identity": "XMLDocNormalizer.ExceptionFlow.Historical, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058",
+          "PdbSha256": "BA0FE51320379147009B8C19610A8BBF30420A75846CC154057CAF6D03D46114"
+        },
+        "OtherBinAndAssetsUntouched": true
+      },
+      {
+        "Step": 4,
+        "Owner": "historical",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\exception-flow-historical\\XMLDocNormalizer.ExceptionFlow.Historical\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Historical.dll",
+          "Identity": "XMLDocNormalizer.ExceptionFlow.Historical, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058",
+          "PdbSha256": "BA0FE51320379147009B8C19610A8BBF30420A75846CC154057CAF6D03D46114"
+        },
+        "OtherBinAndAssetsUntouched": true
+      },
+      {
+        "Step": 5,
+        "Owner": "current",
+        "Image": {
+          "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\bin\\Debug\\net8.0\\XMLDocNormalizer.dll",
+          "Identity": "XMLDocNormalizer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "Sha256": "097A822687E8FD1C93890D2522D57EDE81AD62F422DF85BFA0AC636213716EA7",
+          "PdbSha256": "4B6BD5FAABA136BF9A2F31E9E7262C24BC7ECC66CBFDC05CFDF596A904FC90CF"
+        },
+        "OtherBinAndAssetsUntouched": true
+      }
+    ],
+    "Passed": true,
+    "RuntimeExecuted": true
+  },
+  "ActualCallerAndChildRuntimeEvidence": {
+    "callerProcessId": 35640,
+    "workerProcessId": 30024,
+    "separateProcesses": true,
+    "historicalLoadedInCaller": false,
+    "currentCommon": {
+      "name": "Microsoft.CodeAnalysis, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+      "informationalVersion": "5.0.0-2.25567.12+6c4a46a31302167b425d5e0a31ea83c9a9aa1d09",
+      "beforeMvid": "6ccc5f27-c8f9-4fa6-adde-9f4dae33cd52",
+      "afterMvid": "6ccc5f27-c8f9-4fa6-adde-9f4dae33cd52",
+      "sha256": "5C1E3821A4504801FA7F4C1E652FD8B9BD7FD54A8A07F4D205B809A8ABAC2F32"
+    },
+    "currentCSharp": {
+      "name": "Microsoft.CodeAnalysis.CSharp, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+      "informationalVersion": "5.0.0-2.25567.12+6c4a46a31302167b425d5e0a31ea83c9a9aa1d09",
+      "beforeMvid": "415d4282-325f-4661-a6dc-44fe371cd27c",
+      "afterMvid": "415d4282-325f-4661-a6dc-44fe371cd27c",
+      "sha256": "04A501010F76FC98E6430DFAB912A094D6E2952718989B56EE8BDD703F2F191B"
+    },
+    "workerIdentity": {
+      "workerVersion": "1.0",
+      "protocolVersion": 1,
+      "worker": {
+        "name": "XMLDocNormalizer.HistoricalWorker",
+        "assemblyVersion": "1.0.0.0",
+        "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+        "mvid": "02dfa132-8450-49ae-949a-44dccac61bee",
+        "sha256": "AA696D11C0754722978CBF75058D3C3FBA25CE91CD669DA9C99C4BFAB6248083"
+      },
+      "analyzer": {
+        "name": "XMLDocNormalizer.ExceptionFlow.Historical",
+        "assemblyVersion": "1.0.0.0",
+        "informationalVersion": "1.0.0+a4a533c823ee909aadb25cf6660c688101f90618",
+        "mvid": "1dacf649-2f22-4c5f-9df9-9e8648d5a97c",
+        "sha256": "4CDBE1735AF7D0B98E5AA04DC4BD487BAE52C6283C58FE76E6C7D3333A65F058"
+      },
+      "loadedRoslyn": [
+        {
+          "name": "Microsoft.CodeAnalysis",
+          "assemblyVersion": "5.0.0.0",
+          "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+          "mvid": "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+          "sha256": "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+        },
+        {
+          "name": "Microsoft.CodeAnalysis.CSharp",
+          "assemblyVersion": "5.0.0.0",
+          "informationalVersion": "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+          "mvid": "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+          "sha256": "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+        }
+      ],
+      "runtimeAwaitInformationAvailable": false,
+      "referenceProfile": "net8-runtime-bounded-v1"
+    }
+  },
+  "BuildLogFingerprints": [
+    {
+      "Name": "restore-current",
+      "Artifact": "artifacts/dual-version-build/restore-current.log",
+      "Sha256": "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+    },
+    {
+      "Name": "restore-historical",
+      "Artifact": "artifacts/dual-version-build/restore-historical.log",
+      "Sha256": "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+    },
+    {
+      "Name": "restore-worker",
+      "Artifact": "artifacts/dual-version-build/restore-worker.log",
+      "Sha256": "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+    },
+    {
+      "Name": "0-current-clean",
+      "Artifact": "artifacts/dual-version-build/0-current-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "0-current-build",
+      "Artifact": "artifacts/dual-version-build/0-current-build.log",
+      "Sha256": "599DEB3BDED906140D2BC04A14AAB964F2CAA5A8FB8FEB13CEF441C96B08B728"
+    },
+    {
+      "Name": "1-historical-clean",
+      "Artifact": "artifacts/dual-version-build/1-historical-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "1-historical-build",
+      "Artifact": "artifacts/dual-version-build/1-historical-build.log",
+      "Sha256": "DD8AEFC1FB441D6674AC10125B1E36868C77E02DC93E8E101BC9B737E4FC25FC"
+    },
+    {
+      "Name": "2-current-clean",
+      "Artifact": "artifacts/dual-version-build/2-current-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "2-current-build",
+      "Artifact": "artifacts/dual-version-build/2-current-build.log",
+      "Sha256": "3FC0EE5A7A46B733C1B3E7B347E5F965DD508070BF001A20F2018FABFAF77DD4"
+    },
+    {
+      "Name": "3-historical-clean",
+      "Artifact": "artifacts/dual-version-build/3-historical-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "3-historical-build",
+      "Artifact": "artifacts/dual-version-build/3-historical-build.log",
+      "Sha256": "62D20F3D7FE61D5702BAE4D1CD31DB8B6341BE360E9F640B80C70E11CEFFD0CE"
+    },
+    {
+      "Name": "4-historical-clean",
+      "Artifact": "artifacts/dual-version-build/4-historical-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "4-historical-build",
+      "Artifact": "artifacts/dual-version-build/4-historical-build.log",
+      "Sha256": "258A460CDF0AB2C1FFDF50080B1BF4E5DADFEAD540955A9728A9CA37E6C9A5A2"
+    },
+    {
+      "Name": "5-current-clean",
+      "Artifact": "artifacts/dual-version-build/5-current-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "5-current-build",
+      "Artifact": "artifacts/dual-version-build/5-current-build.log",
+      "Sha256": "061D2B3BB88B210BDED02AB7821FF9C0C1DD1CC0231395A39C0B6527B62AE529"
+    },
+    {
+      "Name": "worker-0-clean",
+      "Artifact": "artifacts/dual-version-build/worker-0-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "worker-0-build",
+      "Artifact": "artifacts/dual-version-build/worker-0-build.log",
+      "Sha256": "F97414ADABEEF14DFCF1DF5A654622651E26BD55F5E35BF0E0DFF28AE1D47C69"
+    },
+    {
+      "Name": "worker-1-clean",
+      "Artifact": "artifacts/dual-version-build/worker-1-clean.log",
+      "Sha256": "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+    },
+    {
+      "Name": "worker-1-build",
+      "Artifact": "artifacts/dual-version-build/worker-1-build.log",
+      "Sha256": "6610FE28D0DE41E2E475C53E4DECFADFFF47120AB0AC0D9431F54EB3A2053527"
+    }
+  ],
+  "Tests": [
+    {
+      "Name": "worker-architecture",
+      "Total": 100,
+      "Passed": 100,
+      "Failed": 0,
+      "Artifact": "artifacts/p5o2b3/tests/worker-architecture.trx",
+      "Sha256": "38C83B57175216873B73D42D184E999DF29168FB6E55E362A230D11A8A79B7C5"
+    },
+    {
+      "Name": "broad",
+      "Total": 1844,
+      "Passed": 1844,
+      "Failed": 0,
+      "Artifact": "artifacts/p5o2b3/tests/broad.trx",
+      "Sha256": "5C4E947390863A1F65BE885B86BA861979D892327D5E871A31D1FEF7D7E94AA6"
+    },
+    {
+      "Name": "full",
+      "Total": 2636,
+      "Passed": 2636,
+      "Failed": 0,
+      "Artifact": "artifacts/p5o2b3/tests/full.trx",
+      "Sha256": "4747F2490B1685D80515EF8B42C3BCDD8E219377217ECBFEC2C87A927603FA30"
+    }
+  ],
+  "NewHostAndWorkerSourceFingerprints": [
+    {
+      "Path": "src/XMLDocNormalizer.ExceptionFlow.Historical/HistoricalSemanticEnvironment.cs",
+      "Sha256": "83340E1F9452DCEE009C62A94C5592236F6B171E71C33EE3F28075D465A6CF09"
+    },
+    {
+      "Path": "src/XMLDocNormalizer.HistoricalWorker/HistoricalAnalysis.cs",
+      "Sha256": "208EC117D29A044B286356F6BE383F7B304B6D3D207121F28DEB6C6313786233"
+    },
+    {
+      "Path": "src/XMLDocNormalizer.HistoricalWorker/Program.cs",
+      "Sha256": "276A2D58EE35B680C2AAEEC01D5985F9C8777D0F4B6A92EA5CB18ADE331B70FB"
+    },
+    {
+      "Path": "src/XMLDocNormalizer.HistoricalWorker/WorkerProtocol.cs",
+      "Sha256": "E4B5552996FB441931E18B4C6594355322052340B13044C36862919F1D4461F4"
+    },
+    {
+      "Path": "src/XMLDocNormalizer.HistoricalWorker/WorkerRuntimeIdentity.cs",
+      "Sha256": "C70FB73540126E64F15927870418AD3B15FCD2881FACA2A3DBCC03789762B43D"
+    }
+  ],
+  "QualityGates": {
+    "StrictUtf8CrLfFinalNewline": true,
+    "ScopedFolderFormat": true,
+    "JsonAndXmlParse": true,
+    "PowerShellParse": true,
+    "GitDiffCheck": true,
+    "FormatLog": "artifacts/p5o2b3/format.log"
+  },
+  "StateLifetime": {
+    "Model": "one owned Compilation/tree/SemanticModel/scope and SummarySession per request/process",
+    "WeakCaches": [
+      "ContextualFactEvaluator conditional-weak-table value facts by SemanticModel",
+      "DereferenceFactDiscovery successful dereference facts by SemanticModel",
+      "DataFlowFactsProvider static cache with weak SemanticModel partitions and exact region keys"
+    ],
+    "OtherStatics": "unchanged stateless RuntimeAwait cached getter, neutral comparers/immutable sentinels",
+    "AlgorithmCachesRedesigned": false,
+    "SessionGraphAndTraversal": "same existing graph/SCC/cache/guard behavior; new process lifecycle only",
+    "CrossRequestState": "none: one request until EOF, then exit; two JSON frames rejected",
+    "SymbolOrAnalyzerStateSerialized": false
+  },
+  "CurrentSemantics": {
+    "ProductiveCurrentSourcesReverified": 362,
+    "SharedHistoricalSourcesUnchanged": 121,
+    "RuntimeAwaitCapabilityUnchanged": true,
+    "A2Evidence": "Evaluation/P5O2B1A2-runtime-await-call-site-contract-audit.json",
+    "A2EvidenceSha256": "C9A4330DF589C3E3C72C2BE07EA4EFA7CD7F5BFC275D97949D88EB990ECC6E9D",
+    "SelfAnalysis": {
+      "Inherited": true,
+      "Findings": 16,
+      "DOC610": 0,
+      "DOC611": 1,
+      "DOC631": 15,
+      "DOC632": 0,
+      "Evidence": {
+        "Counts": {
+          "DOC100": 0,
+          "DOC110": 0,
+          "DOC140": 0,
+          "DOC141": 0,
+          "DOC142": 0,
+          "DOC143": 0,
+          "DOC150": 0,
+          "DOC200": 0,
+          "DOC210": 0,
+          "DOC220": 0,
+          "DOC230": 0,
+          "DOC240": 0,
+          "DOC300": 0,
+          "DOC310": 0,
+          "DOC320": 0,
+          "DOC330": 0,
+          "DOC340": 0,
+          "DOC350": 0,
+          "DOC360": 0,
+          "DOC370": 0,
+          "DOC380": 0,
+          "DOC390": 0,
+          "DOC400": 0,
+          "DOC410": 0,
+          "DOC420": 0,
+          "DOC430": 0,
+          "DOC440": 0,
+          "DOC450": 0,
+          "DOC460": 0,
+          "DOC470": 0,
+          "DOC480": 0,
+          "DOC490": 0,
+          "DOC500": 0,
+          "DOC510": 0,
+          "DOC520": 0,
+          "DOC530": 0,
+          "DOC540": 0,
+          "DOC541": 0,
+          "DOC600": 0,
+          "DOC610": 0,
+          "DOC611": 1,
+          "DOC620": 0,
+          "DOC630": 0,
+          "DOC631": 15,
+          "DOC632": 0,
+          "DOC640": 0,
+          "DOC650": 0,
+          "DOC660": 0,
+          "DOC670": 0,
+          "DOC680": 0,
+          "DOC700": 0,
+          "DOC710": 0,
+          "DOC711": 0,
+          "DOC720": 0,
+          "DOC730": 0,
+          "DOC740": 0,
+          "DOC750": 0,
+          "DOC800": 0,
+          "DOC810": 0,
+          "DOC820": 0,
+          "DOC830": 0,
+          "DOC831": 0,
+          "DOC900": 0,
+          "DOC901": 0,
+          "DOC910": 0,
+          "DOC911": 0,
+          "DOC912": 0,
+          "DOC920": 0,
+          "DOC921": 0,
+          "DOC930": 0,
+          "DOC931": 0,
+          "DOC940": 0,
+          "DOC941": 0,
+          "DOC950": 0,
+          "DOC960": 0,
+          "DOC970": 0,
+          "DOC980": 0,
+          "DOC981": 0
+        },
+        "ExitCode": 1,
+        "Sha256": "C32395E1349B13FF07FC56CAA42D8C63AC1536A28EF4130B577590D622B54E03",
+        "Artifact": "artifacts/p5o2b1a2/self-analysis-final.json",
+        "Findings": 16
+      }
+    },
+    "Canonical": {
+      "Inherited": true,
+      "Added": 0,
+      "Removed": 0,
+      "ChangedEvidence": 0,
+      "FullRawArraysEqual": true,
+      "FullNormalizedArraysEqual": true,
+      "NormalizedHash": "2335A309D71F94CC0D3DD7546B57E2D14A107806CD666DD4FEBED5F04AB5F8DF"
+    },
+    "InheritanceReason": "B3 section 17: no productive shared Analyzer source change; Current Main source/project/solution unchanged. Historical host/protocol/orchestration are the authorized B3 additions, not an algorithm fork."
+  },
+  "LocalCorrections": [
+    "Repeated identical TPA corelib path canonicalized/deduplicated; distinct ambiguous profile files still fail closed",
+    "Initial await test expected property name rather than the actual unchanged existing uncertainty text; assertion corrected, no Analyzer change",
+    "Original B2 rejecting host retained uncompiled as evidence; explicit Compile now selects the real Historical host",
+    "UTF-8 decoding and response serialization failures receive structured fail-closed responses; diagnostics stderr only"
+  ],
+  "RemainingBoundary": "No Main-process worker selection/routing; no external artifact/manifest acquisition, exact external reference reconstruction, full reporting/check routing, canonical import policy or worker pool. Bounded one-source endpoint is not a general external compilation workflow.",
+  "NextStep": "P5O2B4 - Main-Process/Worker Integration and Final Roslyn-free Analysis Boundary, reusing proven permanent build/runtime isolation and existing canonical domain; no repeated compile/isolation proof package",
+  "Protected": {
+    "Unchanged": true,
+    "RootIgnore": "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "CoreFiles": [
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.deps.json",
+        "Sha256": "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+        "Sha256": "6DF2DAA9CFDE5DF03FE0A697237843E3750AE4A844A2DC32FDB843302B5A2B5D"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+        "Sha256": "E6361D157307D1FB52D84036C4D39271C9853AD1C64AD343F81FD92712AAD7AA"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.assets.json",
+        "Sha256": "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.nuget.cache",
+        "Sha256": "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.dgspec.json",
+        "Sha256": "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.props",
+        "Sha256": "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.targets",
+        "Sha256": "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+        "Sha256": "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+        "Sha256": "33DDF3DDF49E5D54CFFF74ED37B4BBE9014856C894B3954C5C3EFA0B5C103C8B"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+        "Sha256": "477FCAB9671137CC5FC6C339894F3A5AC76FF80577FF0150E8964DA497AAF35D"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.assets.cache",
+        "Sha256": "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache",
+        "Sha256": "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.FileListAbsolute.txt",
+        "Sha256": "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+        "Sha256": "6DF2DAA9CFDE5DF03FE0A697237843E3750AE4A844A2DC32FDB843302B5A2B5D"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig",
+        "Sha256": "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GlobalUsings.g.cs",
+        "Sha256": "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+        "Sha256": "E6361D157307D1FB52D84036C4D39271C9853AD1C64AD343F81FD92712AAD7AA"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+        "Sha256": "F06F1591B91360D66BB5FA9DE048221D7BC9924A69A593BD0C1F493DEC43D2DE"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\ref\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+        "Sha256": "F4CD8D8B1B682B85D6B51A56EC90095C12996AF0E28F12BF55EF91F59E681029"
+      },
+      {
+        "Path": "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\refint\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+        "Sha256": "F4CD8D8B1B682B85D6B51A56EC90095C12996AF0E28F12BF55EF91F59E681029"
+      }
+    ],
+    "Stashes": [
+      "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+      "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+      "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+      "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+      "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+      "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+    ],
+    "MainProject": "84E17CEFF9936B0FE016F78CDAF5A12A9D3A74BF51D158D10990CF8A2BAC2D08",
+    "Solution": "9B8180190E7C79778F4082B1FE5F46CE600C43E1CF26E3124D6A9BC9A4A6E81E"
+  },
+  "Git": {
+    "Status": [
+      " M ../../.github/workflows/xml-doc-normalizer-dual-build.yml",
+      " M ../../.gitignore",
+      " M Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+      " M Tests/XMLDocNormalizerTests/Check/Semantic/Exceptions/HistoricalAnalyzerBuildProjectTests.cs",
+      " M Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+      " M build/README.md",
+      " M build/Verify-DualVersionBuild.ps1",
+      " M src/XMLDocNormalizer.ExceptionFlow.Historical/XMLDocNormalizer.ExceptionFlow.Historical.csproj",
+      "?? Evaluation/P5O2B3-historical-worker-host-audit.json",
+      "?? Evaluation/P5O2B3-historical-worker-host.md",
+      "?? Evaluation/P5O2B3Proof/",
+      "?? Tests/XMLDocNormalizerTests/Worker/",
+      "?? src/XMLDocNormalizer.ExceptionFlow.Historical/HistoricalSemanticEnvironment.cs",
+      "?? src/XMLDocNormalizer.HistoricalWorker/"
+    ],
+    "Commit": false,
+    "Push": false,
+    "IndexChanged": false,
+    "StashChanged": false
+  }
+}

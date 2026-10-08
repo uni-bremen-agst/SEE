@@ -1,0 +1,4 @@
+<Project>
+  <!-- One B2 configuration, separate project-named bin/obj, same isolated package universe. -->
+  <Import Project="../XMLDocNormalizer.ExceptionFlow.Historical/Directory.Build.props" />
+</Project>
