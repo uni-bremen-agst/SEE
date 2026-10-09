@@ -1,0 +1,280 @@
+{
+  "Schema": "XMLDocNormalizer-CI-CoreProjectFix-v1",
+  "Date": "2026-10-09",
+  "Branch": "fix/documentation",
+  "ReportedFailingHead": "6fc6f19a4f",
+  "FirstObservedLocalHead": "35dbd5b2150e4f4591b1eead23511cd6f8444108",
+  "FixParent": "eed44bc56080bda516be2a2cf424d0db43ab74f2",
+  "ExternalHeadMovement": "B7 externally committed during initial read-only investigation; fix begins after eed44bc560",
+  "Cause": "Root Unity *.csproj rule hid genuine local Core project; repository had 19 generated outputs only; MSB9008 causes alias/namespace downstream errors",
+  "Architecture": {
+    "CorePurpose": "Independent Roslyn-neutral shared-source validation assembly, not Main/Historical runtime dependency",
+    "CoreProjectOriginalUnchanged": true,
+    "ActualSharedSourceCount": 18,
+    "SharedSourcesAlreadyTracked": true,
+    "OriginalDependencyTestRetained": true,
+    "NewProjectIgnoreGuards": 2,
+    "DummyProject": false,
+    "SourceCopies": false,
+    "AnalyzerSemanticsChanged": false,
+    "RoutingChanged": false,
+    "RoslynVersionsChanged": false,
+    "CiScriptChanged": false
+  },
+  "Fix": {
+    "ProjectTracked": true,
+    "LocalIgnoreException": true,
+    "GeneratedOutputRules": [
+      "bin/",
+      "obj/"
+    ],
+    "UntrackedGeneratedCount": 19,
+    "UntrackedGeneratedPaths": [
+      "src/XMLDocNormalizer.ExceptionFlow.Core/bin/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.deps.json",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/bin/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.GlobalUsings.g.cs",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.assets.cache",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.csproj.FileListAbsolute.txt",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.dll",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/ref/XMLDocNormalizer.ExceptionFlow.Core.dll",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/Debug/net8.0/refint/XMLDocNormalizer.ExceptionFlow.Core.dll",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.dgspec.json",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.props",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.targets",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/project.assets.json",
+      "src/XMLDocNormalizer.ExceptionFlow.Core/obj/project.nuget.cache"
+    ],
+    "RemovalWasIndexOnly": true,
+    "SubsequentCleanBuildRegeneratedOutputs": true
+  },
+  "Tests": [
+    {
+      "Artifact": "artifacts/ci-core-fix/tests/core-tests.trx",
+      "Total": 11,
+      "Passed": 11,
+      "Failed": 0,
+      "NotExecuted": 0,
+      "Sha256": "3841CF1297AAE02E8BBA0260CDCA1E2DC0F45B3845C8A3EEC78F34B77FD474F7"
+    },
+    {
+      "Artifact": "artifacts/ci-core-fix/tests/git-only-core.trx",
+      "Total": 11,
+      "Passed": 11,
+      "Failed": 0,
+      "NotExecuted": 0,
+      "Sha256": "427B702E15345E0A7F1C6D0CC97609437D489B6DC08D79E1E2BFF50FF6E6DA09"
+    },
+    {
+      "Artifact": "artifacts/ci-core-fix/tests/full-including-self.trx",
+      "Total": 2778,
+      "Passed": 2778,
+      "Failed": 0,
+      "NotExecuted": 0,
+      "Sha256": "EAC136B05FC2FE4E2029065EE4F715F86D6C1D226FE79EEB8D15DEC353BE9C2F"
+    },
+    {
+      "Artifact": "artifacts/dual-version-build/main-boundary.trx",
+      "Total": 175,
+      "Passed": 175,
+      "Failed": 0,
+      "NotExecuted": 0,
+      "Sha256": "585174E3B6860C9AD1D3B8BB8203BB24473A91F74E4DE24484D7AC78688AB6F9"
+    }
+  ],
+  "Builds": {
+    "RequestedCleanThenBuild": true,
+    "ProjectReferencesEnabled": true,
+    "Warnings": 0,
+    "Errors": 0,
+    "StandaloneLogs": [
+      {
+        "Path": "artifacts/ci-core-fix/clean-tests.log",
+        "Sha256": "F9865818D0445773673DE8A76608F377CA63AD10871C9C40A2B9FBA451D6376C"
+      },
+      {
+        "Path": "artifacts/ci-core-fix/build-tests.log",
+        "Sha256": "7381E304965F4F2149554096E1E8737EDA35896744AD2452302AE1410BB90B8C"
+      },
+      {
+        "Path": "artifacts/ci-core-fix/git-only-build.log",
+        "Sha256": "D5CC48A198406834755D7096B2BA3B21CA7ECF62E87DC5D26FD6A66225B22F33"
+      }
+    ],
+    "PermanentGatePassed": true,
+    "RequestedSwitches": [
+      "-RunMainBoundaryTests",
+      "-BuildTestProjectReferences"
+    ],
+    "MainBoundaryBuild": {
+      "Name": "main-boundary-tests-build",
+      "Arguments": [
+        "build",
+        "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\XMLDocNormalizerTests.csproj",
+        "-p:Configuration=Debug",
+        "-warnaserror"
+      ],
+      "ExitCode": 0
+    },
+    "CurrentHistoricalForcedImages": 6,
+    "WorkerBuildImages": 2,
+    "SharedAnalyzerSources": 121,
+    "HistoricalHostCount": 1,
+    "RuntimeExecuted": true,
+    "GateAudit": {
+      "Path": "artifacts/dual-version-build/audit.json",
+      "Sha256": "4319B5C368264EF61D0CFA1796A9425D02142CC71E4B7F211B976B0A8991F21E"
+    },
+    "GateBuildLogFingerprints": [
+      {
+        "Path": "artifacts/dual-version-build/0-current-build.log",
+        "Sha256": "B9D3E21BD80AB1F1FC408C9E3AB88A6A48E750DBDF2C9187B193EC88A8114FA9"
+      },
+      {
+        "Path": "artifacts/dual-version-build/1-historical-build.log",
+        "Sha256": "D9743B82B3C240312EC5803416AB73D1EF4925BFC839E975957736680133ED8B"
+      },
+      {
+        "Path": "artifacts/dual-version-build/2-current-build.log",
+        "Sha256": "765EDF3E578B44C1A23CED5688AE339D1D4B84DD54A96C1D78B4FC948AEA3F6D"
+      },
+      {
+        "Path": "artifacts/dual-version-build/3-historical-build.log",
+        "Sha256": "059FB935CD6D260C640E49319C91C5C2F905C025B64227C1D53D644A29DC93B5"
+      },
+      {
+        "Path": "artifacts/dual-version-build/4-historical-build.log",
+        "Sha256": "750C3639A84CAA4E20F8B83A4D92DDF3FCB60B88B3B33CEC9443EDD56EA2080C"
+      },
+      {
+        "Path": "artifacts/dual-version-build/5-current-build.log",
+        "Sha256": "8D38834AEC673A54E5260ABA15D62A4FCCA233B80563C1406CB5F837636612E9"
+      },
+      {
+        "Path": "artifacts/dual-version-build/worker-0-build.log",
+        "Sha256": "F97414ADABEEF14DFCF1DF5A654622651E26BD55F5E35BF0E0DFF28AE1D47C69"
+      },
+      {
+        "Path": "artifacts/dual-version-build/worker-1-build.log",
+        "Sha256": "41EE5334BED52D8B8E429A3890DF848BBE7A9823956FED670AC4C59891F22CC4"
+      },
+      {
+        "Path": "artifacts/dual-version-build/boundary-test-process-build.log",
+        "Sha256": "EBCC7B28498BDE9650006FE051CFDF4667AAC05E5CCE003D70F8C8E5E5846668"
+      },
+      {
+        "Path": "artifacts/dual-version-build/projection-pdb-fixture-build.log",
+        "Sha256": "F8422647A1585764C753DF39ECB5CC0D72CD0C7E186B2947E17666606593C71C"
+      },
+      {
+        "Path": "artifacts/dual-version-build/main-boundary-tests-build.log",
+        "Sha256": "47002BF879D36FF00195FF89ABC2B88D9E9DDF9634B701C8B30EAA329482ED7C"
+      }
+    ]
+  },
+  "SelfAnalysis": {
+    "ActuallyExecuted": true,
+    "Test": "SolutionTransitiveSelfAnalysisTests.ProductionProject_CompletesWithoutUnhandledException",
+    "Outcome": "Passed",
+    "NormallyExcludedCategoryEnabledBy": "-p:IncludeSelfAnalysis=true",
+    "CanonicalFindingDiffNewRun": false,
+    "NoNewCanonicalCountClaim": true
+  },
+  "GitOnlyProof": {
+    "SourceTree": "89aac9659eceb61a4361abfdc17adcee3486f29a",
+    "Archive": {
+      "Path": "artifacts/ci-core-fix/tracked-inputs.tar",
+      "Sha256": "81751CD8B4EAD462CAEB4A22BD06B50B5F3CEB38A57E3FBE830044C03BBAFA37"
+    },
+    "NoInitialBinObj": true,
+    "IgnoredWorkspaceProjectInputs": false,
+    "BuildPlatform": "Windows .NET 8",
+    "FreshOutputBuildPassed": true,
+    "CoreAndHistoricalTestsPassed": 11,
+    "EvaluatedInputInventory": {
+      "Path": "artifacts/ci-core-fix/evaluated-input-paths-linux.txt",
+      "Sha256": "E6F5B84850AB54C00F9D75DFF9AF8E4820F58BB570E6988DE36A2212EFA740E4"
+    },
+    "Linux": {
+      "InputCount": 703,
+      "ExplicitSourceProjectLinksExactOrdinal": true,
+      "SdkGlobWindowsCaseDifferences": [
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ExceptionAnalysisModeComparisonReportDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ExceptionAnalysisModeRunDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ExceptionAnalysisModeSharedMetricsDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ExceptionAnalysisModeTimingDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/NamespaceDoc.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/RunMetricsDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ValueDocumentationModeComparisonReportDto.cs",
+        "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/DTO/ValueDocumentationModeRunDto.cs"
+      ],
+      "SdkGlobPathHandling": "Only SDK DefaultItems filesystem globs use canonical Git spelling; all explicit links checked ordinal",
+      "CaseCollisions": 0,
+      "LinuxCaseSensitiveFilesystem": true,
+      "LinuxRoot": "/tmp/xmldoc-core-fix.Pnnfkf",
+      "Output": "PASS: 703 tracked source/project inputs exist on case-sensitive Linux; no bin/obj.",
+      "LinuxDotNetSdkAvailable": false,
+      "LinuxBuildExecuted": false
+    }
+  },
+  "Quality": {
+    "ScopedFolderFormatPassed": true,
+    "StagedDiffCheckPassed": true,
+    "ShellExecutedOnLinux": true,
+    "RootIgnoreNotStaged": true
+  },
+  "OwnedFiles": [
+    {
+      "Path": "src/XMLDocNormalizer.ExceptionFlow.Core/.gitignore",
+      "Sha256": "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259"
+    },
+    {
+      "Path": "src/XMLDocNormalizer.ExceptionFlow.Core/XMLDocNormalizer.ExceptionFlow.Core.csproj",
+      "Sha256": "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386"
+    },
+    {
+      "Path": "Tests/XMLDocNormalizerTests/Check/Semantic/Exceptions/ExceptionFlowCoreDependencyTests.cs",
+      "Sha256": "0AA145577F9279FAA0BBCFB275F3902D1D699D7AB54973249C2C7E7790184201"
+    },
+    {
+      "Path": "Evaluation/CI-CoreProjectFix.md",
+      "Sha256": "0660EB6B06A3AB7493635DFA64CBDECF1F4F726E543820B39F35A0FEC33A4E9F"
+    },
+    {
+      "Path": "Evaluation/CI-CoreProjectFixProof/.gitattributes",
+      "Sha256": "1D5D71DCC6CCD28AB46A335349ECC74742CA4B81F4FCAD212F8D134F70F1F13E"
+    },
+    {
+      "Path": "Evaluation/CI-CoreProjectFixProof/verify-linux-inputs.sh",
+      "Sha256": "C354C140AF7EACD2E7101A147C29F07F2D6D1C674219A8FC26A369783DE560E3"
+    }
+  ],
+  "Protected": {
+    "RootIgnoreUnchanged": true,
+    "RootIgnoreSha256": "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "OriginalCoreProjectSha256": "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386",
+    "SixStashesUnchanged": true,
+    "Stashes": [
+      "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+      "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+      "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+      "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+      "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+      "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+    ],
+    "StartingSnapshot": {
+      "Path": "artifacts/ci-core-fix/protected-before.json",
+      "Sha256": "7C29CEDECDC00E7766700DEE8989FEBC85AE2006F725B49BD1433370A46CBEB3"
+    }
+  },
+  "CommitScope": "Only six owned project/test/proof/report files plus this audit and 19 generated-output index removals",
+  "Push": false,
+  "ExpectedFinalStatus": [
+    " M ../../.gitignore"
+  ]
+}

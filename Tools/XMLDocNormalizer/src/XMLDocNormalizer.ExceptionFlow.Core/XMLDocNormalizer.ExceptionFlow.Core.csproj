@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>XMLDocNormalizer.ExceptionFlow.Core</AssemblyName>
+    <RootNamespace>XMLDocNormalizer</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XMLDocNormalizer\Checks\Infrastructure\Exception\Flow\ExceptionFlowValueFacts.cs"
+             Link="Checks\Infrastructure\Exception\Flow\ExceptionFlowValueFacts.cs" />
+    <Compile Include="..\XMLDocNormalizer\Models\ExceptionFlowPath.cs"
+             Link="Models\ExceptionFlowPath.cs" />
+    <Compile Include="..\XMLDocNormalizer\Models\ExceptionFlowPathDeduplicationKey.cs"
+             Link="Models\ExceptionFlowPathDeduplicationKey.cs" />
+    <Compile Include="..\XMLDocNormalizer\Models\ExceptionFlowPathStep.cs"
+             Link="Models\ExceptionFlowPathStep.cs" />
+    <Compile Include="..\XMLDocNormalizer\Models\ExceptionFlowPathStepKind.cs"
+             Link="Models\ExceptionFlowPathStepKind.cs" />
+    <Compile Include="..\XMLDocNormalizer\Models\ExceptionFlowSourceKind.cs"
+             Link="Models\ExceptionFlowSourceKind.cs" />
+    <Compile Include="..\XMLDocNormalizer\Checks\Infrastructure\Exception\Flow\Canonical\Canonical*.cs"
+             Link="Checks\Infrastructure\Exception\Flow\Canonical\%(Filename)%(Extension)" />
+    <Compile Include="..\XMLDocNormalizer\Checks\Infrastructure\Exception\Flow\Canonical\NamespaceDoc.cs"
+             Link="Checks\Infrastructure\Exception\Flow\Canonical\NamespaceDoc.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>XMLDocNormalizer</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>XMLDocNormalizerTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>XMLDocNormalizer.Evaluation</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
