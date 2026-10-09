@@ -190,7 +190,9 @@ namespace XMLDocNormalizerTests.Worker
             Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly =>
                 assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker"
                 || assembly.ManifestModule.ModuleVersionId.ToString() is "dc7738cc-6dca-4d34-9c44-29b53a7caa93" or "0f9c1dcf-4eb1-47f8-81b2-733db5887be7");
-            await File.WriteAllTextAsync(Path.Combine(Root(), "artifacts", "p5o2b6", "selection-runtime-parity.json"), JsonSerializer.Serialize(new
+            string evidence = Path.Combine(Root(), "artifacts", "p5o2b6", "selection-runtime-parity.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(evidence)!);
+            await File.WriteAllTextAsync(evidence, JsonSerializer.Serialize(new
             {
                 CurrentDecision = currentDecision,
                 HistoricalDecision = historicalDecision,
