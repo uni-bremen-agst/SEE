@@ -10,25 +10,23 @@ namespace XMLDocNormalizer.Execution.Analysis
         ValidatedPortablePdb = 2
     }
 
-    /// <summary>Immutable Main-local evidence; callers must supply a validated C# analysis context.</summary>
-    /// <remarks>Current evidence is caller-owned; external evidence must originate from target-bound validated PDB provenance.</remarks>
-    internal sealed record ExceptionFlowAnalyzerSelectionContext(
-        ExceptionFlowCompilerProvenance Provenance = ExceptionFlowCompilerProvenance.Unspecified,
-        string? CompilerVersion = null)
+    /// <summary>Immutable Main-local evidence produced only by the typed projection boundary, never raw strings.</summary>
+    internal sealed partial record ExceptionFlowAnalyzerSelectionContext
     {
-        /// <summary>Projects existing validated C# PDB options, without acquiring artifacts or reconstructing a compilation.</summary>
+        private ExceptionFlowAnalyzerSelectionContext(ExceptionFlowCompilerProvenance provenance, string? compilerVersion)
+        {
+            Provenance = provenance;
+            CompilerVersion = compilerVersion;
+        }
+
+        public ExceptionFlowCompilerProvenance Provenance { get; }
+        public string? CompilerVersion { get; }
+
+        /// <summary>Retains the B6 convenience API through the same trusted projector; failures stay non-executable.</summary>
         internal static ExceptionFlowAnalyzerSelectionContext FromValidatedPortablePdb(
             ExternalCompilationProvenanceDescriptor? descriptor)
-        {
-            ExternalCompilationOptionsDescriptor? options = descriptor?.CompilationOptions;
-            if (options == null || !options.TryGetValue("language", out string language) || language != "C#"
-                || !options.TryGetValue("version", out string schema) || schema != "2")
-            {
-                return new();
-            }
-            options.TryGetValue("compiler-version", out string compilerVersion);
-            return new(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, compilerVersion);
-        }
+            => Projector.Project(new(PortablePdbProvenance: descriptor)).Context
+                ?? new(ExceptionFlowCompilerProvenance.Unspecified, null);
     }
 
     /// <summary>Selection failures never supply an executable engine choice.</summary>

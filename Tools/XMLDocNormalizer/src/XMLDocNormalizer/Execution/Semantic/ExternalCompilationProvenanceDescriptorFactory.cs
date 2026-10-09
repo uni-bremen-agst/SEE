@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -11,6 +12,13 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalCompilationProvenanceDescriptorFactory
     {
+        /// <summary>Weak, Main-local receipts for actual successful validation outputs; never serialized or caller-minted.</summary>
+        private static readonly ConditionalWeakTable<ExternalCompilationProvenanceDescriptor, object> validationReceipts = new();
+
+        /// <summary>Checks validation ownership by reference without repeating PE/PDB/CDI validation.</summary>
+        internal static bool IsValidated(ExternalCompilationProvenanceDescriptor? descriptor)
+            => descriptor != null && validationReceipts.TryGetValue(descriptor, out _);
+
         /// <summary>
         /// The standardized module-level Compilation Options CDI identifier.
         /// </summary>
@@ -194,6 +202,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                     portablePdb,
                     compilationOptions,
                     metadataReferences);
+                validationReceipts.Add(descriptor, new object());
                 return true;
             }
             catch (BadImageFormatException)

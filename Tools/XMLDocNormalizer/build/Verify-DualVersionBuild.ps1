@@ -234,11 +234,17 @@ try {
     Invoke-DotNet 'boundary-test-process-build' @('build', (Join-Path $repoRoot 'Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj'), "-p:Configuration=$Configuration", '-warnaserror')
     $mainBoundaryExecuted = $false
     if ($RunMainBoundaryTests) {
+        # Test fixture emits a real PDB with the loaded Historical compiler, not the SDK that built the Analyzer DLL.
+        $pdbFixture = Join-Path $repoRoot 'Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj'
+        Invoke-DotNet 'projection-pdb-fixture-restore' @('restore', $pdbFixture, '--configfile', (Join-Path $repoRoot 'src/XMLDocNormalizer.ExceptionFlow.Historical/NuGet.Config'))
+        Invoke-DotNet 'projection-pdb-fixture-build' @('build', $pdbFixture, '--no-restore', "-p:Configuration=$Configuration", '-warnaserror', '-p:BuildProjectReferences=false')
+        $pdbFixtureDll = Join-Path $repoRoot "artifacts/exception-flow-historical/HistoricalPdbFixture/bin/$Configuration/net8.0/HistoricalPdbFixture.dll"
+        Invoke-DotNet 'projection-pdb-fixture-emit' @($pdbFixtureDll, (Join-Path $repoRoot 'artifacts/p5o2b7/historical-pdb'))
         $testProject = Join-Path $repoRoot 'Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj'
         $testBuild = @('build', $testProject, "-p:Configuration=$Configuration", '-warnaserror')
         if (-not $BuildTestProjectReferences) { $testBuild += @('--no-restore', '-p:BuildProjectReferences=false') }
         Invoke-DotNet 'main-boundary-tests-build' $testBuild
-        Invoke-DotNet 'main-boundary-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~ExceptionFlowAnalysisRouterTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionPolicyTests', '--logger', 'trx;LogFileName=main-boundary.trx', '--results-directory', $evidenceRoot)
+        Invoke-DotNet 'main-boundary-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~ExceptionFlowAnalysisRouterTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionPolicyTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionProjectionTests', '--logger', 'trx;LogFileName=main-boundary.trx', '--results-directory', $evidenceRoot)
         $mainBoundaryExecuted = $true
     }
     $result = [ordered]@{

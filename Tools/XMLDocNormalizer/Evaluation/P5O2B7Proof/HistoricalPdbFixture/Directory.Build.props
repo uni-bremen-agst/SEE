@@ -1,0 +1,4 @@
+<Project>
+  <!-- Test-only process, same permanent Historical package/output isolation, no Main/Core build graph. -->
+  <Import Project="../../../src/XMLDocNormalizer.ExceptionFlow.Historical/Directory.Build.props" />
+</Project>

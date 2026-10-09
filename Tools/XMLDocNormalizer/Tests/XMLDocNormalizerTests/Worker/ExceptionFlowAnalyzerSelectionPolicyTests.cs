@@ -27,7 +27,7 @@ namespace XMLDocNormalizerTests.Worker
         [InlineData((int)ExceptionFlowCompilerProvenance.ValidatedPortablePdb, HistoricalCompilerVersion, (int)ExceptionFlowAnalyzerSelection.Historical)]
         public void ExactSupportedContexts_SelectOnlyTheRequiredEngine(int provenance, string version, int expected)
         {
-            ExceptionFlowAnalyzerSelectionDecision decision = Select(new((ExceptionFlowCompilerProvenance)provenance, version));
+            ExceptionFlowAnalyzerSelectionDecision decision = Select(PolicyFixtureContext((ExceptionFlowCompilerProvenance)provenance, version));
             Assert.True(decision.Succeeded);
             Assert.Null(decision.Failure);
             Assert.Equal((ExceptionFlowAnalyzerSelection)expected, decision.Selection);
@@ -56,7 +56,7 @@ namespace XMLDocNormalizerTests.Worker
         {
             foreach (ExceptionFlowCompilerProvenance provenance in new[] { ExceptionFlowCompilerProvenance.CurrentCompilation, ExceptionFlowCompilerProvenance.ValidatedPortablePdb })
             {
-                AssertFailure(Select(new(provenance, version)), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedCompilerVersion);
+                AssertFailure(Select(PolicyFixtureContext(provenance, version)), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedCompilerVersion);
             }
         }
 
@@ -69,7 +69,7 @@ namespace XMLDocNormalizerTests.Worker
         {
             foreach (string version in new[] { CurrentCompilerVersion, HistoricalCompilerVersion })
             {
-                AssertFailure(Select(new((ExceptionFlowCompilerProvenance)provenance, version)), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedProvenance);
+                AssertFailure(Select(PolicyFixtureContext((ExceptionFlowCompilerProvenance)provenance, version)), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedProvenance);
             }
         }
 
@@ -77,7 +77,7 @@ namespace XMLDocNormalizerTests.Worker
         public void NullAndDefaultContext_AreNotCurrent()
         {
             AssertFailure(Select(null), ExceptionFlowAnalyzerSelectionFailureCode.MissingContext);
-            AssertFailure(Select(new()), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedProvenance);
+            AssertFailure(Select(PolicyFixtureContext()), ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedProvenance);
         }
 
         [Theory]
@@ -85,16 +85,16 @@ namespace XMLDocNormalizerTests.Worker
         [InlineData("")]
         [InlineData(" \t\r\n")]
         public void MissingCompilerEvidence_FailsClosed(string? version)
-            => AssertFailure(Select(new(ExceptionFlowCompilerProvenance.CurrentCompilation, version)), ExceptionFlowAnalyzerSelectionFailureCode.MissingCompilerVersion);
+            => AssertFailure(Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.CurrentCompilation, version)), ExceptionFlowAnalyzerSelectionFailureCode.MissingCompilerVersion);
 
         [Fact]
         public void CurrentOwnedContextWithHistoricalRequirement_IsConflictingEvidence()
-            => AssertFailure(Select(new(ExceptionFlowCompilerProvenance.CurrentCompilation, HistoricalCompilerVersion)), ExceptionFlowAnalyzerSelectionFailureCode.ConflictingEvidence);
+            => AssertFailure(Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.CurrentCompilation, HistoricalCompilerVersion)), ExceptionFlowAnalyzerSelectionFailureCode.ConflictingEvidence);
 
         [Fact]
         public void SelectionIsPureDeterministicAndHasNoExecutionOwnerOrMutableState()
         {
-            ExceptionFlowAnalyzerSelectionContext context = new(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, HistoricalCompilerVersion);
+            ExceptionFlowAnalyzerSelectionContext context = PolicyFixtureContext(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, HistoricalCompilerVersion);
             ExceptionFlowAnalyzerSelectionDecision expected = Select(context);
             Parallel.For(0, 1000, _ => Assert.Equal(expected, Select(context)));
             Assert.All(typeof(ExceptionFlowAnalyzerSelectionPolicy).GetFields(BindingFlags.Static | BindingFlags.NonPublic), field => Assert.True(field.IsLiteral));
@@ -149,7 +149,7 @@ namespace XMLDocNormalizerTests.Worker
         [Fact]
         public async Task SelectedCurrent_ExecutesExistingRouterWithNoWorkerRequirement()
         {
-            ExceptionFlowAnalyzerSelectionDecision decision = Select(new(ExceptionFlowCompilerProvenance.CurrentCompilation, Info(typeof(CSharpCompilation).Assembly)));
+            ExceptionFlowAnalyzerSelectionDecision decision = Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.CurrentCompilation, Info(typeof(CSharpCompilation).Assembly)));
             Assert.True(decision.Succeeded);
             (MethodDeclarationSyntax member, ExceptionFlowSummaryAnalysisSession session) = CurrentInput();
             ExceptionFlowAnalysisRouter router = new(new HistoricalWorkerClient(Path.Combine(Root(), "artifacts", "p5o2b6", "never-start"), WorkerPath(), TimeSpan.FromSeconds(30)));
@@ -167,8 +167,8 @@ namespace XMLDocNormalizerTests.Worker
             Assembly csharp = typeof(CSharpCompilation).Assembly;
             Guid beforeCommon = common.ManifestModule.ModuleVersionId;
             Guid beforeCsharp = csharp.ManifestModule.ModuleVersionId;
-            ExceptionFlowAnalyzerSelectionDecision historicalDecision = Select(new(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, HistoricalCompilerVersion));
-            ExceptionFlowAnalyzerSelectionDecision currentDecision = Select(new(ExceptionFlowCompilerProvenance.CurrentCompilation, Info(csharp)));
+            ExceptionFlowAnalyzerSelectionDecision historicalDecision = Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, HistoricalCompilerVersion));
+            ExceptionFlowAnalyzerSelectionDecision currentDecision = Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.CurrentCompilation, Info(csharp)));
             Assert.True(historicalDecision.Succeeded);
             Assert.True(currentDecision.Succeeded);
             ExceptionFlowAnalysisRouter router = new(new HistoricalWorkerClient("dotnet", WorkerPath(), TimeSpan.FromSeconds(30)));
@@ -211,7 +211,7 @@ namespace XMLDocNormalizerTests.Worker
         [Fact]
         public async Task SelectionFailure_RemainsNonExecutableAtTheUnchangedRouter()
         {
-            ExceptionFlowAnalyzerSelectionDecision decision = Select(new(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, "unknown"));
+            ExceptionFlowAnalyzerSelectionDecision decision = Select(PolicyFixtureContext(ExceptionFlowCompilerProvenance.ValidatedPortablePdb, "unknown"));
             AssertFailure(decision, ExceptionFlowAnalyzerSelectionFailureCode.UnsupportedCompilerVersion);
             (MethodDeclarationSyntax member, ExceptionFlowSummaryAnalysisSession session) = CurrentInput();
             ExceptionFlowAnalysisRoutingResult result = await new ExceptionFlowAnalysisRouter().AnalyzeAsync(new(decision.Selection, Current: new(member, session)));
@@ -221,6 +221,12 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Null(result.Result);
             Assert.Equal(ExceptionFlowAnalysisRoutingFailureCode.InvalidSelection, result.RoutingFailure!.Code);
         }
+
+        /// <summary>Test-only bypass to retain B6 policy fuzz coverage after B7 closes raw production construction.</summary>
+        private static ExceptionFlowAnalyzerSelectionContext PolicyFixtureContext(
+            ExceptionFlowCompilerProvenance provenance = ExceptionFlowCompilerProvenance.Unspecified, string? version = null)
+            => (ExceptionFlowAnalyzerSelectionContext)Activator.CreateInstance(typeof(ExceptionFlowAnalyzerSelectionContext),
+                BindingFlags.Instance | BindingFlags.NonPublic, binder: null, args: [provenance, version], culture: null)!;
 
         private static void AssertFailure(ExceptionFlowAnalyzerSelectionDecision decision, ExceptionFlowAnalyzerSelectionFailureCode expected)
         {
