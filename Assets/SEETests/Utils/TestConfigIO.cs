@@ -8,6 +8,7 @@ using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
 using SEE.Extensions;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.Utils
 {
@@ -1004,7 +1005,7 @@ namespace SEE.Utils
         {
             settings.Shape = NodeShapes.Blocks;
             settings.IsRelevant = false;
-            settings.MetricToLength = new List<string> { "0.001", SEE.DataModel.DG.Metrics.Prefix + "LOC" };
+            settings.MetricToLength = new List<string> { "0.001", SEE.Graphs.Metrics.Prefix + "LOC" };
             settings.ColorProperty.ColorMetric = "X";
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;

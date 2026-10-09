@@ -1,4 +1,5 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -86,8 +87,8 @@ namespace SEE.Game
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Lower, lowerLabel);
-            writer.Save(Upper, upperLabel);
+            writer.SaveColor(Lower, lowerLabel);
+            writer.SaveColor(Upper, upperLabel);
             writer.Save((int)NumberOfColors, numberOfColorsLabel);
             writer.EndGroup();
         }
@@ -106,8 +107,8 @@ namespace SEE.Game
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, lowerLabel, ref Lower);
-                    ConfigIO.Restore(values, upperLabel, ref Upper);
+                    UnityConfigIO.RestoreColor(values, lowerLabel, ref Lower);
+                    UnityConfigIO.RestoreColor(values, upperLabel, ref Upper);
                     long storedNumberOfColors = 0;
                     if (ConfigIO.Restore(values, numberOfColorsLabel, ref storedNumberOfColors))
                     {

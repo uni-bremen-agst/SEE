@@ -1,10 +1,10 @@
 using SEE.Audio;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Net.Actions.GraphElement;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.XR;

@@ -2,7 +2,7 @@
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
@@ -13,7 +13,6 @@ using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SimpleFileBrowser;
 using Sirenix.OdinInspector;
@@ -27,6 +26,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.KeyActions;
+using SEE.Graphs.Config;
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -965,7 +965,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case BoardAttributes:
                 case IncrementalTreeMapAttributes:
                 case VisualAttributes:
-                case ConfigIO.IPersistentConfigItem:
+                case IPersistentConfigItem:
                 case LabelAttributes:
                     parent = CreateNestedSetting(settingName, parent, removable);
                     createdObj = parent.transform.parent.gameObject;

@@ -22,7 +22,7 @@ REM The path to the Unity editor to generate the solution and csproj files.
 SET "UNITY=C:\Program Files\Unity\Hub\Editor\6000.0.67f1\Editor\Unity.exe"
 
 REM The path to AspNetCore.App needed by csharp2rfg.
-SET "ASPNETCORE=C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\9.0.15"
+SET "ASPNETCORE=C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\9.0.20"
 
 goto generateRFG
 
@@ -45,6 +45,8 @@ csharp2rfg --library --no_duplicate_edges ^
  -v --framework_path "%ASPNETCORE%" ^
  SEE.csproj "%RFG%"
 
+goto end
+
 REM Reduce the graph to all components in SEE and only its immediate neighbors.
 :reduce
 rfgscript Axivion\reduce.py --graph "%RFG%" "%RFG%"
@@ -55,3 +57,5 @@ REM rfgexport -f GXL -o "Code Facts" "%RFG%" "%GXL%"
 
 REM RFG can be visualized as follows:
 REM gravis %RFG%
+
+:end

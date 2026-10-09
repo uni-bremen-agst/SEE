@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Tools.ReflexionAnalysis;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
+using SEE.Graphs;
+using SEE.Graphs.Events;
+using SEE.Graphs.Reflexion;
+using static SEE.Graphs.Reflexion.ReflexionGraph;
 
 namespace SEE.Tools.Architecture
 {
@@ -452,7 +452,7 @@ namespace SEE.Tools.Architecture
             // 0 absences
 
             // 0 divergences
-            
+
             AssertEventCountEquals<EdgeChange>(9);
             // 0 removed edges
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);

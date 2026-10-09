@@ -11,10 +11,14 @@
 // This script also relies on the Task-API-Tutorial by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
 // https://github.com/homuler/MediaPipeUnityPlugin/blob/master/docs/Tutorial-Task-API.md
 
+/// <summary>
+/// These namespaces are imported to be able to use MediaPipe solutions
+/// </summary>
 using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity.Experimental;
+using Mediapipe.Tasks.Vision.HandLandmarker;
 using RootMotion.FinalIK;
 using SEE.Extensions;
 using SEE.Utils;
@@ -22,14 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-/// <summary>
-/// These namespaces are imported to be able to use MediaPipe solutions
-/// </summary>
 using Stopwatch = System.Diagnostics.Stopwatch;
-using Mediapipe.Tasks.Vision.PoseLandmarker;
-using Mediapipe.Tasks.Vision.HandLandmarker;
-using Mediapipe.Unity.Experimental;
-using Mediapipe.Tasks.Vision.GestureRecognizer;
 using SEE.UI;
 using SEE.Controls.KeyActions;
 

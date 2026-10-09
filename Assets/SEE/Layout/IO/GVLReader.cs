@@ -28,7 +28,7 @@ namespace SEE.Layout.IO
         /// <param name="groundLevel">The y co-ordinate setting the ground level; all nodes will be
         /// placed on this level.</param>
         /// <param name="logger">Logger used to emit errors, warnings, etc.</param>
-        public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, SEE.Utils.ILogger logger = null)
+        public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, Graphs.Utils.ILogger logger = null)
         {
             Filename = filename;
             Logger = logger;
@@ -125,7 +125,7 @@ namespace SEE.Layout.IO
         /// <summary>
         /// The logger used to emit errors, warnings, etc.
         /// </summary>
-        protected readonly SEE.Utils.ILogger Logger;
+        protected readonly Graphs.Utils.ILogger Logger;
         /// <summary>
         /// A mapping of the IDs of all gameNodes onto the gameNodes. This
         /// mapping allows us to quickly identify the nodes by their IDs.

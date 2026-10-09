@@ -1,5 +1,5 @@
-﻿using SEE.UI;
-using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.UI;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +19,7 @@ namespace SEE.UserSettings
         /// <summary>
         /// Indicates whether music is muted.
         /// </summary>
-        public bool MusicMuted = false;
+        public bool MusicMuted = true;
 
         /// <summary>
         /// Current sound effects volume.

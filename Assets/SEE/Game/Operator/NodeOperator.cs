@@ -1,12 +1,12 @@
 using DG.Tweening;
 using SEE.Controls;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.Layout;
 using SEE.SceneManipulation;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

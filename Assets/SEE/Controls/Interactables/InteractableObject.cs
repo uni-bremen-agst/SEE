@@ -595,28 +595,28 @@ namespace SEE.Controls
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
-        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// for all existing instances of <see cref="InteractableObject"/> it is interested in,
         /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for multiplayer actions.
         ///
         /// Note: This event is declared static so that it is independent of a particular
-        /// <see cref="InteractableObject"/.
+        /// <see cref="InteractableObject"/>.
         /// </summary>
         public static event MultiPlayerHoverAction AnyHoverIn;
 
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
-        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// for all existing instances of <see cref="InteractableObject"/> it is interested in,
         /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for multiplayer actions.
         ///
         /// Note: This event is declared static so that it is independent of a particular
-        /// <see cref="InteractableObject"/.
+        /// <see cref="InteractableObject"/>.
         /// </summary>
         public static event MultiPlayerHoverAction AnyHoverOut;
 
@@ -635,28 +635,28 @@ namespace SEE.Controls
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
-        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// for all existing instances of <see cref="InteractableObject"/> it is interested in,
         /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for actions to be executed only locally.
         ///
         /// Note: This event is declared static so that it is independent of a particular
-        /// <see cref="InteractableObject"/.
+        /// <see cref="InteractableObject"/>.
         /// </summary>
         public static event LocalPlayerHoverAction LocalAnyHoverIn;
 
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
-        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// for all existing instances of <see cref="InteractableObject"/> it is interested in,
         /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for actions to be executed only locally.
         ///
         /// Note: This event is declared static so that it is independent of a particular
-        /// <see cref="InteractableObject"/.
+        /// <see cref="InteractableObject"/>.
         /// </summary>
         public static event LocalPlayerHoverAction LocalAnyHoverOut;
 

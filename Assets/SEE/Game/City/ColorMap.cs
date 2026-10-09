@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// Specifies which color is used to render a named property.
     /// </summary>
     [Serializable]
-    public class ColorMap : ConfigIO.IPersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
+    public class ColorMap : IPersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
     {
         /// <summary>
         /// Mapping of property name onto color.

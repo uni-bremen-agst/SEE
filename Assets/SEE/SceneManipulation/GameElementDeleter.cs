@@ -1,11 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
@@ -586,6 +586,34 @@ namespace SEE.SceneManipulation
                 }
             });
             RestoreNodeTypes(createdNodes, nodeTypes);
+        }
+
+        /// <summary>
+        /// A memento for an edge.
+        /// </summary>
+        private class EdgeMemento : GraphElementsMemento
+        {
+            /// <summary>
+            /// Constructor setting the edge to be memorized.
+            /// </summary>
+            /// <param name="edge">Edge to be memorized.</param>
+            public EdgeMemento(Edge edge) : base(edge.ItsGraph)
+            {
+                this.edge = edge;
+            }
+
+            /// <summary>
+            /// Memorized edge.
+            /// </summary>
+            private readonly Edge edge;
+
+            /// <summary>
+            /// Re-adds the memorized edge to <see cref="ItsGraph"/>.
+            /// </summary>
+            public override void Restore()
+            {
+                ItsGraph.AddEdge(edge);
+            }
         }
     }
 }

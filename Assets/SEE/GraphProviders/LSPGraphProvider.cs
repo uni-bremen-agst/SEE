@@ -4,19 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Tools.LSP;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {

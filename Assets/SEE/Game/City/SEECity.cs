@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.GXL;
+using SEE.Graphs;
+using SEE.Graphs.IO.GXL;
 using SEE.Game.CityRendering;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
@@ -15,7 +15,6 @@ using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UserSettings;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -28,6 +27,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Cities;
 using SEE.Components.GameNodes.BranchCity;
+using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

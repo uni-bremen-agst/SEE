@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel.DG.IO.ReportImports;
+using SEE.Graphs.IO.ReportImports;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -8,6 +8,7 @@ using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {
@@ -207,15 +208,6 @@ namespace SEE.GraphProviders
             };
         }
 
-        private GitEvolutionGraphProvider GetGitEvolutionProvider()
-        {
-            return new GitEvolutionGraphProvider()
-            {
-                Date = "2024/01/05",
-                GitRepository = GetGitRepository()
-            };
-        }
-
         private static void AreEqualGXLProviders(GXLSingleGraphProvider expected, SingleGraphProvider actual)
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
@@ -324,6 +316,15 @@ namespace SEE.GraphProviders
         #endregion
 
         #region GitProvider
+
+        private GitEvolutionGraphProvider GetGitEvolutionProvider()
+        {
+            return new GitEvolutionGraphProvider()
+            {
+                Date = "2024/01/05",
+                GitRepository = GetGitRepository()
+            };
+        }
 
         [Test]
         public void TestGitEvolutionProvider()

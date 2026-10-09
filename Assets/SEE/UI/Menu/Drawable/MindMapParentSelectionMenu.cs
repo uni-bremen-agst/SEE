@@ -211,7 +211,7 @@ namespace SEE.UI.Menu.Drawable
                 });
                 parentSelector.defaultIndex = index;
 
-                /// For the <paramref name="cutCopyMode", provide a Finish Button.
+                /// For the <paramref name="cutCopyMode"/>, provide a Finish Button.
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {

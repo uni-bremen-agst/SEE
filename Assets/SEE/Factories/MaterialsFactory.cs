@@ -181,7 +181,8 @@ namespace SEE.Factories
         /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
         /// <param name="renderQueueOffset">The offset of the new material in the render queue.</param>
         /// <returns>New material.</returns>
-        /// <exception cref=""></exception>
+        /// <exception cref="FileNotFoundException">Thrown if no material resource with
+        /// <paramref name="name"/> can be loaded.</exception>
         private static Material New(string name, Color color, Texture texture)
         {
             Material prefab = Resources.Load<Material>(name);

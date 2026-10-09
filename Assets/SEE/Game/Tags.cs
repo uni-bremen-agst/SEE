@@ -151,11 +151,9 @@ namespace SEE.Game
         public const string Right = "Right";
 
         /// <summary>
-        /// All existing tags in one.
+        /// For objects that should only be present in the editor and not in the build.
         /// </summary>
-        public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
-            Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera,
-            Drawable, Whiteboard, StickyNote, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
+        public const string EditorOnly = "EditorOnly";
 
         /// <summary>
         /// All existing <see cref="DrawableTypes"/> object tags in one.

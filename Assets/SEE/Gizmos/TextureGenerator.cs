@@ -36,7 +36,7 @@ namespace SEE.Gizmos
         ///
         /// The algorithm is based on 'Murphy's Modified Bresenham Line Algorithm' and
         /// the implementation is based on:
-        /// <see cref="https://github.com/danbar/murphy_line_draw/blob/master/murphy_line_draw.m"/>
+        /// <a href="https://github.com/danbar/murphy_line_draw/blob/master/murphy_line_draw.m">murphy_line_draw.m</a>
         /// </summary>
         /// <param name="textureWidth">The width of the texture.</param>
         /// <param name="textureHeight">The height of the texture.</param>

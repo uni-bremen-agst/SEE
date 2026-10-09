@@ -4298,7 +4298,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 21|SEE.Game.LabelAttributes, SEE
+      Data: 21|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -7995,7 +7995,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 91|SEE.Game.LabelAttributes, SEE
+      Data: 91|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -9458,7 +9458,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.LabelAttributes, SEE
+      Data: 26|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -14228,7 +14228,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.LabelAttributes, SEE
+      Data: 26|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -14622,10 +14622,13 @@ MonoBehaviour:
       Data: 36|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 1
       Data: Assets/SEE
+    - Name: 
+      Entry: 1
+      Data: Assets/SEETests
     - Name: 
       Entry: 13
       Data: 
@@ -14640,7 +14643,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: origin/master
+      Data: origin/.*
     - Name: 
       Entry: 13
       Data: 
@@ -14659,304 +14662,9 @@ MonoBehaviour:
     - Name: SimplifyGraph
       Entry: 5
       Data: true
-    - Name: CombineAuthors
+    - Name: AddCoChangeEdges
       Entry: 5
-      Data: true
-    - Name: AuthorAliasMap
-      Entry: 7
-      Data: 38|SEE.GraphProviders.VCS.AuthorMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 39|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 40|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Rainer Koschke
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 41|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 42|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: AnnaZinner
-    - Name: Email
-      Entry: 1
-      Data: annznner@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: annznner
-    - Name: Email
-      Entry: 1
-      Data: annznner@stvr1.informatik.uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 46|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: AnnaZinner
-    - Name: Email
-      Entry: 1
-      Data: 131189739+AnnaZinner@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 47|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: zahir
-    - Name: Email
-      Entry: 1
-      Data: zama@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 48|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 49|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: zama9
-    - Name: Email
-      Entry: 1
-      Data: 116647782+zama9@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 50|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: zama
-    - Name: Email
-      Entry: 1
-      Data: zama@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 51|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Michel Krause
-    - Name: Email
-      Entry: 1
-      Data: krausem@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 52|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 53|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: M. Krause
-    - Name: Email
-      Entry: 1
-      Data: 39034757+Cyclone1337@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 54|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: WilliamGoesGit
-    - Name: Email
-      Entry: 1
-      Data: behnkewilliam@gmail.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 55|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 56|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: William
-    - Name: Email
-      Entry: 1
-      Data: 54861950+WilliamGoesGit@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 57|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: ferri
-    - Name: Email
-      Entry: 1
-      Data: ferris@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 58|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 59|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: felarmouche
-    - Name: Email
-      Entry: 1
-      Data: 167546681+felarmouche@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -18494,7 +18202,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 56|SEE.Game.LabelAttributes, SEE
+      Data: 56|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -19509,7 +19217,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  <InScenePlaced>k__BackingField: 0
+  m_InScenePlaced: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
@@ -24986,7 +24694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1914333879
 Transform:
   m_ObjectHideFlags: 0
@@ -25608,7 +25316,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.LabelAttributes, SEE
+      Data: 26|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -25786,13 +25494,10 @@ MonoBehaviour:
       Data: 36|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 1
-      Data: Assets/SEE/GraphProviders
-    - Name: 
-      Entry: 1
-      Data: Assets/SEE/VCS
+      Data: Assets/SEE
     - Name: 
       Entry: 13
       Data: 
@@ -25826,28 +25531,9 @@ MonoBehaviour:
     - Name: SimplifyGraph
       Entry: 5
       Data: true
-    - Name: CombineAuthors
+    - Name: AddCoChangeEdges
       Entry: 5
-      Data: false
-    - Name: AuthorAliasMap
-      Entry: 7
-      Data: 38|SEE.GraphProviders.VCS.AuthorMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 39|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: true
     - Name: CommitID
       Entry: 1
       Data: 6468e775f859eda7473736d9040cd760fefa5ebb
@@ -25907,7 +25593,7 @@ MonoBehaviour:
       AbsolutePath: 
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
-    Kind: 0
+    Kind: 3
     showEdges: 0
     animationKind: 2
     animateEdgeFlow: 0
@@ -30103,7 +29789,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 71|SEE.Game.LabelAttributes, SEE
+      Data: 71|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true

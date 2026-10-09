@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.Utils.Config;
 using SEE.Components.GraphElements;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {

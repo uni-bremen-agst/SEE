@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="screen" style="flex-grow: 1;">
+        <ui:VisualElement name="pip_horispace" style="flex-grow: 1; background-color: rgba(255, 0, 0, 0); max-height: none; max-width: 35%;">
+            <ui:VisualElement name="pip_spacer" style="flex-grow: 1;" />
+            <ui:VisualElement name="pip" data-source="project://database/Assets/Resources/UI/PictureInPicture/pipDataSource.asset?fileID=11400000&amp;guid=475f1a68f58038027ab7093c73d79774&amp;type=2#pipDataSource" data-source-path="pipImage" style="flex-grow: 1; max-height: 35%; border-top-width: 4px; border-right-width: 4px; border-bottom-width: 4px; border-left-width: 4px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;">
+                <Bindings>
+                    <ui:DataBinding property="style.backgroundImage" data-source-path="pipImage" data-source="project://database/Assets/Resources/UI/PictureInPicture/pipDataSource.asset?fileID=11400000&amp;guid=475f1a68f58038027ab7093c73d79774&amp;type=2#pipDataSource" binding-mode="ToTarget" />
+                </Bindings>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

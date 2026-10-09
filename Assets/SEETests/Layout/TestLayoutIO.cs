@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Game;
+using SEE.Graphs.Utils;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using System.Collections.Generic;

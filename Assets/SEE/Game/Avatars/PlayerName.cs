@@ -63,7 +63,7 @@ namespace SEE.Game.Avatars
         /// from the server.
         /// </summary>
         /// <remarks><see cref="NetworkBehaviour.OnNetworkDespawn"/> is invoked on each
-        /// <see cref=">NetworkBehaviour"/> associated with a <see cref="NetworkObject"/>
+        /// <see cref="NetworkBehaviour"/> associated with a <see cref="NetworkObject"/>
         /// when it's despawned. This is where all netcode cleanup code should occur,
         /// but isn't to be confused with destroying.</remarks>
         public override void OnNetworkDespawn()

@@ -1,6 +1,6 @@
 ﻿using HighlightPlus;
 using MoreLinq;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.Extensions;

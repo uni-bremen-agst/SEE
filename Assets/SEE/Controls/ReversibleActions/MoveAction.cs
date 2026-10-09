@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Audio;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
-using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.XR;
@@ -18,6 +17,7 @@ using SEE.Net.Actions.GraphElement;
 using SEE.Controls.Modifiers;
 using SEE.Controls.KeyActions;
 using SEE.Components.GraphElements;
+using SEE.Graphs.Reflexion;
 
 namespace SEE.Controls.ReversibleActions
 {

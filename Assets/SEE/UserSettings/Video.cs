@@ -1,6 +1,6 @@
 ﻿using SEE.Game;
+using SEE.Graphs.Config;
 using SEE.UI;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;

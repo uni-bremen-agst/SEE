@@ -3,12 +3,13 @@ using Sirenix.OdinInspector;
 using SEE.Utils;
 using System.Collections.Generic;
 using MoreLinq.Extensions;
-using SEE.DataModel;
-using SEE.DataModel.DG;
+using SEE.Graphs;
+using SEE.Graphs;
 using SEE.UI;
 using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.Components.GameEdges;
+using SEE.Graphs.Events;
 
 namespace SEE.Game.City
 {

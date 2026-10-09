@@ -1,14 +1,14 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.Controls.Interactables;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.GraphElement;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Graphs.Reflexion;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenus;

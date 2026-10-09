@@ -1,7 +1,9 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
+using SEE.Scanner.Antlr;
 using SEE.Utils.Paths;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -64,6 +66,11 @@ namespace SEE.VCS
         private const string firstFile = "firstFile.cs";
 
         /// <summary>
+        /// The content of the file that <see cref="SetUp"/> commits initially.
+        /// </summary>
+        private const string firstFileContent = "//This is a test.\nclass TestClass {}\n";
+
+        /// <summary>
         /// Path of the original repository, created by <see cref="SetUp"/>.
         /// </summary>
         private static string originalRepoPath;
@@ -73,6 +80,13 @@ namespace SEE.VCS
         /// </summary>
         private static string cloneRepoPath;
 
+        /// <summary>
+        /// Creates a temporary original repository under <see cref="originalRepoPath"/>,
+        /// commits a file <see cref="firstFile"/>to it, and clones it into another temporary
+        /// directory under <see cref="cloneRepoPath"/>.
+        ///
+        /// The author of the commit is <see cref="developer"/>.
+        /// </summary>
         [SetUp]
         public static void SetUp()
         {
@@ -85,7 +99,7 @@ namespace SEE.VCS
             // Create and populate original repository.
             Debug.Log($"Creating original repository at {Repository.Init(originalRepoPath)}\n");
             using Repository original = new(originalRepoPath);
-            WriteFile(original, originalRepoPath, firstFile, "This is a test", developer);
+            WriteFile(original, originalRepoPath, firstFile, firstFileContent, developer);
 
             // Clone original repository into clone repository.
             Debug.Log($"Cloning original repository into {Repository.Clone(originalRepoPath, cloneRepoPath)}\n");
@@ -137,6 +151,37 @@ namespace SEE.VCS
             original.Branches.Remove(newBranch);
             Assert.That(gitRepositorySession.FetchRemotes(), Is.True,
                         "The deletion of the branch must have been fetched.");
+        }
+
+        /// <summary>
+        /// Tests <see cref="GitRepositorySession.GetStream(string)"/>.
+        /// </summary>
+        [Test]
+        public void TestGetStream()
+        {
+            GitRepository gitRepository = new(new DataPath(originalRepoPath), null);
+            using GitRepositorySession gitRepositorySession = gitRepository.OpenGitSession();
+            Stream stream = gitRepositorySession.GetStream(firstFile);
+            using (StreamReader sr = new(stream))
+            {
+                string content = sr.ReadToEnd();
+                Debug.Log(content);
+                Assert.That(content, Is.EqualTo(firstFileContent));
+            }
+        }
+
+        /// <summary>
+        /// Tests <see cref="GitRepositorySession.GetFileContent(string)"/>.
+        /// </summary>
+        [Test]
+        public void TestGetFileContent()
+        {
+            GitRepository gitRepository = new(new DataPath(originalRepoPath), null);
+            using GitRepositorySession gitRepositorySession = gitRepository.OpenGitSession();
+
+            string content = gitRepositorySession.GetFileContent(firstFile);
+            Debug.Log(content);
+            Assert.That(content, Is.EqualTo(firstFileContent));
         }
 
         [TearDown]

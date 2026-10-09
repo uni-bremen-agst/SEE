@@ -14107,7 +14107,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -14482,8 +14482,8 @@ MonoBehaviour:
     referenceIdx: 0
   eyeExpIndex: 0
   eyeExpNames:
-  - eyelid 0
-  - eyelid 1
+  - eyeL
+  - eyeR
   eyeExpRend: {fileID: 0}
   eyeExpRendItemCount: 2
   eyeExpRendIsNullOrSmr: 1
@@ -14646,7 +14646,9 @@ MonoBehaviour:
     gizmo: {fileID: 0}
     referenceIdx: 0
   eyelidExpIndex: 0
-  eyelidExpNames: []
+  eyelidExpNames:
+  - eyelidL
+  - eyelidR
   eyelidExpRend: {fileID: 0}
   eyelidExpRendItemCount: 1
   eyelidExpRendIsNullOrSmr: 1

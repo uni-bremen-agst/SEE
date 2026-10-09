@@ -3,11 +3,12 @@ using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.UI.Notification;
-using SEE.Utils;
 using UnityEngine;
 using System;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using SEE.Graphs.Utils;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.HolisticMetrics
 {
