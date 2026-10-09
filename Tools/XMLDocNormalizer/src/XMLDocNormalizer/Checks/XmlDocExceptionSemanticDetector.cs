@@ -422,6 +422,20 @@ namespace XMLDocNormalizer.Checks
             CancellationToken cancellationToken = default)
             => dispatch.AnalyzeAsync(request, cancellationToken);
 
+        /// <summary>Projects existing external handoffs before entering the same B9 execution seam.</summary>
+        /// <remarks>No engine is selected here; failed prerequisites cannot dispatch or fall back to Current.</remarks>
+        internal static async Task<ExternalExceptionFlowAnalysisResult> AnalyzeExternalExceptionFlowAsync(
+            HistoricalWorkerPayloadProjectionInput? input,
+            ExceptionFlowAnalysisDispatch dispatch,
+            CancellationToken cancellationToken = default)
+        {
+            HistoricalWorkerPayloadProjectionResult projected = HistoricalWorkerPayloadProjection.Project(input);
+            if (!projected.Succeeded) { return new(projected, null); }
+            var request = new ExceptionFlowAnalysisDispatchRequest.PortablePdb(projected.Value!.Provenance,
+                new ExceptionFlowAnalysisDispatchRequest.ExecutionPayload.Worker(projected.Value.Payload));
+            return new(projected, await AnalyzeConfiguredExceptionFlowAsync(request, dispatch, cancellationToken));
+        }
+
         /// <summary>
         /// Extracts the raw cref value from an exception XML element.
         /// </summary>

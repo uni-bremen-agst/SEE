@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,6 +14,15 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalCSharpSyntaxTreeFactory
     {
+        private static readonly ConditionalWeakTable<ExternalCSharpSyntaxTree, ExternalCSharpCompilationConfiguration> configurationOrigins = new();
+
+        /// <summary>Returns the original successful P5I configuration without decoding or parsing again.</summary>
+        internal static bool TryGetConfiguration(ExternalCSharpSyntaxTree? sourceTree, out ExternalCSharpCompilationConfiguration? configuration)
+        {
+            configuration = null;
+            return sourceTree != null && configurationOrigins.TryGetValue(sourceTree, out configuration);
+        }
+
         /// <summary>
         /// UTF-8 without a byte-order mark, used when BOM-less source has no
         /// recorded default or fallback encoding.
@@ -103,6 +113,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 configuration.ParseOptions,
                 document.Name);
             sourceTree = new ExternalCSharpSyntaxTree(material, text, tree);
+            configurationOrigins.Add(sourceTree, configuration);
             return true;
         }
 

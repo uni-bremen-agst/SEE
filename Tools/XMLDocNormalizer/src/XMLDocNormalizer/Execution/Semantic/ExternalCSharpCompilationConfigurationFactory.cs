@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -11,6 +12,12 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalCSharpCompilationConfigurationFactory
     {
+        private static readonly ConditionalWeakTable<ExternalCSharpCompilationConfiguration, ExternalCompilationProvenanceDescriptor> provenanceOrigins = new();
+
+        /// <summary>Checks the original successful P5G handoff by reference; no options are reparsed.</summary>
+        internal static bool IsDerivedFrom(ExternalCSharpCompilationConfiguration? configuration, ExternalCompilationProvenanceDescriptor provenance)
+            => configuration != null && provenanceOrigins.TryGetValue(configuration, out var origin) && ReferenceEquals(origin, provenance);
+
         /// <summary>
         /// The Portable PDB compilation-options schema emitted by the
         /// repository's Roslyn version.
@@ -127,6 +134,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 sourceFileCount,
                 defaultEncoding,
                 fallbackEncoding);
+            provenanceOrigins.Add(configuration, compilationProvenance);
             return true;
         }
 

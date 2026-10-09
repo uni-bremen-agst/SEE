@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -11,6 +12,15 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalPeDebugDirectoryDescriptorFactory
     {
+        private static readonly ConditionalWeakTable<ExternalPeDebugDirectoryDescriptor, ExternalAssemblyReferenceDescriptor> validatedTargets = new();
+
+        /// <summary>Retains the original successful PE binding without rereading or validating the image.</summary>
+        internal static bool TryGetValidatedTarget(ExternalPeDebugDirectoryDescriptor? descriptor, out ExternalAssemblyReferenceDescriptor? target)
+        {
+            target = null;
+            return descriptor != null && validatedTargets.TryGetValue(descriptor, out target);
+        }
+
         /// <summary>
         /// Tries to read debug provenance from a caller-owned PE stream.
         /// </summary>
@@ -285,6 +295,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 codeViews,
                 embeddedIds,
                 pdbChecksums.ToImmutable());
+            validatedTargets.Add(descriptor, expectedDescriptor);
             return true;
         }
 

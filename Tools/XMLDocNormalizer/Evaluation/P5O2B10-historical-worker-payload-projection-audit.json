@@ -1,0 +1,657 @@
+{
+    "Schema":  "P5O2B10-worker-payload-projection-v1",
+    "StartingHead":  "a3194cf086280b6da5b0798e9357bb630f383c38",
+    "Head":  "a3194cf086280b6da5b0798e9357bb630f383c38",
+    "ExternalHeadMovement":  false,
+    "Decision":  "Complete for bounded profile",
+    "Projection":  "Execution/Analysis/HistoricalWorkerPayloadProjection.Project",
+    "Adoption":  "XmlDocExceptionSemanticDetector.AnalyzeExternalExceptionFlowAsync",
+    "Input":  "existing P5A provenance + original P5I source/text + PE-bound IMethodSymbol + explicit ExceptionAnalysisMode",
+    "ManualBefore":  "B9 prepared WorkerAnalysisInput(source, type name, method name, default context) in tests",
+    "Chain":  "existing P4/P5A/P5G/P5H/P5I handoffs -\u003e B10 -\u003e same B9 async seam -\u003e B8/B7/B6/B5 -\u003e B4 Worker",
+    "Trust":  "Reference receipts on successful existing P4/P5G/P5I factories; same original P5A descriptor and document; existing PE method module/assembly binding; no second validator/parser or file I/O",
+    "FieldMapping":  {
+                         "Source":  "retained P5I.Text.ToString, no decode/parse/normalization",
+                         "TypeMetadataName":  "exact namespace/nested metadata names of PE-bound method type",
+                         "MethodName":  "PE ordinary method MetadataName",
+                         "AnalysisMode":  "explicit SolutionTransitive only",
+                         "LanguageNullable":  "recorded CSharp12 / Enable only",
+                         "ReferenceProfile":  "published net8-runtime-bounded-v1 policy, not original-reference equivalence",
+                         "AssemblyName":  "published HistoricalWorkerInput analysis identity, not original target identity",
+                         "UnsupportedExtras":  "source count/options/signing/defines mismatches rejected; no additional sources/reference/supporting/root/compiler envelope invented",
+                         "OriginalProvenance":  "same original P5A/P5I/P5H objects retained Main-locally alongside unchanged IPC contract"
+                     },
+    "Failure":  "typed missing/unvalidated/mixed/profile/selector/payload errors with no Value; no dispatch after failed projection; original downstream staged/Worker failures without fallback",
+    "Current":  "B9 native Current route unchanged; no B10 payload construction or Worker; all eight complete parent finding/graph cases rerun unchanged",
+    "NoCurrentFallback":  true,
+    "B5B6B7B8Unchanged":  true,
+    "AnalyzerSemanticsChanged":  false,
+    "VersionsChanged":  false,
+    "WorkerContractChanged":  false,
+    "NewParserValidator":  false,
+    "AllKnowingInputContext":  false,
+    "Tests":  [
+                  {
+                      "Name":  "parent-current",
+                      "Total":  8,
+                      "Passed":  8,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-tests\\parent-current.trx",
+                                       "Sha256":  "32CD7552F677BD94C21D41B08C48933C4AB8C6EEA80546B75E8DAAB39635D316"
+                                   }
+                  },
+                  {
+                      "Name":  "b10",
+                      "Total":  34,
+                      "Passed":  34,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\b10.trx",
+                                       "Sha256":  "D8D89751F7C68F7AEFBB9A111CAA8DEF1652FC0F279E96348AD63463A8671434"
+                                   }
+                  },
+                  {
+                      "Name":  "b5-b9-independent",
+                      "Total":  156,
+                      "Passed":  156,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\b5-b9.trx",
+                                       "Sha256":  "889431FB5552C12AAC8509BD3F17D0129921D794367A44CFF41BFACE98721B2A"
+                                   }
+                  },
+                  {
+                      "Name":  "productive",
+                      "Total":  676,
+                      "Passed":  676,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\productive.trx",
+                                       "Sha256":  "47353AB6C3825FEB9BC6844EED10FF9D6451D236B24ADF15D4F319039B6E5B87"
+                                   }
+                  },
+                  {
+                      "Name":  "focused",
+                      "Total":  354,
+                      "Passed":  354,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\focused.trx",
+                                       "Sha256":  "2604291B48AE49ED9E106453A387511AD7FDD6E6F2333429790CE9B55763F435"
+                                   }
+                  },
+                  {
+                      "Name":  "broad",
+                      "Total":  2780,
+                      "Passed":  2780,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\broad.trx",
+                                       "Sha256":  "6719F84C357B97961588CED66ACA85DD79D5B1CD7C29ECE0828C8110DD39A170"
+                                   }
+                  },
+                  {
+                      "Name":  "full",
+                      "Total":  2871,
+                      "Passed":  2871,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\full.trx",
+                                       "Sha256":  "E2AAE38CDEAB106FDF4078B3BC055C40E0825DB9699D9E635B659053F1DEBDCE"
+                                   }
+                  },
+                  {
+                      "Name":  "permanent-boundary",
+                      "Total":  269,
+                      "Passed":  269,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary.trx",
+                                       "Sha256":  "AB139D4E50E77781C926C92A0339589611F2CCCC1CA5328026AD7B6C7180650B"
+                                   }
+                  },
+                  {
+                      "Name":  "multimodule-isolated",
+                      "Total":  1,
+                      "Passed":  1,
+                      "Failed":  0,
+                      "NotExecuted":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\multimodule-isolated.trx",
+                                       "Sha256":  "099EDB40B289E83EAB5CF67180AF787F99D653FFEBF4AD31C84CC53F1F1E146A"
+                                   }
+                  }
+              ],
+    "CurrentParity":  [
+                          {
+                              "Case":  "Direct-False.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\Direct-False.json",
+                                             "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-False.json",
+                                            "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "Direct-True.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\Direct-True.json",
+                                             "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-True.json",
+                                            "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "ProjectTransitive-False.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\ProjectTransitive-False.json",
+                                             "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-False.json",
+                                            "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "ProjectTransitive-True.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\ProjectTransitive-True.json",
+                                             "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-True.json",
+                                            "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "ProjectTransitiveDeclaredExceptions-False.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\ProjectTransitiveDeclaredExceptions-False.json",
+                                             "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-False.json",
+                                            "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "ProjectTransitiveDeclaredExceptions-True.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\ProjectTransitiveDeclaredExceptions-True.json",
+                                             "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-True.json",
+                                            "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "SolutionTransitive-False.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\SolutionTransitive-False.json",
+                                             "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-False.json",
+                                            "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                                        },
+                              "Equal":  true
+                          },
+                          {
+                              "Case":  "SolutionTransitive-True.json",
+                              "Before":  {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\parent-current\\SolutionTransitive-True.json",
+                                             "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                                         },
+                              "After":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-True.json",
+                                            "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                                        },
+                              "Equal":  true
+                          }
+                      ],
+    "Runtime":  {
+                    "automaticPayload":  true,
+                    "rawPayloadInPositiveSetup":  false,
+                    "actualFactoryReceipt":  true,
+                    "realPdbValidation":  "IdentityAndChecksum",
+                    "historicalContext":  {
+                                              "provenance":  "validatedPortablePdb",
+                                              "compilerVersion":  "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0"
+                                          },
+                    "payload":  {
+                                    "source":  "public static class Fixture { public static void Root() { throw null; } }",
+                                    "typeMetadataName":  "Fixture",
+                                    "methodName":  "Root",
+                                    "context":  {
+                                                    "analysisMode":  "solution-transitive",
+                                                    "referenceProfile":  "net8-runtime-bounded-v1",
+                                                    "languageVersion":  "12",
+                                                    "nullableContext":  "enable",
+                                                    "assemblyName":  "HistoricalWorkerInput"
+                                                }
+                                },
+                    "originalDocumentName":  "/controlled-historical.cs",
+                    "originalChecksumAlgorithm":  "ff1816ec-aa5e-4d10-87f7-6f4963833460",
+                    "originalChecksum":  "07D7F0AE2A91124AFA61FEBF61E4F3E46BF50D19",
+                    "originalSourceBytes":  "88CEFB046DB47C08B3A33AE43F5CB5970D856E6FCE5D05C99B8DBC9662694C3C",
+                    "originalSourceOrigin":  "ExplicitStream",
+                    "originalSourceExactness":  "DirectExact",
+                    "retainsOriginalObjects":  true,
+                    "historicalIdentity":  {
+                                               "workerVersion":  "1.0",
+                                               "protocolVersion":  2,
+                                               "worker":  {
+                                                              "name":  "XMLDocNormalizer.HistoricalWorker",
+                                                              "assemblyVersion":  "1.0.0.0",
+                                                              "informationalVersion":  "1.0.0+a3194cf086280b6da5b0798e9357bb630f383c38",
+                                                              "mvid":  "caa1252a-6131-4a0e-833f-bea7c6de764c",
+                                                              "sha256":  "838291E8275E010D29DE74B637E026AEC46DB2DC554518BD5393CA65E9B3308C"
+                                                          },
+                                               "analyzer":  {
+                                                                "name":  "XMLDocNormalizer.ExceptionFlow.Historical",
+                                                                "assemblyVersion":  "1.0.0.0",
+                                                                "informationalVersion":  "1.0.0+a3194cf086280b6da5b0798e9357bb630f383c38",
+                                                                "mvid":  "6853c4ab-4807-4ce1-a427-794f8cab333e",
+                                                                "sha256":  "4D015E14C8C8DBC08FC05C692148CED37F981703A50061EB7588EFEF855DE1DA"
+                                                            },
+                                               "loadedRoslyn":  [
+                                                                    {
+                                                                        "name":  "Microsoft.CodeAnalysis",
+                                                                        "assemblyVersion":  "5.0.0.0",
+                                                                        "informationalVersion":  "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                                                                        "mvid":  "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+                                                                        "sha256":  "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+                                                                    },
+                                                                    {
+                                                                        "name":  "Microsoft.CodeAnalysis.CSharp",
+                                                                        "assemblyVersion":  "5.0.0.0",
+                                                                        "informationalVersion":  "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                                                                        "mvid":  "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+                                                                        "sha256":  "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+                                                                    }
+                                                                ],
+                                               "runtimeAwaitInformationAvailable":  false,
+                                               "referenceProfile":  "net8-runtime-bounded-v1"
+                                           },
+                    "workerProvenance":  {
+                                             "sourceSha256":  "AFCD5E33F70C78A9D6E96D7CC696DD9F889BAE7DAB56C788846E3CF6D16C1315",
+                                             "typeMetadataName":  "Fixture",
+                                             "methodName":  "Root",
+                                             "logicalPath":  "worker-input.cs",
+                                             "analysisMode":  "solution-transitive",
+                                             "referenceProfile":  "net8-runtime-bounded-v1",
+                                             "languageVersion":  "12",
+                                             "nullableContext":  "enable"
+                                         },
+                    "processId":  29948,
+                    "processStopped":  true,
+                    "historicalLoadedInCaller":  false,
+                    "currentMvids":  [
+                                         "6ccc5f27-c8f9-4fa6-adde-9f4dae33cd52",
+                                         "415d4282-325f-4661-a6dc-44fe371cd27c"
+                                     ],
+                    "canonicalResult":  {
+                                            "entries":  [
+                                                            {
+                                                                "exceptionType":  {
+                                                                                      "kind":  "named",
+                                                                                      "namedTypeKind":  "class",
+                                                                                      "assembly":  {
+                                                                                                       "name":  "System.Private.CoreLib",
+                                                                                                       "versionMajor":  8,
+                                                                                                       "versionMinor":  0,
+                                                                                                       "versionBuild":  0,
+                                                                                                       "versionRevision":  0,
+                                                                                                       "cultureName":  "",
+                                                                                                       "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                       "hasPublicKey":  true,
+                                                                                                       "isRetargetable":  false,
+                                                                                                       "contentType":  "default"
+                                                                                                   },
+                                                                                      "module":  {
+                                                                                                     "assembly":  {
+                                                                                                                      "name":  "System.Private.CoreLib",
+                                                                                                                      "versionMajor":  8,
+                                                                                                                      "versionMinor":  0,
+                                                                                                                      "versionBuild":  0,
+                                                                                                                      "versionRevision":  0,
+                                                                                                                      "cultureName":  "",
+                                                                                                                      "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                      "hasPublicKey":  true,
+                                                                                                                      "isRetargetable":  false,
+                                                                                                                      "contentType":  "default"
+                                                                                                                  },
+                                                                                                     "name":  "System.Private.CoreLib.dll",
+                                                                                                     "ordinal":  0
+                                                                                                 },
+                                                                                      "namespaceName":  "System",
+                                                                                      "metadataName":  "NullReferenceException",
+                                                                                      "typeArguments":  [
+
+                                                                                                        ],
+                                                                                      "isUnboundGenericType":  false,
+                                                                                      "isNativeIntegerType":  false,
+                                                                                      "arrayRank":  0,
+                                                                                      "functionPointerParameters":  [
+
+                                                                                                                    ]
+                                                                                  },
+                                                                "evidenceKind":  "proven",
+                                                                "paths":  [
+                                                                              {
+                                                                                  "steps":  [
+                                                                                                {
+                                                                                                    "kind":  "explicitThrow",
+                                                                                                    "symbolName":  "System.NullReferenceException",
+                                                                                                    "filePath":  "worker-input.cs",
+                                                                                                    "line":  1,
+                                                                                                    "column":  59
+                                                                                                }
+                                                                                            ]
+                                                                              }
+                                                                          ],
+                                                                "pathsTruncated":  false
+                                                            }
+                                                        ],
+                                            "uncertainties":  [
+
+                                                              ]
+                                        },
+                    "peSha256":  "CE114F3C392FFE4548B05415F4AD3A823B0019BE57395D378F2FEC7628626841",
+                    "pdbSha256":  "CCF77D4F8C2D177BDE733430C0C9BFC71816A84FD87189C01FD1FE8AA4A67D47"
+                },
+    "ActualEmission":  {
+                           "TestOnly":  true,
+                           "SubmittedSourceAccepted":  false,
+                           "EmittedSourceExecuted":  false,
+                           "CompilerRuntime":  [
+                                                   {
+                                                       "Name":  "Microsoft.CodeAnalysis",
+                                                       "InformationalVersion":  "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                                                       "Mvid":  "dc7738cc-6dca-4d34-9c44-29b53a7caa93",
+                                                       "Sha256":  "660C3D626C4B8F4CF8C231FBEF0FB6B4DB4FFFCC89EF5B31AAECA1CF4D7F66A1"
+                                                   },
+                                                   {
+                                                       "Name":  "Microsoft.CodeAnalysis.CSharp",
+                                                       "InformationalVersion":  "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0",
+                                                       "Mvid":  "0f9c1dcf-4eb1-47f8-81b2-733db5887be7",
+                                                       "Sha256":  "B0EC1DDCA4C97DCF15845FF4BCEB5499C3989025197D5D65E04310E29C09217D"
+                                                   }
+                                               ],
+                           "PeSha256":  "CE114F3C392FFE4548B05415F4AD3A823B0019BE57395D378F2FEC7628626841",
+                           "PdbSha256":  "CCF77D4F8C2D177BDE733430C0C9BFC71816A84FD87189C01FD1FE8AA4A67D47"
+                       },
+    "BuildLogs":  [
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\restore-current.log",
+                          "Sha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\restore-historical.log",
+                          "Sha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\restore-worker.log",
+                          "Sha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\0-current-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\0-current-build.log",
+                          "Sha256":  "604711057F6781F9F9AD2A005D8ED0BBC227F6BFCF1A6057D3BDA0B7AEA110F7"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\1-historical-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\1-historical-build.log",
+                          "Sha256":  "62E3C6CADD058B2DB1ECE30C340902724BFE8460E9E0A19CEA6415467CD3A4F7"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\2-current-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\2-current-build.log",
+                          "Sha256":  "C60C6B174A2C87B9DDA272174640E0BC8AA1A814729284809493C7396F1C61A4"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\3-historical-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\3-historical-build.log",
+                          "Sha256":  "1193D4693C174005B2FD6FAE77ED718EB786E2E1255E8EF7B464F98918B24057"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\4-historical-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\4-historical-build.log",
+                          "Sha256":  "15AE268542A83DB51FD30FD91EA294EB5CD6D460A74D512F5D6C01567A08E531"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\5-current-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\5-current-build.log",
+                          "Sha256":  "C60C6B174A2C87B9DDA272174640E0BC8AA1A814729284809493C7396F1C61A4"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-0-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-0-build.log",
+                          "Sha256":  "C55EB827806AE8011E331813C3985917F3640DFF71BE572045187C5755373CCE"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-1-clean.log",
+                          "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-1-build.log",
+                          "Sha256":  "33F1DDD0FBC470774B4D074FED20CD9E08271F8BB3AAD2664F56983237B9AFEC"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\boundary-test-process-build.log",
+                          "Sha256":  "37E385B77FB1B7371ACBB0914D0C30EE930CF78B7667A43403EF807B95864D59"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\projection-pdb-fixture-restore.log",
+                          "Sha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\projection-pdb-fixture-build.log",
+                          "Sha256":  "6AF966A2CDCB8F37A863E4BFCB7DB30ABA20E2B4A1F3B27B446D10D4AF3384DB"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\projection-pdb-fixture-emit.log",
+                          "Sha256":  "413FF02E8C2ED6EF1F9788AF04D17C14E07B73F8B8F0030A652D3991C1214CFC"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary-tests-build.log",
+                          "Sha256":  "4E4D7E34157C5B3152589E4D2F38430491991931D2559E303090B1FAA49A4D1F"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary-tests.log",
+                          "Sha256":  "EBC1E7E468522F37B86CD15B887C581C2ECAE8B55CEB564C44FED2048110147A"
+                      }
+                  ],
+    "DualGate":  {
+                     "Passed":  true,
+                     "SharedSources":  121,
+                     "HostSources":  1,
+                     "BuildImages":  6,
+                     "WorkerBuildImages":  2,
+                     "TestProjectReferencesEnabled":  true,
+                     "Audit":  {
+                                   "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\audit.json",
+                                   "Sha256":  "FA2FE37C484CCF2EDF5E79392F7600C982CCF4A9352588EF9DF648DC625832C6"
+                               }
+                 },
+    "Quality":  {
+                    "Format":  true,
+                    "Utf8CrLf":  true,
+                    "JsonParsed":  true,
+                    "PowerShellParsed":  true,
+                    "ArchitectureIsolationTests":  true,
+                    "GitDiffCheck":  true,
+                    "NoManualPayloadInNewSetup":  true
+                },
+    "SemanticsBaseline":  {
+                              "SelfAnalysisFindings":  16,
+                              "CanonicalAdded":  0,
+                              "CanonicalRemoved":  0,
+                              "CanonicalChangedEvidence":  0,
+                              "Inherited":  true,
+                              "FreshSelfAnalysis":  false,
+                              "FreshCanonicalDiff":  false,
+                              "Note":  "B9 baseline values, not newly revalidated for changed source/documentation. Fresh Current fixture finding/graph parity is separate."
+                          },
+    "Attempts":  {
+                     "FirstDualGatePassed":  true,
+                     "FirstBoundaryCases":  266,
+                     "FinalBoundaryCases":  269,
+                     "TestFailures":  1,
+                     "BuildFailures":  0,
+                     "FirstBroad":  {
+                                        "Total":  2780,
+                                        "Passed":  2779,
+                                        "Failed":  1,
+                                        "NotExecuted":  0,
+                                        "TestName":  "XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceFactoryTests.MultiModuleAssembly_FailsClosed",
+                                        "Artifact":  {
+                                                         "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\broad-first.trx",
+                                                         "Sha256":  "E384BA0A75FD3EFED33BD9608C562819AE12E4B5D0C0790CB371011857F5277A"
+                                                     },
+                                        "Log":  {
+                                                    "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\broad-first.log",
+                                                    "Sha256":  "7468067534DFED628802B3CCE0406476A99A3B7A652A59304141B867A4F82890"
+                                                }
+                                    },
+                     "IsolatedRetry":  {
+                                           "Name":  "multimodule-isolated",
+                                           "Total":  1,
+                                           "Passed":  1,
+                                           "Failed":  0,
+                                           "NotExecuted":  0,
+                                           "Artifact":  {
+                                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\multimodule-isolated.trx",
+                                                            "Sha256":  "099EDB40B289E83EAB5CF67180AF787F99D653FFEBF4AD31C84CC53F1F1E146A"
+                                                        }
+                                       },
+                     "BroadRetry":  {
+                                        "Name":  "broad",
+                                        "Total":  2780,
+                                        "Passed":  2780,
+                                        "Failed":  0,
+                                        "NotExecuted":  0,
+                                        "Artifact":  {
+                                                         "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b10-d8fb9e6b\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b10\\tests\\broad.trx",
+                                                         "Sha256":  "6719F84C357B97961588CED66ACA85DD79D5B1CD7C29ECE0828C8110DD39A170"
+                                                     }
+                                    },
+                     "NoTestOrProductionChangeForRetry":  true,
+                     "Note":  "Previously documented MultiModule fixture assertion flaked in first broad run; preserved failure, isolated retry and identical broad rerun. No exclusions or suppression.",
+                     "Expansion":  "exact nested/keyword metadata names, multiple sources, source budget",
+                     "EditorPatchRetry":  "Formatter split a test initializer; failed atomic patch was reapplied against actual lines; no source/build failure."
+                 },
+    "Remaining":  "full external reference/runtime/documents/options/generator/supporting-compilation equivalence and original identity in Worker results; Historical reporting import; CLI/acquisition/discovery and other call-sites; no Dapper redesign",
+    "Protected":  {
+                      "RootIgnore":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+                      "CoreFiles":  23,
+                      "MainSourcesExceptFourChanged":  368,
+                      "ExistingWorkerTests":  9,
+                      "Stashes":  6,
+                      "IndexUnchanged":  true
+                  },
+    "OwnedFileFingerprints":  [
+                                  {
+                                      "Path":  "src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.cs",
+                                      "Sha256":  "6E4BAAB8EB0A6E4C2E58A30D16B0369341E5D3A3A1F9E2F3F064DB49E1B969CC"
+                                  },
+                                  {
+                                      "Path":  "src/XMLDocNormalizer/Execution/Semantic/ExternalPeDebugDirectoryDescriptorFactory.cs",
+                                      "Sha256":  "3653E26EA18C5F35A72BD5A5C9290E31DD9AD14C321C96719663A2365EF5D049"
+                                  },
+                                  {
+                                      "Path":  "src/XMLDocNormalizer/Execution/Semantic/ExternalCSharpCompilationConfigurationFactory.cs",
+                                      "Sha256":  "3BE6411B062D998B805D32E9BA8B9A208EB8E1D5E72B2FEA792E11D339EBC47F"
+                                  },
+                                  {
+                                      "Path":  "src/XMLDocNormalizer/Execution/Semantic/ExternalCSharpSyntaxTreeFactory.cs",
+                                      "Sha256":  "F25022FF05B6D4706899E6330FC5247DDCD141CF4517D933ECC059B0F8AC1919"
+                                  },
+                                  {
+                                      "Path":  "src/XMLDocNormalizer/Execution/Analysis/HistoricalWorkerPayloadProjection.cs",
+                                      "Sha256":  "969220A921DBEC4D5423EDB31187282DD02BE92A6DEB7D06666DD3B308A36DB2"
+                                  },
+                                  {
+                                      "Path":  "Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalPayloadProjectionTests.cs",
+                                      "Sha256":  "4CE43E31A197F9D8282148EAA1C62AE8C637F6CC9B8BAAB36D6B819E2B93B5C6"
+                                  },
+                                  {
+                                      "Path":  "build/Verify-DualVersionBuild.ps1",
+                                      "Sha256":  "E2BB49BE8E16F0177B903A9717EFEB1DBD98A5CEC3AC1D9169501171D13646D9"
+                                  },
+                                  {
+                                      "Path":  "Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                                      "Sha256":  "884B2CA20F83357BFE67BC6B379DA899074FE008903B8E06183E03F53FD67E61"
+                                  },
+                                  {
+                                      "Path":  "Evaluation/P5O2B10-historical-worker-payload-projection.md",
+                                      "Sha256":  "8BED4D4CBBAF41B01009ECEC962264B3FA95C860816BBC4C7BB68FF3D54A43AC"
+                                  },
+                                  {
+                                      "Path":  "Evaluation/P5O2B10Proof/Write-Verify-PayloadEvidence.ps1",
+                                      "Sha256":  "48FD6D9435E1EC8E439DDFD4083D562C8420F292C55D338A0375327765616803"
+                                  }
+                              ],
+    "Git":  {
+                "Status":  [
+                               " M ../../.gitignore",
+                               " M Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                               " M build/Verify-DualVersionBuild.ps1",
+                               " M src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.cs",
+                               " M src/XMLDocNormalizer/Execution/Semantic/ExternalCSharpCompilationConfigurationFactory.cs",
+                               " M src/XMLDocNormalizer/Execution/Semantic/ExternalCSharpSyntaxTreeFactory.cs",
+                               " M src/XMLDocNormalizer/Execution/Semantic/ExternalPeDebugDirectoryDescriptorFactory.cs",
+                               "?? Evaluation/P5O2B10-historical-worker-payload-projection-audit.json",
+                               "?? Evaluation/P5O2B10-historical-worker-payload-projection.md",
+                               "?? Evaluation/P5O2B10Proof/",
+                               "?? Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalPayloadProjectionTests.cs",
+                               "?? src/XMLDocNormalizer/Execution/Analysis/HistoricalWorkerPayloadProjection.cs"
+                           ],
+                "AgentCommit":  false,
+                "AgentPush":  false,
+                "AgentIndexChanged":  false,
+                "AgentStashChanged":  false
+            },
+    "LocalValidation":  "Windows isolated Git archive + only owned source overlay; original Core outputs preserved; no Linux/remote run claimed"
+}
