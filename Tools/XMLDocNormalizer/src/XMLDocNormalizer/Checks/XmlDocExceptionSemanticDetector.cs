@@ -6,6 +6,7 @@ using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Checks.Infrastructure.Tags;
 using XMLDocNormalizer.Configuration;
+using XMLDocNormalizer.Execution.Analysis;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
@@ -26,6 +27,8 @@ namespace XMLDocNormalizer.Checks
     /// </remarks>
     internal static class XmlDocExceptionSemanticDetector
     {
+        private static readonly ExceptionFlowAnalysisDispatch analysisDispatch = new(new());
+
         /// <summary>
         /// Scans the syntax tree and returns exception-related findings that require semantic analysis.
         /// </summary>
@@ -225,6 +228,7 @@ namespace XMLDocNormalizer.Checks
                 ExceptionFlowAnalysisResult flowResult =
                     AnalyzeConfiguredExceptionFlow(
                         member,
+                        (CSharpCompilation)semanticModel.Compilation,
                         semanticContext,
                         exceptionFlowEnvironment,
                         options,
@@ -341,6 +345,7 @@ namespace XMLDocNormalizer.Checks
         /// <param name="member">
         /// The member whose exception flow should be analyzed.
         /// </param>
+        /// <param name="compilation">The member's existing Current compilation.</param>
         /// <param name="semanticContext">
         /// The project-closure semantic context.
         /// </param>
@@ -364,6 +369,7 @@ namespace XMLDocNormalizer.Checks
         /// </returns>
         private static ExceptionFlowAnalysisResult AnalyzeConfiguredExceptionFlow(
             MemberDeclarationSyntax member,
+            CSharpCompilation compilation,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSemanticEnvironment exceptionFlowEnvironment,
             XmlDocOptions options,
@@ -386,9 +392,35 @@ namespace XMLDocNormalizer.Checks
                 ExceptionFlowSummaryAnalysisSession.CreateSummaryAnalysisSession(
                     exceptionFlowEnvironment);
 
-            return session.Analyze(
-                member);
+            ExceptionFlowAnalysisDispatchResult dispatched =
+                AnalyzeConfiguredExceptionFlowAsync(
+                    new ExceptionFlowAnalysisDispatchRequest.CurrentCompilation(
+                        compilation, new(member, session)),
+                    analysisDispatch).GetAwaiter().GetResult();
+
+            if (!dispatched.Succeeded || dispatched.Routing?.CurrentAnalysis == null)
+            {
+                throw new InvalidOperationException("Exception-flow dispatch failed: " +
+                    (dispatched.Projection.Failure?.Message ?? dispatched.Decision?.Failure?.Message ??
+                        dispatched.Routing?.RoutingFailure?.Message ?? "Native result unavailable."));
+            }
+
+            return dispatched.Routing.CurrentAnalysis;
         }
+
+        /// <summary>
+        /// Executes this production analysis seam using the existing closed B8 input forms.
+        /// </summary>
+        /// <remarks>
+        /// Current callers retain their sequential summary session. Prepared external callers
+        /// receive staged canonical outcomes; this entry neither reconstructs inputs nor imports
+        /// Historical symbols into native finding generation. Failures remain unchanged, without fallback.
+        /// </remarks>
+        internal static Task<ExceptionFlowAnalysisDispatchResult> AnalyzeConfiguredExceptionFlowAsync(
+            ExceptionFlowAnalysisDispatchRequest? request,
+            ExceptionFlowAnalysisDispatch dispatch,
+            CancellationToken cancellationToken = default)
+            => dispatch.AnalyzeAsync(request, cancellationToken);
 
         /// <summary>
         /// Extracts the raw cref value from an exception XML element.
