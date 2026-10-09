@@ -244,7 +244,7 @@ try {
         $testBuild = @('build', $testProject, "-p:Configuration=$Configuration", '-warnaserror')
         if (-not $BuildTestProjectReferences) { $testBuild += @('--no-restore', '-p:BuildProjectReferences=false') }
         Invoke-DotNet 'main-boundary-tests-build' $testBuild
-        Invoke-DotNet 'main-boundary-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~ExceptionFlowAnalysisRouterTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionPolicyTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionProjectionTests', '--logger', 'trx;LogFileName=main-boundary.trx', '--results-directory', $evidenceRoot)
+        Invoke-DotNet 'main-boundary-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~ExceptionFlowAnalysisRouterTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionPolicyTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionProjectionTests|FullyQualifiedName~ExceptionFlowAnalysisDispatchTests', '--logger', 'trx;LogFileName=main-boundary.trx', '--results-directory', $evidenceRoot)
         $mainBoundaryExecuted = $true
     }
     $result = [ordered]@{
