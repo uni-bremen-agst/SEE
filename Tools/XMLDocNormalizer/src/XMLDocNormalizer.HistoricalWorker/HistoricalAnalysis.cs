@@ -15,8 +15,19 @@ namespace XMLDocNormalizer.HistoricalWorker
         /// <summary>Runs one genuine source-backed transitive root, without emitting/executing input code.</summary>
         internal static WorkerResponse Analyze(WorkerAnalysisInput input, WorkerIdentity identity)
         {
+            var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp12);
+            if (input.Context?.ParseContext is { } parse)
+            {
+                if (!LanguageVersionFacts.TryParse(parse.LanguageVersion, out var language)
+                    || !Enum.IsDefined(language) || language is LanguageVersion.Default or LanguageVersion.Latest
+                        or LanguageVersion.LatestMajor or LanguageVersion.Preview)
+                {
+                    return Failure(WorkerFailureCode.UnsupportedContext, "The loaded Historical compiler does not support the concrete language version.", identity);
+                }
+                parseOptions = new CSharpParseOptions(language, DocumentationMode.Parse, SourceCodeKind.Regular, parse.PreprocessorSymbols);
+            }
             SyntaxTree tree = CSharpSyntaxTree.ParseText(
-                input.Source!, new CSharpParseOptions(LanguageVersion.CSharp12), path: WorkerInputValidation.GetLogicalPath(input));
+                input.Source!, parseOptions, path: WorkerInputValidation.GetLogicalPath(input));
             if (tree.GetRoot().DescendantNodesAndSelf().Take(8193).Count() > 8192)
             {
                 return Failure(WorkerFailureCode.InvalidRequest, "Source exceeds the syntax-node budget.", identity);

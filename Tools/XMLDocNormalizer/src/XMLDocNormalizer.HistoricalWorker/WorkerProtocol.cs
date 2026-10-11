@@ -32,7 +32,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal static WorkerAnalysisProvenance Provenance(WorkerAnalysisInput input) => new(
             Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))), input.TypeMetadataName!, input.MethodName!,
             WorkerInputValidation.GetLogicalPath(input), "solution-transitive", input.Context?.ReferenceProfile ?? "net8-runtime-bounded-v1",
-            "12", "enable", ReferenceWorldHash(input));
+            input.Context?.LanguageVersion ?? "12", "enable", ReferenceWorldHash(input));
 
         /// <summary>Reject duplicate fields recursively rather than accepting last-property-wins input.</summary>
         internal static void RejectDuplicateProperties(JsonElement element)
@@ -82,7 +82,13 @@ namespace XMLDocNormalizer.HistoricalWorker
         WorkerCompilerOption[]? CompilerOptions = null,
         string[]? PreprocessorSymbols = null,
         CanonicalAssemblyIdentity? TargetIdentity = null,
-        string? TargetModuleName = null);
+        string? TargetModuleName = null,
+        WorkerParseContext? ParseContext = null,
+        string? ParseProfile = null);
+
+    /// <summary>Explicit logical parse input, not serialized Roslyn options. No missing-field defaults.</summary>
+    internal sealed record WorkerParseContext(string? LanguageVersion, string[]? PreprocessorSymbols,
+        string? DocumentationMode, string? SourceKind);
 
     /// <summary>Exact ordered compiler-option entries, like existing PDB option provenance; no polymorphic values.</summary>
     internal sealed record WorkerCompilerOption(string Key, string Value);
@@ -112,12 +118,35 @@ namespace XMLDocNormalizer.HistoricalWorker
                 && (input.LogicalPath == null || (!string.IsNullOrWhiteSpace(input.LogicalPath)
                     && input.LogicalPath.Length <= WorkerProtocol.MaximumLogicalPathCharacters
                     && !input.LogicalPath.Any(char.IsControl)))
+                && (input.Context?.ParseContext == null || input.LogicalPath != null)
                 && (input.Context == null || (input.Context.AnalysisMode == "solution-transitive"
-                    && input.Context.LanguageVersion == "12" && input.Context.NullableContext == "enable"
+                    && HasSupportedParseContext(input.Context) && input.Context.NullableContext == "enable"
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
                     && input.Context.AdditionalSources == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null
                     && HasSupportedReferences(input.Context)));
+
+        internal static bool HasSupportedParseContext(WorkerCompilationContext context)
+        {
+            if (context.ParseContext == null) { return context.ParseProfile == null && context.LanguageVersion == "12"; }
+            var parse = context.ParseContext;
+            return context.ParseProfile == "validated-parse-v1" && context.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                && context.LanguageVersion == parse.LanguageVersion && IsConcreteLanguageVersion(parse.LanguageVersion)
+                && parse.DocumentationMode == "parse" && parse.SourceKind == "regular"
+                && parse.PreprocessorSymbols != null && parse.PreprocessorSymbols.Length <= 128
+                && parse.PreprocessorSymbols.All(symbol => symbol != null && symbol is not "true" and not "false" && symbol.Length is > 0 and <= 256
+                    && (symbol[0] == '_' || char.IsLetter(symbol[0]))
+                    && symbol.All(character => character == '_' || char.IsLetterOrDigit(character)))
+                && parse.PreprocessorSymbols.Distinct(StringComparer.Ordinal).Count() == parse.PreprocessorSymbols.Length;
+        }
+
+        // Neutral syntax only. Actual capability is checked against the loaded compiler in the child.
+        private static bool IsConcreteLanguageVersion(string? version)
+            => version != null && version.Length is > 0 and <= 8
+                && version[0] is >= '1' and <= '9'
+                && version.All(character => character is >= '0' and <= '9' or '.')
+                && (version.Count(character => character == '.') == 0
+                    || (version.Length == 3 && version[0] == '7' && version[1] == '.' && version[2] is >= '1' and <= '3'));
 
         internal static bool HasSupportedReferences(WorkerCompilationContext context)
         {
@@ -179,6 +208,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         InvalidRequest,
         UnsupportedProtocolVersion,
         MalformedInput,
+        UnsupportedContext,
         CompilationFailure,
         AnalysisFailure,
         UnexpectedWorkerFailure

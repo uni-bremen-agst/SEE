@@ -22,6 +22,8 @@ foreach (Assembly engine in new[] { common, csharp })
 if (args.Length == 2 && args[0] == "--b11-graph") { B11GraphProbe.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--b12-emit") { B12ReferenceProbe.Run(args[1], emit: true); return; }
 if (args.Length == 1 && args[0] == "--b12-graph") { B12ReferenceProbe.Run(null, emit: false); return; }
+if (args.Length == 2 && args[0] == "--b13-emit") { B12ReferenceProbe.Run(args[1], emit: true, preserveParse: true); return; }
+if (args.Length == 1 && args[0] == "--b13-graph") { B12ReferenceProbe.Run(null, emit: false, preserveParse: true); return; }
 if (args.Length != 1) { throw new ArgumentException("One trusted fixture output directory is required."); }
 string output = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(output);

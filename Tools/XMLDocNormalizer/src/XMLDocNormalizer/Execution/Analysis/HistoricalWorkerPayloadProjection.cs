@@ -9,7 +9,8 @@ namespace XMLDocNormalizer.Execution.Analysis
     /// <summary>Existing validated external data and a PE-bound selector; never raw source/selector strings.</summary>
     internal sealed record HistoricalWorkerPayloadProjectionInput(
         ExternalCompilationProvenanceDescriptor Provenance, ExternalCSharpSyntaxTree Source,
-        IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null);
+        IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null,
+        ExternalCSharpCompilationConfiguration? ParseConfiguration = null);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -91,10 +92,21 @@ namespace XMLDocNormalizer.Execution.Analysis
             }
             var parse = configuration!.ParseOptions;
             var options = configuration.CompilationOptions;
+            if (input.ParseConfiguration != null && (!ReferenceEquals(input.ParseConfiguration, configuration)
+                || !ExternalCSharpCompilationConfigurationFactory.IsDerivedFrom(input.ParseConfiguration, provenance)))
+            {
+                return Fail(HistoricalWorkerPayloadProjectionFailureCode.ConflictingInputs, "Parse context must be the original P5G object used by this P5I handoff.");
+            }
+            WorkerParseContext? parseContext = null;
+            if (input.ParseConfiguration != null && (input.ReferenceSet == null
+                || !HistoricalWorkerParseProjection.TryProject(input.ParseConfiguration, out parseContext)))
+            {
+                return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Explicit parse context requires exact validated references and the bounded regular parse policy.");
+            }
             if (input.AnalysisMode != ExceptionAnalysisMode.SolutionTransitive || configuration.SourceFileCount != 1
                 || provenance.PortablePdb.Documents.Length != 1 || target!.Modules.Length != 1 || target.IsReferenceAssembly
-                || parse.LanguageVersion != LanguageVersion.CSharp12 || parse.Kind != SourceCodeKind.Regular
-                || parse.DocumentationMode != DocumentationMode.Parse || parse.PreprocessorSymbolNames.Any()
+                || (parseContext == null && (parse.LanguageVersion != LanguageVersion.CSharp12 || parse.PreprocessorSymbolNames.Any()))
+                || parse.Kind != SourceCodeKind.Regular || parse.DocumentationMode != DocumentationMode.Parse
                 || options.NullableContextOptions != NullableContextOptions.Enable || options.OutputKind != OutputKind.DynamicallyLinkedLibrary
                 || options.Platform != Platform.AnyCpu || options.OptimizationLevel != OptimizationLevel.Debug
                 || options.CheckOverflow || options.AllowUnsafe || configuration.SigningProvenance.State != ExternalAssemblySigningState.Unsigned)
@@ -110,6 +122,10 @@ namespace XMLDocNormalizer.Execution.Analysis
                 {
                     return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedPayload, "Exact references require the original bounded P5C/P5E handoff for this P5A provenance.");
                 }
+            }
+            if (parseContext != null)
+            {
+                context = context with { LanguageVersion = parseContext.LanguageVersion!, ParseContext = parseContext, ParseProfile = "validated-parse-v1" };
             }
             var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
                 LogicalPath: input.Source.Document.Name);

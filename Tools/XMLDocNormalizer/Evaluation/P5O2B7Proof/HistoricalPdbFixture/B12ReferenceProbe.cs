@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Emit;
 /// <summary>Test-only genuine Historical emission/graph observation; never executes submitted source or reference code.</summary>
 internal static class B12ReferenceProbe
 {
-    internal static void Run(string? output, bool emit)
+    internal static void Run(string? output, bool emit, bool preserveParse = false)
     {
         string input = Console.In.ReadToEnd();
         if (input.Length > 48 * 1024 * 1024) { throw new ArgumentException("Fixture request too large."); }
@@ -22,7 +22,16 @@ internal static class B12ReferenceProbe
             new MetadataReferenceProperties(MetadataImageKind.Assembly,
                 aliases: [.. image.GetProperty("aliases").EnumerateArray().Select(alias => alias.GetString()!)]),
             filePath: "fixture-reference-" + index + ".dll")).ToArray();
-        var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp12), path, Encoding.UTF8);
+        var parse = new CSharpParseOptions(LanguageVersion.CSharp12);
+        if (preserveParse)
+        {
+            var description = context.GetProperty("parseContext");
+            if (!LanguageVersionFacts.TryParse(description.GetProperty("languageVersion").GetString(), out var language)
+                || !Enum.IsDefined(language)) { throw new ArgumentException("Unsupported fixture language."); }
+            parse = new CSharpParseOptions(language, DocumentationMode.Parse, SourceCodeKind.Regular,
+                description.GetProperty("preprocessorSymbols").EnumerateArray().Select(symbol => symbol.GetString()!));
+        }
+        var tree = CSharpSyntaxTree.ParseText(source, parse, path, Encoding.UTF8);
         var compilation = CSharpCompilation.Create(context.GetProperty("assemblyName").GetString()!, [tree], references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, deterministic: true, nullableContextOptions: NullableContextOptions.Enable));
         if (!emit) { B11GraphProbe.Observe(compilation, includeSummaries: true); return; }
