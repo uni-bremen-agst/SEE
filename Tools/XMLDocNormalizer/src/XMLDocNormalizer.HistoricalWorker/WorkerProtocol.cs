@@ -10,6 +10,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal const int Version = 2;
         internal const int MaximumRequestCharacters = 65536;
         internal const int MaximumSourceCharacters = 32768;
+        internal const int MaximumLogicalPathCharacters = 4096;
 
         /// <summary>Strict options shared by request parsing and canonical result serialization.</summary>
         internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -22,12 +23,12 @@ namespace XMLDocNormalizer.HistoricalWorker
         };
     }
 
-    /// <summary>One command; no file paths, compiler objects or reference injection.</summary>
+    /// <summary>One command; no file access, compiler objects or reference injection.</summary>
     internal sealed record WorkerRequest(int? ProtocolVersion, string? Operation, WorkerAnalysisInput? Payload = null);
 
     /// <summary>One source compilation and an exact, parameterless static method selector.</summary>
     internal sealed record WorkerAnalysisInput(string? Source, string? TypeMetadataName, string? MethodName,
-        WorkerCompilationContext? Context = null);
+        WorkerCompilationContext? Context = null, string? LogicalPath = null);
 
     /// <summary>Explicit bounded profile, with typed future inputs that are rejected until supported.</summary>
     internal sealed record WorkerCompilationContext(
@@ -66,6 +67,9 @@ namespace XMLDocNormalizer.HistoricalWorker
                 && input.Source.Length <= WorkerProtocol.MaximumSourceCharacters
                 && !string.IsNullOrWhiteSpace(input.TypeMetadataName) && input.TypeMetadataName.Length <= 256
                 && !string.IsNullOrWhiteSpace(input.MethodName) && input.MethodName.Length <= 256
+                && (input.LogicalPath == null || (!string.IsNullOrWhiteSpace(input.LogicalPath)
+                    && input.LogicalPath.Length <= WorkerProtocol.MaximumLogicalPathCharacters
+                    && !input.LogicalPath.Any(char.IsControl)))
                 && (input.Context == null || (input.Context.AnalysisMode == "solution-transitive"
                     && input.Context.ReferenceProfile == "net8-runtime-bounded-v1"
                     && input.Context.LanguageVersion == "12" && input.Context.NullableContext == "enable"
@@ -73,6 +77,9 @@ namespace XMLDocNormalizer.HistoricalWorker
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
                     && input.Context.AdditionalSources == null && input.Context.References == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null));
+
+        /// <summary>Absent path retains the original explicit bounded policy; supplied data is never normalized or opened.</summary>
+        internal static string GetLogicalPath(WorkerAnalysisInput input) => input.LogicalPath ?? "worker-input.cs";
     }
 
     /// <summary>A completed result or a structured failure, never an optimistic partial success.</summary>

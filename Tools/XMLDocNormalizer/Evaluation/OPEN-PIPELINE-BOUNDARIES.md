@@ -131,6 +131,20 @@ permanent rejection; status and resolution package identify the active path.
 - Last Verified: 2026-10-09
 - Evidence / Report: Evaluation/P5O2B10-historical-worker-payload-projection.md, Evaluation/P5O2B10-historical-worker-payload-projection-audit.json, Evaluation/P5O2B10Proof
 
+## BND-P5O2B-005 — Historical external input equivalence
+
+- Pipeline Stage: P5O2B / External Current-Historical input boundary
+- Status: Partially Resolved (P5O2B11 exact single-source logical path/provenance binding; independent reference/identity and source/compiler/scope families open)
+- First Observed: P5O2B10 bounded automatic payload closure
+- Current Root Cause: complete code-derived B11 inventory shows several independent input families. Real B10 Current/Worker differential execution proved that identical source already loses its original physical logical path in Worker flow evidence. B11 carries the exact validated P5I document name, reconstructs the Historical tree with that path and validates response provenance plus every flow step against it. No file access/path normalization, new Main parser/validator, analyzer changes or engine selection.
+- Current Fail-Closed Behavior: empty, control-character or oversized supplied paths are typed UnsupportedInput before process start; forged response paths are MalformedResponse with no result. Production never defaults a missing real document path. Legacy explicit bounded requests with absent optional path retain worker-input.cs. Unknown fields, unsupported options, unvalidated/mixed provenance and Worker failures retain existing rejection and no Current fallback.
+- Resolution Package: additive optional WorkerAnalysisInput.LogicalPath within protocol v2; existing source/selector/context contract unchanged. Genuine automatic projection/runtime full-flow/source/uncertainty equality, repeated processes and test-only isolated Historical graph-state observation; eight unchanged full Current finding/graph baseline cases. No Historical Finding/reporting import is implemented or claimed.
+- Remaining B12: exact validated metadata images/ordinals/properties/aliases/XML contracts, original assembly/public-key/friend identity and framework/reference equivalence.
+- Remaining B13: complete ordered source/parse/compiler context, generated output, project/supporting-source scopes and exact root bindings. Differential #if, language admissibility, external-reference and multi-source witnesses demonstrate that these cannot be treated as equivalent to fixed Worker defaults. Nullable annotations differ while the tested explicit-throw flow is equal; no unproven option copying.
+- Still Open: full external input equivalence, Historical canonical-to-findings import, external CLI/acquisition/discovery and other call-sites. BND-P5O2B-003 remains partial and BND-P5O2B-004 remains bounded-resolved only. No Dapper redesign or full external pipeline advancement.
+- Last Verified: 2026-10-11
+- Evidence / Report: Evaluation/P5O2B11-historical-external-input-equivalence.md, Evaluation/P5O2B11-historical-external-input-equivalence-audit.json, Evaluation/P5O2B11Proof
+
 ## BND-P4P7-001 — OneOf exact PDB
 
 - Pipeline Stage: P4/P7

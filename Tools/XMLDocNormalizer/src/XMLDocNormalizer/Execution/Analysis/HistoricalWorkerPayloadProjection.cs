@@ -104,7 +104,8 @@ namespace XMLDocNormalizer.Execution.Analysis
             // Published analysis policies, not guesses about original references/assembly identity.
             var context = new WorkerCompilationContext(AnalysisMode: "solution-transitive", ReferenceProfile: "net8-runtime-bounded-v1",
                 LanguageVersion: "12", NullableContext: "enable", AssemblyName: "HistoricalWorkerInput");
-            var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context);
+            var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
+                LogicalPath: input.Source.Document.Name);
             if (!WorkerInputValidation.IsSupported(payload))
             {
                 return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedPayload, "Mapped source/selector exceeds the existing Worker contract.");

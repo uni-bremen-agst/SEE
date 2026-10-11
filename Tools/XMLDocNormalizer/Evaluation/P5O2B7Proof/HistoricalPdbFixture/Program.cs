@@ -7,7 +7,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
 // Test-only fixture emits one fixed source through the actual existing Historical runtime.
-// It is not an Analyzer/Worker, accepts no submitted source and never executes the emitted assembly.
+// Default emission accepts no submitted source and never executes the emitted assembly.
+// B11 graph diagnostics are test-only, isolated, and never execute submitted source.
 const string expected = "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0";
 Assembly common = typeof(Compilation).Assembly;
 Assembly csharp = typeof(CSharpCompilation).Assembly;
@@ -18,6 +19,7 @@ foreach (Assembly engine in new[] { common, csharp })
         throw new InvalidOperationException("Historical fixture loaded the wrong compiler runtime.");
     }
 }
+if (args.Length == 2 && args[0] == "--b11-graph") { B11GraphProbe.Run(args[1]); return; }
 if (args.Length != 1) { throw new ArgumentException("One trusted fixture output directory is required."); }
 string output = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(output);

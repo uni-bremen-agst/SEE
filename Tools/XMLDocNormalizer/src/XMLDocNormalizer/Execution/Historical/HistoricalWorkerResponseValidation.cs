@@ -80,8 +80,8 @@ namespace XMLDocNormalizer.Execution.Historical
                     return Fail(HistoricalWorkerClientFailureCode.IncompleteResult, "Historical analysis is incomplete.");
                 }
                 WorkerAnalysisProvenance expected = new(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))),
-                    input.TypeMetadataName!, input.MethodName!, "worker-input.cs", "solution-transitive", "net8-runtime-bounded-v1", "12", "enable");
-                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input.Source!))
+                    input.TypeMetadataName!, input.MethodName!, WorkerInputValidation.GetLogicalPath(input), "solution-transitive", "net8-runtime-bounded-v1", "12", "enable");
+                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input.Source!, expected.LogicalPath))
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
                 }
@@ -94,7 +94,7 @@ namespace XMLDocNormalizer.Execution.Historical
             }
         }
 
-        private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, string source)
+        private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, string source, string logicalPath)
         {
             string[] lines = source.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
             return result.Entries.All(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven
@@ -103,7 +103,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 && entry.ExceptionType.Assembly != null && entry.ExceptionType.Module != null
                 && entry.ExceptionType.Module.Assembly.Equals(entry.ExceptionType.Assembly)
                 && entry.Paths.Length != 0 && entry.Paths.All(path => path.Steps.Length != 0
-                    && path.Steps.All(step => step.FilePath == "worker-input.cs" && !string.IsNullOrWhiteSpace(step.SymbolName)
+                    && path.Steps.All(step => step.FilePath == logicalPath && !string.IsNullOrWhiteSpace(step.SymbolName)
                         && step.Line is int line && line > 0 && line <= lines.Length
                         && step.Column is int column && column > 0 && column <= lines[line - 1].Length + 1)));
         }

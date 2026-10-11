@@ -16,7 +16,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal static WorkerResponse Analyze(WorkerAnalysisInput input, WorkerIdentity identity)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(
-                input.Source!, new CSharpParseOptions(LanguageVersion.CSharp12), path: "worker-input.cs");
+                input.Source!, new CSharpParseOptions(LanguageVersion.CSharp12), path: WorkerInputValidation.GetLogicalPath(input));
             if (tree.GetRoot().DescendantNodesAndSelf().Take(8193).Count() > 8192)
             {
                 return Failure(WorkerFailureCode.InvalidRequest, "Source exceeds the syntax-node budget.", identity);
@@ -83,7 +83,7 @@ namespace XMLDocNormalizer.HistoricalWorker
 
             return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
                 Provenance: new(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))),
-                    input.TypeMetadataName!, input.MethodName!, "worker-input.cs", "solution-transitive",
+                    input.TypeMetadataName!, input.MethodName!, WorkerInputValidation.GetLogicalPath(input), "solution-transitive",
                     "net8-runtime-bounded-v1", "12", "enable"));
         }
 
