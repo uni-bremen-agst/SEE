@@ -80,7 +80,7 @@ namespace XMLDocNormalizer.Execution.Historical
                     return Fail(HistoricalWorkerClientFailureCode.IncompleteResult, "Historical analysis is incomplete.");
                 }
                 WorkerAnalysisProvenance expected = WorkerProtocol.Provenance(input);
-                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input.Source!, expected.LogicalPath)
+                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input)
                     || !ValidReferenceIdentities(response.Result, input.Context))
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
@@ -108,18 +108,23 @@ namespace XMLDocNormalizer.Execution.Historical
                         && entry.ExceptionType.Module.ModuleVersionId == null)));
         }
 
-        private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, string source, string logicalPath)
+        private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, WorkerAnalysisInput input)
         {
-            string[] lines = source.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
+            var sources = new Dictionary<string, string[]>(StringComparer.Ordinal)
+            { [WorkerInputValidation.GetLogicalPath(input)] = Lines(input.Source!) };
+            foreach (var source in input.Context?.AdditionalSources ?? []) { sources.Add(source.LogicalPath, Lines(source.Text)); }
             return result.Entries.All(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven
                 && entry.ExceptionType.Kind == CanonicalTypeIdentityKind.Named
                 && !string.IsNullOrWhiteSpace(entry.ExceptionType.MetadataName)
                 && entry.ExceptionType.Assembly != null && entry.ExceptionType.Module != null
                 && entry.ExceptionType.Module.Assembly.Equals(entry.ExceptionType.Assembly)
                 && entry.Paths.Length != 0 && entry.Paths.All(path => path.Steps.Length != 0
-                    && path.Steps.All(step => step.FilePath == logicalPath && !string.IsNullOrWhiteSpace(step.SymbolName)
+                    && path.Steps.All(step => step.FilePath != null && sources.TryGetValue(step.FilePath, out var lines)
+                        && !string.IsNullOrWhiteSpace(step.SymbolName)
                         && step.Line is int line && line > 0 && line <= lines.Length
                         && step.Column is int column && column > 0 && column <= lines[line - 1].Length + 1)));
+
+            static string[] Lines(string text) => text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
         }
 
         private static bool ValidIdentity(WorkerIdentity? identity, WorkerAnalysisInput input)

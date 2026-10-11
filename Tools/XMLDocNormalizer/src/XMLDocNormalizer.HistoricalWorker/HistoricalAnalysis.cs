@@ -15,20 +15,20 @@ namespace XMLDocNormalizer.HistoricalWorker
         /// <summary>Runs one genuine source-backed transitive root, without emitting/executing input code.</summary>
         internal static WorkerResponse Analyze(WorkerAnalysisInput input, WorkerIdentity identity)
         {
-            var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp12);
-            if (input.Context?.ParseContext is { } parse)
-            {
-                if (!LanguageVersionFacts.TryParse(parse.LanguageVersion, out var language)
-                    || !Enum.IsDefined(language) || language is LanguageVersion.Default or LanguageVersion.Latest
-                        or LanguageVersion.LatestMajor or LanguageVersion.Preview)
-                {
-                    return Failure(WorkerFailureCode.UnsupportedContext, "The loaded Historical compiler does not support the concrete language version.", identity);
-                }
-                parseOptions = new CSharpParseOptions(language, DocumentationMode.Parse, SourceCodeKind.Regular, parse.PreprocessorSymbols);
-            }
+            if (!TryCreateParseOptions(input.Context?.ParseContext, out var parseOptions))
+            { return Failure(WorkerFailureCode.UnsupportedContext, "The loaded Historical compiler does not support the concrete language version.", identity); }
             SyntaxTree tree = CSharpSyntaxTree.ParseText(
                 input.Source!, parseOptions, path: WorkerInputValidation.GetLogicalPath(input));
-            if (tree.GetRoot().DescendantNodesAndSelf().Take(8193).Count() > 8192)
+            var treesByPath = new Dictionary<string, SyntaxTree>(StringComparer.Ordinal) { [tree.FilePath] = tree };
+            foreach (var source in input.Context?.AdditionalSources ?? [])
+            {
+                if (!TryCreateParseOptions(source.ParseContext, out var options))
+                { return Failure(WorkerFailureCode.UnsupportedContext, "The loaded Historical compiler does not support a supporting source language version.", identity); }
+                treesByPath.Add(source.LogicalPath, CSharpSyntaxTree.ParseText(source.Text, options, source.LogicalPath));
+            }
+            SyntaxTree[] trees = input.Context?.Scope is { } scope
+                ? scope.OrderedSourcePaths!.Select(path => treesByPath[path]).ToArray() : [tree];
+            if (trees.Sum(source => source.GetRoot().DescendantNodesAndSelf().Take(8193).Count()) > 8192)
             {
                 return Failure(WorkerFailureCode.InvalidRequest, "Source exceeds the syntax-node budget.", identity);
             }
@@ -48,7 +48,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             }
 
             CSharpCompilation compilation = CSharpCompilation.Create(
-                input.Context?.AssemblyName ?? "HistoricalWorkerInput", [tree], references,
+                input.Context?.AssemblyName ?? "HistoricalWorkerInput", trees, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
             if (input.Context?.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
                 && !HaveExpectedIdentities(compilation, references, input.Context))
@@ -71,6 +71,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             if (type == null || type.IsGenericType || !SymbolEqualityComparer.Default.Equals(type.ContainingAssembly, compilation.Assembly)
                 || methods.Length != 1 || methods[0].DeclaringSyntaxReferences.Length != 1
                 || methods[0].DeclaringSyntaxReferences[0].GetSyntax() is not MethodDeclarationSyntax member
+                || !ReferenceEquals(member.SyntaxTree, tree)
                 || (member.Body == null && member.ExpressionBody == null))
             {
                 return Failure(WorkerFailureCode.InvalidRequest, "Root must identify one source-owned parameterless static method with a body.", identity);
@@ -87,7 +88,9 @@ namespace XMLDocNormalizer.HistoricalWorker
             try
             {
                 result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
-                    ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
+                    input.Context?.AnalysisMode == "direct"
+                        ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
+                        : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
             }
             catch (Exception exception)
             {
@@ -102,6 +105,19 @@ namespace XMLDocNormalizer.HistoricalWorker
 
             return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
                 Provenance: WorkerProtocol.Provenance(input));
+        }
+
+        /// <summary>B13 capability policy reused for each source, never a default for a missing explicit context.</summary>
+        private static bool TryCreateParseOptions(WorkerParseContext? parse, out CSharpParseOptions options)
+        {
+            options = new CSharpParseOptions(LanguageVersion.CSharp12);
+            if (parse == null) { return true; } // Only the legacy root profile permits absence.
+            if (!LanguageVersionFacts.TryParse(parse.LanguageVersion, out var language)
+                || !Enum.IsDefined(language) || language is LanguageVersion.Default or LanguageVersion.Latest
+                    or LanguageVersion.LatestMajor or LanguageVersion.Preview)
+            { return false; }
+            options = new CSharpParseOptions(language, DocumentationMode.Parse, SourceCodeKind.Regular, parse.PreprocessorSymbols);
+            return true;
         }
 
         /// <summary>Compare actual Historical binding to original neutral identities; paths never stand in for identity.</summary>

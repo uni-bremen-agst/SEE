@@ -6,35 +6,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal sealed partial class ExceptionFlowSemanticEnvironment
     {
         private readonly ExceptionFlowSemanticScope scope;
-        private readonly SemanticModel model;
+        private readonly Dictionary<SyntaxTree, SemanticModel> models = new(ReferenceEqualityComparer.Instance);
         private readonly IReadOnlyList<ExceptionFlowSemanticScope> scopes;
 
-        /// <summary>Owns exactly one tree and one stable semantic model for the request.</summary>
+        /// <summary>Owns a complete single-compilation source set and stable models per exact tree.</summary>
         internal ExceptionFlowSemanticEnvironment(Compilation compilation)
         {
             ArgumentNullException.ThrowIfNull(compilation);
             SyntaxTree[] trees = compilation.SyntaxTrees.ToArray();
-            if (trees.Length != 1)
+            if (trees.Length == 0)
             {
-                throw new ArgumentException("Historical bounded host requires exactly one source tree.", nameof(compilation));
+                throw new ArgumentException("Historical bounded host requires source-owned trees.", nameof(compilation));
             }
 
             scope = new ExceptionFlowSemanticScope(compilation);
-            model = compilation.GetSemanticModel(trees[0]);
+            foreach (var tree in trees) { models.Add(tree, compilation.GetSemanticModel(tree)); }
             scopes = Array.AsReadOnly(new[] { scope });
         }
 
         /// <summary>Only the exact owned tree can retrieve the request's stable model.</summary>
         internal bool TryGetSemanticModel(SyntaxTree tree, out SemanticModel semanticModel)
         {
-            if (ReferenceEquals(tree, model.SyntaxTree))
-            {
-                semanticModel = model;
-                return true;
-            }
-
-            semanticModel = null!;
-            return false;
+            return models.TryGetValue(tree, out semanticModel!);
         }
 
         /// <summary>Returns only the request-owned deterministic single-compilation scope.</summary>
@@ -46,7 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             if (SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, scope.Compilation.Assembly)
                 && !methodSymbol.DeclaringSyntaxReferences.IsDefaultOrEmpty
-                && methodSymbol.DeclaringSyntaxReferences.All(reference => ReferenceEquals(reference.SyntaxTree, model.SyntaxTree)))
+                && methodSymbol.DeclaringSyntaxReferences.All(reference => models.ContainsKey(reference.SyntaxTree)))
             {
                 resolution = new ExceptionFlowSupportingSourceMethod(methodSymbol, scope);
                 return true;

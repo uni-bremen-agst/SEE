@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -9,6 +10,22 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalCSharpSyntaxTreeSetFactory
     {
+        private sealed record Origin(ExternalCSharpCompilationConfiguration Configuration,
+            ImmutableArray<ExternalCSharpSyntaxTree> Sources);
+        private static readonly ConditionalWeakTable<ExternalCSharpSyntaxTreeSet, Origin> origins = new();
+
+        /// <summary>Retains the original successful P5J composition, without validating or parsing again.</summary>
+        internal static bool TryGetOrigin(ExternalCSharpSyntaxTreeSet set,
+            out ExternalCSharpCompilationConfiguration? configuration, out ImmutableArray<ExternalCSharpSyntaxTree> sources)
+        {
+            configuration = null;
+            sources = default;
+            if (!origins.TryGetValue(set, out var origin)) { return false; }
+            configuration = origin.Configuration;
+            sources = origin.Sources;
+            return true;
+        }
+
         /// <summary>
         /// Tries to validate and aggregate one reconstructed tree for every
         /// explicitly supplied source-document ordinal.
@@ -69,6 +86,7 @@ namespace XMLDocNormalizer.Execution.Semantic
             ImmutableArray<ValidatedExternalSourceMaterial>.Builder materials =
                 ImmutableArray.CreateBuilder<ValidatedExternalSourceMaterial>(
                     sourceTrees.Count);
+            var originals = ImmutableArray.CreateBuilder<ExternalCSharpSyntaxTree>(sourceTrees.Count);
 
             for (int index = 0; index < sourceTrees.Count; index++)
             {
@@ -93,11 +111,13 @@ namespace XMLDocNormalizer.Execution.Semantic
 
                 trees.Add(sourceTree.Tree);
                 materials.Add(sourceTree.Material);
+                originals.Add(sourceTree);
             }
 
             syntaxTreeSet = new ExternalCSharpSyntaxTreeSet(
                 trees.MoveToImmutable(),
                 materials.MoveToImmutable());
+            origins.Add(syntaxTreeSet, new(configuration, originals.MoveToImmutable()));
             return true;
         }
 

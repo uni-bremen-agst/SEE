@@ -10,7 +10,7 @@ namespace XMLDocNormalizer.Execution.Analysis
     internal sealed record HistoricalWorkerPayloadProjectionInput(
         ExternalCompilationProvenanceDescriptor Provenance, ExternalCSharpSyntaxTree Source,
         IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null,
-        ExternalCSharpCompilationConfiguration? ParseConfiguration = null);
+        ExternalCSharpCompilationConfiguration? ParseConfiguration = null, ExternalCSharpSyntaxTreeSet? SourceSet = null);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -103,8 +103,8 @@ namespace XMLDocNormalizer.Execution.Analysis
             {
                 return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Explicit parse context requires exact validated references and the bounded regular parse policy.");
             }
-            if (input.AnalysisMode != ExceptionAnalysisMode.SolutionTransitive || configuration.SourceFileCount != 1
-                || provenance.PortablePdb.Documents.Length != 1 || target!.Modules.Length != 1 || target.IsReferenceAssembly
+            if ((input.SourceSet == null && (input.AnalysisMode != ExceptionAnalysisMode.SolutionTransitive || configuration.SourceFileCount != 1
+                || provenance.PortablePdb.Documents.Length != 1)) || target!.Modules.Length != 1 || target.IsReferenceAssembly
                 || (parseContext == null && (parse.LanguageVersion != LanguageVersion.CSharp12 || parse.PreprocessorSymbolNames.Any()))
                 || parse.Kind != SourceCodeKind.Regular || parse.DocumentationMode != DocumentationMode.Parse
                 || options.NullableContextOptions != NullableContextOptions.Enable || options.OutputKind != OutputKind.DynamicallyLinkedLibrary
@@ -126,6 +126,12 @@ namespace XMLDocNormalizer.Execution.Analysis
             if (parseContext != null)
             {
                 context = context with { LanguageVersion = parseContext.LanguageVersion!, ParseContext = parseContext, ParseProfile = "validated-parse-v1" };
+            }
+            if (input.SourceSet != null && (parseContext == null || input.ReferenceSet == null
+                || !HistoricalWorkerScopeProjection.TryProject(input.SourceSet, input.Source, configuration, provenance,
+                    context, input.AnalysisMode, out context)))
+            {
+                return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Scope requires the original complete P5J/P5I project, explicit parse and exact references; unsupported modes are not substituted.");
             }
             var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
                 LogicalPath: input.Source.Document.Name);

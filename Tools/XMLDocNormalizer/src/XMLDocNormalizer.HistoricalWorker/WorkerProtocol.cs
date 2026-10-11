@@ -13,6 +13,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal const int MaximumRequestCharacters = 65536;
         internal const int MaximumSourceCharacters = 32768;
         internal const int MaximumLogicalPathCharacters = 4096;
+        internal const int MaximumProjectSources = 16;
         internal const string ExactReferenceProfile = "validated-pe-images-v1";
         internal const int MaximumReferenceCount = 64;
         internal const int MaximumReferenceBytes = 32 * 1024 * 1024;
@@ -29,9 +30,11 @@ namespace XMLDocNormalizer.HistoricalWorker
             return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(context, JsonOptions))));
         }
 
+        internal static string SourceHash(string source) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(source)));
+
         internal static WorkerAnalysisProvenance Provenance(WorkerAnalysisInput input) => new(
-            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))), input.TypeMetadataName!, input.MethodName!,
-            WorkerInputValidation.GetLogicalPath(input), "solution-transitive", input.Context?.ReferenceProfile ?? "net8-runtime-bounded-v1",
+            SourceHash(input.Source!), input.TypeMetadataName!, input.MethodName!,
+            WorkerInputValidation.GetLogicalPath(input), input.Context?.AnalysisMode ?? "solution-transitive", input.Context?.ReferenceProfile ?? "net8-runtime-bounded-v1",
             input.Context?.LanguageVersion ?? "12", "enable", ReferenceWorldHash(input));
 
         /// <summary>Reject duplicate fields recursively rather than accepting last-property-wins input.</summary>
@@ -84,7 +87,11 @@ namespace XMLDocNormalizer.HistoricalWorker
         CanonicalAssemblyIdentity? TargetIdentity = null,
         string? TargetModuleName = null,
         WorkerParseContext? ParseContext = null,
-        string? ParseProfile = null);
+        string? ParseProfile = null,
+        WorkerProjectScope? Scope = null);
+
+    /// <summary>Complete ordered source membership in exactly one assembly-bound project, not a solution closure.</summary>
+    internal sealed record WorkerProjectScope(string? Kind, string? AssemblyName, string[]? OrderedSourcePaths, string? RootLogicalPath);
 
     /// <summary>Explicit logical parse input, not serialized Roslyn options. No missing-field defaults.</summary>
     internal sealed record WorkerParseContext(string? LanguageVersion, string[]? PreprocessorSymbols,
@@ -95,7 +102,8 @@ namespace XMLDocNormalizer.HistoricalWorker
 
     /// <summary>Source bytes represented as text, a logical path and checksum provenance, not syntax.</summary>
     internal sealed record WorkerSourceDocument(string LogicalPath, string Text, string Sha256,
-        byte[]? OriginalBytes = null, string? ChecksumAlgorithm = null);
+        byte[]? OriginalBytes = null, string? ChecksumAlgorithm = null,
+        WorkerParseContext? ParseContext = null, string? AssemblyName = null);
 
     /// <summary>Metadata image and provenance; no caller-local paths or symbol instances.</summary>
     internal sealed record WorkerReferenceImage(string LogicalName, byte[] Image, string Sha256,
@@ -119,12 +127,44 @@ namespace XMLDocNormalizer.HistoricalWorker
                     && input.LogicalPath.Length <= WorkerProtocol.MaximumLogicalPathCharacters
                     && !input.LogicalPath.Any(char.IsControl)))
                 && (input.Context?.ParseContext == null || input.LogicalPath != null)
-                && (input.Context == null || (input.Context.AnalysisMode == "solution-transitive"
+                && (input.Context == null || (HasSupportedScope(input)
                     && HasSupportedParseContext(input.Context) && input.Context.NullableContext == "enable"
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
-                    && input.Context.AdditionalSources == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null
                     && HasSupportedReferences(input.Context)));
+
+        /// <summary>Explicit membership, completeness and budgets; absent scope retains the old single-source policy.</summary>
+        internal static bool HasSupportedScope(WorkerAnalysisInput input)
+        {
+            var context = input.Context!;
+            if (context.Scope == null)
+            { return context.AnalysisMode == "solution-transitive" && context.AdditionalSources == null; }
+            var scope = context.Scope;
+            if (scope.Kind != "single-project-v1" || context.AnalysisMode is not ("direct" or "project-transitive" or "solution-transitive")
+                || context.ReferenceProfile != WorkerProtocol.ExactReferenceProfile || !HasSupportedParseContext(context)
+                || context.ParseContext == null || scope.AssemblyName != context.AssemblyName
+                || scope.RootLogicalPath != input.LogicalPath || input.LogicalPath == null
+                || scope.OrderedSourcePaths == null || scope.OrderedSourcePaths.Length is < 1 or > WorkerProtocol.MaximumProjectSources
+                || scope.OrderedSourcePaths.Any(path => !ValidText(path, WorkerProtocol.MaximumLogicalPathCharacters))
+                || scope.OrderedSourcePaths.Distinct(StringComparer.Ordinal).Count() != scope.OrderedSourcePaths.Length
+                || !scope.OrderedSourcePaths.Contains(input.LogicalPath, StringComparer.Ordinal) || context.AdditionalSources == null
+                || context.AdditionalSources.Length != scope.OrderedSourcePaths.Length - 1)
+            { return false; }
+            long size = input.Source!.Length;
+            var expected = scope.OrderedSourcePaths.Where(path => path != input.LogicalPath).ToArray();
+            for (int index = 0; index < context.AdditionalSources.Length; index++)
+            {
+                var source = context.AdditionalSources[index];
+                if (source == null || source.LogicalPath != expected[index] || source.AssemblyName != scope.AssemblyName
+                    || string.IsNullOrWhiteSpace(source.Text) || source.Text.Length > WorkerProtocol.MaximumSourceCharacters
+                    || (size += source.Text.Length) > WorkerProtocol.MaximumSourceCharacters
+                    || source.Sha256 != WorkerProtocol.SourceHash(source.Text) || source.OriginalBytes != null || source.ChecksumAlgorithm != null
+                    || source.ParseContext == null || !HasSupportedParseContext(context with
+                    { LanguageVersion = source.ParseContext.LanguageVersion!, ParseContext = source.ParseContext }))
+                { return false; }
+            }
+            return true;
+        }
 
         internal static bool HasSupportedParseContext(WorkerCompilationContext context)
         {

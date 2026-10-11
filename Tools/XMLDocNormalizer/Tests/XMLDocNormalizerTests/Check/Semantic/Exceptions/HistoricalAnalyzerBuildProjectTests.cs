@@ -105,7 +105,9 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         {
             string host = File.ReadAllText(Path.Combine(HistoricalDirectory(), "HistoricalSemanticEnvironment.cs"));
             Assert.Contains("internal ExceptionFlowSemanticEnvironment(Compilation compilation)", host);
-            Assert.Contains("ReferenceEquals(tree, model.SyntaxTree)", host);
+            Assert.Contains("Dictionary<SyntaxTree, SemanticModel> models = new(ReferenceEqualityComparer.Instance)", host);
+            Assert.Contains("models.TryGetValue(tree, out semanticModel!)", host);
+            Assert.Contains("models.ContainsKey(reference.SyntaxTree)", host);
             Assert.Contains("ReferenceEquals(bindingCompilation, scope.Compilation)", host);
             Assert.DoesNotContain("ProjectClosure", host);
             Assert.DoesNotContain("Assembly.Load", host);
