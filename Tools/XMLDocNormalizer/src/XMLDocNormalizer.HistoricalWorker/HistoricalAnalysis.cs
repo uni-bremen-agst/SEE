@@ -15,9 +15,82 @@ namespace XMLDocNormalizer.HistoricalWorker
         /// <summary>Runs one genuine source-backed transitive root, without emitting/executing input code.</summary>
         internal static WorkerResponse Analyze(WorkerAnalysisInput input, WorkerIdentity identity)
         {
+            CSharpCompilation compilation;
+            SyntaxTree tree;
+            var supporting = new List<Compilation>();
+            if (input.Context?.Solution is { } graph)
+            {
+                var reconstructed = new Dictionary<WorkerProjectIdentity, (CSharpCompilation Compilation, SyntaxTree Root)>();
+                long nodes = 0;
+                foreach (var project in graph.Projects!)
+                {
+                    var failure = Reconstruct(project.Input!, identity, out var projectCompilation, out var projectTree);
+                    if (failure != null) { return failure; }
+                    nodes += projectCompilation.SyntaxTrees.Sum(source => source.GetRoot().DescendantNodesAndSelf().Count());
+                    if (nodes > 16384) { return Failure(WorkerFailureCode.InvalidRequest, "Solution exceeds the syntax-node budget.", identity); }
+                    reconstructed.Add(project.Identity!, (projectCompilation, projectTree));
+                }
+                (compilation, tree) = reconstructed[graph.Target!];
+                supporting.AddRange(reconstructed.Where(pair => pair.Key != graph.Target).Select(pair => pair.Value.Compilation));
+            }
+            else
+            {
+                var failure = Reconstruct(input, identity, out compilation, out tree);
+                if (failure != null) { return failure; }
+            }
+
+            INamedTypeSymbol? type = compilation.GetTypeByMetadataName(input.TypeMetadataName!);
+            IMethodSymbol[] methods = type?.GetMembers(input.MethodName!).OfType<IMethodSymbol>()
+                .Where(method => method.MethodKind == MethodKind.Ordinary && method.IsStatic
+                    && method.Parameters.Length == 0 && method.TypeParameters.Length == 0).ToArray() ?? [];
+            if (type == null || type.IsGenericType || !SymbolEqualityComparer.Default.Equals(type.ContainingAssembly, compilation.Assembly)
+                || methods.Length != 1 || methods[0].DeclaringSyntaxReferences.Length != 1
+                || methods[0].DeclaringSyntaxReferences[0].GetSyntax() is not MethodDeclarationSyntax member
+                || !ReferenceEquals(member.SyntaxTree, tree)
+                || (member.Body == null && member.ExpressionBody == null))
+            {
+                return Failure(WorkerFailureCode.InvalidRequest, "Root must identify one source-owned parameterless static method with a body.", identity);
+            }
+
+            ExceptionFlowSemanticEnvironment environment = new(compilation, supporting);
+            if (!environment.TryGetSemanticModel(member.SyntaxTree, out SemanticModel rootModel)
+                || !SymbolEqualityComparer.Default.Equals(rootModel.GetDeclaredSymbol(member), methods[0]))
+            {
+                return Failure(WorkerFailureCode.AnalysisFailure, "Root semantic ownership could not be established.", identity);
+            }
+
+            CanonicalExceptionFlowAnalysisResult result;
+            try
+            {
+                result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
+                    input.Context?.AnalysisMode == "direct"
+                        ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
+                        : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("Historical analysis failure: " + exception);
+                return Failure(WorkerFailureCode.AnalysisFailure, "Historical analysis could not complete.", identity);
+            }
+            if (result.Uncertainties.Length != 0 || result.Entries.Any(entry => entry.PathsTruncated))
+            {
+                return Failure(WorkerFailureCode.AnalysisFailure, "Exception-flow analysis is incomplete.", identity,
+                    result.Uncertainties.Select(item => item.DisplayText).OrderBy(text => text, StringComparer.Ordinal).ToArray());
+            }
+
+            return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
+                Provenance: WorkerProtocol.Provenance(input));
+        }
+
+        /// <summary>Reuse the exact B12/B13/B14 reconstruction for each independently owned project.</summary>
+        internal static WorkerResponse? Reconstruct(WorkerAnalysisInput input, WorkerIdentity identity,
+            out CSharpCompilation compilation, out SyntaxTree tree)
+        {
+            compilation = null!;
+            tree = null!;
             if (!TryCreateParseOptions(input.Context?.ParseContext, out var parseOptions))
             { return Failure(WorkerFailureCode.UnsupportedContext, "The loaded Historical compiler does not support the concrete language version.", identity); }
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(
+            tree = CSharpSyntaxTree.ParseText(
                 input.Source!, parseOptions, path: WorkerInputValidation.GetLogicalPath(input));
             var treesByPath = new Dictionary<string, SyntaxTree>(StringComparer.Ordinal) { [tree.FilePath] = tree };
             foreach (var source in input.Context?.AdditionalSources ?? [])
@@ -47,7 +120,7 @@ namespace XMLDocNormalizer.HistoricalWorker
                 return Failure(WorkerFailureCode.CompilationFailure, "Runtime reference profile could not be resolved.", identity);
             }
 
-            CSharpCompilation compilation = CSharpCompilation.Create(
+            compilation = CSharpCompilation.Create(
                 input.Context?.AssemblyName ?? "HistoricalWorkerInput", trees, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
             if (input.Context?.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
@@ -64,47 +137,7 @@ namespace XMLDocNormalizer.HistoricalWorker
                 return Failure(WorkerFailureCode.CompilationFailure, "Historical compilation failed.", identity, errors);
             }
 
-            INamedTypeSymbol? type = compilation.GetTypeByMetadataName(input.TypeMetadataName!);
-            IMethodSymbol[] methods = type?.GetMembers(input.MethodName!).OfType<IMethodSymbol>()
-                .Where(method => method.MethodKind == MethodKind.Ordinary && method.IsStatic
-                    && method.Parameters.Length == 0 && method.TypeParameters.Length == 0).ToArray() ?? [];
-            if (type == null || type.IsGenericType || !SymbolEqualityComparer.Default.Equals(type.ContainingAssembly, compilation.Assembly)
-                || methods.Length != 1 || methods[0].DeclaringSyntaxReferences.Length != 1
-                || methods[0].DeclaringSyntaxReferences[0].GetSyntax() is not MethodDeclarationSyntax member
-                || !ReferenceEquals(member.SyntaxTree, tree)
-                || (member.Body == null && member.ExpressionBody == null))
-            {
-                return Failure(WorkerFailureCode.InvalidRequest, "Root must identify one source-owned parameterless static method with a body.", identity);
-            }
-
-            ExceptionFlowSemanticEnvironment environment = new(compilation);
-            if (!environment.TryGetSemanticModel(member.SyntaxTree, out SemanticModel rootModel)
-                || !SymbolEqualityComparer.Default.Equals(rootModel.GetDeclaredSymbol(member), methods[0]))
-            {
-                return Failure(WorkerFailureCode.AnalysisFailure, "Root semantic ownership could not be established.", identity);
-            }
-
-            CanonicalExceptionFlowAnalysisResult result;
-            try
-            {
-                result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
-                    input.Context?.AnalysisMode == "direct"
-                        ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
-                        : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine("Historical analysis failure: " + exception);
-                return Failure(WorkerFailureCode.AnalysisFailure, "Historical analysis could not complete.", identity);
-            }
-            if (result.Uncertainties.Length != 0 || result.Entries.Any(entry => entry.PathsTruncated))
-            {
-                return Failure(WorkerFailureCode.AnalysisFailure, "Exception-flow analysis is incomplete.", identity,
-                    result.Uncertainties.Select(item => item.DisplayText).OrderBy(text => text, StringComparer.Ordinal).ToArray());
-            }
-
-            return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
-                Provenance: WorkerProtocol.Provenance(input));
+            return null;
         }
 
         /// <summary>B13 capability policy reused for each source, never a default for a missing explicit context.</summary>

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.HistoricalWorker;
@@ -10,7 +11,8 @@ namespace XMLDocNormalizer.Execution.Analysis
     internal sealed record HistoricalWorkerPayloadProjectionInput(
         ExternalCompilationProvenanceDescriptor Provenance, ExternalCSharpSyntaxTree Source,
         IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null,
-        ExternalCSharpCompilationConfiguration? ParseConfiguration = null, ExternalCSharpSyntaxTreeSet? SourceSet = null);
+        ExternalCSharpCompilationConfiguration? ParseConfiguration = null, ExternalCSharpSyntaxTreeSet? SourceSet = null,
+        ImmutableArray<HistoricalWorkerPayloadProjectionInput> SupportingProjects = default);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -45,6 +47,7 @@ namespace XMLDocNormalizer.Execution.Analysis
     {
         internal static HistoricalWorkerPayloadProjectionResult Project(HistoricalWorkerPayloadProjectionInput? input)
         {
+            if (input != null && !input.SupportingProjects.IsDefault) { return HistoricalWorkerSolutionProjection.Project(input); }
             HistoricalWorkerPayloadProjectionResult Fail(HistoricalWorkerPayloadProjectionFailureCode code, string message)
                 => new(null, new(code, message));
             if (input?.Provenance == null || input.Source == null || input.Root == null)

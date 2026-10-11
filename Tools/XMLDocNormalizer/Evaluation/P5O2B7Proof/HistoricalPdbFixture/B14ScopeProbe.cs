@@ -9,13 +9,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 /// <summary>Test-only complete scope/graph observation in the genuine Historical host, never source execution or reporting import.</summary>
 internal static class B14ScopeProbe
 {
-    internal static void Observe(CSharpCompilation compilation, string rootPath, string mode)
+    internal static void Observe(CSharpCompilation compilation, string rootPath, string mode, IReadOnlyList<Compilation>? supporting = null)
     {
         if (compilation.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error)) { throw new InvalidOperationException("Test compilation failed."); }
         var assembly = Assembly.Load("XMLDocNormalizer.ExceptionFlow.Historical");
         const string prefix = "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.";
         var environmentType = assembly.GetType(prefix + "ExceptionFlowSemanticEnvironment", true)!;
-        var environment = Activator.CreateInstance(environmentType, BindingFlags.Instance | BindingFlags.NonPublic, null, [compilation], null)!;
+        var environment = Activator.CreateInstance(environmentType, BindingFlags.Instance | BindingFlags.NonPublic, null,
+            supporting == null ? [compilation] : [compilation, supporting], null)!;
         var sessionType = assembly.GetType(prefix + "ExceptionFlowSummaryAnalysisSession", true)!;
         var session = sessionType.GetMethod("CreateSummaryAnalysisSession", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!.Invoke(null, [environment])!;
         var root = compilation.SyntaxTrees.Single(tree => tree.FilePath == rootPath).GetRoot().DescendantNodes()
@@ -47,14 +48,15 @@ internal static class B14ScopeProbe
             return result.OrderBy(value => value, StringComparer.Ordinal).ToArray();
         }
         var getModel = environmentType.GetMethod("TryGetSemanticModel", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var ownership = compilation.SyntaxTrees.Select(tree =>
+        var ownership = new[] { compilation }.Concat(supporting ?? []).OrderBy(project => project.AssemblyName, StringComparer.Ordinal)
+            .SelectMany(project => project.SyntaxTrees.Select(tree =>
         {
             object?[] first = [tree, null]; object?[] second = [tree, null];
             if (!(bool)getModel.Invoke(environment, first)! || !(bool)getModel.Invoke(environment, second)!
-                || !ReferenceEquals(first[1], second[1]) || !ReferenceEquals(((SemanticModel)first[1]!).Compilation, compilation))
+                || !ReferenceEquals(first[1], second[1]) || !ReferenceEquals(((SemanticModel)first[1]!).Compilation, project))
             { throw new InvalidOperationException("Unstable/foreign model ownership."); }
-            return new { LogicalPath = tree.FilePath, AssemblyName = compilation.AssemblyName, Owned = true, StableModel = true };
-        }).ToArray();
+            return new { LogicalPath = tree.FilePath, AssemblyName = project.AssemblyName, Owned = true, StableModel = true };
+        })).ToArray();
         var foreign = CSharpSyntaxTree.ParseText(compilation.SyntaxTrees.First().GetText().ToString(), path: compilation.SyntaxTrees.First().FilePath);
         object?[] foreignArgs = [foreign, null];
         if ((bool)getModel.Invoke(environment, foreignArgs)!) { throw new InvalidOperationException("Foreign tree accepted."); }

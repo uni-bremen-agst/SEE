@@ -107,7 +107,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             int count;
             while ((count = await Console.In.ReadAsync(buffer)) != 0)
             {
-                if (input.Length + count > WorkerProtocol.MaximumReferenceRequestCharacters)
+                if (input.Length + count > WorkerProtocol.MaximumSolutionRequestCharacters)
                 {
                     throw new InvalidDataException("Request too large.");
                 }

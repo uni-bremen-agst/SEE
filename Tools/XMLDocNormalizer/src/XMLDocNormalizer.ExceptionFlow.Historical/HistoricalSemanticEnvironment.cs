@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
-    /// <summary>Owns one source compilation in an isolated Worker; no external source registry.</summary>
+    /// <summary>Owns independently reconstructed source projects in an isolated Worker.</summary>
     internal sealed partial class ExceptionFlowSemanticEnvironment
     {
         private readonly ExceptionFlowSemanticScope scope;
@@ -11,6 +11,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>Owns a complete single-compilation source set and stable models per exact tree.</summary>
         internal ExceptionFlowSemanticEnvironment(Compilation compilation)
+            : this(compilation, Array.Empty<Compilation>()) { }
+
+        /// <summary>Registers only the explicit graph's complete projects; never widens a local profile.</summary>
+        internal ExceptionFlowSemanticEnvironment(Compilation compilation, IReadOnlyList<Compilation> supporting)
         {
             ArgumentNullException.ThrowIfNull(compilation);
             SyntaxTree[] trees = compilation.SyntaxTrees.ToArray();
@@ -20,8 +24,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             scope = new ExceptionFlowSemanticScope(compilation);
-            foreach (var tree in trees) { models.Add(tree, compilation.GetSemanticModel(tree)); }
-            scopes = Array.AsReadOnly(new[] { scope });
+            var owned = new[] { scope }.Concat(supporting.Select(project => new ExceptionFlowSemanticScope(project)))
+                .OrderBy(item => item.Compilation.AssemblyName, StringComparer.Ordinal).ToArray();
+            foreach (var item in owned)
+            {
+                if (!item.Compilation.SyntaxTrees.Any()) { throw new ArgumentException("Project sources are incomplete.", nameof(supporting)); }
+                foreach (var tree in item.Compilation.SyntaxTrees) { models.Add(tree, item.Compilation.GetSemanticModel(tree)); }
+            }
+            scopes = Array.AsReadOnly(owned);
         }
 
         /// <summary>Only the exact owned tree can retrieve the request's stable model.</summary>
@@ -30,18 +40,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return models.TryGetValue(tree, out semanticModel!);
         }
 
-        /// <summary>Returns only the request-owned deterministic single-compilation scope.</summary>
+        /// <summary>Returns the request-owned deterministic project scopes.</summary>
         internal IReadOnlyList<ExceptionFlowSemanticScope> GetAnalysisScopes() => scopes;
 
         /// <summary>Returns genuine local source, never a metadata-name approximation.</summary>
         internal bool TryResolveSupportingSourceMethod(
             IMethodSymbol methodSymbol, out ExceptionFlowSupportingSourceMethod resolution)
         {
-            if (SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, scope.Compilation.Assembly)
-                && !methodSymbol.DeclaringSyntaxReferences.IsDefaultOrEmpty
-                && methodSymbol.DeclaringSyntaxReferences.All(reference => models.ContainsKey(reference.SyntaxTree)))
+            var destination = scopes.SingleOrDefault(item => item.Compilation.Assembly.Identity.Equals(methodSymbol.ContainingAssembly.Identity));
+            var resolved = destination == null ? null
+                : SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, destination.Compilation.Assembly)
+                    ? methodSymbol : scopes.Count > 1
+                        ? ExceptionFlowCrossCompilationResolver.ResolveMethod(methodSymbol, destination.Compilation) : null;
+            if (resolved != null && destination != null
+                && SymbolEqualityComparer.Default.Equals(resolved.ContainingAssembly, destination.Compilation.Assembly)
+                && ((!resolved.DeclaringSyntaxReferences.IsDefaultOrEmpty
+                        && resolved.DeclaringSyntaxReferences.All(reference => models.ContainsKey(reference.SyntaxTree)))
+                    || (scopes.Count > 1 && resolved.IsImplicitlyDeclared && !resolved.ContainingType.DeclaringSyntaxReferences.IsDefaultOrEmpty
+                        && resolved.ContainingType.DeclaringSyntaxReferences.All(reference => models.ContainsKey(reference.SyntaxTree)))))
             {
-                resolution = new ExceptionFlowSupportingSourceMethod(methodSymbol, scope);
+                resolution = new ExceptionFlowSupportingSourceMethod(resolved, destination);
                 return true;
             }
 
@@ -54,7 +72,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol, Compilation bindingCompilation,
             out ExceptionFlowSupportingSourceMethod resolution)
         {
-            if (ReferenceEquals(bindingCompilation, scope.Compilation))
+            if ((ReferenceEquals(bindingCompilation, scope.Compilation)
+                    || scopes.Any(item => ReferenceEquals(item.Compilation, bindingCompilation)))
+                && (SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, bindingCompilation.Assembly)
+                    || IsBoundReference(bindingCompilation, methodSymbol.ContainingAssembly)))
             {
                 return TryResolveSupportingSourceMethod(methodSymbol, out resolution);
             }
@@ -63,13 +84,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return false;
         }
 
-        /// <summary>No external supporting-source provenance is installed by this bounded host.</summary>
+        /// <summary>Maps an actually bound exact reference to its request-owned source project.</summary>
         internal bool TryGetExternalSupportingSourceScope(
             Compilation bindingCompilation, IAssemblySymbol assemblySymbol,
             out ExceptionFlowSemanticScope scope)
         {
             scope = null!;
-            return false;
+            if (!scopes.Any(item => ReferenceEquals(item.Compilation, bindingCompilation))
+                || !IsBoundReference(bindingCompilation, assemblySymbol)) { return false; }
+            scope = scopes.SingleOrDefault(item => item.Compilation.Assembly.Identity.Equals(assemblySymbol.Identity))!;
+            return scope != null;
         }
+
+        private static bool IsBoundReference(Compilation compilation, IAssemblySymbol assembly)
+            => compilation.References.Any(reference => SymbolEqualityComparer.Default.Equals(
+                compilation.GetAssemblyOrModuleSymbol(reference), assembly));
     }
 }

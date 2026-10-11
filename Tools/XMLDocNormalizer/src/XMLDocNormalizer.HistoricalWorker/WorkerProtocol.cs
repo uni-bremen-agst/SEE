@@ -14,21 +14,38 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal const int MaximumSourceCharacters = 32768;
         internal const int MaximumLogicalPathCharacters = 4096;
         internal const int MaximumProjectSources = 16;
+        internal const int MaximumSolutionProjects = 4;
+        internal const long MaximumSolutionReferenceBytes = 64L * 1024 * 1024;
+        internal const int MaximumSolutionRequestCharacters = 96 * 1024 * 1024;
         internal const string ExactReferenceProfile = "validated-pe-images-v1";
         internal const int MaximumReferenceCount = 64;
         internal const int MaximumReferenceBytes = 32 * 1024 * 1024;
         internal const int MaximumReferenceRequestCharacters = 48 * 1024 * 1024;
 
-        internal static int RequestLimit(WorkerAnalysisInput input) => input.Context?.ReferenceProfile == ExactReferenceProfile
+        internal static int RequestLimit(WorkerAnalysisInput input) => input.Context?.Solution != null ? MaximumSolutionRequestCharacters : input.Context?.ReferenceProfile == ExactReferenceProfile
             ? MaximumReferenceRequestCharacters : MaximumRequestCharacters;
 
         /// <summary>Bind ordered image hashes, identities/properties and target identity; exclude descriptive reference lookup names.</summary>
         internal static string? ReferenceWorldHash(WorkerAnalysisInput input)
         {
             if (input.Context?.ReferenceProfile != ExactReferenceProfile) { return null; }
-            var context = input.Context with { References = input.Context.References!.Select(reference => reference with { Image = [], LogicalName = "" }).ToArray() };
+            var context = StripReferences(input.Context);
+            if (context.Solution is { } graph)
+            {
+                context = context with
+                {
+                    Solution = graph with
+                    {
+                        Projects = graph.Projects!.Select(project => project with
+                        { Input = project.Input! with { Context = StripReferences(project.Input!.Context!) } }).ToArray()
+                    }
+                };
+            }
             return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(context, JsonOptions))));
         }
+
+        private static WorkerCompilationContext StripReferences(WorkerCompilationContext context)
+            => context with { References = context.References!.Select(reference => reference with { Image = [], LogicalName = "" }).ToArray() };
 
         internal static string SourceHash(string source) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(source)));
 
@@ -88,7 +105,15 @@ namespace XMLDocNormalizer.HistoricalWorker
         string? TargetModuleName = null,
         WorkerParseContext? ParseContext = null,
         string? ParseProfile = null,
-        WorkerProjectScope? Scope = null);
+        WorkerProjectScope? Scope = null,
+        WorkerSolutionGraph? Solution = null);
+
+    /// <summary>Original binary-project identity, not a path, simple assembly name or Roslyn ProjectId.</summary>
+    internal sealed record WorkerProjectIdentity(CanonicalAssemblyIdentity? Assembly, string? ModuleName, Guid? ModuleVersionId);
+    /// <summary>One complete B14 project and ordered exact-reference-bound outgoing dependencies.</summary>
+    internal sealed record WorkerProjectNode(WorkerProjectIdentity? Identity, WorkerAnalysisInput? Input, WorkerProjectIdentity[]? Dependencies);
+    /// <summary>Explicit complete reachable external source-project DAG and its exact target.</summary>
+    internal sealed record WorkerSolutionGraph(WorkerProjectIdentity? Target, WorkerProjectNode[]? Projects);
 
     /// <summary>Complete ordered source membership in exactly one assembly-bound project, not a solution closure.</summary>
     internal sealed record WorkerProjectScope(string? Kind, string? AssemblyName, string[]? OrderedSourcePaths, string? RootLogicalPath);
@@ -119,6 +144,9 @@ namespace XMLDocNormalizer.HistoricalWorker
     internal static class WorkerInputValidation
     {
         internal static bool IsSupported(WorkerAnalysisInput? input)
+            => IsSupportedLocal(input) && HasSupportedSolution(input!);
+
+        private static bool IsSupportedLocal(WorkerAnalysisInput? input)
             => input != null && !string.IsNullOrWhiteSpace(input.Source)
                 && input.Source.Length <= WorkerProtocol.MaximumSourceCharacters
                 && !string.IsNullOrWhiteSpace(input.TypeMetadataName) && input.TypeMetadataName.Length <= 256
@@ -132,6 +160,64 @@ namespace XMLDocNormalizer.HistoricalWorker
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null
                     && HasSupportedReferences(input.Context)));
+
+        internal static bool ReferenceMatchesProject(WorkerReferenceImage reference, WorkerProjectIdentity project)
+            => reference.Identity != null && reference.Identity.Equals(project.Assembly)
+                && reference.ModuleName == project.ModuleName && reference.ModuleVersionId == project.ModuleVersionId;
+
+        private static bool HasSupportedSolution(WorkerAnalysisInput input)
+        {
+            if (input.Context?.Solution is not { } graph) { return true; }
+            if (input.Context.AnalysisMode != "solution-transitive" || input.Context.Scope == null || graph.Target == null
+                || graph.Projects == null || graph.Projects.Length is < 2 or > MaximumProjects)
+            { return false; }
+            var nodes = new Dictionary<WorkerProjectIdentity, WorkerProjectNode>();
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var paths = new HashSet<string>(StringComparer.Ordinal);
+            long images = input.Context.References!.Sum(reference => (long)reference.Image.Length);
+            long text = 0;
+            foreach (var project in graph.Projects)
+            {
+                if (project?.Identity is not { } identity || project.Input?.Context is not { } context || context.Solution != null
+                    || context.Scope == null || context.AnalysisMode != "solution-transitive" || !IsSupportedLocal(project.Input)
+                    || !Equals(identity.Assembly, context.TargetIdentity) || identity.ModuleName != context.TargetModuleName
+                    || identity.ModuleVersionId == null || identity.ModuleVersionId == Guid.Empty || project.Dependencies == null
+                    || project.Dependencies.Length >= graph.Projects.Length || !nodes.TryAdd(identity, project)
+                    || !names.Add(identity.Assembly!.Name))
+                { return false; }
+                foreach (var path in context.Scope.OrderedSourcePaths!) { if (!paths.Add(path)) { return false; } }
+                text += project.Input.Source!.Length + context.AdditionalSources!.Sum(source => (long)source.Text.Length);
+                images += context.References!.Sum(reference => (long)reference.Image.Length);
+            }
+            if (text > 65536 || images > WorkerProtocol.MaximumSolutionReferenceBytes || !nodes.TryGetValue(graph.Target, out var target)
+                || input.Source != target.Input!.Source || input.LogicalPath != target.Input.LogicalPath
+                || input.TypeMetadataName != target.Input.TypeMetadataName || input.MethodName != target.Input.MethodName
+                || WorkerProtocol.ReferenceWorldHash(input with { Context = input.Context with { Solution = null } }) != WorkerProtocol.ReferenceWorldHash(target.Input))
+            { return false; }
+            foreach (var node in nodes.Values)
+            {
+                var expected = new List<WorkerProjectIdentity>();
+                foreach (var reference in node.Input!.Context!.References!)
+                {
+                    var candidates = nodes.Keys.Where(identity => string.Equals(identity.Assembly!.Name, reference.Identity!.Name, StringComparison.OrdinalIgnoreCase)).ToArray();
+                    if (candidates.Length == 0) { continue; }
+                    if (candidates.Length != 1 || !ReferenceMatchesProject(reference, candidates[0])) { return false; }
+                    expected.Add(candidates[0]);
+                }
+                if (!expected.SequenceEqual(node.Dependencies!)) { return false; }
+            }
+            var visiting = new HashSet<WorkerProjectIdentity>(); var complete = new HashSet<WorkerProjectIdentity>();
+            bool Visit(WorkerProjectIdentity identity)
+            {
+                if (complete.Contains(identity)) { return true; }
+                if (!nodes.TryGetValue(identity, out var node) || !visiting.Add(identity)) { return false; }
+                foreach (var dependency in node.Dependencies!) { if (!Visit(dependency)) { return false; } }
+                visiting.Remove(identity); complete.Add(identity); return true;
+            }
+            return Visit(graph.Target) && complete.Count == nodes.Count;
+        }
+
+        private const int MaximumProjects = WorkerProtocol.MaximumSolutionProjects;
 
         /// <summary>Explicit membership, completeness and budgets; absent scope retains the old single-source policy.</summary>
         internal static bool HasSupportedScope(WorkerAnalysisInput input)

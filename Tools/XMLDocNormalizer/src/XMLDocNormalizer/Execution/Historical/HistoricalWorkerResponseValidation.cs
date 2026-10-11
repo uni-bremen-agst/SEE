@@ -97,11 +97,13 @@ namespace XMLDocNormalizer.Execution.Historical
         private static bool ValidReferenceIdentities(CanonicalExceptionFlowAnalysisResult result, WorkerCompilationContext? context)
         {
             if (context?.ReferenceProfile != WorkerProtocol.ExactReferenceProfile) { return true; }
+            var contexts = context.Solution?.Projects!.Select(project => project.Input!.Context!).ToArray() ?? [context];
             return result.Entries.All(entry =>
                 entry.ExceptionType.Module?.Ordinal == 0
-                && (entry.ExceptionType.Assembly!.Equals(context.TargetIdentity)
-                    ? entry.ExceptionType.Module.Name == context.TargetModuleName && entry.ExceptionType.Module.ModuleVersionId == null
-                    : context.References!.Any(reference => entry.ExceptionType.Assembly.Equals(reference.Identity)
+                && entry.ExceptionType.Module.ModuleVersionId == null
+                && contexts.Any(project => entry.ExceptionType.Assembly!.Equals(project.TargetIdentity)
+                    ? entry.ExceptionType.Module.Name == project.TargetModuleName
+                    : project.References!.Any(reference => entry.ExceptionType.Assembly.Equals(reference.Identity)
                         && entry.ExceptionType.Module.Name == reference.ModuleName
                         // Existing canonical adapter intentionally emits no MVID, even for PE-backed symbols.
                         // Exact PE MVID is checked in Worker binding and covered by ReferenceWorldSha256 instead.
@@ -110,9 +112,13 @@ namespace XMLDocNormalizer.Execution.Historical
 
         private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, WorkerAnalysisInput input)
         {
-            var sources = new Dictionary<string, string[]>(StringComparer.Ordinal)
-            { [WorkerInputValidation.GetLogicalPath(input)] = Lines(input.Source!) };
-            foreach (var source in input.Context?.AdditionalSources ?? []) { sources.Add(source.LogicalPath, Lines(source.Text)); }
+            var sources = new Dictionary<string, string[]>(StringComparer.Ordinal);
+            var projects = input.Context?.Solution?.Projects!.Select(project => project.Input!).ToArray() ?? [input];
+            foreach (var project in projects)
+            {
+                sources.Add(WorkerInputValidation.GetLogicalPath(project), Lines(project.Source!));
+                foreach (var source in project.Context?.AdditionalSources ?? []) { sources.Add(source.LogicalPath, Lines(source.Text)); }
+            }
             return result.Entries.All(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven
                 && entry.ExceptionType.Kind == CanonicalTypeIdentityKind.Named
                 && !string.IsNullOrWhiteSpace(entry.ExceptionType.MetadataName)
