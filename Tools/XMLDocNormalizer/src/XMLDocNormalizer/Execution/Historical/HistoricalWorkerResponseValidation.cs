@@ -55,7 +55,7 @@ namespace XMLDocNormalizer.Execution.Historical
                     {
                         return Fail(HistoricalWorkerClientFailureCode.NonZeroExit, "Failure response has an inconsistent exit code.");
                     }
-                    if (response.Identity != null && !ValidIdentity(response.Identity))
+                    if (response.Identity != null && !ValidIdentity(response.Identity, input))
                     {
                         return Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Failure runtime identity does not match.");
                     }
@@ -71,7 +71,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Missing analysis result or inconsistent response.");
                 }
-                if (!ValidIdentity(response.Identity))
+                if (!ValidIdentity(response.Identity, input))
                 {
                     return Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Worker runtime identity does not match the exact historical engine.");
                 }
@@ -79,9 +79,9 @@ namespace XMLDocNormalizer.Execution.Historical
                 {
                     return Fail(HistoricalWorkerClientFailureCode.IncompleteResult, "Historical analysis is incomplete.");
                 }
-                WorkerAnalysisProvenance expected = new(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))),
-                    input.TypeMetadataName!, input.MethodName!, WorkerInputValidation.GetLogicalPath(input), "solution-transitive", "net8-runtime-bounded-v1", "12", "enable");
-                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input.Source!, expected.LogicalPath))
+                WorkerAnalysisProvenance expected = WorkerProtocol.Provenance(input);
+                if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input.Source!, expected.LogicalPath)
+                    || !ValidReferenceIdentities(response.Result, input.Context))
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
                 }
@@ -92,6 +92,20 @@ namespace XMLDocNormalizer.Execution.Historical
                 return Fail(exitCode == 0 ? HistoricalWorkerClientFailureCode.MalformedResponse
                     : HistoricalWorkerClientFailureCode.NonZeroExit, "Worker did not return valid protocol data.");
             }
+        }
+
+        private static bool ValidReferenceIdentities(CanonicalExceptionFlowAnalysisResult result, WorkerCompilationContext? context)
+        {
+            if (context?.ReferenceProfile != WorkerProtocol.ExactReferenceProfile) { return true; }
+            return result.Entries.All(entry =>
+                entry.ExceptionType.Module?.Ordinal == 0
+                && (entry.ExceptionType.Assembly!.Equals(context.TargetIdentity)
+                    ? entry.ExceptionType.Module.Name == context.TargetModuleName && entry.ExceptionType.Module.ModuleVersionId == null
+                    : context.References!.Any(reference => entry.ExceptionType.Assembly.Equals(reference.Identity)
+                        && entry.ExceptionType.Module.Name == reference.ModuleName
+                        // Existing canonical adapter intentionally emits no MVID, even for PE-backed symbols.
+                        // Exact PE MVID is checked in Worker binding and covered by ReferenceWorldSha256 instead.
+                        && entry.ExceptionType.Module.ModuleVersionId == null)));
         }
 
         private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, string source, string logicalPath)
@@ -108,11 +122,11 @@ namespace XMLDocNormalizer.Execution.Historical
                         && step.Column is int column && column > 0 && column <= lines[line - 1].Length + 1)));
         }
 
-        private static bool ValidIdentity(WorkerIdentity? identity)
+        private static bool ValidIdentity(WorkerIdentity? identity, WorkerAnalysisInput input)
         {
             const string version = "5.0.0-2.25451.107+2db1f5ee2bdda2e8d873769325fabede32e420e0";
             if (identity == null || identity.ProtocolVersion != WorkerProtocol.Version || identity.WorkerVersion != "1.0"
-                || identity.ReferenceProfile != "net8-runtime-bounded-v1" || identity.RuntimeAwaitInformationAvailable
+                || identity.ReferenceProfile != (input.Context?.ReferenceProfile ?? "net8-runtime-bounded-v1") || identity.RuntimeAwaitInformationAvailable
                 || !ValidAssembly(identity.Worker, "XMLDocNormalizer.HistoricalWorker")
                 || !ValidAssembly(identity.Analyzer, "XMLDocNormalizer.ExceptionFlow.Historical")
                 || identity.LoadedRoslyn == null || identity.LoadedRoslyn.Length != 2)

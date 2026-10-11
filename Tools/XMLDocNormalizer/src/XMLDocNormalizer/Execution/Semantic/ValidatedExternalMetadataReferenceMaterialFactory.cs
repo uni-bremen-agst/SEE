@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace XMLDocNormalizer.Execution.Semantic
 {
@@ -9,6 +10,11 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ValidatedExternalMetadataReferenceMaterialFactory
     {
+        private static readonly ConditionalWeakTable<ValidatedExternalMetadataReferenceMaterial, object> receipts = new();
+
+        /// <summary>Recognizes original successful P5C handoffs, not caller-constructed copies.</summary>
+        internal static bool IsValidated(ValidatedExternalMetadataReferenceMaterial material) => receipts.TryGetValue(material, out _);
+
         /// <summary>
         /// Tries to materialize and validate a caller-owned PE stream from its
         /// current position.
@@ -146,6 +152,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 }
 
                 material = new ValidatedExternalMetadataReferenceMaterial(candidate, image);
+                receipts.Add(material, new object());
                 return true;
             }
             catch (IOException)

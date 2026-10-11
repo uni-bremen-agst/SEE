@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -9,6 +10,23 @@ namespace XMLDocNormalizer.Execution.Semantic
     /// </summary>
     internal static class ExternalMetadataReferenceSetFactory
     {
+        private sealed record Receipt(ExternalCompilationProvenanceDescriptor Provenance,
+            ImmutableArray<ValidatedExternalMetadataReferenceMaterial> Materials);
+        private static readonly ConditionalWeakTable<ExternalMetadataReferenceSet, Receipt> receipts = new();
+
+        /// <summary>Retains exact successful P5C/P5E ordinals for neutral transport without reopening metadata.</summary>
+        internal static bool TryGetValidatedMaterials(ExternalMetadataReferenceSet set,
+            ExternalCompilationProvenanceDescriptor provenance, out ImmutableArray<ValidatedExternalMetadataReferenceMaterial> materials)
+        {
+            if (receipts.TryGetValue(set, out var receipt) && ReferenceEquals(receipt.Provenance, provenance))
+            {
+                materials = receipt.Materials;
+                return true;
+            }
+            materials = default;
+            return false;
+        }
+
         /// <summary>
         /// Tries to reconstruct one Roslyn reference for every recorded
         /// metadata-reference ordinal from the corresponding validated
@@ -59,6 +77,7 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             ImmutableArray<PortableExecutableReference>.Builder references =
                 ImmutableArray.CreateBuilder<PortableExecutableReference>(materials.Count);
+            var retainedMaterials = ImmutableArray.CreateBuilder<ValidatedExternalMetadataReferenceMaterial>(materials.Count);
 
             for (int index = 0; index < materials.Count; index++)
             {
@@ -80,9 +99,16 @@ namespace XMLDocNormalizer.Execution.Semantic
                 }
 
                 references.Add(reference);
+                retainedMaterials.Add(material);
             }
 
             referenceSet = new ExternalMetadataReferenceSet(references.MoveToImmutable());
+            // Preserve P5E acceptance semantics; only original validated materials acquire an IPC receipt.
+            var snapshot = retainedMaterials.MoveToImmutable();
+            if (snapshot.All(ValidatedExternalMetadataReferenceMaterialFactory.IsValidated))
+            {
+                receipts.Add(referenceSet, new(compilationProvenance, snapshot));
+            }
             return true;
         }
 

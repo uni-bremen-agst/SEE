@@ -38,7 +38,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 return Fail(HistoricalWorkerClientFailureCode.UnsupportedInput, "Input is incomplete or outside the bounded historical profile.");
             }
             string request = JsonSerializer.Serialize(new WorkerRequest(WorkerProtocol.Version, "analyze", input), WorkerProtocol.JsonOptions);
-            if (request.Length > WorkerProtocol.MaximumRequestCharacters)
+            if (request.Length > WorkerProtocol.RequestLimit(input))
             {
                 return Fail(HistoricalWorkerClientFailureCode.UnsupportedInput, "Serialized request exceeds the protocol budget.");
             }
@@ -49,8 +49,11 @@ namespace XMLDocNormalizer.Execution.Historical
 
             ProcessStartInfo start = new(dotnetHost)
             {
-                UseShellExecute = false, RedirectStandardInput = true, RedirectStandardOutput = true,
-                RedirectStandardError = true, CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
                 StandardInputEncoding = new UTF8Encoding(false, true),
                 StandardOutputEncoding = new UTF8Encoding(false, true),
                 StandardErrorEncoding = new UTF8Encoding(false, true)

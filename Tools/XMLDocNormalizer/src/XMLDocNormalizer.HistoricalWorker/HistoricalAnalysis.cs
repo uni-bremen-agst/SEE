@@ -25,17 +25,25 @@ namespace XMLDocNormalizer.HistoricalWorker
             MetadataReference[] references;
             try
             {
-                references = GetFrameworkReferences();
+                references = input.Context?.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                    ? input.Context.References!.Select(reference => MetadataReference.CreateFromImage(reference.Image,
+                        new MetadataReferenceProperties(MetadataImageKind.Assembly, aliases: [.. reference.Aliases!]))).ToArray()
+                    : GetFrameworkReferences();
             }
-            catch (Exception exception) when (exception is InvalidOperationException or IOException or BadImageFormatException)
+            catch (Exception exception) when (exception is InvalidOperationException or IOException or BadImageFormatException or ArgumentException)
             {
                 Console.Error.WriteLine("Historical compilation input failure: " + exception);
                 return Failure(WorkerFailureCode.CompilationFailure, "Runtime reference profile could not be resolved.", identity);
             }
 
             CSharpCompilation compilation = CSharpCompilation.Create(
-                "HistoricalWorkerInput", [tree], references,
+                input.Context?.AssemblyName ?? "HistoricalWorkerInput", [tree], references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+            if (input.Context?.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                && !HaveExpectedIdentities(compilation, references, input.Context))
+            {
+                return Failure(WorkerFailureCode.CompilationFailure, "Reconstructed assembly/module identities contradict the exact reference description.", identity);
+            }
             string[] errors = compilation.GetDiagnostics()
                 .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
                 .Select(diagnostic => diagnostic.Id + ": " + diagnostic.GetMessage(CultureInfo.InvariantCulture))
@@ -82,9 +90,32 @@ namespace XMLDocNormalizer.HistoricalWorker
             }
 
             return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
-                Provenance: new(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input.Source!))),
-                    input.TypeMetadataName!, input.MethodName!, WorkerInputValidation.GetLogicalPath(input), "solution-transitive",
-                    "net8-runtime-bounded-v1", "12", "enable"));
+                Provenance: WorkerProtocol.Provenance(input));
+        }
+
+        /// <summary>Compare actual Historical binding to original neutral identities; paths never stand in for identity.</summary>
+        private static bool HaveExpectedIdentities(CSharpCompilation compilation, MetadataReference[] references, WorkerCompilationContext context)
+        {
+            try
+            {
+                if (!RoslynCanonicalIdentityFactory.CreateAssemblyIdentity(compilation.Assembly).Equals(context.TargetIdentity)
+                    || compilation.SourceModule.Name != context.TargetModuleName)
+                { return false; }
+                for (int index = 0; index < references.Length; index++)
+                {
+                    var expected = context.References![index];
+                    if (compilation.GetAssemblyOrModuleSymbol(references[index]) is not IAssemblySymbol assembly
+                        || !RoslynCanonicalIdentityFactory.CreateAssemblyIdentity(assembly).Equals(expected.Identity))
+                    { return false; }
+                    var modules = assembly.Modules.ToArray();
+                    if (modules.Length != 1 || modules[0].Name != expected.ModuleName
+                        || modules[0].GetMetadata()?.GetModuleVersionId() != expected.ModuleVersionId)
+                    { return false; }
+                }
+                return true;
+            }
+            catch (Exception exception) when (exception is BadImageFormatException or InvalidOperationException or ArgumentException)
+            { return false; }
         }
 
         /// <summary>Bounded framework-only reference profile; never imports Worker/Analyzer/Roslyn as input metadata.</summary>

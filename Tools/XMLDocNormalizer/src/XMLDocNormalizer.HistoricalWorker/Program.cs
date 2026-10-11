@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace XMLDocNormalizer.HistoricalWorker
 {
@@ -12,15 +13,25 @@ namespace XMLDocNormalizer.HistoricalWorker
             Console.InputEncoding = new UTF8Encoding(false, true);
             Console.OutputEncoding = new UTF8Encoding(false);
             WorkerResponse response;
+            string input = "";
             try
             {
-                string input = await ReadBoundedRequest();
+                input = await ReadBoundedRequest();
+                using var document = JsonDocument.Parse(input, new JsonDocumentOptions { MaxDepth = 64 });
+                WorkerProtocol.RejectDuplicateProperties(document.RootElement);
                 WorkerRequest? request = JsonSerializer.Deserialize<WorkerRequest>(input, WorkerProtocol.JsonOptions);
+                if (request?.Payload?.Context?.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                    && !JsonNode.DeepEquals(JsonNode.Parse(input), JsonNode.Parse(JsonSerializer.Serialize(request, WorkerProtocol.JsonOptions))))
+                { throw new JsonException("Exact reference input is not canonical protocol data."); }
+                if (input.Length > (request?.Payload == null ? WorkerProtocol.MaximumRequestCharacters : WorkerProtocol.RequestLimit(request.Payload)))
+                { throw new InvalidDataException("Request too large for profile."); }
                 response = Execute(request);
             }
             catch (JsonException)
             {
-                response = Failure(WorkerFailureCode.MalformedInput, "Request is not one valid protocol JSON object.");
+                response = input.Length > WorkerProtocol.MaximumRequestCharacters
+                    ? Failure(WorkerFailureCode.InvalidRequest, "Request exceeds the legacy character budget.")
+                    : Failure(WorkerFailureCode.MalformedInput, "Request is not one valid protocol JSON object.");
             }
             catch (DecoderFallbackException)
             {
@@ -81,6 +92,8 @@ namespace XMLDocNormalizer.HistoricalWorker
             }
 
             WorkerIdentity identity = WorkerRuntimeIdentity.ReadAndValidate();
+            if (request.Operation == "analyze")
+            { identity = identity with { ReferenceProfile = request.Payload!.Context?.ReferenceProfile ?? "net8-runtime-bounded-v1" }; }
             return request.Operation == "identity"
                 ? new WorkerResponse(WorkerProtocol.Version, "identity", true, identity)
                 : HistoricalAnalysis.Analyze(request.Payload!, identity);
@@ -94,7 +107,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             int count;
             while ((count = await Console.In.ReadAsync(buffer)) != 0)
             {
-                if (input.Length + count > WorkerProtocol.MaximumRequestCharacters)
+                if (input.Length + count > WorkerProtocol.MaximumReferenceRequestCharacters)
                 {
                     throw new InvalidDataException("Request too large.");
                 }

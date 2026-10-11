@@ -20,6 +20,12 @@ internal static class B11GraphProbe
             .Select(file => MetadataReference.CreateFromFile(file)).ToArray();
         var compilation = CSharpCompilation.Create("HistoricalWorkerInput", [tree], references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+        Observe(compilation);
+    }
+
+    internal static void Observe(CSharpCompilation compilation, bool includeSummaries = false)
+    {
+        var tree = compilation.SyntaxTrees.Single();
         if (compilation.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error)) { throw new InvalidOperationException("Test graph compilation failed."); }
         var assembly = Assembly.Load("XMLDocNormalizer.ExceptionFlow.Historical");
         const string prefix = "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.";
@@ -41,8 +47,10 @@ internal static class B11GraphProbe
         object graph = sessionType.GetField("graph", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(session)!;
         int count = (int)graph.GetType().GetProperty("Count")!.GetValue(graph)!;
         string json = JsonSerializer.Serialize(result, result.GetType(), options);
+        string[]? summaries = includeSummaries ? Summaries() : null;
         object repeated = canonical.Invoke(null, [analyze.Invoke(session, [member])])!;
         int repeatedCount = (int)graph.GetType().GetProperty("Count")!.GetValue(graph)!;
+        string[]? repeatedSummaries = includeSummaries ? Summaries() : null;
         using var document = JsonDocument.Parse(json);
         Console.WriteLine(JsonSerializer.Serialize(new
         {
@@ -51,9 +59,25 @@ internal static class B11GraphProbe
             GraphCount = count,
             RepeatedGraphCount = repeatedCount,
             RepeatedResultEqual = json == JsonSerializer.Serialize(repeated, repeated.GetType(), options),
+            Summaries = summaries,
+            RepeatedSummaries = repeatedSummaries,
             Result = document.RootElement,
             SubmittedSourceExecuted = false,
             CompilerMvids = new[] { typeof(Compilation).Assembly.ManifestModule.ModuleVersionId, typeof(CSharpCompilation).Assembly.ManifestModule.ModuleVersionId }
         }, options));
+
+        string[] Summaries()
+        {
+            var entries = (System.Collections.IDictionary)graph.GetType().GetField("summaries", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(graph)!;
+            var create = adapter.GetMethod("TryCreateSummary", BindingFlags.Static | BindingFlags.Public)!;
+            var values = new List<string>();
+            foreach (System.Collections.DictionaryEntry entry in entries)
+            {
+                object?[] arguments = [entry.Key, entry.Value, null];
+                if (!(bool)create.Invoke(null, arguments)!) { throw new InvalidOperationException("Graph node could not be canonicalized."); }
+                values.Add(JsonSerializer.Serialize(arguments[2], arguments[2]!.GetType(), options));
+            }
+            return values.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        }
     }
 }

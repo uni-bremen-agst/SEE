@@ -9,7 +9,7 @@ namespace XMLDocNormalizer.Execution.Analysis
     /// <summary>Existing validated external data and a PE-bound selector; never raw source/selector strings.</summary>
     internal sealed record HistoricalWorkerPayloadProjectionInput(
         ExternalCompilationProvenanceDescriptor Provenance, ExternalCSharpSyntaxTree Source,
-        IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode);
+        IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -104,6 +104,13 @@ namespace XMLDocNormalizer.Execution.Analysis
             // Published analysis policies, not guesses about original references/assembly identity.
             var context = new WorkerCompilationContext(AnalysisMode: "solution-transitive", ReferenceProfile: "net8-runtime-bounded-v1",
                 LanguageVersion: "12", NullableContext: "enable", AssemblyName: "HistoricalWorkerInput");
+            if (input.ReferenceSet != null)
+            {
+                if (!HistoricalWorkerReferenceProjection.TryProject(input.ReferenceSet, provenance, target, out context))
+                {
+                    return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedPayload, "Exact references require the original bounded P5C/P5E handoff for this P5A provenance.");
+                }
+            }
             var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
                 LogicalPath: input.Source.Document.Name);
             if (!WorkerInputValidation.IsSupported(payload))
