@@ -2,6 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Security.Cryptography;
 using System.Text;
+using System.Runtime.CompilerServices;
+using XMLDocNormalizer.Execution.Analysis;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
 using XMLDocNormalizer.HistoricalWorker;
 
@@ -10,6 +12,12 @@ namespace XMLDocNormalizer.Execution.Historical
     /// <summary>Validates a complete protocol envelope before importing the existing canonical result.</summary>
     internal static class HistoricalWorkerResponseValidation
     {
+        private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, DeclaredPolicyFacts> policyReceipts = new();
+        internal static bool TryGetDeclaredPolicyFacts(HistoricalWorkerCallResult? call, out DeclaredPolicyFacts? facts)
+        {
+            facts = null;
+            return call?.Success == true && policyReceipts.TryGetValue(call, out facts);
+        }
         internal static HistoricalWorkerCallResult Validate(string stdout, string stderr, int exitCode,
             WorkerAnalysisInput input, int? processId = null)
         {
@@ -45,7 +53,7 @@ namespace XMLDocNormalizer.Execution.Historical
 
                 if (!response.Success)
                 {
-                    if (response.Result != null || response.Provenance != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
+                    if (response.Result != null || response.Provenance != null || response.DeclaredPolicy != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
                         || response.Failure.Details == null || response.Failure.Details.Any(detail => detail == null)
                         || (response.Operation != "analyze" && response.Operation != "invalid"))
                     {
@@ -81,11 +89,13 @@ namespace XMLDocNormalizer.Execution.Historical
                 }
                 WorkerAnalysisProvenance expected = WorkerProtocol.Provenance(input);
                 if (response.Provenance != expected || !ValidCanonicalResult(response.Result, input)
-                    || !ValidReferenceIdentities(response.Result, input.Context))
+                    || !ValidReferenceIdentities(response.Result, input.Context) || !ValidDeclaredPolicy(response.DeclaredPolicy, response.Result, input))
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
                 }
-                return new(response.Result, response.Identity, null, stderr, processId, response.Provenance);
+                var call = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance, response.DeclaredPolicy);
+                if (response.DeclaredPolicy != null) { policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result)); }
+                return call;
             }
             catch (Exception exception) when (exception is JsonException or ArgumentException or InvalidOperationException or NotSupportedException or NullReferenceException)
             {
@@ -95,20 +105,71 @@ namespace XMLDocNormalizer.Execution.Historical
         }
 
         private static bool ValidReferenceIdentities(CanonicalExceptionFlowAnalysisResult result, WorkerCompilationContext? context)
+            => result.Entries.All(entry => ValidReferenceType(entry.ExceptionType, context));
+
+        private static bool ValidReferenceType(CanonicalTypeIdentity type, WorkerCompilationContext? context)
         {
             if (context?.ReferenceProfile != WorkerProtocol.ExactReferenceProfile) { return true; }
             var contexts = context.Solution?.Projects!.Select(project => project.Input!.Context!).ToArray() ?? [context];
-            return result.Entries.All(entry =>
-                entry.ExceptionType.Module?.Ordinal == 0
-                && entry.ExceptionType.Module.ModuleVersionId == null
-                && contexts.Any(project => entry.ExceptionType.Assembly!.Equals(project.TargetIdentity)
-                    ? entry.ExceptionType.Module.Name == project.TargetModuleName
-                    : project.References!.Any(reference => entry.ExceptionType.Assembly.Equals(reference.Identity)
-                        && entry.ExceptionType.Module.Name == reference.ModuleName
+            return type.Module?.Ordinal == 0
+                && type.Module.ModuleVersionId == null
+                && contexts.Any(project => type.Assembly!.Equals(project.TargetIdentity)
+                    ? type.Module.Name == project.TargetModuleName
+                    : project.References!.Any(reference => type.Assembly.Equals(reference.Identity)
+                        && type.Module.Name == reference.ModuleName
                         // Existing canonical adapter intentionally emits no MVID, even for PE-backed symbols.
                         // Exact PE MVID is checked in Worker binding and covered by ReferenceWorldSha256 instead.
-                        && entry.ExceptionType.Module.ModuleVersionId == null)));
+                        && type.Module.ModuleVersionId == null));
         }
+
+        /// <summary>Structural/input-binding validation only; the Worker owns symbol facts, Main owns eligibility.</summary>
+        private static bool ValidDeclaredPolicy(WorkerDeclaredPolicyEvidence? evidence, CanonicalExceptionFlowAnalysisResult summary, WorkerAnalysisInput input)
+        {
+            if (input.Context?.DeclaredPolicy == null) { return evidence == null; }
+            if (!WorkerInputValidation.IsSupported(input) || !WorkerDeclaredPolicyContract.HasSupportedRequest(input) || evidence == null
+                || evidence.Profile != WorkerDeclaredPolicyContract.Profile || evidence.Mode != input.Context.DeclaredPolicy.Mode
+                || evidence.ReportingSourcePaths == null || input.Context.Scope?.OrderedSourcePaths == null
+                || !evidence.ReportingSourcePaths.SequenceEqual(input.Context.Scope.OrderedSourcePaths, StringComparer.Ordinal)
+                || evidence.Declarations == null || evidence.DeclarationCount != evidence.Declarations.Length
+                || evidence.Declarations.Length > WorkerDeclaredPolicyContract.MaximumDeclarations || evidence.DirectResult == null
+                || evidence.DirectResult.Uncertainties.Length != 0 || evidence.DirectResult.Entries.Any(entry => entry.PathsTruncated)
+                || !ValidCanonicalResult(evidence.DirectResult, input) || !ValidReferenceIdentities(evidence.DirectResult, input.Context)
+                || evidence.DirectResult.Entries.SelectMany(entry => entry.Paths).SelectMany(path => path.Steps).Any(step => step.FilePath != input.LogicalPath))
+            { return false; }
+            var declarations = new HashSet<CanonicalTypeIdentity>();
+            var keys = new List<string>();
+            foreach (var declaration in evidence.Declarations)
+            {
+                if (declaration?.Type is not { } type || !ValidPolicyType(type) || !ValidReferenceType(type, input.Context)
+                    || !type.Assembly!.Equals(input.Context.TargetIdentity) || type.Module!.Name != input.Context.TargetModuleName
+                    || !declarations.Add(type) || declaration.DeclaringSourcePaths == null || declaration.DeclaringSourcePaths.Length == 0
+                    || !declaration.DeclaringSourcePaths.SequenceEqual(evidence.ReportingSourcePaths.Where(path => declaration.DeclaringSourcePaths.Contains(path, StringComparer.Ordinal)), StringComparer.Ordinal))
+                { return false; }
+                keys.Add(JsonSerializer.Serialize(type, WorkerProtocol.JsonOptions));
+            }
+            if (!keys.SequenceEqual(keys.OrderBy(key => key, StringComparer.Ordinal), StringComparer.Ordinal)
+                || !declarations.SetEquals(input.Context.DeclaredPolicy.ExpectedDeclarations!)) { return false; }
+            foreach (var entry in summary.Entries.Concat(evidence.DirectResult.Entries))
+            {
+                if (!ValidPolicyType(entry.ExceptionType) || entry.ExceptionType.Assembly!.Equals(input.Context.TargetIdentity) && !declarations.Contains(entry.ExceptionType))
+                { return false; }
+            }
+            return true;
+        }
+
+        private static bool ValidPolicyType(CanonicalTypeIdentity type, bool exception = true, int depth = 0)
+            => depth < 16 && type.Kind == CanonicalTypeIdentityKind.Named && Enum.IsDefined(type.NamedTypeKind)
+                && type.NamedTypeKind != CanonicalNamedTypeKind.Unknown && (!exception || type.NamedTypeKind == CanonicalNamedTypeKind.Class)
+                && type.Assembly != null && type.Module != null && type.Module.Assembly.Equals(type.Assembly)
+                && (type.ContainingType != null ? type.NamespaceName == null
+                    : type.NamespaceName != null && type.NamespaceName.Length <= 4096 && !type.NamespaceName.Any(char.IsControl))
+                && !string.IsNullOrWhiteSpace(type.MetadataName) && type.MetadataName.Length <= 256 && !type.MetadataName.Any(char.IsControl)
+                && !type.MetadataName.Contains('`') && type.TypeArguments.Length == 0 && !type.IsUnboundGenericType && !type.IsNativeIntegerType
+                && type.ElementType == null && type.ArrayRank == 0 && type.TypeParameterScope == null && type.TypeParameterOrdinal == null
+                && type.TypeParameterOwnerAssembly == null && type.TypeParameterOwnerModule == null && type.TypeParameterOwnerDeclarationId == null
+                && type.FunctionPointerCallingConvention == null && type.FunctionPointerReturn == null && type.FunctionPointerParameters.Length == 0
+                && (type.ContainingType == null || type.ContainingType.Assembly!.Equals(type.Assembly)
+                    && type.ContainingType.Module!.Equals(type.Module) && ValidPolicyType(type.ContainingType, false, depth + 1));
 
         private static bool ValidCanonicalResult(CanonicalExceptionFlowAnalysisResult result, WorkerAnalysisInput input)
         {

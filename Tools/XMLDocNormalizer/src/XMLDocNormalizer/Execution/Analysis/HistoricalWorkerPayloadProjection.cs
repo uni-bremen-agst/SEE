@@ -12,7 +12,8 @@ namespace XMLDocNormalizer.Execution.Analysis
         ExternalCompilationProvenanceDescriptor Provenance, ExternalCSharpSyntaxTree Source,
         IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null,
         ExternalCSharpCompilationConfiguration? ParseConfiguration = null, ExternalCSharpSyntaxTreeSet? SourceSet = null,
-        ImmutableArray<HistoricalWorkerPayloadProjectionInput> SupportingProjects = default);
+        ImmutableArray<HistoricalWorkerPayloadProjectionInput> SupportingProjects = default,
+        WorkerDeclaredPolicyRequest? DeclaredPolicy = null);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -47,9 +48,12 @@ namespace XMLDocNormalizer.Execution.Analysis
     {
         internal static HistoricalWorkerPayloadProjectionResult Project(HistoricalWorkerPayloadProjectionInput? input)
         {
-            if (input != null && !input.SupportingProjects.IsDefault) { return HistoricalWorkerSolutionProjection.Project(input); }
             HistoricalWorkerPayloadProjectionResult Fail(HistoricalWorkerPayloadProjectionFailureCode code, string message)
                 => new(null, new(code, message));
+            if (input?.DeclaredPolicy != null && (input.AnalysisMode != ExceptionAnalysisMode.ProjectTransitive
+                || input.SourceSet == null || !input.SupportingProjects.IsDefault))
+            { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Declared policy facts require an explicit complete single ProjectTransitive project, not mode activation or a solution graph."); }
+            if (input != null && !input.SupportingProjects.IsDefault) { return HistoricalWorkerSolutionProjection.Project(input); }
             if (input?.Provenance == null || input.Source == null || input.Root == null)
             {
                 return Fail(HistoricalWorkerPayloadProjectionFailureCode.MissingInput, "Existing provenance, source and PE method are required.");
@@ -135,6 +139,12 @@ namespace XMLDocNormalizer.Execution.Analysis
                     context, input.AnalysisMode, out context)))
             {
                 return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Scope requires the original complete P5J/P5I project, explicit parse and exact references; unsupported modes are not substituted.");
+            }
+            if (input.DeclaredPolicy != null)
+            {
+                if (!HistoricalWorkerDeclaredPolicyProjection.TryProject(input, out var policy))
+                { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Policy opt-in requires the original bound complete nongeneric PE exception definitions, not caller-supplied declarations."); }
+                context = context with { DeclaredPolicy = policy };
             }
             var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
                 LogicalPath: input.Source.Document.Name);

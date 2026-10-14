@@ -106,7 +106,35 @@ namespace XMLDocNormalizer.HistoricalWorker
         WorkerParseContext? ParseContext = null,
         string? ParseProfile = null,
         WorkerProjectScope? Scope = null,
-        WorkerSolutionGraph? Solution = null);
+        WorkerSolutionGraph? Solution = null,
+        WorkerDeclaredPolicyRequest? DeclaredPolicy = null);
+
+    /// <summary>Explicit detector-policy facts opt-in, not an Analyzer mode or a default.</summary>
+    internal enum WorkerDeclaredPolicyMode { Unspecified, ProjectTransitiveDeclaredExceptions }
+    internal sealed record WorkerDeclaredPolicyRequest(string? Profile, WorkerDeclaredPolicyMode? Mode,
+        CanonicalTypeIdentity[]? ExpectedDeclarations = null);
+    /// <summary>Owned source definitions, including unused types; no Finding relevance computed here.</summary>
+    internal sealed record WorkerExceptionDeclaration(CanonicalTypeIdentity? Type, string[]? DeclaringSourcePaths);
+    internal sealed record WorkerDeclaredPolicyEvidence(string? Profile, WorkerDeclaredPolicyMode? Mode,
+        string[]? ReportingSourcePaths, int? DeclarationCount, WorkerExceptionDeclaration[]? Declarations,
+        CanonicalExceptionFlowAnalysisResult? DirectResult);
+
+    internal static class WorkerDeclaredPolicyContract
+    {
+        internal const string Profile = "single-project-declared-policy-v1";
+        internal const int MaximumDeclarations = 128;
+        internal static bool HasSupportedRequest(WorkerAnalysisInput input)
+            => input.Context?.DeclaredPolicy is not { } request || request.Profile == Profile
+                && request.Mode == WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions
+                && input.Context.AnalysisMode == "project-transitive" && input.Context.Solution == null
+                && input.Context.Scope != null && input.Context.ParseContext != null
+                && input.Context.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                && request.ExpectedDeclarations != null && request.ExpectedDeclarations.Length <= MaximumDeclarations
+                && request.ExpectedDeclarations.All(type => type != null && type.Assembly != null && type.Module != null
+                    && type.Assembly.Equals(input.Context.TargetIdentity) && type.Module.Assembly.Equals(type.Assembly)
+                    && type.Module.Name == input.Context.TargetModuleName && type.Module.Ordinal == 0 && type.Module.ModuleVersionId == null)
+                && request.ExpectedDeclarations.Distinct().Count() == request.ExpectedDeclarations.Length;
+    }
 
     /// <summary>Original binary-project identity, not a path, simple assembly name or Roslyn ProjectId.</summary>
     internal sealed record WorkerProjectIdentity(CanonicalAssemblyIdentity? Assembly, string? ModuleName, Guid? ModuleVersionId);
@@ -159,7 +187,7 @@ namespace XMLDocNormalizer.HistoricalWorker
                     && HasSupportedParseContext(input.Context) && input.Context.NullableContext == "enable"
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null
-                    && HasSupportedReferences(input.Context)));
+                    && HasSupportedReferences(input.Context) && WorkerDeclaredPolicyContract.HasSupportedRequest(input)));
 
         internal static bool ReferenceMatchesProject(WorkerReferenceImage reference, WorkerProjectIdentity project)
             => reference.Identity != null && reference.Identity.Equals(project.Assembly)
@@ -321,7 +349,8 @@ namespace XMLDocNormalizer.HistoricalWorker
         WorkerIdentity? Identity = null,
         CanonicalExceptionFlowAnalysisResult? Result = null,
         WorkerFailure? Failure = null,
-        WorkerAnalysisProvenance? Provenance = null);
+        WorkerAnalysisProvenance? Provenance = null,
+        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null);
 
     /// <summary>Completed analysis input binding; separate from existing canonical exception/path identities.</summary>
     internal sealed record WorkerAnalysisProvenance(string SourceSha256, string TypeMetadataName,

@@ -22,7 +22,8 @@ namespace XMLDocNormalizer.Execution.Historical
         HistoricalWorkerClientFailure? Failure,
         string Diagnostics = "",
         int? ProcessId = null,
-        WorkerAnalysisProvenance? Provenance = null)
+        WorkerAnalysisProvenance? Provenance = null,
+        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null)
     {
         internal bool Success => Result != null && Identity != null && Provenance != null && Failure == null;
     }

@@ -78,8 +78,19 @@ namespace XMLDocNormalizer.HistoricalWorker
                     result.Uncertainties.Select(item => item.DisplayText).OrderBy(text => text, StringComparer.Ordinal).ToArray());
             }
 
+            WorkerDeclaredPolicyEvidence? policy = null;
+            if (input.Context?.DeclaredPolicy != null)
+            {
+                try { policy = HistoricalDeclaredPolicyFacts.Create(input, compilation, member, environment); }
+                catch (Exception exception)
+                {
+                    Console.Error.WriteLine("Historical policy fact projection failed: " + exception);
+                    return Failure(WorkerFailureCode.AnalysisFailure, "Policy facts could not be completed.", identity);
+                }
+                if (policy == null) { return Failure(WorkerFailureCode.UnsupportedContext, "Policy facts exceed the bounded complete nongeneric source-declaration profile.", identity); }
+            }
             return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
-                Provenance: WorkerProtocol.Provenance(input));
+                Provenance: WorkerProtocol.Provenance(input), DeclaredPolicy: policy);
         }
 
         /// <summary>Reuse the exact B12/B13/B14 reconstruction for each independently owned project.</summary>
