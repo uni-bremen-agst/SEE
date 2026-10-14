@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>XMLDocNormalizer</AssemblyName>
@@ -13,6 +13,8 @@
     <Compile Remove="..\..\Tests\XMLDocNormalizerTests\**\*.cs" />
     <!-- Neutral same-source protocol only: no Worker/Historical runtime reference. -->
     <Compile Include="../XMLDocNormalizer.HistoricalWorker/WorkerProtocol.cs" Link="Execution/Historical/WorkerProtocol.cs" />
+    <!-- Same bounded fact projection compiled against each owner's own compiler; no Worker runtime reference. -->
+    <Compile Include="../XMLDocNormalizer.HistoricalWorker/HistoricalDeclaredDocumentationFacts.cs" Link="Execution/Historical/HistoricalDeclaredDocumentationFacts.cs" />
   </ItemGroup>
 
 <ItemGroup>

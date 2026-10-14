@@ -53,7 +53,7 @@ namespace XMLDocNormalizer.Execution.Historical
 
                 if (!response.Success)
                 {
-                    if (response.Result != null || response.Provenance != null || response.DeclaredPolicy != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
+                    if (response.Result != null || response.Provenance != null || response.DeclaredPolicy != null || response.DeclaredDocumentation != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
                         || response.Failure.Details == null || response.Failure.Details.Any(detail => detail == null)
                         || (response.Operation != "analyze" && response.Operation != "invalid"))
                     {
@@ -93,8 +93,14 @@ namespace XMLDocNormalizer.Execution.Historical
                 {
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
                 }
-                var call = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance, response.DeclaredPolicy);
-                if (response.DeclaredPolicy != null) { policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result)); }
+                DeclaredFindingDocumentationFacts? documentation = null;
+                if (response.DeclaredPolicy == null && response.DeclaredDocumentation != null)
+                { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation facts require validated B17 evidence."); }
+                if (response.DeclaredPolicy != null && !HistoricalWorkerDeclaredDocumentationProjection.TryValidate(input,
+                    response.DeclaredDocumentation, response.DeclaredPolicy, response.Result, out documentation))
+                { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation identity, completeness, ownership or original context is invalid."); }
+                var call = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance, response.DeclaredPolicy, response.DeclaredDocumentation);
+                if (response.DeclaredPolicy != null) { policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result, documentation)); }
                 return call;
             }
             catch (Exception exception) when (exception is JsonException or ArgumentException or InvalidOperationException or NotSupportedException or NullReferenceException)

@@ -18,11 +18,15 @@ namespace XMLDocNormalizer.Execution.Analysis
     }
 
     /// <summary>Immutable neutral snapshot, consumable only via the validation-owned call receipt.</summary>
-    internal sealed class DeclaredPolicyFacts(WorkerDeclaredPolicyEvidence evidence, CanonicalExceptionFlowAnalysisResult summary)
+    internal sealed class DeclaredPolicyFacts(WorkerDeclaredPolicyEvidence evidence, CanonicalExceptionFlowAnalysisResult summary,
+        DeclaredFindingDocumentationFacts? documentation = null)
     {
         internal ImmutableHashSet<CanonicalTypeIdentity> Declarations { get; } = evidence.Declarations!.Select(item => item.Type!).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Direct { get; } = evidence.DirectResult!.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Summary { get; } = summary.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
+        internal DeclaredFindingDocumentationFacts? Documentation { get; } = documentation;
+        internal ImmutableHashSet<CanonicalTypeIdentity> Documented { get; } = documentation?.Tags.Where(tag => tag.IsException == true)
+            .Select(tag => tag.Type!).ToImmutableHashSet() ?? ImmutableHashSet<CanonicalTypeIdentity>.Empty;
     }
 
     /// <summary>Main detector eligibility over validated facts; no Analyzer execution or Finding rendering.</summary>
@@ -42,7 +46,7 @@ namespace XMLDocNormalizer.Execution.Analysis
             bool local = validated.Declarations.Contains(query.ExceptionType);
             bool direct = validated.Direct.Contains(query.ExceptionType);
             bool summary = validated.Summary.Contains(query.ExceptionType);
-            if (!local && !direct && !summary)
+            if (!local && !direct && !summary && !validated.Documented.Contains(query.ExceptionType))
             { return Fail(DeclaredFindingPolicyFailureCode.UnknownExceptionType, "No source-definition or proven-flow exception fact exists for this identity."); }
             bool enabled = validated.Declarations.Count != 0; // Complete inventory, not exceptions observed in Result.
             bool relevant = query.SourceKind switch

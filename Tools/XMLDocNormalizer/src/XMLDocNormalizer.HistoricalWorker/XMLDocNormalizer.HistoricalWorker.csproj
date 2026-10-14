@@ -10,5 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../XMLDocNormalizer.ExceptionFlow.Historical/XMLDocNormalizer.ExceptionFlow.Historical.csproj" />
+    <!-- Unchanged local-document syntax helpers; no detector/Finding policy is compiled here. -->
+    <Compile Include="../XMLDocNormalizer/Utils/XmlDocUtils.cs" Link="Documentation/XmlDocUtils.cs" />
+    <Compile Include="../XMLDocNormalizer/Utils/XmlDocElementQuery.cs" Link="Documentation/XmlDocElementQuery.cs" />
+    <Compile Include="../XMLDocNormalizer/Utils/Extensions/XmlSyntaxExtensions.cs" Link="Documentation/XmlSyntaxExtensions.cs" />
+    <Compile Include="../XMLDocNormalizer/Utils/MemberAnchorResolver.cs" Link="Documentation/MemberAnchorResolver.cs" />
+    <Compile Include="../XMLDocNormalizer/Models/ExtractedXmlDocTag.cs" Link="Documentation/ExtractedXmlDocTag.cs" />
+    <Compile Include="../XMLDocNormalizer/Checks/Infrastructure/Tags/XmlDocTagExtraction.cs" Link="Documentation/XmlDocTagExtraction.cs" />
   </ItemGroup>
 </Project>

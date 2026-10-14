@@ -112,12 +112,49 @@ namespace XMLDocNormalizer.HistoricalWorker
     /// <summary>Explicit detector-policy facts opt-in, not an Analyzer mode or a default.</summary>
     internal enum WorkerDeclaredPolicyMode { Unspecified, ProjectTransitiveDeclaredExceptions }
     internal sealed record WorkerDeclaredPolicyRequest(string? Profile, WorkerDeclaredPolicyMode? Mode,
-        CanonicalTypeIdentity[]? ExpectedDeclarations = null);
+        CanonicalTypeIdentity[]? ExpectedDeclarations = null, WorkerDeclaredDocumentationRequest? Documentation = null);
     /// <summary>Owned source definitions, including unused types; no Finding relevance computed here.</summary>
     internal sealed record WorkerExceptionDeclaration(CanonicalTypeIdentity? Type, string[]? DeclaringSourcePaths);
     internal sealed record WorkerDeclaredPolicyEvidence(string? Profile, WorkerDeclaredPolicyMode? Mode,
         string[]? ReportingSourcePaths, int? DeclarationCount, WorkerExceptionDeclaration[]? Declarations,
         CanonicalExceptionFlowAnalysisResult? DirectResult);
+
+    /// <summary>Selected-root local XML facts, never an external XML contract or a Finding payload.</summary>
+    internal sealed record WorkerDeclaredDocumentationRequest(string? Profile, WorkerDeclaredPolicyMode? Mode,
+        CanonicalCallableIdentity? Method = null, WorkerDeclaredDocumentationSyntax? Syntax = null);
+    internal sealed record WorkerDeclaredDocumentationSyntax(string? LogicalPath, int? MemberStart, int? MemberLength,
+        int? Anchor, bool? HasDocumentation, bool? HasInheritdoc, WorkerExceptionTagSyntax[]? Tags);
+    internal sealed record WorkerExceptionTagSyntax(int? Start, int? Length, int? CrefStart, int? CrefLength, string? RawCref);
+    internal enum WorkerCrefBindingKind { Unspecified, Unresolved, NamedType, OtherSymbol }
+    internal sealed record WorkerExceptionTagBinding(WorkerExceptionTagSyntax? Syntax, WorkerCrefBindingKind? Kind,
+        CanonicalTypeIdentity? Type, bool? IsException);
+    internal sealed record WorkerTypeDisplayFact(CanonicalTypeIdentity? Type, string? DisplayName);
+    internal sealed record WorkerDeclaredDocumentationEvidence(string? Profile, WorkerDeclaredPolicyMode? Mode,
+        CanonicalCallableIdentity? Method, WorkerDeclaredDocumentationSyntax? Syntax,
+        WorkerExceptionTagBinding[]? Bindings, WorkerTypeDisplayFact[]? TypeDisplays,
+        string? DirectSha256 = null, string? SummarySha256 = null);
+
+    internal static class WorkerDeclaredDocumentationContract
+    {
+        internal const string Profile = "single-root-declared-documentation-v1";
+        internal const int MaximumTags = 128;
+        internal static bool HasSupportedRequest(WorkerAnalysisInput input)
+        {
+            if (input.Context?.DeclaredPolicy?.Documentation is not { } request) { return true; }
+            var syntax = request.Syntax;
+            return request.Profile == Profile && request.Mode == WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions
+                && request.Method != null && request.Method.ContainingType?.Assembly?.Equals(input.Context.TargetIdentity) == true
+                && syntax != null && syntax.LogicalPath == input.LogicalPath && syntax.MemberStart is >= 0 && syntax.MemberLength is > 0
+                && (long)syntax.MemberStart + syntax.MemberLength <= input.Source!.Length
+                && syntax.Anchor >= syntax.MemberStart && syntax.Anchor < syntax.MemberStart + syntax.MemberLength
+                && syntax.HasDocumentation != null && syntax.HasInheritdoc != null && syntax.Tags != null
+                && syntax.Tags.Length <= MaximumTags && (syntax.HasDocumentation == true || syntax.Tags.Length == 0 && syntax.HasInheritdoc == false)
+                && syntax.Tags.All(tag => tag != null && tag.Start is >= 0 && tag.Length is > 0
+                    && (long)tag.Start + tag.Length <= syntax.MemberStart && tag.CrefStart.HasValue == tag.CrefLength.HasValue
+                    && (tag.CrefStart == null ? tag.RawCref == null : tag.CrefStart >= tag.Start && tag.CrefLength > 0
+                        && (long)tag.CrefStart + tag.CrefLength <= tag.Start + tag.Length));
+        }
+    }
 
     internal static class WorkerDeclaredPolicyContract
     {
@@ -133,7 +170,8 @@ namespace XMLDocNormalizer.HistoricalWorker
                 && request.ExpectedDeclarations.All(type => type != null && type.Assembly != null && type.Module != null
                     && type.Assembly.Equals(input.Context.TargetIdentity) && type.Module.Assembly.Equals(type.Assembly)
                     && type.Module.Name == input.Context.TargetModuleName && type.Module.Ordinal == 0 && type.Module.ModuleVersionId == null)
-                && request.ExpectedDeclarations.Distinct().Count() == request.ExpectedDeclarations.Length;
+                && request.ExpectedDeclarations.Distinct().Count() == request.ExpectedDeclarations.Length
+                && WorkerDeclaredDocumentationContract.HasSupportedRequest(input);
     }
 
     /// <summary>Original binary-project identity, not a path, simple assembly name or Roslyn ProjectId.</summary>
@@ -350,7 +388,7 @@ namespace XMLDocNormalizer.HistoricalWorker
         CanonicalExceptionFlowAnalysisResult? Result = null,
         WorkerFailure? Failure = null,
         WorkerAnalysisProvenance? Provenance = null,
-        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null);
+        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null, WorkerDeclaredDocumentationEvidence? DeclaredDocumentation = null);
 
     /// <summary>Completed analysis input binding; separate from existing canonical exception/path identities.</summary>
     internal sealed record WorkerAnalysisProvenance(string SourceSha256, string TypeMetadataName,

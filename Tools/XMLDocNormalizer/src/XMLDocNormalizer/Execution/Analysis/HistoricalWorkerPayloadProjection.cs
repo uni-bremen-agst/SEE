@@ -146,12 +146,15 @@ namespace XMLDocNormalizer.Execution.Analysis
                 { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Policy opt-in requires the original bound complete nongeneric PE exception definitions, not caller-supplied declarations."); }
                 context = context with { DeclaredPolicy = policy };
             }
+            if (!HistoricalWorkerDeclaredDocumentationProjection.TryProject(input, context, out context, out var documentOrigin))
+            { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Documentation facts require the original selected source member and an explicit bounded profile, not caller-supplied facts."); }
             var payload = new WorkerAnalysisInput(input.Source.Text.ToString(), MetadataName(method.ContainingType), method.MetadataName, context,
                 LogicalPath: input.Source.Document.Name);
             if (!WorkerInputValidation.IsSupported(payload))
             {
                 return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedPayload, "Mapped source/selector exceeds the existing Worker contract.");
             }
+            HistoricalWorkerDeclaredDocumentationProjection.Register(payload, documentOrigin);
             return new(new(provenance, input.Source, method, payload), null);
         }
 
