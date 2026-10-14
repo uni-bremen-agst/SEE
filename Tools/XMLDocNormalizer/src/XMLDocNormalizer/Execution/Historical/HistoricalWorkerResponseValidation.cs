@@ -107,7 +107,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 if (response.DeclaredPolicy != null)
                 {
                     policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result, documentation,
-                    documentation == null ? null : documentationExecution));
+                    documentation == null ? null : documentationExecution, input.Context?.DeclaredExecution));
                 }
                 return call;
             }
@@ -150,6 +150,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 || !ValidCanonicalResult(evidence.DirectResult, input) || !ValidReferenceIdentities(evidence.DirectResult, input.Context)
                 || evidence.DirectResult.Entries.SelectMany(entry => entry.Paths).SelectMany(path => path.Steps).Any(step => step.FilePath != input.LogicalPath))
             { return false; }
+            if (input.Context.DeclaredExecution == WorkerDeclaredExecution.DirectEvidence && !summary.Equals(evidence.DirectResult)) { return false; }
             var declarations = new HashSet<CanonicalTypeIdentity>();
             var keys = new List<string>();
             foreach (var declaration in evidence.Declarations)

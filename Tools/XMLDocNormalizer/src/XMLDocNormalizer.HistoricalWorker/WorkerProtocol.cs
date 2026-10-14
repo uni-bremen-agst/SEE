@@ -107,7 +107,11 @@ namespace XMLDocNormalizer.HistoricalWorker
         string? ParseProfile = null,
         WorkerProjectScope? Scope = null,
         WorkerSolutionGraph? Solution = null,
-        WorkerDeclaredPolicyRequest? DeclaredPolicy = null);
+        WorkerDeclaredPolicyRequest? DeclaredPolicy = null,
+        WorkerDeclaredExecution? DeclaredExecution = null);
+
+    /// <summary>Main-selected execution purpose, never a Worker guard or relevance decision.</summary>
+    internal enum WorkerDeclaredExecution { Unspecified, DirectEvidence, SummaryEvidence }
 
     /// <summary>Explicit detector-policy facts opt-in, not an Analyzer mode or a default.</summary>
     internal enum WorkerDeclaredPolicyMode { Unspecified, ProjectTransitiveDeclaredExceptions }
@@ -161,9 +165,13 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal const string Profile = "single-project-declared-policy-v1";
         internal const int MaximumDeclarations = 128;
         internal static bool HasSupportedRequest(WorkerAnalysisInput input)
-            => input.Context?.DeclaredPolicy is not { } request || request.Profile == Profile
+            => input.Context?.DeclaredPolicy is not { } request ? input.Context?.DeclaredExecution == null : request.Profile == Profile
                 && request.Mode == WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions
-                && input.Context.AnalysisMode == "project-transitive" && input.Context.Solution == null
+                && (input.Context.AnalysisMode == "project-transitive" && input.Context.DeclaredExecution == null
+                    || input.Context.AnalysisMode == "project-transitive-declared-exceptions"
+                        && input.Context.DeclaredExecution is WorkerDeclaredExecution.DirectEvidence or WorkerDeclaredExecution.SummaryEvidence
+                        && request.Documentation != null)
+                && input.Context.Solution == null
                 && input.Context.Scope != null && input.Context.ParseContext != null
                 && input.Context.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
                 && request.ExpectedDeclarations != null && request.ExpectedDeclarations.Length <= MaximumDeclarations
@@ -290,9 +298,12 @@ namespace XMLDocNormalizer.HistoricalWorker
         {
             var context = input.Context!;
             if (context.Scope == null)
-            { return context.AnalysisMode == "solution-transitive" && context.AdditionalSources == null; }
+            { return context.AnalysisMode == "solution-transitive" && context.AdditionalSources == null && context.DeclaredExecution == null; }
             var scope = context.Scope;
-            if (scope.Kind != "single-project-v1" || context.AnalysisMode is not ("direct" or "project-transitive" or "solution-transitive")
+            if (scope.Kind != "single-project-v1"
+                || !(context.AnalysisMode is "direct" or "project-transitive" or "solution-transitive" && context.DeclaredExecution == null
+                    || context.AnalysisMode == "project-transitive-declared-exceptions" && context.DeclaredPolicy?.Documentation != null
+                        && context.DeclaredExecution is WorkerDeclaredExecution.DirectEvidence or WorkerDeclaredExecution.SummaryEvidence)
                 || context.ReferenceProfile != WorkerProtocol.ExactReferenceProfile || !HasSupportedParseContext(context)
                 || context.ParseContext == null || scope.AssemblyName != context.AssemblyName
                 || scope.RootLogicalPath != input.LogicalPath || input.LogicalPath == null

@@ -25,7 +25,7 @@ namespace XMLDocNormalizer.Checks
     /// documented exceptions that are not found within the configured transitive scope.
     /// DOC660 and DOC670 are independent of the selected exception analysis mode.
     /// </remarks>
-    internal static class XmlDocExceptionSemanticDetector
+    internal static partial class XmlDocExceptionSemanticDetector
     {
         private static readonly ExceptionFlowAnalysisDispatch analysisDispatch = new(new());
 
@@ -235,91 +235,16 @@ namespace XMLDocNormalizer.Checks
                         directFlowResult,
                         summaryAnalysisSession);
 
-                bool suppressMissingExceptionTagFindings =
-                    doc.HasInheritdoc();
-
-                AddInvalidExceptionCrefFindings(
-                    findings,
-                    tree,
-                    filePath,
-                    tagInfos);
-
-                AddExceptionCrefNotExceptionTypeFindings(
-                    findings,
-                    tree,
-                    filePath,
-                    tagInfos,
-                    exceptionBase);
-
-                if (IsTransitiveMode(
-                        options))
-                {
-                    AddExceptionFlowNotDecidableFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        tagInfos,
-                        exceptionBase,
-                        flowResult,
-                        options,
-                        semanticContext);
-
-                    AddDocumentedExceptionWithoutTransitiveThrowFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        tagInfos,
-                        exceptionBase,
-                        flowResult,
-                        options,
-                        semanticContext);
-
-                    if (!suppressMissingExceptionTagFindings)
-                    {
-                        AddMissingDirectExceptionTagFindings(
-                            findings,
-                            tree,
-                            filePath,
-                            member,
-                            tagInfos,
-                            exceptionBase,
-                            directFlowResult);
-
-                        AddMissingTransitiveExceptionTagFindings(
-                            findings,
-                            tree,
-                            filePath,
-                            member,
-                            tagInfos,
-                            exceptionBase,
-                            flowResult,
-                            directFlowResult,
-                            options,
-                            semanticContext);
-                    }
-                }
-                else
-                {
-                    AddDocumentedExceptionWithoutDirectThrowFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        tagInfos,
-                        exceptionBase,
-                        flowResult);
-
-                    if (!suppressMissingExceptionTagFindings)
-                    {
-                        AddMissingDirectExceptionTagFindings(
-                            findings,
-                            tree,
-                            filePath,
-                            member,
-                            tagInfos,
-                            exceptionBase,
-                            flowResult);
-                    }
-                }
+                AddExceptionFindings<INamedTypeSymbol>(
+                    findings, NativeTags(tree, filePath, tagInfos),
+                    () => FindingAnchor(tree, filePath, MemberAnchorResolver.GetAnchorPosition(member),
+                        CreateExceptionFlowContext(member, null, filePath)),
+                    directFlowResult.ThrownExceptions, flowResult.ThrownExceptions,
+                    SymbolEqualityComparer.Default, type => type.InheritsFromOrEquals(exceptionBase),
+                    semanticContext.IsDeclaredInReportingScope, type => type.ToDisplayString(),
+                    options.ExceptionAnalysisMode, doc.HasInheritdoc(),
+                    flowResult.HasUncertainPaths, flowResult.UncertainTargets,
+                    flowResult.ExternalDocumentationEvidenceExceptions);
             }
 
             return findings;
@@ -376,13 +301,9 @@ namespace XMLDocNormalizer.Checks
             ExceptionFlowAnalysisResult directFlowResult,
             ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession)
         {
-            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.Direct)
-            {
-                return directFlowResult;
-            }
-
-            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
-                && !semanticContext.HasDeclaredExceptionTypesInReportingScope())
+            if (!RequiresSummary(options.ExceptionAnalysisMode,
+                options.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
+                    || semanticContext.HasDeclaredExceptionTypesInReportingScope()))
             {
                 return directFlowResult;
             }
@@ -495,415 +416,51 @@ namespace XMLDocNormalizer.Checks
             return infos;
         }
 
-        /// <summary>
-        /// Adds DOC660 findings for exception tags whose cref cannot be resolved to a known type.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
-        /// empty, or consists only of white-space characters and an invalid-cref finding is created.
-        /// </exception>
-        private static void AddInvalidExceptionCrefFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            List<ExceptionTagSemanticInfo> tagInfos)
+        // Native conservative-policy seams used by the unchanged RuntimeAwait controls.
+        private static void AddExceptionFlowNotDecidableFindings(List<Finding> findings,
+            SyntaxTree tree, string filePath, List<ExceptionTagSemanticInfo> tagInfos,
+            INamedTypeSymbol exceptionBase, ExceptionFlowAnalysisResult flowResult,
+            XmlDocOptions options, ProjectClosureSemanticContext semanticContext)
         {
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue) ||
-                    info.CrefAttribute == null ||
-                    info.CrefAttribute.Cref == null ||
-                    info.ResolvedSymbol != null)
-                {
-                    continue;
-                }
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.InvalidExceptionCref,
-                    info.CrefAttribute.SpanStart,
-                    info.FindingContext,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue));
-            }
+            if (!flowResult.HasUncertainPaths) { return; }
+            AddNativeDocumentedTransitiveFindings(findings, tree, filePath, tagInfos, exceptionBase, flowResult, options, semanticContext);
         }
 
-        /// <summary>
-        /// Adds DOC670 findings for exception tags whose cref resolves to a symbol that is not an exception type.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and a non-exception-cref finding is created.
-        /// </exception>
-        private static void AddExceptionCrefNotExceptionTypeFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase)
+        private static void AddDocumentedExceptionWithoutTransitiveThrowFindings(List<Finding> findings,
+            SyntaxTree tree, string filePath, List<ExceptionTagSemanticInfo> tagInfos,
+            INamedTypeSymbol exceptionBase, ExceptionFlowAnalysisResult flowResult,
+            XmlDocOptions options, ProjectClosureSemanticContext semanticContext)
         {
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue) ||
-                    info.CrefAttribute == null ||
-                    info.CrefAttribute.Cref == null ||
-                    info.ResolvedTypeSymbol == null)
-                {
-                    continue;
-                }
-
-                if (info.ResolvedTypeSymbol.InheritsFromOrEquals(exceptionBase))
-                {
-                    continue;
-                }
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.ExceptionCrefNotExceptionType,
-                    info.CrefAttribute.SpanStart,
-                    info.FindingContext,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue));
-            }
+            if (flowResult.HasUncertainPaths) { return; }
+            AddNativeDocumentedTransitiveFindings(findings, tree, filePath, tagInfos, exceptionBase, flowResult, options, semanticContext);
         }
 
-        /// <summary>
-        /// Adds DOC631 findings for relevant documented exception tags whose transitive flow
-        /// could not be decided completely and that are not already covered by proven thrown exceptions.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
-        /// <param name="options">The XML documentation analysis options.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and an undecidable-flow finding is created.
-        /// </exception>
-        private static void AddExceptionFlowNotDecidableFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult,
-            XmlDocOptions options,
-            ProjectClosureSemanticContext semanticContext)
-        {
-            if (!flowResult.HasUncertainPaths)
-            {
-                return;
-            }
+        private static void AddNativeDocumentedTransitiveFindings(List<Finding> findings,
+            SyntaxTree tree, string filePath, List<ExceptionTagSemanticInfo> tagInfos,
+            INamedTypeSymbol exceptionBase, ExceptionFlowAnalysisResult flowResult,
+            XmlDocOptions options, ProjectClosureSemanticContext semanticContext)
+            => AddDocumentedTransitiveFindings<INamedTypeSymbol>(findings, NativeTags(tree, filePath, tagInfos),
+                new(flowResult.ThrownExceptions, SymbolEqualityComparer.Default),
+                new(flowResult.ExternalDocumentationEvidenceExceptions, SymbolEqualityComparer.Default),
+                type => IsRelevantThrownException(type, exceptionBase, options, semanticContext),
+                flowResult.HasUncertainPaths, flowResult.UncertainTargets);
 
-            string summary = SummarizeUncertainTargets(flowResult.UncertainTargets, 3);
-
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (!IsRelevantDocumentedException(
-                        info,
-                        exceptionBase,
-                        options,
-                        semanticContext))
-                {
-                    continue;
-                }
-
-                if (IsDocumentedExceptionCoveredByThrownTypes(
-                        flowResult.ThrownExceptions,
-                        info.ResolvedTypeSymbol!))
-                {
-                    continue;
-                }
-
-                string findingSummary = summary;
-
-                if (IsDocumentedExceptionCoveredByThrownTypes(
-                        flowResult.ExternalDocumentationEvidenceExceptions,
-                        info.ResolvedTypeSymbol!))
-                {
-                    findingSummary +=
-                        ". External XML documentation lists this exception " +
-                        "as a possible throw.";
-                }
-
-                findings.Add(
-                    FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "exception",
-                        XmlDocSmells.ExceptionFlowNotDecidable,
-                        info.CrefAttribute!.SpanStart,
-                        info.FindingContext,
-                        snippet:
-                            SyntaxUtils.GetSnippet(
-                                info.Tag.Element),
-                        info.Tag.RawAttributeValue!,
-                        findingSummary));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC630 findings for documented exceptions that are not directly thrown by the member.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <param name="flowResult">The direct exception-flow analysis result.</param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and an unthrown-exception finding is created.
-        /// </exception>
-        private static void AddDocumentedExceptionWithoutDirectThrowFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult)
-        {
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue) ||
-                    info.CrefAttribute == null ||
-                    info.CrefAttribute.Cref == null ||
-                    info.ResolvedTypeSymbol == null ||
-                    !info.ResolvedTypeSymbol.InheritsFromOrEquals(exceptionBase))
-                {
-                    continue;
-                }
-
-                if (IsDocumentedExceptionCoveredByThrownTypes(flowResult.ThrownExceptions, info.ResolvedTypeSymbol))
-                {
-                    continue;
-                }
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.ExceptionTagWithoutDirectThrow,
-                    info.CrefAttribute.SpanStart,
-                    info.FindingContext,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC632 findings for relevant documented exceptions that were not found
-        /// within the configured transitive analysis scope.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
-        /// <param name="options">The XML documentation analysis options.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and an unthrown-exception finding is created.
-        /// </exception>
-        private static void AddDocumentedExceptionWithoutTransitiveThrowFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult,
-            XmlDocOptions options,
-            ProjectClosureSemanticContext semanticContext)
-        {
-            if (flowResult.HasUncertainPaths)
-            {
-                return;
-            }
-
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (!IsRelevantDocumentedException(info, exceptionBase, options, semanticContext))
-                {
-                    continue;
-                }
-
-                if (IsDocumentedExceptionCoveredByThrownTypes(flowResult.ThrownExceptions, info.ResolvedTypeSymbol!))
-                {
-                    continue;
-                }
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.ExceptionTagWithoutTransitiveThrow,
-                    info.CrefAttribute!.SpanStart,
-                    info.FindingContext,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue!));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC610 findings for directly thrown exceptions that are not
-        /// covered by any valid exception tag.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member whose direct exception flow is analyzed.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <param name="flowResult">The direct exception-flow result.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
-        /// missing direct-exception finding must be reported.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and a missing direct-exception finding is created.
-        /// </exception>
-        private static void AddMissingDirectExceptionTagFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult)
-        {
-            HashSet<INamedTypeSymbol> documentedExceptions =
-                CollectDocumentedExceptionTypes(
-                    tagInfos,
-                    exceptionBase);
-
-            foreach (INamedTypeSymbol thrownType
-                     in flowResult.ThrownExceptions)
-            {
-                if (!thrownType.InheritsFromOrEquals(
-                        exceptionBase))
-                {
-                    continue;
-                }
-
-                if (IsThrownExceptionCoveredByDocumentedTypes(
-                        documentedExceptions,
-                        thrownType))
-                {
-                    continue;
-                }
-
-                string thrownTypeName =
-                    thrownType.ToDisplayString();
-
-                findings.Add(
-                    FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "exception",
-                        XmlDocSmells.MissingExceptionTag,
-                        MemberAnchorResolver.GetAnchorPosition(
-                            member),
-                        CreateExceptionFlowContext(
-                            member,
-                            thrownTypeName,
-                            filePath),
-                        snippet: string.Empty,
-                        thrownTypeName));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC611 findings for transitively thrown exceptions that are not covered by any relevant exception tag.
-        /// Directly thrown exceptions are excluded because they are reported as DOC610.
-        /// </summary>
-        /// <param name="findings">The finding list to append to.</param>
-        /// <param name="tree">The syntax tree that contains the member.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member whose transitive exception flow is analyzed.</param>
-        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
-        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
-        /// <param name="flowResult">The transitive exception-flow result.</param>
-        /// <param name="directFlowResult">The direct exception-flow result for the same member.</param>
-        /// <param name="options">The XML documentation analysis options.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
-        /// missing transitive-exception finding must be reported.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
-        /// or consists only of white-space characters and a missing transitive-exception finding is created.
-        /// </exception>
+        // Kept as the native policy seam used by existing architecture controls.
         private static void AddMissingTransitiveExceptionTagFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member,
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult,
-            ExceptionFlowAnalysisResult directFlowResult,
-            XmlDocOptions options,
+            List<Finding> findings, SyntaxTree tree, string filePath,
+            MemberDeclarationSyntax member, List<ExceptionTagSemanticInfo> tagInfos,
+            INamedTypeSymbol exceptionBase, ExceptionFlowAnalysisResult flowResult,
+            ExceptionFlowAnalysisResult directFlowResult, XmlDocOptions options,
             ProjectClosureSemanticContext semanticContext)
         {
-            HashSet<INamedTypeSymbol> documentedExceptions =
-                CollectRelevantDocumentedExceptionTypes(
-                    tagInfos,
-                    exceptionBase,
-                    options,
-                    semanticContext);
-
-            foreach (INamedTypeSymbol thrownType in flowResult.ThrownExceptions)
-            {
-                if (directFlowResult.ThrownExceptions.Contains(thrownType))
-                {
-                    continue;
-                }
-
-                if (!IsRelevantThrownException(thrownType, exceptionBase, options, semanticContext))
-                {
-                    continue;
-                }
-
-                if (IsThrownExceptionCoveredByDocumentedTypes(documentedExceptions, thrownType))
-                {
-                    continue;
-                }
-
-                string thrownTypeName = thrownType.ToDisplayString();
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.MissingTransitiveExceptionDocumentation,
-                    MemberAnchorResolver.GetAnchorPosition(member),
-                    CreateExceptionFlowContext(
-                        member,
-                        thrownTypeName,
-                        filePath),
-                    snippet: string.Empty,
-                    thrownTypeName));
-            }
+            AddMissingExceptionFindings<INamedTypeSymbol>(findings,
+                () => FindingAnchor(tree, filePath, MemberAnchorResolver.GetAnchorPosition(member),
+                    CreateExceptionFlowContext(member, null, filePath)),
+                flowResult.ThrownExceptions, directFlowResult.ThrownExceptions,
+                CollectRelevantDocumentedExceptionTypes(tagInfos, exceptionBase, options, semanticContext),
+                SymbolEqualityComparer.Default,
+                type => IsRelevantThrownException(type, exceptionBase, options, semanticContext),
+                type => type.ToDisplayString(), transitive: true);
         }
 
         /// <summary>

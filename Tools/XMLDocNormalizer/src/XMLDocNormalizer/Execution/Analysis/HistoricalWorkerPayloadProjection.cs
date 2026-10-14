@@ -47,10 +47,19 @@ namespace XMLDocNormalizer.Execution.Analysis
     internal static class HistoricalWorkerPayloadProjection
     {
         internal static HistoricalWorkerPayloadProjectionResult Project(HistoricalWorkerPayloadProjectionInput? input)
+            => Project(input, null);
+
+        internal static HistoricalWorkerPayloadProjectionResult ProjectForFindings(HistoricalWorkerPayloadProjectionInput? input, WorkerDeclaredExecution execution)
+            => Project(input, execution);
+
+        private static HistoricalWorkerPayloadProjectionResult Project(HistoricalWorkerPayloadProjectionInput? input, WorkerDeclaredExecution? execution)
         {
             HistoricalWorkerPayloadProjectionResult Fail(HistoricalWorkerPayloadProjectionFailureCode code, string message)
                 => new(null, new(code, message));
-            if (input?.DeclaredPolicy != null && (input.AnalysisMode != ExceptionAnalysisMode.ProjectTransitive
+            if (execution != null && (input?.AnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
+                || input.DeclaredPolicy?.Documentation == null || execution is not (WorkerDeclaredExecution.DirectEvidence or WorkerDeclaredExecution.SummaryEvidence)))
+            { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Productive findings require explicit Declared mode, documentation and a bounded execution purpose."); }
+            if (input?.DeclaredPolicy != null && (input.AnalysisMode != (execution == null ? ExceptionAnalysisMode.ProjectTransitive : ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
                 || input.SourceSet == null || !input.SupportingProjects.IsDefault))
             { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Declared policy facts require an explicit complete single ProjectTransitive project, not mode activation or a solution graph."); }
             if (input != null && !input.SupportingProjects.IsDefault) { return HistoricalWorkerSolutionProjection.Project(input); }
@@ -134,6 +143,7 @@ namespace XMLDocNormalizer.Execution.Analysis
             {
                 context = context with { LanguageVersion = parseContext.LanguageVersion!, ParseContext = parseContext, ParseProfile = "validated-parse-v1" };
             }
+            context = context with { DeclaredExecution = execution };
             if (input.SourceSet != null && (parseContext == null || input.ReferenceSet == null
                 || !HistoricalWorkerScopeProjection.TryProject(input.SourceSet, input.Source, configuration, provenance,
                     context, input.AnalysisMode, out context)))

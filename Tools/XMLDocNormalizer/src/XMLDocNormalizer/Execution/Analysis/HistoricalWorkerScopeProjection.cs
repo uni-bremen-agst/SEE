@@ -18,6 +18,7 @@ namespace XMLDocNormalizer.Execution.Analysis
                 ExceptionAnalysisMode.Direct => "direct",
                 ExceptionAnalysisMode.ProjectTransitive => "project-transitive",
                 ExceptionAnalysisMode.SolutionTransitive => "solution-transitive",
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions when context.DeclaredExecution != null => "project-transitive-declared-exceptions",
                 _ => null
             };
             if (name == null || !ExternalCSharpSyntaxTreeSetFactory.TryGetOrigin(set, out var original, out var sources)

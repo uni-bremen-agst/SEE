@@ -63,7 +63,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             try
             {
                 result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
-                    input.Context?.AnalysisMode == "direct"
+                    input.Context?.AnalysisMode == "direct" || input.Context?.DeclaredExecution == WorkerDeclaredExecution.DirectEvidence
                         ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
                         : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
             }

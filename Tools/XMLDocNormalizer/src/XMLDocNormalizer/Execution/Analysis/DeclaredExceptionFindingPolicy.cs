@@ -19,13 +19,18 @@ namespace XMLDocNormalizer.Execution.Analysis
 
     /// <summary>Immutable neutral snapshot, consumable only via the validation-owned call receipt.</summary>
     internal sealed class DeclaredPolicyFacts(WorkerDeclaredPolicyEvidence evidence, CanonicalExceptionFlowAnalysisResult summary,
-        DeclaredFindingDocumentationFacts? documentation = null, HistoricalWorkerClient.DocumentationExecution? documentationExecution = null)
+        DeclaredFindingDocumentationFacts? documentation = null, HistoricalWorkerClient.DocumentationExecution? documentationExecution = null,
+        WorkerDeclaredExecution? execution = null)
     {
         internal ImmutableHashSet<CanonicalTypeIdentity> Declarations { get; } = evidence.Declarations!.Select(item => item.Type!).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Direct { get; } = evidence.DirectResult!.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Summary { get; } = summary.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
         internal DeclaredFindingDocumentationFacts? Documentation { get; } = documentation;
         internal HistoricalWorkerClient.DocumentationExecution? DocumentationExecution { get; } = documentationExecution;
+        internal WorkerDeclaredExecution? Execution { get; } = execution;
+        internal CanonicalExceptionFlowAnalysisResult DirectResult { get; } = evidence.DirectResult!;
+        internal CanonicalExceptionFlowAnalysisResult FlowResult { get; } = summary;
+        internal string OwnershipSnapshot { get; } = System.Text.Json.JsonSerializer.Serialize(evidence.Declarations, WorkerProtocol.JsonOptions);
         internal ImmutableHashSet<CanonicalTypeIdentity> Documented { get; } = documentation?.Tags.Where(tag => tag.IsException == true)
             .Select(tag => tag.Type!).ToImmutableHashSet() ?? ImmutableHashSet<CanonicalTypeIdentity>.Empty;
     }
