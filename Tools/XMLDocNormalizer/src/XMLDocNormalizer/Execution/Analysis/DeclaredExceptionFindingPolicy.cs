@@ -19,12 +19,13 @@ namespace XMLDocNormalizer.Execution.Analysis
 
     /// <summary>Immutable neutral snapshot, consumable only via the validation-owned call receipt.</summary>
     internal sealed class DeclaredPolicyFacts(WorkerDeclaredPolicyEvidence evidence, CanonicalExceptionFlowAnalysisResult summary,
-        DeclaredFindingDocumentationFacts? documentation = null)
+        DeclaredFindingDocumentationFacts? documentation = null, HistoricalWorkerClient.DocumentationExecution? documentationExecution = null)
     {
         internal ImmutableHashSet<CanonicalTypeIdentity> Declarations { get; } = evidence.Declarations!.Select(item => item.Type!).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Direct { get; } = evidence.DirectResult!.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
         internal ImmutableHashSet<CanonicalTypeIdentity> Summary { get; } = summary.Entries.Select(item => item.ExceptionType).ToImmutableHashSet();
         internal DeclaredFindingDocumentationFacts? Documentation { get; } = documentation;
+        internal HistoricalWorkerClient.DocumentationExecution? DocumentationExecution { get; } = documentationExecution;
         internal ImmutableHashSet<CanonicalTypeIdentity> Documented { get; } = documentation?.Tags.Where(tag => tag.IsException == true)
             .Select(tag => tag.Type!).ToImmutableHashSet() ?? ImmutableHashSet<CanonicalTypeIdentity>.Empty;
     }

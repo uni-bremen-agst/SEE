@@ -2,6 +2,13 @@ using System.Text.Json;
 
 // Adversarial pipe peer only: no Analyzer, Worker contract copy, reference or input-source execution.
 using JsonDocument request = JsonDocument.Parse(await Console.In.ReadToEndAsync());
+if (request.RootElement.GetProperty("payload").TryGetProperty("context", out JsonElement context)
+    && context.TryGetProperty("declaredPolicy", out JsonElement policy) && policy.TryGetProperty("documentation", out _))
+{
+    // B21: a real process with copied genuine identity/binding JSON is not the executed Historical Worker.
+    Console.Write(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "b21-replayed-worker-response.json")));
+    return 0;
+}
 string? scenario = request.RootElement.GetProperty("payload").GetProperty("source").GetString();
 switch (scenario)
 {

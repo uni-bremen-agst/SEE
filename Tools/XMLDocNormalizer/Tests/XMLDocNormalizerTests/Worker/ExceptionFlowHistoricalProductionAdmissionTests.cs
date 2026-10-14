@@ -16,14 +16,14 @@ using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizerTests.Worker
 {
-    /// <summary>B20 admission-gap witnesses. They deliberately do not activate or implement a second Finding policy.</summary>
+    /// <summary>Original B20 attack fixtures; B21 now rejects their unchanged coherent substitutions.</summary>
     public sealed class ExceptionFlowHistoricalProductionAdmissionTests
     {
         [Theory]
         [InlineData("unresolved")]
         [InlineData("other-symbol")]
         [InlineData("redirect-named")]
-        public async Task CoherentBindingSubstitution_CanMintEvidenceReceipt_ButCannotEnterProduction(string substitution)
+        public async Task CoherentBindingSubstitution_IsRejectedWithoutExecutionAttestation_AndCannotEnterProduction(string substitution)
         {
             var payload = Payload("exact");
             if (substitution == "redirect-named")
@@ -66,22 +66,17 @@ namespace XMLDocNormalizerTests.Worker
             }
             string modifiedJson = response.ToJsonString();
             // The original prepared payload/source receipt is retained. No cloned payload or changed source is involved.
-            // Validate currently mints a receipt even without a successful transport-owned execution/process receipt.
+            // B21 must reject the exact B20 bypass, even with the original source/payload receipt retained.
             var admitted = HistoricalWorkerResponseValidation.Validate(modifiedJson, "", 0, prepared);
             var admittedRepeat = HistoricalWorkerResponseValidation.Validate(modifiedJson, "", 0, prepared);
-            Assert.True(admitted.Success, admitted.Failure?.Message); Assert.Null(admitted.ProcessId);
-            var after = DeclaredFindingDocumentationContract.Read(admitted, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions);
-            Assert.True(after.Succeeded); Assert.True(DeclaredFindingDocumentationContract.Read(admittedRepeat, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Succeeded);
-            Assert.NotEqual(Json(before.Facts.Tags), Json(after.Facts!.Tags));
-            Assert.Equal(Json(before.Facts.Member), Json(after.Facts.Member));
-            Assert.Equal(Json(genuine.Result), Json(admitted.Result)); Assert.Equal(Json(genuine.DeclaredPolicy), Json(admitted.DeclaredPolicy));
-            Assert.Equal(genuine.Provenance, admitted.Provenance);
-            Assert.Equal(Json(after.Facts), Json(DeclaredFindingDocumentationContract.Read(admittedRepeat, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Facts));
-            var falseTag = Assert.Single(after.Facts.Tags);
-            Assert.Equal(realTag.Syntax, falseTag.Syntax);
-            if (substitution == "redirect-named") { Assert.NotEqual(realTag.Type, falseTag.Type); Assert.True(falseTag.IsException); }
-            else { Assert.Null(falseTag.Type); Assert.Null(falseTag.IsException); Assert.NotEqual(realTag.Kind, falseTag.Kind); }
-            // Receipt immutability does not prove the compiler-binding association admitted into that receipt.
+            Assert.False(admitted.Success); Assert.Null(admitted.ProcessId); Assert.Null(admitted.Result); Assert.Null(admitted.DeclaredDocumentation);
+            Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, admitted.Failure!.Code);
+            Assert.Contains("execution attestation", admitted.Failure.Message, StringComparison.Ordinal);
+            Assert.Equal(Json(admitted.Failure), Json(admittedRepeat.Failure));
+            Assert.Equal(DeclaredFindingPolicyFailureCode.UnvalidatedEvidence,
+                DeclaredFindingDocumentationContract.Read(admitted, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Failure!.Code);
+            Assert.Equal(DeclaredFindingPolicyFailureCode.UnvalidatedEvidence,
+                DeclaredFindingDocumentationContract.Read(admittedRepeat, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Failure!.Code);
             Assert.Equal(DeclaredFindingPolicyFailureCode.UnvalidatedEvidence,
                 DeclaredFindingDocumentationContract.Read(admitted with { }, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Failure!.Code);
             await RejectDeclared(input); Stopped(genuine); Stopped(repeat); NoHistoricalLoaded();
@@ -90,10 +85,10 @@ namespace XMLDocNormalizerTests.Worker
                 Substitution = substitution,
                 Native = native,
                 GenuineDocument = genuine.DeclaredDocumentation,
-                ModifiedDocument = admitted.DeclaredDocumentation,
+                ModifiedDocument = JsonSerializer.Deserialize<JsonElement>(document.ToJsonString()),
                 GenuineFacts = before.Facts,
-                AdmittedFacts = after.Facts,
-                RepeatedAdmittedFacts = DeclaredFindingDocumentationContract.Read(admittedRepeat, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions).Facts,
+                Rejection = admitted.Failure,
+                RepeatedRejection = admittedRepeat.Failure,
                 Direct = genuine.DeclaredPolicy!.DirectResult,
                 Summary = genuine.Result,
                 Declarations = genuine.DeclaredPolicy.Declarations,
@@ -104,9 +99,9 @@ namespace XMLDocNormalizerTests.Worker
                 OriginalPayloadRetained = true,
                 SourceAndSpansUnchanged = true,
                 DirectSummaryHashesUnchanged = true,
-                CoherentSubstitutionAccepted = true,
-                EvidenceReceiptWithoutTransport = true,
-                BindingAssociationNotAttested = true,
+                CoherentSubstitutionAccepted = false,
+                NoEvidenceReceiptWithoutExecution = true,
+                BindingAssociationAttestationRequired = true,
                 CompleteFindingParityNotProved = true,
                 ProductionStillUnsupported = true,
                 NoFallback = true,

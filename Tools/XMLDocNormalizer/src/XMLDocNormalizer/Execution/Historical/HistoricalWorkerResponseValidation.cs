@@ -19,7 +19,7 @@ namespace XMLDocNormalizer.Execution.Historical
             return call?.Success == true && policyReceipts.TryGetValue(call, out facts);
         }
         internal static HistoricalWorkerCallResult Validate(string stdout, string stderr, int exitCode,
-            WorkerAnalysisInput input, int? processId = null)
+            WorkerAnalysisInput input, int? processId = null, HistoricalWorkerClient.DocumentationExecution? documentationExecution = null)
         {
             HistoricalWorkerCallResult Fail(HistoricalWorkerClientFailureCode code, string message, WorkerFailure? failure = null)
                 => new(null, null, new(code, message, failure), stderr, processId);
@@ -31,6 +31,8 @@ namespace XMLDocNormalizer.Execution.Historical
 
             try
             {
+                bool executedDocumentation = HistoricalWorkerClient.TryConsumeDocumentationExecution(documentationExecution,
+                    input, stdout, stderr, exitCode, processId, out var matchesExecutedWorker);
                 using JsonDocument document = JsonDocument.Parse(stdout, new JsonDocumentOptions { MaxDepth = 64 });
                 JsonElement root = document.RootElement;
                 RejectDuplicateProperties(root);
@@ -99,8 +101,14 @@ namespace XMLDocNormalizer.Execution.Historical
                 if (response.DeclaredPolicy != null && !HistoricalWorkerDeclaredDocumentationProjection.TryValidate(input,
                     response.DeclaredDocumentation, response.DeclaredPolicy, response.Result, out documentation))
                 { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation identity, completeness, ownership or original context is invalid."); }
+                if (documentation != null && (!executedDocumentation || matchesExecutedWorker?.Invoke(response.Identity!.Worker) != true))
+                { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation binding requires its exact single-use completed Worker execution attestation."); }
                 var call = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance, response.DeclaredPolicy, response.DeclaredDocumentation);
-                if (response.DeclaredPolicy != null) { policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result, documentation)); }
+                if (response.DeclaredPolicy != null)
+                {
+                    policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result, documentation,
+                    documentation == null ? null : documentationExecution));
+                }
                 return call;
             }
             catch (Exception exception) when (exception is JsonException or ArgumentException or InvalidOperationException or NotSupportedException or NullReferenceException)
