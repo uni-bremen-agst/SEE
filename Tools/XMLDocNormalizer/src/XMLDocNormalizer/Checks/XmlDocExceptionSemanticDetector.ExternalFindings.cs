@@ -21,6 +21,7 @@ namespace XMLDocNormalizer.Checks
             HistoricalWorkerPayloadProjectionInput? input, ExceptionFlowAnalysisDispatch dispatch,
             CancellationToken cancellationToken = default)
         {
+            if (input?.Finding != null) { return await FindIndependentExternalExceptionSmellsAsync(input, dispatch, cancellationToken); }
             var direct = await AnalyzeFindingEvidenceAsync(input, dispatch, WorkerDeclaredExecution.DirectEvidence, cancellationToken);
             ExternalExceptionFindingAnalysisResult Fail(string message, bool guarded = false, ExternalExceptionFlowAnalysisResult? summary = null)
                 => new(direct, summary, [], guarded, summary != null, message);
@@ -53,23 +54,63 @@ namespace XMLDocNormalizer.Checks
         // One bounded adapter into the shared policy. It accepts the validation-owned
         // immutable receipt, never caller-authored worker DTOs or native rebound source.
         private static ImmutableArray<Finding> RenderFindingEvidence(DeclaredPolicyFacts selected, ExceptionAnalysisMode mode)
+            => RenderBoundedFindingEvidence(selected.Documentation!, selected.DirectResult, selected.FlowResult, selected.Declarations.Contains, mode);
+
+        private static ImmutableArray<Finding> RenderBoundedFindingEvidence(DeclaredFindingDocumentationFacts document,
+            CanonicalExceptionFlowAnalysisResult direct, CanonicalExceptionFlowAnalysisResult flow,
+            Func<CanonicalTypeIdentity, bool> isLocal, ExceptionAnalysisMode mode)
         {
-            var document = selected.Documentation!;
             var findings = new List<Finding>();
             if (!document.HasDocumentation) { return []; }
             var displays = document.TypeDisplays.ToDictionary(item => item.Type!, item => item.DisplayName!);
-            var exceptions = selected!.Direct.Concat(selected.Summary).Concat(selected.Documented).ToHashSet();
+            var exceptions = direct.Entries.Concat(flow.Entries).Select(entry => entry.ExceptionType)
+                .Concat(document.Tags.Where(tag => tag.IsException == true).Select(tag => tag.Type!)).ToHashSet();
             var tags = document.Tags.Select(tag => new FindingTag<CanonicalTypeIdentity>(tag.Syntax.RawCref,
                 tag.Syntax.CrefStart != null, tag.Kind != WorkerCrefBindingKind.Unresolved, tag.Type, tag.Anchor, tag.Snippet)).ToArray();
             AddExceptionFindings(findings, tags, () => document.Member,
-                selected.DirectResult.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven).Select(entry => entry.ExceptionType),
-                selected.FlowResult.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven).Select(entry => entry.ExceptionType),
-                EqualityComparer<CanonicalTypeIdentity>.Default, exceptions.Contains, selected.Declarations.Contains,
+                direct.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven).Select(entry => entry.ExceptionType),
+                flow.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.Proven).Select(entry => entry.ExceptionType),
+                EqualityComparer<CanonicalTypeIdentity>.Default, exceptions.Contains, isLocal,
                 type => displays[type], mode, document.HasInheritdoc,
-                selected.FlowResult.Uncertainties.Length != 0,
-                selected.FlowResult.Uncertainties.Select(item => item.DisplayText).ToHashSet(StringComparer.Ordinal),
-                selected.FlowResult.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.ExternalDocumentation).Select(entry => entry.ExceptionType));
+                flow.Uncertainties.Length != 0,
+                flow.Uncertainties.Select(item => item.DisplayText).ToHashSet(StringComparer.Ordinal),
+                flow.Entries.Where(entry => entry.EvidenceKind == CanonicalExceptionFlowEvidenceKind.ExternalDocumentation).Select(entry => entry.ExceptionType));
             return findings.ToImmutableArray();
+        }
+
+        private static async Task<ExternalExceptionFindingAnalysisResult> FindIndependentExternalExceptionSmellsAsync(
+            HistoricalWorkerPayloadProjectionInput input, ExceptionFlowAnalysisDispatch dispatch, CancellationToken cancellationToken)
+        {
+            var firstInput = input with { Finding = input.Finding! with { Execution = WorkerDeclaredExecution.DirectEvidence } };
+            var direct = await AnalyzeFindingEvidenceAsync(firstInput, dispatch, WorkerDeclaredExecution.DirectEvidence, cancellationToken);
+            bool Admit(ExternalExceptionFlowAnalysisResult run, WorkerDeclaredExecution purpose, out HistoricalFindingFacts? facts)
+            {
+                facts = null;
+                if (!run.Succeeded) { return false; }
+                if (!HistoricalWorkerResponseValidation.TryGetFindingFacts(run.Dispatch?.Routing?.HistoricalAnalysis, out facts)) { return false; }
+                return facts!.Execution == purpose && facts.Mode == (input.AnalysisMode == ExceptionAnalysisMode.Direct
+                    ? WorkerDeclaredPolicyMode.Direct : WorkerDeclaredPolicyMode.ProjectTransitive);
+            }
+            if (!Admit(direct, WorkerDeclaredExecution.DirectEvidence, out var first))
+            { return new(direct, null, [], false, false, "Independent Finding admission requires original B21-attested mode/root/document/Direct evidence."); }
+            if (!first!.Documentation.HasDocumentation) { return new(direct, null, [], true, false, null); }
+            ExternalExceptionFlowAnalysisResult? summary = null;
+            var selected = first;
+            bool summaryRequired = RequiresSummary(input.AnalysisMode, false);
+            if (summaryRequired)
+            {
+                summary = await AnalyzeFindingEvidenceAsync(input with { Finding = input.Finding! with { Execution = WorkerDeclaredExecution.SummaryEvidence } },
+                    dispatch, WorkerDeclaredExecution.SummaryEvidence, cancellationToken);
+                if (!Admit(summary, WorkerDeclaredExecution.SummaryEvidence, out selected)
+                    || !first.DirectResult.Equals(selected!.DirectResult) || first.OwnershipSnapshot != selected.OwnershipSnapshot
+                    || !first.Documentation.Method.Equals(selected.Documentation.Method) || first.Documentation.Member != selected.Documentation.Member
+                    || first.Documentation.HasDocumentation != selected.Documentation.HasDocumentation
+                    || first.Documentation.HasInheritdoc != selected.Documentation.HasInheritdoc || !first.Documentation.Tags.SequenceEqual(selected.Documentation.Tags))
+                { return new(direct, summary, [], true, true, "Independent Direct and Summary executions must agree on the immutable root contract."); }
+            }
+            // These modes have no local-definition relevance policy. Do not obtain or transport an inventory.
+            return new(direct, summary, RenderBoundedFindingEvidence(selected!.Documentation, selected.DirectResult, selected.FlowResult,
+                _ => throw new InvalidOperationException("Direct/Project must not ask Declared relevance."), input.AnalysisMode), true, summaryRequired, null);
         }
 
         // Admission deliberately precedes every guard/render invocation. A cloned call or

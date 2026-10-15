@@ -108,13 +108,38 @@ namespace XMLDocNormalizer.HistoricalWorker
         WorkerProjectScope? Scope = null,
         WorkerSolutionGraph? Solution = null,
         WorkerDeclaredPolicyRequest? DeclaredPolicy = null,
-        WorkerDeclaredExecution? DeclaredExecution = null);
+        WorkerDeclaredExecution? DeclaredExecution = null,
+        WorkerFindingRequest? Finding = null);
 
     /// <summary>Main-selected execution purpose, never a Worker guard or relevance decision.</summary>
     internal enum WorkerDeclaredExecution { Unspecified, DirectEvidence, SummaryEvidence }
 
     /// <summary>Explicit detector-policy facts opt-in, not an Analyzer mode or a default.</summary>
-    internal enum WorkerDeclaredPolicyMode { Unspecified, ProjectTransitiveDeclaredExceptions }
+    internal enum WorkerDeclaredPolicyMode { Unspecified, ProjectTransitiveDeclaredExceptions, Direct, ProjectTransitive }
+    /// <summary>Independent bounded Finding opt-in. Reuses XML fact shapes, never the Declared inventory/relevance policy.</summary>
+    internal sealed record WorkerFindingRequest(WorkerDeclaredExecution Execution, WorkerDeclaredDocumentationRequest? Documentation);
+    internal static class WorkerFindingContract
+    {
+        internal const string Profile = "single-project-root-findings-v1";
+        internal static bool HasSupportedRequest(WorkerAnalysisInput input)
+        {
+            if (input.Context?.Finding is not { } request) { return true; }
+            var context = input.Context;
+            var mode = context.AnalysisMode switch
+            {
+                "direct" => WorkerDeclaredPolicyMode.Direct,
+                "project-transitive" => WorkerDeclaredPolicyMode.ProjectTransitive,
+                _ => WorkerDeclaredPolicyMode.Unspecified
+            };
+            return mode != WorkerDeclaredPolicyMode.Unspecified && context.DeclaredPolicy == null && context.DeclaredExecution == null
+                && context.Solution == null && context.Scope != null && context.ParseContext != null
+                && context.ReferenceProfile == WorkerProtocol.ExactReferenceProfile
+                && (request.Execution == WorkerDeclaredExecution.DirectEvidence
+                    || mode == WorkerDeclaredPolicyMode.ProjectTransitive && request.Execution == WorkerDeclaredExecution.SummaryEvidence)
+                && request.Documentation is { } doc && doc.Profile == Profile && doc.Mode == mode
+                && WorkerDeclaredDocumentationContract.HasSupportedSyntax(input, doc);
+        }
+    }
     internal sealed record WorkerDeclaredPolicyRequest(string? Profile, WorkerDeclaredPolicyMode? Mode,
         CanonicalTypeIdentity[]? ExpectedDeclarations = null, WorkerDeclaredDocumentationRequest? Documentation = null);
     /// <summary>Owned source definitions, including unused types; no Finding relevance computed here.</summary>
@@ -145,9 +170,13 @@ namespace XMLDocNormalizer.HistoricalWorker
         internal static bool HasSupportedRequest(WorkerAnalysisInput input)
         {
             if (input.Context?.DeclaredPolicy?.Documentation is not { } request) { return true; }
-            var syntax = request.Syntax;
             return request.Profile == Profile && request.Mode == WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions
-                && request.Method != null && request.Method.ContainingType?.Assembly?.Equals(input.Context.TargetIdentity) == true
+                && HasSupportedSyntax(input, request);
+        }
+        internal static bool HasSupportedSyntax(WorkerAnalysisInput input, WorkerDeclaredDocumentationRequest request)
+        {
+            var syntax = request.Syntax;
+            return request.Method != null && request.Method.ContainingType?.Assembly?.Equals(input.Context!.TargetIdentity) == true
                 && syntax != null && syntax.LogicalPath == input.LogicalPath && syntax.MemberStart is >= 0 && syntax.MemberLength is > 0
                 && (long)syntax.MemberStart + syntax.MemberLength <= input.Source!.Length
                 && syntax.Anchor >= syntax.MemberStart && syntax.Anchor < syntax.MemberStart + syntax.MemberLength
@@ -233,7 +262,8 @@ namespace XMLDocNormalizer.HistoricalWorker
                     && HasSupportedParseContext(input.Context) && input.Context.NullableContext == "enable"
                     && input.Context.CompilerOptions == null && input.Context.PreprocessorSymbols == null
                     && input.Context.SupportingCompilations == null && input.Context.RootIdentity == null
-                    && HasSupportedReferences(input.Context) && WorkerDeclaredPolicyContract.HasSupportedRequest(input)));
+                    && HasSupportedReferences(input.Context) && WorkerDeclaredPolicyContract.HasSupportedRequest(input)
+                    && WorkerFindingContract.HasSupportedRequest(input)));
 
         internal static bool ReferenceMatchesProject(WorkerReferenceImage reference, WorkerProjectIdentity project)
             => reference.Identity != null && reference.Identity.Equals(project.Assembly)
@@ -399,7 +429,8 @@ namespace XMLDocNormalizer.HistoricalWorker
         CanonicalExceptionFlowAnalysisResult? Result = null,
         WorkerFailure? Failure = null,
         WorkerAnalysisProvenance? Provenance = null,
-        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null, WorkerDeclaredDocumentationEvidence? DeclaredDocumentation = null);
+        WorkerDeclaredPolicyEvidence? DeclaredPolicy = null, WorkerDeclaredDocumentationEvidence? DeclaredDocumentation = null,
+        CanonicalExceptionFlowAnalysisResult? FindingDirect = null);
 
     /// <summary>Completed analysis input binding; separate from existing canonical exception/path identities.</summary>
     internal sealed record WorkerAnalysisProvenance(string SourceSha256, string TypeMetadataName,

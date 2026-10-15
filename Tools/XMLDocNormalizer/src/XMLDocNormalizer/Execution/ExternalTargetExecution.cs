@@ -18,7 +18,7 @@ namespace XMLDocNormalizer.Execution
     /// <summary>Untrusted local file names and a bounded selector, not trusted execution DTOs.</summary>
     internal sealed record ExternalTargetJob([property: JsonRequired] int Version, string? TargetPe, string? PortablePdb,
         ExternalTargetSource[]? Sources, string[]? References, ExternalTargetRoot? Root,
-        string? WorkerAssembly, string? DotnetHost = null);
+        string? WorkerAssembly, string? DotnetHost = null, string? AnalysisMode = null);
     internal sealed record ExternalTargetSource([property: JsonRequired] int DocumentOrdinal, string? Path);
     internal sealed record ExternalTargetRoot(string? TypeMetadataName, string? MethodName, [property: JsonRequired] int DocumentOrdinal);
 
@@ -32,7 +32,7 @@ namespace XMLDocNormalizer.Execution
             MaxDepth = 16
         };
 
-        internal static async Task<ExternalExceptionFindingAnalysisResult> AnalyzeAsync(string jobPath)
+        internal static async Task<ExternalExceptionFindingAnalysisResult> AnalyzeAsync(string jobPath, ExceptionAnalysisMode? assertedMode = null)
         {
             static ExternalTargetExecutionException Failure(string message) => new(message);
             try
@@ -51,6 +51,15 @@ namespace XMLDocNormalizer.Execution
                     || !job.Sources.Any(source => source.DocumentOrdinal == job.Root.DocumentOrdinal)
                     || string.IsNullOrWhiteSpace(job.Root.TypeMetadataName) || string.IsNullOrWhiteSpace(job.Root.MethodName))
                 { throw Failure("Input: version-1 complete local sources/references and one explicit root are required."); }
+                // Additive job opt-in: old v1 jobs and their CLI admission remain unchanged.
+                var mode = job.AnalysisMode switch
+                {
+                    null or "project-transitive-declared-exceptions" => ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions,
+                    "direct" => ExceptionAnalysisMode.Direct,
+                    "project-transitive" => ExceptionAnalysisMode.ProjectTransitive,
+                    _ => throw Failure("Input: bounded external Findings support only direct, project-transitive or project-transitive-declared-exceptions; Solution is not admitted.")
+                };
+                if (assertedMode != null && assertedMode != mode) { throw Failure("Input: explicit CLI analysis mode conflicts with the external job analysisMode."); }
                 string Local(string? path)
                 {
                     if (string.IsNullOrWhiteSpace(path)) { throw Failure("Input: an explicit local file path is required."); }
@@ -109,7 +118,10 @@ namespace XMLDocNormalizer.Execution
                 var policy = new WorkerDeclaredPolicyRequest(WorkerDeclaredPolicyContract.Profile, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions,
                     Documentation: new(WorkerDeclaredDocumentationContract.Profile, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions));
                 var input = new HistoricalWorkerPayloadProjectionInput(provenance, rootSource, methods[0],
-                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions, referenceSet, configuration, sourceSet, DeclaredPolicy: policy);
+                    mode, referenceSet, configuration, sourceSet,
+                    DeclaredPolicy: mode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions ? policy : null,
+                    Finding: mode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions ? null : new(WorkerDeclaredExecution.DirectEvidence,
+                        new(WorkerFindingContract.Profile, mode == ExceptionAnalysisMode.Direct ? WorkerDeclaredPolicyMode.Direct : WorkerDeclaredPolicyMode.ProjectTransitive)));
                 var dispatch = new ExceptionFlowAnalysisDispatch(new(new HistoricalWorkerClient(job.DotnetHost ?? "dotnet", worker, TimeSpan.FromSeconds(60))));
                 var result = await XmlDocExceptionSemanticDetector.FindExternalExceptionSmellsAsync(input, dispatch);
                 if (!result.Succeeded)

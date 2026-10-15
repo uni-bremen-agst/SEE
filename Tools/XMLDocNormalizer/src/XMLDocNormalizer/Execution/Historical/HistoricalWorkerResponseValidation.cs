@@ -13,6 +13,12 @@ namespace XMLDocNormalizer.Execution.Historical
     internal static class HistoricalWorkerResponseValidation
     {
         private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, DeclaredPolicyFacts> policyReceipts = new();
+        private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, HistoricalFindingFacts> findingReceipts = new();
+        internal static bool TryGetFindingFacts(HistoricalWorkerCallResult? call, out HistoricalFindingFacts? facts)
+        {
+            facts = null;
+            return call?.Success == true && findingReceipts.TryGetValue(call, out facts);
+        }
         internal static bool TryGetDeclaredPolicyFacts(HistoricalWorkerCallResult? call, out DeclaredPolicyFacts? facts)
         {
             facts = null;
@@ -55,7 +61,7 @@ namespace XMLDocNormalizer.Execution.Historical
 
                 if (!response.Success)
                 {
-                    if (response.Result != null || response.Provenance != null || response.DeclaredPolicy != null || response.DeclaredDocumentation != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
+                    if (response.Result != null || response.Provenance != null || response.DeclaredPolicy != null || response.DeclaredDocumentation != null || response.FindingDirect != null || response.Failure == null || string.IsNullOrWhiteSpace(response.Failure.Message)
                         || response.Failure.Details == null || response.Failure.Details.Any(detail => detail == null)
                         || (response.Operation != "analyze" && response.Operation != "invalid"))
                     {
@@ -96,6 +102,24 @@ namespace XMLDocNormalizer.Execution.Historical
                     return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Canonical identity, location or input provenance is invalid.");
                 }
                 DeclaredFindingDocumentationFacts? documentation = null;
+                if (input.Context?.Finding is { } finding)
+                {
+                    var direct = response.FindingDirect;
+                    if (!WorkerInputValidation.IsSupported(input) || direct == null || response.DeclaredPolicy != null
+                        || direct.Uncertainties.Length != 0 || direct.Entries.Any(entry => entry.PathsTruncated)
+                        || !ValidCanonicalResult(direct, input) || !ValidReferenceIdentities(direct, input.Context)
+                        || direct.Entries.SelectMany(entry => entry.Paths).SelectMany(path => path.Steps).Any(step => step.FilePath != input.LogicalPath)
+                        || finding.Execution == WorkerDeclaredExecution.DirectEvidence && !direct.Equals(response.Result)
+                        || !HistoricalWorkerDeclaredDocumentationProjection.TryValidateFinding(input, response.DeclaredDocumentation, direct, response.Result, out documentation)
+                        || !executedDocumentation || matchesExecutedWorker?.Invoke(response.Identity!.Worker) != true)
+                    { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Independent Finding facts require complete original mode/root/ownership/type evidence and exact B21 execution."); }
+                    var admitted = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance,
+                        DeclaredDocumentation: response.DeclaredDocumentation);
+                    findingReceipts.Add(admitted, new(direct, response.Result, documentation!, finding.Documentation!.Mode!.Value, finding.Execution,
+                        JsonSerializer.Serialize(input.Context.Scope, WorkerProtocol.JsonOptions), documentationExecution!));
+                    return admitted;
+                }
+                if (response.FindingDirect != null) { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Unrequested independent Finding evidence."); }
                 if (response.DeclaredPolicy == null && response.DeclaredDocumentation != null)
                 { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation facts require validated B17 evidence."); }
                 if (response.DeclaredPolicy != null && !HistoricalWorkerDeclaredDocumentationProjection.TryValidate(input,

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "analysisMode": "project-transitive",
+  "targetPe": "materials/target.dll",
+  "portablePdb": "materials/target.pdb",
+  "sources": [
+    { "documentOrdinal": 0, "path": "materials/root.cs" }
+  ],
+  "references": ["materials/reference-0.dll"],
+  "root": { "typeMetadataName": "Fixture", "methodName": "Root", "documentOrdinal": 0 },
+  "workerAssembly": "worker/XMLDocNormalizer.HistoricalWorker.dll"
+}

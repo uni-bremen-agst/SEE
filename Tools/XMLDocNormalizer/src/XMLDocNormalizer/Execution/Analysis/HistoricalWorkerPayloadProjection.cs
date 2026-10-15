@@ -13,7 +13,7 @@ namespace XMLDocNormalizer.Execution.Analysis
         IMethodSymbol Root, ExceptionAnalysisMode AnalysisMode, ExternalMetadataReferenceSet? ReferenceSet = null,
         ExternalCSharpCompilationConfiguration? ParseConfiguration = null, ExternalCSharpSyntaxTreeSet? SourceSet = null,
         ImmutableArray<HistoricalWorkerPayloadProjectionInput> SupportingProjects = default,
-        WorkerDeclaredPolicyRequest? DeclaredPolicy = null);
+        WorkerDeclaredPolicyRequest? DeclaredPolicy = null, WorkerFindingRequest? Finding = null);
 
     internal enum HistoricalWorkerPayloadProjectionFailureCode
     {
@@ -56,7 +56,13 @@ namespace XMLDocNormalizer.Execution.Analysis
         {
             HistoricalWorkerPayloadProjectionResult Fail(HistoricalWorkerPayloadProjectionFailureCode code, string message)
                 => new(null, new(code, message));
-            if (execution != null && (input?.AnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
+            bool boundedFinding = input?.Finding != null;
+            if (boundedFinding && (input!.DeclaredPolicy != null || input.SourceSet == null || !input.SupportingProjects.IsDefault
+                || input.AnalysisMode is not (ExceptionAnalysisMode.Direct or ExceptionAnalysisMode.ProjectTransitive)
+                || execution == null || input.Finding!.Execution != execution
+                || input.AnalysisMode == ExceptionAnalysisMode.Direct && execution != WorkerDeclaredExecution.DirectEvidence))
+            { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Independent Finding facts require an explicit Direct/Project single-project execution, without Declared policy or solution inputs."); }
+            if (!boundedFinding && execution != null && (input?.AnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
                 || input.DeclaredPolicy?.Documentation == null || execution is not (WorkerDeclaredExecution.DirectEvidence or WorkerDeclaredExecution.SummaryEvidence)))
             { return Fail(HistoricalWorkerPayloadProjectionFailureCode.UnsupportedProfile, "Productive findings require explicit Declared mode, documentation and a bounded execution purpose."); }
             if (input?.DeclaredPolicy != null && (input.AnalysisMode != (execution == null ? ExceptionAnalysisMode.ProjectTransitive : ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
@@ -143,7 +149,7 @@ namespace XMLDocNormalizer.Execution.Analysis
             {
                 context = context with { LanguageVersion = parseContext.LanguageVersion!, ParseContext = parseContext, ParseProfile = "validated-parse-v1" };
             }
-            context = context with { DeclaredExecution = execution };
+            context = boundedFinding ? context with { Finding = input!.Finding } : context with { DeclaredExecution = execution };
             if (input.SourceSet != null && (parseContext == null || input.ReferenceSet == null
                 || !HistoricalWorkerScopeProjection.TryProject(input.SourceSet, input.Source, configuration, provenance,
                     context, input.AnalysisMode, out context)))

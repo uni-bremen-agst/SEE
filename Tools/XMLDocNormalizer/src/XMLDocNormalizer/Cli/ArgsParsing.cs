@@ -69,7 +69,7 @@ namespace XMLDocNormalizer.Cli
 
             if (externalTarget && !HasValidExternalArguments(args))
             {
-                PrintUsage("External targets require --check --external-target job.json; only format/output, verbose and Declared mode are supported. No positional target, rewrite, comparison or project-scope options.");
+                PrintUsage("External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.");
                 return false;
             }
 
@@ -186,7 +186,8 @@ namespace XMLDocNormalizer.Cli
                 exceptionAnalysisComparisonWarmupRuns: exceptionAnalysisComparisonWarmupRuns,
                 enableStatistics: enableStatistics,
                 statisticsOutputPath: statisticsOutputPath,
-                externalTarget: externalTarget);
+                externalTarget: externalTarget,
+                externalTargetModeExplicit: externalTarget && HasFlag(args, "--exception-analysis-mode"));
 
             return true;
         }
@@ -646,7 +647,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]");
             Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]");
             Console.WriteLine("                   [--compare-exception-analysis-modes]");
-            Console.WriteLine("  --external-target <job.json>  Explicit local v1 unsigned single-project/root Declared job (--check only); paths relative to job file, no discovery or downloads.");
+            Console.WriteLine("  --external-target <job.json>  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.");
             Console.WriteLine("                   [--compare-value-documentation-modes]");
             Console.WriteLine("                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]");
             Console.WriteLine("                   [--value-documentation-mode mode]");

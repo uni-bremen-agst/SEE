@@ -62,7 +62,7 @@ namespace XMLDocNormalizer.Execution.Historical
 
             // Only the opt-in B19 trust boundary needs an execution-image witness. Legacy transport is unchanged.
             WorkerImage? documentationImage = null;
-            if (input.Context?.DeclaredPolicy?.Documentation != null)
+            if (input.Context?.DeclaredPolicy?.Documentation != null || input.Context?.Finding?.Documentation != null)
             {
                 try { documentationImage = ReadWorkerImage(); }
                 catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or BadImageFormatException)

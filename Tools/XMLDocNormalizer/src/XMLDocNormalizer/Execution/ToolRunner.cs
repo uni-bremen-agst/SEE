@@ -83,10 +83,11 @@ namespace XMLDocNormalizer.Execution
         {
             if (!options.CheckOnly || options.CompareExceptionAnalysisModes || options.CompareValueDocumentationModes
                 || options.XmlDocOptions.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
-            { throw new ExternalTargetExecutionException("Only a check-only bounded Declared external target is supported."); }
+            { throw new ExternalTargetExecutionException("Only a check-only bounded external job is supported; new modes require job.analysisMode, not a legacy CLI mode override."); }
             Stopwatch stopwatch = Stopwatch.StartNew();
-            var analyzed = ExternalTargetExecution.AnalyzeAsync(options.TargetPath).GetAwaiter().GetResult();
-            ConsoleLogger.Info("Bounded external target: selected-root Declared exception findings only; not a full project check.");
+            var analyzed = ExternalTargetExecution.AnalyzeAsync(options.TargetPath,
+                options.ExternalTargetModeExplicit ? options.XmlDocOptions.ExceptionAnalysisMode : null).GetAwaiter().GetResult();
+            ConsoleLogger.Info("Bounded external target: selected-root exception findings only; not a full project check.");
             // No reporter or success result exists until the complete B21/B22 operation succeeds.
             RunResult result = new();
             result.AccumulateFindings(analyzed.Findings);

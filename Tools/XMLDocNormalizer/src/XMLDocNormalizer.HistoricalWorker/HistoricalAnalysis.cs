@@ -64,6 +64,7 @@ namespace XMLDocNormalizer.HistoricalWorker
             {
                 result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
                     input.Context?.AnalysisMode == "direct" || input.Context?.DeclaredExecution == WorkerDeclaredExecution.DirectEvidence
+                        || input.Context?.Finding?.Execution == WorkerDeclaredExecution.DirectEvidence
                         ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
                         : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
             }
@@ -95,8 +96,27 @@ namespace XMLDocNormalizer.HistoricalWorker
                 }
                 if (policy == null) { return Failure(WorkerFailureCode.UnsupportedContext, "Policy facts exceed the bounded complete nongeneric source-declaration profile.", identity); }
             }
+            CanonicalExceptionFlowAnalysisResult? findingDirect = null;
+            if (input.Context?.Finding is { } finding)
+            {
+                try
+                {
+                    findingDirect = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
+                        ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment));
+                    if (findingDirect.Uncertainties.Length != 0 || findingDirect.Entries.Any(entry => entry.PathsTruncated))
+                    { return Failure(WorkerFailureCode.AnalysisFailure, "Independent Direct evidence is incomplete.", identity); }
+                    documentation = HistoricalDeclaredDocumentationFacts.Create(rootModel, member, findingDirect, result)
+                        with
+                    { Profile = WorkerFindingContract.Profile, Mode = finding.Documentation!.Mode };
+                }
+                catch (Exception exception)
+                {
+                    Console.Error.WriteLine("Historical Finding facts failed: " + exception);
+                    return Failure(WorkerFailureCode.AnalysisFailure, "Finding facts could not be completed.", identity);
+                }
+            }
             return new WorkerResponse(WorkerProtocol.Version, "analyze", true, identity, result,
-                Provenance: WorkerProtocol.Provenance(input), DeclaredPolicy: policy, DeclaredDocumentation: documentation);
+                Provenance: WorkerProtocol.Provenance(input), DeclaredPolicy: policy, DeclaredDocumentation: documentation, FindingDirect: findingDirect);
         }
 
         /// <summary>Reuse the exact B12/B13/B14 reconstruction for each independently owned project.</summary>

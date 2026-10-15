@@ -10,6 +10,7 @@ namespace XMLDocNormalizer.Cli
     /// </remarks>
     /// <param name="targetPath">The root directory or file path to process.</param>
     /// <param name="externalTarget">Whether the target is an explicit bounded local external job.</param>
+    /// <param name="externalTargetModeExplicit">Whether a legacy external CLI mode assertion was explicitly supplied.</param>
     /// <param name="checkOnly">True to run in check-only mode.</param>
     /// <param name="cleanBackups">True to delete old backup files before processing.</param>
     /// <param name="useTest">True to run in test mode (rewrite .bak files only).</param>
@@ -63,10 +64,13 @@ namespace XMLDocNormalizer.Cli
         int exceptionAnalysisComparisonWarmupRuns = 0,
         bool enableStatistics = false,
         string? statisticsOutputPath = null,
-        bool externalTarget = false)
+        bool externalTarget = false,
+        bool externalTargetModeExplicit = false)
     {
         /// <summary>Gets whether TargetPath names an untrusted local external-target job.</summary>
         public bool ExternalTarget { get; } = externalTarget;
+        /// <summary>Gets whether the legacy CLI mode must agree with the job's explicit mode.</summary>
+        public bool ExternalTargetModeExplicit { get; } = externalTargetModeExplicit;
 
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
