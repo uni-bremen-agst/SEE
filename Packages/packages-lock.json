@@ -48,14 +48,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.23",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.25",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "4fed345deaaa9f54a3f780ffe5132ff5a7159b5f"
+      "hash": "c28f1b725d26c4b59f5c6606a0c0e91aa52c50a8"
     },
     "com.soupday.cc3_unity_tools": {
       "version": "https://github.com/soupday/cc_unity_tools_URP.git",
