@@ -26,7 +26,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils.IdeRPC;
 using UnityEngine;
 

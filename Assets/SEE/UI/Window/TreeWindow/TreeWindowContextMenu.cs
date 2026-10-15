@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.GraphSearch;
+using SEE.Graphs;
+using SEE.Graphs.GraphSearch;
 using SEE.Game.City;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.PopupMenu;
+using SEE.Graphs.Reflexion;
+using SEE.UI.PopupMenus;
 using SEE.Utils;
+using SEE.Extensions;
 using UnityEngine;
 using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
-using State = SEE.Tools.ReflexionAnalysis.State;
+using State = SEE.Graphs.Reflexion.State;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -22,13 +23,13 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        public readonly PopupMenu.PopupMenu ContextMenu;
+        public readonly PopupMenu ContextMenu;
 
         /// <summary>
         /// The graph search associated with the tree window.
         /// We also retrieve the graph from this.
         /// </summary>
-        private readonly GraphSearch searcher;
+        private readonly NodeSearch searcher;
 
         /// <summary>
         /// The grouper that is used to group the elements in the tree window.
@@ -65,7 +66,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, GraphSearch searcher, TreeWindowGrouper grouper,
+        public TreeWindowContextMenu(PopupMenu contextMenu, NodeSearch searcher, TreeWindowGrouper grouper,
                                      Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {
@@ -86,7 +87,7 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
-        /// Forwards to <see cref="PopupMenu.ShowWith(IEnumerable{PopupMenuEntry},Vector2)"/>.
+        /// Forwards to <see cref="PopupMenus.ShowWith(IEnumerable{PopupMenuEntry},Vector2)"/>.
         /// </summary>
         public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position) => ContextMenu.ShowWith(entries, position);
 

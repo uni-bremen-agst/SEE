@@ -1,10 +1,12 @@
 using DG.Tweening;
 using SEE.Controls;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.GraphElementRefs;
 using SEE.Layout;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.SceneManipulation;
+using SEE.Graphs.Reflexion;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -149,7 +151,33 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the interaction layer of the game object, and optionally its children.
+        /// </summary>
+        /// <param name="gameObject">The affected game object.</param>
+        /// <param name="recurse">Should children be updated as well?.</param>
+        private static void UpdateInteractableLayers(GameObject gameObject, bool recurse = true)
+        {
+            if (gameObject.TryGetComponent(out InteractableObjectBase io))
+            {
+                io.UpdateLayer();
+            }
+            else
+            {
+                Debug.LogWarning($"GameObject {gameObject.name} is not an interactable object!");
+            }
+
+            if (recurse)
+            {
+                InteractableObjectBase[] children = gameObject.transform.GetComponentsInChildren<InteractableObjectBase>();
+                foreach (InteractableObjectBase child in children)
+                {
+                    child.UpdateLayer();
                 }
             }
         }
@@ -183,7 +211,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }
@@ -217,7 +245,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }
@@ -255,7 +283,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }
@@ -319,7 +347,7 @@ namespace SEE.Game.Operator
                 }
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                     updateLayers = false;
                 }
             }
@@ -349,7 +377,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }
@@ -381,7 +409,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }
@@ -416,7 +444,7 @@ namespace SEE.Game.Operator
             {
                 if (updateLayers)
                 {
-                    transform.gameObject.UpdateInteractableLayers();
+                    UpdateInteractableLayers(transform.gameObject);
                 }
             }
         }

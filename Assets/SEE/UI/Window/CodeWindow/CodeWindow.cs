@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MoreLinq;
 using SEE.Tools.LSP;
-using SEE.Utils;
+using SEE.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;

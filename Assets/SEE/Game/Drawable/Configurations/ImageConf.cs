@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -65,12 +66,10 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this <see cref="ImageConf"/> object. The file data array is copied.
+        /// Returns a clone of this <see cref="ImageConf"/> object.
+        /// The <see cref="FileData"/> array is copied if present. A null value is preserved.
         /// </summary>
         /// <returns>A new <see cref="ImageConf"/> with the values of this object.</returns>
-        /// <remarks>
-        /// TODO (#987): Review whether cloning should support a null <see cref="FileData"/> value.
-        /// </remarks>
         public ImageConf Clone()
         {
             return new ImageConf
@@ -83,7 +82,7 @@ namespace SEE.Game.Drawable.Configurations
                 OrderInLayer = this.OrderInLayer,
                 ImageColor = this.ImageColor,
                 Path = this.Path,
-                FileData = this.FileData.ToArray(),
+                FileData = this.FileData?.ToArray(),
                 URL = this.URL
             };
         }
@@ -111,7 +110,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(ImageColor, colorLabel);
+            writer.SaveColor(ImageColor, colorLabel);
             writer.Save(Path, pathLabel);
             writer.Save(URL, urlLabel);
         }
@@ -131,7 +130,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the image color.
             Color loadedimageColor = Color.black;
-            if (ConfigIO.Restore(attributes, colorLabel, ref loadedimageColor))
+            if (UnityConfigIO.RestoreColor(attributes, colorLabel, ref loadedimageColor))
             {
                 ImageColor = loadedimageColor;
             }
@@ -156,7 +155,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             /// Try to restore the image url.
-            if (attributes.TryGetValue(pathLabel, out object url))
+            if (attributes.TryGetValue(urlLabel, out object url))
             {
                 URL = (string)url;
             }

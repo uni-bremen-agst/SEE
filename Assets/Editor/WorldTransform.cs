@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.GO;
+using SEE.Extensions;
 using UnityEditor;
 using UnityEngine;
 

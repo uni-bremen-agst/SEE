@@ -1,0 +1,36 @@
+﻿using System;
+#if UNITY_5_3_OR_NEWER
+using UnityEngine;
+#endif
+
+namespace SEE.Graphs.IO.ReportImports
+{
+    /// <summary>
+    /// Configuration for parsing XML-based reports using XPath mappings.
+    /// </summary>
+    [Serializable]
+    public abstract class XmlParsingConfig : ParsingConfig
+    {
+        /// <summary>
+        /// Describes which XML nodes to visit and how to interpret them.
+        /// Must not be null when an XML parser uses this configuration.
+        /// </summary>
+        /// <remarks>This is not a user setting. It will not be saved to a configuration file.
+        /// It depends solely on the type of report data and will be set by the subclasses
+        /// appropriately.</remarks>
+#if UNITY_5_3_OR_NEWER
+        [HideInInspector]
+#endif
+        public XPathMapping XPathMapping = new();
+
+        /// <summary>
+        /// Creates an <see cref="XmlReportParser"/> configured for XML input.
+        /// </summary>
+        /// <remarks>Preconditions: <see cref="XPathMapping"/> and <see cref="ParsingConfig.ToolId"/> must be initialized.</remarks>
+        /// <returns>An <see cref="IReportParser"/> instance for XML reports.</returns>
+        public override IReportParser CreateParser()
+        {
+            return new XmlReportParser(this);
+        }
+    }
+}

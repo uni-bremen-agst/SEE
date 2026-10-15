@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using UnityEngine;
 using System.Threading;
 using SEE.VCS;
 using SEE.GraphProviders.VCS;
+using SEE.Graphs.Config;
 
 namespace SEE.GraphProviders
 {
@@ -63,10 +63,27 @@ namespace SEE.GraphProviders
              CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GitGraphGenerator.AddNodesForCommit
-                                                      (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
-                                                       CombineAuthors, AuthorAliasMap,
-                                                       changePercentage, token));
+
+            return await UniTask.RunOnThreadPool<Graph>(() => GetGraph(graph, changePercentage, token));
+        }
+
+        /// <summary>
+        /// Adds the nodes and metrics of the commits between
+        /// <see cref="BaselineCommitID"/> and <see cref="CommitID"/> to
+        /// <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph into which the metrics shall be loaded.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>The graph handed in, with the nodes and metrics added.</returns>
+        private Graph GetGraph(Graph graph, Action<float> changePercentage, CancellationToken token)
+        {
+            string repositoryPath = GitRepository.RepositoryPath.Path;
+            ChurnGraphGenerator.AddNodesForCommit
+                (graph, SimplifyGraph, GitRepository,
+                 Graphs.Utils.Filenames.InnermostDirectoryName(repositoryPath),
+                 CommitID, BaselineCommitID, AddCoChangeEdges, changePercentage, token);
+            return graph;
         }
 
         /// <summary>

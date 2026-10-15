@@ -1,9 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
+using SEE.UserSettings;
 using SEE.Net.Util.FileSync;
 using SEE.UI.Notification;
-using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -14,6 +14,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
+using SEE.Graphs.Utils;
 
 namespace SEE.Net.Util
 {
@@ -241,7 +242,7 @@ namespace SEE.Net.Util
                 return new List<ServerSnapshot>();
             }
 
-            string url = $"{UserSettings.BackendServerAPI}server/snapshots?id={Network.ServerId}";
+            string url = $"{UserSetting.BackendServerAPI}server/snapshots?id={Network.ServerId}";
             using UnityWebRequest request = UnityWebRequest.Get(url);
             await request.SendWebRequest().ToUniTask();
 
@@ -279,7 +280,7 @@ namespace SEE.Net.Util
                 return false;
             }
 
-            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshotId}/download";
+            string url = $"{UserSetting.BackendServerAPI}serversnapshot/{snapshotId}/download";
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.downloadHandler = new DownloadHandlerFile(targetFileName);
             UnityWebRequestAsyncOperation asyncOp = request.SendWebRequest();
@@ -313,7 +314,7 @@ namespace SEE.Net.Util
                 return;
             }
 
-            string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
+            string url = UserSetting.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
             byte[] bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = CreateFileUploadRequest(url, bytes, snapshotZipPath);
@@ -335,7 +336,7 @@ namespace SEE.Net.Util
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
         {
-            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(UserSettings.BackendDomain))
+            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(UserSetting.BackendDomain))
             {
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
@@ -363,7 +364,7 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Logger.Log($"Backend API URL is: {UserSettings.BackendServerAPI}.\n");
+            Logger.Log($"Backend API URL is: {UserSetting.BackendServerAPI}.\n");
 
             if (!await LogInAsync())
             {
@@ -413,7 +414,7 @@ namespace SEE.Net.Util
             string projectType = Filenames.GetRootFolder(fileName.Substring(MultiplayerDataPath.Length));
             string relativePath = fileName.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
 
-            string url = UserSettings.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+            string url = UserSetting.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
             UnityWebRequest request = new UnityWebRequest(url, "POST");
 
@@ -482,7 +483,7 @@ namespace SEE.Net.Util
             string relativeOldPath = oldFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
             string relativeNewPath = newFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
 
-            string url = UserSettings.BackendServerAPI + $"server/renameProjectFile?id={Network.ServerId}&projectType={projectType}&oldFilePath={relativeOldPath}&newFilePath={relativeNewPath}";
+            string url = UserSetting.BackendServerAPI + $"server/renameProjectFile?id={Network.ServerId}&projectType={projectType}&oldFilePath={relativeOldPath}&newFilePath={relativeNewPath}";
 
             UnityWebRequest request = new UnityWebRequest(url, "POST");
 
@@ -509,7 +510,7 @@ namespace SEE.Net.Util
 
             string projectType = Filenames.GetRootFolder(filePath.Substring(MultiplayerDataPath.Length));
             string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
-            string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+            string url = UserSetting.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
             using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
             await request.SendWebRequest().ToUniTask();
@@ -595,7 +596,7 @@ namespace SEE.Net.Util
         /// <param name="id">The unique identifier of the file to be retrieved.</param>
         /// <param name="path">The path and filename of the file to be saved locally after retrieval.</param>
         /// <returns>
-        /// A <see cref="UniTask{bool}"/> indicating whether the file retrieval was successful.
+        /// A <see cref="UniTask{Boolean}"/> indicating whether the file retrieval was successful.
         /// Returns true if the file is successfully retrieved and saved; otherwise, false.
         /// </returns>
         /// <remarks>
@@ -615,7 +616,7 @@ namespace SEE.Net.Util
                 throw new IOException($"The file already exists: '{targetPath}'");
             }
 
-            string url = UserSettings.BackendServerAPI + "file/download?id=" + id;
+            string url = UserSetting.BackendServerAPI + "file/download?id=" + id;
             using UnityWebRequest getRequest = UnityWebRequest.Get(url);
             getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
             UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
@@ -641,7 +642,7 @@ namespace SEE.Net.Util
         /// must be set.
         /// </summary>
         /// <returns>
-        /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
+        /// A <see cref="UniTask{Boolean}"/> indicating whether the login was successful.
         /// Returns true if the login is successful; otherwise, false.
         /// </returns>
         public static async UniTask<bool> LogInAsync()
@@ -653,13 +654,13 @@ namespace SEE.Net.Util
                 ShowNotification.Error(title, "There is no server id.\n");
                 return false;
             }
-            if (UserSettings.Instance.Network.RoomPassword == null)
+            if (UserSetting.Instance.Network.RoomPassword == null)
             {
                 ShowNotification.Error(title, "Password must not be null.\n");
                 return false;
             }
-            string url = UserSettings.BackendServerAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, UserSettings.Instance.Network.RoomPassword);
+            string url = UserSetting.BackendServerAPI + "user/signin";
+            string postBody = new LoginData(Network.ServerId, UserSetting.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
             UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
@@ -683,7 +684,7 @@ namespace SEE.Net.Util
         /// <returns>A list of file metadata objects if the request was successful, or null if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
-            string url = UserSettings.BackendServerAPI + "server/files?id=" + serverId;
+            string url = UserSetting.BackendServerAPI + "server/files?id=" + serverId;
             using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
             UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
             await operation.ToUniTask();

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework;
 using UnityEngine;
+using SEE.UserSettings;
 
 namespace SEE.UI
 {
@@ -17,8 +18,7 @@ namespace SEE.UI
         /// <summary>
         /// Setup for a test.
         /// The playmode will be entered.
-        /// The <see cref="User.UserSettings.InputType">UserSettings.Instance.InputType</see>
-        /// will be <see cref="GO.PlayerInputType.DesktopPlayer"/>.
+        /// The <see cref="UserSetting.InputType"/> will be <see cref="SEE.UserSettings.PlayerInputType.DesktopPlayer"/>.
         ///
         /// Note: Subclasses may have their own method tagged by UnitySetUp,
         /// which will then be called after this method.
@@ -34,7 +34,7 @@ namespace SEE.UI
         public IEnumerator SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            User.UserSettings.Instance.InputType = GO.PlayerInputType.DesktopPlayer;
+            UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
             yield return new EnterPlayMode();
         }
 

@@ -1,3 +1,4 @@
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -102,9 +103,9 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(MarkerHeight, markerHeightLabel);
             writer.Save(MarkerWidth, markerWidthLabel);
-            writer.Save(AdditionBeamColor, additionBeamColorLabel);
-            writer.Save(ChangeBeamColor, changeBeamColorLabel);
-            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
+            writer.SaveColor(AdditionBeamColor, additionBeamColorLabel);
+            writer.SaveColor(ChangeBeamColor, changeBeamColorLabel);
+            writer.SaveColor(DeletionBeamColor, deletionBeamColorLabel);
             writer.EndGroup();
         }
 
@@ -119,9 +120,9 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.Restore(values, markerHeightLabel, ref MarkerHeight);
                 ConfigIO.Restore(values, markerWidthLabel, ref MarkerWidth);
-                ConfigIO.Restore(values, additionBeamColorLabel, ref AdditionBeamColor);
-                ConfigIO.Restore(values, changeBeamColorLabel, ref ChangeBeamColor);
-                ConfigIO.Restore(values, deletionBeamColorLabel, ref DeletionBeamColor);
+                UnityConfigIO.RestoreColor(values, additionBeamColorLabel, ref AdditionBeamColor);
+                UnityConfigIO.RestoreColor(values, changeBeamColorLabel, ref ChangeBeamColor);
+                UnityConfigIO.RestoreColor(values, deletionBeamColorLabel, ref DeletionBeamColor);
             }
         }
         #endregion

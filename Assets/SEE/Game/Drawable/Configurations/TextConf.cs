@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -82,7 +83,9 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this <see cref="TextConf"/> object.
+        /// Returns an independent clone of this <see cref="TextConf"/>.
+        /// This configuration contains only value type and immutable string data,
+        /// so no mutable nested state is shared.
         /// </summary>
         /// <returns>A new <see cref="TextConf"/> with the values of this object.</returns>
         public TextConf Clone()
@@ -149,9 +152,9 @@ namespace SEE.Game.Drawable.Configurations
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(Text, textLabel);
-            writer.Save(FontColor, fontColorLabel);
+            writer.SaveColor(FontColor, fontColorLabel);
             writer.Save(IsOutlined, outlineStatusLabel);
-            writer.Save(OutlineColor, outlineColorLabel);
+            writer.SaveColor(OutlineColor, outlineColorLabel);
             writer.Save(OutlineThickness, outlineThicknessColorLabel);
             writer.Save(FontSize, fontSizeLabel);
             writer.Save(FontStyles.ToString(), fontStylesLabel);
@@ -182,7 +185,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the font color.
             Color loadedFontColor = Color.black;
-            if (ConfigIO.Restore(attributes, fontColorLabel, ref loadedFontColor))
+            if (UnityConfigIO.RestoreColor(attributes, fontColorLabel, ref loadedFontColor))
             {
                 FontColor = loadedFontColor;
             }
@@ -194,7 +197,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the outline color.
             Color loadedOutlineColor = Color.clear;
-            if (ConfigIO.Restore(attributes, outlineColorLabel, ref loadedOutlineColor))
+            if (UnityConfigIO.RestoreColor(attributes, outlineColorLabel, ref loadedOutlineColor))
             {
                 OutlineColor = loadedOutlineColor;
             }

@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
@@ -14,6 +13,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -401,7 +401,7 @@ namespace SEE.UI.Menu.Drawable
         /// Otherwise it will be opened for the WriteTextAction.</param>
         public static void Enable(bool reset = true, bool showEditMode = false)
         {
-            /// Resets the handlers, if desired (depending on <paramref name="reset").
+            /// Resets the handlers, if desired (depending on <paramref name="reset"/>).
             if (reset)
             {
                 Reset();
@@ -439,7 +439,7 @@ namespace SEE.UI.Menu.Drawable
         private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true,
             bool showEditMode = false)
         {
-            /// Resets the handlers, if desired (depending on <paramref name="reset").
+            /// Resets the handlers, if desired (depending on <paramref name="reset"/>).
             if (reset)
             {
                 Reset();

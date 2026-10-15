@@ -3,7 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Notification;
 using System.Collections.Generic;
@@ -211,7 +211,7 @@ namespace SEE.UI.Menu.Drawable
                 });
                 parentSelector.defaultIndex = index;
 
-                /// For the <paramref name="cutCopyMode", provide a Finish Button.
+                /// For the <paramref name="cutCopyMode"/>, provide a Finish Button.
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {

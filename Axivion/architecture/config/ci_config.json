@@ -1,0 +1,42 @@
+{
+    "Project": {
+        "AxivionCompiler 1": {
+            "_active": true,
+            "_copy_from": "AxivionCompiler",
+            "ir": "$(AXIVION_PROJECT_NAME).ir",
+            "options": "-j -Isrc",
+            "source_files": [
+                "src/**/*.c"
+            ]
+        },
+        "BuildSystemIntegration": {
+            "child_order": [
+                "AxivionCompiler 1"
+            ]
+        },
+        "Project-GlobalOptions": {
+            "directory": "../../",
+            "ir": "$(AXIVION_PROJECT_NAME).ir",
+            "name": "$(AXIVION_PROJECT_NAME)"
+        },
+        "Shadow": {
+            "_active": true,
+            "shadow_directory": "$(AXIVION_DATABASES_DIRECTORY)/$(AXIVION_PROJECT_NAME).shadow"
+        }
+    },
+    "Results": {
+        "Dashboard": {
+            "ci_mode": {
+                "directory": "$(AXIVION_DATABASES_DIRECTORY)"
+            },
+            "dashboard_url": "$(AXIVION_DASHBOARD_URL=)"
+        }
+    },
+    "_Format": "1.0",
+    "_VersionNum": [
+        7,
+        9,
+        0,
+        15691
+    ]
+}

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.Utils.Config;
+using SEE.Components.GraphElements;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {
@@ -147,7 +148,7 @@ namespace SEE.Game.City
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
         [Tooltip("The outline width when a node is hovered.")]
-        public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+        public float OutlineWidth = Outline.DefaultWidth;
         /// <summary>
         /// If true, persistent text labels will be added to the node representation.
         /// </summary>

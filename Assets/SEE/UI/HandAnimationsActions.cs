@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
-using SEE.GO;
 using SEE.Utils;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Avatars;
 using TMPro;
+using SEE.Extensions;
 
 namespace SEE.UI
 {

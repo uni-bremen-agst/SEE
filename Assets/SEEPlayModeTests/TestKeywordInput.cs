@@ -7,7 +7,7 @@ using UnityEngine.Windows.Speech;
 using NUnit.Framework;
 using System.Linq;
 
-namespace SEE.Controls
+namespace SEE.Controls.SpeechInput
 {
     /// <summary>
     /// Test cases for <see cref="KeywordInput"/>.

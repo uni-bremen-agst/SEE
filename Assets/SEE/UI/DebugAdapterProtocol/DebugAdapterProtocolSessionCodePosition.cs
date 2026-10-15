@@ -1,6 +1,5 @@
-using SEE.Controls;
-using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Graphs;
+using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;
 using SEE.Utils;
@@ -8,6 +7,8 @@ using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.StackFrame;
+using SEE.Controls.Players;
+using SEE.Graphs.Utils;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
@@ -82,7 +83,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="highlightDuration">The highlight duration (seconds) in the city.</param>
         private void ShowCodePosition(bool makeActive = false, bool scroll = false, float highlightDuration = highlightDurationInitial)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => Filenames.OnCurrentPlatform(window.FilePath) == Filenames.OnCurrentPlatform(lastCodePath));
             if (codeWindow == null)
             {

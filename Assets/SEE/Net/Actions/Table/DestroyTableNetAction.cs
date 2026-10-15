@@ -1,4 +1,4 @@
-﻿using SEE.Game.Table;
+﻿using SEE.Game.Tables;
 
 namespace SEE.Net.Actions.Table
 {

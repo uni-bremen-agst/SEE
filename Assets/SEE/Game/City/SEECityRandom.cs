@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
+using SEE.Graphs.Config;
 using SEE.Tools.RandomGraphs;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

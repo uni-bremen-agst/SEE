@@ -1,4 +1,4 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Graphs;
 using SEE.Layout;
 
 namespace SEE.Game.CityRendering

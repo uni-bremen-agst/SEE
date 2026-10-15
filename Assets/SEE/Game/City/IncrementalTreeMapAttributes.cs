@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// The settings for <see cref="Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
     /// </summary>
     [Serializable]
-    public class IncrementalTreeMapAttributes : ConfigIO.IPersistentConfigItem
+    public class IncrementalTreeMapAttributes : IPersistentConfigItem
     {
         /// <summary>
         /// The depth of the local moves search.

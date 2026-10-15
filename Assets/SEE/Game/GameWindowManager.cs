@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.Players;
 using SEE.UI.Window;
 
 namespace SEE.Game
@@ -20,7 +20,7 @@ namespace SEE.Game
         /// </param>
         public static void ActivateWindow(BaseWindow window)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             if (!manager.Windows.Contains(window))
             {
                 manager.AddWindow(window);

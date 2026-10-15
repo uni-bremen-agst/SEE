@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.UserSettings;
 
 namespace SEE.Game.Avatars
 {
@@ -48,7 +49,7 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 Log($"{nameof(Start)}() uses GetLocalPlayerName()\n");
-                SetPlayerName(User.UserSettings.Instance.Player.PlayerName);
+                SetPlayerName(UserSetting.Instance.Player.PlayerName);
             }
             else
             {
@@ -62,7 +63,7 @@ namespace SEE.Game.Avatars
         /// from the server.
         /// </summary>
         /// <remarks><see cref="NetworkBehaviour.OnNetworkDespawn"/> is invoked on each
-        /// <see cref=">NetworkBehaviour"/> associated with a <see cref="NetworkObject"/>
+        /// <see cref="NetworkBehaviour"/> associated with a <see cref="NetworkObject"/>
         /// when it's despawned. This is where all netcode cleanup code should occur,
         /// but isn't to be confused with destroying.</remarks>
         public override void OnNetworkDespawn()

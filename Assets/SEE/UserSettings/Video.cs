@@ -1,12 +1,12 @@
 ﻿using SEE.Game;
+using SEE.Graphs.Config;
 using SEE.UI;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the video settings for the SEE application. These are attributes

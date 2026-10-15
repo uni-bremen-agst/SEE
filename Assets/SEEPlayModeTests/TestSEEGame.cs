@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.UserSettings;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -120,8 +121,8 @@ namespace SEE.Net
             PressButton(HostButtonPath);
             yield return new WaitForEndOfFrame();
 
-            Assert.That(User.UserSettings.Instance, Is.Not.Null,
-                        $"There is no {nameof(User.UserSettings)} instance after pressing {HostButtonPath}.");
+            Assert.That(UserSetting.Instance, Is.Not.Null,
+                        $"There is no {nameof(UserSetting.Instance)} instance after pressing {HostButtonPath}.");
             Debug.Log($"[SetUp] Finished.\n");
             yield return null;
         }

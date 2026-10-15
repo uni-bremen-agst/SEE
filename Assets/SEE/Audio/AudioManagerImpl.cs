@@ -1,5 +1,5 @@
+using SEE.UserSettings;
 using SEE.Net.Actions.GraphElement;
-using SEE.User;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,7 +10,7 @@ using static SEE.Audio.SceneContext;
 namespace SEE.Audio
 {
     /// <summary>
-    /// Implements the IAudioManager interface.
+    /// Implements the <see cref="IAudioManager"/> interface.
     /// </summary>
     public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
@@ -277,10 +277,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public float MusicVolume
         {
-            get => UserSettings.Instance.Audio.MusicVolume;
+            get => UserSetting.Instance.Audio.MusicVolume;
             set
             {
-                UserSettings.Instance.Audio.MusicVolume = Mathf.Clamp(value, 0f, 1f);
+                UserSetting.Instance.Audio.MusicVolume = Mathf.Clamp(value, 0f, 1f);
                 TriggerVolumeChanges();
             }
         }
@@ -288,10 +288,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public float SoundEffectsVolume
         {
-            get => UserSettings.Instance.Audio.SoundEffectsVolume;
+            get => UserSetting.Instance.Audio.SoundEffectsVolume;
             set
             {
-                UserSettings.Instance.Audio.SoundEffectsVolume = Mathf.Clamp(value, 0f, 1f);
+                UserSetting.Instance.Audio.SoundEffectsVolume = Mathf.Clamp(value, 0f, 1f);
                 TriggerVolumeChanges();
             }
         }
@@ -299,10 +299,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool MusicMuted
         {
-            get => UserSettings.Instance.Audio.MusicMuted;
+            get => UserSetting.Instance.Audio.MusicMuted;
             set
             {
-                UserSettings.Instance.Audio.MusicMuted = value;
+                UserSetting.Instance.Audio.MusicMuted = value;
                 TriggerVolumeChanges();
                 PauseMusic();
             }
@@ -311,10 +311,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool SoundEffectsMuted
         {
-            get => UserSettings.Instance.Audio.SoundEffectsMuted;
+            get => UserSetting.Instance.Audio.SoundEffectsMuted;
             set
             {
-                UserSettings.Instance.Audio.SoundEffectsMuted = value;
+                UserSetting.Instance.Audio.SoundEffectsMuted = value;
                 TriggerVolumeChanges();
             }
         }
@@ -322,10 +322,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool RemoteSoundEffectsMuted
         {
-            get => UserSettings.Instance.Audio.RemoteSoundEffectsMuted;
+            get => UserSetting.Instance.Audio.RemoteSoundEffectsMuted;
             set
             {
-                UserSettings.Instance.Audio.RemoteSoundEffectsMuted = value;
+                UserSetting.Instance.Audio.RemoteSoundEffectsMuted = value;
                 TriggerVolumeChanges();
             }
         }
@@ -438,7 +438,7 @@ namespace SEE.Audio
             AudioGameObject controlObject = soundEffectGameObjects.FirstOrDefault(x => x.AttachedObject == sourceObject);
             if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume, UserSettings.Instance.Audio.SoundEffectsMuted);
+                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume, UserSetting.Instance.Audio.SoundEffectsMuted);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
