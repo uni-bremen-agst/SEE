@@ -41,7 +41,7 @@ namespace XMLDocNormalizerTests.Worker
             var before = await Client().AnalyzeAsync(new(ExternalSource, "Fixture", "Root", LogicalPath: PathName));
             Assert.Equal(WorkerFailureCode.CompilationFailure, before.Failure!.WorkerFailure!.Code);
             Assert.Null(before.Result);
-            Stopped(before.ProcessId!.Value);
+            Stopped(before);
 
             // Genuine Historical PE/PDB -> unchanged P4/P5A/P5G/P5H/P5I -> original P5C/P5E -> production dispatch.
             var input = await ValidatedInput(payload);
@@ -57,8 +57,8 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(WorkerProtocol.ReferenceWorldHash(first.PayloadProjection.Value.Payload), first.Dispatch.Routing.HistoricalAnalysis!.Provenance!.ReferenceWorldSha256);
             var graph = await Probe(payload, "--b12-graph");
             AssertGraph(native, first.Result!, graph);
-            Stopped(first.Dispatch.Routing.HistoricalAnalysis.ProcessId!.Value);
-            Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!.ProcessId!.Value);
+            Stopped(first.Dispatch.Routing.HistoricalAnalysis);
+            Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!);
             NoHistoricalLoaded();
             await Evidence("external-v" + version, new
             {
@@ -75,7 +75,9 @@ namespace XMLDocNormalizerTests.Worker
                 HistoricalLoadedInMain = false,
                 Before = before.Failure,
                 FirstProcess = first.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                FirstProcessExit = first.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 SecondProcess = second.Dispatch.Routing.HistoricalAnalysis!.ProcessId,
+                SecondProcessExit = second.Dispatch.Routing.HistoricalAnalysis!.ProcessExit,
                 ReferenceWorld = payload.Context!.References!.Select(reference => reference with { Image = [] }).ToArray()
             });
         }
@@ -97,7 +99,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal("Original.Local.Target.dll", local.ExceptionType.Module!.Name);
             var graph = await Probe(input, "--b12-graph");
             AssertGraph(native, first.Result, graph);
-            Stopped(first.ProcessId!.Value); Stopped(second.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(first); Stopped(second); NoHistoricalLoaded();
             await Evidence("target-identity", new { Native = native, Historical = first.Result, RepeatedHistorical = second.Result, Graph = graph, first.Provenance, ProcessesStopped = true });
         }
 
@@ -112,11 +114,11 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(left.Success, left.Failure?.Message); Assert.True(right.Success, right.Failure?.Message);
             Assert.NotEqual(left.Result, right.Result);
             Assert.Equal(Native(first).Result, left.Result); Assert.Equal(Native(second).Result, right.Result);
-            Stopped(left.ProcessId!.Value); Stopped(right.ProcessId!.Value);
+            Stopped(left); Stopped(right);
             var renamed = first with { Context = first.Context with { References = first.Context.References!.Select(reference => reference with { LogicalName = "same/nonexistent/path.dll" }).ToArray() } };
             var again = await Client().AnalyzeAsync(renamed);
             Assert.True(again.Success); Assert.Equal(left.Result, again.Result); Assert.Equal(left.Provenance, again.Provenance);
-            Stopped(again.ProcessId!.Value);
+            Stopped(again);
         }
 
         [Fact]
@@ -133,7 +135,7 @@ namespace XMLDocNormalizerTests.Worker
             var second = await Client().AnalyzeAsync(reordered);
             Assert.True(second.Success); Assert.Equal(Native(reordered).Result, second.Result); Assert.Equal(first.Result, second.Result);
             Assert.NotEqual(first.Provenance!.ReferenceWorldSha256, second.Provenance!.ReferenceWorldSha256);
-            Stopped(first.ProcessId!.Value); Stopped(second.ProcessId!.Value);
+            Stopped(first); Stopped(second);
             await Evidence("aliases-order", new
             {
                 Native = native,
@@ -156,7 +158,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.False(result.Success); Assert.Null(result.Result);
             Assert.Equal(WorkerFailureCode.CompilationFailure, result.Failure!.WorkerFailure!.Code);
             Assert.Contains(result.Failure.WorkerFailure.Details, error => error.StartsWith("CS0246", StringComparison.Ordinal));
-            Stopped(result.ProcessId!.Value);
+            Stopped(result);
             await Evidence("missing-reference", new { CurrentErrors = native.Errors, HistoricalFailure = result.Failure, ExistingCompletenessContract = true });
         }
 
@@ -183,7 +185,7 @@ namespace XMLDocNormalizerTests.Worker
             if (scenario == "target-module") { context = context with { TargetModuleName = "wrong.dll" }; }
             var result = await Client().AnalyzeAsync(input with { Context = context });
             Assert.Equal(WorkerFailureCode.CompilationFailure, result.Failure!.WorkerFailure!.Code);
-            Assert.Null(result.Result); Stopped(result.ProcessId!.Value);
+            Assert.Null(result.Result); Stopped(result);
         }
 
         [Theory]
@@ -250,7 +252,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<WorkerReferenceImage>("{\"unexpected\":true}", WorkerProtocol.JsonOptions));
             using var duplicate = JsonDocument.Parse("{\"payload\":{\"context\":{\"references\":[],\"references\":[]}}}");
             Assert.Throws<JsonException>(() => WorkerProtocol.RejectDuplicateProperties(duplicate.RootElement));
-            Stopped(real.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(real); NoHistoricalLoaded();
         }
 
         [Theory]
@@ -272,7 +274,7 @@ namespace XMLDocNormalizerTests.Worker
             }
             var rejected = HistoricalWorkerResponseValidation.Validate(node.ToJsonString(), "", 0, input);
             Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, rejected.Failure!.Code); Assert.Null(rejected.Result);
-            Stopped(real.ProcessId!.Value);
+            Stopped(real);
         }
 
         private sealed record Snapshot(CanonicalExceptionFlowAnalysisResult Result, int GraphCount, string[] GraphSummaries, object Findings, bool RepeatedFindingsEqual, string[] Errors);
@@ -399,8 +401,8 @@ namespace XMLDocNormalizerTests.Worker
             string output = Path.Combine(Root(), "artifacts", "p5o2b12", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             await File.WriteAllTextAsync(output, JsonSerializer.Serialize(value, WorkerProtocol.JsonOptions));
         }
-        private static void Stopped(int pid)
-        { try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker"
             || assembly.ManifestModule.ModuleVersionId.ToString() is "dc7738cc-6dca-4d34-9c44-29b53a7caa93" or "0f9c1dcf-4eb1-47f8-81b2-733db5887be7");
     }

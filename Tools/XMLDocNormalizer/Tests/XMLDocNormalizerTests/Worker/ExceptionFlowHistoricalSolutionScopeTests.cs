@@ -58,7 +58,7 @@ namespace XMLDocNormalizerTests.Worker
                 foreach (var dependency in node.Dependencies!)
                 { Assert.Single(node.Input!.Context!.References!.Where(reference => WorkerInputValidation.ReferenceMatchesProject(reference, dependency))); }
             }
-            Stopped(call.ProcessId!.Value); Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(call); Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!); NoHistoricalLoaded();
             await Evidence("solution-" + count + "-" + sourceException, new
             {
                 ProjectCount = count,
@@ -71,7 +71,9 @@ namespace XMLDocNormalizerTests.Worker
                 call.Provenance,
                 call.Identity,
                 FirstProcess = call.ProcessId,
-                SecondProcess = second.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                FirstProcessExit = call.ProcessExit,
+                SecondProcess = second.Dispatch.Routing.HistoricalAnalysis!.ProcessId,
+                SecondProcessExit = second.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 OriginalReceipts = true,
                 NoCurrentFallback = true,
                 ProcessesStopped = true,
@@ -100,7 +102,7 @@ namespace XMLDocNormalizerTests.Worker
             var worker = await Client().AnalyzeAsync(rootOnly);
             if (mode == ExceptionAnalysisMode.Direct) { Assert.True(worker.Success, worker.Failure?.Message); Assert.Equal(local.Result, worker.Result); }
             else { Assert.False(worker.Success); Assert.Equal(WorkerFailureCode.AnalysisFailure, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result); }
-            Stopped(worker.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(worker); NoHistoricalLoaded();
             await Evidence("local-" + mode, new { Mode = mode, Native = local, Solution = solution, WorkerResult = worker.Result, worker.Failure, GraphRefusedBeforeDispatch = true, NoScopeWidening = true, ProcessesStopped = true });
         }
 
@@ -184,7 +186,7 @@ namespace XMLDocNormalizerTests.Worker
             var routing = result.Dispatch!.Routing!;
             Assert.Null(routing.CurrentAnalysis);
             Assert.Equal(WorkerFailureCode.AnalysisFailure, routing.HistoricalFailure!.WorkerFailure!.Code);
-            Stopped(routing.HistoricalAnalysis!.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(routing.HistoricalAnalysis!); NoHistoricalLoaded();
             await Evidence("missing-reachable-source", new { routing.HistoricalFailure, ActualReachableSourceMissing = true, NoPartialResult = true, NoLocalOrCurrentFallback = true, ProcessesStopped = true });
         }
 
@@ -197,14 +199,14 @@ namespace XMLDocNormalizerTests.Worker
             var unavailable = input with { Context = input.Context with { Solution = graph with { Projects = nodes } } };
             Assert.NotEqual(WorkerProtocol.ReferenceWorldHash(input), WorkerProtocol.ReferenceWorldHash(unavailable));
             var result = await Client().AnalyzeAsync(unavailable);
-            Assert.Equal(WorkerFailureCode.UnsupportedContext, result.Failure!.WorkerFailure!.Code); Assert.Null(result.Result); Stopped(result.ProcessId!.Value);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, result.Failure!.WorkerFailure!.Code); Assert.Null(result.Result); Stopped(result);
             var real = await Client().AnalyzeAsync(input); Assert.True(real.Success, real.Failure?.Message);
             var response = new WorkerResponse(2, "analyze", true, real.Identity, real.Result, Provenance: WorkerProtocol.Provenance(unavailable));
             Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, HistoricalWorkerResponseValidation.Validate(JsonSerializer.Serialize(response, WorkerProtocol.JsonOptions), "", 0, input).Failure!.Code);
             response = response with { Provenance = WorkerProtocol.Provenance(input) };
             string forged = JsonSerializer.Serialize(response, WorkerProtocol.JsonOptions).Replace(PathFor(1), "/foreign/Helper.cs", StringComparison.Ordinal);
             Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, HistoricalWorkerResponseValidation.Validate(forged, "", 0, input).Failure!.Code);
-            Stopped(real.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(real); NoHistoricalLoaded();
             await Evidence("compiler-response", new { result.Failure, ActualCompilerRejection = true, ForgedGraphWorldRejected = true, ForeignPathRejected = true, NoFallback = true, ProcessesStopped = true });
         }
 
@@ -331,7 +333,8 @@ namespace XMLDocNormalizerTests.Worker
         private static Task<JsonElement> Probe(WorkerAnalysisInput input, string operation, string? output = null) => (Task<JsonElement>)B12("Probe", input, operation, output)!;
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical", "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
-        private static void Stopped(int pid) { try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         {

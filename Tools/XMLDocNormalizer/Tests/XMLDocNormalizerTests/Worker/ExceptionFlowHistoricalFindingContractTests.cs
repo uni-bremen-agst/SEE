@@ -137,7 +137,9 @@ namespace XMLDocNormalizerTests.Worker
                 call.Provenance,
                 call.Identity,
                 FirstProcess = call.ProcessId,
+                FirstProcessExit = call.ProcessExit,
                 SecondProcess = repeat.ProcessId,
+                SecondProcessExit = repeat.ProcessExit,
                 GuardInputEquivalent = true,
                 GuardExecutionDeferred = true,
                 DeclaredStillUnsupported = true,
@@ -295,7 +297,8 @@ namespace XMLDocNormalizerTests.Worker
             .GetMethod("ValidatedInput", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [payload])!;
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical", "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
-        private static void Stopped(HistoricalWorkerCallResult call) { Assert.NotNull(call.ProcessId); try { using var process = Process.GetProcessById(call.ProcessId.Value); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         {

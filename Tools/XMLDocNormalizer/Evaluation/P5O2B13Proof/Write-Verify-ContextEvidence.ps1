@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $toolRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $toolRoot
 try {
@@ -91,7 +92,7 @@ try {
         Require ((Json $value.Graph.Result) -ceq (Json $value.Historical) -and $value.Native.GraphCount -eq $value.Graph.GraphCount -and $value.Graph.GraphCount -eq $value.Graph.RepeatedGraphCount) 'Graph/result ownership/repetition drift.'
         Require ($value.Provenance.LanguageVersion -ceq $language -and $value.Provenance.ReferenceWorldSha256.Length -eq 64) 'Parse context not bound.'
         foreach($engine in $value.Identity.LoadedRoslyn) { Require ($gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256 -and $value.Graph.CompilerMvids -contains $engine.Mvid) 'Historical runtime identity mismatch.' }
-        foreach($processId in @($value.FirstProcess,$value.SecondProcess)) { Require ($null -ne $processId -and $null -eq (Get-Process -Id $processId -ErrorAction SilentlyContinue)) 'Own Worker process still alive.' }
+        Assert-OwnedProcessPair $value.FirstProcessExit $value.SecondProcessExit $value.FirstProcess $value.SecondProcess
         [ordered]@{Name=$name;Value=$value;Artifact=(Fingerprint $path)}
     } }
     $language=ReadJson (Join-Path $validation 'artifacts/p5o2b13/language-admissibility.json')

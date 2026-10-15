@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -93,10 +94,7 @@ try {
     Require ($runtime.FirstProvenance.LogicalPath -ceq $runtime.OriginalPath -and $b10.Payload.LogicalPath -ceq $b10.OriginalDocumentName -and $b10.WorkerProvenance.LogicalPath -ceq $b10.OriginalDocumentName) 'Original path lost.'
     Require ($b10.PeSha256 -ceq $emission.PeSha256 -and $b10.PdbSha256 -ceq $emission.PdbSha256) 'Actual Historical PE/PDB emission differs.'
     foreach($engine in $runtime.FirstIdentity.LoadedRoslyn) { Require ($gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256 -and $runtime.Graph.CompilerMvids -contains $engine.Mvid) 'Historical runtime/compiler/graph host identity mismatch.' }
-    foreach($processId in @($runtime.FirstProcess,$runtime.SecondProcess)) {
-        $process=Get-Process -Id $processId -ErrorAction SilentlyContinue
-        Require ($null -eq $process -or $process.HasExited) 'Historical Worker is still running.'
-    }
+    Assert-OwnedProcessPair $runtime.FirstProcessExit $runtime.SecondProcessExit $runtime.FirstProcess $runtime.SecondProcess
     Require ($gaps.Defines.Gap -and $gaps.References.Gap -and $gaps.Sources.Gap -and $gaps.Nullable.AnnotationsDiffer -and $gaps.Nullable.FlowEqual -and $gaps.Deferred) 'Differential gap inventory incomplete.'
     $report='Evaluation/P5O2B11-historical-external-input-equivalence.md'
     $matrix=foreach($line in Get-Content $report -Encoding UTF8) {

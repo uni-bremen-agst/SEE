@@ -100,7 +100,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(graph.GetProperty("repeatedResultEqual").GetBoolean());
             Assert.All(graph.GetProperty("ownership").EnumerateArray(), item => Assert.True(item.GetProperty("stableModel").GetBoolean()));
             Assert.True(graph.GetProperty("foreignTreeRejected").GetBoolean()); Assert.True(graph.GetProperty("foreignBindingRejected").GetBoolean());
-            Stopped(call.ProcessId!.Value); Stopped(repeat.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(call); Stopped(repeat); NoHistoricalLoaded();
             var disabled = await XmlDocExceptionSemanticDetector.AnalyzeExternalExceptionFlowAsync(input with { AnalysisMode = ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions }, new(new(Client())));
             Assert.False(disabled.Succeeded); Assert.Null(disabled.Dispatch);
             // A record clone cannot mint a receipt; mutating raw DTO arrays cannot mutate the validated immutable snapshot.
@@ -121,7 +121,9 @@ namespace XMLDocNormalizerTests.Worker
                 call.Provenance,
                 call.Identity,
                 FirstProcess = call.ProcessId,
+                FirstProcessExit = call.ProcessExit,
                 SecondProcess = repeat.ProcessId,
+                SecondProcessExit = repeat.ProcessExit,
                 OriginalValidatedProjection = true,
                 NoFallback = true,
                 ProcessesStopped = true,
@@ -179,7 +181,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, rejected.Failure!.Code); Assert.Null(rejected.Result); Assert.Null(rejected.DeclaredPolicy);
             Assert.Equal(DeclaredFindingPolicyFailureCode.UnvalidatedEvidence, DeclaredExceptionFindingPolicy.Evaluate(rejected,
                 new(WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions, native.Expected[0].Type, DeclaredFindingSourceKind.Summary)).Failure!.Code);
-            Stopped(call.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(call); NoHistoricalLoaded();
             await Evidence("negative-response-" + scenario, new { Scenario = scenario, rejected.Failure, NoPolicyReceipt = true, NoResult = true, NoFallback = true, ProcessesStopped = true });
         }
 
@@ -197,7 +199,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(DeclaredFindingPolicyFailureCode.UnknownExceptionType, DeclaredExceptionFindingPolicy.Evaluate(call, valid with { ExceptionType = unknown }).Failure!.Code);
             var legacy = await Client().AnalyzeAsync(payload); Assert.True(legacy.Success); Assert.Null(legacy.DeclaredPolicy);
             Assert.Equal(DeclaredFindingPolicyFailureCode.UnvalidatedEvidence, DeclaredExceptionFindingPolicy.Evaluate(legacy, valid).Failure!.Code);
-            Stopped(call.ProcessId!.Value); Stopped(legacy.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(call); Stopped(legacy); NoHistoricalLoaded();
             await Evidence("query-negative", new
             {
                 MissingType = true,
@@ -228,10 +230,10 @@ namespace XMLDocNormalizerTests.Worker
             var generic = await Original(Payload("generic"));
             Assert.False(HistoricalWorkerPayloadProjection.Project(generic with { DeclaredPolicy = OptIn() }).Succeeded);
             var mismatch = await Client().AnalyzeAsync(raw with { Context = raw.Context with { DeclaredPolicy = request with { ExpectedDeclarations = [] } } });
-            Assert.Equal(WorkerFailureCode.UnsupportedContext, mismatch.Failure!.WorkerFailure!.Code); Assert.Null(mismatch.Result); Assert.Null(mismatch.DeclaredPolicy); Stopped(mismatch.ProcessId!.Value);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, mismatch.Failure!.WorkerFailure!.Code); Assert.Null(mismatch.Result); Assert.Null(mismatch.DeclaredPolicy); Stopped(mismatch);
             var uncertain = Payload("uncertain"); var uncertainNative = Native(uncertain);
             var failed = await Client().AnalyzeAsync(RawOptIn(uncertain, uncertainNative));
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, failed.Failure!.WorkerFailure!.Code); Assert.Null(failed.DeclaredPolicy); Assert.Null(failed.Result); Stopped(failed.ProcessId!.Value);
+            Assert.Equal(WorkerFailureCode.AnalysisFailure, failed.Failure!.WorkerFailure!.Code); Assert.Null(failed.DeclaredPolicy); Assert.Null(failed.Result); Stopped(failed);
             NoHistoricalLoaded();
             await Evidence("request-negative", new
             {
@@ -331,7 +333,8 @@ namespace XMLDocNormalizerTests.Worker
         private static Task<JsonElement> Probe(WorkerAnalysisInput payload) => (Task<JsonElement>)typeof(ExceptionFlowHistoricalScopeTests).GetMethod("Probe", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [payload, "--b14-graph", null])!;
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical", "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
-        private static void Stopped(int pid) { try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         {

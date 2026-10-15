@@ -394,7 +394,7 @@ namespace XMLDocNormalizerTests.Worker
             return json.EnumerateArray().Select(item => item.GetRawText()).OrderBy(item => item, StringComparer.Ordinal).ToArray();
         }
         private static void Stopped(HistoricalWorkerCallResult call)
-        { Assert.NotNull(call.ProcessId); try { using var process = Process.GetProcessById(call.ProcessId.Value); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         { string path = Path.Combine(Root(), "artifacts", "p5o2b22", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, Json(value)); }

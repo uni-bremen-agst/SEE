@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $toolRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $toolRoot
 try {
@@ -95,11 +96,7 @@ try {
             Require ($value.OriginalP5CAndP5E -and $value.AutomaticProjection -and $value.NoCurrentFallback -and -not $value.HistoricalLoadedInMain) 'Original production/isolation handoff incomplete.'
             Require ($value.Identity.ReferenceProfile -ceq 'validated-pe-images-v1' -and $value.Provenance.ReferenceProfile -ceq 'validated-pe-images-v1' -and $value.Provenance.ReferenceWorldSha256.Length -eq 64) 'Exact reference world not bound.'
             foreach($engine in $value.Identity.LoadedRoslyn) { Require ($gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256 -and $value.Graph.CompilerMvids -contains $engine.Mvid) 'Historical runtime identity differs.' }
-            foreach($processId in @($value.FirstProcess,$value.SecondProcess)) {
-                Require ($null -ne $processId) 'Production process evidence missing.'
-                $process=Get-Process -Id $processId -ErrorAction SilentlyContinue
-                Require ($null -eq $process -or $process.HasExited) 'Historical Worker still running.'
-            }
+            Assert-OwnedProcessPair $value.FirstProcessExit $value.SecondProcessExit $value.FirstProcess $value.SecondProcess
         }
         [ordered]@{Name=$name;Value=$value;Artifact=(Fingerprint $path)}
     }

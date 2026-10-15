@@ -31,7 +31,7 @@ namespace XMLDocNormalizerTests.Worker
             HistoricalWorkerCallResult second = await Client().AnalyzeAsync(Input());
             AssertSuccess(first);
             AssertSuccess(second);
-            Assert.NotEqual(first.ProcessId, second.ProcessId);
+            Assert.NotEqual(first.ProcessExit!.ExecutionId, second.ProcessExit!.ExecutionId);
             Assert.NotEqual(Environment.ProcessId, first.ProcessId);
             Assert.Equal(first.Result, second.Result);
             Assert.Equal(JsonSerializer.Serialize(first.Identity, WorkerProtocol.JsonOptions),
@@ -56,10 +56,16 @@ namespace XMLDocNormalizerTests.Worker
             await File.WriteAllTextAsync(evidence, JsonSerializer.Serialize(new
             {
                 Current = new[] { CurrentIdentity(common), CurrentIdentity(csharp) },
-                first.ProcessId, RepeatedProcessId = second.ProcessId,
-                Historical = first.Identity, Result = first.Result,
+                first.ProcessId,
+                RepeatedProcessId = second.ProcessId,
+                first.ProcessExit,
+                RepeatedProcessExit = second.ProcessExit,
+                Historical = first.Identity,
+                Result = first.Result,
                 first.Provenance,
-                CanonicalParity = true, Deterministic = true, ProcessesStopped = true,
+                CanonicalParity = true,
+                Deterministic = true,
+                ProcessesStopped = true,
                 HistoricalLoadedInCaller = false
             }, WorkerProtocol.JsonOptions));
         }
@@ -262,12 +268,8 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Null(result.Failure);
             Assert.Empty(result.Diagnostics);
         }
-        private static void AssertStopped(HistoricalWorkerCallResult result)
-        {
-            Assert.NotNull(result.ProcessId);
-            try { using Process process = Process.GetProcessById(result.ProcessId!.Value); Assert.True(process.HasExited); }
-            catch (ArgumentException) { /* Reaped owned child is absent from the process table. */ }
-        }
+        private static void AssertStopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static string Info(Assembly assembly) => assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
         private static WorkerAssemblyIdentity CurrentIdentity(Assembly assembly)
             => new(assembly.GetName().Name!, assembly.GetName().Version!.ToString(), Info(assembly),

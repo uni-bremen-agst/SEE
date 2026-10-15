@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.HistoricalWorker;
+using XMLDocNormalizer.Execution.Historical;
 
 namespace XMLDocNormalizerTests.Worker
 {
@@ -59,12 +60,25 @@ namespace XMLDocNormalizerTests.Worker
             {
                 CallerProcessId = Environment.ProcessId,
                 WorkerProcessId = execution.ProcessId,
+                execution.ProcessExit,
                 SeparateProcesses = true,
                 HistoricalLoadedInCaller = false,
-                CurrentCommon = new { Name = common.GetName().FullName, InformationalVersion = infoBefore, BeforeMvid = commonBefore,
-                    AfterMvid = common.ManifestModule.ModuleVersionId, Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(common.Location))) },
-                CurrentCSharp = new { Name = csharp.GetName().FullName, InformationalVersion = csharp.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
-                    BeforeMvid = csharpBefore, AfterMvid = csharp.ManifestModule.ModuleVersionId, Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(csharp.Location))) },
+                CurrentCommon = new
+                {
+                    Name = common.GetName().FullName,
+                    InformationalVersion = infoBefore,
+                    BeforeMvid = commonBefore,
+                    AfterMvid = common.ManifestModule.ModuleVersionId,
+                    Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(common.Location)))
+                },
+                CurrentCSharp = new
+                {
+                    Name = csharp.GetName().FullName,
+                    InformationalVersion = csharp.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                    BeforeMvid = csharpBefore,
+                    AfterMvid = csharp.ManifestModule.ModuleVersionId,
+                    Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(csharp.Location)))
+                },
                 WorkerIdentity = identity
             }, WorkerProtocol.JsonOptions));
         }
@@ -75,7 +89,7 @@ namespace XMLDocNormalizerTests.Worker
             WorkerRequest request = new(WorkerProtocol.Version, "analyze", new(Source, "Fixture", "Root"));
             ProcessResult first = await Run(request);
             ProcessResult second = await Run(request);
-            Assert.NotEqual(first.ProcessId, second.ProcessId);
+            Assert.NotEqual(first.ProcessExit.ExecutionId, second.ProcessExit.ExecutionId);
             Assert.Equal(0, first.ExitCode);
             Assert.Equal(0, second.ExitCode);
             Assert.Empty(first.Stderr);
@@ -191,8 +205,11 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(File.Exists(worker), "Build the permanent dual-version/worker gate before process tests: " + worker);
             ProcessStartInfo start = new("dotnet")
             {
-                UseShellExecute = false, RedirectStandardInput = true,
-                RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
             };
             start.ArgumentList.Add(worker);
             using Process process = Process.Start(start)!;
@@ -227,7 +244,7 @@ namespace XMLDocNormalizerTests.Worker
                 throw new TimeoutException("Owned Historical Worker exceeded its test deadline.");
             }
 
-            return new ProcessResult(process.Id, process.ExitCode, (await stdout).Trim(), (await stderr).Trim());
+            return new ProcessResult(process.Id, process.ExitCode, (await stdout).Trim(), (await stderr).Trim(), OwnedProcessExit.Capture(process));
         }
 
         private static string FindRoot()
@@ -243,6 +260,6 @@ namespace XMLDocNormalizerTests.Worker
             throw new InvalidOperationException("Could not locate solution directory.");
         }
 
-        private sealed record ProcessResult(int ProcessId, int ExitCode, string Stdout, string Stderr);
+        private sealed record ProcessResult(int ProcessId, int ExitCode, string Stdout, string Stderr, OwnedProcessExit ProcessExit);
     }
 }

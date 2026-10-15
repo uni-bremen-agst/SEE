@@ -1,5 +1,6 @@
 param([Parameter(Mandatory = $true)][string]$ValidationRoot)
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -91,8 +92,7 @@ try {
     foreach ($engine in $runtime.HistoricalIdentity.LoadedRoslyn) {
         Require ($engine.InformationalVersion -ceq $runtime.HistoricalContext.CompilerVersion -and $gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256) 'Worker runs a different compiler from original provenance.'
     }
-    $process = Get-Process -Id $runtime.ProcessId -ErrorAction SilentlyContinue
-    Require ($null -eq $process -or $process.HasExited) 'Historical process remains alive.'
+    Assert-OwnedProcessExit $runtime.ProcessExit $runtime.ProcessId
     $projection = Get-Content -LiteralPath $ownedSources[4] -Raw -Encoding UTF8
     foreach ($forbidden in @('ExceptionFlowAnalyzerSelectionPolicy','ExceptionFlowAnalysisRouter','HistoricalWorkerClient','Process.Start','Assembly.Load','5.0.0-','File.','Stream','MetadataReader','PEReader','ParseText','SourceText.From','TryCreate(','GetChecksum','SHA256','JsonSerializer','AnalyzeAsync')) {
         Require (-not $projection.Contains($forbidden)) "Projection owns forbidden selection/parser/execution: $forbidden"

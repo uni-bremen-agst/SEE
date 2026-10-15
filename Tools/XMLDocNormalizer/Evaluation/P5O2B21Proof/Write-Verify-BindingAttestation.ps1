@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $toolRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $toolRoot
 try {
@@ -99,7 +100,8 @@ try {
         Equal $value.Native.Summary $value.Summary 'Full genuine flow/source/uncertainty differs.'
         Equal $value.Native.Direct $value.Direct 'Independent Direct differs.'
         Equal $value.Native.Declarations $value.Declarations 'Ownership inventory differs.'
-        Require ($value.FirstProcess -ne $value.SecondProcess -and $value.Document.Profile -ceq 'single-root-declared-documentation-v1' -and
+        Assert-OwnedProcessPair $value.FirstProcessExit $value.SecondProcessExit $value.FirstProcess $value.SecondProcess
+        Require ($value.Document.Profile -ceq 'single-root-declared-documentation-v1' -and
             $value.Provenance.AnalysisMode -ceq 'project-transitive') 'Fresh actual Worker or truthful mode missing.'
         Equal $value.Contract.TypeDisplays $value.Document.TypeDisplays 'Immutable type facts differ.'
         [ordered]@{Artifact=(Fingerprint $file.FullName);Evidence=$value}

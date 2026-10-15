@@ -26,5 +26,7 @@ namespace XMLDocNormalizer.Execution.Historical
         WorkerDeclaredPolicyEvidence? DeclaredPolicy = null, WorkerDeclaredDocumentationEvidence? DeclaredDocumentation = null)
     {
         internal bool Success => Result != null && Identity != null && Provenance != null && Failure == null;
+        // Main-local lifecycle diagnostics only. Raw validation / record cloning cannot mint one.
+        public OwnedProcessExit? ProcessExit => HistoricalWorkerClient.TryGetProcessExit(this, out var exit) ? exit : null;
     }
 }

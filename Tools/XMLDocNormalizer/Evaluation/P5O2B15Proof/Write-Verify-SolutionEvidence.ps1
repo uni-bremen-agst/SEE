@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $toolRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $toolRoot
 try {
@@ -78,8 +79,6 @@ try {
     Require (@($parity).Count -eq 8) 'Eight complete Current baselines required.'
     $before=ReadJson 'artifacts/p5o2b15/before-cross-project-gap.json'
     Require ($before.ActualSourceRegistry -and $before.RepeatedEqual -and $before.ExplicitUnsupported -and (Json $before.ProjectFlow) -cne (Json $before.SolutionFlow)) 'Fresh parent cross-project witness missing.'
-    $workerPath=[IO.Path]::GetFullPath((Join-Path $validation 'artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin/Debug/net8.0/XMLDocNormalizer.HistoricalWorker.dll'))
-    $reusedProcessIds=New-Object 'System.Collections.Generic.List[object]'
     $runtime=foreach($path in Get-ChildItem (Join-Path $validation 'artifacts/p5o2b15') -File -Filter 'solution-*.json') {
         $value=ReadJson $path.FullName
         Require ((Json $value.Native.Result) -ceq (Json $value.Historical) -and (Json $value.Historical) -ceq (Json $value.RepeatedHistorical)) 'Complete canonical flow/source/uncertainty drift.'
@@ -101,14 +100,7 @@ try {
         }
         Require ($edges -eq $value.ProjectCount-1 -and $value.Provenance.ReferenceWorldSha256.Length -eq 64 -and $value.Provenance.AnalysisMode -ceq 'solution-transitive') 'Edges/context provenance missing.'
         foreach($engine in $value.Identity.LoadedRoslyn) { Require ($gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256 -and $value.Graph.CompilerMvids -contains $engine.Mvid) 'Historical runtime differs.' }
-        foreach($processId in @($value.FirstProcess,$value.SecondProcess)) {
-            Require ($null -ne $processId) 'Actual Worker PID missing.'
-            $live=Get-CimInstance Win32_Process -Filter "ProcessId = $processId"
-            if($live) {
-                Require ($null -ne $live.CommandLine -and $live.CommandLine.Replace('/','\').IndexOf($workerPath,[StringComparison]::OrdinalIgnoreCase) -lt 0) 'Own Worker still alive or identity unavailable.'
-                $reusedProcessIds.Add([ordered]@{RecordedWorkerPid=$processId;CurrentProcessName=$live.Name;NotRecordedWorker=$true})
-            }
-        }
+        Assert-OwnedProcessPair $value.FirstProcessExit $value.SecondProcessExit $value.FirstProcess $value.SecondProcess
         [ordered]@{Value=$value;Artifact=(Fingerprint $path.FullName)}
     }
     Require (@($runtime).Count -eq 3) 'Three full genuine differentials required.'
@@ -169,7 +161,7 @@ try {
         Closed='Explicit original validated external project DAG; exact reference-bound edges; source/project/root ownership; actual PE-to-source rebinding; complete tested two/three-project flow/graph equivalence'
         Open=@('native Workspace/MSBuild/CLI acquisition and automatic source discovery','larger graphs, shared/linked logical paths and broader roots/options/reference forms','ProjectTransitiveDeclaredExceptions','signed targets and XML contracts','Historical Reporting Import')
         Protocol=[ordered]@{Version=2;MaximumProjects=4;TotalSourceCharacters=65536;AggregateSyntaxNodes=16384;TotalReferenceBytes=67108864;RequestCharacters=100663296;LocalB14LimitsUnchanged=$true;LegacyUnchanged=$true;ExplicitSolutionOnly=$true;FullContextBoundByHash=$true;NoPathInferredEdges=$true;NoScopeSubstitution=$true}
-        BeforeGap=$before;Runtime=@($runtime);Controls=@($controls);Negatives=@($negatives);Receipts=$receipts;MissingReachableSource=$missing;UnsupportedCompilerResponse=$unsupported;ReusedProcessIds=@($reusedProcessIds.ToArray())
+        BeforeGap=$before;Runtime=@($runtime);Controls=@($controls);Negatives=@($negatives);Receipts=$receipts;MissingReachableSource=$missing;UnsupportedCompilerResponse=$unsupported;LifetimeVerification='original owned exit observations, not PID/path heuristics'
         CurrentParity=@($parity);Tests=$tests;Coverage=@($coverage);BuildLogs=@($logs);BuildAudit=(Fingerprint (Join-Path $gateRoot 'audit.json'));Attempts=$attempts
         RetainedNativeCrash=[ordered]@{Trx=(Fingerprint $crashPath);Completed=277;FailedAssertions=0;Cause='Unchanged ReadAssemblyFiles returns reader-backed AssemblyFile after PEReader.Dispose';Log=(Fingerprint (Join-Path $export.ExportRoot 'attempt-final-full-aborted/full.log'));Cleanup=$cleanup;UnchangedFullRepeatPassed=3009;NoTestsExcluded=$true;NoOldCodeRepaired=$true}
         Architecture=[ordered]@{SharedAnalyzerSources=121;HistoricalHostSources=1;SharedAnalyzerUnchanged=$true;B5B6RoutingSelectionUnchanged=$true;B10ThroughB14TestsUnchanged=$true;NoSecondValidator=$true;NoMainHistoricalLoad=$true;NoSourceExecution=$true;NeutralProtocol=$true;NoProductionReportingImport=$true}

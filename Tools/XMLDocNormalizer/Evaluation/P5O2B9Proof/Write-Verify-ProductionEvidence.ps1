@@ -1,5 +1,6 @@
 param([Parameter(Mandatory = $true)][string]$ValidationRoot)
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -73,8 +74,7 @@ try {
     foreach ($engine in $boundary.HistoricalIdentity.LoadedRoslyn) {
         Require ($engine.InformationalVersion -ceq $boundary.HistoricalContext.CompilerVersion -and $gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256) 'Wrong isolated Historical engine.'
     }
-    $process = Get-Process -Id $boundary.HistoricalProcessId -ErrorAction SilentlyContinue
-    Require ($null -eq $process -or $process.HasExited) 'Historical process still alive.'
+    Assert-OwnedProcessExit $boundary.HistoricalProcessExit $boundary.HistoricalProcessId
     $source = Get-Content -LiteralPath $detector -Raw -Encoding UTF8
     foreach ($forbidden in @('session.Analyze(', 'ExceptionFlowAnalyzerSelectionPolicy.Select', 'Projector.Project', 'HistoricalWorkerClient', 'Process.Start', 'Assembly.Load', '5.0.0-', 'IsValidated', 'new WorkerAnalysisInput')) {
         Require (-not $source.Contains($forbidden)) "New production seam owns forbidden lower-layer behavior: $forbidden"

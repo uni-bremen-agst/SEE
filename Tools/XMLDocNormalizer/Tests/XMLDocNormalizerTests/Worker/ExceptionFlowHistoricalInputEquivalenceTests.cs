@@ -39,9 +39,9 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(first.Result, second.Result);
             Assert.Empty(first.Result!.Uncertainties);
             Assert.Null(first.Dispatch.Routing.CurrentAnalysis);
-            Assert.NotEqual(first.Dispatch.Routing.HistoricalAnalysis.ProcessId, second.Dispatch!.Routing!.HistoricalAnalysis!.ProcessId);
-            AssertStopped(first.Dispatch.Routing.HistoricalAnalysis.ProcessId!.Value);
-            AssertStopped(second.Dispatch.Routing.HistoricalAnalysis.ProcessId!.Value);
+            Assert.NotEqual(first.Dispatch.Routing.HistoricalAnalysis.ProcessExit!.ExecutionId, second.Dispatch!.Routing!.HistoricalAnalysis!.ProcessExit!.ExecutionId);
+            AssertStopped(first.Dispatch.Routing.HistoricalAnalysis);
+            AssertStopped(second.Dispatch.Routing.HistoricalAnalysis);
             AssertNoHistoricalLoaded();
 
             var graph = await HistoricalGraph(Source, input.Source.Document.Name);
@@ -63,7 +63,9 @@ namespace XMLDocNormalizerTests.Worker
                 FirstProvenance = first.Dispatch.Routing.HistoricalAnalysis.Provenance,
                 FirstIdentity = first.Dispatch.Routing.HistoricalAnalysis.Identity,
                 FirstProcess = first.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                FirstProcessExit = first.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 SecondProcess = second.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                SecondProcessExit = second.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 ProcessesStopped = true,
                 HistoricalLoadedInMain = false,
                 NoCurrentFallback = true,
@@ -88,8 +90,8 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(native.Result, first.Result);
             Assert.Equal(first.Result, second.Result);
             Assert.All(first.Result!.Entries.SelectMany(entry => entry.Paths).SelectMany(flow => flow.Steps), step => Assert.Equal(path, step.FilePath));
-            AssertStopped(first.ProcessId!.Value);
-            AssertStopped(second.ProcessId!.Value);
+            AssertStopped(first);
+            AssertStopped(second);
             AssertNoHistoricalLoaded();
         }
 
@@ -100,7 +102,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(result.Success);
             Assert.Equal("worker-input.cs", result.Provenance!.LogicalPath);
             Assert.Equal(Native(Source, "worker-input.cs").Result, result.Result);
-            AssertStopped(result.ProcessId!.Value);
+            AssertStopped(result);
         }
 
         [Theory]
@@ -134,7 +136,7 @@ namespace XMLDocNormalizerTests.Worker
             var rejected = HistoricalWorkerResponseValidation.Validate(node.ToJsonString(), "", 0, input);
             Assert.Equal(HistoricalWorkerClientFailureCode.MalformedResponse, rejected.Failure!.Code);
             Assert.Null(rejected.Result);
-            AssertStopped(real.ProcessId!.Value);
+            AssertStopped(real);
         }
 
         [Fact]
@@ -166,7 +168,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(oldWorker.Success);
             Assert.Equal(noDefines.Result, oldWorker.Result);
             Assert.NotEqual(defined.Result, oldWorker.Result);
-            AssertStopped(oldWorker.ProcessId!.Value);
+            AssertStopped(oldWorker);
 
             const string language = "public static class Fixture { public static void Root() { var value = \"\"\"text\"\"\"; throw null; } }";
             var oldLanguage = Native(language, "worker-input.cs", new(LanguageVersion.CSharp10));
@@ -190,7 +192,7 @@ namespace XMLDocNormalizerTests.Worker
             var withoutReference = await Client().AnalyzeAsync(new(external, "Fixture", "Root"));
             Assert.Equal(WorkerFailureCode.CompilationFailure, withoutReference.Failure!.WorkerFailure!.Code);
             Assert.Null(withoutReference.Result);
-            AssertStopped(withoutReference.ProcessId!.Value);
+            AssertStopped(withoutReference);
 
             const string rootSource = "public static class Fixture { public static void Root() { Extra.Thrower(); } }";
             var multiple = Native(rootSource, "worker-input.cs", additional: "public static class Extra { public static void Thrower() { throw null; } }");
@@ -198,7 +200,7 @@ namespace XMLDocNormalizerTests.Worker
             var missingSource = await Client().AnalyzeAsync(new(rootSource, "Fixture", "Root"));
             Assert.Equal(WorkerFailureCode.CompilationFailure, missingSource.Failure!.WorkerFailure!.Code);
             Assert.Null(missingSource.Result);
-            AssertStopped(missingSource.ProcessId!.Value);
+            AssertStopped(missingSource);
             await WriteEvidence("inventory-differentials", new
             {
                 Defines = new { Native = defined, EmptyDefines = noDefines, Worker = oldWorker.Result, Gap = true },
@@ -270,12 +272,8 @@ namespace XMLDocNormalizerTests.Worker
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             await File.WriteAllTextAsync(path, JsonSerializer.Serialize(value, WorkerProtocol.JsonOptions));
         }
-        private static void AssertStopped(int pid)
-        {
-            Assert.NotEqual(Environment.ProcessId, pid);
-            try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+        private static void AssertStopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void AssertNoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly =>
             assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker"
             || assembly.ManifestModule.ModuleVersionId.ToString() is "dc7738cc-6dca-4d34-9c44-29b53a7caa93" or "0f9c1dcf-4eb1-47f8-81b2-733db5887be7");

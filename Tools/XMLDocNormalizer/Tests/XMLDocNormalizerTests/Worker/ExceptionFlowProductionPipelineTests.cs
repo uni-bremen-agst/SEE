@@ -85,6 +85,7 @@ namespace XMLDocNormalizerTests.Worker
                 HistoricalContext = result.Projection.Context,
                 HistoricalIdentity = result.Routing.HistoricalAnalysis!.Identity,
                 HistoricalProcessId = result.Routing.HistoricalAnalysis.ProcessId,
+                HistoricalProcessExit = result.Routing.HistoricalAnalysis.ProcessExit,
                 CurrentMvids = before,
                 CanonicalParity = true,
                 ProcessStopped = true,
@@ -254,12 +255,7 @@ namespace XMLDocNormalizerTests.Worker
             return (compilation, new(tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Single(method => method.Identifier.ValueText == "Root"), session));
         }
         private static void AssertStopped(ExceptionFlowAnalysisDispatchResult result)
-        {
-            int processId = result.Routing!.HistoricalAnalysis!.ProcessId!.Value;
-            Assert.NotEqual(Environment.ProcessId, processId);
-            try { using var process = Process.GetProcessById(processId); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+            => HistoricalWorkerLifetimeAssertions.Stopped(result.Routing!.HistoricalAnalysis!);
         private static void AssertNoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly =>
             assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker"
             || assembly.ManifestModule.ModuleVersionId.ToString() is "dc7738cc-6dca-4d34-9c44-29b53a7caa93" or "0f9c1dcf-4eb1-47f8-81b2-733db5887be7");

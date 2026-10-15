@@ -82,7 +82,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Null(first.Routing!.CurrentAnalysis);
             AssertStopped(first.Routing.HistoricalAnalysis!);
             AssertStopped(second.Routing!.HistoricalAnalysis!);
-            Assert.NotEqual(first.Routing.HistoricalAnalysis!.ProcessId, second.Routing.HistoricalAnalysis!.ProcessId);
+            Assert.NotEqual(first.Routing.HistoricalAnalysis!.ProcessExit!.ExecutionId, second.Routing.HistoricalAnalysis!.ProcessExit!.ExecutionId);
             Assert.Equal(beforeCommon, common.ManifestModule.ModuleVersionId);
             Assert.Equal(beforeCsharp, csharp.ManifestModule.ModuleVersionId);
             AssertNoHistoricalLoaded();
@@ -96,6 +96,7 @@ namespace XMLDocNormalizerTests.Worker
                 HistoricalSelection = first.Decision!.Selection.ToString(),
                 HistoricalIdentity = first.Routing.HistoricalAnalysis.Identity,
                 HistoricalProcessIds = new[] { first.Routing.HistoricalAnalysis.ProcessId, second.Routing.HistoricalAnalysis.ProcessId },
+                HistoricalProcessExits = new[] { first.Routing.HistoricalAnalysis.ProcessExit, second.Routing.HistoricalAnalysis.ProcessExit },
                 CurrentMvids = new[] { beforeCommon, beforeCsharp },
                 CanonicalParity = true,
                 HistoricalDeterministic = true,
@@ -365,13 +366,8 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Same(result.Routing.HistoricalAnalysis!.Failure, result.Routing.HistoricalFailure);
             Assert.Equal(code, result.Routing.HistoricalFailure!.Code);
         }
-        private static void AssertStopped(HistoricalWorkerCallResult result)
-        {
-            Assert.NotNull(result.ProcessId);
-            Assert.NotEqual(Environment.ProcessId, result.ProcessId);
-            try { using Process process = Process.GetProcessById(result.ProcessId!.Value); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+        private static void AssertStopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static Task<ExceptionFlowAnalysisDispatchResult> DispatchHistorical(WorkerAnalysisInput input, HistoricalWorkerClient? client = null, CancellationToken token = default)
             => new ExceptionFlowAnalysisDispatch(new(client ?? Client())).AnalyzeAsync(new Request.PortablePdb(HistoricalPdb(), new Request.ExecutionPayload.Worker(input)), token);
         private static WorkerAnalysisInput Input(string source = Source) => new(source, "Fixture", "Root", new());

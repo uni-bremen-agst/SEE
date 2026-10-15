@@ -230,6 +230,7 @@ namespace XMLDocNormalizerTests.Worker
                 HistoricalIdentity = result.Dispatch.Routing.HistoricalAnalysis.Identity,
                 WorkerProvenance = result.Dispatch.Routing.HistoricalAnalysis.Provenance,
                 ProcessId = result.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                ProcessExit = result.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 ProcessStopped = true,
                 HistoricalLoadedInCaller = false,
                 CurrentMvids = before,
@@ -313,12 +314,7 @@ namespace XMLDocNormalizerTests.Worker
         private static string HistoricalPath() => Path.Combine(Root(), "artifacts", "p5o2b7", "historical-pdb", "historical-input.dll");
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static void AssertStopped(ExternalExceptionFlowAnalysisResult result)
-        {
-            int processId = result.Dispatch!.Routing!.HistoricalAnalysis!.ProcessId!.Value;
-            Assert.NotEqual(Environment.ProcessId, processId);
-            try { using var process = Process.GetProcessById(processId); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+            => HistoricalWorkerLifetimeAssertions.Stopped(result.Dispatch!.Routing!.HistoricalAnalysis!);
         private static void AssertNoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly =>
             assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker"
             || assembly.ManifestModule.ModuleVersionId.ToString() is "dc7738cc-6dca-4d34-9c44-29b53a7caa93" or "0f9c1dcf-4eb1-47f8-81b2-733db5887be7");

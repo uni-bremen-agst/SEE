@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -40,8 +41,8 @@ try {
     }
     Require ($boundary.CurrentContext.CompilerVersion -ceq $baseline.ProjectionBoundary.CurrentRuntimeInformationalVersion) 'Current native identity changed.'
     Require ($boundary.CurrentMvids -contains $baseline.ProjectionBoundary.CurrentRuntimeMvid) 'Current CSharp runtime image changed.'
-    Require (@($boundary.HistoricalProcessIds).Count -eq 2 -and $boundary.HistoricalProcessIds[0] -ne $boundary.HistoricalProcessIds[1]) 'Repeated historical execution not proven.'
-    foreach ($pidValue in $boundary.HistoricalProcessIds) { $process = Get-Process -Id $pidValue -ErrorAction SilentlyContinue; Require ($null -eq $process -or $process.HasExited) 'Historical process remains alive.' }
+    Require (@($boundary.HistoricalProcessIds).Count -eq 2 -and @($boundary.HistoricalProcessExits).Count -eq 2) 'Repeated historical execution not proven.'
+    Assert-OwnedProcessPair $boundary.HistoricalProcessExits[0] $boundary.HistoricalProcessExits[1] $boundary.HistoricalProcessIds[0] $boundary.HistoricalProcessIds[1]
     $tests = @('dispatch-final','b5-b8-boundaries','focused','broad-expanded','full') | ForEach-Object {
         $path = "artifacts/p5o2b8/tests/$_.trx"
         [xml]$trx = Get-Content -LiteralPath $path -Raw -Encoding UTF8

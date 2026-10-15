@@ -19,6 +19,9 @@ namespace XMLDocNormalizer.Execution.Historical
         private sealed record CompletedDocumentationExchange(WorkerAnalysisInput Input, string Request, string Response,
             string Diagnostics, int ExitCode, int ProcessId, WorkerImage Image);
         private static readonly ConditionalWeakTable<DocumentationExecution, CompletedDocumentationExchange> documentationExecutions = new();
+        private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, OwnedProcessExit> processExits = new();
+        internal static bool TryGetProcessExit(HistoricalWorkerCallResult? call, out OwnedProcessExit? exit)
+        { exit = null; return call != null && processExits.TryGetValue(call, out exit); }
         internal const int MaximumResponseCharacters = 1048576;
         internal const int MaximumDiagnosticCharacters = 16384;
         private readonly string dotnetHost;
@@ -89,6 +92,8 @@ namespace XMLDocNormalizer.Execution.Historical
             }
 
             int pid = process.Id;
+            HistoricalWorkerCallResult? returnedCall = null;
+            HistoricalWorkerCallResult Observe(HistoricalWorkerCallResult call) { returnedCall = call; return call; }
             using CancellationTokenSource timeout = new(deadline);
             using CancellationTokenSource operation = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken);
             Task<string> stdout = ReadBoundedAsync(process.StandardOutput, MaximumResponseCharacters, operation.Token);
@@ -114,28 +119,28 @@ namespace XMLDocNormalizer.Execution.Historical
                     try
                     {
                         if (documentationImage != ReadWorkerImage())
-                        { return Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Documentation Worker image changed during execution.", pid); }
+                        { return Observe(Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Documentation Worker image changed during execution.", pid)); }
                     }
                     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or BadImageFormatException)
-                    { return Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Documentation Worker image is no longer available.", pid); }
+                    { return Observe(Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Documentation Worker image is no longer available.", pid)); }
                     execution = new();
                     documentationExecutions.Add(execution, new(input, request, response, diagnostics, process.ExitCode, pid, documentationImage));
                 }
-                try { return HistoricalWorkerResponseValidation.Validate(response, diagnostics, process.ExitCode, input, pid, execution); }
+                try { return Observe(HistoricalWorkerResponseValidation.Validate(response, diagnostics, process.ExitCode, input, pid, execution)); }
                 finally { if (execution != null) { documentationExecutions.Remove(execution); } }
             }
             catch (OperationCanceledException)
             {
-                return Fail(cancellationToken.IsCancellationRequested ? HistoricalWorkerClientFailureCode.Cancelled
-                    : HistoricalWorkerClientFailureCode.Timeout, "Historical request did not complete before cancellation/deadline.", pid);
+                return Observe(Fail(cancellationToken.IsCancellationRequested ? HistoricalWorkerClientFailureCode.Cancelled
+                    : HistoricalWorkerClientFailureCode.Timeout, "Historical request did not complete before cancellation/deadline.", pid));
             }
             catch (InvalidDataException)
             {
-                return Fail(HistoricalWorkerClientFailureCode.OutputLimit, "Worker output exceeds the transport budget.", pid);
+                return Observe(Fail(HistoricalWorkerClientFailureCode.OutputLimit, "Worker output exceeds the transport budget.", pid));
             }
             catch (Exception exception) when (exception is IOException or InvalidOperationException or DecoderFallbackException)
             {
-                return Fail(HistoricalWorkerClientFailureCode.TransportFailure, "Historical process transport failed.", pid);
+                return Observe(Fail(HistoricalWorkerClientFailureCode.TransportFailure, "Historical process transport failed.", pid));
             }
             finally
             {
@@ -145,6 +150,7 @@ namespace XMLDocNormalizer.Execution.Historical
                 await process.WaitForExitAsync();
                 try { await Task.WhenAll(stdout, stderr, exchange); }
                 catch (Exception exception) when (exception is OperationCanceledException or IOException or InvalidOperationException or InvalidDataException or DecoderFallbackException) { }
+                if (returnedCall != null) { processExits.Add(returnedCall, OwnedProcessExit.Capture(process)); }
             }
 
             async Task ExchangeAsync()

@@ -139,7 +139,7 @@ namespace XMLDocNormalizerTests.Worker
                 Assert.True(graph.GetProperty("repeatedResultEqual").GetBoolean());
                 Assert.Equal(native.GraphCount, graph.GetProperty("repeatedGraphCount").GetInt32());
                 Assert.All(graph.GetProperty("ownership").EnumerateArray(), item => Assert.True(item.GetProperty("stableModel").GetBoolean()));
-                Stopped(worker.ProcessId!.Value); Stopped(second.Dispatch.Routing.HistoricalAnalysis!.ProcessId!.Value);
+                Stopped(worker); Stopped(second.Dispatch.Routing.HistoricalAnalysis!);
                 controls.Add(new
                 {
                     Mode = name,
@@ -150,7 +150,9 @@ namespace XMLDocNormalizerTests.Worker
                     worker.Provenance,
                     worker.Identity,
                     FirstProcess = worker.ProcessId,
-                    SecondProcess = second.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                    FirstProcessExit = worker.ProcessExit,
+                    SecondProcess = second.Dispatch.Routing.HistoricalAnalysis!.ProcessId,
+                    SecondProcessExit = second.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                     NoCurrentFallback = true,
                     ProcessesStopped = true
                 });
@@ -186,7 +188,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.DoesNotContain(project.Findings.Concat(declared.Findings), finding => finding.Smell.ID == "DOC632");
             var worker = await Client().AnalyzeAsync(payload);
             Assert.Equal(WorkerFailureCode.AnalysisFailure, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result);
-            Stopped(worker.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(worker); NoHistoricalLoaded();
             await Evidence("uncertainty", new { Project = project, Declared = declared, worker.Failure, ProcessesStopped = true, NoPartialResult = true });
         }
 
@@ -230,7 +232,7 @@ namespace XMLDocNormalizerTests.Worker
             var broken = await Client().AnalyzeAsync(payload with { Source = "public static class Fixture { public static void Root() { Missing(); } }" });
             Assert.Equal(WorkerFailureCode.CompilationFailure, broken.Failure!.WorkerFailure!.Code);
             Assert.Null(unavailable.Result); Assert.Null(broken.Result);
-            Stopped(unavailable.ProcessId!.Value); Stopped(broken.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(unavailable); Stopped(broken); NoHistoricalLoaded();
             await Evidence("worker-errors", new { ParseFailure = unavailable.Failure, CompilationFailure = broken.Failure, ProcessesStopped = true, NoFallback = true, DeclaredNeverStarted = true });
         }
 
@@ -308,7 +310,8 @@ namespace XMLDocNormalizerTests.Worker
         private static Task<JsonElement> Graph(WorkerAnalysisInput payload) => (Task<JsonElement>)typeof(ExceptionFlowHistoricalScopeTests).GetMethod("Probe", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [payload, "--b14-graph", null])!;
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical", "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
-        private static void Stopped(int pid) { try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         {

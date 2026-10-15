@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -32,7 +33,7 @@ try {
         Require ((Get-FileHash -LiteralPath $file.Path).Hash -eq $file.Sha256) "Historical source changed: $($file.Path)"
     }
     Require ($runtime.CanonicalParity -and $runtime.Deterministic -and $runtime.ProcessesStopped -and -not $runtime.HistoricalLoadedInCaller) 'Missing actual Main E2E proof.'
-    Require ($runtime.ProcessId -ne $runtime.RepeatedProcessId) 'Repeated requests reused a process.'
+    Assert-OwnedProcessPair $runtime.ProcessExit $runtime.RepeatedProcessExit $runtime.ProcessId $runtime.RepeatedProcessId
     Require ($runtime.Historical.ProtocolVersion -eq 2) 'Wrong final protocol version.'
     foreach ($engine in $runtime.Current) {
         Require ($engine.InformationalVersion.StartsWith('5.0.0-2.25567.12+')) 'Wrong actual Current engine.'

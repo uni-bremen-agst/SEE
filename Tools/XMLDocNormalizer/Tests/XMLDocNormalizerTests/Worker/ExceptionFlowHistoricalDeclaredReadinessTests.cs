@@ -202,11 +202,7 @@ namespace XMLDocNormalizerTests.Worker
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical",
             "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
         private static void Stopped(HistoricalWorkerCallResult call)
-        {
-            Assert.NotNull(call.ProcessId);
-            try { using var process = Process.GetProcessById(call.ProcessId.Value); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(),
             assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)

@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $repoRoot
 try {
@@ -28,6 +29,7 @@ try {
     Require (@($productive.File | Sort-Object -Unique).Count -eq 362) 'Expected 362 unchanged productive Current sources.'
     Require ((($gate.SharedSourceFingerprints.Path | Sort-Object) -join ';') -eq (($a2.ApiSurface.ProductiveFiles.File | Sort-Object) -join ';')) 'Historical shared boundary changed.'
     Require ($isolation.SeparateProcesses -and -not $isolation.HistoricalLoadedInCaller -and $isolation.CallerProcessId -ne $isolation.WorkerProcessId) 'Process isolation not established.'
+    Assert-OwnedProcessExit $isolation.ProcessExit $isolation.WorkerProcessId
     foreach ($name in @('CurrentCommon', 'CurrentCSharp')) {
         $engine = $isolation.$name
         Require ($engine.BeforeMvid -eq $engine.AfterMvid -and $engine.InformationalVersion.StartsWith('5.0.0-2.25567.12+')) 'Current runtime changed/mismatched.'

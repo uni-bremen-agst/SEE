@@ -71,7 +71,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(JsonNode.DeepEquals(JsonSerializer.SerializeToNode(first.Result, WorkerProtocol.JsonOptions), JsonNode.Parse(graph.GetProperty("result").GetRawText())));
             Assert.Equal(payload.Context.Scope.OrderedSourcePaths, graph.GetProperty("ownership").EnumerateArray().Select(item => item.GetProperty("logicalPath").GetString()).ToArray());
             Assert.All(graph.GetProperty("ownership").EnumerateArray(), item => { Assert.True(item.GetProperty("stableModel").GetBoolean()); Assert.Equal(payload.Context.AssemblyName, item.GetProperty("assemblyName").GetString()); });
-            Stopped(call.ProcessId!.Value); Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!.ProcessId!.Value); NoHistoricalLoaded();
+            Stopped(call); Stopped(second.Dispatch!.Routing!.HistoricalAnalysis!); NoHistoricalLoaded();
             await Evidence("scope-" + mode + "-" + language + "-" + count + "-" + throwing + "-" + reversed, new
             {
                 Mode = mode,
@@ -91,7 +91,9 @@ namespace XMLDocNormalizerTests.Worker
                 call.Provenance,
                 call.Identity,
                 FirstProcess = call.ProcessId,
-                SecondProcess = second.Dispatch.Routing.HistoricalAnalysis.ProcessId,
+                FirstProcessExit = call.ProcessExit,
+                SecondProcess = second.Dispatch.Routing.HistoricalAnalysis!.ProcessId,
+                SecondProcessExit = second.Dispatch.Routing.HistoricalAnalysis.ProcessExit,
                 OriginalP5GP5IP5JP5CP5E = true,
                 NoCurrentFallback = true,
                 ProcessesStopped = true,
@@ -156,7 +158,7 @@ namespace XMLDocNormalizerTests.Worker
             input = input with { Context = input.Context with { AdditionalSources = [source with { ParseContext = source.ParseContext! with { LanguageVersion = "999" } }] } };
             var result = await Client().AnalyzeAsync(input);
             Assert.Equal(WorkerFailureCode.UnsupportedContext, result.Failure!.WorkerFailure!.Code);
-            Assert.Null(result.Result); Stopped(result.ProcessId!.Value); NoHistoricalLoaded();
+            Assert.Null(result.Result); Stopped(result); NoHistoricalLoaded();
             await Evidence("unsupported-source-language", new { result.Failure, NoDowngrade = true, NoFallback = true, ProcessStopped = true });
         }
 
@@ -246,7 +248,7 @@ namespace XMLDocNormalizerTests.Worker
             };
             var wrong = await Client().AnalyzeAsync(wrongRoot);
             Assert.Equal(WorkerFailureCode.InvalidRequest, wrong.Failure!.WorkerFailure!.Code); Assert.Null(wrong.Result);
-            Stopped(real.ProcessId!.Value); Stopped(wrong.ProcessId!.Value);
+            Stopped(real); Stopped(wrong);
             using var duplicates = JsonDocument.Parse("{\"scope\":{\"kind\":\"single-project-v1\",\"kind\":\"solution-v1\"}}");
             Assert.Throws<JsonException>(() => WorkerProtocol.RejectDuplicateProperties(duplicates.RootElement));
             Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<WorkerProjectScope>("{\"unknown\":true}", WorkerProtocol.JsonOptions));
@@ -359,7 +361,8 @@ namespace XMLDocNormalizerTests.Worker
         }
         private static string Root() => ExceptionFlowProductionCurrentParityTests.Root();
         private static HistoricalWorkerClient Client() => new("dotnet", Path.Combine(Root(), "artifacts", "exception-flow-historical", "XMLDocNormalizer.HistoricalWorker", "bin", "Debug", "net8.0", "XMLDocNormalizer.HistoricalWorker.dll"), TimeSpan.FromSeconds(60));
-        private static void Stopped(int pid) { try { using var process = Process.GetProcessById(pid); Assert.True(process.HasExited); } catch (ArgumentException) { } }
+        private static void Stopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private static void NoHistoricalLoaded() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
         {

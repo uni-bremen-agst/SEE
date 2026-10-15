@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$ValidationRoot)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot '../PIDG1Proof/ProcessLifetime.ps1')
 $toolRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 Push-Location $toolRoot
 try {
@@ -78,8 +79,6 @@ try {
     Require (@($parity).Count -eq 8) 'Eight complete Current baselines required.'
     $before=ReadJson 'artifacts/p5o2b14/before-input-gaps.json'
     Require ($before.Sources.Gap -and @($before.Sources.Native.Result.Entries).Count -gt 0 -and $before.Sources.WorkerFailure.WorkerFailure.Code -ceq 'compilationFailure') 'Executed parent supporting-source gap missing.'
-    $workerPath=[IO.Path]::GetFullPath((Join-Path $validation 'artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin/Debug/net8.0/XMLDocNormalizer.HistoricalWorker.dll'))
-    $reusedProcessIds=New-Object 'System.Collections.Generic.List[object]'
     $runtime=foreach($path in Get-ChildItem (Join-Path $validation 'artifacts/p5o2b14') -File -Filter 'scope-*.json') {
         $value=ReadJson $path.FullName
         Require ((Json $value.Native.Result) -ceq (Json $value.Historical) -and (Json $value.Historical) -ceq (Json $value.RepeatedHistorical)) 'Full canonical flow/source/uncertainty drift.'
@@ -92,14 +91,7 @@ try {
         Require ($value.Payload.Context.Scope.Kind -ceq 'single-project-v1' -and $value.Payload.Context.Scope.AssemblyName -ceq $value.Payload.Context.AssemblyName -and $value.Payload.Context.Scope.RootLogicalPath -ceq $value.Payload.LogicalPath) 'Explicit original project/root binding missing.'
         Require ($value.Provenance.AnalysisMode -ceq $value.Mode -and $value.Provenance.ReferenceWorldSha256.Length -eq 64) 'Scope not bound to response.'
         foreach($engine in $value.Identity.LoadedRoslyn) { Require ($gate.HistoricalCompilerReferences.Sha256 -contains $engine.Sha256 -and $value.Graph.CompilerMvids -contains $engine.Mvid) 'Historical runtime differs.' }
-        foreach($processId in @($value.FirstProcess,$value.SecondProcess)) {
-            Require ($null -ne $processId) 'Actual Worker PID missing.'
-            $live=Get-CimInstance Win32_Process -Filter "ProcessId = $processId"
-            if($live) {
-                Require ($null -ne $live.CommandLine -and $live.CommandLine.Replace('/','\').IndexOf($workerPath,[StringComparison]::OrdinalIgnoreCase) -lt 0) 'Own Worker process remains alive or identity unavailable.'
-                $reusedProcessIds.Add([ordered]@{RecordedWorkerPid=$processId;CurrentProcessName=$live.Name;NotRecordedWorker=$true})
-            }
-        }
+        Assert-OwnedProcessPair $value.FirstProcessExit $value.SecondProcessExit $value.FirstProcess $value.SecondProcess
         [ordered]@{Value=$value;Artifact=(Fingerprint $path.FullName)}
     }
     Require (@($runtime).Count -eq 6) 'Six complete positive differentials required.'
@@ -146,7 +138,7 @@ try {
         Modes=[ordered]@{Direct='equivalent tested local control';ProjectTransitive='equivalent complete local single-project graph';SolutionTransitive='equivalent only explicit complete single-project/local graph; cross-project open B15';ProjectTransitiveDeclaredExceptions='explicit unsupported; actual Current detector guard/filter difference evidenced'}
         Open=@('B15 exact dependency/source/assembly closure and supporting registry','declared-mode detector/reporting contract','arbitrary root signatures','compiler/parse options outside bounded B13 policy','signed targets and unsupported references','XML documentation contracts','Historical Reporting Import','CLI adoption')
         Protocol=[ordered]@{Version=2;ScopeKind='single-project-v1';MaximumSources=16;TotalSourceCharacters=32768;AggregateSyntaxNodes=8192;LegacyUnchanged=$true;ExplicitOptIn=$true;ExactOrderedManifest=$true;OriginalReceiptRequired=$true;NoScopeSubstitution=$true;ContextBoundByReferenceWorldHash=$true}
-        BeforeGaps=$before.Sources;Runtime=@($runtime);ReusedProcessIds=@($reusedProcessIds.ToArray());DeclaredMode=$declared;CrossProject=$cross;UnsupportedLanguage=$unsupported;Receipts=$receipts;Response=$response
+        BeforeGaps=$before.Sources;Runtime=@($runtime);LifetimeVerification='original owned exit observations, not PID/path heuristics';DeclaredMode=$declared;CrossProject=$cross;UnsupportedLanguage=$unsupported;Receipts=$receipts;Response=$response
         CurrentParity=@($parity);Tests=$tests;Coverage=@($coverage);BuildLogs=@($logs);BuildAudit=(Fingerprint (Join-Path $gateRoot 'audit.json'));Attempts=$attempts
         Architecture=[ordered]@{SharedAnalyzerSources=121;HistoricalHostSources=1;HistoricalHostChange='stable exact-tree model map in one compilation';SharedAnalyzerUnchanged=$true;B5B6RoutingSelectionUnchanged=$true;B10ThroughB13TestsUnchanged=$true;OneB2OwnershipAssertionUpdated=$true;NoSecondPePdbReferenceSourceValidator=$true;NoMainHistoricalLoad=$true;NoSourceExecution=$true;NoProductionGraphReportingImport=$true}
         FindingsScope='All eight native Current Finding/graph baselines byteequal; full native repeat Findings in positives and declared differential. Historical canonical flow/graph is fully compared; Historical Finding import remains explicitly excluded, so cross-engine Finding parity is not claimed.'

@@ -183,7 +183,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal("NullReferenceException", Assert.Single(historical.Result!.Entries).ExceptionType.MetadataName);
             int pid = historical.HistoricalAnalysis.ProcessId!.Value;
             Assert.NotEqual(Environment.ProcessId, pid);
-            try { using Process child = Process.GetProcessById(pid); Assert.True(child.HasExited); } catch (ArgumentException) { }
+            HistoricalWorkerLifetimeAssertions.Stopped(historical.HistoricalAnalysis);
             Assert.Equal(beforeCommon, common.ManifestModule.ModuleVersionId);
             Assert.Equal(beforeCsharp, csharp.ManifestModule.ModuleVersionId);
             Assert.All(historical.HistoricalAnalysis.Identity!.LoadedRoslyn, engine => Assert.Equal(HistoricalCompilerVersion, engine.InformationalVersion));

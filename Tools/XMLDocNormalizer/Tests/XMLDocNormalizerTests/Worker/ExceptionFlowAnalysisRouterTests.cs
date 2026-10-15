@@ -273,12 +273,8 @@ namespace XMLDocNormalizerTests.Worker
         private static string Info(Assembly assembly) => assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
         private static WorkerAssemblyIdentity Identity(Assembly assembly) => new(assembly.GetName().Name!, assembly.GetName().Version!.ToString(), Info(assembly),
             assembly.ManifestModule.ModuleVersionId.ToString(), Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(assembly.Location))));
-        private static void AssertStopped(HistoricalWorkerCallResult result)
-        {
-            Assert.NotNull(result.ProcessId);
-            try { using Process process = Process.GetProcessById(result.ProcessId!.Value); Assert.True(process.HasExited); }
-            catch (ArgumentException) { }
-        }
+        private static void AssertStopped(HistoricalWorkerCallResult call)
+            => HistoricalWorkerLifetimeAssertions.Stopped(call);
         private sealed record Fixture(SyntaxTree Tree, ExceptionFlowSemanticEnvironment Environment, ExceptionFlowSummaryAnalysisSession Session)
         {
             internal MethodDeclarationSyntax Method(string name) => Tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Single(method => method.Identifier.ValueText == name);
