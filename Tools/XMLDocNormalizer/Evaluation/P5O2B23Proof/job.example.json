@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "targetPe": "materials/input.dll",
+  "portablePdb": "materials/input.pdb",
+  "sources": [
+    { "documentOrdinal": 0, "path": "materials/source.cs" }
+  ],
+  "references": [
+    "materials/reference-0.dll",
+    "materials/reference-1.dll"
+  ],
+  "root": { "typeMetadataName": "Fixture", "methodName": "Root", "documentOrdinal": 0 },
+  "workerAssembly": "worker/XMLDocNormalizer.HistoricalWorker.dll",
+  "dotnetHost": "dotnet"
+}

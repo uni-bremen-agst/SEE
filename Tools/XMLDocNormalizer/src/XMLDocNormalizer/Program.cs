@@ -1,4 +1,4 @@
-﻿using XMLDocNormalizer.Cli;
+using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Cli.Output;
 using XMLDocNormalizer.Execution;
 using XMLDocNormalizer.IO;
@@ -53,7 +53,13 @@ namespace XMLDocNormalizer
             }
 
 
-            RunResult result = ToolRunner.Run(options);
+            RunResult result;
+            try { result = ToolRunner.Run(options); }
+            catch (ExternalTargetExecutionException exception) when (options.ExternalTarget)
+            {
+                Console.Error.WriteLine("External target failed: " + exception.Message);
+                return ToolExitCodes.ExternalTargetFailure;
+            }
 
             EvaluateResult(options, result);
 

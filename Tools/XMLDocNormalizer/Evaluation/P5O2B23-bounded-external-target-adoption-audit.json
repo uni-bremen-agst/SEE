@@ -1,0 +1,661 @@
+{
+    "Package":  "P5O2B23",
+    "VerifiedUtc":  "2026-10-15T13:33:32.3543317Z",
+    "EvidenceVerifierPassed":  true,
+    "Head":  "a3d811c68c72fbd6f911bf51e82cd95ff60970f6",
+    "ExternalHeadMovement":  false,
+    "Scope":  "Explicit local unsigned complete/proven v1 single-project selected-root Declared only",
+    "RealCliReachable":  true,
+    "SharedReporting":  true,
+    "NoDuplicateCounting":  true,
+    "NoCurrentFallback":  true,
+    "AnalyzerSemanticsChanged":  false,
+    "RoslynVersionsChanged":  false,
+    "SharedAnalyzerSources":  121,
+    "Tests":  [
+                  {
+                      "Name":  "b23",
+                      "Total":  36,
+                      "Passed":  36,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b23.trx",
+                                       "Sha256":  "81AEDC627B7D28C2AF479D65C9CC1F49BDF4791206A5B00AF80881AA9F1300EA"
+                                   }
+                  },
+                  {
+                      "Name":  "b22",
+                      "Total":  46,
+                      "Passed":  46,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b22.trx",
+                                       "Sha256":  "954367B7678D5D710CEC32BFDB5162BEDBBE0A7A7D5C009FFCC97F6B8A3D8ADD"
+                                   }
+                  },
+                  {
+                      "Name":  "b21",
+                      "Total":  26,
+                      "Passed":  26,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b21.trx",
+                                       "Sha256":  "67CFF28FC3FD58EAD6A3697B491B2DD6B2B39BE8185AFCCC1F2804E939E2C369"
+                                   }
+                  },
+                  {
+                      "Name":  "b20",
+                      "Total":  10,
+                      "Passed":  10,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b20.trx",
+                                       "Sha256":  "87C89043B4E5FA7E1076847B2FBFE9EC1BB42F8298734CE8C8D800C188186F66"
+                                   }
+                  },
+                  {
+                      "Name":  "b19",
+                      "Total":  39,
+                      "Passed":  39,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b19.trx",
+                                       "Sha256":  "62B1B9FD351ED8E0819827D874BB954C72A233B72185D0CDDB24541269386FE7"
+                                   }
+                  },
+                  {
+                      "Name":  "b18",
+                      "Total":  7,
+                      "Passed":  7,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b18.trx",
+                                       "Sha256":  "382206D3701226BF3E1A0664820701C90ACEF78F5C7F1C2BD11D3B64F073F513"
+                                   }
+                  },
+                  {
+                      "Name":  "b17",
+                      "Total":  25,
+                      "Passed":  25,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b17.trx",
+                                       "Sha256":  "BF5EA6E9CA86BD96D4ACF9FF2A6C42345FA33A2019AC47AF808F41B8DC641F5F"
+                                   }
+                  },
+                  {
+                      "Name":  "b16",
+                      "Total":  18,
+                      "Passed":  18,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b16.trx",
+                                       "Sha256":  "D60B63D7C8F2BC6D7A52052D2BC536C02E563581CF34599D176FBE0B4A93E5DD"
+                                   }
+                  },
+                  {
+                      "Name":  "b15",
+                      "Total":  28,
+                      "Passed":  28,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b15.trx",
+                                       "Sha256":  "A80F61B896947BDAACAD63FD8BDD680DCF90C8EA66483839E173ACE51D70B94E"
+                                   }
+                  },
+                  {
+                      "Name":  "b14",
+                      "Total":  31,
+                      "Passed":  31,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b14.trx",
+                                       "Sha256":  "0DF6EED8F79D3473F33BBC4E725EC0DCCF0097CC1F98E24C911B2734B82C004C"
+                                   }
+                  },
+                  {
+                      "Name":  "b13",
+                      "Total":  34,
+                      "Passed":  34,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b13.trx",
+                                       "Sha256":  "49D45E7731E8DD836E1258404C13E218BFC6BA5480BC0D3075BC4C681C8B46D8"
+                                   }
+                  },
+                  {
+                      "Name":  "b12",
+                      "Total":  29,
+                      "Passed":  29,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b12.trx",
+                                       "Sha256":  "975FE738CA8D3EAB59F37A1E0CF137EC5CC59E8CFFDF0E382E635C7BA721AB48"
+                                   }
+                  },
+                  {
+                      "Name":  "b11",
+                      "Total":  16,
+                      "Passed":  16,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b11.trx",
+                                       "Sha256":  "5A39F5902EDC06E2C07EFECE2B85500D5AA1F18C7F923F489E91CF57527DB51E"
+                                   }
+                  },
+                  {
+                      "Name":  "b10",
+                      "Total":  34,
+                      "Passed":  34,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b10.trx",
+                                       "Sha256":  "6CE6373199E92FCC25187E783630DB0DA2E5D75B9ED467EB9B68946322F5B5D8"
+                                   }
+                  },
+                  {
+                      "Name":  "b5-b9",
+                      "Total":  156,
+                      "Passed":  156,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\b5-b9.trx",
+                                       "Sha256":  "841EFF3C0E6C98C9C580DF3FCEF3618CBD24525B67A78503C0EAC551F6EE17B6"
+                                   }
+                  },
+                  {
+                      "Name":  "productive",
+                      "Total":  717,
+                      "Passed":  717,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\productive.trx",
+                                       "Sha256":  "46085548AE95D2C234D024E90B9402F3E010647603AD3F606843E5970A67F2C6"
+                                   }
+                  },
+                  {
+                      "Name":  "focused",
+                      "Total":  824,
+                      "Passed":  824,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\focused.trx",
+                                       "Sha256":  "46BF931EA8B3DE95B7BD123E0D41A5DD4BE75D92C9132A717AD6E3B8E7149297"
+                                   }
+                  },
+                  {
+                      "Name":  "broad",
+                      "Total":  3125,
+                      "Passed":  3125,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\broad.trx",
+                                       "Sha256":  "1028358592E50BE96E3A2705CA7F1AF9168BC56A562B8463DFAA0AFBF2DF8CE9"
+                                   }
+                  },
+                  {
+                      "Name":  "full",
+                      "Total":  3216,
+                      "Passed":  3216,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\tests\\full.trx",
+                                       "Sha256":  "DEB35C8D25B9527C8C77EADBED293BB9ABC6039D3A85A42812F20F4B4F05BE59"
+                                   }
+                  },
+                  {
+                      "Name":  "boundary",
+                      "Total":  578,
+                      "Passed":  578,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary.trx",
+                                       "Sha256":  "1DE33673F1E3A9E2F828A1C1C5BAF209FE392D99A4BF125AAC35E43A92FE1DDC"
+                                   }
+                  },
+                  {
+                      "Name":  "boundary-external",
+                      "Total":  36,
+                      "Passed":  36,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\external-target.trx",
+                                       "Sha256":  "B4AE7EC78963BBC80460A3A7F4A55E05F0330F0E0E757F7D184E65FDED3640FE"
+                                   }
+                  }
+              ],
+    "WaeBuilds":  [
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\0-current-build.log",
+                          "Sha256":  "0C3333E5A57063BC7B971AAE68F6EF85E76D02E8AD1FD0212ABF2FE5E0D48147"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\1-historical-build.log",
+                          "Sha256":  "F5509B7088FE98DE3CD2390B78DAEB5BED9D080C6E54D8ED93F9D25661423466"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\2-current-build.log",
+                          "Sha256":  "C0533FEAE2DFA25CDE547A40E1DCD137B054193D16CD104B591ECA629E45A0FE"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\3-historical-build.log",
+                          "Sha256":  "23F3B1219D0EEFE4D9752A29A02275F7E06A2D0FAD1DF36743094B3E90FE55EE"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\4-historical-build.log",
+                          "Sha256":  "60B3EE331C314A879E96ED357C1955710D83ABCEB52BB8EFC36B171A1D69544B"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\5-current-build.log",
+                          "Sha256":  "1868BCFB7BE9F4B943F0CD14097F9A0111ADABCEE56EAFD8F5EB4ED1936F05DE"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-0-build.log",
+                          "Sha256":  "4E4CC420FCA0BC76B8298490EC1714C335347C6F732482786597F23AEE8DB8C3"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-1-build.log",
+                          "Sha256":  "6AC878AED82699BC1C53C3F5BB926FA6F9E4121A241BEB96173BB84B3139FEB6"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\boundary-test-process-build.log",
+                          "Sha256":  "69FD08AA9E1E747DCE7F723A5BE61EF3D0BE371203224F15D9A75458884B3152"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\projection-pdb-fixture-build.log",
+                          "Sha256":  "850BE27AE5893EEC1E267B264A515510D2B2FAE4058FAAC749A721051ACC7FA2"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary-tests-build.log",
+                          "Sha256":  "76D66EB3926C48288A12BE07906282BD6CACBD873C9AC40C6BBCFB3648A866F5"
+                      }
+                  ],
+    "CurrentBaselines":  [
+                             {
+                                 "Name":  "Direct-False.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-False.json",
+                                                  "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                                              }
+                             },
+                             {
+                                 "Name":  "Direct-True.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-True.json",
+                                                  "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                                              }
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-False.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-False.json",
+                                                  "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                                              }
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-True.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-True.json",
+                                                  "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                                              }
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-False.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-False.json",
+                                                  "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                                              }
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-True.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-True.json",
+                                                  "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                                              }
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-False.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-False.json",
+                                                  "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                                              }
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-True.json",
+                                 "ByteEqual":  true,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-True.json",
+                                                  "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                                              }
+                             }
+                         ],
+    "CrossExportBinaryComparisons":  [
+                                         {
+                                             "Owner":  "historical",
+                                             "Step":  1,
+                                             "DllByteEqual":  false,
+                                             "PdbByteEqual":  false,
+                                             "CrossExportBuildRootChanged":  true
+                                         },
+                                         {
+                                             "Owner":  "historical",
+                                             "Step":  3,
+                                             "DllByteEqual":  false,
+                                             "PdbByteEqual":  false,
+                                             "CrossExportBuildRootChanged":  true
+                                         },
+                                         {
+                                             "Owner":  "historical",
+                                             "Step":  4,
+                                             "DllByteEqual":  false,
+                                             "PdbByteEqual":  false,
+                                             "CrossExportBuildRootChanged":  true
+                                         },
+                                         {
+                                             "Owner":  "worker",
+                                             "Step":  0,
+                                             "DllByteEqual":  false,
+                                             "PdbByteEqual":  false,
+                                             "CrossExportBuildRootChanged":  true
+                                         },
+                                         {
+                                             "Owner":  "worker",
+                                             "Step":  1,
+                                             "DllByteEqual":  false,
+                                             "PdbByteEqual":  false,
+                                             "CrossExportBuildRootChanged":  true
+                                         }
+                                     ],
+    "UnchangedWorkerSources":  [
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\HistoricalAnalysis.cs",
+                                       "Sha256":  "046CA1885A7925FA886C2D7B08A1CE03102A5D3D4FFC9D0A8BCC934EA0FD12D4"
+                                   },
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\HistoricalDeclaredDocumentationFacts.cs",
+                                       "Sha256":  "EFC7E3F338FF8F71E4DE450BA85ADE6DE56FB4B5C22619A4BF0E926A58F2E100"
+                                   },
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\HistoricalDeclaredPolicyFacts.cs",
+                                       "Sha256":  "9396A85E4C463BDDE39ECF6FD9BB2217A1A81F6F105329A18CB560AC6902F794"
+                                   },
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\Program.cs",
+                                       "Sha256":  "2C8AE8868320A7BFA499725DE38455584CD0144F0BFAC0D9E74873E3F6D25729"
+                                   },
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\WorkerProtocol.cs",
+                                       "Sha256":  "D73710F8B2D569FA8869189AB418D620952D667F6B97E323F35E815455E63B26"
+                                   },
+                                   {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.HistoricalWorker\\WorkerRuntimeIdentity.cs",
+                                       "Sha256":  "C70FB73540126E64F15927870418AD3B15FCD2881FACA2A3DBCC03789762B43D"
+                                   }
+                               ],
+    "CliEvidence":  [
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\empty-console.json",
+                            "Sha256":  "1CF104E6319327576166D9B74F50D6A8712672C71C8E92562F1B6CFC4B678B4C"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\empty-json.json",
+                            "Sha256":  "E128058871B335BB32BB000077E57B5C21A79C8E5E203E71755DB6457BBB70C2"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\empty-sarif.json",
+                            "Sha256":  "2B0D247E9F67ABADEDE6A6297517BB9EA2234712304BD436019CA3D3A5C6BBA9"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\mode-direct.json",
+                            "Sha256":  "452C2D67453823B4572B28AEC4A4AAF199C24102361D47EC74BA046AE9700E58"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\mode-project-transitive.json",
+                            "Sha256":  "C83E7DA8EFE13CECF156A15A1F322ACC7657B8DC969BBE9AC1C5B3B361387EA7"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\mode-solution-transitive.json",
+                            "Sha256":  "1A2C446CABE0EBCECA2CDBD6346B6D66A5BDD1170DA7FC23A998EB59D586908B"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-ambiguous-root.json",
+                            "Sha256":  "F167A7A0C2B375177BAC251894AFB554C510517D37140314C426961B4DEAE5E2"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-attestation.json",
+                            "Sha256":  "36CC573EFCBF7FED3EC66AD1EAD31CFA934E052800A2FB5257BB4C12693A1F27"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-checksum.json",
+                            "Sha256":  "E1C341E329DCB1E926ACDBDD1A58206DCF661EA2C921B3B35420655688949F39"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-compiler.json",
+                            "Sha256":  "6411AF46C400086D059FC97FBD25DB6E9A06920759EDB993D6FBD57C07D1BB4F"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-contract.json",
+                            "Sha256":  "D5AB78412F6F195A9DD611AAD0FE8E63DA1E54EFA2CB9B1EE2C075354BD1D2BF"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-duplicate-property.json",
+                            "Sha256":  "255670F078B88071FBEB89C3F7DE128C4C1727FE69A7322EF84B07E95DCE0524"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-invalid-pdb.json",
+                            "Sha256":  "4531D6CC2D3129E2B568F999B5B6DBBB7E1B83A2D43D4C2E0CDA391A51D4CCF0"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-missing-pdb.json",
+                            "Sha256":  "EC5896DE56361AA7BD322E9201E551A088DE687069EB56B279E8C91F81B654E9"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-missing-pe.json",
+                            "Sha256":  "3790D3F9CBC5E64F211504EEEF7B6F8FAF570FCCC14294A0B281600A61ECFEA9"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-missing-source.json",
+                            "Sha256":  "A9E4891DE780D0391B4F476A518E97565015C0CAD8644E63C2F2F17ACE52E6D1"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-profile.json",
+                            "Sha256":  "C0E556582D93FD81A56CD45B6781051F0B75B2143FB63002C060DD0F1F312A29"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-reference.json",
+                            "Sha256":  "F6CCC3375737B6D68D136665BE054428234D29662C53AF096E1CB8D7092022CE"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-root-source.json",
+                            "Sha256":  "95EF6E9C5D6AB45B9AD690C6E86DF4BCC27BBBF974F7AC8EDCD6B5AF3CE84895"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-root.json",
+                            "Sha256":  "894C43B19E4589BA3E3C1B49F7029FB166B5DBD6CD145BF6E45E66B813FBD26F"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-signature.json",
+                            "Sha256":  "85D970698899A2C206FDD77EC2946071FA28CBD79C705FBE8313BB15619E96F8"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-signed.json",
+                            "Sha256":  "36D5D06A0B8D8E1320154525F5CD7B2E898CF6B96F46DF30B688F45CC352D6A6"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-unknown-property.json",
+                            "Sha256":  "FB21F4470A0360D50E6422994A2D8BFD037D5DE3057DBD1FB8C355868E1EE06D"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-worker-error.json",
+                            "Sha256":  "57D1BDCE68FFFABB46058AD91168337BE113EE8650F02E2CEAE148AF1967ED2B"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-worker-missing.json",
+                            "Sha256":  "5C180941372974F4920E535CC581892436C8FEB315C580ECC48F74973732E8B2"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\negative-wrong-pdb.json",
+                            "Sha256":  "378B023539FEF3E26BC19418414E9D00FDB74C608171D8DD267B091F73B342E9"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\positive-console.json",
+                            "Sha256":  "4CD703E14ACD6F3C2A3E1980CD6AC5CE14F2624DC1FE6A3158E75FF428E17DA7"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\positive-json.json",
+                            "Sha256":  "3C514A39CCB0CECC58D1B946548FE23131C3551C89D4A8D3E92620ECDC9DCFA3"
+                        },
+                        {
+                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b23\\e2e\\positive-sarif.json",
+                            "Sha256":  "8718BCEC9BBDFE9C36E18A5810AD49EBD332BCCAC7ACA76B16446A0E4F6F9E34"
+                        }
+                    ],
+    "OwnedFiles":  [
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\build\\Verify-DualVersionBuild.ps1",
+                           "Sha256":  "E1651285548FC324C28AC75674232201A56B6CAA7236DFDFD61A7CDD9A1204EA"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\OPEN-PIPELINE-BOUNDARIES.md",
+                           "Sha256":  "8969086770BEB9671F5C2A26830763EA07C709B8DF2AE47ED00C855699C6AFBF"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23-bounded-external-target-adoption.md",
+                           "Sha256":  "3C549EA966C225AA697FBF2C5FCA72D04A7FD9A401DE9CC0F706F97170F7CDA2"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Capture-Protection.ps1",
+                           "Sha256":  "988F8A4A25F6CBB37AE43F8387BA0DA104921AF5549993499419207E8362F166"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Export-Validation.ps1",
+                           "Sha256":  "E775093B11BCFA81ED3907672F4F66E9AAF1ED0FFA25429D0799D81F0D1573B2"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Format-Owned.ps1",
+                           "Sha256":  "32F85BE5110C36CE83052245E22DAF5411169FC6B62D190BCF15D5B5BCE3A30B"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\job.example.json",
+                           "Sha256":  "3269C5A15EBC491EAC6AF431AFCBAD197FCC62C0E5B0E6517DA445E280A3C1CF"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Run-Regressions.ps1",
+                           "Sha256":  "E42CCBB421EA2C7A186DD42EAE57E83C749A09361C03D487692299A1F54CC602"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Sync-Validation.ps1",
+                           "Sha256":  "AAC6A4440E595A6F5919B23373B031AC83FEF467FAC5FA8C400F9E8594A34665"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B23Proof\\Write-Verify-ExternalTarget.ps1",
+                           "Sha256":  "3C0D3F5346568EAC6D76F225455C6A626007CCBC90D1486345765E701A1344F4"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Cli\\ArgsParsing.cs",
+                           "Sha256":  "E63134D60434A5318CF92FAD9468F2EA4321633B02B295A656B6310EEB219BD4"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Cli\\ToolOptions.cs",
+                           "Sha256":  "5B879C1BDBFF1F58494BD790705D7A221FFB8F9E9E0AE88AB66AF36400827C87"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Execution\\ExternalTargetExecution.cs",
+                           "Sha256":  "7FE68D7D31BB263F89B6B046AACA2AE6C29E67847C46EFA8D5238394FED32334"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Execution\\ToolExitCodes.cs",
+                           "Sha256":  "650B9AD4CEA0E72C08DB1E99261586C07C2DCE84DB80A1E30F41E4FAF3FF98B1"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Execution\\ToolRunner.cs",
+                           "Sha256":  "F1546381BABA63868834489631E607472C53BD399C43C339591CDD6C2133FDDE"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer\\Program.cs",
+                           "Sha256":  "DCB24D5EC736235ADADADA215C901BEE0F0133738F53F5ED555C3576DBA14155"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowExternalTargetCliTests.cs",
+                           "Sha256":  "2001B6F30656B5E0CD1421AE770D5C6489363E576E823B7E65AFF7CE0CB287E9"
+                       }
+                   ],
+    "DualGate":  {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b23-a3d8\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\audit.json",
+                     "Sha256":  "8256EED74A9F221631EE5E33C263ED6A6A17C5E275FA5DFC018700679B633F08"
+                 },
+    "Protection":  {
+                       "RootIgnoreUnchanged":  true,
+                       "IndexUnchanged":  true,
+                       "CoreFileCount":  23,
+                       "CoreUnchanged":  true,
+                       "StashCount":  6,
+                       "StashesUnchanged":  true
+                   },
+    "SelfAnalysis":  {
+                         "Findings":  16,
+                         "Fresh":  false,
+                         "Origin":  "Previous B22/B21 evidence; not a new self-analysis of added B23 source"
+                     },
+    "CanonicalFindingDiff":  {
+                                 "Added":  0,
+                                 "Removed":  0,
+                                 "ChangedEvidence":  0,
+                                 "Fresh":  false,
+                                 "Origin":  "Previous B22/B21 evidence, not rerun"
+                             },
+    "Attempts":  [
+                     "Initial script launch blocked by Windows execution policy; rerun with process-local Bypass.",
+                     "Initial sandboxed restore failed NU1900; unchanged restore with network authorization passed, no audit suppression.",
+                     "Two relative-path setup commands used export cwd and failed/no-op; retained tool output, corrected absolute/original-root invocations.",
+                     "First B23 run: 31/33 passed, two tests assumed camelCase for existing PascalCase JSON. Reporter unchanged; corrected test assertions.",
+                     "Second B23 run: 36/36 passed after three additional unsupported-mode cases.",
+                     "First dual gate: 578/578 passed. Second: 577/578, unchanged B16 Stopped(pid) liveness assertion failed after semantic checks. Isolated unchanged B16 repeat: 18/18. No client/test change; PID reuse is a possible explanation, not established.",
+                     "Final gate uses formatted final inputs; previous gate logs/TRX retained. No automatic retry or excluded tests."
+                 ],
+    "FinalGitStatus":  [
+                           " M ../../.gitignore",
+                           " M Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                           " M build/Verify-DualVersionBuild.ps1",
+                           " M src/XMLDocNormalizer/Cli/ArgsParsing.cs",
+                           " M src/XMLDocNormalizer/Cli/ToolOptions.cs",
+                           " M src/XMLDocNormalizer/Execution/ToolExitCodes.cs",
+                           " M src/XMLDocNormalizer/Execution/ToolRunner.cs",
+                           " M src/XMLDocNormalizer/Program.cs",
+                           "?? Evaluation/P5O2B23-bounded-external-target-adoption-audit.json",
+                           "?? Evaluation/P5O2B23-bounded-external-target-adoption.md",
+                           "?? Evaluation/P5O2B23Proof/",
+                           "?? Tests/XMLDocNormalizerTests/Worker/ExceptionFlowExternalTargetCliTests.cs",
+                           "?? src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"
+                       ],
+    "NoCommit":  true,
+    "NoPush":  true
+}

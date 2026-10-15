@@ -9,6 +9,7 @@ namespace XMLDocNormalizer.Cli
     /// Initializes a new instance of the <see cref="ToolOptions"/> class.
     /// </remarks>
     /// <param name="targetPath">The root directory or file path to process.</param>
+    /// <param name="externalTarget">Whether the target is an explicit bounded local external job.</param>
     /// <param name="checkOnly">True to run in check-only mode.</param>
     /// <param name="cleanBackups">True to delete old backup files before processing.</param>
     /// <param name="useTest">True to run in test mode (rewrite .bak files only).</param>
@@ -61,8 +62,12 @@ namespace XMLDocNormalizer.Cli
         int exceptionAnalysisComparisonRuns = 1,
         int exceptionAnalysisComparisonWarmupRuns = 0,
         bool enableStatistics = false,
-        string? statisticsOutputPath = null)
+        string? statisticsOutputPath = null,
+        bool externalTarget = false)
     {
+        /// <summary>Gets whether TargetPath names an untrusted local external-target job.</summary>
+        public bool ExternalTarget { get; } = externalTarget;
+
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
         /// </summary>

@@ -24,5 +24,8 @@ namespace XMLDocNormalizer.Execution
         /// Indicates that a specified project was not found in the solution.
         /// </summary>
         public const int ProjectNotFound = 3;
+
+        /// <summary>Indicates a rejected or failed bounded external-target execution.</summary>
+        public const int ExternalTargetFailure = 4;
     }
 }

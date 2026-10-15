@@ -49,6 +49,11 @@ namespace XMLDocNormalizer.Execution
             ConsoleLogger.VerboseEnabled = options.Verbose;
             ConsoleLogger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
+            if (options.ExternalTarget)
+            {
+                return RunExternalTarget(options);
+            }
+
             if (!File.Exists(options.TargetPath) && !Directory.Exists(options.TargetPath))
             {
                 throw new ArgumentException($"Invalid target path: {options.TargetPath}", nameof(options));
@@ -72,6 +77,26 @@ namespace XMLDocNormalizer.Execution
 
             ConsoleLogger.InfoVerbose("Fix mode enabled.");
             return RunFix(files, options);
+        }
+
+        private static RunResult RunExternalTarget(ToolOptions options)
+        {
+            if (!options.CheckOnly || options.CompareExceptionAnalysisModes || options.CompareValueDocumentationModes
+                || options.XmlDocOptions.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
+            { throw new ExternalTargetExecutionException("Only a check-only bounded Declared external target is supported."); }
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            var analyzed = ExternalTargetExecution.AnalyzeAsync(options.TargetPath).GetAwaiter().GetResult();
+            ConsoleLogger.Info("Bounded external target: selected-root Declared exception findings only; not a full project check.");
+            // No reporter or success result exists until the complete B21/B22 operation succeeds.
+            RunResult result = new();
+            result.AccumulateFindings(analyzed.Findings);
+            IFindingsReporter reporter = FindingsReporterFactory.Create(options);
+            foreach (var file in analyzed.Findings.GroupBy(finding => finding.FilePath))
+            { reporter.ReportFile(file.Key, file.ToArray()); }
+            stopwatch.Stop();
+            result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
+            CompleteReporting(reporter, result);
+            return result;
         }
 
         /// <summary>

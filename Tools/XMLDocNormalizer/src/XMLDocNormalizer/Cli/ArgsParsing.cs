@@ -15,6 +15,7 @@ namespace XMLDocNormalizer.Cli
             new(StringComparer.OrdinalIgnoreCase)
             {
                 "--project",
+                "--external-target",
                 "--format",
                 "--output",
                 "--exception-analysis-mode",
@@ -64,8 +65,25 @@ namespace XMLDocNormalizer.Cli
             bool compareExceptionAnalysisModes = HasFlag(args, "--compare-exception-analysis-modes");
             bool compareValueDocumentationModes = HasFlag(args, "--compare-value-documentation-modes");
             bool enableStatistics = HasFlag(args, "--enable-statistics");
+            bool externalTarget = HasFlag(args, "--external-target");
+
+            if (externalTarget && !HasValidExternalArguments(args))
+            {
+                PrintUsage("External targets require --check --external-target job.json; only format/output, verbose and Declared mode are supported. No positional target, rewrite, comparison or project-scope options.");
+                return false;
+            }
 
             XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
+            if (externalTarget)
+            {
+                if (HasFlag(args, "--exception-analysis-mode")
+                    && xmlDocOptions.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
+                {
+                    PrintUsage("External targets support only project-transitive-declared-exceptions.");
+                    return false;
+                }
+                xmlDocOptions.ExceptionAnalysisMode = ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions;
+            }
 
             string? projectName = GetOptionValue(args, "--project");
             OutputFormat outputFormat = ParseOutputFormat(args);
@@ -142,7 +160,7 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
-            string targetPath = GetTargetPathOrDefault(args);
+            string targetPath = externalTarget ? GetOptionValue(args, "--external-target")! : GetTargetPathOrDefault(args);
             if (!Directory.Exists(targetPath) && !File.Exists(targetPath))
             {
                 PrintUsage($"Target path does not exist: {targetPath}");
@@ -167,8 +185,25 @@ namespace XMLDocNormalizer.Cli
                 exceptionAnalysisComparisonRuns: exceptionAnalysisComparisonRuns,
                 exceptionAnalysisComparisonWarmupRuns: exceptionAnalysisComparisonWarmupRuns,
                 enableStatistics: enableStatistics,
-                statisticsOutputPath: statisticsOutputPath);
+                statisticsOutputPath: statisticsOutputPath,
+                externalTarget: externalTarget);
 
+            return true;
+        }
+
+        private static bool HasValidExternalArguments(string[] args)
+        {
+            if (!HasFlag(args, "--check") || args.Count(arg => arg == "--external-target") != 1) { return false; }
+            HashSet<string> flags = new(StringComparer.Ordinal) { "--check", "--verbose", "-v" };
+            HashSet<string> values = new(StringComparer.Ordinal) { "--external-target", "--format", "--output", "--exception-analysis-mode" };
+            HashSet<string> seen = new(StringComparer.Ordinal);
+            for (int index = 0; index < args.Length; index++)
+            {
+                string argument = args[index];
+                if (!seen.Add(argument)) { return false; }
+                if (flags.Contains(argument)) { continue; }
+                if (!values.Contains(argument) || ++index >= args.Length || IsFlagToken(args[index])) { return false; }
+            }
             return true;
         }
 
@@ -611,6 +646,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]");
             Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]");
             Console.WriteLine("                   [--compare-exception-analysis-modes]");
+            Console.WriteLine("  --external-target <job.json>  Explicit local v1 unsigned single-project/root Declared job (--check only); paths relative to job file, no discovery or downloads.");
             Console.WriteLine("                   [--compare-value-documentation-modes]");
             Console.WriteLine("                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]");
             Console.WriteLine("                   [--value-documentation-mode mode]");
