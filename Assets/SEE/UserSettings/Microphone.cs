@@ -1,8 +1,11 @@
 using System.Collections.Generic;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 
 namespace SEE.UserSettings
 {
+    /// <summary>
+    /// Configuration for the microphone.
+    /// </summary>
     public class Microphone
     {
         /// <summary>
@@ -30,14 +33,29 @@ namespace SEE.UserSettings
         /// </summary>
         public bool AutoGainControl;
 
+        /// <summary>
+        /// Label of <see cref="MicrophoneDevice"/> in the configuration file.
+        /// </summary>
         private const string microphoneDeviceLabel = "microphoneDevice";
 
+        /// <summary>
+        /// Label of <see cref="MaxBitrate"/> in the configuration file.
+        /// </summary>
         private const string maxBitrateLabel = "maxBitrate";
 
+        /// <summary>
+        /// Label of <see cref="EchoCancellation"/> in the configuration file.
+        /// </summary>
         private const string echoCancellationLabel = "echoCancellation";
 
+        /// <summary>
+        /// Label of <see cref="NoiseSuppression"/> in the configuration file.
+        /// </summary>
         private const string noiseSuppressionLabel = "noiseSuppression";
 
+        /// <summary>
+        /// Label of <see cref="AutoGainControl"/> in the configuration file.
+        /// </summary>
         private const string autoGainControlLabel = "autoGainControl";
 
         public virtual void Save(ConfigWriter writer, string label)
