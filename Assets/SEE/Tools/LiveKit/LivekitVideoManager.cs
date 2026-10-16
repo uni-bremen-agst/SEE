@@ -164,7 +164,7 @@ namespace SEE.Tools.LiveKit
                 }
             }
 
-            if (SEEInput.ToggleVoiceChat())
+            if (SEEInput.ToggleVoiceChat() && UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
             {
                 if (publishedAudioTrack == null)
                 {
