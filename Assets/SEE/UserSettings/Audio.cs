@@ -105,7 +105,7 @@ namespace SEE.UserSettings
                 ConfigIO.Restore(values, musicMutedLabel, ref MusicMuted);
                 ConfigIO.Restore(values, soundEffectsMutedLabel, ref SoundEffectsMuted);
                 ConfigIO.Restore(values, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
-                Microphone.Restore(attributes, microphoneLabel);
+                Microphone.Restore(values, microphoneLabel);
             }
         }
         #endregion
