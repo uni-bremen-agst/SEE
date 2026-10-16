@@ -1,0 +1,259 @@
+using System.Reflection;
+using System.Text.Json;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
+using XMLDocNormalizer.Execution.Analysis;
+using XMLDocNormalizer.HistoricalWorker;
+using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.DTO;
+using XMLDocNormalizerTests.Helpers;
+
+namespace XMLDocNormalizerTests.Worker
+{
+    /// <summary>B25A: exact ownership in the shared evaluator, not a Historical-only compensation.</summary>
+    public sealed class ExceptionFlowAssemblyQualifiedOwnershipTests
+    {
+        private const string Fault = "namespace Shared { public class Fault : System.Exception {} }";
+        private const string Entry = " public static class Entry { public static void Root() {} }";
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void T1_SameNameAndNamespace_DifferentAssemblies_DoNotCoalesce(bool documentation)
+        {
+            var b = Compile("B", Fault + Entry);
+            var a = Compile("A", Fault + Entry, Emit(b));
+            var aType = a.Assembly.GetTypeByMetadataName("Shared.Fault")!;
+            var bType = b.Assembly.GetTypeByMetadataName("Shared.Fault")!;
+            Assert.Equal(DocumentationCommentId.CreateDeclarationId(aType), DocumentationCommentId.CreateDeclarationId(bType));
+            var result = Evaluate(a, [a, b], [(0, aType), (1, bType)], documentation: documentation);
+            var types = documentation ? result.ExternalDocumentationEvidenceExceptions : result.ThrownExceptions;
+            Assert.Equal(2, types.Count);
+            Assert.Contains(types, type => Identity(type).Equals(Identity(aType)));
+            Assert.Contains(types, type => Identity(type).Equals(Identity(bType)));
+        }
+
+        [Fact]
+        public void T2_SameAssemblyAndType_RebindsToExactDestinationSymbol()
+        {
+            var original = Compile("Same", Fault + Entry);
+            var root = Compile("Same", Fault + Entry);
+            var type = original.GetTypeByMetadataName("Shared.Fault")!;
+            var result = Evaluate(root, [original], [(0, type)]);
+            Assert.Same(root.GetTypeByMetadataName("Shared.Fault"), Assert.Single(result.ThrownExceptions));
+        }
+
+        [Fact]
+        public void T3_ThreeNodeGraph_KeepsCDespiteCollisionsInAAndB()
+        {
+            var c = Compile("C", Fault + Entry);
+            var b = Compile("B", Fault + Entry, Emit(c));
+            var a = Compile("A", Fault + Entry, Emit(b), Emit(c));
+            var type = c.Assembly.GetTypeByMetadataName("Shared.Fault")!;
+            var result = Evaluate(a, [a, b, c], [(2, type)]);
+            Assert.Equal(Identity(type), Identity(Assert.Single(result.ThrownExceptions)));
+        }
+
+        [Fact]
+        public void T4_DifferentNamespaces_AreUnchanged()
+        {
+            var b = Compile("B", Fault + Entry);
+            var a = Compile("A", Fault.Replace("Shared", "Different", StringComparison.Ordinal) + Entry, Emit(b));
+            var type = b.GetTypeByMetadataName("Shared.Fault")!;
+            Assert.Equal(Identity(type), Identity(Assert.Single(Evaluate(a, [a, b], [(1, type)]).ThrownExceptions)));
+        }
+
+        [Fact]
+        public void T5_FrameworkType_IsStillTheDestinationFrameworkType()
+        {
+            var b = Compile("B", Entry);
+            var a = Compile("A", Entry, Emit(b));
+            var type = b.GetTypeByMetadataName("System.InvalidOperationException")!;
+            Assert.Same(a.GetTypeByMetadataName("System.InvalidOperationException"), Assert.Single(Evaluate(a, [a, b], [(1, type)]).ThrownExceptions));
+        }
+
+        [Theory]
+        [InlineData("Shared.Generic`1")]
+        [InlineData("Shared.Outer+Nested`1")]
+        [InlineData("Shared.OuterGeneric`1+Nested")]
+        public void ConstructedAndNestedTypes_NeverBecomeDefinitionsOrChangeArgumentOwner(string metadataName)
+        {
+            const string shapes = "namespace Shared { public class Generic<T> : System.Exception {} public class Outer { public class Nested<T> : System.Exception {} } public class OuterGeneric<T> { public class Nested : System.Exception {} } }";
+            var b = Compile("B", Fault + shapes + Entry);
+            var a = Compile("A", Fault + shapes + Entry, Emit(b));
+            var argument = b.GetTypeByMetadataName("Shared.Fault")!;
+            var type = metadataName == "Shared.OuterGeneric`1+Nested"
+                ? b.GetTypeByMetadataName("Shared.OuterGeneric`1")!.Construct(argument).GetTypeMembers("Nested").Single()
+                : b.GetTypeByMetadataName(metadataName)!.Construct(argument);
+            var actual = Assert.Single(Evaluate(a, [a, b], [(1, type)]).ThrownExceptions);
+            Assert.Equal(Identity(type), Identity(actual));
+            Assert.NotEqual(Identity(type.OriginalDefinition), Identity(actual));
+        }
+
+        [Fact]
+        public void ConstructedContainingType_ExactMetadataCatchStillHandlesSourceException()
+        {
+            const string source = "namespace Shared { public class Outer<T> { public class Fault : System.Exception {} } }";
+            var b = Compile("B", source + Entry);
+            var reference = Emit(b);
+            var a = Compile("A", Entry, reference);
+            var owner = (IAssemblySymbol)a.GetAssemblyOrModuleSymbol(reference)!;
+            var thrown = b.GetTypeByMetadataName("Shared.Outer`1")!.Construct(b.GetSpecialType(SpecialType.System_Int32)).GetTypeMembers("Fault").Single();
+            var caught = owner.GetTypeByMetadataName("Shared.Outer`1")!.Construct(a.GetSpecialType(SpecialType.System_Int32)).GetTypeMembers("Fault").Single();
+            Assert.Equal(Identity(thrown), Identity(caught));
+            Assert.Empty(Evaluate(a, [a, b], [(1, thrown)], caught: caught).ThrownExceptions);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void CatchFilters_RequireActualAssemblyOwner(bool catchActualOwner)
+        {
+            var b = Compile("B", Fault + Entry);
+            var a = Compile("A", Fault + Entry, Emit(b));
+            var thrown = b.GetTypeByMetadataName("Shared.Fault")!;
+            var caught = catchActualOwner ? thrown : a.Assembly.GetTypeByMetadataName("Shared.Fault")!;
+            var result = Evaluate(a, [a, b], [(1, thrown)], caught: caught);
+            if (catchActualOwner) { Assert.Empty(result.ThrownExceptions); }
+            else { Assert.Equal(Identity(thrown), Identity(Assert.Single(result.ThrownExceptions))); }
+        }
+
+        [Fact]
+        public void UnknownOwner_KeepsKnownOriginalSymbol_NotRootNamesake()
+        {
+            var b = Compile("Unknown", Fault + Entry);
+            var a = Compile("A", Fault + Entry);
+            var type = b.GetTypeByMetadataName("Shared.Fault")!;
+            Assert.Null(new RoslynCanonicalIdentityResolver(a).ResolveType(Identity(type)));
+            Assert.Same(type, Assert.Single(Evaluate(a, [a, b], [(1, type)]).ThrownExceptions));
+        }
+
+        [Fact]
+        public void MissingSymbolOwner_DoesNotAttemptNameOnlyRebinding()
+        {
+            var root = Compile("A", Fault + Entry);
+            var error = root.CreateErrorTypeSymbol(null, "Fault", 0);
+            Assert.Null(error.ContainingAssembly);
+            Assert.Same(error, Assert.Single(Evaluate(root, [root], [(0, error)]).ThrownExceptions));
+        }
+
+        [Theory]
+        [InlineData("missing-assembly")]
+        [InlineData("unknown-assembly")]
+        [InlineData("version")]
+        [InlineData("culture")]
+        [InlineData("token")]
+        [InlineData("module-owner")]
+        [InlineData("module-name")]
+        [InlineData("reference-owner")]
+        [InlineData("metadata-name")]
+        public void InvalidOrContradictoryCanonicalFacts_FailClosed(string mutation)
+        {
+            var source = Compile("B", Fault + Entry);
+            var root = Compile("A", Fault + Entry, Emit(source));
+            var identity = Identity(source.GetTypeByMetadataName("Shared.Fault")!);
+            var original = identity.Assembly!;
+            CanonicalAssemblyIdentity? assembly = mutation == "missing-assembly" ? null : new(
+                mutation == "unknown-assembly" ? "Unknown" : original.Name,
+                mutation == "version" ? 9 : original.VersionMajor, original.VersionMinor, original.VersionBuild, original.VersionRevision,
+                mutation == "culture" ? "de-DE" : original.CultureName,
+                mutation == "token" ? "0102030405060708" : original.PublicKeyOrToken,
+                original.HasPublicKey, original.IsRetargetable, original.ContentType);
+            if (mutation == "reference-owner") { assembly = Identity(root.Assembly.GetTypeByMetadataName("Shared.Fault")!).Assembly; }
+            var module = mutation is "module-owner" or "module-name"
+                ? new CanonicalModuleIdentity(mutation == "module-owner" ? Identity(root.Assembly.GetTypeByMetadataName("Shared.Fault")!).Assembly! : original,
+                    mutation == "module-name" ? "Wrong.dll" : identity.Module!.Name, identity.Module!.Ordinal, identity.Module.ModuleVersionId)
+                : identity.Module;
+            var invalid = new CanonicalTypeIdentity(identity.Kind, identity.NamedTypeKind, assembly, module, identity.NamespaceName,
+                mutation == "metadata-name" ? "Absent" : identity.MetadataName, identity.ContainingType, identity.TypeArguments,
+                identity.IsUnboundGenericType, identity.IsNativeIntegerType, null, 0, null, null, null, null, null, null, null, null);
+            Assert.Null(new RoslynCanonicalIdentityResolver(root).ResolveType(invalid));
+        }
+
+        [Theory]
+        [InlineData(2)]
+        [InlineData(3)]
+        public async Task GenuineCurrentAndHistoricalSolutionFlows_KeepLastProjectOwner_WithoutFindingAdmission(int count)
+        {
+            // Reuse unchanged B25 genuine PE/PDB/project-scope construction, not fake identity DTOs.
+            var type = typeof(ExceptionFlowHistoricalSolutionFindingTests);
+            var task = (Task)Invoke(type, "Create", count, "same-name-types")!;
+            await task;
+            var fixture = task.GetType().GetProperty("Result")!.GetValue(task)!;
+            var input = (HistoricalWorkerPayloadProjectionInput)fixture.GetType().GetProperty("Input")!.GetValue(fixture)!;
+            var payload = HistoricalWorkerPayloadProjection.Project(input).Value!.Payload;
+            var native = (JsonElement)Invoke(type, "Native", payload)!;
+            var historical = await (Task<ExternalExceptionFlowAnalysisResult>)Invoke(type, "Flow", input)!;
+            Assert.True(historical.Succeeded, historical.PayloadProjection.Failure?.Message);
+            Assert.Equal(native.GetProperty("result").GetRawText(), JsonSerializer.Serialize(historical.Result, WorkerProtocol.JsonOptions));
+            Assert.Equal(2, historical.Result!.Entries.Length);
+            string owner = "Original.Solution.P" + (count - 1);
+            var last = Assert.Single(historical.Result.Entries, entry => entry.ExceptionType.Assembly!.Name == owner);
+            Assert.Contains(last.Paths.SelectMany(path => path.Steps), step => step.Kind.ToString() == "ExplicitThrow" && step.FilePath == $"/solution/p{count - 1}/Source.cs");
+            var graph = await (Task<JsonElement>)Invoke(type, "Probe", payload, "--b15-graph", null)!;
+            Assert.Equal(native.GetProperty("summaries").GetRawText(), graph.GetProperty("summaries").GetRawText());
+            Assert.Equal(native.GetProperty("result").GetRawText(), graph.GetProperty("result").GetRawText());
+            await (Task)Invoke(type, "AssertNoFindingAdmission", input)!;
+            HistoricalWorkerLifetimeAssertions.Stopped(historical.Dispatch!.Routing!.HistoricalAnalysis!);
+            Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
+            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), $"artifacts/p5o2b25a/cases/collision-{count}.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            await File.WriteAllTextAsync(path, JsonSerializer.Serialize(new
+            {
+                Count = count,
+                Before = new { WrongOwner = "Original.Solution.P0", UnsafeLookup = "GetFirstSymbolForDeclarationId" },
+                ActualOwner = owner,
+                CorrectedType = last.ExceptionType,
+                Current = native,
+                Historical = historical.Result,
+                Graph = graph,
+                ProcessExit = historical.Dispatch.Routing.HistoricalAnalysis!.ProcessExit,
+                FindingAdmission = false
+            }, WorkerProtocol.JsonOptions));
+        }
+
+        private static CanonicalTypeIdentity Identity(ITypeSymbol type) => RoslynCanonicalIdentityFactory.CreateTypeIdentity(type);
+        private static object? Invoke(Type type, string method, params object?[] args) => type.GetMethod(method, BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, args);
+        private static CSharpCompilation Compile(string name, string source, params MetadataReference[] references)
+        {
+            var compilation = CSharpCompilation.Create(name, [CSharpSyntaxTree.ParseText(source, path: "/" + name + ".cs")],
+                MetadataReferences.Default.Concat(references), new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            Assert.DoesNotContain(compilation.GetDiagnostics(), diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+            return compilation;
+        }
+        private static MetadataReference Emit(CSharpCompilation compilation)
+        {
+            using var image = new MemoryStream();
+            var emitted = compilation.Emit(image);
+            Assert.True(emitted.Success, string.Join(Environment.NewLine, emitted.Diagnostics));
+            return MetadataReference.CreateFromImage(image.ToArray());
+        }
+        private static ExceptionFlowAnalysisResult Evaluate(CSharpCompilation root, CSharpCompilation[] chain,
+            (int Owner, INamedTypeSymbol Type)[] sources, bool documentation = false, INamedTypeSymbol? caught = null)
+        {
+            var graph = new ExceptionFlowSummaryGraph();
+            var methods = chain.Select(compilation => compilation.GetTypeByMetadataName("Entry")!.GetMembers("Root").OfType<IMethodSymbol>().Single()).ToArray();
+            var keys = methods.Select(method => new ExceptionFlowCallableKey(method, new ExceptionFlowCallContext(method))).ToArray();
+            for (int index = 0; index < chain.Length; index++)
+            {
+                var syntax = chain[index].SyntaxTrees.Single().GetRoot();
+                var fragment = new ExceptionFlowSummaryFragment();
+                foreach (var source in sources.Where(source => source.Owner == index))
+                {
+                    fragment.AddSource(new(source.Type, ExceptionFlowPathFactory.CreateTerminal(ExceptionFlowPathStepKind.ExplicitThrow, source.Type, syntax),
+                        documentation ? ExceptionFlowSourceKind.ExternalDocumentationEvidence : ExceptionFlowSourceKind.ProvenException));
+                }
+                if (index + 1 < chain.Length)
+                {
+                    var edge = new ExceptionFlowSummaryCallEdge(keys[index + 1], ExceptionFlowPathFactory.CreateStep(ExceptionFlowPathStepKind.MethodCall, methods[index], syntax));
+                    if (index == 0 && caught != null) { edge.AddCaughtExceptionType(caught); }
+                    fragment.AddCallEdge(edge);
+                }
+                var summary = graph.GetOrAdd(keys[index]); summary.MarkExecutableBodyAnalyzed(); summary.Merge(fragment);
+            }
+            return new ExceptionFlowSummaryGraphEvaluator().Evaluate(graph, keys[0], root);
+        }
+    }
+}

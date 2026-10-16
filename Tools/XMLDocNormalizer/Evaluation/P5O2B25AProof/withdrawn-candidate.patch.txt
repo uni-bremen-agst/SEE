@@ -1,0 +1,108 @@
+diff --git a/Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs b/Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs
+index 836b230f93..5495955e87 100644
+--- a/Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs
++++ b/Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs
+@@ -85,7 +85,7 @@ namespace XMLDocNormalizerTests.Worker
+         }
+ 
+         [Fact]
+-        public async Task AssemblyDistinctSameDeclarationId_LosesTypeOwnerDuringSharedEvaluation_AndRemainsUnadmitted()
++        public async Task AssemblyDistinctSameDeclarationId_PreservesTypeOwnerDuringSharedEvaluation_AndRemainsUnadmitted()
+         {
+             var fixture = await Create(2, "same-name-types");
+             var payload = HistoricalWorkerPayloadProjection.Project(fixture.Input).Value!.Payload;
+@@ -101,11 +101,15 @@ namespace XMLDocNormalizerTests.Worker
+                 var b = summaries.Single(item => item.RootElement.GetProperty("callable").GetProperty("containingType").GetProperty("assembly").GetProperty("name").GetString() == "Original.Solution.P1");
+                 string SourceOwner(JsonDocument summary) => summary.RootElement.GetProperty("sources")[0].GetProperty("exceptionType").GetProperty("assembly").GetProperty("name").GetString()!;
+                 Assert.Equal("Original.Solution.P0", SourceOwner(a)); Assert.Equal("Original.Solution.P1", SourceOwner(b));
+-                var entry = Assert.Single(historical.Result!.Entries);
+-                Assert.Equal("Original.Solution.P0", entry.ExceptionType.Assembly!.Name);
++                Assert.Equal(2, historical.Result!.Entries.Length);
++                var entry = Assert.Single(historical.Result.Entries, item => item.ExceptionType.Assembly!.Name == "Original.Solution.P1");
++                var localEntry = Assert.Single(historical.Result.Entries, item => item.ExceptionType.Assembly!.Name == "Original.Solution.P0");
++                Assert.NotEqual(localEntry.ExceptionType, entry.ExceptionType);
++                Assert.Equal("Original.Solution.P1", entry.ExceptionType.Assembly!.Name);
+                 Assert.Contains(entry.Paths.SelectMany(path => path.Steps), step => step.FilePath == "/solution/p1/Source.cs" && step.Kind.ToString() == "ExplicitThrow");
+-                Assert.Single(native.GetProperty("findings").EnumerateArray());
+-                Assert.Equal("DOC611", native.GetProperty("findings")[0].GetProperty("smell").GetProperty("id").GetString());
++                Assert.DoesNotContain(localEntry.Paths.SelectMany(path => path.Steps), step => step.FilePath == "/solution/p1/Source.cs" && step.Kind.ToString() == "ExplicitThrow");
++                Assert.Equal(2, native.GetProperty("findings").GetArrayLength());
++                Assert.All(native.GetProperty("findings").EnumerateArray(), finding => Assert.Equal("DOC611", finding.GetProperty("smell").GetProperty("id").GetString()));
+                 await AssertNoFindingAdmission(fixture.Input);
+                 HistoricalWorkerLifetimeAssertions.Stopped(historical.Dispatch!.Routing!.HistoricalAnalysis!); Isolation();
+                 await Evidence("ownership-stop-witness", new
+@@ -116,7 +120,9 @@ namespace XMLDocNormalizerTests.Worker
+                     LocalATypeOwner = SourceOwner(a),
+                     LocalBTypeOwner = SourceOwner(b),
+                     EvaluatedTypeOwner = entry.ExceptionType.Assembly.Name,
+-                    TypeOwnershipLossObserved = true,
++                    TypeOwnershipLossObserved = false,
++                    BeforeB25A = new { WrongEvaluatedOwner = "Original.Solution.P0", UnsafeLookup = "GetFirstSymbolForDeclarationId" },
++                    CorrectedAssemblyQualifiedType = entry.ExceptionType,
+                     CurrentHistoricalParityDoesNotProveOwnership = true,
+                     FinalFindingAdmission = false
+                 });
+@@ -192,7 +198,9 @@ namespace XMLDocNormalizerTests.Worker
+         public void StopRule_DoesNotIntroducePolicyRoutingAttestationOrPidWorkarounds()
+         {
+             string evaluator = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs"));
+-            Assert.Contains("GetFirstSymbolForDeclarationId", evaluator);
++            Assert.DoesNotContain("GetFirstSymbolForDeclarationId", evaluator);
++            Assert.Contains("RoslynCanonicalIdentityFactory.CreateTypeIdentity(exceptionType)", evaluator);
++            Assert.Contains("RoslynCanonicalIdentityResolver(rootCompilation)", evaluator);
+             string external = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"));
+             Assert.Contains("Solution is not admitted", external); Assert.DoesNotContain("SupportingProjects", external);
+             string client = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/Historical/HistoricalWorkerClient.cs"));
+diff --git a/Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs b/Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs
+index 140e74b9d8..a013359616 100644
+--- a/Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs
++++ b/Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs
+@@ -1,4 +1,5 @@
+ using Microsoft.CodeAnalysis;
++using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
+ using XMLDocNormalizer.Models;
+ using XMLDocNormalizer.Models.DTO;
+ 
+@@ -384,29 +385,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
+         /// The compilation whose symbol identity should be returned.
+         /// </param>
+         /// <returns>
+-        /// The corresponding root-compilation symbol when it can be resolved;
+-        /// otherwise the original exception symbol.
++        /// The root-compilation symbol only when its complete canonical type
++        /// identity matches; otherwise the original authoritative symbol.
+         /// </returns>
+         private static INamedTypeSymbol NormalizeSummaryExceptionType(
+             INamedTypeSymbol exceptionType,
+             Compilation rootCompilation)
+         {
+-            string? declarationId =
+-                DocumentationCommentId.CreateDeclarationId(
+-                    exceptionType.OriginalDefinition);
+-
+-            if (!string.IsNullOrWhiteSpace(
+-                    declarationId) &&
+-                DocumentationCommentId
+-                    .GetFirstSymbolForDeclarationId(
+-                        declarationId,
+-                        rootCompilation)
+-                    is INamedTypeSymbol normalizedType)
++            if (exceptionType.ContainingAssembly == null
++                || exceptionType.ContainingModule == null)
+             {
+-                return normalizedType;
++                return exceptionType;
+             }
+ 
+-            return exceptionType;
++            CanonicalTypeIdentity identity =
++                RoslynCanonicalIdentityFactory.CreateTypeIdentity(exceptionType);
++
++            // A declaration ID cannot distinguish assembly owners or retain
++            // generic construction. Never replace a known source symbol with
++            // a name-only match when exact rebinding is unavailable.
++            return new RoslynCanonicalIdentityResolver(rootCompilation)
++                .ResolveType(identity) as INamedTypeSymbol ?? exceptionType;
+         }
+ 
+         /// <summary>

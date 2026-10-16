@@ -254,6 +254,10 @@ try {
         Invoke-DotNet 'main-bounded-finding-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowHistoricalBoundedFindingTests', '--logger', 'trx;LogFileName=bounded-findings.trx', '--results-directory', $evidenceRoot)
         # B25 stop-rule audit: characterize type ownership loss and require closed Solution Finding admission.
         Invoke-DotNet 'main-solution-finding-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowHistoricalSolutionFindingTests', '--logger', 'trx;LogFileName=solution-findings.trx', '--results-directory', $evidenceRoot)
+        # B25A stop-rule audit: green defect characterizations do not claim an ownership repair or Finding admission.
+        Invoke-DotNet 'main-assembly-qualified-ownership-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowAssemblyQualifiedOwnershipTests', '--logger', 'trx;LogFileName=assembly-qualified-ownership.trx', '--results-directory', $evidenceRoot)
+        # B25A2 boundary audit: preserve real compiler/summary construction-loss witnesses, not a production repair.
+        Invoke-DotNet 'main-canonical-exception-identity-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowCanonicalExceptionIdentityTests', '--logger', 'trx;LogFileName=canonical-exception-identity.trx', '--results-directory', $evidenceRoot)
         $mainBoundaryExecuted = $true
     }
     $result = [ordered]@{

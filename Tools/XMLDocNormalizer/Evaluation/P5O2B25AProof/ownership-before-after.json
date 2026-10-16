@@ -1,0 +1,830 @@
+{
+    "Package":  "P5O2B25A",
+    "Outcome":  "BoundaryAudit_StopRule",
+    "CandidateAdopted":  false,
+    "OwnershipFixed":  false,
+    "Before":  {
+                   "ActualWitness":  {
+                                         "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\baseline\\b25-cases\\ownership-stop-witness.json",
+                                         "Sha256":  "CB6C3383B2AEF6B439ED5B0DE5C50521F6A9BE2E4ECA1BD3B02EFD9A39148D12"
+                                     },
+                   "WrongOwner":  "Original.Solution.P0",
+                   "ActualLocalOwner":  "Original.Solution.P1",
+                   "UnsafeLookup":  "GetFirstSymbolForDeclarationId"
+               },
+    "CandidateOnly":  {
+                          "ActualWitness":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25\\audit-cases\\ownership-stop-witness.json",
+                                                "Sha256":  "045FF0594984CB75B77B88FAC039DEBD1248A6300A022A9A5962311BDC9BAB2D"
+                                            },
+                          "Owner":  "Original.Solution.P1",
+                          "Type":  {
+                                       "kind":  "named",
+                                       "namedTypeKind":  "class",
+                                       "assembly":  {
+                                                        "name":  "Original.Solution.P1",
+                                                        "versionMajor":  0,
+                                                        "versionMinor":  0,
+                                                        "versionBuild":  0,
+                                                        "versionRevision":  0,
+                                                        "cultureName":  "",
+                                                        "publicKeyOrToken":  "",
+                                                        "hasPublicKey":  false,
+                                                        "isRetargetable":  false,
+                                                        "contentType":  "default"
+                                                    },
+                                       "module":  {
+                                                      "assembly":  {
+                                                                       "name":  "Original.Solution.P1",
+                                                                       "versionMajor":  0,
+                                                                       "versionMinor":  0,
+                                                                       "versionBuild":  0,
+                                                                       "versionRevision":  0,
+                                                                       "cultureName":  "",
+                                                                       "publicKeyOrToken":  "",
+                                                                       "hasPublicKey":  false,
+                                                                       "isRetargetable":  false,
+                                                                       "contentType":  "default"
+                                                                   },
+                                                      "name":  "Original.Solution.P1.dll",
+                                                      "ordinal":  0
+                                                  },
+                                       "namespaceName":  "Shared",
+                                       "metadataName":  "Fault",
+                                       "typeArguments":  [
+
+                                                         ],
+                                       "isUnboundGenericType":  false,
+                                       "isNativeIntegerType":  false,
+                                       "arrayRank":  0,
+                                       "functionPointerParameters":  [
+
+                                                                     ]
+                                   },
+                          "FindingAdmission":  false,
+                          "EmbeddedGraphIsInitialStaleProbe":  true,
+                          "GraphCorrectnessProof":  "Use the separately archived fresh-probe GenuineCandidateCases, not the initial witness embedded graph"
+                      },
+    "AuthorizedB25WitnessDelta":  "Only ownership-stop-witness.json was emitted differently by the two authorized candidate characterization methods; the architecture method emits no witness. Both methods and all B25 report/audit/proof files are unchanged in the final tree.",
+    "GenuineCandidateCases":  [
+                                  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25a\\cases\\collision-2.json",
+                                      "Sha256":  "2EB6E7518E47437E6CA8E16F0CBE3C40C1E2FE3D18D342237FE5A0B742FE1177"
+                                  },
+                                  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25a\\cases\\collision-3.json",
+                                      "Sha256":  "0104171D7FF173354E08415BE5DC3E5BB0107C4B7A697210A8CB158D7C03B132"
+                                  }
+                              ],
+    "OpenDefectWitnesses":  [
+                                {
+                                    "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a-4d90\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\audit-cases\\root-cause.json",
+                                    "Sha256":  "43520C654D7D8AA4F8A084806B9035ADDB6309865AACE8B234FB0686AB372C87"
+                                },
+                                {
+                                    "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a-4d90\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\audit-cases\\nested-rebind.json",
+                                    "Sha256":  "F131137B3B46AAD6045164D6FAF8058D504C7E9427BB8E5EC7BE960EA9C37275"
+                                },
+                                {
+                                    "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a-4d90\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\audit-cases\\generic-catch.json",
+                                    "Sha256":  "E5816393F5B0F3F49B893F3FD1A09CAB92E83F5A69438E3DDE07B0F8064B470B"
+                                }
+                            ],
+    "OpenDefectDetails":  {
+                              "root-cause":  {
+                                                 "actualThrownType":  {
+                                                                          "kind":  "named",
+                                                                          "namedTypeKind":  "class",
+                                                                          "assembly":  {
+                                                                                           "name":  "B",
+                                                                                           "versionMajor":  0,
+                                                                                           "versionMinor":  0,
+                                                                                           "versionBuild":  0,
+                                                                                           "versionRevision":  0,
+                                                                                           "cultureName":  "",
+                                                                                           "publicKeyOrToken":  "",
+                                                                                           "hasPublicKey":  false,
+                                                                                           "isRetargetable":  false,
+                                                                                           "contentType":  "default"
+                                                                                       },
+                                                                          "module":  {
+                                                                                         "assembly":  {
+                                                                                                          "name":  "B",
+                                                                                                          "versionMajor":  0,
+                                                                                                          "versionMinor":  0,
+                                                                                                          "versionBuild":  0,
+                                                                                                          "versionRevision":  0,
+                                                                                                          "cultureName":  "",
+                                                                                                          "publicKeyOrToken":  "",
+                                                                                                          "hasPublicKey":  false,
+                                                                                                          "isRetargetable":  false,
+                                                                                                          "contentType":  "default"
+                                                                                                      },
+                                                                                         "name":  "B.dll",
+                                                                                         "ordinal":  0
+                                                                                     },
+                                                                          "namespaceName":  "Shared",
+                                                                          "metadataName":  "Fault",
+                                                                          "typeArguments":  [
+
+                                                                                            ],
+                                                                          "isUnboundGenericType":  false,
+                                                                          "isNativeIntegerType":  false,
+                                                                          "arrayRank":  0,
+                                                                          "functionPointerParameters":  [
+
+                                                                                                        ]
+                                                                      },
+                                                 "beforeWrongOwner":  {
+                                                                          "kind":  "named",
+                                                                          "namedTypeKind":  "class",
+                                                                          "assembly":  {
+                                                                                           "name":  "A",
+                                                                                           "versionMajor":  0,
+                                                                                           "versionMinor":  0,
+                                                                                           "versionBuild":  0,
+                                                                                           "versionRevision":  0,
+                                                                                           "cultureName":  "",
+                                                                                           "publicKeyOrToken":  "",
+                                                                                           "hasPublicKey":  false,
+                                                                                           "isRetargetable":  false,
+                                                                                           "contentType":  "default"
+                                                                                       },
+                                                                          "module":  {
+                                                                                         "assembly":  {
+                                                                                                          "name":  "A",
+                                                                                                          "versionMajor":  0,
+                                                                                                          "versionMinor":  0,
+                                                                                                          "versionBuild":  0,
+                                                                                                          "versionRevision":  0,
+                                                                                                          "cultureName":  "",
+                                                                                                          "publicKeyOrToken":  "",
+                                                                                                          "hasPublicKey":  false,
+                                                                                                          "isRetargetable":  false,
+                                                                                                          "contentType":  "default"
+                                                                                                      },
+                                                                                         "name":  "A.dll",
+                                                                                         "ordinal":  0
+                                                                                     },
+                                                                          "namespaceName":  "Shared",
+                                                                          "metadataName":  "Fault",
+                                                                          "typeArguments":  [
+
+                                                                                            ],
+                                                                          "isUnboundGenericType":  false,
+                                                                          "isNativeIntegerType":  false,
+                                                                          "arrayRank":  0,
+                                                                          "functionPointerParameters":  [
+
+                                                                                                        ]
+                                                                      },
+                                                 "candidateCorrectOwner":  {
+                                                                               "kind":  "named",
+                                                                               "namedTypeKind":  "class",
+                                                                               "assembly":  {
+                                                                                                "name":  "B",
+                                                                                                "versionMajor":  0,
+                                                                                                "versionMinor":  0,
+                                                                                                "versionBuild":  0,
+                                                                                                "versionRevision":  0,
+                                                                                                "cultureName":  "",
+                                                                                                "publicKeyOrToken":  "",
+                                                                                                "hasPublicKey":  false,
+                                                                                                "isRetargetable":  false,
+                                                                                                "contentType":  "default"
+                                                                                            },
+                                                                               "module":  {
+                                                                                              "assembly":  {
+                                                                                                               "name":  "B",
+                                                                                                               "versionMajor":  0,
+                                                                                                               "versionMinor":  0,
+                                                                                                               "versionBuild":  0,
+                                                                                                               "versionRevision":  0,
+                                                                                                               "cultureName":  "",
+                                                                                                               "publicKeyOrToken":  "",
+                                                                                                               "hasPublicKey":  false,
+                                                                                                               "isRetargetable":  false,
+                                                                                                               "contentType":  "default"
+                                                                                                           },
+                                                                                              "name":  "B.dll",
+                                                                                              "ordinal":  0
+                                                                                          },
+                                                                               "namespaceName":  "Shared",
+                                                                               "metadataName":  "Fault",
+                                                                               "typeArguments":  [
+
+                                                                                                 ],
+                                                                               "isUnboundGenericType":  false,
+                                                                               "isNativeIntegerType":  false,
+                                                                               "arrayRank":  0,
+                                                                               "functionPointerParameters":  [
+
+                                                                                                             ]
+                                                                           },
+                                                 "unsafeLookup":  "GetFirstSymbolForDeclarationId",
+                                                 "candidateAdopted":  false,
+                                                 "solutionFindingAdmission":  false
+                                             },
+                              "nested-rebind":  {
+                                                    "sourceIdentity":  {
+                                                                           "kind":  "named",
+                                                                           "namedTypeKind":  "class",
+                                                                           "assembly":  {
+                                                                                            "name":  "B",
+                                                                                            "versionMajor":  0,
+                                                                                            "versionMinor":  0,
+                                                                                            "versionBuild":  0,
+                                                                                            "versionRevision":  0,
+                                                                                            "cultureName":  "",
+                                                                                            "publicKeyOrToken":  "",
+                                                                                            "hasPublicKey":  false,
+                                                                                            "isRetargetable":  false,
+                                                                                            "contentType":  "default"
+                                                                                        },
+                                                                           "module":  {
+                                                                                          "assembly":  {
+                                                                                                           "name":  "B",
+                                                                                                           "versionMajor":  0,
+                                                                                                           "versionMinor":  0,
+                                                                                                           "versionBuild":  0,
+                                                                                                           "versionRevision":  0,
+                                                                                                           "cultureName":  "",
+                                                                                                           "publicKeyOrToken":  "",
+                                                                                                           "hasPublicKey":  false,
+                                                                                                           "isRetargetable":  false,
+                                                                                                           "contentType":  "default"
+                                                                                                       },
+                                                                                          "name":  "B.dll",
+                                                                                          "ordinal":  0
+                                                                                      },
+                                                                           "metadataName":  "Fault",
+                                                                           "containingType":  {
+                                                                                                  "kind":  "named",
+                                                                                                  "namedTypeKind":  "class",
+                                                                                                  "assembly":  {
+                                                                                                                   "name":  "B",
+                                                                                                                   "versionMajor":  0,
+                                                                                                                   "versionMinor":  0,
+                                                                                                                   "versionBuild":  0,
+                                                                                                                   "versionRevision":  0,
+                                                                                                                   "cultureName":  "",
+                                                                                                                   "publicKeyOrToken":  "",
+                                                                                                                   "hasPublicKey":  false,
+                                                                                                                   "isRetargetable":  false,
+                                                                                                                   "contentType":  "default"
+                                                                                                               },
+                                                                                                  "module":  {
+                                                                                                                 "assembly":  {
+                                                                                                                                  "name":  "B",
+                                                                                                                                  "versionMajor":  0,
+                                                                                                                                  "versionMinor":  0,
+                                                                                                                                  "versionBuild":  0,
+                                                                                                                                  "versionRevision":  0,
+                                                                                                                                  "cultureName":  "",
+                                                                                                                                  "publicKeyOrToken":  "",
+                                                                                                                                  "hasPublicKey":  false,
+                                                                                                                                  "isRetargetable":  false,
+                                                                                                                                  "contentType":  "default"
+                                                                                                                              },
+                                                                                                                 "name":  "B.dll",
+                                                                                                                 "ordinal":  0
+                                                                                                             },
+                                                                                                  "namespaceName":  "Shared",
+                                                                                                  "metadataName":  "Outer`1",
+                                                                                                  "typeArguments":  [
+                                                                                                                        {
+                                                                                                                            "kind":  "named",
+                                                                                                                            "namedTypeKind":  "structure",
+                                                                                                                            "assembly":  {
+                                                                                                                                             "name":  "System.Private.CoreLib",
+                                                                                                                                             "versionMajor":  8,
+                                                                                                                                             "versionMinor":  0,
+                                                                                                                                             "versionBuild":  0,
+                                                                                                                                             "versionRevision":  0,
+                                                                                                                                             "cultureName":  "",
+                                                                                                                                             "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                             "hasPublicKey":  true,
+                                                                                                                                             "isRetargetable":  false,
+                                                                                                                                             "contentType":  "default"
+                                                                                                                                         },
+                                                                                                                            "module":  {
+                                                                                                                                           "assembly":  {
+                                                                                                                                                            "name":  "System.Private.CoreLib",
+                                                                                                                                                            "versionMajor":  8,
+                                                                                                                                                            "versionMinor":  0,
+                                                                                                                                                            "versionBuild":  0,
+                                                                                                                                                            "versionRevision":  0,
+                                                                                                                                                            "cultureName":  "",
+                                                                                                                                                            "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                                            "hasPublicKey":  true,
+                                                                                                                                                            "isRetargetable":  false,
+                                                                                                                                                            "contentType":  "default"
+                                                                                                                                                        },
+                                                                                                                                           "name":  "System.Private.CoreLib.dll",
+                                                                                                                                           "ordinal":  0
+                                                                                                                                       },
+                                                                                                                            "namespaceName":  "System",
+                                                                                                                            "metadataName":  "Int32",
+                                                                                                                            "typeArguments":  [
+
+                                                                                                                                              ],
+                                                                                                                            "isUnboundGenericType":  false,
+                                                                                                                            "isNativeIntegerType":  false,
+                                                                                                                            "arrayRank":  0,
+                                                                                                                            "functionPointerParameters":  [
+
+                                                                                                                                                          ]
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                  "isUnboundGenericType":  false,
+                                                                                                  "isNativeIntegerType":  false,
+                                                                                                  "arrayRank":  0,
+                                                                                                  "functionPointerParameters":  [
+
+                                                                                                                                ]
+                                                                                              },
+                                                                           "typeArguments":  [
+
+                                                                                             ],
+                                                                           "isUnboundGenericType":  false,
+                                                                           "isNativeIntegerType":  false,
+                                                                           "arrayRank":  0,
+                                                                           "functionPointerParameters":  [
+
+                                                                                                         ]
+                                                                       },
+                                                    "metadataCatchIdentity":  {
+                                                                                  "kind":  "named",
+                                                                                  "namedTypeKind":  "class",
+                                                                                  "assembly":  {
+                                                                                                   "name":  "B",
+                                                                                                   "versionMajor":  0,
+                                                                                                   "versionMinor":  0,
+                                                                                                   "versionBuild":  0,
+                                                                                                   "versionRevision":  0,
+                                                                                                   "cultureName":  "",
+                                                                                                   "publicKeyOrToken":  "",
+                                                                                                   "hasPublicKey":  false,
+                                                                                                   "isRetargetable":  false,
+                                                                                                   "contentType":  "default"
+                                                                                               },
+                                                                                  "module":  {
+                                                                                                 "assembly":  {
+                                                                                                                  "name":  "B",
+                                                                                                                  "versionMajor":  0,
+                                                                                                                  "versionMinor":  0,
+                                                                                                                  "versionBuild":  0,
+                                                                                                                  "versionRevision":  0,
+                                                                                                                  "cultureName":  "",
+                                                                                                                  "publicKeyOrToken":  "",
+                                                                                                                  "hasPublicKey":  false,
+                                                                                                                  "isRetargetable":  false,
+                                                                                                                  "contentType":  "default"
+                                                                                                              },
+                                                                                                 "name":  "B.dll",
+                                                                                                 "ordinal":  0
+                                                                                             },
+                                                                                  "metadataName":  "Fault",
+                                                                                  "containingType":  {
+                                                                                                         "kind":  "named",
+                                                                                                         "namedTypeKind":  "class",
+                                                                                                         "assembly":  {
+                                                                                                                          "name":  "B",
+                                                                                                                          "versionMajor":  0,
+                                                                                                                          "versionMinor":  0,
+                                                                                                                          "versionBuild":  0,
+                                                                                                                          "versionRevision":  0,
+                                                                                                                          "cultureName":  "",
+                                                                                                                          "publicKeyOrToken":  "",
+                                                                                                                          "hasPublicKey":  false,
+                                                                                                                          "isRetargetable":  false,
+                                                                                                                          "contentType":  "default"
+                                                                                                                      },
+                                                                                                         "module":  {
+                                                                                                                        "assembly":  {
+                                                                                                                                         "name":  "B",
+                                                                                                                                         "versionMajor":  0,
+                                                                                                                                         "versionMinor":  0,
+                                                                                                                                         "versionBuild":  0,
+                                                                                                                                         "versionRevision":  0,
+                                                                                                                                         "cultureName":  "",
+                                                                                                                                         "publicKeyOrToken":  "",
+                                                                                                                                         "hasPublicKey":  false,
+                                                                                                                                         "isRetargetable":  false,
+                                                                                                                                         "contentType":  "default"
+                                                                                                                                     },
+                                                                                                                        "name":  "B.dll",
+                                                                                                                        "ordinal":  0
+                                                                                                                    },
+                                                                                                         "namespaceName":  "Shared",
+                                                                                                         "metadataName":  "Outer`1",
+                                                                                                         "typeArguments":  [
+                                                                                                                               {
+                                                                                                                                   "kind":  "named",
+                                                                                                                                   "namedTypeKind":  "structure",
+                                                                                                                                   "assembly":  {
+                                                                                                                                                    "name":  "System.Private.CoreLib",
+                                                                                                                                                    "versionMajor":  8,
+                                                                                                                                                    "versionMinor":  0,
+                                                                                                                                                    "versionBuild":  0,
+                                                                                                                                                    "versionRevision":  0,
+                                                                                                                                                    "cultureName":  "",
+                                                                                                                                                    "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                                    "hasPublicKey":  true,
+                                                                                                                                                    "isRetargetable":  false,
+                                                                                                                                                    "contentType":  "default"
+                                                                                                                                                },
+                                                                                                                                   "module":  {
+                                                                                                                                                  "assembly":  {
+                                                                                                                                                                   "name":  "System.Private.CoreLib",
+                                                                                                                                                                   "versionMajor":  8,
+                                                                                                                                                                   "versionMinor":  0,
+                                                                                                                                                                   "versionBuild":  0,
+                                                                                                                                                                   "versionRevision":  0,
+                                                                                                                                                                   "cultureName":  "",
+                                                                                                                                                                   "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                                                   "hasPublicKey":  true,
+                                                                                                                                                                   "isRetargetable":  false,
+                                                                                                                                                                   "contentType":  "default"
+                                                                                                                                                               },
+                                                                                                                                                  "name":  "System.Private.CoreLib.dll",
+                                                                                                                                                  "ordinal":  0
+                                                                                                                                              },
+                                                                                                                                   "namespaceName":  "System",
+                                                                                                                                   "metadataName":  "Int32",
+                                                                                                                                   "typeArguments":  [
+
+                                                                                                                                                     ],
+                                                                                                                                   "isUnboundGenericType":  false,
+                                                                                                                                   "isNativeIntegerType":  false,
+                                                                                                                                   "arrayRank":  0,
+                                                                                                                                   "functionPointerParameters":  [
+
+                                                                                                                                                                 ]
+                                                                                                                               }
+                                                                                                                           ],
+                                                                                                         "isUnboundGenericType":  false,
+                                                                                                         "isNativeIntegerType":  false,
+                                                                                                         "arrayRank":  0,
+                                                                                                         "functionPointerParameters":  [
+
+                                                                                                                                       ]
+                                                                                                     },
+                                                                                  "typeArguments":  [
+
+                                                                                                    ],
+                                                                                  "isUnboundGenericType":  false,
+                                                                                  "isNativeIntegerType":  false,
+                                                                                  "arrayRank":  0,
+                                                                                  "functionPointerParameters":  [
+
+                                                                                                                ]
+                                                                              },
+                                                    "completeIdentitiesEqual":  true,
+                                                    "canonicalRebindAvailable":  false,
+                                                    "candidateRetainsActualSource":  true,
+                                                    "sameTypeCatchWorks":  false,
+                                                    "existingCrossCompilationAlternative":  {
+                                                                                                "kind":  "named",
+                                                                                                "namedTypeKind":  "class",
+                                                                                                "assembly":  {
+                                                                                                                 "name":  "B",
+                                                                                                                 "versionMajor":  0,
+                                                                                                                 "versionMinor":  0,
+                                                                                                                 "versionBuild":  0,
+                                                                                                                 "versionRevision":  0,
+                                                                                                                 "cultureName":  "",
+                                                                                                                 "publicKeyOrToken":  "",
+                                                                                                                 "hasPublicKey":  false,
+                                                                                                                 "isRetargetable":  false,
+                                                                                                                 "contentType":  "default"
+                                                                                                             },
+                                                                                                "module":  {
+                                                                                                               "assembly":  {
+                                                                                                                                "name":  "B",
+                                                                                                                                "versionMajor":  0,
+                                                                                                                                "versionMinor":  0,
+                                                                                                                                "versionBuild":  0,
+                                                                                                                                "versionRevision":  0,
+                                                                                                                                "cultureName":  "",
+                                                                                                                                "publicKeyOrToken":  "",
+                                                                                                                                "hasPublicKey":  false,
+                                                                                                                                "isRetargetable":  false,
+                                                                                                                                "contentType":  "default"
+                                                                                                                            },
+                                                                                                               "name":  "B.dll",
+                                                                                                               "ordinal":  0
+                                                                                                           },
+                                                                                                "metadataName":  "Fault",
+                                                                                                "containingType":  {
+                                                                                                                       "kind":  "named",
+                                                                                                                       "namedTypeKind":  "class",
+                                                                                                                       "assembly":  {
+                                                                                                                                        "name":  "B",
+                                                                                                                                        "versionMajor":  0,
+                                                                                                                                        "versionMinor":  0,
+                                                                                                                                        "versionBuild":  0,
+                                                                                                                                        "versionRevision":  0,
+                                                                                                                                        "cultureName":  "",
+                                                                                                                                        "publicKeyOrToken":  "",
+                                                                                                                                        "hasPublicKey":  false,
+                                                                                                                                        "isRetargetable":  false,
+                                                                                                                                        "contentType":  "default"
+                                                                                                                                    },
+                                                                                                                       "module":  {
+                                                                                                                                      "assembly":  {
+                                                                                                                                                       "name":  "B",
+                                                                                                                                                       "versionMajor":  0,
+                                                                                                                                                       "versionMinor":  0,
+                                                                                                                                                       "versionBuild":  0,
+                                                                                                                                                       "versionRevision":  0,
+                                                                                                                                                       "cultureName":  "",
+                                                                                                                                                       "publicKeyOrToken":  "",
+                                                                                                                                                       "hasPublicKey":  false,
+                                                                                                                                                       "isRetargetable":  false,
+                                                                                                                                                       "contentType":  "default"
+                                                                                                                                                   },
+                                                                                                                                      "name":  "B.dll",
+                                                                                                                                      "ordinal":  0
+                                                                                                                                  },
+                                                                                                                       "namespaceName":  "Shared",
+                                                                                                                       "metadataName":  "Outer`1",
+                                                                                                                       "typeArguments":  [
+                                                                                                                                             {
+                                                                                                                                                 "kind":  "named",
+                                                                                                                                                 "namedTypeKind":  "structure",
+                                                                                                                                                 "assembly":  {
+                                                                                                                                                                  "name":  "System.Private.CoreLib",
+                                                                                                                                                                  "versionMajor":  8,
+                                                                                                                                                                  "versionMinor":  0,
+                                                                                                                                                                  "versionBuild":  0,
+                                                                                                                                                                  "versionRevision":  0,
+                                                                                                                                                                  "cultureName":  "",
+                                                                                                                                                                  "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                                                  "hasPublicKey":  true,
+                                                                                                                                                                  "isRetargetable":  false,
+                                                                                                                                                                  "contentType":  "default"
+                                                                                                                                                              },
+                                                                                                                                                 "module":  {
+                                                                                                                                                                "assembly":  {
+                                                                                                                                                                                 "name":  "System.Private.CoreLib",
+                                                                                                                                                                                 "versionMajor":  8,
+                                                                                                                                                                                 "versionMinor":  0,
+                                                                                                                                                                                 "versionBuild":  0,
+                                                                                                                                                                                 "versionRevision":  0,
+                                                                                                                                                                                 "cultureName":  "",
+                                                                                                                                                                                 "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                                                                                 "hasPublicKey":  true,
+                                                                                                                                                                                 "isRetargetable":  false,
+                                                                                                                                                                                 "contentType":  "default"
+                                                                                                                                                                             },
+                                                                                                                                                                "name":  "System.Private.CoreLib.dll",
+                                                                                                                                                                "ordinal":  0
+                                                                                                                                                            },
+                                                                                                                                                 "namespaceName":  "System",
+                                                                                                                                                 "metadataName":  "Int32",
+                                                                                                                                                 "typeArguments":  [
+
+                                                                                                                                                                   ],
+                                                                                                                                                 "isUnboundGenericType":  false,
+                                                                                                                                                 "isNativeIntegerType":  false,
+                                                                                                                                                 "arrayRank":  0,
+                                                                                                                                                 "functionPointerParameters":  [
+
+                                                                                                                                                                               ]
+                                                                                                                                             }
+                                                                                                                                         ],
+                                                                                                                       "isUnboundGenericType":  false,
+                                                                                                                       "isNativeIntegerType":  false,
+                                                                                                                       "arrayRank":  0,
+                                                                                                                       "functionPointerParameters":  [
+
+                                                                                                                                                     ]
+                                                                                                                   },
+                                                                                                "typeArguments":  [
+
+                                                                                                                  ],
+                                                                                                "isUnboundGenericType":  false,
+                                                                                                "isNativeIntegerType":  false,
+                                                                                                "arrayRank":  0,
+                                                                                                "functionPointerParameters":  [
+
+                                                                                                                              ]
+                                                                                            },
+                                                    "stopRule":  "Constructed containing-type rebinding and catch identity need a separate complete contract",
+                                                    "candidateAdopted":  false
+                                                },
+                              "generic-catch":  {
+                                                    "thrown":  {
+                                                                   "kind":  "named",
+                                                                   "namedTypeKind":  "class",
+                                                                   "assembly":  {
+                                                                                    "name":  "B",
+                                                                                    "versionMajor":  0,
+                                                                                    "versionMinor":  0,
+                                                                                    "versionBuild":  0,
+                                                                                    "versionRevision":  0,
+                                                                                    "cultureName":  "",
+                                                                                    "publicKeyOrToken":  "",
+                                                                                    "hasPublicKey":  false,
+                                                                                    "isRetargetable":  false,
+                                                                                    "contentType":  "default"
+                                                                                },
+                                                                   "module":  {
+                                                                                  "assembly":  {
+                                                                                                   "name":  "B",
+                                                                                                   "versionMajor":  0,
+                                                                                                   "versionMinor":  0,
+                                                                                                   "versionBuild":  0,
+                                                                                                   "versionRevision":  0,
+                                                                                                   "cultureName":  "",
+                                                                                                   "publicKeyOrToken":  "",
+                                                                                                   "hasPublicKey":  false,
+                                                                                                   "isRetargetable":  false,
+                                                                                                   "contentType":  "default"
+                                                                                               },
+                                                                                  "name":  "B.dll",
+                                                                                  "ordinal":  0
+                                                                              },
+                                                                   "namespaceName":  "Shared",
+                                                                   "metadataName":  "Fault`1",
+                                                                   "typeArguments":  [
+                                                                                         {
+                                                                                             "kind":  "named",
+                                                                                             "namedTypeKind":  "structure",
+                                                                                             "assembly":  {
+                                                                                                              "name":  "System.Private.CoreLib",
+                                                                                                              "versionMajor":  8,
+                                                                                                              "versionMinor":  0,
+                                                                                                              "versionBuild":  0,
+                                                                                                              "versionRevision":  0,
+                                                                                                              "cultureName":  "",
+                                                                                                              "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                              "hasPublicKey":  true,
+                                                                                                              "isRetargetable":  false,
+                                                                                                              "contentType":  "default"
+                                                                                                          },
+                                                                                             "module":  {
+                                                                                                            "assembly":  {
+                                                                                                                             "name":  "System.Private.CoreLib",
+                                                                                                                             "versionMajor":  8,
+                                                                                                                             "versionMinor":  0,
+                                                                                                                             "versionBuild":  0,
+                                                                                                                             "versionRevision":  0,
+                                                                                                                             "cultureName":  "",
+                                                                                                                             "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                             "hasPublicKey":  true,
+                                                                                                                             "isRetargetable":  false,
+                                                                                                                             "contentType":  "default"
+                                                                                                                         },
+                                                                                                            "name":  "System.Private.CoreLib.dll",
+                                                                                                            "ordinal":  0
+                                                                                                        },
+                                                                                             "namespaceName":  "System",
+                                                                                             "metadataName":  "Int32",
+                                                                                             "typeArguments":  [
+
+                                                                                                               ],
+                                                                                             "isUnboundGenericType":  false,
+                                                                                             "isNativeIntegerType":  false,
+                                                                                             "arrayRank":  0,
+                                                                                             "functionPointerParameters":  [
+
+                                                                                                                           ]
+                                                                                         }
+                                                                                     ],
+                                                                   "isUnboundGenericType":  false,
+                                                                   "isNativeIntegerType":  false,
+                                                                   "arrayRank":  0,
+                                                                   "functionPointerParameters":  [
+
+                                                                                                 ]
+                                                               },
+                                                    "caught":  {
+                                                                   "kind":  "named",
+                                                                   "namedTypeKind":  "class",
+                                                                   "assembly":  {
+                                                                                    "name":  "B",
+                                                                                    "versionMajor":  0,
+                                                                                    "versionMinor":  0,
+                                                                                    "versionBuild":  0,
+                                                                                    "versionRevision":  0,
+                                                                                    "cultureName":  "",
+                                                                                    "publicKeyOrToken":  "",
+                                                                                    "hasPublicKey":  false,
+                                                                                    "isRetargetable":  false,
+                                                                                    "contentType":  "default"
+                                                                                },
+                                                                   "module":  {
+                                                                                  "assembly":  {
+                                                                                                   "name":  "B",
+                                                                                                   "versionMajor":  0,
+                                                                                                   "versionMinor":  0,
+                                                                                                   "versionBuild":  0,
+                                                                                                   "versionRevision":  0,
+                                                                                                   "cultureName":  "",
+                                                                                                   "publicKeyOrToken":  "",
+                                                                                                   "hasPublicKey":  false,
+                                                                                                   "isRetargetable":  false,
+                                                                                                   "contentType":  "default"
+                                                                                               },
+                                                                                  "name":  "B.dll",
+                                                                                  "ordinal":  0
+                                                                              },
+                                                                   "namespaceName":  "Shared",
+                                                                   "metadataName":  "Fault`1",
+                                                                   "typeArguments":  [
+                                                                                         {
+                                                                                             "kind":  "named",
+                                                                                             "namedTypeKind":  "class",
+                                                                                             "assembly":  {
+                                                                                                              "name":  "System.Private.CoreLib",
+                                                                                                              "versionMajor":  8,
+                                                                                                              "versionMinor":  0,
+                                                                                                              "versionBuild":  0,
+                                                                                                              "versionRevision":  0,
+                                                                                                              "cultureName":  "",
+                                                                                                              "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                              "hasPublicKey":  true,
+                                                                                                              "isRetargetable":  false,
+                                                                                                              "contentType":  "default"
+                                                                                                          },
+                                                                                             "module":  {
+                                                                                                            "assembly":  {
+                                                                                                                             "name":  "System.Private.CoreLib",
+                                                                                                                             "versionMajor":  8,
+                                                                                                                             "versionMinor":  0,
+                                                                                                                             "versionBuild":  0,
+                                                                                                                             "versionRevision":  0,
+                                                                                                                             "cultureName":  "",
+                                                                                                                             "publicKeyOrToken":  "00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB",
+                                                                                                                             "hasPublicKey":  true,
+                                                                                                                             "isRetargetable":  false,
+                                                                                                                             "contentType":  "default"
+                                                                                                                         },
+                                                                                                            "name":  "System.Private.CoreLib.dll",
+                                                                                                            "ordinal":  0
+                                                                                                        },
+                                                                                             "namespaceName":  "System",
+                                                                                             "metadataName":  "String",
+                                                                                             "typeArguments":  [
+
+                                                                                                               ],
+                                                                                             "isUnboundGenericType":  false,
+                                                                                             "isNativeIntegerType":  false,
+                                                                                             "arrayRank":  0,
+                                                                                             "functionPointerParameters":  [
+
+                                                                                                                           ]
+                                                                                         }
+                                                                                     ],
+                                                                   "isUnboundGenericType":  false,
+                                                                   "isNativeIntegerType":  false,
+                                                                   "arrayRank":  0,
+                                                                   "functionPointerParameters":  [
+
+                                                                                                 ]
+                                                               },
+                                                    "incorrectlySuppressed":  true,
+                                                    "productionRepaired":  false
+                                                }
+                          },
+    "RetainedAttempts":  [
+                             {
+                                 "Name":  "candidate-initial-not-accepted",
+                                 "Total":  52,
+                                 "Passed":  49,
+                                 "Failed":  3,
+                                 "ExpectedFailed":  3,
+                                 "Skipped":  0,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25a\\tests\\ownership-first.trx",
+                                                  "Sha256":  "6A4FA447CEF6BDD79B8549CFF409485D7E786199993E10F5F3C88BC1DDC9C161"
+                                              }
+                             },
+                             {
+                                 "Name":  "nested-catch-diagnostic-confirmed-failure",
+                                 "Total":  1,
+                                 "Passed":  0,
+                                 "Failed":  1,
+                                 "ExpectedFailed":  1,
+                                 "Skipped":  0,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25a\\tests\\nested-catch-diagnostic.trx",
+                                                  "Sha256":  "2D36D2469922BCEE385ECD0708564DE9A3227E1BB77A07EBC22FE245D0CD47D4"
+                                              }
+                             },
+                             {
+                                 "Name":  "fresh-probe-genuine-two-three-project-owner-parity",
+                                 "Total":  2,
+                                 "Passed":  2,
+                                 "Failed":  0,
+                                 "ExpectedFailed":  0,
+                                 "Skipped":  0,
+                                 "Artifact":  {
+                                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a\\candidate\\artifacts\\p5o2b25a\\tests\\candidate-fresh-probe.trx",
+                                                  "Sha256":  "EE47367C9B22B4C9FCAF41362CA95197FFE7CE0DC11DD4FA5296D3E78EBD2205"
+                                              }
+                             }
+                         ]
+}
