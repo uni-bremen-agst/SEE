@@ -19,6 +19,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using MoreLinq;
 
 namespace SEE.UI
 {
@@ -451,11 +452,15 @@ namespace SEE.UI
             sfxToggle.isOn = !audioManager.SoundEffectsMuted;
             remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
             remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+            echoCancellationToggle.isOn = UserSetting.Instance.Audio.Microphone.EchoCancellation;
+            noiseSuppressionToggle.isOn = UserSetting.Instance.Audio.Microphone.NoiseSuppression;
+            autoGainControlToggle.isOn = UserSetting.Instance.Audio.Microphone.AutoGainControl;
 
             foreach (string mic in UnityEngine.Microphone.devices)
             {
                 microphoneDropdown.options.Add(new Dropdown.OptionData(mic));
             }
+            microphoneDropdown.value = UnityEngine.Microphone.devices.ToList().IndexOf(UserSetting.Instance.Audio.Microphone.MicrophoneDevice);
 
             microphoneDropdown.onValueChanged.AddListener((value) =>
             {
