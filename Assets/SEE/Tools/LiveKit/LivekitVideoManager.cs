@@ -19,7 +19,6 @@ using System.Linq;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Categorization;
 using RoomOptions = LiveKit.RoomOptions;
 
 namespace SEE.Tools.LiveKit
@@ -564,7 +563,14 @@ namespace SEE.Tools.LiveKit
 
             PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(publishedAudioTrack, options);
             yield return publish;
-
+            if (publish.IsError)
+            {
+                ShowNotification.Error("Livekit error", "Publishing audio failed");
+                Destroy(livekitMicrophone);
+                publishedAudioTrack = null;
+                rtcSource.Dispose();
+                yield break;
+            }
             if (!publish.IsError)
             {
                 Debug.Log("Track published!");
