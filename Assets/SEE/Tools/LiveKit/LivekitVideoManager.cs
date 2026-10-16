@@ -531,9 +531,16 @@ namespace SEE.Tools.LiveKit
                 yield break;
             }
 
+            if (!UnityEngine.Microphone.devices.Any())
+            {
+                ShowNotification.Error("Livekit error", "No microphones are available");
+                yield break;
+            }
+
             Debug.Log("Publishing microphone using Unity Audio\n");
 
             livekitMicrophone = new GameObject("my-audio-source");
+
             string microphone = UnityEngine.Microphone.devices.FirstOrDefault(x => x == UserSetting.Instance.Audio.Microphone.MicrophoneDevice) ?? UnityEngine.Microphone.devices[0];
 
             AudioProcessingOptions processing = new AudioProcessingOptions

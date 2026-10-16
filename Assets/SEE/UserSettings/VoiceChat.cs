@@ -33,7 +33,7 @@ namespace SEE.UserSettings
                     EnableDissonance(false);
                     break;
                 case VoiceChatSystems.LiveKit:
-                    // Nothing to do here
+                    EnableDissonance(false);
                     break;
                 default:
                     EnableDissonance(false);
