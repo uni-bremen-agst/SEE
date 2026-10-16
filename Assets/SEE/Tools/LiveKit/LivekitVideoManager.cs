@@ -698,7 +698,7 @@ namespace SEE.Tools.LiveKit
                 StartCoroutine(stream.Update()); // Continuously update the video stream.
                 videoStreams.Add(stream); // Add the stream to the list of active video streams.
             }
-            else if (track is RemoteAudioTrack audioTrack)
+            else if (track is RemoteAudioTrack audioTrack && UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
             {
                 Debug.Log("[LiveKit] Audio TrackSubscribed for " + participant.Identity);
 
