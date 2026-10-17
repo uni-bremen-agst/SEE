@@ -189,7 +189,7 @@
       }
     },
     "com.unity.netcode.gameobjects": {
-      "version": "2.13.1",
+      "version": "2.13.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
