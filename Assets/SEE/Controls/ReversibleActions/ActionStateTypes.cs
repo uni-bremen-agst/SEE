@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 using SEE.Utils;
 using SEE.Extensions;
 using SEE.Controls.ReversibleActions.HolisticMetrics;
@@ -66,6 +67,11 @@ namespace SEE.Controls.ReversibleActions
         {
             // IMPORTANT NOTE: The order of the following field assignments must be exaclty
             // the same as the order of their declarations below.
+
+            MarkNode =
+              new("Mark Node", "Mark a node",
+                  Color.white.Darker(), Icons.Brush,
+                  MarkAction.CreateReversibleAction);
 
             Move =
               new("Move", "Move a node within a graph",
@@ -308,6 +314,7 @@ namespace SEE.Controls.ReversibleActions
         // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
         // as the order of their assignments in the static constructor above.
 
+        public static readonly ActionStateType MarkNode;
         public static readonly ActionStateType Move;
         public static readonly ActionStateType Hide;
         public static readonly ActionStateType NewEdge;
