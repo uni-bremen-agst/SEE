@@ -132,14 +132,9 @@ namespace SEE.Controls.ReversibleActions
         /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (targetNode != null)
-            {
-                return new HashSet<string> { targetNode.ID() };
-            }
-            else
-            {
-                return new();
-            }
+            return targetNode != null
+                ? new HashSet<string> { targetNode.ID() }
+                : new();
         }
     }
 }
