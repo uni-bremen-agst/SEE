@@ -1,49 +1,48 @@
 ﻿using SEE.Extensions;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace SEE.SceneManipulation
 {
     /// <summary>
-    /// provide the necessary functions to create and destroy the sphere for the marking
+    /// Provides the necessary functions to create and destroy the sphere for the marking of a node.
     /// </summary>
     public static class GameNodeMarker
-    { 
-        public static void MarkingNode(GameObject node)
+    {
+
+        /// <summary>
+        /// Toggles the marking of the given <paramref name="node"/>: if the node is not
+        /// yet marked, a sphere is created above it whose diameter is the minimum of the
+        /// node's width and depth and whose bottom touches the node's roof. If the node
+        /// is already marked, the sphere is destroyed.
+        /// </summary>
+        /// <param name="node">The game node to be marked or unmarked.</param>
+        public static void ToggleMark(GameObject node)
         {
-            Transform find = node.transform.Find("kugel");
+            Transform existingSphere = node.transform.Find("MarkingSphere");
 
-            if (find != null)
+            if (existingSphere != null)
             {
-                //Marker erkennt, dass beim 2. Klick kugel vorhanden ist und löscht sie 
-                Destroyer.Destroy(find.gameObject);
+                Destroyer.Destroy(existingSphere.gameObject);
 
-            } 
+            }
             else
             {
-                //Kugel erstellen
-                Vector3 grosse = node.WorldSpaceSize();
-                float durchmesser = Mathf.Min(grosse.x, grosse.z); //breite, tiefe
+                Vector3 nodeSize = node.WorldSpaceSize();
+                float diameter = Mathf.Min(nodeSize.x, nodeSize.z);
 
-                // GetTop: bestimmt Mitte des Node
-                Vector3 mitte = node.GetTop();
+                Vector3 top = node.GetTop();
 
-                GameObject kugel = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                kugel.transform.localScale = new Vector3(durchmesser, durchmesser, durchmesser);
-                mitte.y = mitte.y + durchmesser / 2;
-                kugel.transform.position = mitte;
-                kugel.name = "kugel";
-                kugel.transform.SetParent(node.transform); //kugel als kind von node
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.transform.localScale = new Vector3(diameter, diameter, diameter);
+                top.y = top.y + diameter / 2;
+                sphere.transform.position = top;
+                sphere.name = "MarkingSphere";
+                sphere.transform.SetParent(node.transform);
 
             }
 
-
-
-
         }
-        
+
     }
 }
