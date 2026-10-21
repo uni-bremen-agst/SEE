@@ -36,7 +36,6 @@ namespace SEE.SceneManipulation
                 sphere.transform.localScale = Vector3.one * diameter;
 
                 Vector3 top = node.GetTop();
-                
                 sphere.transform.position = top + Vector3.up * (diameter / 2f);
                 sphere.transform.SetParent(node.transform, true);
             }
