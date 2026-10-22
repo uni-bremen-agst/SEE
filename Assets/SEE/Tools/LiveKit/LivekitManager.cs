@@ -12,11 +12,11 @@ using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UserSettings;
 using SEE.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 using RoomOptions = LiveKit.RoomOptions;
@@ -24,8 +24,8 @@ using RoomOptions = LiveKit.RoomOptions;
 namespace SEE.Tools.LiveKit
 {
     /// <summary>
-    /// Manages LiveKit video streams and plays them via the LivekitVideo object in the player objects.
-    /// Handles publishing/unpublishing local video, subscribing/unsubscribing to remote video,
+    /// Manages LiveKit video and audio streams and plays them via the LivekitVideo object in the player objects.
+    /// Handles publishing/unpublishing local video/audio, subscribing/unsubscribing to remote video/audio,
     /// and switching between available camera devices.
     /// </summary>
     /// <remarks>
@@ -53,11 +53,6 @@ namespace SEE.Tools.LiveKit
         private LocalAudioTrack publishedAudioTrack = null;
 
         /// <summary>
-        /// The gameobject the microphone of the local player is attached to.
-        /// </summary>
-        private GameObject localAudioObject;
-
-        /// <summary>
         /// The WebCamTexture used to capture the video stream from the selected camera.
         /// </summary>
         private WebCamTexture webCamTexture = null;
@@ -67,6 +62,9 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private readonly List<RtcVideoSource> rtcVideoSources = new();
 
+        /// <summary>
+        /// Audio source from the local microphone.
+        /// </summary>
         private RtcAudioSource rtcAudioSource;
 
         /// <summary>
@@ -96,6 +94,9 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         public ConnectionStatus ConnectionState { get; private set; }
 
+        /// <summary>
+        /// Game object that records the local microphone.
+        /// </summary>
         private GameObject livekitMicrophone;
 
         /// <summary>
@@ -112,6 +113,11 @@ namespace SEE.Tools.LiveKit
         /// Livekit Topic name on which file delete messages will be sent.
         /// </summary>
         private const string fileDeleteTopicName = "file-delete";
+
+        /// <summary>
+        /// Lock to ensure only one connection attempt can be made at the same time.
+        /// </summary>
+        private readonly SemaphoreSlim connectionLock = new(1, 1);
 
         /// <summary>
         /// Represents the connection status to the LiveKit room.
@@ -136,7 +142,7 @@ namespace SEE.Tools.LiveKit
             }
             if (UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
             {
-                StartCoroutine(ConnectAndPublish(publishAudio: false, publishVideo: false));
+                StartCoroutine(FetchTokenAndJoinRoomAsync().ToCoroutine());
             }
         }
 
@@ -213,6 +219,10 @@ namespace SEE.Tools.LiveKit
             }
         }
 
+        /// <summary>
+        /// Unpublishes the audio and removes all audio sources.
+        /// </summary>
+        /// <returns>A coroutine to manage the operation</returns>
         private IEnumerator UnpublishAudio()
         {
             if (publishedAudioTrack == null)
@@ -220,7 +230,6 @@ namespace SEE.Tools.LiveKit
                 yield break;
             }
 
-            // Unpublish the audio track from the room.
             UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedAudioTrack, true);
             yield return unpublish;
 
@@ -231,15 +240,11 @@ namespace SEE.Tools.LiveKit
             }
             rtcAudioSource.Stop();
             rtcAudioSource.Dispose();
-
-            if (localAudioObject != null)
-            {
-                Destroy(localAudioObject);
-                localAudioObject = null;
-            }
+            rtcAudioSource = null;
 
             publishedAudioTrack = null;
             Destroy(livekitMicrophone);
+            livekitMicrophone = null;
             UIOverlay.SetLiveKitAudioActive(false);
         }
 
@@ -333,30 +338,46 @@ namespace SEE.Tools.LiveKit
         /// <returns>Coroutine to handle the asynchronous token request process.</returns>
         public async UniTask FetchTokenAndJoinRoomAsync()
         {
-            if (!await BackendSyncUtil.LogInAsync())
+            using (LoadingSpinner.ShowIndeterminate("Establishing LiveKit connection..."))
             {
-                return;
-            }
-            ConnectionState = ConnectionStatus.Disconnected;
-            // Send a GET request to the token server to retrieve the token for this client.
-            string uri = $"{UserSetting.BackendServerAPI}" +
-                $"server/livekitToken?id={Network.ServerId}" +
-                $"&participantId={NetworkManager.Singleton.LocalClientId}";
-            Net.Util.Logger.Log($"Try Connecting to Livekit server at: {uri}");
-            using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
-            // Wait for the request to complete.
-            await www.SendWebRequest();
+                await connectionLock.WaitAsync();
+                try
+                {
+                    if (IsConnected())
+                    {
+                        return;
+                    }
 
-            // Check if the request was successful.
-            if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
-            {
-                // Token received, proceed to join the room using the received token.
-                await JoinRoomAsync(www.downloadHandler.text);
-            }
-            else
-            {
-                ShowNotification.Error("LiveKit", $"Failed to get token from {uri}: {www.error}.");
-                ConnectionState = ConnectionStatus.TokenFailed;
+                    if (!await BackendSyncUtil.LogInAsync())
+                    {
+                        return;
+                    }
+                    ConnectionState = ConnectionStatus.Disconnected;
+                    // Send a GET request to the token server to retrieve the token for this client.
+                    string uri = $"{UserSetting.BackendServerAPI}" +
+                        $"server/livekitToken?id={Network.ServerId}" +
+                        $"&participantId={NetworkManager.Singleton.LocalClientId}";
+                    Net.Util.Logger.Log($"Try Connecting to Livekit server at: {uri}");
+                    using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
+                    // Wait for the request to complete.
+                    await www.SendWebRequest();
+
+                    // Check if the request was successful.
+                    if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+                    {
+                        // Token received, proceed to join the room using the received token.
+                        await JoinRoomAsync(www.downloadHandler.text);
+                    }
+                    else
+                    {
+                        ShowNotification.Error("LiveKit", $"Failed to get token from {uri}: {www.error}.");
+                        ConnectionState = ConnectionStatus.TokenFailed;
+                    }
+                }
+                finally
+                {
+                    connectionLock.Release();
+                }
             }
         }
 
@@ -378,6 +399,7 @@ namespace SEE.Tools.LiveKit
             // Subscribe to events related to track management.
             room.TrackSubscribed += TrackSubscribed;
             room.TrackUnsubscribed += UnTrackSubscribed;
+            room.Disconnected += HandleRoomDisconnected;
 
             room.DataReceived += (data, participant, kind, topic) =>
             {
@@ -445,6 +467,32 @@ namespace SEE.Tools.LiveKit
         private bool IsConnected() => room != null && room.IsConnected;
 
         /// <summary>
+        /// Releases local media when the server disconnects the current room, allowing the
+        /// next microphone toggle to establish a new connection.
+        /// </summary>
+        /// <param name="disconnectedRoom">The room whose connection ended.</param>
+        private void HandleRoomDisconnected(Room disconnectedRoom)
+        {
+            if (room != disconnectedRoom)
+            {
+                return;
+            }
+
+            disconnectedRoom.TrackSubscribed -= TrackSubscribed;
+            disconnectedRoom.TrackUnsubscribed -= UnTrackSubscribed;
+            disconnectedRoom.Disconnected -= HandleRoomDisconnected;
+            room = null;
+            ConnectionState = ConnectionStatus.Disconnected;
+
+            if (publishedVideoTrack != null)
+            {
+                WebcamManager.Release();
+                publishedVideoTrack = null;
+            }
+            CleanUp();
+        }
+
+        /// <summary>
         /// Disconnects from the LiveKit room, stops publishing, cleans up resources,
         /// and updates the connection state.
         /// </summary>
@@ -463,6 +511,7 @@ namespace SEE.Tools.LiveKit
             {
                 room.TrackSubscribed -= TrackSubscribed;
                 room.TrackUnsubscribed -= UnTrackSubscribed;
+                room.Disconnected -= HandleRoomDisconnected;
                 room.Disconnect();
                 room = null;
             }
@@ -542,6 +591,10 @@ namespace SEE.Tools.LiveKit
             }
         }
 
+        /// <summary>
+        /// Publishes the local audio.
+        /// </summary>
+        /// <returns>A coroutines to manage the operation.</returns>
         private IEnumerator PublishAudio()
         {
             if (room == null || !room.IsConnected)
@@ -575,6 +628,8 @@ namespace SEE.Tools.LiveKit
             };
 
             MicrophoneSource rtcSource = new MicrophoneSource(microphone, livekitMicrophone, processing);
+            // Own the source before yielding so a disconnect can dispose pending capture too.
+            rtcAudioSource = rtcSource;
             publishedAudioTrack = LocalAudioTrack.CreateAudioTrack($"{UserSetting.Instance.Player.PlayerName}-audio-track", rtcSource, room);
 
             TrackPublishOptions options = new TrackPublishOptions
@@ -588,19 +643,25 @@ namespace SEE.Tools.LiveKit
 
             PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(publishedAudioTrack, options);
             yield return publish;
+            if (rtcAudioSource != rtcSource)
+            {
+                // The room disconnected while publication was pending.
+                yield break;
+            }
             if (publish.IsError)
             {
                 ShowNotification.Error("Livekit error", "Publishing audio failed");
                 Destroy(livekitMicrophone);
+                livekitMicrophone = null;
                 publishedAudioTrack = null;
                 rtcSource.Dispose();
+                rtcAudioSource = null;
                 yield break;
             }
             if (!publish.IsError)
             {
                 Debug.Log("Track published!");
             }
-            rtcAudioSource = rtcSource;
             rtcSource.Start();
             UIOverlay.SetLiveKitAudioActive(true);
         }
@@ -614,25 +675,22 @@ namespace SEE.Tools.LiveKit
         /// </returns>
         private IEnumerator ConnectAndPublish(bool publishVideo, bool publishAudio)
         {
-            using (LoadingSpinner.ShowIndeterminate("Establishing LiveKit connection..."))
+            if (room == null || !room.IsConnected)
             {
-                if (room == null || !room.IsConnected)
-                {
-                    yield return StartCoroutine(FetchTokenAndJoinRoomAsync().ToCoroutine());
-                    // wait one frame to allow room state update.
-                    yield return null;
-                }
+                yield return StartCoroutine(FetchTokenAndJoinRoomAsync().ToCoroutine());
+                // wait one frame to allow room state update.
+                yield return null;
+            }
 
-                if (IsConnected())
+            if (IsConnected())
+            {
+                if (publishVideo)
                 {
-                    if (publishVideo)
-                    {
-                        yield return StartCoroutine(PublishVideo());
-                    }
-                    if (publishAudio)
-                    {
-                        yield return StartCoroutine(PublishAudio());
-                    }
+                    yield return StartCoroutine(PublishVideo());
+                }
+                if (publishAudio)
+                {
+                    yield return StartCoroutine(PublishAudio());
                 }
             }
         }
@@ -803,7 +861,7 @@ namespace SEE.Tools.LiveKit
 
         #region Cleanup Methods
         /// <summary>
-        /// Cleans up all video-related objects and stops all video streams and RTC sources.
+        /// Cleans up local capture objects and stops all audio/video streams and RTC sources.
         /// </summary>
         private void CleanUp()
         {
@@ -827,10 +885,10 @@ namespace SEE.Tools.LiveKit
             publishedAudioTrack = null;
             UIOverlay.SetLiveKitAudioActive(false);
 
-            if (localAudioObject != null)
+            if (livekitMicrophone != null)
             {
-                Destroy(localAudioObject);
-                localAudioObject = null;
+                Destroy(livekitMicrophone);
+                livekitMicrophone = null;
             }
 
             foreach (AudioStream audioStream in audioStreams.Values)
