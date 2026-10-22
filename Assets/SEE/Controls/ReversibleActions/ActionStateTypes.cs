@@ -71,7 +71,7 @@ namespace SEE.Controls.ReversibleActions
               new("Mark", "Mark a selected node",
                   Color.magenta.Darker(), Icons.CircleExclamationMark,
                   MarkAction.CreateReversibleAction);
-            
+
             Move =
               new("Move", "Move a node within a graph",
                   Color.red.Darker(), Icons.Move,
