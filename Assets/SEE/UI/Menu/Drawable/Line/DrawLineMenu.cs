@@ -112,8 +112,6 @@ namespace SEE.UI.Menu.Drawable.Line
             SetUpFillOutSwitch();
 
             SelectPrimaryColor();
-
-            MenuHelper.CalculateHeight(lineMenu, true);
         }
 
         /// <summary>

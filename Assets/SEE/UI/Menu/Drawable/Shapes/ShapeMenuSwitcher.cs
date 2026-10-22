@@ -1,7 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
 using UnityEngine;
 
@@ -101,9 +100,6 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     LineConf.Get(currentPreviewShape),
                     lineCapsChanged: SynchronizePreviewLineCaps);
             }
-
-            MenuHelper.CalculateHeight(
-                LineMenu.Instance.GameObject);
 
             BindLineMenu();
 
