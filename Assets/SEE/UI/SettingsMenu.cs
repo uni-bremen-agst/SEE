@@ -308,7 +308,7 @@ namespace SEE.UI
             ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
             disconnectGO.SetActive(false);
 
-            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitManager liveKitVideoManager))
             {
                 UpdateLiveKitSettings();
 
@@ -364,26 +364,26 @@ namespace SEE.UI
                         liveKitVideoManager.FetchTokenAndJoinRoomAsync().ToCoroutine()
                     );
 
-                    while (liveKitVideoManager.ConnectionState == LiveKitVideoManager.ConnectionStatus.Disconnected)
+                    while (liveKitVideoManager.ConnectionState == LiveKitManager.ConnectionStatus.Disconnected)
                     {
                         yield return null;
                     }
 
                     switch (liveKitVideoManager.ConnectionState)
                     {
-                        case LiveKitVideoManager.ConnectionStatus.Connected:
+                        case LiveKitManager.ConnectionStatus.Connected:
                             connectGO.SetActive(false);
                             disconnectGO.SetActive(true);
                             liveKitURLInputField.SetNormalState();
                             roomNameInputField.SetNormalState();
                             tokenURLInputField.SetNormalState();
                             break;
-                        case LiveKitVideoManager.ConnectionStatus.TokenFailed:
+                        case LiveKitManager.ConnectionStatus.TokenFailed:
                             tokenURLInputField.SetErrorState();
                             liveKitURLInputField.SetNormalState();
                             roomNameInputField.SetNormalState();
                             break;
-                        case LiveKitVideoManager.ConnectionStatus.RoomConnectionFailed:
+                        case LiveKitManager.ConnectionStatus.RoomConnectionFailed:
                             liveKitURLInputField.SetErrorState();
                             roomNameInputField.SetErrorState();
                             tokenURLInputField.SetNormalState();

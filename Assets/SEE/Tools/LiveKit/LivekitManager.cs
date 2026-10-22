@@ -35,7 +35,7 @@ namespace SEE.Tools.LiveKit
     /// can be edited in the <see cref="UserSetting"/> component in the SEEStart scene,
     /// where the UserSettings component is attached to the NetworkManager.
     /// /remarks>
-    public class LiveKitVideoManager : MonoBehaviour
+    public class LiveKitManager : MonoBehaviour
     {
         /// <summary>
         /// The LiveKit room object that manages connection and tracks.
