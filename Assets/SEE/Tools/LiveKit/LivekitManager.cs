@@ -240,7 +240,7 @@ namespace SEE.Tools.LiveKit
 
             publishedAudioTrack = null;
             Destroy(livekitMicrophone);
-            UIOverlay.ToggleLiveKitAudio();
+            UIOverlay.SetLiveKitAudioActive(false);
         }
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace SEE.Tools.LiveKit
             }
             rtcAudioSource = rtcSource;
             rtcSource.Start();
-            UIOverlay.ToggleLiveKitAudio();
+            UIOverlay.SetLiveKitAudioActive(true);
         }
 
         /// <summary>
@@ -820,10 +820,12 @@ namespace SEE.Tools.LiveKit
                 videoStream.Stop();
             }
             videoStreams.Clear();
-            rtcAudioSource.Stop();
-            rtcAudioSource.Dispose();
+            rtcAudioSource?.Stop();
+            rtcAudioSource?.Dispose();
+            rtcAudioSource = null;
 
             publishedAudioTrack = null;
+            UIOverlay.SetLiveKitAudioActive(false);
 
             if (localAudioObject != null)
             {

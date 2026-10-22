@@ -189,6 +189,7 @@ namespace SEE.UI
             DeactivateWebcam();
             SetBodyAnimatorActive(false);
             SetLiveKitActive(false);
+            SetLiveKitAudioActive(false);
         }
 
         /// <summary>
@@ -254,10 +255,13 @@ namespace SEE.UI
             livekitVideo.SetActive(!isActive, activeColor, inactiveColor);
         }
 
-        public static void ToggleLiveKitAudio()
+        /// <summary>
+        /// Sets the LiveKit microphone indicator to the given publishing state.
+        /// </summary>
+        /// <param name="active">Whether microphone audio is being published.</param>
+        public static void SetLiveKitAudioActive(bool active)
         {
-            bool isActive = livekitAudio.Text.color == activeColor;
-            livekitAudio.SetActive(!isActive, activeColor, inactiveColor);
+            livekitAudio.SetActive(active, activeColor, inactiveColor);
         }
         #endregion
     }
