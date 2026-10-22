@@ -22,7 +22,6 @@ namespace SEE.Controls.ReversibleActions
         private GameObject markedGameNode;
 
         private Memento memento;
-        
         private struct Memento
         {
             public bool WasMarked;
