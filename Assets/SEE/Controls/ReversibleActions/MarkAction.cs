@@ -35,7 +35,6 @@ namespace SEE.Controls.ReversibleActions
         public override bool Update()
         {
             bool result = false;
-            
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
