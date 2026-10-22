@@ -556,7 +556,7 @@ namespace SEE.Tools.LiveKit
             {
                 AudioEncoding = new AudioEncoding
                 {
-                    MaxBitrate = UserSetting.Instance.Audio.Microphone.MaxBitrate
+                    MaxBitrate = (ulong)UserSetting.Instance.Audio.Microphone.MaxBitrate
                 },
                 Source = TrackSource.SourceMicrophone
             };

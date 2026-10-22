@@ -16,7 +16,7 @@ namespace SEE.UserSettings
         /// <summary>
         /// Maximal bitrate to use for microphone.
         /// </summary>
-        public ulong MaxBitrate = 64000;
+        public int MaxBitrate = 64000;
 
         /// <summary>
         /// Whenever echo cancellation should be enabled.
