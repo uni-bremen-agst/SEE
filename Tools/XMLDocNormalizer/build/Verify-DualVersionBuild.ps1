@@ -258,6 +258,12 @@ try {
         Invoke-DotNet 'main-assembly-qualified-ownership-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowAssemblyQualifiedOwnershipTests', '--logger', 'trx;LogFileName=assembly-qualified-ownership.trx', '--results-directory', $evidenceRoot)
         # B25A2 boundary audit: preserve real compiler/summary construction-loss witnesses, not a production repair.
         Invoke-DotNet 'main-canonical-exception-identity-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowCanonicalExceptionIdentityTests', '--logger', 'trx;LogFileName=canonical-exception-identity.trx', '--results-directory', $evidenceRoot)
+        # B25A3 stop audit: exact constructed recursion needs a bounded expansion contract, not definition folding or an arbitrary limit.
+        Invoke-DotNet 'main-constructed-invocation-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowConstructedInvocationContextTests', '--logger', 'trx;LogFileName=constructed-invocation-context.trx', '--results-directory', $evidenceRoot)
+        # B25A4 stop audit: finite recursive results must not be reused before SCC closure.
+        Invoke-DotNet 'main-bounded-generic-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowBoundedGenericContextTests', '--logger', 'trx;LogFileName=bounded-generic-context.trx', '--results-directory', $evidenceRoot)
+        # B25A5: completed recursive results retain their SCC ancestor-exclusion context.
+        Invoke-DotNet 'main-recursive-summary-closure-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowRecursiveSummaryClosureTests', '--logger', 'trx;LogFileName=recursive-summary-closure.trx', '--results-directory', $evidenceRoot)
         $mainBoundaryExecuted = $true
     }
     $result = [ordered]@{

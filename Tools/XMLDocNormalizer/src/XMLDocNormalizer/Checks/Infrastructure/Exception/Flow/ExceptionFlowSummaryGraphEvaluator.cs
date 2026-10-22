@@ -18,9 +18,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// without recursive CLR method calls.
         /// </summary>
         /// <remarks>
-        /// Each reachable context-sensitive node is evaluated at most once
-        /// for the current root. Completed target results are reused when
-        /// multiple call paths converge on the same graph node.
+        /// Completed results are reused for the same node and the same
+        /// excluded ancestors within its strongly connected component.
+        /// Acyclic nodes retain node-only reuse. Recursive intermediate
+        /// results are never published as unrestricted node summaries.
         /// </remarks>
         /// <param name="graph">
         /// The summary graph containing the root and every discovered target.
@@ -41,9 +42,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 Compilation rootCompilation)
         {
             Dictionary<
-                ExceptionFlowCallableKey,
+                (ExceptionFlowCallableKey Key, string ExcludedMembers),
                 SummaryEvaluationFrame> completedFrames =
                     new();
+
+            Dictionary<ExceptionFlowCallableKey, (int Component, int Member)>
+                components = FindSummaryComponents(graph, rootKey);
+
+            Dictionary<int, SortedSet<int>> activeComponentMembers = new();
 
             HashSet<ExceptionFlowCallableKey> activeKeys =
                 new();
@@ -69,6 +75,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         rootCompilation,
                         activeKeys);
 
+                    var membership = components[frame.Key];
+                    if (!activeComponentMembers.TryGetValue(membership.Component, out var members))
+                    {
+                        members = new SortedSet<int>();
+                        activeComponentMembers.Add(membership.Component, members);
+                    }
+                    members.Add(membership.Member);
+
                     if (frame.Summary == null ||
                         !frame.Summary.HasExecutableBody)
                     {
@@ -76,6 +90,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             frames,
                             activeKeys,
                             completedFrames,
+                            components,
+                            activeComponentMembers,
                             rootCompilation);
 
                         continue;
@@ -92,6 +108,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         frames,
                         activeKeys,
                         completedFrames,
+                        components,
+                        activeComponentMembers,
                         rootCompilation);
 
                     continue;
@@ -106,11 +124,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (activeKeys.Contains(
                         edge.Target))
                 {
+                    // Cycle-erased path exclusion, not a read of an active
+                    // frame's provisional result. Every dependent cache key
+                    // retains the relevant ancestor exclusions below.
                     continue;
                 }
 
+                int targetComponent = components[edge.Target].Component;
+                string excludedMembers = activeComponentMembers.TryGetValue(targetComponent, out var excluded)
+                    ? string.Join(",", excluded)
+                    : string.Empty;
+
                 if (completedFrames.TryGetValue(
-                        edge.Target,
+                        (edge.Target, excludedMembers),
                         out SummaryEvaluationFrame?
                             completedTargetFrame) &&
                     completedTargetFrame != null)
@@ -127,11 +153,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 frames.Push(
                     new SummaryEvaluationFrame(
                         edge.Target,
-                        edge));
+                        edge,
+                        excludedMembers));
             }
 
             if (completedFrames.TryGetValue(
-                    rootKey,
+                    (rootKey, string.Empty),
                     out SummaryEvaluationFrame? rootFrame) &&
                 rootFrame != null)
             {
@@ -139,6 +166,74 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return new ExceptionFlowAnalysisResult();
+        }
+
+        /// <summary>
+        /// Finds reachable strongly connected components using an explicit
+        /// Tarjan stack. IDs follow edge-list discovery, never hash iteration.
+        /// </summary>
+        /// <param name="graph">The frozen summary graph.</param>
+        /// <param name="rootKey">The selected root.</param>
+        /// <returns>Component and unique member IDs for each reachable key.</returns>
+        private static Dictionary<ExceptionFlowCallableKey, (int Component, int Member)> FindSummaryComponents(
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowCallableKey rootKey)
+        {
+            Dictionary<ExceptionFlowCallableKey, int> indices = new();
+            Dictionary<ExceptionFlowCallableKey, int> lowlinks = new();
+            Dictionary<ExceptionFlowCallableKey, (int Component, int Member)> components = new();
+            HashSet<ExceptionFlowCallableKey> pending = new();
+            Stack<ExceptionFlowCallableKey> members = new();
+            Stack<SummaryEvaluationFrame> traversal = new();
+            int nextComponent = 0;
+            traversal.Push(new SummaryEvaluationFrame(rootKey, incomingEdge: null));
+            while (traversal.Count > 0)
+            {
+                SummaryEvaluationFrame frame = traversal.Peek();
+                if (!frame.IsEntered)
+                {
+                    frame.IsEntered = true;
+                    indices.Add(frame.Key, indices.Count);
+                    lowlinks.Add(frame.Key, indices[frame.Key]);
+                    pending.Add(frame.Key);
+                    members.Push(frame.Key);
+                    graph.TryGetSummary(frame.Key, out var summary);
+                    frame.Summary = summary;
+                }
+
+                if (frame.Summary is { HasExecutableBody: true } body && frame.NextEdgeIndex < body.CallEdges.Count)
+                {
+                    ExceptionFlowCallableKey target = body.CallEdges[frame.NextEdgeIndex++].Target;
+                    if (!indices.ContainsKey(target))
+                    {
+                        traversal.Push(new SummaryEvaluationFrame(target, incomingEdge: null));
+                    }
+                    else if (pending.Contains(target))
+                    {
+                        lowlinks[frame.Key] = Math.Min(lowlinks[frame.Key], indices[target]);
+                    }
+                    continue;
+                }
+
+                traversal.Pop();
+                if (lowlinks[frame.Key] == indices[frame.Key])
+                {
+                    ExceptionFlowCallableKey member;
+                    do
+                    {
+                        member = members.Pop();
+                        pending.Remove(member);
+                        components.Add(member, (nextComponent, indices[member]));
+                    }
+                    while (member != frame.Key);
+                    nextComponent++;
+                }
+                if (traversal.TryPeek(out var parent))
+                {
+                    lowlinks[parent.Key] = Math.Min(lowlinks[parent.Key], lowlinks[frame.Key]);
+                }
+            }
+            return components;
         }
 
         /// <summary>
@@ -258,6 +353,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="completedFrames">
         /// The frames already completed for the current root.
         /// </param>
+        /// <param name="components">The component membership of each key.</param>
+        /// <param name="activeComponentMembers">The current path's excluded component members.</param>
         /// <param name="rootCompilation">
         /// The compilation used to normalize caught exception types.
         /// </param>
@@ -265,8 +362,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             Stack<SummaryEvaluationFrame> frames,
             HashSet<ExceptionFlowCallableKey> activeKeys,
             Dictionary<
-                ExceptionFlowCallableKey,
+                (ExceptionFlowCallableKey Key, string ExcludedMembers),
                 SummaryEvaluationFrame> completedFrames,
+            Dictionary<ExceptionFlowCallableKey, (int Component, int Member)> components,
+            Dictionary<int, SortedSet<int>> activeComponentMembers,
             Compilation rootCompilation)
         {
             SummaryEvaluationFrame completedFrame =
@@ -275,8 +374,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             activeKeys.Remove(
                 completedFrame.Key);
 
+            var membership = components[completedFrame.Key];
+            activeComponentMembers[membership.Component].Remove(membership.Member);
+
             completedFrames[
-                completedFrame.Key] =
+                (completedFrame.Key, completedFrame.ExcludedMembers)] =
                     completedFrame;
 
             if (completedFrame.IncomingEdge == null ||
@@ -425,16 +527,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             /// The edge through which the frame was reached, or
             /// <see langword="null"/> for the root.
             /// </param>
+            /// <param name="excludedMembers">The ancestor exclusion context within this SCC.</param>
             public SummaryEvaluationFrame(
                 ExceptionFlowCallableKey key,
-                ExceptionFlowSummaryCallEdge? incomingEdge)
+                ExceptionFlowSummaryCallEdge? incomingEdge,
+                string excludedMembers = "")
             {
                 Key =
                     key;
 
                 IncomingEdge =
                     incomingEdge;
+
+                ExcludedMembers = excludedMembers;
             }
+
+            /// <summary>Gets the closed result's required ancestor exclusions.</summary>
+            /// <value>The sorted component-member IDs, or empty for unrestricted reuse.</value>
+            public string ExcludedMembers { get; }
 
             /// <summary>
             /// Gets the graph-node key represented by the frame.

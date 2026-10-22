@@ -1,0 +1,13 @@
+diff --git a/D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a4/inherited/build/Verify-DualVersionBuild.ps1 b/D:/Repository/SEE/Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1
+index 3bd24b39ff..1ddc425c42 100644
+--- a/D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a4/inherited/build/Verify-DualVersionBuild.ps1
++++ b/D:/Repository/SEE/Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1
+@@ -260,6 +260,8 @@ try {
+         Invoke-DotNet 'main-canonical-exception-identity-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowCanonicalExceptionIdentityTests', '--logger', 'trx;LogFileName=canonical-exception-identity.trx', '--results-directory', $evidenceRoot)
+         # B25A3 stop audit: exact constructed recursion needs a bounded expansion contract, not definition folding or an arbitrary limit.
+         Invoke-DotNet 'main-constructed-invocation-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowConstructedInvocationContextTests', '--logger', 'trx;LogFileName=constructed-invocation-context.trx', '--results-directory', $evidenceRoot)
++        # B25A4 stop audit: finite recursive results must not be reused before SCC closure.
++        Invoke-DotNet 'main-bounded-generic-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowBoundedGenericContextTests', '--logger', 'trx;LogFileName=bounded-generic-context.trx', '--results-directory', $evidenceRoot)
+         $mainBoundaryExecuted = $true
+     }
+     $result = [ordered]@{

@@ -1,0 +1,13 @@
+diff --git a/artifacts/p5o2b25a5/inherited/build/Verify-DualVersionBuild.ps1 b/build/Verify-DualVersionBuild.ps1
+index 1ddc425c42..9601226fb3 100644
+--- a/artifacts/p5o2b25a5/inherited/build/Verify-DualVersionBuild.ps1
++++ b/build/Verify-DualVersionBuild.ps1
+@@ -262,6 +262,8 @@ try {
+         Invoke-DotNet 'main-constructed-invocation-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowConstructedInvocationContextTests', '--logger', 'trx;LogFileName=constructed-invocation-context.trx', '--results-directory', $evidenceRoot)
+         # B25A4 stop audit: finite recursive results must not be reused before SCC closure.
+         Invoke-DotNet 'main-bounded-generic-context-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowBoundedGenericContextTests', '--logger', 'trx;LogFileName=bounded-generic-context.trx', '--results-directory', $evidenceRoot)
++        # B25A5: completed recursive results retain their SCC ancestor-exclusion context.
++        Invoke-DotNet 'main-recursive-summary-closure-tests' @('test', $testProject, '--no-build', '--no-restore', "-p:Configuration=$Configuration", '--filter', 'FullyQualifiedName~ExceptionFlowRecursiveSummaryClosureTests', '--logger', 'trx;LogFileName=recursive-summary-closure.trx', '--results-directory', $evidenceRoot)
+         $mainBoundaryExecuted = $true
+     }
+     $result = [ordered]@{

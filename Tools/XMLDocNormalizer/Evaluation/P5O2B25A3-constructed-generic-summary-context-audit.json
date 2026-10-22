@@ -1,0 +1,1379 @@
+{
+    "Package":  "P5O2B25A3",
+    "Passed":  false,
+    "ValidationPassed":  false,
+    "EvidenceConsistent":  true,
+    "GateFailures":  [
+                         {
+                             "Gate":  "unchanged-head-baseline-dual",
+                             "ExitCode":  1,
+                             "Failures":  [
+                                              {
+                                                  "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalBoundedFindingTests.GenuineModeContract_FullNativeFindingEvidenceAndRepeat(project: True, scenario: \"unused\")",
+                                                  "Message":  "Fatal error. System.AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt.\n   at Microsoft.CodeAnalysis.CSharp.MethodCompiler..ctor(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, Microsoft.CodeAnalysis.CSharp.Emit.PEModuleBuilder, Boolean, Boolean, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, AsyncForwardEntryPoint, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.MethodCompiler.CompileMethodBodies(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, Microsoft.CodeAnalysis.CSharp.Emit.PEModuleBuilder, Boolean, Boolean, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsForAllMethodBodies(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, Boolean, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsWithoutSeverityFiltering(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(System.Threading.CancellationToken)\n   at B14ScopeProbe.Observe(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, System.String, System.String, System.Collections.Generic.IReadOnlyList`1\u003cMicrosoft.CodeAnalysis.Compilation\u003e)\n   at B12ReferenceProbe.Run(System.String, Boolean, Boolean, Boolean)\n   at Program.\u003cMain\u003e$(System.String[])\n",
+                                                  "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalReferenceIdentityTests.Probe(WorkerAnalysisInput input, String operation, String outputDirectory) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalReferenceIdentityTests.cs:line 384\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalBoundedFindingTests.GenuineModeContract_FullNativeFindingEvidenceAndRepeat(Boolean project, String scenario) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalBoundedFindingTests.cs:line 87\r\n--- End of stack trace from previous location ---",
+                                                  "Duration":  "00:00:04.4897240"
+                                              }
+                                          ],
+                             "BeforeAnyProductionOrTestOverlay":  true
+                         },
+                         {
+                             "Gate":  "final-post-change-dual",
+                             "ExitCode":  1,
+                             "State":  "Running or interrupted"
+                         },
+                         {
+                             "Gate":  "dual-external-target",
+                             "Failures":  [
+                                              {
+                                                  "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: \"missing-pe\")",
+                                                  "Message":  "Fatal error. Internal CLR error. (0x80131506)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.MergedNamespaceSymbol..ctor(Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceExtent, Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol, System.Collections.Immutable.ImmutableArray`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol\u003e, System.String)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.MergedNamespaceSymbol.Create(Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceExtent, Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol, System.Collections.Immutable.ImmutableArray`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol\u003e, System.String)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.get_GlobalNamespace()\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCompilationUnit(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax, Boolean, Boolean)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCompilationUnit(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)\n   at Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax.Accept[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Microsoft.CodeAnalysis.CSharp.CSharpSyntaxVisitor`1\u003cSystem.__Canon\u003e)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCore(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitTypeDeclarationCore(Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax, NodeUsage)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitTypeDeclarationCore(Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitClassDeclaration(Microsoft.CodeAnalysis.CSharp.Syntax.ClassDeclarationSyntax)\n   at Microsoft.CodeAnalysis.CSharp.Syntax.ClassDeclarationSyntax.Accept[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Microsoft.CodeAnalysis.CSharp.CSharpSyntaxVisitor`1\u003cSystem.__Canon\u003e)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCore(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.Visit(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory.GetBinder(Microsoft.CodeAnalysis.SyntaxNode, Int32, Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode, Microsoft.CodeAnalysis.CSharp.Symbol)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory.GetBinder(Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode, Microsoft.CodeAnalysis.CSharp.Symbol)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetBinder(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeOneDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e, Microsoft.CodeAnalysis.CSharp.SingleTypeDeclaration, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.GetDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.GetDeclaredBaseType(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeAcyclicBaseType(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.get_BaseTypeNoUseSiteDiagnostics()\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.CheckBase(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceMemberContainerTypeSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbol.ForceCompleteMemberConditionally(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, Microsoft.CodeAnalysis.CSharp.Symbol, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamespaceSymbol+\u003c\u003ec__DisplayClass66_1.\u003cForceComplete\u003eb__0(Int32)\n   at Roslyn.Utilities.UICultureUtilities+\u003c\u003ec__DisplayClass6_0`1[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].\u003cWithCurrentUICulture\u003eb__0(Int32)\n   at Roslyn.Utilities.RoslynParallel+\u003c\u003ec__DisplayClass1_0.\u003cFor\u003eg__errorHandlingBody|0(Int32)\n   at System.Threading.Tasks.Parallel+\u003c\u003ec__DisplayClass19_0`2[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].\u003cForWorker\u003eb__1(System.Threading.Tasks.RangeWorker ByRef, Int64, Boolean ByRef)\n   at System.Threading.Tasks.TaskReplicator+Replica.Execute()\n   at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)\n   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task ByRef, System.Threading.Thread)\n   at System.Threading.Tasks.ThreadPoolTaskScheduler.TryExecuteTaskInline(System.Threading.Tasks.Task, Boolean)\n   at System.Threading.Tasks.TaskScheduler.TryRunInline(System.Threading.Tasks.Task, Boolean)\n   at System.Threading.Tasks.Task.InternalRunSynchronously(System.Threading.Tasks.TaskScheduler, Boolean)\n   at System.Threading.Tasks.TaskReplicator.Run[[System.Threading.Tasks.RangeWorker, System.Threading.Tasks.Parallel, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]](ReplicatableUserAction`1\u003cSystem.Threading.Tasks.RangeWorker\u003e, System.Threading.Tasks.ParallelOptions, Boolean)\n   at System.Threading.Tasks.Parallel.ForWorker[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Int32, Int32, System.Threading.Tasks.ParallelOptions, System.Action`1\u003cInt32\u003e, System.Action`2\u003cInt32,System.Threading.Tasks.ParallelLoopState\u003e, System.Func`4\u003cInt32,System.Threading.Tasks.ParallelLoopState,System.__Canon,System.__Canon\u003e, System.Func`1\u003cSystem.__Canon\u003e, System.Action`1\u003cSystem.__Canon\u003e)\n   at System.Threading.Tasks.Parallel.For(Int32, Int32, System.Threading.Tasks.ParallelOptions, System.Action`1\u003cInt32\u003e)\n   at Roslyn.Utilities.RoslynParallel.For(Int32, Int32, System.Action`1\u003cInt32\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamespaceSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceModuleSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceAssemblySymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetSourceDeclarationDiagnostics(Microsoft.CodeAnalysis.SyntaxTree, System.Nullable`1\u003cMicrosoft.CodeAnalysis.Text.TextSpan\u003e, System.Func`4\u003cSystem.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.Diagnostic\u003e,Microsoft.CodeAnalysis.SyntaxTree,System.Nullable`1\u003cMicrosoft.CodeAnalysis.Text.TextSpan\u003e,System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.Diagnostic\u003e\u003e, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsWithoutSeverityFiltering(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.CompileMethods(Microsoft.CodeAnalysis.Emit.CommonPEModuleBuilder, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, Microsoft.CodeAnalysis.RebuildData, Microsoft.CodeAnalysis.CodeGen.CompilationTestData, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, System.IO.Stream, Microsoft.CodeAnalysis.RebuildData, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, System.IO.Stream, System.Threading.CancellationToken)\n   at B12ReferenceProbe.Run(System.String, Boolean, Boolean, Boolean)\n   at Program.\u003cMain\u003e$(System.String[])\n",
+                                                  "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalReferenceIdentityTests.Probe(WorkerAnalysisInput input, String operation, String outputDirectory) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalReferenceIdentityTests.cs:line 384\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.Create(String source, Boolean current, Boolean release, Boolean signed) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowExternalTargetCliTests.cs:line 190\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(String scenario) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowExternalTargetCliTests.cs:line 103\r\n--- End of stack trace from previous location ---",
+                                                  "Duration":  "00:00:00.6675189"
+                                              }
+                                          ]
+                         },
+                         {
+                             "Gate":  "dual-bounded-findings",
+                             "Failure":  "Not reached after fail-closed Dual driver failure; not an intentional test skip"
+                         },
+                         {
+                             "Gate":  "dual-solution-findings",
+                             "Failure":  "Not reached after fail-closed Dual driver failure; not an intentional test skip"
+                         },
+                         {
+                             "Gate":  "dual-assembly-qualified-ownership",
+                             "Failure":  "Not reached after fail-closed Dual driver failure; not an intentional test skip"
+                         },
+                         {
+                             "Gate":  "dual-canonical-exception-identity",
+                             "Failure":  "Not reached after fail-closed Dual driver failure; not an intentional test skip"
+                         },
+                         {
+                             "Gate":  "dual-constructed-invocation-context",
+                             "Failure":  "Not reached after fail-closed Dual driver failure; not an intentional test skip"
+                         },
+                         {
+                             "Gate":  "dual.json",
+                             "ExitCode":  1
+                         }
+                     ],
+    "Outcome":  "BoundaryAudit_StopRule",
+    "ConstructedContextFixed":  false,
+    "ReadyForB25B":  false,
+    "SolutionFindingAdmitted":  false,
+    "GeneratedUtc":  "2026-10-16T18:10:19.9464626Z",
+    "Head":  "c777f9642c145a57c112c28216c3996128c6234b",
+    "AllProductionAndExistingTestsUnchanged":  true,
+    "OriginalFileCount":  1009,
+    "SharedSourcesUnchanged":  121,
+    "NewTests":  17,
+    "RootCause":  "Method and containing substitutions are discarded by definition normalization; body semantic types remain open",
+    "IndependentBoundary":  "Exact type-growing generic contexts remove the finite queue bound; graph construction has no bounded recursive-substitution/SCC policy before evaluator active-key guards",
+    "FollowUp":  "Bounded Generic Context Expansion and Recursive Substitution Contract; no arbitrary cutoff or B25B activation",
+    "RecursionObservations":  [
+                                  {
+                                      "containing":  false,
+                                      "growing":  false,
+                                      "actualDefinitionNodeCount":  2,
+                                      "actualOpenSource":  {
+                                                               "kind":  "named",
+                                                               "namedTypeKind":  "class",
+                                                               "assembly":  {
+                                                                                "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                "versionMajor":  0,
+                                                                                "versionMinor":  0,
+                                                                                "versionBuild":  0,
+                                                                                "versionRevision":  0,
+                                                                                "cultureName":  "",
+                                                                                "publicKeyOrToken":  "",
+                                                                                "hasPublicKey":  false,
+                                                                                "isRetargetable":  false,
+                                                                                "contentType":  "default"
+                                                                            },
+                                                               "module":  {
+                                                                              "assembly":  {
+                                                                                               "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                               "versionMajor":  0,
+                                                                                               "versionMinor":  0,
+                                                                                               "versionBuild":  0,
+                                                                                               "versionRevision":  0,
+                                                                                               "cultureName":  "",
+                                                                                               "publicKeyOrToken":  "",
+                                                                                               "hasPublicKey":  false,
+                                                                                               "isRetargetable":  false,
+                                                                                               "contentType":  "default"
+                                                                                           },
+                                                                              "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                              "ordinal":  0
+                                                                          },
+                                                               "namespaceName":  "",
+                                                               "metadataName":  "Fault`1",
+                                                               "typeArguments":  [
+                                                                                     {
+                                                                                         "kind":  "typeParameter",
+                                                                                         "namedTypeKind":  "unknown",
+                                                                                         "typeArguments":  [
+
+                                                                                                           ],
+                                                                                         "isUnboundGenericType":  false,
+                                                                                         "isNativeIntegerType":  false,
+                                                                                         "arrayRank":  0,
+                                                                                         "typeParameterScope":  "method",
+                                                                                         "typeParameterOrdinal":  0,
+                                                                                         "typeParameterOwnerAssembly":  {
+                                                                                                                            "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                            "versionMajor":  0,
+                                                                                                                            "versionMinor":  0,
+                                                                                                                            "versionBuild":  0,
+                                                                                                                            "versionRevision":  0,
+                                                                                                                            "cultureName":  "",
+                                                                                                                            "publicKeyOrToken":  "",
+                                                                                                                            "hasPublicKey":  false,
+                                                                                                                            "isRetargetable":  false,
+                                                                                                                            "contentType":  "default"
+                                                                                                                        },
+                                                                                         "typeParameterOwnerModule":  {
+                                                                                                                          "assembly":  {
+                                                                                                                                           "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                                           "versionMajor":  0,
+                                                                                                                                           "versionMinor":  0,
+                                                                                                                                           "versionBuild":  0,
+                                                                                                                                           "versionRevision":  0,
+                                                                                                                                           "cultureName":  "",
+                                                                                                                                           "publicKeyOrToken":  "",
+                                                                                                                                           "hasPublicKey":  false,
+                                                                                                                                           "isRetargetable":  false,
+                                                                                                                                           "contentType":  "default"
+                                                                                                                                       },
+                                                                                                                          "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                                                                          "ordinal":  0
+                                                                                                                      },
+                                                                                         "typeParameterOwnerDeclarationId":  "M:Api.Recur``1",
+                                                                                         "functionPointerParameters":  [
+
+                                                                                                                       ]
+                                                                                     }
+                                                                                 ],
+                                                               "isUnboundGenericType":  false,
+                                                               "isNativeIntegerType":  false,
+                                                               "arrayRank":  0,
+                                                               "functionPointerParameters":  [
+
+                                                                                             ]
+                                                           },
+                                      "testExpansionSteps":  32,
+                                      "exactContextsVisited":  1,
+                                      "exactContextsRegistered":  1,
+                                      "pendingWorkRemainsAtHarnessLimit":  false,
+                                      "recurrence":  "T[n+1] = T[n]; exact key reused",
+                                      "unboundedProductRunExecuted":  false,
+                                      "productionBudgetAdded":  false,
+                                      "productionCorrected":  false
+                                  },
+                                  {
+                                      "containing":  false,
+                                      "growing":  true,
+                                      "actualDefinitionNodeCount":  2,
+                                      "actualOpenSource":  {
+                                                               "kind":  "named",
+                                                               "namedTypeKind":  "class",
+                                                               "assembly":  {
+                                                                                "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                "versionMajor":  0,
+                                                                                "versionMinor":  0,
+                                                                                "versionBuild":  0,
+                                                                                "versionRevision":  0,
+                                                                                "cultureName":  "",
+                                                                                "publicKeyOrToken":  "",
+                                                                                "hasPublicKey":  false,
+                                                                                "isRetargetable":  false,
+                                                                                "contentType":  "default"
+                                                                            },
+                                                               "module":  {
+                                                                              "assembly":  {
+                                                                                               "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                               "versionMajor":  0,
+                                                                                               "versionMinor":  0,
+                                                                                               "versionBuild":  0,
+                                                                                               "versionRevision":  0,
+                                                                                               "cultureName":  "",
+                                                                                               "publicKeyOrToken":  "",
+                                                                                               "hasPublicKey":  false,
+                                                                                               "isRetargetable":  false,
+                                                                                               "contentType":  "default"
+                                                                                           },
+                                                                              "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                              "ordinal":  0
+                                                                          },
+                                                               "namespaceName":  "",
+                                                               "metadataName":  "Fault`1",
+                                                               "typeArguments":  [
+                                                                                     {
+                                                                                         "kind":  "typeParameter",
+                                                                                         "namedTypeKind":  "unknown",
+                                                                                         "typeArguments":  [
+
+                                                                                                           ],
+                                                                                         "isUnboundGenericType":  false,
+                                                                                         "isNativeIntegerType":  false,
+                                                                                         "arrayRank":  0,
+                                                                                         "typeParameterScope":  "method",
+                                                                                         "typeParameterOrdinal":  0,
+                                                                                         "typeParameterOwnerAssembly":  {
+                                                                                                                            "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                            "versionMajor":  0,
+                                                                                                                            "versionMinor":  0,
+                                                                                                                            "versionBuild":  0,
+                                                                                                                            "versionRevision":  0,
+                                                                                                                            "cultureName":  "",
+                                                                                                                            "publicKeyOrToken":  "",
+                                                                                                                            "hasPublicKey":  false,
+                                                                                                                            "isRetargetable":  false,
+                                                                                                                            "contentType":  "default"
+                                                                                                                        },
+                                                                                         "typeParameterOwnerModule":  {
+                                                                                                                          "assembly":  {
+                                                                                                                                           "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                                           "versionMajor":  0,
+                                                                                                                                           "versionMinor":  0,
+                                                                                                                                           "versionBuild":  0,
+                                                                                                                                           "versionRevision":  0,
+                                                                                                                                           "cultureName":  "",
+                                                                                                                                           "publicKeyOrToken":  "",
+                                                                                                                                           "hasPublicKey":  false,
+                                                                                                                                           "isRetargetable":  false,
+                                                                                                                                           "contentType":  "default"
+                                                                                                                                       },
+                                                                                                                          "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                                                                          "ordinal":  0
+                                                                                                                      },
+                                                                                         "typeParameterOwnerDeclarationId":  "M:Api.Recur``1",
+                                                                                         "functionPointerParameters":  [
+
+                                                                                                                       ]
+                                                                                     }
+                                                                                 ],
+                                                               "isUnboundGenericType":  false,
+                                                               "isNativeIntegerType":  false,
+                                                               "arrayRank":  0,
+                                                               "functionPointerParameters":  [
+
+                                                                                             ]
+                                                           },
+                                      "testExpansionSteps":  32,
+                                      "exactContextsVisited":  32,
+                                      "exactContextsRegistered":  33,
+                                      "pendingWorkRemainsAtHarnessLimit":  true,
+                                      "recurrence":  "T[n+1] = List\u003cT[n]\u003e; strict argument-depth growth, no repeated exact constructed key",
+                                      "unboundedProductRunExecuted":  false,
+                                      "productionBudgetAdded":  false,
+                                      "productionCorrected":  false
+                                  },
+                                  {
+                                      "containing":  true,
+                                      "growing":  false,
+                                      "actualDefinitionNodeCount":  2,
+                                      "actualOpenSource":  {
+                                                               "kind":  "named",
+                                                               "namedTypeKind":  "class",
+                                                               "assembly":  {
+                                                                                "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                "versionMajor":  0,
+                                                                                "versionMinor":  0,
+                                                                                "versionBuild":  0,
+                                                                                "versionRevision":  0,
+                                                                                "cultureName":  "",
+                                                                                "publicKeyOrToken":  "",
+                                                                                "hasPublicKey":  false,
+                                                                                "isRetargetable":  false,
+                                                                                "contentType":  "default"
+                                                                            },
+                                                               "module":  {
+                                                                              "assembly":  {
+                                                                                               "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                               "versionMajor":  0,
+                                                                                               "versionMinor":  0,
+                                                                                               "versionBuild":  0,
+                                                                                               "versionRevision":  0,
+                                                                                               "cultureName":  "",
+                                                                                               "publicKeyOrToken":  "",
+                                                                                               "hasPublicKey":  false,
+                                                                                               "isRetargetable":  false,
+                                                                                               "contentType":  "default"
+                                                                                           },
+                                                                              "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                              "ordinal":  0
+                                                                          },
+                                                               "namespaceName":  "",
+                                                               "metadataName":  "Fault`1",
+                                                               "typeArguments":  [
+                                                                                     {
+                                                                                         "kind":  "typeParameter",
+                                                                                         "namedTypeKind":  "unknown",
+                                                                                         "typeArguments":  [
+
+                                                                                                           ],
+                                                                                         "isUnboundGenericType":  false,
+                                                                                         "isNativeIntegerType":  false,
+                                                                                         "arrayRank":  0,
+                                                                                         "typeParameterScope":  "type",
+                                                                                         "typeParameterOrdinal":  0,
+                                                                                         "typeParameterOwnerAssembly":  {
+                                                                                                                            "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                            "versionMajor":  0,
+                                                                                                                            "versionMinor":  0,
+                                                                                                                            "versionBuild":  0,
+                                                                                                                            "versionRevision":  0,
+                                                                                                                            "cultureName":  "",
+                                                                                                                            "publicKeyOrToken":  "",
+                                                                                                                            "hasPublicKey":  false,
+                                                                                                                            "isRetargetable":  false,
+                                                                                                                            "contentType":  "default"
+                                                                                                                        },
+                                                                                         "typeParameterOwnerModule":  {
+                                                                                                                          "assembly":  {
+                                                                                                                                           "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                                           "versionMajor":  0,
+                                                                                                                                           "versionMinor":  0,
+                                                                                                                                           "versionBuild":  0,
+                                                                                                                                           "versionRevision":  0,
+                                                                                                                                           "cultureName":  "",
+                                                                                                                                           "publicKeyOrToken":  "",
+                                                                                                                                           "hasPublicKey":  false,
+                                                                                                                                           "isRetargetable":  false,
+                                                                                                                                           "contentType":  "default"
+                                                                                                                                       },
+                                                                                                                          "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                                                                          "ordinal":  0
+                                                                                                                      },
+                                                                                         "typeParameterOwnerDeclarationId":  "T:Api`1",
+                                                                                         "functionPointerParameters":  [
+
+                                                                                                                       ]
+                                                                                     }
+                                                                                 ],
+                                                               "isUnboundGenericType":  false,
+                                                               "isNativeIntegerType":  false,
+                                                               "arrayRank":  0,
+                                                               "functionPointerParameters":  [
+
+                                                                                             ]
+                                                           },
+                                      "testExpansionSteps":  32,
+                                      "exactContextsVisited":  1,
+                                      "exactContextsRegistered":  1,
+                                      "pendingWorkRemainsAtHarnessLimit":  false,
+                                      "recurrence":  "T[n+1] = T[n]; exact key reused",
+                                      "unboundedProductRunExecuted":  false,
+                                      "productionBudgetAdded":  false,
+                                      "productionCorrected":  false
+                                  },
+                                  {
+                                      "containing":  true,
+                                      "growing":  true,
+                                      "actualDefinitionNodeCount":  2,
+                                      "actualOpenSource":  {
+                                                               "kind":  "named",
+                                                               "namedTypeKind":  "class",
+                                                               "assembly":  {
+                                                                                "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                "versionMajor":  0,
+                                                                                "versionMinor":  0,
+                                                                                "versionBuild":  0,
+                                                                                "versionRevision":  0,
+                                                                                "cultureName":  "",
+                                                                                "publicKeyOrToken":  "",
+                                                                                "hasPublicKey":  false,
+                                                                                "isRetargetable":  false,
+                                                                                "contentType":  "default"
+                                                                            },
+                                                               "module":  {
+                                                                              "assembly":  {
+                                                                                               "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                               "versionMajor":  0,
+                                                                                               "versionMinor":  0,
+                                                                                               "versionBuild":  0,
+                                                                                               "versionRevision":  0,
+                                                                                               "cultureName":  "",
+                                                                                               "publicKeyOrToken":  "",
+                                                                                               "hasPublicKey":  false,
+                                                                                               "isRetargetable":  false,
+                                                                                               "contentType":  "default"
+                                                                                           },
+                                                                              "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                              "ordinal":  0
+                                                                          },
+                                                               "namespaceName":  "",
+                                                               "metadataName":  "Fault`1",
+                                                               "typeArguments":  [
+                                                                                     {
+                                                                                         "kind":  "typeParameter",
+                                                                                         "namedTypeKind":  "unknown",
+                                                                                         "typeArguments":  [
+
+                                                                                                           ],
+                                                                                         "isUnboundGenericType":  false,
+                                                                                         "isNativeIntegerType":  false,
+                                                                                         "arrayRank":  0,
+                                                                                         "typeParameterScope":  "type",
+                                                                                         "typeParameterOrdinal":  0,
+                                                                                         "typeParameterOwnerAssembly":  {
+                                                                                                                            "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                            "versionMajor":  0,
+                                                                                                                            "versionMinor":  0,
+                                                                                                                            "versionBuild":  0,
+                                                                                                                            "versionRevision":  0,
+                                                                                                                            "cultureName":  "",
+                                                                                                                            "publicKeyOrToken":  "",
+                                                                                                                            "hasPublicKey":  false,
+                                                                                                                            "isRetargetable":  false,
+                                                                                                                            "contentType":  "default"
+                                                                                                                        },
+                                                                                         "typeParameterOwnerModule":  {
+                                                                                                                          "assembly":  {
+                                                                                                                                           "name":  "ExceptionFlowSummaryGraphBuilderTests",
+                                                                                                                                           "versionMajor":  0,
+                                                                                                                                           "versionMinor":  0,
+                                                                                                                                           "versionBuild":  0,
+                                                                                                                                           "versionRevision":  0,
+                                                                                                                                           "cultureName":  "",
+                                                                                                                                           "publicKeyOrToken":  "",
+                                                                                                                                           "hasPublicKey":  false,
+                                                                                                                                           "isRetargetable":  false,
+                                                                                                                                           "contentType":  "default"
+                                                                                                                                       },
+                                                                                                                          "name":  "ExceptionFlowSummaryGraphBuilderTests.dll",
+                                                                                                                          "ordinal":  0
+                                                                                                                      },
+                                                                                         "typeParameterOwnerDeclarationId":  "T:Api`1",
+                                                                                         "functionPointerParameters":  [
+
+                                                                                                                       ]
+                                                                                     }
+                                                                                 ],
+                                                               "isUnboundGenericType":  false,
+                                                               "isNativeIntegerType":  false,
+                                                               "arrayRank":  0,
+                                                               "functionPointerParameters":  [
+
+                                                                                             ]
+                                                           },
+                                      "testExpansionSteps":  32,
+                                      "exactContextsVisited":  32,
+                                      "exactContextsRegistered":  33,
+                                      "pendingWorkRemainsAtHarnessLimit":  true,
+                                      "recurrence":  "T[n+1] = List\u003cT[n]\u003e; strict argument-depth growth, no repeated exact constructed key",
+                                      "unboundedProductRunExecuted":  false,
+                                      "productionBudgetAdded":  false,
+                                      "productionCorrected":  false
+                                  }
+                              ],
+    "BaselinePassed":  false,
+    "BaselineNativeFailure":  [
+                                  {
+                                      "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalBoundedFindingTests.GenuineModeContract_FullNativeFindingEvidenceAndRepeat(project: True, scenario: \"unused\")",
+                                      "Message":  "Fatal error. System.AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt.\n   at Microsoft.CodeAnalysis.CSharp.MethodCompiler..ctor(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, Microsoft.CodeAnalysis.CSharp.Emit.PEModuleBuilder, Boolean, Boolean, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, AsyncForwardEntryPoint, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.MethodCompiler.CompileMethodBodies(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, Microsoft.CodeAnalysis.CSharp.Emit.PEModuleBuilder, Boolean, Boolean, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsForAllMethodBodies(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, Boolean, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsWithoutSeverityFiltering(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(System.Threading.CancellationToken)\n   at B14ScopeProbe.Observe(Microsoft.CodeAnalysis.CSharp.CSharpCompilation, System.String, System.String, System.Collections.Generic.IReadOnlyList`1\u003cMicrosoft.CodeAnalysis.Compilation\u003e)\n   at B12ReferenceProbe.Run(System.String, Boolean, Boolean, Boolean)\n   at Program.\u003cMain\u003e$(System.String[])\n",
+                                      "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalReferenceIdentityTests.Probe(WorkerAnalysisInput input, String operation, String outputDirectory) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalReferenceIdentityTests.cs:line 384\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalBoundedFindingTests.GenuineModeContract_FullNativeFindingEvidenceAndRepeat(Boolean project, String scenario) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalBoundedFindingTests.cs:line 87\r\n--- End of stack trace from previous location ---",
+                                      "Duration":  "00:00:04.4897240"
+                                  }
+                              ],
+    "BaselineRootCauseKnown":  false,
+    "BaselineNoRetry":  true,
+    "BaselineSnapshot":  {
+                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\state.json",
+                             "Sha256":  "D943FB5289AC86F95EFE5F7440E0388A970AB35DEC7983F2A228781BCAA95632"
+                         },
+    "BaselineDual":  {
+                         "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\dual-version-build\\audit.json",
+                         "Sha256":  "7E8528EADDA868E9B0D05CB1FDC96E47BD2856D626A8DAD17CAC30150D3A6736"
+                     },
+    "FinalDualPassed":  false,
+    "Dual":  {
+                 "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\audit.json",
+                 "Sha256":  "68DCE667BB4AE1354A88788CA2939E2C3F68CBC61C673F6C21C0FF431B6CC62A"
+             },
+    "Tests":  [
+                  {
+                      "Name":  "b24",
+                      "Executed":  true,
+                      "Total":  42,
+                      "Passed":  42,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b24.trx",
+                                       "Sha256":  "67F6FF70B9B114461F921ECC4B174ED3883AD9B8AD82A2FFA0A4F93A7FAB4462"
+                                   }
+                  },
+                  {
+                      "Name":  "b23",
+                      "Executed":  true,
+                      "Total":  36,
+                      "Passed":  36,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b23.trx",
+                                       "Sha256":  "BC3C03FC196D49B552BCD1094FFF6EE3A187270C7F59A5FAB87CFB3464317097"
+                                   }
+                  },
+                  {
+                      "Name":  "b22",
+                      "Executed":  true,
+                      "Total":  46,
+                      "Passed":  46,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b22.trx",
+                                       "Sha256":  "137283424ACBE9A767C73801322F31201C67D713E20FE244B1EBCCFD7D72E80C"
+                                   }
+                  },
+                  {
+                      "Name":  "b21",
+                      "Executed":  true,
+                      "Total":  26,
+                      "Passed":  26,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b21.trx",
+                                       "Sha256":  "EEEFC2B4FF5E80A95E31CB79A382331B77A240F323765F0D5EE0BCE1EDFD08C8"
+                                   }
+                  },
+                  {
+                      "Name":  "b20",
+                      "Executed":  true,
+                      "Total":  10,
+                      "Passed":  10,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b20.trx",
+                                       "Sha256":  "74138FA859D4C5ABD14658682C97323284046016246D9452FC7305CCBB334860"
+                                   }
+                  },
+                  {
+                      "Name":  "b19",
+                      "Executed":  true,
+                      "Total":  39,
+                      "Passed":  39,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b19.trx",
+                                       "Sha256":  "86F246A97FE624138BB57FE85463E9DB8F13639305BBDA2BA2CA5B813A6B8CED"
+                                   }
+                  },
+                  {
+                      "Name":  "b18",
+                      "Executed":  true,
+                      "Total":  7,
+                      "Passed":  7,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b18.trx",
+                                       "Sha256":  "133BC111273DBA62301FD9128535F7AC89E2C38059ED6D63BDC1A4D186854BBA"
+                                   }
+                  },
+                  {
+                      "Name":  "b17",
+                      "Executed":  true,
+                      "Total":  25,
+                      "Passed":  25,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b17.trx",
+                                       "Sha256":  "0AB5E8D390EC236C8E22254A4A5A4CDABD7041CD444119F3A20CE5E0307ACC5E"
+                                   }
+                  },
+                  {
+                      "Name":  "b16",
+                      "Executed":  true,
+                      "Total":  18,
+                      "Passed":  18,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b16.trx",
+                                       "Sha256":  "C58AA8F61F8D1F683926798957908B5B041E1A35F3F2CD198598B094000AC378"
+                                   }
+                  },
+                  {
+                      "Name":  "b15",
+                      "Executed":  true,
+                      "Total":  28,
+                      "Passed":  28,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b15.trx",
+                                       "Sha256":  "538795F7C821445A6BBEB20FFC0BBB12C2493B3421A2E8B9A9D7B79530FF3BBD"
+                                   }
+                  },
+                  {
+                      "Name":  "b14",
+                      "Executed":  true,
+                      "Total":  31,
+                      "Passed":  31,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b14.trx",
+                                       "Sha256":  "2E858942EFD14B09A7C57B2FA7DC179519209B79107DF4DFB2B57F87C32A93BD"
+                                   }
+                  },
+                  {
+                      "Name":  "b13",
+                      "Executed":  true,
+                      "Total":  34,
+                      "Passed":  34,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b13.trx",
+                                       "Sha256":  "5CF6680472E2E58F0A5FADB6D2453743B80727D7411843229FF74AE5FDCAF138"
+                                   }
+                  },
+                  {
+                      "Name":  "b12",
+                      "Executed":  true,
+                      "Total":  29,
+                      "Passed":  29,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b12.trx",
+                                       "Sha256":  "E70DA49AA1EF60170E282E47792C153A1A5D0A193C0EC3B6A989B23BE58E8E3A"
+                                   }
+                  },
+                  {
+                      "Name":  "b11",
+                      "Executed":  true,
+                      "Total":  16,
+                      "Passed":  16,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b11.trx",
+                                       "Sha256":  "A2FE4903604BCDF5180C76AC5DD05D3D935D7869FF2F948119ADE58DF926F135"
+                                   }
+                  },
+                  {
+                      "Name":  "b10",
+                      "Executed":  true,
+                      "Total":  34,
+                      "Passed":  34,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b10.trx",
+                                       "Sha256":  "1D5E71CF733438CEC3D77C306DED58392BBE0ECC9BCA184A87894FD0C527E0AE"
+                                   }
+                  },
+                  {
+                      "Name":  "b5-b9",
+                      "Executed":  true,
+                      "Total":  156,
+                      "Passed":  156,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\b5-b9.trx",
+                                       "Sha256":  "1C7162AB787D71190E3E43954A637C65203E0DDCF778995C10D2638EC1A901EA"
+                                   }
+                  },
+                  {
+                      "Name":  "productive",
+                      "Executed":  true,
+                      "Total":  855,
+                      "Passed":  855,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\productive.trx",
+                                       "Sha256":  "A67684B528B462E37564CA987E998F2DD767CF535F8B73247CECB76671C5F552"
+                                   }
+                  },
+                  {
+                      "Name":  "focused",
+                      "Executed":  true,
+                      "Total":  962,
+                      "Passed":  962,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\focused.trx",
+                                       "Sha256":  "F9409C73F7E2C77B3AFA52DB99F84A97662D0A27AF9EDA95CA48BA86DB475860"
+                                   }
+                  },
+                  {
+                      "Name":  "broad",
+                      "Executed":  true,
+                      "Total":  3263,
+                      "Passed":  3263,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\broad.trx",
+                                       "Sha256":  "AED7CE0C1F2AA29053174332A08F34E31A372A65AF519B0A5C77BB79C3E8968E"
+                                   }
+                  },
+                  {
+                      "Name":  "full",
+                      "Executed":  true,
+                      "Total":  3354,
+                      "Passed":  3354,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b24\\tests\\full.trx",
+                                       "Sha256":  "F6F2795256C04525329C84B6BBB25D16FF3C1F57E98CA766468A34777F8C1A0D"
+                                   }
+                  },
+                  {
+                      "Name":  "a3-and-unchanged-b25a2-b25a-b25",
+                      "Executed":  true,
+                      "Total":  78,
+                      "Passed":  78,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\tests\\contexts.trx",
+                                       "Sha256":  "5388B653436BD513B7D5BAB46722EABE7B6186519815B2ED0FF530421D6B55F5"
+                                   }
+                  },
+                  {
+                      "Name":  "pid-g1",
+                      "Executed":  true,
+                      "Total":  18,
+                      "Passed":  18,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\tests\\pid-g1.trx",
+                                       "Sha256":  "5E469205D8E355BDABF3291DBB8AAC90A23F05E8F6E41D72BC62733569886FBF"
+                                   }
+                  },
+                  {
+                      "Name":  "boundary",
+                      "Executed":  true,
+                      "Total":  596,
+                      "Passed":  596,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\tests\\boundary.trx",
+                                       "Sha256":  "00FFC64931436C0677EE335208E4AA777D75912809123FC344C8771FB25FD8D1"
+                                   }
+                  },
+                  {
+                      "Name":  "dual-main-boundary",
+                      "Executed":  true,
+                      "Total":  596,
+                      "Passed":  596,
+                      "Failed":  0,
+                      "Skipped":  0,
+                      "Failures":  [
+
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary.trx",
+                                       "Sha256":  "D66E5A8852B7991F41D0187E6F9B260D22EEE36534D30D70CFB6A51D07CD8844"
+                                   }
+                  },
+                  {
+                      "Name":  "dual-external-target",
+                      "Executed":  true,
+                      "Total":  36,
+                      "Passed":  35,
+                      "Failed":  1,
+                      "Skipped":  0,
+                      "Failures":  [
+                                       {
+                                           "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: \"missing-pe\")",
+                                           "Message":  "Fatal error. Internal CLR error. (0x80131506)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.MergedNamespaceSymbol..ctor(Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceExtent, Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol, System.Collections.Immutable.ImmutableArray`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol\u003e, System.String)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.MergedNamespaceSymbol.Create(Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceExtent, Microsoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol, System.Collections.Immutable.ImmutableArray`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.NamespaceSymbol\u003e, System.String)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.get_GlobalNamespace()\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCompilationUnit(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax, Boolean, Boolean)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCompilationUnit(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)\n   at Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax.Accept[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Microsoft.CodeAnalysis.CSharp.CSharpSyntaxVisitor`1\u003cSystem.__Canon\u003e)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCore(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitTypeDeclarationCore(Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax, NodeUsage)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitTypeDeclarationCore(Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitClassDeclaration(Microsoft.CodeAnalysis.CSharp.Syntax.ClassDeclarationSyntax)\n   at Microsoft.CodeAnalysis.CSharp.Syntax.ClassDeclarationSyntax.Accept[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Microsoft.CodeAnalysis.CSharp.CSharpSyntaxVisitor`1\u003cSystem.__Canon\u003e)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.VisitCore(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory+BinderFactoryVisitor.Visit(Microsoft.CodeAnalysis.SyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory.GetBinder(Microsoft.CodeAnalysis.SyntaxNode, Int32, Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode, Microsoft.CodeAnalysis.CSharp.Symbol)\n   at Microsoft.CodeAnalysis.CSharp.BinderFactory.GetBinder(Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode, Microsoft.CodeAnalysis.CSharp.Symbol)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetBinder(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeOneDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e, Microsoft.CodeAnalysis.CSharp.SingleTypeDeclaration, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.GetDeclaredBases(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.GetDeclaredBaseType(Roslyn.Utilities.ConsList`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbols.TypeSymbol\u003e)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.MakeAcyclicBaseType(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.get_BaseTypeNoUseSiteDiagnostics()\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamedTypeSymbol.CheckBase(Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceMemberContainerTypeSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbol.ForceCompleteMemberConditionally(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, Microsoft.CodeAnalysis.CSharp.Symbol, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamespaceSymbol+\u003c\u003ec__DisplayClass66_1.\u003cForceComplete\u003eb__0(Int32)\n   at Roslyn.Utilities.UICultureUtilities+\u003c\u003ec__DisplayClass6_0`1[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].\u003cWithCurrentUICulture\u003eb__0(Int32)\n   at Roslyn.Utilities.RoslynParallel+\u003c\u003ec__DisplayClass1_0.\u003cFor\u003eg__errorHandlingBody|0(Int32)\n   at System.Threading.Tasks.Parallel+\u003c\u003ec__DisplayClass19_0`2[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].\u003cForWorker\u003eb__1(System.Threading.Tasks.RangeWorker ByRef, Int64, Boolean ByRef)\n   at System.Threading.Tasks.TaskReplicator+Replica.Execute()\n   at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)\n   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task ByRef, System.Threading.Thread)\n   at System.Threading.Tasks.ThreadPoolTaskScheduler.TryExecuteTaskInline(System.Threading.Tasks.Task, Boolean)\n   at System.Threading.Tasks.TaskScheduler.TryRunInline(System.Threading.Tasks.Task, Boolean)\n   at System.Threading.Tasks.Task.InternalRunSynchronously(System.Threading.Tasks.TaskScheduler, Boolean)\n   at System.Threading.Tasks.TaskReplicator.Run[[System.Threading.Tasks.RangeWorker, System.Threading.Tasks.Parallel, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]](ReplicatableUserAction`1\u003cSystem.Threading.Tasks.RangeWorker\u003e, System.Threading.Tasks.ParallelOptions, Boolean)\n   at System.Threading.Tasks.Parallel.ForWorker[[System.__Canon, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]](Int32, Int32, System.Threading.Tasks.ParallelOptions, System.Action`1\u003cInt32\u003e, System.Action`2\u003cInt32,System.Threading.Tasks.ParallelLoopState\u003e, System.Func`4\u003cInt32,System.Threading.Tasks.ParallelLoopState,System.__Canon,System.__Canon\u003e, System.Func`1\u003cSystem.__Canon\u003e, System.Action`1\u003cSystem.__Canon\u003e)\n   at System.Threading.Tasks.Parallel.For(Int32, Int32, System.Threading.Tasks.ParallelOptions, System.Action`1\u003cInt32\u003e)\n   at Roslyn.Utilities.RoslynParallel.For(Int32, Int32, System.Action`1\u003cInt32\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceNamespaceSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceModuleSymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.Symbols.SourceAssemblySymbol.ForceComplete(Microsoft.CodeAnalysis.SourceLocation, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetSourceDeclarationDiagnostics(Microsoft.CodeAnalysis.SyntaxTree, System.Nullable`1\u003cMicrosoft.CodeAnalysis.Text.TextSpan\u003e, System.Func`4\u003cSystem.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.Diagnostic\u003e,Microsoft.CodeAnalysis.SyntaxTree,System.Nullable`1\u003cMicrosoft.CodeAnalysis.Text.TextSpan\u003e,System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.Diagnostic\u003e\u003e, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnosticsWithoutSeverityFiltering(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.CSharp.BindingDiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.CSharp.Symbol\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.GetDiagnostics(Microsoft.CodeAnalysis.CompilationStage, Boolean, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.CSharp.CSharpCompilation.CompileMethods(Microsoft.CodeAnalysis.Emit.CommonPEModuleBuilder, Boolean, Microsoft.CodeAnalysis.DiagnosticBag, System.Predicate`1\u003cMicrosoft.CodeAnalysis.Symbols.ISymbolInternal\u003e, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, Microsoft.CodeAnalysis.RebuildData, Microsoft.CodeAnalysis.CodeGen.CompilationTestData, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, System.IO.Stream, Microsoft.CodeAnalysis.RebuildData, System.Threading.CancellationToken)\n   at Microsoft.CodeAnalysis.Compilation.Emit(System.IO.Stream, System.IO.Stream, System.IO.Stream, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.ResourceDescription\u003e, Microsoft.CodeAnalysis.Emit.EmitOptions, Microsoft.CodeAnalysis.IMethodSymbol, System.IO.Stream, System.Collections.Generic.IEnumerable`1\u003cMicrosoft.CodeAnalysis.EmbeddedText\u003e, System.IO.Stream, System.Threading.CancellationToken)\n   at B12ReferenceProbe.Run(System.String, Boolean, Boolean, Boolean)\n   at Program.\u003cMain\u003e$(System.String[])\n",
+                                           "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalReferenceIdentityTests.Probe(WorkerAnalysisInput input, String operation, String outputDirectory) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowHistoricalReferenceIdentityTests.cs:line 384\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.Create(String source, Boolean current, Boolean release, Boolean signed) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowExternalTargetCliTests.cs:line 190\r\n   at XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(String scenario) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowExternalTargetCliTests.cs:line 103\r\n--- End of stack trace from previous location ---",
+                                           "Duration":  "00:00:00.6675189"
+                                       }
+                                   ],
+                      "Artifact":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\external-target.trx",
+                                       "Sha256":  "5C8F65D7FC5A485EAEC1BB38CED83B0B3842F29BCEB4C2E9EE613038F49393BC"
+                                   }
+                  },
+                  {
+                      "Name":  "dual-bounded-findings",
+                      "Executed":  false,
+                      "ExpectedTotal":  42,
+                      "OlderArtifactRetained":  true,
+                      "OlderArtifact":  {
+                                            "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\bounded-findings.trx",
+                                            "Sha256":  "8D2E7CA11249662EBB58F2D5855A9C6352723CABC4551EB332E0539F1BD0564C"
+                                        }
+                  },
+                  {
+                      "Name":  "dual-solution-findings",
+                      "Executed":  false,
+                      "ExpectedTotal":  27,
+                      "OlderArtifactRetained":  false,
+                      "OlderArtifact":  null
+                  },
+                  {
+                      "Name":  "dual-assembly-qualified-ownership",
+                      "Executed":  false,
+                      "ExpectedTotal":  14,
+                      "OlderArtifactRetained":  false,
+                      "OlderArtifact":  null
+                  },
+                  {
+                      "Name":  "dual-canonical-exception-identity",
+                      "Executed":  false,
+                      "ExpectedTotal":  20,
+                      "OlderArtifactRetained":  false,
+                      "OlderArtifact":  null
+                  },
+                  {
+                      "Name":  "dual-constructed-invocation-context",
+                      "Executed":  false,
+                      "ExpectedTotal":  17,
+                      "OlderArtifactRetained":  false,
+                      "OlderArtifact":  null
+                  }
+              ],
+    "WaeBuilds":  [
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\0-current-build.log",
+                          "Sha256":  "56900008BCAE3A94B7CDB1BFE7436DED527B1D681B8433DA7C2DF05704554022"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\1-historical-build.log",
+                          "Sha256":  "109CCB0E518E9255A2258754172A0E9F83EC228C4A0FABA42307000F3632B40F"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\2-current-build.log",
+                          "Sha256":  "A5D8F8B9F443D41053209BBA88E603CB414A1D345FA9C5CA098BAC88D3D59FEA"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\3-historical-build.log",
+                          "Sha256":  "E27ACC5F4BB53B9469DD51815B5E274D1DA18D67B95AA63B4C733A6440BC1E09"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\4-historical-build.log",
+                          "Sha256":  "2B7C2AE45CC4C265E08AF31D00E4D91A8FED27CCBF75B7E87D39D06FFCD5F358"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\5-current-build.log",
+                          "Sha256":  "D6DCF74F76CEFEFDBD5FACA48567B52A18CDB3A63404D7BA4E268BAF18689C91"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\boundary-test-process-build.log",
+                          "Sha256":  "9504E305F90FFBFDC2483C1DFF1CA69DD57C39DF137CEEE24CF32244A96E014E"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\main-boundary-tests-build.log",
+                          "Sha256":  "98AE4DDD328B3D06198EE54857A25D3D065DA9BDC06314D37B5E2FE006363866"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\projection-pdb-fixture-build.log",
+                          "Sha256":  "036F38663205CCF0F48544F3FB7E2C8F7ACABB2C4F10B7A74AD6012736C5BAF2"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-0-build.log",
+                          "Sha256":  "787EBC6F527E1DAAE0C45270E084F6C6B732D1B624A1E42E9EB247584A89359D"
+                      },
+                      {
+                          "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\dual-version-build\\worker-1-build.log",
+                          "Sha256":  "B42C41F32E566E2D380DA20B0A6BC800E899EEAA8A26C227C17DB4E72E1FCE43"
+                      }
+                  ],
+    "Runs":  [
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\boundary.json",
+                                      "Sha256":  "71E7FED9F580918ABE57A8A54B82BDA8F3978E7DB16D993C0DCA72D6608B7CAF"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\build-tests-wae.json",
+                                      "Sha256":  "095432EA94AA156B6C7C24FDADFEDC15AE4F232022E4392F7AC7E1A2797243F8"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\current-clean.json",
+                                      "Sha256":  "58850D1C73ECCEB91475952CA86128C463D72464A4397F721B2249CBC2700E48"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\dual.json",
+                                      "Sha256":  "D720B11CA4B2423A7D18EDDC6AFB025FAA3F3A4D594904EAB322DA6D839F2452"
+                                  },
+                     "ExitCode":  1
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\graph-probe-wae.json",
+                                      "Sha256":  "B6ABCAB71289FE5D27C778EE6631526801394F37F163DCAF825D75D64E146450"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\historical-clean.json",
+                                      "Sha256":  "687A6C48176D7077934FC7EB9C2D02024115A99C6825219EFF2C7BDBDB9229A8"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\historical-wae.json",
+                                      "Sha256":  "2B990A625F832F8779C251CE50EF79C84523424F591AFFAB2A4B476ED2033E16"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\model-tests-wae.json",
+                                      "Sha256":  "2FD53882AF2E5955DFFB7E0AEF96B259F9AE48D4DF486E23F554CC36C2344660"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\model-tests.json",
+                                      "Sha256":  "F51406FA525EB9407E4445153F91B6D1EB021E297D21AC367D10B08312A6615D"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\new-tests.json",
+                                      "Sha256":  "8D0136370CEF74F487BD7D5A76FF8E40FEC91BFAB823ABBA82784EF64A1C1833"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\pid-g1-proof.json",
+                                      "Sha256":  "D28FA52A6E26F09746D047BAA014954C3408314BC8B6DF2F66B22129ABB81582"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\pid-g1-tests.json",
+                                      "Sha256":  "E9241D3D1F2132377CCB8E11F12B9240C4D689B3F97415A7E252EBD1039025C4"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\regressions.json",
+                                      "Sha256":  "283F014763CCA29C35C27F7CE82B7BA88CC9A2425D191D5BB652039007682216"
+                                  },
+                     "ExitCode":  0
+                 },
+                 {
+                     "Artifact":  {
+                                      "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\runs\\worker-wae.json",
+                                      "Sha256":  "E90EB4EEB45CAFD3AAB23DF34DF8FCE48240238A265DFD661EB94F44DCD30398"
+                                  },
+                     "ExitCode":  0
+                 }
+             ],
+    "CurrentBaselines":  [
+                             {
+                                 "Name":  "Direct-False.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\Direct-False.json",
+                                                "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-False.json",
+                                               "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "Direct-True.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\Direct-True.json",
+                                                "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\Direct-True.json",
+                                               "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-False.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\ProjectTransitive-False.json",
+                                                "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-False.json",
+                                               "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-True.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\ProjectTransitive-True.json",
+                                                "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitive-True.json",
+                                               "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-False.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\ProjectTransitiveDeclaredExceptions-False.json",
+                                                "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-False.json",
+                                               "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-True.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\ProjectTransitiveDeclaredExceptions-True.json",
+                                                "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\ProjectTransitiveDeclaredExceptions-True.json",
+                                               "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-False.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\SolutionTransitive-False.json",
+                                                "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-False.json",
+                                               "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                                           },
+                                 "ByteEqual":  true
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-True.json",
+                                 "Before":  {
+                                                "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\baseline\\current\\SolutionTransitive-True.json",
+                                                "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                                            },
+                                 "After":  {
+                                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b9\\current\\SolutionTransitive-True.json",
+                                               "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                                           },
+                                 "ByteEqual":  true
+                             }
+                         ],
+    "BinaryImages":  [
+                         {
+                             "Owner":  "current",
+                             "Before":  "ACCECCFFB3DFAEBA7EAC7CF54BB3F74E3589202BC66979FAFAA5CD6D6D38195A",
+                             "After":  "ACCECCFFB3DFAEBA7EAC7CF54BB3F74E3589202BC66979FAFAA5CD6D6D38195A",
+                             "ByteEqual":  true
+                         },
+                         {
+                             "Owner":  "historical",
+                             "Before":  "F470A1B21A0C87C47265A93BD6F0CB31F698A354E1FBE8FD028E2F4581EFBA9A",
+                             "After":  "F470A1B21A0C87C47265A93BD6F0CB31F698A354E1FBE8FD028E2F4581EFBA9A",
+                             "ByteEqual":  true
+                         },
+                         {
+                             "Owner":  "worker-host",
+                             "Before":  "C1C9BD1310C2918C9963C7C70838BEF64B11BEE8F8A4AE244C5FE773E9B68295",
+                             "After":  "C1C9BD1310C2918C9963C7C70838BEF64B11BEE8F8A4AE244C5FE773E9B68295",
+                             "ByteEqual":  true
+                         }
+                     ],
+    "IdentityWitnesses":  [
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\cache-False.json",
+                                  "Sha256":  "B0C46FF3D80114BE08247E11E231E1FDD9C0C15A5C369023885630FC104D0719"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\cache-True.json",
+                                  "Sha256":  "3455199B60F6AD3CD3FFA27BEE447829D444F5C79D5C98D7BA21BD7B45F52E10"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\callsite-both.json",
+                                  "Sha256":  "80AAC111B736A1A85D910DE0A6653634FECE070B2A9001AA6882A9394232F409"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\callsite-containing.json",
+                                  "Sha256":  "A71C3B45ABD52EF7537D0654C992F249FEE53A9574333D3C32D4DE02247DF359"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\callsite-method.json",
+                                  "Sha256":  "B2FF0D2E973AD2FE2F11382FE938169350E406DC0196DA9FE5BEDB86F89170A8"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\callsite-nested.json",
+                                  "Sha256":  "995D075017B0180AEC067545786B508671132AAA5CC84F5109887813370BF976"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\callsite-non-generic.json",
+                                  "Sha256":  "7A5B2AE334868D569D6893C1DB31855B574B75975C845E030DE29E46E72127E3"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\catch-False.json",
+                                  "Sha256":  "DB9A042D55E0F8FE26CB0A03956EFC8EC139CD2C8D23139BCFBB32F1E97040F0"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\catch-True.json",
+                                  "Sha256":  "F60BDA6F0F373D4F56484B4357D1A1C688CD7010991A957FF8DEC7C33174D940"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\cross-project-rebind-False.json",
+                                  "Sha256":  "8C61FA25CDC00757E0F99BF053C802942A263B49FBBAB44065B29F1941734E3C"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\cross-project-rebind-True.json",
+                                  "Sha256":  "2DBA467934C63A7F1EB37BAED739C2A227762BAA560BA771D2548EB1058C7A3A"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\recursion-False-False.json",
+                                  "Sha256":  "790BEA0C112519915D6A9A863B8558C7A9935D3D118775EDA4D1591DD648739D"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\recursion-False-True.json",
+                                  "Sha256":  "FB56E122624B2B7F2A9355BF3ED1762ABF6F6E7DBFB2C3E51A233962E0AA5A8F"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\recursion-True-False.json",
+                                  "Sha256":  "6C4759C5EFC04789B3831874517A83234BE9405F545C52DBE41187E2A70BD793"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\recursion-True-True.json",
+                                  "Sha256":  "43F7C95EEE5AC1EDE77A17DE38F01FBA0B1DBD1CC1AA8DDF6406B186B1E4E5FB"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\worker-recursion-False.json",
+                                  "Sha256":  "529E142E0D005FA1AFA0AFF56B631818620D9E4526724CE67D4A252F98042939"
+                              },
+                              {
+                                  "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a3-c777\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\analysis\\worker-recursion-True.json",
+                                  "Sha256":  "085D74FA86AECFD95757F41EF4FE283A979068C7C9F82F3B80D2BA0F96FAA737"
+                              }
+                          ],
+    "CompiledInputs":  {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\validation-inputs.json",
+                           "Sha256":  "1FBD2E984574526A96CBE9251913E24056532AD01AD8C9E454EDF28D40D1364B"
+                       },
+    "HistoricalEvidenceVerifier":  {
+                                       "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\historical-evidence-verification.json",
+                                       "Sha256":  "13299BD7DB487BBF869E679DF4554F079930F60094D66369D83A2331BF549CEA"
+                                   },
+    "StaticVerification":  {
+                               "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a3\\static-verification.json",
+                               "Sha256":  "D2AE8F1E17D49DCC5BFA4D42C6A75A5110138705EBBE04D8D4D12ADECDA4542C"
+                           },
+    "Changes":  {
+                    "value":  [
+                                  {
+                                      "Path":  "build/Verify-DualVersionBuild.ps1",
+                                      "BeforeSha256":  "D0EB1C18328C84979DF9989C0E4655E87B150C82CBDE564ACA7DD48E14613190",
+                                      "AfterSha256":  "9EE3787FCD73813AC27366EBBF7D5BF80F6666B1E4DB47A83E78BFB49AE8C45B",
+                                      "ExactDelta":  "gate-vs-c777.patch.txt"
+                                  },
+                                  {
+                                      "Path":  "Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                                      "BeforeSha256":  "4D6BE7BF53AB7CC621DE3B77F60A9047AE1F4B30867E410D11DCA92B7307DAB2",
+                                      "AfterSha256":  "868492903B56F3E4EF998CC0333F8194A93CE7C5A92B0DB7BB30944E0C8C6E97",
+                                      "ExactDelta":  "register-vs-c777.patch.txt"
+                                  }
+                              ],
+                    "Count":  2
+                },
+    "CharacterizationMethodsChanged":  0,
+    "HistoricalEvidenceChanged":  false,
+    "PidG1Unchanged":  true,
+    "NoInfrastructureOrRoslynRepair":  true,
+    "NoGreenRetries":  true,
+    "SelfAnalysis":  {
+                         "Fresh":  false,
+                         "InheritedCount":  16
+                     },
+    "CanonicalFindingDiff":  {
+                                 "Fresh":  false,
+                                 "InheritedAdded":  0,
+                                 "InheritedRemoved":  0,
+                                 "InheritedChanged":  0
+                             },
+    "ActualLinuxRun":  false,
+    "Network":  false,
+    "Protection":  {
+                       "HeadUnchanged":  true,
+                       "SemanticIndexClean":  true,
+                       "IndexAtStart":  "7E38AE2E60BE2F836FC08BD9305155A3D5A7D8323D33975C49CD46EB782B3F8D",
+                       "IndexAtEnd":  "7E38AE2E60BE2F836FC08BD9305155A3D5A7D8323D33975C49CD46EB782B3F8D",
+                       "IndexRepair":  false,
+                       "IgnoreUnchanged":  true,
+                       "CoreCount":  23,
+                       "CoreUnchanged":  true,
+                       "StashCount":  6,
+                       "StashesUnchanged":  true
+                   },
+    "OwnedFiles":  [
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\build\\Verify-DualVersionBuild.ps1",
+                           "Sha256":  "9EE3787FCD73813AC27366EBBF7D5BF80F6666B1E4DB47A83E78BFB49AE8C45B"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\OPEN-PIPELINE-BOUNDARIES.md",
+                           "Sha256":  "868492903B56F3E4EF998CC0333F8194A93CE7C5A92B0DB7BB30944E0C8C6E97"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3-constructed-generic-summary-context.md",
+                           "Sha256":  "64074A1D92CCAF962499E7A2330B528DF3F5D4330BCB9C3A7B08B589ACF298AE"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Format-Owned.ps1",
+                           "Sha256":  "DAC0BBCBCAADB0446926FC1DD98EC27757EDC02FDBF9D457EE197FF66E645CF9"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\gate-vs-c777.patch.txt",
+                           "Sha256":  "8853F2A5C44F53083BCF144C82E47343AC3923DA951F177EE8BD8E51FB1E0B2A"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Prepare-Validation.ps1",
+                           "Sha256":  "BEB3A76136F7EE74AF6F02DE3EC2CAD496B4BCAC9B4CD3C48F32CD45C23E6452"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\README.md",
+                           "Sha256":  "627956401B6DE8137D833EEF75833B40A82FD75FFB98E3B3D61D6243BFED184D"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\register-vs-c777.patch.txt",
+                           "Sha256":  "7EB6CE581CAA91C24E435DE9A4BFE61C5BB7826F272EAAAACE3DD4DFC747CF5D"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Run-EvidenceGate.ps1",
+                           "Sha256":  "B3D8DBE0BDFED5F1CB65B6FAE5FEB6FDADA4464C888EA0294DB94F423CB6E06C"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Run-Validation.ps1",
+                           "Sha256":  "9789CC49187A607743F988DDF7412A966E9C215398CC373D3617CBDFF206FD14"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Verify-Changes.ps1",
+                           "Sha256":  "002A356307AF2CC2BFE8DB22C6F2B051211F52BAF1D3D81271EEECEEA99B4250"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Verify-HistoricalEvidence.ps1",
+                           "Sha256":  "AF1F00F1E8E682BAA872DAF35AD7EDDA511441E7AEB676BC726ABC68B3F96C92"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Verify-Static.ps1",
+                           "Sha256":  "F7E524B490EC32F7AE17A73B02E6DB0E648A19718D7591EE83E8815FEEA30B59"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A3Proof\\Write-Verify-Evidence.ps1",
+                           "Sha256":  "6A9A9AB7FBDD73D1A8E183BB5A0D758A2503398AEAE07D3A084EFE49D5501B0E"
+                       },
+                       {
+                           "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowConstructedInvocationContextTests.cs",
+                           "Sha256":  "C29D3DCC494A99300AF9EC3BB4B1371BBE016A38A15CACFE436F2EA350C42CF8"
+                       }
+                   ],
+    "FinalGitStatus":  [
+                           " M ../../.gitignore",
+                           " M Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                           " M build/Verify-DualVersionBuild.ps1",
+                           "?? Evaluation/P5O2B25A3-constructed-generic-summary-context-audit.json",
+                           "?? Evaluation/P5O2B25A3-constructed-generic-summary-context.md",
+                           "?? Evaluation/P5O2B25A3Proof/",
+                           "?? Tests/XMLDocNormalizerTests/Worker/ExceptionFlowConstructedInvocationContextTests.cs"
+                       ]
+}
