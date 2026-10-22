@@ -347,20 +347,24 @@ namespace SEE.Controls.Actions.Drawable.DrawShapes
                 return false;
             }
 
-            Vector3 convertedHitPoint;
+            Vector3 targetPosition =
+                previewController.IsFixed
+                    ? previewController.FixedPosition
+                    : raycastHit.point;
+
+            Vector3 convertedHitPoint =
+                GameLineGeometry.GetConvertedPosition(
+                    Surface,
+                    targetPosition);
 
             if (!previewController.IsFixed)
             {
-                convertedHitPoint =
-                    GameLineGeometry.GetConvertedPosition(Surface, raycastHit.point);
-
                 GetSelectedShapePosition(convertedHitPoint);
             }
-            else
+
+            if (Shape == null)
             {
-                convertedHitPoint = GameLineGeometry.GetConvertedPosition(
-                    Surface,
-                    previewController.FixedPosition);
+                ShapePreview(targetPosition);
             }
 
             return DrawShape(convertedHitPoint);
