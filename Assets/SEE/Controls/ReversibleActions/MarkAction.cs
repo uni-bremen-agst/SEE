@@ -116,7 +116,6 @@ namespace SEE.Controls.ReversibleActions
         {
             return new MarkAction();
         }
-        
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
