@@ -19,7 +19,6 @@ namespace SEE.Controls.ReversibleActions
             Finish
         }
         private ProgressState progress = ProgressState.NoNodeSelected;
-        
         private GameObject markedGameNode;
 
         private Memento memento;
