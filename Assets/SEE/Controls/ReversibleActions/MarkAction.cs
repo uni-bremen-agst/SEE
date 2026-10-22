@@ -128,6 +128,5 @@ namespace SEE.Controls.ReversibleActions
                 memento.NodeID
             };
         }
-        
     }
 }
