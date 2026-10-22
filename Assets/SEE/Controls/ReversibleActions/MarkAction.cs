@@ -67,7 +67,6 @@ namespace SEE.Controls.ReversibleActions
                     }
                     break;
                 }
-        
                 case ProgressState.Finish:
                     result = true;
                     CurrentState = IReversibleAction.Progress.Completed;
