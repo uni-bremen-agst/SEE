@@ -86,7 +86,6 @@ namespace SEE.Controls.ReversibleActions
                 SetMarked(node, memento.WasMarked);
             }
         }
-        
         public override void Redo()
         {
             base.Redo();
