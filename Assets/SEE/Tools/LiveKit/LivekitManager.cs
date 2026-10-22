@@ -47,8 +47,14 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private LocalVideoTrack publishedVideoTrack = null;
 
+        /// <summary>
+        /// The local audio track being published to the LiveKit server.
+        /// </summary>
         private LocalAudioTrack publishedAudioTrack = null;
 
+        /// <summary>
+        /// The gameobject the microphone of the local player is attached to.
+        /// </summary>
         private GameObject localAudioObject;
 
         /// <summary>
@@ -61,7 +67,12 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private readonly List<RtcVideoSource> rtcVideoSources = new();
 
-        private readonly List<RtcAudioSource> rtcAudioSources = new();
+        private RtcAudioSource rtcAudioSource;
+
+        /// <summary>
+        /// Whether an audio toggle is connecting, publishing, or unpublishing.
+        /// </summary>
+        private bool audioOperationInProgress;
 
         /// <summary>
         /// A list of video streams from remote participants in the LiveKit room.
@@ -163,23 +174,42 @@ namespace SEE.Tools.LiveKit
                 }
             }
 
-            if (SEEInput.ToggleVoiceChat() && UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
+            if (UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit && SEEInput.ToggleVoiceChat())
             {
-                if (publishedAudioTrack == null)
+                StartCoroutine(ToggleAudio());
+            }
+        }
+
+        /// <summary>
+        /// Toggles microphone publishing while preventing overlapping audio operations.
+        /// </summary>
+        /// <returns>Coroutine to handle the async publishing or unpublishing process.</returns>
+        private IEnumerator ToggleAudio()
+        {
+            if (audioOperationInProgress)
+            {
+                yield break;
+            }
+
+            audioOperationInProgress = true;
+            try
+            {
+                if (publishedAudioTrack != null)
                 {
-                    if (room == null || !room.IsConnected)
-                    {
-                        StartCoroutine(ConnectAndPublish(publishVideo: false, publishAudio: true));
-                    }
-                    else
-                    {
-                        StartCoroutine(PublishAudio());
-                    }
+                    yield return UnpublishAudio();
+                }
+                else if (room == null || !room.IsConnected)
+                {
+                    yield return ConnectAndPublish(publishVideo: false, publishAudio: true);
                 }
                 else
                 {
-                    StartCoroutine(UnpublishAudio());
+                    yield return PublishAudio();
                 }
+            }
+            finally
+            {
+                audioOperationInProgress = false;
             }
         }
 
@@ -199,13 +229,8 @@ namespace SEE.Tools.LiveKit
                 Debug.LogError($"Failed to unpublish microphone track: {unpublish}");
                 yield break;
             }
-
-            foreach (RtcAudioSource source in rtcAudioSources)
-            {
-                source.Stop();
-                source.Dispose();
-            }
-            rtcAudioSources.Clear();
+            rtcAudioSource.Stop();
+            rtcAudioSource.Dispose();
 
             if (localAudioObject != null)
             {
@@ -575,9 +600,7 @@ namespace SEE.Tools.LiveKit
             {
                 Debug.Log("Track published!");
             }
-
-            rtcAudioSources.Add(rtcSource);
-
+            rtcAudioSource = rtcSource;
             rtcSource.Start();
             UIOverlay.ToggleLiveKitAudio();
         }
@@ -797,13 +820,9 @@ namespace SEE.Tools.LiveKit
                 videoStream.Stop();
             }
             videoStreams.Clear();
+            rtcAudioSource.Stop();
+            rtcAudioSource.Dispose();
 
-            foreach (RtcAudioSource rtcAudioSource in rtcAudioSources)
-            {
-                rtcAudioSource.Stop();
-                rtcAudioSource.Dispose();
-            }
-            rtcAudioSources.Clear();
             publishedAudioTrack = null;
 
             if (localAudioObject != null)
