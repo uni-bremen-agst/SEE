@@ -394,14 +394,15 @@ namespace SEE.Tools.LiveKit
                 Disconnect();
             }
             // Initialize a new room instance.
-            room = new();
+            Room connectingRoom = new();
+            room = connectingRoom;
 
             // Subscribe to events related to track management.
-            room.TrackSubscribed += TrackSubscribed;
-            room.TrackUnsubscribed += UnTrackSubscribed;
-            room.Disconnected += HandleRoomDisconnected;
+            connectingRoom.TrackSubscribed += TrackSubscribed;
+            connectingRoom.TrackUnsubscribed += UnTrackSubscribed;
+            connectingRoom.Disconnected += HandleRoomDisconnected;
 
-            room.DataReceived += (data, participant, kind, topic) =>
+            Room.DataDelegate dataReceived = (data, participant, kind, topic) =>
             {
                 switch (topic)
                 {
@@ -419,11 +420,12 @@ namespace SEE.Tools.LiveKit
                         break;
                 }
             };
+            connectingRoom.DataReceived += dataReceived;
 
             RoomOptions options = new();
             Net.Util.Logger.Log($"Try connect to livekit server at: {UserSetting.Instance.Video.LiveKitUrl}");
             // Attempt to connect to the room using the LiveKit server URL and the provided token.;
-            ConnectInstruction connect = room.Connect(UserSetting.Instance.Video.LiveKitUrl, token, options);
+            ConnectInstruction connect = connectingRoom.Connect(UserSetting.Instance.Video.LiveKitUrl, token, options);
             float elapsed = 0f;
             float timeoutSeconds = 10f;
             while (!connect.IsDone)
@@ -433,8 +435,15 @@ namespace SEE.Tools.LiveKit
                     ShowNotification.Error("LiveKit",
                         $"Connection to room \"{UserSetting.Instance.Video.RoomName}\" timed out after {timeoutSeconds} seconds.");
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
-                    room.Disconnect();
-                    room = null;
+                    connectingRoom.TrackSubscribed -= TrackSubscribed;
+                    connectingRoom.TrackUnsubscribed -= UnTrackSubscribed;
+                    connectingRoom.Disconnected -= HandleRoomDisconnected;
+                    connectingRoom.DataReceived -= dataReceived;
+                    if (room == connectingRoom)
+                    {
+                        room = null;
+                    }
+                    DisconnectAfterConnectAsync(connectingRoom, connect).Forget();
                     return;
                 }
                 elapsed += Time.deltaTime;
@@ -454,6 +463,18 @@ namespace SEE.Tools.LiveKit
                 Debug.Log($"[LiveKit] Connected to \"{room.Name}\" \n");
                 ConnectionState = ConnectionStatus.Connected;
             }
+        }
+
+        /// <summary>
+        /// Closes an abandoned connection attempt once the SDK can disconnect it.
+        /// Calling Room.Disconnect while Connect is pending has no effect.
+        /// </summary>
+        /// <param name="connectingRoom">The abandoned room, not a subsequent connection.</param>
+        /// <param name="connect">The pending connection instruction.</param>
+        private static async UniTask DisconnectAfterConnectAsync(Room connectingRoom, ConnectInstruction connect)
+        {
+            await UniTask.WaitUntil(() => connect.IsDone);
+            connectingRoom.Disconnect();
         }
 
         /// <summary>
