@@ -15,7 +15,6 @@ namespace SEE.Net.Actions.GraphElement
         {
             ShouldMark = shouldMark;
         }
-        
         public override void ExecuteOnClient()
         {
             GameObject node = Find(GraphElementID);
