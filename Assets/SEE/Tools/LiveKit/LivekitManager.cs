@@ -140,6 +140,7 @@ namespace SEE.Tools.LiveKit
             {
                 gameObject.SetActive(false);
             }
+
             if (UserSetting.Instance.VoiceChat == VoiceChatSystems.LiveKit)
             {
                 StartCoroutine(FetchTokenAndJoinRoomAsync().ToCoroutine());
@@ -423,7 +424,7 @@ namespace SEE.Tools.LiveKit
             connectingRoom.DataReceived += dataReceived;
 
             RoomOptions options = new();
-            Net.Util.Logger.Log($"Try connect to livekit server at: {UserSetting.Instance.Video.LiveKitUrl}");
+            Net.Util.Logger.Log($"Try connect to livekit server at: {UserSetting.Instance.Video.LiveKitUrl}\n");
             // Attempt to connect to the room using the LiveKit server URL and the provided token.;
             ConnectInstruction connect = connectingRoom.Connect(UserSetting.Instance.Video.LiveKitUrl, token, options);
             float elapsed = 0f;
@@ -618,13 +619,7 @@ namespace SEE.Tools.LiveKit
         /// <returns>A coroutines to manage the operation.</returns>
         private IEnumerator PublishAudio()
         {
-            if (room == null || !room.IsConnected)
-            {
-                ShowNotification.Error("LiveKit", "Not connected.");
-                yield break;
-            }
-
-            if (publishedAudioTrack != null)
+            if (room == null || !room.IsConnected || publishedAudioTrack != null)
             {
                 yield break;
             }
@@ -636,9 +631,7 @@ namespace SEE.Tools.LiveKit
             }
 
             Debug.Log("Publishing microphone using Unity Audio\n");
-
             livekitMicrophone = new GameObject("my-audio-source");
-
             string microphone = UnityEngine.Microphone.devices.FirstOrDefault(x => x == UserSetting.Instance.Audio.Microphone.MicrophoneDevice) ?? UnityEngine.Microphone.devices[0];
 
             AudioProcessingOptions processing = new AudioProcessingOptions

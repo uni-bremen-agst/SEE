@@ -89,12 +89,24 @@ namespace SEE.UI
         /// </summary>
         private Toggle remoteSfxToggle;
 
+        /// <summary>
+        /// Dropdown for selecting the microphone device to use.
+        /// </summary>
         private Dropdown microphoneDropdown;
 
+        /// <summary>
+        /// Checkbox whenever echo cancellation should be enabled.
+        /// </summary>
         private Toggle echoCancellationToggle;
 
+        /// <summary>
+        /// Checkbox whenever noise suppression should be enabled.
+        /// </summary>
         private Toggle noiseSuppressionToggle;
 
+        /// <summary>
+        /// Checkbox whenever auto gain control should be enabled.
+        /// </summary>
         private Toggle autoGainControlToggle;
 
         /// <summary>
