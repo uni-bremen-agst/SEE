@@ -86,7 +86,6 @@ namespace SEE.Controls.ReversibleActions
               new("New Node", "Create a new node",
                   Color.green.Darker(), '+',
                   AddNodeAction.CreateReversibleAction);
-            
             NewMarker =
                 new("New Marker", "Create a new marker",
                     Color.green.Darker(), '+',
