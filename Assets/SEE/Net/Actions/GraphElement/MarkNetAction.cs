@@ -18,8 +18,7 @@ namespace SEE.Net.Actions.GraphElement
         /// Constructor.
         /// </summary>
         /// <param name="nodeID">The ID for the node to mark or unmark.</param>
-        public MarkNetAction
-            (string nodeID)
+        public MarkNetAction(string nodeID)
             : base(nodeID)
         {
         }
@@ -30,11 +29,7 @@ namespace SEE.Net.Actions.GraphElement
         public override void ExecuteOnClient()
         {
             GameObject node = Find(GraphElementID);
-
-            if (node != null)
-            {
-                GameNodeMarker.ToggleMark(node);
-            }
+            GameNodeMarker.ToggleMark(node);
         }
     }
 }

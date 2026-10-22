@@ -15,7 +15,7 @@ namespace SEE.SceneManipulation
         /// Creates a marker above the given node if it is not already marked.
         /// </summary>
         /// <param name="node">The node to mark.</param>
-        public static void MarkNode(GameObject node)
+        private static void MarkNode(GameObject node)
         {
             if (IsMarked(node))
             {
@@ -46,22 +46,18 @@ namespace SEE.SceneManipulation
         /// </summary>
         /// <param name="node">The node to check.</param>
         /// <returns>True if the node is marked, otherwise false.</returns>
-        public static bool IsMarked(GameObject node)
+        private static bool IsMarked(GameObject node)
         {
             Transform sphere = node.transform.Find("MarkSphere");
 
-            if (sphere != null)
-            {
-                return true;
-            }
-            return false;
+            return sphere != null;
         }
 
         /// <summary>
         /// Removes the marker from the given node.
         /// </summary>
         /// <param name="node">The node to unmark.</param>
-        public static void UnmarkNode(GameObject node)
+        private static void UnmarkNode(GameObject node)
         {
             Transform marker = node.transform.Find("MarkSphere");
 

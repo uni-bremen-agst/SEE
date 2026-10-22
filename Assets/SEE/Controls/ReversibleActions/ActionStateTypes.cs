@@ -4,7 +4,6 @@ using SEE.Extensions;
 using SEE.Controls.ReversibleActions.HolisticMetrics;
 using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Controls.ReversibleActions.Tables;
-using UnityEditor.Timeline.Actions;
 
 namespace SEE.Controls.ReversibleActions
 {

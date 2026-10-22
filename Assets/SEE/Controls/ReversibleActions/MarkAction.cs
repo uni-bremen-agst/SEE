@@ -66,7 +66,6 @@ namespace SEE.Controls.ReversibleActions
         private void ToggleNodeMark(GameObject clickedNode)
         {
             targetNode = clickedNode;
-
             GameNodeMarker.ToggleMark(targetNode);
             BroadcastMarkChange();
         }
