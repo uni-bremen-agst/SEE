@@ -30,10 +30,15 @@ namespace SEE.Controls.ReversibleActions
                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef) == HitGraphElement.Node
                && elementRef.gameObject.TryGetComponent(out InteractableObject io)
                && io.IsInteractable(raycastHit.point))
-
             {
-                CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
+                GameObject node = elementRef.gameObject;
+                nodeID = node.name;
+                previouslyMarked = GameNodeMarker.IsMarked(node);
+                SetMarked(!previouslyMarked);
+                CurrentState = IReversibleAction.Progress.Completed;
+                return true;
             }
+
             else if (UserSetting.IsVR
                 && XRSEEActions.Selected
                 && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
