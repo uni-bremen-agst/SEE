@@ -1,7 +1,6 @@
 ﻿using SEE.Graphs.Config;
 using SEE.UI;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.UserSettings
 {

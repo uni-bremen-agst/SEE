@@ -682,8 +682,10 @@ namespace SEE.Tools.LiveKit
 
         /// <summary>
         /// Establishes a connection to the LiveKit room if not already connected
-        /// and publishes the local video track.
+        /// and publishes the local video or audio track when specified.
         /// </summary>
+        /// <param name="publishAudio">Whenever the audio track should be published.</param>
+        /// <param name="publishVideo">Whenever the video track should be published.</param>
         /// <returns>
         /// A coroutine that yields while the connection and publishing process is ongoing.
         /// </returns>
