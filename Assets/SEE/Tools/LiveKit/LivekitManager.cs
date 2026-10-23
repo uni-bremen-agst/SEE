@@ -244,7 +244,7 @@ namespace SEE.Tools.LiveKit
             rtcAudioSource = null;
 
             publishedAudioTrack = null;
-            Destroy(livekitMicrophone);
+            Destroyer.Destroy(livekitMicrophone);
             livekitMicrophone = null;
             UIOverlay.SetLiveKitAudioActive(false);
         }
@@ -665,7 +665,7 @@ namespace SEE.Tools.LiveKit
             if (publish.IsError)
             {
                 ShowNotification.Error("Livekit error", "Publishing audio failed");
-                Destroy(livekitMicrophone);
+                Destroyer.Destroy(livekitMicrophone);
                 livekitMicrophone = null;
                 publishedAudioTrack = null;
                 rtcSource.Dispose();
@@ -847,7 +847,7 @@ namespace SEE.Tools.LiveKit
                 }
                 if (audioOutputSources.Remove(audioTrack.Sid, out source))
                 {
-                    Destroy(source);
+                    Destroyer.Destroy(source);
                 }
             }
         }
@@ -903,7 +903,7 @@ namespace SEE.Tools.LiveKit
 
             if (livekitMicrophone != null)
             {
-                Destroy(livekitMicrophone);
+                Destroyer.Destroy(livekitMicrophone);
                 livekitMicrophone = null;
             }
 
@@ -919,7 +919,7 @@ namespace SEE.Tools.LiveKit
                 {
                     avatar.ClearLiveKitAudioSource(source);
                 }
-                Destroy(source);
+                Destroyer.Destroy(source);
             }
             audioOutputSources.Clear();
 
