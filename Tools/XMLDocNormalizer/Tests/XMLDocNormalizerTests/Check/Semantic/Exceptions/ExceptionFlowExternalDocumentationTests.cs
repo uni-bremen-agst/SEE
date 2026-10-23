@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 projectRun,
                 "System.IO.IOException");
 
-            AssertContractPresent(
+            ExceptionFlowFiniteOrbitAssertions.ExternalDocumentationOutside(
                 solutionRun,
                 "System.IO.IOException");
         }
@@ -112,11 +112,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 projectRun,
                 "System.InvalidOperationException");
 
-            AssertContractPresent(
+            ExceptionFlowFiniteOrbitAssertions.ExternalDocumentationOutside(
                 solutionRun,
                 "System.IO.IOException");
 
-            AssertContractPresent(
+            ExceptionFlowFiniteOrbitAssertions.ExternalDocumentationOutside(
                 solutionRun,
                 "System.InvalidOperationException");
         }

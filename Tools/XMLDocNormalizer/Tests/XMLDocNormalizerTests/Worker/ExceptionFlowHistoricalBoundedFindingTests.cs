@@ -137,7 +137,7 @@ namespace XMLDocNormalizerTests.Worker
             if (project)
             {
                 Assert.False(result.Succeeded); Assert.True(result.GuardReached); Assert.True(result.SummaryRequested); Assert.Empty(result.Findings);
-                Assert.Equal(WorkerFailureCode.AnalysisFailure, result.Summary!.Dispatch!.Routing!.HistoricalAnalysis!.Failure!.WorkerFailure!.Code);
+                Assert.Equal(WorkerFailureCode.UnsupportedContext, result.Summary!.Dispatch!.Routing!.HistoricalAnalysis!.Failure!.WorkerFailure!.Code);
             }
             else
             {

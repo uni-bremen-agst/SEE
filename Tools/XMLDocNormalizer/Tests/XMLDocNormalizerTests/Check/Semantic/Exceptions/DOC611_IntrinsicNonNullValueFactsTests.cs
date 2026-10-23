@@ -173,11 +173,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentNullException",
-                    StringComparison.Ordinal));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>

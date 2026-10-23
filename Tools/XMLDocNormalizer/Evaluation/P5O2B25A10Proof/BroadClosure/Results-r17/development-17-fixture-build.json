@@ -1,0 +1,15 @@
+{
+    "Name":  "development-17-fixture-build",
+    "StartedUtc":  "2026-10-23T18:16:47.0681710Z",
+    "FinishedUtc":  "2026-10-23T18:16:50.1442852Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "build",
+                      "Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

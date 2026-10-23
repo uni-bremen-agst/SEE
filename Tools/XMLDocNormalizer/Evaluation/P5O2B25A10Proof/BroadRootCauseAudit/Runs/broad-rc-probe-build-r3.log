@@ -1,0 +1,13 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\Repository\SEE\Tools\XMLDocNormalizer\Evaluation\P5O2B25A10Proof\BroadRootCauseProbe\Probe.csproj" wiederhergestellt (in 43 ms.).
+D:\Repository\SEE\Tools\XMLDocNormalizer\Evaluation\P5O2B25A10Proof\BroadRootCauseProbe\Program.cs(85,77): error CS0136: Eine lokale Variable oder ein Parameter namens "selected" kann in diesem Bereich nicht deklariert werden, da der Name in einem einschließenden lokalen Bereich zur Definition einer lokalen Variablen oder eines Parameters verwendet wird. [D:\Repository\SEE\Tools\XMLDocNormalizer\Evaluation\P5O2B25A10Proof\BroadRootCauseProbe\Probe.csproj]
+
+Fehler beim Buildvorgang.
+
+D:\Repository\SEE\Tools\XMLDocNormalizer\Evaluation\P5O2B25A10Proof\BroadRootCauseProbe\Program.cs(85,77): error CS0136: Eine lokale Variable oder ein Parameter namens "selected" kann in diesem Bereich nicht deklariert werden, da der Name in einem einschließenden lokalen Bereich zur Definition einer lokalen Variablen oder eines Parameters verwendet wird. [D:\Repository\SEE\Tools\XMLDocNormalizer\Evaluation\P5O2B25A10Proof\BroadRootCauseProbe\Probe.csproj]
+    0 Warnung(en)
+    1 Fehler
+
+Verstrichene Zeit 00:00:01.71
+
+STDERR:

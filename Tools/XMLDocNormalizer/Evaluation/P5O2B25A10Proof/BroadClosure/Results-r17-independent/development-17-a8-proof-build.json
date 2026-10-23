@@ -1,0 +1,18 @@
+{
+    "Name":  "development-17-a8-proof-build",
+    "StartedUtc":  "2026-10-23T18:42:59.2391988Z",
+    "FinishedUtc":  "2026-10-23T18:43:01.4775905Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "build",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8\\FamilyProof.csproj",
+                      "--configfile",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\NuGet.Config",
+                      "-p:AnalyzerOutput=D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\Tests\\XMLDocNormalizerTests\\bin\\Debug\\net8.0",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

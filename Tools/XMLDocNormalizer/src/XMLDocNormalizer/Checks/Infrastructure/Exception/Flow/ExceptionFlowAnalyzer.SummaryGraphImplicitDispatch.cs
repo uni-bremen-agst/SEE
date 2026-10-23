@@ -64,7 +64,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             INamedTypeSymbol? exactReceiverType,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
@@ -194,7 +194,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 INamedTypeSymbol? exactReceiverType,
                 SemanticModel semanticModel,
                 ExceptionFlowSemanticEnvironment semanticContext,
-                ExceptionFlowSummaryGraph graph,
+                IExceptionFlowSummaryTargetSink graph,
                 ExceptionFlowSummaryFragment fragment,
                 ExceptionFlowCallContext callerContext)
         {
@@ -263,7 +263,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             string description,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
@@ -400,7 +400,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             string description,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
@@ -581,7 +581,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowPathStepKind stepKind,
             SyntaxNode sourceNode,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment)
         {
             ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(

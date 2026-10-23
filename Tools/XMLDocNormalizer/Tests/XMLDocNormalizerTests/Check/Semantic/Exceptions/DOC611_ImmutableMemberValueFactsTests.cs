@@ -140,19 +140,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Equal(2, findings.Count);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentNullException",
-                    StringComparison.Ordinal));
-
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentException",
-                    StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -187,19 +176,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Equal(2, findings.Count);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentNullException",
-                    StringComparison.Ordinal));
-
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentException",
-                    StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -240,19 +218,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Equal(2, findings.Count);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentNullException",
-                    StringComparison.Ordinal));
-
-            Assert.Contains(
-                findings,
-                finding => finding.Message.Contains(
-                    "System.ArgumentException",
-                    StringComparison.Ordinal));
         }
 
         /// <summary>

@@ -1,0 +1,15 @@
+{
+    "Name":  "development-11-test-build",
+    "StartedUtc":  "2026-10-23T13:44:55.0267348Z",
+    "FinishedUtc":  "2026-10-23T13:45:06.2313667Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-11",
+    "Arguments":  [
+                      "build",
+                      "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

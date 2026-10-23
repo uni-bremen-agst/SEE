@@ -187,7 +187,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Single(declared.Findings, finding => finding.Smell.ID == "DOC631");
             Assert.DoesNotContain(project.Findings.Concat(declared.Findings), finding => finding.Smell.ID == "DOC632");
             var worker = await Client().AnalyzeAsync(payload);
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result);
             Stopped(worker); NoHistoricalLoaded();
             await Evidence("uncertainty", new { Project = project, Declared = declared, worker.Failure, ProcessesStopped = true, NoPartialResult = true });
         }

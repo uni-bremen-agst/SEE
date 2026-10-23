@@ -1,0 +1,44 @@
+{
+    "CapturedUtc":  "2026-10-23T12:29:53.6522737Z",
+    "Status":  "STOP_FindingAssertionNotApproved",
+    "Source":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-07\\artifacts\\p5o2b25a10\\analysis\\b25\\ownership-cardinality.json",
+    "Witness":  "Evaluation/P5O2B25A10Proof/ownership-cardinality-followup.json",
+    "WitnessSha256":  "CFAAC64408F0783BB5813E0A44C57DF4B37DF7B476B01A730B10B1156F6657FC",
+    "Owners":  [
+                   "Original.Solution.P0",
+                   "Original.Solution.P1"
+               ],
+    "SelectedOwner":  "Original.Solution.P1",
+    "Selection":  "Complete canonical assembly identity equality; not collection position",
+    "FindingCount":  2,
+    "FindingIds":  [
+                       "DOC611",
+                       "DOC611"
+                   ],
+    "ProtectedFindingAssertions":  [
+                                       {
+                                           "Assertion":  "Assert.Single(native.GetProperty(\"findings\").EnumerateArray());",
+                                           "InHead":  true,
+                                           "InCurrent":  true
+                                       },
+                                       {
+                                           "Assertion":  "Assert.Equal(\"DOC611\", native.GetProperty(\"findings\")[0].GetProperty(\"smell\").GetProperty(\"id\").GetString());",
+                                           "InHead":  true,
+                                           "InCurrent":  true
+                                       }
+                                   ],
+    "ProductionSourceDifferencesSinceExport05":  [
+
+                                                 ],
+    "SingleAffectedTestRun":  "artifacts/p5o2b25a10/runs/development-07-b25-ownership.json",
+    "TestExitCode":  1,
+    "TestCount":  1,
+    "Failed":  1,
+    "Passed":  0,
+    "Skipped":  0,
+    "OwnerAndP1PathAssertionsPassed":  true,
+    "FindingCountAssertionPassed":  false,
+    "SubsequentFindingIdAssertionExecuted":  false,
+    "A10Complete":  false,
+    "B25BActivated":  false
+}

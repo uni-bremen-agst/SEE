@@ -1,0 +1,15 @@
+{
+    "Name":  "development-17-peer-build",
+    "StartedUtc":  "2026-10-23T18:16:52.9012858Z",
+    "FinishedUtc":  "2026-10-23T18:16:55.2363822Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "build",
+                      "Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

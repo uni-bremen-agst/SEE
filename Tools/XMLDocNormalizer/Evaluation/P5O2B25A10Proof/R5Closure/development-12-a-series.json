@@ -1,0 +1,21 @@
+{
+    "Name":  "development-12-a-series",
+    "StartedUtc":  "2026-10-23T14:31:08.5508714Z",
+    "FinishedUtc":  "2026-10-23T14:33:18.2078626Z",
+    "ExitCode":  1,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-12",
+    "Arguments":  [
+                      "test",
+                      "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                      "--no-build",
+                      "--no-restore",
+                      "--filter",
+                      "FullyQualifiedName~ExceptionFlowFiniteOrbitAdmissionTests|FullyQualifiedName~ExceptionFlowAssemblyQualifiedOwnershipTests|FullyQualifiedName~ExceptionFlowCanonicalExceptionIdentityTests|FullyQualifiedName~ExceptionFlowConstructedInvocationContextTests|FullyQualifiedName~ExceptionFlowBoundedGenericContextTests|FullyQualifiedName~ExceptionFlowRecursiveSummaryClosureTests|FullyQualifiedName~ExceptionFlowGenericExpansionBoundaryTests|FullyQualifiedName~ExceptionFlowHistoricalSolutionFindingTests",
+                      "--logger",
+                      "trx;LogFileName=a-series.trx",
+                      "--results-directory",
+                      "artifacts/a10-development-results",
+                      "-v:minimal"
+                  ]
+}

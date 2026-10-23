@@ -1,0 +1,15 @@
+{
+    "Name":  "development-18-fixture-build",
+    "StartedUtc":  "2026-10-23T19:11:49.3292845Z",
+    "FinishedUtc":  "2026-10-23T19:11:51.5561214Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "C:\\Users\\Krause\\AppData\\Local\\Temp\\a10-277b50ca",
+    "Arguments":  [
+                      "build",
+                      "Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

@@ -75,6 +75,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowSummaryFragment fragment =
                     new();
 
+                graph.BuildingKey = key;
+                graph.BuildingContext = callContext;
+                graph.BuildingCompilation = semanticContext.GetAnalysisScopes()
+                    .Select(scope => scope.Compilation).FirstOrDefault(compilation =>
+                        Microsoft.CodeAnalysis.SymbolEqualityComparer.Default.Equals(compilation.Assembly, key.Symbol.ContainingAssembly)
+                        || key.Symbol.DeclaringSyntaxReferences.Any(reference => compilation.ContainsSyntaxTree(reference.SyntaxTree)));
+
                 bool analyzedAnyBody =
                     ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(
                         key.Symbol,
@@ -90,6 +97,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 summary.Merge(
                     fragment);
+
+                graph.BuildingKey = null;
+                graph.BuildingContext = null;
+                graph.BuildingCompilation = null;
             }
         }
     }

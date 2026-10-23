@@ -40,7 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -85,7 +85,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -288,7 +288,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -346,7 +346,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<IMethodSymbol> addedMethods)

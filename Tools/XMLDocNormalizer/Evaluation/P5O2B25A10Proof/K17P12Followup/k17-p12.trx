@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="b46e479b-4349-4edf-ad85-0dd0b2d8a47a" name="Krause@KRAUSEM 2026-10-23 15:45:28" runUser="Krausem\CodexSandboxOffline" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-23T15:45:28.7818069+02:00" queuing="2026-10-23T15:45:28.7818071+02:00" start="2026-10-23T15:45:22.4154914+02:00" finish="2026-10-23T15:45:28.7865270+02:00" />
+  <TestSettings name="default" id="9d92d9bd-dd30-44cb-9b85-b1ffe30023a5">
+    <Deployment runDeploymentRoot="Krause_KRAUSEM_2026-10-23_15_45_28" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e2f52117-987f-4612-8f80-34a0b85d4946" testId="7bfd8cbf-0616-2a86-ca98-3fe1c8a0fb2f" testName="XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests.ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught" computerName="KRAUSEM" duration="00:00:00.0902467" startTime="2026-10-23T15:45:28.7323119+02:00" endTime="2026-10-23T15:45:28.7323204+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e2f52117-987f-4612-8f80-34a0b85d4946">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Same() Failure: Values are not the same instance&#xD;
+Expected: Shared.Outer&lt;int&gt;.Fault&#xD;
+Actual:   Shared.Outer&lt;int&gt;.Fault</Message>
+          <StackTrace>   at XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests.ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught() in D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-11\Tests\XMLDocNormalizerTests\Worker\ExceptionFlowAssemblyQualifiedOwnershipTests.cs:line 62&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests.ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-11\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="7bfd8cbf-0616-2a86-ca98-3fe1c8a0fb2f">
+      <Execution id="e2f52117-987f-4612-8f80-34a0b85d4946" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-11\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests" name="ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="7bfd8cbf-0616-2a86-ca98-3fe1c8a0fb2f" executionId="e2f52117-987f-4612-8f80-34a0b85d4946" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Ergebnisse nicht in einer Liste" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Alle geladenen Ergebnisse" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.24)&#xD;
+[xUnit.net 00:00:02.28]   Discovering: XMLDocNormalizerTests&#xD;
+[xUnit.net 00:00:03.28]   Discovered:  XMLDocNormalizerTests&#xD;
+[xUnit.net 00:00:03.28]   Starting:    XMLDocNormalizerTests&#xD;
+[xUnit.net 00:00:03.40]       Assert.Same() Failure: Values are not the same instance&#xD;
+[xUnit.net 00:00:03.40]       Expected: Shared.Outer&lt;int&gt;.Fault&#xD;
+[xUnit.net 00:00:03.40]       Actual:   Shared.Outer&lt;int&gt;.Fault&#xD;
+[xUnit.net 00:00:03.41]       Stack Trace:&#xD;
+[xUnit.net 00:00:03.41]         D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-11\Tests\XMLDocNormalizerTests\Worker\ExceptionFlowAssemblyQualifiedOwnershipTests.cs(62,0): at XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests.ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught()&#xD;
+[xUnit.net 00:00:03.41]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:03.41]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:03.41]   Finished:    XMLDocNormalizerTests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="KRAUSEM" outcome="Error" timestamp="2026-10-23T15:45:28.7304768+02:00">
+        <Text>[xUnit.net 00:00:03.40]     XMLDocNormalizerTests.Worker.ExceptionFlowAssemblyQualifiedOwnershipTests.ConstructedContainingType_CompleteIdentityButNoExactRebind_LeavesSameTypeUncaught [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

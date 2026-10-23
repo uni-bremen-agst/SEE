@@ -1,0 +1,21 @@
+{
+    "Name":  "development-13-r2-first",
+    "StartedUtc":  "2026-10-23T14:40:00.2571734Z",
+    "FinishedUtc":  "2026-10-23T14:40:10.8348215Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-13",
+    "Arguments":  [
+                      "test",
+                      "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                      "--no-build",
+                      "--no-restore",
+                      "--filter",
+                      "FullyQualifiedName~GenuineWorkerAndCurrentShareExistingFiniteDefinitionFold_NotConstructedCorrectness",
+                      "--logger",
+                      "trx;LogFileName=r2-first.trx",
+                      "--results-directory",
+                      "artifacts/a10-development-results",
+                      "-v:minimal"
+                  ]
+}

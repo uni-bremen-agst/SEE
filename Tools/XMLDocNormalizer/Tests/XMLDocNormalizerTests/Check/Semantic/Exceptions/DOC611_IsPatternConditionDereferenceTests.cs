@@ -38,7 +38,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInsideIsPattern_ProjectTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInsideIsPatternDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInsideIsPatternDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -49,7 +49,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInsideIsPattern_SolutionTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInsideIsPatternDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInsideIsPatternDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -156,6 +156,46 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.Equal(
                 "System.ArgumentNullException",
                 finding.Context.TargetName);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertConditionalAccessInsideIsPatternDoesNotProveReceiverNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates an optionally accessed item.</summary>
+                    public void M(Item? item)
+                    {
+                        if (item?.Value is not object)
+                        {
+                            Validate(item);
+                        }
+                    }
+
+                    private static void Validate(Item? item)
+                    {
+                        System.ArgumentNullException.ThrowIfNull(item);
+                    }
+
+                    public sealed class Item
+                    {
+                        public object? Value { get; set; }
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
+
         }
     }
 }

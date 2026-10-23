@@ -40,7 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -147,7 +147,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ITypeSymbol? receiverType,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -293,7 +293,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ITypeSymbol? receiverType,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
@@ -430,7 +430,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext targetContext,
             SyntaxNode sourceNode,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment)
         {
             ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
@@ -473,7 +473,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {

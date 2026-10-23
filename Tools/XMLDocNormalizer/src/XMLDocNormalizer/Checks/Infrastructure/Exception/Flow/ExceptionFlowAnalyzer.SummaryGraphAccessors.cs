@@ -39,7 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -111,7 +111,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -250,7 +250,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IPropertyReferenceOperation? propertyOperation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -261,13 +261,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     new(propertySymbol);
 
                 ExceptionFlowCallableKey propertyKey =
-                    new(
-                        propertySymbol,
-                        propertyContext.Key);
-
-                graph.GetOrAdd(
-                    propertyKey,
-                    propertyContext);
+                    graph.RegisterTarget(propertySymbol, propertyContext);
 
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(
@@ -348,7 +342,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -422,7 +416,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -585,7 +579,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AssignmentExpressionSyntax assignment,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {

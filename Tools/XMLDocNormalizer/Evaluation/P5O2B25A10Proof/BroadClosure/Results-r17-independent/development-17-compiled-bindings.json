@@ -1,0 +1,17 @@
+{
+    "Name":  "development-17-compiled-bindings",
+    "StartedUtc":  "2026-10-23T18:43:25.4765165Z",
+    "FinishedUtc":  "2026-10-23T18:43:26.9191708Z",
+    "ExitCode":  0,
+    "Executable":  "powershell",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "-NoProfile",
+                      "-ExecutionPolicy",
+                      "Bypass",
+                      "-File",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-CompiledInputs.ps1",
+                      "-Revision",
+                      "17"
+                  ]
+}

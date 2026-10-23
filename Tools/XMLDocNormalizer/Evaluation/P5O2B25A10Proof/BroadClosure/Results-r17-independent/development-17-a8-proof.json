@@ -1,0 +1,12 @@
+{
+    "Name":  "development-17-a8-proof",
+    "StartedUtc":  "2026-10-23T18:43:01.6572943Z",
+    "FinishedUtc":  "2026-10-23T18:43:04.1807013Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8\\bin\\Debug\\net8.0\\FamilyProof.dll",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8-proof.json"
+                  ]
+}

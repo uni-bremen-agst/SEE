@@ -124,7 +124,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(4, run.ExitCode);
             Assert.Contains("External target failed:", run.Stderr);
             if (scenario == "attestation") { Assert.Contains("execution attestation", run.Stderr, StringComparison.Ordinal); }
-            if (scenario == "worker-error") { Assert.Contains("incomplete", run.Stderr, StringComparison.OrdinalIgnoreCase); }
+            if (scenario == "worker-error") { Assert.Contains("outside A9-FiniteOrbit-v1", run.Stderr, StringComparison.OrdinalIgnoreCase); }
             if (scenario == "contract") { Assert.Contains("B21/B22", run.Stderr, StringComparison.Ordinal); }
             Assert.DoesNotContain("Check succeeded", run.Stdout); Assert.DoesNotContain("documentation issue(s)", run.Stdout);
             Assert.False(File.Exists(run.Report));

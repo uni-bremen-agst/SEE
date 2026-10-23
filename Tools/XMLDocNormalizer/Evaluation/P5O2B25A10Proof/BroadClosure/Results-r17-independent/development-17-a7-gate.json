@@ -1,0 +1,17 @@
+{
+    "Name":  "development-17-a7-gate",
+    "StartedUtc":  "2026-10-23T18:44:01.3857831Z",
+    "FinishedUtc":  "2026-10-23T18:44:02.3163914Z",
+    "ExitCode":  0,
+    "Executable":  "powershell",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "-NoProfile",
+                      "-ExecutionPolicy",
+                      "Bypass",
+                      "-File",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Verify-Gate.ps1",
+                      "-Gate",
+                      "A7"
+                  ]
+}

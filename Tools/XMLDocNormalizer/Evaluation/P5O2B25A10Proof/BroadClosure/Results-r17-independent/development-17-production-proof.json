@@ -1,0 +1,13 @@
+{
+    "Name":  "development-17-production-proof",
+    "StartedUtc":  "2026-10-23T18:43:09.8706451Z",
+    "FinishedUtc":  "2026-10-23T18:43:12.5102554Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production\\bin\\Debug\\net8.0\\Validation.dll",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production-proof.json"
+                  ]
+}

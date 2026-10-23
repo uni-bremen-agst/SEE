@@ -231,7 +231,7 @@ namespace XMLDocNormalizerTests.Worker
             var native = Native(uncertain); Assert.False(native.GetProperty("hasDeclaredTypes").GetBoolean()); Assert.Empty(native.GetProperty("declaredFindings").EnumerateArray());
             var failed = await XmlDocExceptionSemanticDetector.AnalyzeExternalExceptionFlowAsync((await Original(uncertain)) with { DeclaredPolicy = request }, new(new(Client())));
             var call = failed.Dispatch!.Routing!.HistoricalAnalysis!; Assert.False(failed.Succeeded); Assert.Null(call.DeclaredDocumentation);
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, call.Failure!.WorkerFailure!.Code); Assert.Null(failed.Result); Assert.Null(failed.Dispatch.Routing.CurrentAnalysis); Stopped(call);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, call.Failure!.WorkerFailure!.Code); Assert.Null(failed.Result); Assert.Null(failed.Dispatch.Routing.CurrentAnalysis); Stopped(call);
             NoHistoricalLoaded();
             await Evidence("admission", new
             {

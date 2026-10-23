@@ -186,7 +186,7 @@ namespace XMLDocNormalizerTests.Worker
 
         [Theory]
         [InlineData("public static class Fixture { public static void Root() { Missing(); } }", "CompilationFailure")]
-        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "AnalysisFailure")]
+        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "UnsupportedContext")]
         public async Task WorkerStructuredFailure_PropagatesOriginalFailureAndStopsProcess(string source, string expected)
         {
             var result = await DispatchHistorical(Input(source));

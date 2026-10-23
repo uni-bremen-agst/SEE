@@ -1,0 +1,21 @@
+{
+    "Name":  "development-17-await-first",
+    "StartedUtc":  "2026-10-23T18:17:02.2417030Z",
+    "FinishedUtc":  "2026-10-23T18:17:11.6316558Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-17",
+    "Arguments":  [
+                      "test",
+                      "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                      "--no-build",
+                      "--no-restore",
+                      "--filter",
+                      "FullyQualifiedName~HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure",
+                      "--logger",
+                      "trx;LogFileName=await-first.trx",
+                      "--results-directory",
+                      "artifacts/a10-closure-results",
+                      "-v:minimal"
+                  ]
+}

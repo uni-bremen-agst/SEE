@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
@@ -37,7 +38,7 @@ namespace XMLDocNormalizerTests.Worker
                     : list;
                 IMethodSymbol successor = Recreate(instance, successorArgument, containing);
                 Assert.NotEqual(key, ExactCandidateKey(successor));
-                // This is the CURRENT defect: the real key still erases the construction.
+                // Legacy bare declaration keys, not the admitted invocation-context keys (R6).
                 Assert.Equal(new ExceptionFlowCallableKey(instance, string.Empty), new ExceptionFlowCallableKey(successor, string.Empty));
                 Assert.Equal(step + 1, graph.Count);
                 observations.Add(new { Step = step, ExactKey = CanonicalIdentityKeyWriter.Write(RoslynCanonicalIdentityFactory.CreateCallableIdentity(instance)), SuccessorKey = CanonicalIdentityKeyWriter.Write(RoslynCanonicalIdentityFactory.CreateCallableIdentity(successor)) });
@@ -46,8 +47,10 @@ namespace XMLDocNormalizerTests.Worker
             graph.GetOrAdd(ExactCandidateKey(instance));
             Assert.Equal(witnessSteps + 1, graph.Count);
             Assert.NotNull(graph.DequeuePendingOrDefault());
-            Assert.Equal(2, run.Graph.Count); // Root plus the CURRENT definition-folded node.
-            Evidence("growth-" + containing + "-" + dictionary, new { Containing = containing, Dictionary = dictionary, WitnessSteps = witnessSteps, Observations = observations, ExactCandidateNodes = graph.Count, ProductionChanged = false, FinitePrefixIsNotTerminationProof = true });
+            Assert.False(run.Profile.Complete); // R4
+            Assert.Contains(run.Profile.Reasons, reason => reason.Category == "PositiveConstructorCycle");
+            Assert.Equal(0, run.Graph.Count);
+            Evidence("growth-" + containing + "-" + dictionary, new { Containing = containing, Dictionary = dictionary, WitnessSteps = witnessSteps, Observations = observations, ExactCandidateNodes = graph.Count, run.Profile, ProductionGraphCount = run.Graph.Count, FinitePrefixIsNotTerminationProof = true });
         }
 
         [Theory]
@@ -72,22 +75,30 @@ namespace XMLDocNormalizerTests.Worker
             ? method.ContainingType.OriginalDefinition.Construct(argument).GetMembers("Recur").OfType<IMethodSymbol>().Single()
             : method.OriginalDefinition.Construct(argument);
 
-        private static (ExceptionFlowSummaryGraphTestRun Run, IMethodSymbol Selected) Build(bool containing, string next)
+        private sealed record Run(CSharpCompilation Compilation, ExceptionFlowSummaryGraph Graph, ExceptionFlowFiniteOrbitProfile.Certificate Profile);
+
+        private static (Run Run, IMethodSymbol Selected) Build(bool containing, string next)
         {
             string api = containing
                 ? "public static class Api<T> { public static void Recur() { if (Flags.Stop) throw new Fault<T>(); Api<" + next + ">.Recur(); } }"
                 : "public static class Api { public static void Recur<T>() { if (Flags.Stop) throw new Fault<T>(); Recur<" + next + ">(); } }";
             string call = containing ? "Api<string>.Recur();" : "Api.Recur<string>();";
-            var run = ExceptionFlowSummaryGraphTestHelper.Build("public class Fault<T> : System.Exception {} public static class Flags { public static bool Stop; } " + api + "public static class Entry { public static void Root() { " + call + " } }", "Root");
-            var tree = run.Compilation.SyntaxTrees.Single();
+            string source = "public class Fault<T> : System.Exception {} public static class Flags { public static bool Stop; } " + api + "public static class Entry { public static void Root() { " + call + " } }";
+            var production = ExceptionFlowFiniteOrbitAdmissionTests.Create(source);
+            var profile = production.Session.Analyze(production.Root).ProfileOutcome!;
+            var tree = production.Compilation.SyntaxTrees.Single();
             var root = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Single(node => node.Identifier.ValueText == "Root");
-            var selected = (IMethodSymbol)run.Compilation.GetSemanticModel(tree).GetSymbolInfo(root.DescendantNodes().OfType<InvocationExpressionSyntax>().Single()).Symbol!;
-            return (run, selected);
+            var selected = (IMethodSymbol)production.Compilation.GetSemanticModel(tree).GetSymbolInfo(root.DescendantNodes().OfType<InvocationExpressionSyntax>().Single()).Symbol!;
+            // Preserve the successful raw Build of both finite controls; only
+            // R4's growing cases switch to the production certificate observer.
+            var graph = next is "T" or "int" ? ExceptionFlowSummaryGraphTestHelper.Build(source, "Root").Graph
+                : ExceptionFlowFiniteOrbitAdmissionTests.Graph(production.Session);
+            return (new(production.Compilation, graph, profile), selected);
         }
 
         private static void Evidence(string name, object value)
         {
-            string directory = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a6/analysis");
+            string directory = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a10/analysis/a6"); // R6
             Directory.CreateDirectory(directory);
             File.WriteAllText(Path.Combine(directory, name + ".json"), JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
         }

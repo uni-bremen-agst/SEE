@@ -1,0 +1,3 @@
+PASS: 40 finite Roslyn/runtime proof checks; NOT a proof of general decidability or a product implementation.
+
+STDERR:

@@ -1,0 +1,59 @@
+[
+    {
+        "Id":  "a8",
+        "SourceFiles":  [
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A8Proof\\FamilyProof.cs",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8\\FamilyProof.cs",
+                                "Sha256":  "5AB4C54EB0176FA2B30F836A0141BD9886EFEB251254E90B5FCC639F5AD98447"
+                            },
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A8Proof\\FamilyProof.csproj",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8\\FamilyProof.csproj",
+                                "Sha256":  "284A2485F034BF0E14F9B08AEA24EFCBFDD9D5F365D351BB277A9AD24684C8D5"
+                            }
+                        ],
+        "Image":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8\\bin\\Debug\\net8.0\\FamilyProof.dll",
+        "ImageSha256":  "D43B1348A949C412B2A4CD2281066CC6A0A3DD532A169E5276BEFA3AE8468EBA",
+        "Result":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a8-proof.json",
+        "ResultSha256":  "699CA81E662C3D2CABCB0C95CC273E40C9C80858AE20689EC4FAE4E345186CA5"
+    },
+    {
+        "Id":  "a9",
+        "SourceFiles":  [
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.cs",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9\\ProfileProof.cs",
+                                "Sha256":  "3BC76D1240C7CBB6A8E7AC0FC00CC8213FA2155A6DFC992052D6CB01A59B19BC"
+                            },
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.csproj",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9\\ProfileProof.csproj",
+                                "Sha256":  "9BDC72BD39E09EEA567B0522876861002FFE01B2018F17F66DBBB725AD80E5E5"
+                            }
+                        ],
+        "Image":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9\\bin\\Debug\\net8.0\\ProfileProof.dll",
+        "ImageSha256":  "44EB345D0E0F0BAC5A0CBEBA8CD4A02EA2811935473E91EFBD287AE36CE4CD77",
+        "Result":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9-proof.json",
+        "ResultSha256":  "4F8FEA173C4402DE00789C8760B299EE47089C6F939035991B8D5003A5CA63F4"
+    },
+    {
+        "Id":  "production",
+        "SourceFiles":  [
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A10Proof\\FinalClosure\\Program.cs",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production\\Program.cs",
+                                "Sha256":  "7253C5DF1D472E5CE15707A6D13D6F07FBCA11A9460E9D0049D46E886BF841D5"
+                            },
+                            {
+                                "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A10Proof\\FinalClosure\\Validation.csproj",
+                                "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production\\Validation.csproj",
+                                "Sha256":  "D6D1A32CB9D996F92A1224411A7DFAB3BD8C72A9D806DE9296E9EC939593D687"
+                            }
+                        ],
+        "Image":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production\\bin\\Debug\\net8.0\\Validation.dll",
+        "ImageSha256":  "91367337697D2785E30581D576293DCCF2C3DE435585EF606A4239F5E8925C57",
+        "Result":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\production-proof.json",
+        "ResultSha256":  "79287FFFD420B1878F5EAE03FE0D8AD3047062706546AE9D63AAC9C43F6D2421"
+    }
+]

@@ -1,0 +1,17 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\src\XMLDocNormalizer.ExceptionFlow.Core\XMLDocNormalizer.ExceptionFlow.Core.csproj" wiederhergestellt (in 39 ms.).
+  "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\Evaluation\XMLDocNormalizer.Evaluation\XMLDocNormalizer.Evaluation.csproj" wiederhergestellt (in 160 ms.).
+  "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\src\XMLDocNormalizer\XMLDocNormalizer.csproj" wiederhergestellt (in 160 ms.).
+  "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\Tests\XMLDocNormalizerTests\XMLDocNormalizerTests.csproj" wiederhergestellt (in 224 ms.).
+  XMLDocNormalizer.ExceptionFlow.Core -> D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\src\XMLDocNormalizer.ExceptionFlow.Core\bin\Debug\net8.0\XMLDocNormalizer.ExceptionFlow.Core.dll
+  XMLDocNormalizer -> D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\src\XMLDocNormalizer\bin\Debug\net8.0\XMLDocNormalizer.dll
+  XMLDocNormalizer.Evaluation -> D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\Evaluation\XMLDocNormalizer.Evaluation\bin\Debug\net8.0\XMLDocNormalizer.Evaluation.dll
+  XMLDocNormalizerTests -> D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-12\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:11.17
+
+STDERR:

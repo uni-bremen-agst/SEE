@@ -1,0 +1,14 @@
+{
+    "Name":  "development-16-current-certificates",
+    "StartedUtc":  "2026-10-23T17:47:04.1465990Z",
+    "FinishedUtc":  "2026-10-23T17:47:07.7814121Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "artifacts/p5o2b25a10/broad-rc-probe-bin-r7/Probe.dll",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-16",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/current-certificates.json"
+                  ]
+}

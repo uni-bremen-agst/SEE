@@ -110,8 +110,9 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.SolutionTransitive);
 
-            AssertSingleArgumentNullFinding(projectFindings);
-            AssertSingleArgumentNullFinding(solutionFindings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
+
         }
 
         /// <summary>
@@ -227,8 +228,9 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.SolutionTransitive);
 
-            AssertSingleArgumentNullFinding(projectFindings);
-            AssertSingleArgumentNullFinding(solutionFindings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
+
         }
 
         /// <summary>

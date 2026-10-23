@@ -447,7 +447,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AddSummaryInvocationEdges(
             SummaryInvocationPlan plan,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment)
         {
             if (!plan.IsDispatchTargetSetComplete)
@@ -539,7 +539,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
@@ -641,7 +641,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {

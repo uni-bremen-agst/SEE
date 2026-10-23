@@ -1,0 +1,12 @@
+{
+    "Name":  "development-17-a9-proof",
+    "StartedUtc":  "2026-10-23T18:43:06.9062886Z",
+    "FinishedUtc":  "2026-10-23T18:43:07.3099155Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9\\bin\\Debug\\net8.0\\ProfileProof.dll",
+                      "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\p5o2b25a10\\final-r17\\a9-proof.json"
+                  ]
+}

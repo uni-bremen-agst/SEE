@@ -1,0 +1,141 @@
+{
+    "CapturedUtc":  "2026-10-23T14:33:28.4706988Z",
+    "Status":  "R5_K17_P12_Closed_R2_RemainsOpen",
+    "PreviousSnapshot":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-11",
+    "TestedSnapshot":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-12",
+    "ExactTestDiffOnlyApprovedR5":  true,
+    "OtherSourceAndTestFilesCompared":  755,
+    "ProductionChangesThisFollowup":  0,
+    "CandidateHelperUnchanged":  true,
+    "R2FileUnchanged":  true,
+    "WorkspaceFeedConfigGitDiffClean":  true,
+    "TestedSourceSha256":  "519F96B3B37C76A34F6C7F2E9E43C3201B3335BA242CA25E3909EC2660BE6501",
+    "CombinedCounters":  [
+
+                         ],
+    "Classes":  [
+                    {
+                        "Class":  "ExceptionFlowRecursiveSummaryClosureTests",
+                        "Total":  33,
+                        "Passed":  33,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowAssemblyQualifiedOwnershipTests",
+                        "Total":  14,
+                        "Passed":  14,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowCanonicalExceptionIdentityTests",
+                        "Total":  20,
+                        "Passed":  20,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowHistoricalSolutionFindingTests",
+                        "Total":  27,
+                        "Passed":  27,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowFiniteOrbitAdmissionTests",
+                        "Total":  15,
+                        "Passed":  15,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowGenericExpansionBoundaryTests",
+                        "Total":  8,
+                        "Passed":  8,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowBoundedGenericContextTests",
+                        "Total":  15,
+                        "Passed":  15,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowConstructedInvocationContextTests",
+                        "Total":  17,
+                        "Passed":  15,
+                        "Failed":  2
+                    }
+                ],
+    "NamedFactCount":  1,
+    "NamedFactPassed":  true,
+    "FullIdentitiesEqual":  true,
+    "DestinationRoslynSymbolsEqual":  true,
+    "ClrReferenceObservations":  {
+                                     "NormalizedCaught":  false,
+                                     "Rebound":  false,
+                                     "NormalizedThrown":  false
+                                 },
+    "Failures":  [
+                     {
+                         "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowConstructedInvocationContextTests.GenuineWorkerAndCurrentShareExistingFiniteDefinitionFold_NotConstructedCorrectness(containing: True)",
+                         "Outcome":  "Failed",
+                         "Message":  "System.NullReferenceException : Object reference not set to an instance of an object.",
+                         "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowConstructedInvocationContextTests.GenuineWorkerAndCurrentShareExistingFiniteDefinitionFold_NotConstructedCorrectness(Boolean containing) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-12\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowConstructedInvocationContextTests.cs:line 227\r\n--- End of stack trace from previous location ---"
+                     },
+                     {
+                         "Test":  "XMLDocNormalizerTests.Worker.ExceptionFlowConstructedInvocationContextTests.GenuineWorkerAndCurrentShareExistingFiniteDefinitionFold_NotConstructedCorrectness(containing: False)",
+                         "Outcome":  "Failed",
+                         "Message":  "System.NullReferenceException : Object reference not set to an instance of an object.",
+                         "Stack":  "   at XMLDocNormalizerTests.Worker.ExceptionFlowConstructedInvocationContextTests.GenuineWorkerAndCurrentShareExistingFiniteDefinitionFold_NotConstructedCorrectness(Boolean containing) in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-12\\Tests\\XMLDocNormalizerTests\\Worker\\ExceptionFlowConstructedInvocationContextTests.cs:line 227\r\n--- End of stack trace from previous location ---"
+                     }
+                 ],
+    "Evidence":  [
+                     {
+                         "Path":  "a-series.trx",
+                         "Sha256":  "1BD5302C931A67E850431DE0F3BBB86D46D871D9FB6BDD084C4E5C4C967A4710"
+                     },
+                     {
+                         "Path":  "canonical-object-identity.json",
+                         "Sha256":  "74ADD1F0BEC40D231835BFE85949D156BF212890AB7F1C00A936965D9DDA2740"
+                     },
+                     {
+                         "Path":  "nested-rebind.json",
+                         "Sha256":  "071F4D76F632660CF9617E6BFFBD0150A57D0EA11C44377BC8391B8C7B606770"
+                     },
+                     {
+                         "Path":  "development-12-test-build.json",
+                         "Sha256":  "CF5476C655F90AE9F4EDEE83730ABCE2BD220B321D2C04E7C481E6F48A86508C"
+                     },
+                     {
+                         "Path":  "development-12-test-build.log",
+                         "Sha256":  "A6DAD60C38CD86F7A070D3B2C42AC7DD5ED393E1E4CA61DEC8BC922BA389A5FA"
+                     },
+                     {
+                         "Path":  "development-12-worker-build.json",
+                         "Sha256":  "12C2B906682D5F3A8FE709039E9D64AFBDE2A53DD6837E6D2E6C8609AB3A15C7"
+                     },
+                     {
+                         "Path":  "development-12-worker-build.log",
+                         "Sha256":  "BFF9F2819F57F744EC6F437BD4DFFD34D93DEA68889035FC18DDAE0ACA7612FA"
+                     },
+                     {
+                         "Path":  "development-12-fixture-build.json",
+                         "Sha256":  "7935180BF47EB9CDA953FB1539D95CD32D7AC6C7A7569456415345916EF6A118"
+                     },
+                     {
+                         "Path":  "development-12-fixture-build.log",
+                         "Sha256":  "87FA5234CD9CD9435A8081CA36725852E03883D02680BA3BAE4C20229B08711A"
+                     },
+                     {
+                         "Path":  "development-12-a-series.json",
+                         "Sha256":  "87EB4A306FEA9F065941757BC589FA51BF392DD0F33DBFC8D06F152CC5FB62C9"
+                     },
+                     {
+                         "Path":  "development-12-a-series.log",
+                         "Sha256":  "1DED21240A2CA081F9344A2D8B36E0208B217A71EC9A25B6B173E0C0F469E176"
+                     }
+                 ],
+    "R2FixImplemented":  false,
+    "FailureEnvelopeChanged":  false,
+    "WireDtoChanged":  false,
+    "FullFinalGatesExecuted":  false,
+    "A10Complete":  false,
+    "B25BActivated":  false
+}

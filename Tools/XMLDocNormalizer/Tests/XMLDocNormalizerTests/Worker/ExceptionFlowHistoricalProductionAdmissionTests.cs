@@ -150,7 +150,7 @@ namespace XMLDocNormalizerTests.Worker
             if (scenario == "guard")
             {
                 Assert.False(first.Succeeded); Assert.False(second.Succeeded); Assert.Null(call.Result); Assert.Null(call.DeclaredDocumentation);
-                Assert.Equal(WorkerFailureCode.AnalysisFailure, call.Failure!.WorkerFailure!.Code); Assert.Equal(Json(call.Failure), Json(repeat.Failure));
+                Assert.Equal(WorkerFailureCode.UnsupportedContext, call.Failure!.WorkerFailure!.Code); Assert.Equal(Json(call.Failure), Json(repeat.Failure));
                 Assert.Empty(declared.Findings); // Existing guard boundary, not misreported as a newly discovered gap.
             }
             else

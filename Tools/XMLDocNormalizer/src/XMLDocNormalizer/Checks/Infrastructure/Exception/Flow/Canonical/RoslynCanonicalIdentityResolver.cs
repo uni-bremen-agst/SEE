@@ -302,6 +302,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical
                 return null;
             }
 
+            if (identity.ContainingType != null)
+            {
+                if (ResolveType(identity.ContainingType) is not INamedTypeSymbol containing) return null;
+                INamedTypeSymbol[] nested = containing.GetTypeMembers()
+                    .Where(candidate => candidate.MetadataName == identity.MetadataName)
+                    .Select(candidate => TryMatchNamedType(candidate, identity)).OfType<INamedTypeSymbol>()
+                    .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).ToArray();
+                return nested.Length == 1 ? nested[0] : null;
+            }
+
             string metadataName = CreateFullMetadataName(identity);
             List<INamedTypeSymbol> matches = new();
             INamedTypeSymbol? compilationCandidate =
@@ -309,7 +319,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical
 
             if (TryMatchNamedType(compilationCandidate, identity) is INamedTypeSymbol matchedCompilationType)
             {
-                return matchedCompilationType;
+                matches.Add(matchedCompilationType);
             }
 
             foreach (IAssemblySymbol assembly in EnumerateAssemblies())
@@ -357,6 +367,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical
                 return null;
             }
 
+            if (RoslynCanonicalIdentityFactory.CreateTypeIdentity(candidate).Equals(identity)) return candidate;
             CanonicalTypeIdentity[] typeArguments = identity.TypeArguments;
 
             if (typeArguments.Length > 0)
@@ -483,6 +494,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical
             IMethodSymbol method,
             CanonicalCallableIdentity identity)
         {
+            if (RoslynCanonicalIdentityFactory.CreateCallableIdentity(method).Equals(identity)) return method;
             CanonicalTypeIdentity[] typeArguments = identity.TypeArguments;
 
             if (typeArguments.Length == 0)

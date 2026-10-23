@@ -37,7 +37,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return selectedMethod;
             }
 
-            return unreducedMethod;
+            return PreserveReducedInvocationArguments(selectedMethod, unreducedMethod);
+        }
+
+        /// <summary>Restores inferred receiver and explicit generic coordinates to the static declaration.</summary>
+        private static IMethodSymbol PreserveReducedInvocationArguments(IMethodSymbol selected, IMethodSymbol unreduced)
+        {
+            if (unreduced.Arity == 0) return unreduced;
+            int remaining = 0;
+            ITypeSymbol[] arguments = unreduced.TypeParameters.Select(parameter =>
+                selected.GetTypeInferredDuringReduction(parameter) ?? selected.TypeArguments[remaining++]).ToArray();
+            return unreduced.ConstructedFrom.Construct(arguments);
         }
 
         /// <summary>
@@ -85,8 +95,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (unreducedMethod.DeclaringSyntaxReferences.Length != 0)
             {
-                return unreducedMethod;
+                return PreserveReducedInvocationArguments(selectedMethod, unreducedMethod);
             }
+
+            unreducedMethod = PreserveReducedInvocationArguments(selectedMethod, unreducedMethod);
 
             if (semanticContext.TryResolveSupportingSourceMethod(
                     unreducedMethod,

@@ -81,7 +81,7 @@ namespace XMLDocNormalizerTests.Worker
         }
 
         [Theory]
-        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "AnalysisFailure")]
+        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "UnsupportedContext")]
         [InlineData("public static class Fixture { public static void Root() { missing(); } }", "CompilationFailure")]
         [InlineData("public static class Fixture { public static void Other() {} }", "InvalidRequest")]
         public async Task RealWorkerFailure_IsStructuredAndNeverEmptySuccess(string source, string code)

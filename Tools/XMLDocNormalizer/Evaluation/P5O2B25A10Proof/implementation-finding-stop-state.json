@@ -1,0 +1,2273 @@
+{
+    "CapturedUtc":  "2026-10-23T12:29:54.7461501Z",
+    "Status":  "STOP_UnapprovedB25FindingCardinality_NoCompletionClaim",
+    "Head":  "9b76e179a568c64ae972cc3a45980a094e44245e",
+    "IndexSha256":  "CB38F3D3B845ABD54FEC4C2E111E77BFF7F31B80A73F438A657BAF03173F8158",
+    "RootIgnoreSha256":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "SemanticIndexClean":  true,
+    "Core":  [
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\.gitignore",
+                     "Frozen":  "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259",
+                     "ExplainedS1OrFrozen":  "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259",
+                     "Actual":  "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.deps.json",
+                     "Frozen":  "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7",
+                     "ExplainedS1OrFrozen":  "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7",
+                     "Actual":  "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "Frozen":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "ExplainedS1OrFrozen":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "Actual":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                     "Frozen":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "ExplainedS1OrFrozen":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "Actual":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+                     "Frozen":  "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E",
+                     "ExplainedS1OrFrozen":  "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E",
+                     "Actual":  "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\ref\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "Frozen":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "ExplainedS1OrFrozen":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "Actual":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\refint\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "Frozen":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "ExplainedS1OrFrozen":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "Actual":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                     "Frozen":  "E947C48320ED008527522DDB32FB1B7C907525F5BD7DF26EDF36D4C9F850FB42",
+                     "ExplainedS1OrFrozen":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8",
+                     "Actual":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                     "Frozen":  "4CC4AB60E2764F626C38F891FAF436A7DCBAB491FF192E32AE533693CA7FD500",
+                     "ExplainedS1OrFrozen":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD",
+                     "Actual":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.assets.cache",
+                     "Frozen":  "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A",
+                     "ExplainedS1OrFrozen":  "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A",
+                     "Actual":  "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache",
+                     "Frozen":  "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A",
+                     "ExplainedS1OrFrozen":  "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A",
+                     "Actual":  "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.FileListAbsolute.txt",
+                     "Frozen":  "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC",
+                     "ExplainedS1OrFrozen":  "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC",
+                     "Actual":  "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "Frozen":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "ExplainedS1OrFrozen":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "Actual":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig",
+                     "Frozen":  "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977",
+                     "ExplainedS1OrFrozen":  "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977",
+                     "Actual":  "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GlobalUsings.g.cs",
+                     "Frozen":  "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC",
+                     "ExplainedS1OrFrozen":  "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC",
+                     "Actual":  "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                     "Frozen":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "ExplainedS1OrFrozen":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "Actual":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+                     "Frozen":  "2B10165F0FBD3A425C6289C2EFC69F1A003776E0F535E1015154441CFA72C06A",
+                     "ExplainedS1OrFrozen":  "2B10165F0FBD3A425C6289C2EFC69F1A003776E0F535E1015154441CFA72C06A",
+                     "Actual":  "2B10165F0FBD3A425C6289C2EFC69F1A003776E0F535E1015154441CFA72C06A",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.assets.json",
+                     "Frozen":  "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299",
+                     "ExplainedS1OrFrozen":  "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299",
+                     "Actual":  "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.nuget.cache",
+                     "Frozen":  "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0",
+                     "ExplainedS1OrFrozen":  "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0",
+                     "Actual":  "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.dgspec.json",
+                     "Frozen":  "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706",
+                     "ExplainedS1OrFrozen":  "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706",
+                     "Actual":  "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.props",
+                     "Frozen":  "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B",
+                     "ExplainedS1OrFrozen":  "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B",
+                     "Actual":  "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.targets",
+                     "Frozen":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                     "ExplainedS1OrFrozen":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                     "Actual":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                     "NewDrift":  false
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\XMLDocNormalizer.ExceptionFlow.Core.csproj",
+                     "Frozen":  "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386",
+                     "ExplainedS1OrFrozen":  "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386",
+                     "Actual":  "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386",
+                     "NewDrift":  false
+                 }
+             ],
+    "NewCoreDrift":  0,
+    "HistoricalEvidence":  [
+                               {
+                                   "Path":  "Evaluation/CI-CoreProjectFix.md",
+                                   "Frozen":  "0660EB6B06A3AB7493635DFA64CBDECF1F4F726E543820B39F35A0FEC33A4E9F",
+                                   "Actual":  "0660EB6B06A3AB7493635DFA64CBDECF1F4F726E543820B39F35A0FEC33A4E9F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/CI-CoreProjectFix-audit.json",
+                                   "Frozen":  "F2D95B97EEFACC0B1E45242DE8D855BB955377122F540287F7283F258D606094",
+                                   "Actual":  "F2D95B97EEFACC0B1E45242DE8D855BB955377122F540287F7283F258D606094",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/CI-CoreProjectFixProof/.gitattributes",
+                                   "Frozen":  "1D5D71DCC6CCD28AB46A335349ECC74742CA4B81F4FCAD212F8D134F70F1F13E",
+                                   "Actual":  "1D5D71DCC6CCD28AB46A335349ECC74742CA4B81F4FCAD212F8D134F70F1F13E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/CI-CoreProjectFixProof/verify-linux-inputs.sh",
+                                   "Frozen":  "C354C140AF7EACD2E7101A147C29F07F2D6D1C674219A8FC26A369783DE560E3",
+                                   "Actual":  "C354C140AF7EACD2E7101A147C29F07F2D6D1C674219A8FC26A369783DE560E3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/CI-SelectionEvidenceDirectoryFix.md",
+                                   "Frozen":  "226CE601BC1BF140B72D98AD99093D961546274EC0910BD64FADCF0CD6B39A14",
+                                   "Actual":  "226CE601BC1BF140B72D98AD99093D961546274EC0910BD64FADCF0CD6B39A14",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/.gitignore",
+                                   "Frozen":  "8110B2C02AAE82EEA2652423B4C26C826AB051B3D0317F394D093D108C2CFB1A",
+                                   "Actual":  "8110B2C02AAE82EEA2652423B4C26C826AB051B3D0317F394D093D108C2CFB1A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/ArchitectureClosureAudit.cs",
+                                   "Frozen":  "4FB6E813B8D244529B9B9488F4D7600480545C2C7792A4A76BE8BCD7A01E2336",
+                                   "Actual":  "4FB6E813B8D244529B9B9488F4D7600480545C2C7792A4A76BE8BCD7A01E2336",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/CompositionAudit.cs",
+                                   "Frozen":  "A32F5F7755092735A88C90D8A8579350CA9B93C08B970A6286DF914DDC33F3F5",
+                                   "Actual":  "A32F5F7755092735A88C90D8A8579350CA9B93C08B970A6286DF914DDC33F3F5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/CompositionBaseline.cs",
+                                   "Frozen":  "723D4C009BA963812230C33F3589E0906E24ED01EF4DD64BFE2099BB1E1C54FC",
+                                   "Actual":  "723D4C009BA963812230C33F3589E0906E24ED01EF4DD64BFE2099BB1E1C54FC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/ContextualBoundaryAudit.csproj",
+                                   "Frozen":  "44A931394CBAB1CF928FE28668D12B6FCD1A1828093CAC4C648F33AA60A9CC44",
+                                   "Actual":  "44A931394CBAB1CF928FE28668D12B6FCD1A1828093CAC4C648F33AA60A9CC44",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/ExtractionPlan.cs",
+                                   "Frozen":  "D1A005632DA9F8087CBC1C74FA962A8473DDF2C912AD2800A5B3B79BB6D7AB9C",
+                                   "Actual":  "D1A005632DA9F8087CBC1C74FA962A8473DDF2C912AD2800A5B3B79BB6D7AB9C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/ExtractionVerification.cs",
+                                   "Frozen":  "07D32397BF8D13320C9DC88396DC116BBD9EA0E281F3040B4B818F932B2DE1DA",
+                                   "Actual":  "07D32397BF8D13320C9DC88396DC116BBD9EA0E281F3040B4B818F932B2DE1DA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Program.cs",
+                                   "Frozen":  "5E4502AD360A01CAC55987C74F5D657A2E059331592DC89CD50C96FC625E1662",
+                                   "Actual":  "5E4502AD360A01CAC55987C74F5D657A2E059331592DC89CD50C96FC625E1662",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/SummaryClosureVerification.cs",
+                                   "Frozen":  "B928A5C21ADDDE0F57993B0C73AC620D3070AC6EB1C5D45EC871CE7E0B62F5B7",
+                                   "Actual":  "B928A5C21ADDDE0F57993B0C73AC620D3070AC6EB1C5D45EC871CE7E0B62F5B7",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Write-ClosureEvidence.ps1",
+                                   "Frozen":  "D2A0C4F39F1D0FE7BC6C4FE27C7DBE4B544BFBED1D8146C5309FC079AAE4234D",
+                                   "Actual":  "D2A0C4F39F1D0FE7BC6C4FE27C7DBE4B544BFBED1D8146C5309FC079AAE4234D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Write-CompositionEvidence.ps1",
+                                   "Frozen":  "B11C7D48CB50D3212DA520035D83AF1334A9346E102ADB7C69A1181EC6A06131",
+                                   "Actual":  "B11C7D48CB50D3212DA520035D83AF1334A9346E102ADB7C69A1181EC6A06131",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Write-Evidence.ps1",
+                                   "Frozen":  "6E8A0BFC19BB125A4251A14EB04610B8938F7654AE4BCE0E3CCB679D3AF5CB01",
+                                   "Actual":  "6E8A0BFC19BB125A4251A14EB04610B8938F7654AE4BCE0E3CCB679D3AF5CB01",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Write-ExtractionEvidence.ps1",
+                                   "Frozen":  "5A76C17FAB8162B847B09462312B5A6F098B14BE84EFFBBED29B7F41EAA46AC8",
+                                   "Actual":  "5A76C17FAB8162B847B09462312B5A6F098B14BE84EFFBBED29B7F41EAA46AC8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/ContextualBoundaryAudit/Write-SummaryClosureEvidence.ps1",
+                                   "Frozen":  "7B05BC84F008BA457A24EC40DA29128C86FF5BB33C19137B62782B590E723DD7",
+                                   "Actual":  "7B05BC84F008BA457A24EC40DA29128C86FF5BB33C19137B62782B590E723DD7",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/G1-reference-acquisition.md",
+                                   "Frozen":  "23D22D9E97A61E4714D7AF8BD2C7868B6F09102C291E3F3560FFFC6482E599AC",
+                                   "Actual":  "23D22D9E97A61E4714D7AF8BD2C7868B6F09102C291E3F3560FFFC6482E599AC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/G2-portable-pdb-acquisition.md",
+                                   "Frozen":  "3314C3D0D892BD277E28B77ADCF755A529C260AE7B6CAB57E1378F80FA157C3C",
+                                   "Actual":  "3314C3D0D892BD277E28B77ADCF755A529C260AE7B6CAB57E1378F80FA157C3C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/G4B-bounded-remote-artifacts.md",
+                                   "Frozen":  "61765897EFEFF6E39C0067400F8DF32D3138DE2EF0F6FFDA2A939D5632AE465E",
+                                   "Actual":  "61765897EFEFF6E39C0067400F8DF32D3138DE2EF0F6FFDA2A939D5632AE465E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/G5-exact-signed-compilation.md",
+                                   "Frozen":  "7D7DBE5AB27E639E04AEA402B185A5102ECD43C5BC7004FD5B0E5E42DF6257DB",
+                                   "Actual":  "7D7DBE5AB27E639E04AEA402B185A5102ECD43C5BC7004FD5B0E5E42DF6257DB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                                   "Frozen":  "B62CC4F7418B19BB39BD12312BC38E289911BC211FB8D2664ABF10AF0E07BBFD",
+                                   "Actual":  "B62CC4F7418B19BB39BD12312BC38E289911BC211FB8D2664ABF10AF0E07BBFD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O1-canonical-exception-flow-ir.md",
+                                   "Frozen":  "BA58839B035A58CCF18CA80972A5FB31D064861CE88476C37BAE1810239C20DB",
+                                   "Actual":  "BA58839B035A58CCF18CA80972A5FB31D064861CE88476C37BAE1810239C20DB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A2-semantic-scope-callable-resolution-seam.md",
+                                   "Frozen":  "2AC87BD5B59422CC3DA7824438990BABBBB7D2E0D816CAEBD27B6E1F51EFE039",
+                                   "Actual":  "2AC87BD5B59422CC3DA7824438990BABBBB7D2E0D816CAEBD27B6E1F51EFE039",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A3-summary-graph-construction-evaluation.md",
+                                   "Frozen":  "7B5B5EFCEE92D798A498C59CB729032757DB87F24922B03552709CB726693DC3",
+                                   "Actual":  "7B5B5EFCEE92D798A498C59CB729032757DB87F24922B03552709CB726693DC3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4B-call-context-value-fact-dependency-decomposition.md",
+                                   "Frozen":  "B450F0D5AAB3575FFA4A558BE6756A4BE549E20A00F36C38A6F4188D699AAEA9",
+                                   "Actual":  "B450F0D5AAB3575FFA4A558BE6756A4BE549E20A00F36C38A6F4188D699AAEA9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4B-call-graph-after.json",
+                                   "Frozen":  "CD9F76F3144CEAF23DF51CF89149DB2B131A2D903A2D544CF828AFE2A1452A86",
+                                   "Actual":  "CD9F76F3144CEAF23DF51CF89149DB2B131A2D903A2D544CF828AFE2A1452A86",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4B-call-graph-before.json",
+                                   "Frozen":  "D6677EA314A6288E1C1BAB178FCBB75A9ACA330286271A5A29544DB234A2920C",
+                                   "Actual":  "D6677EA314A6288E1C1BAB178FCBB75A9ACA330286271A5A29544DB234A2920C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-downstream-fact-provider-audit.json",
+                                   "Frozen":  "3F8B1AF6A2C208A2549953AD050AF99A89D6FF2452B529E6F7AB8C366DEC0FC6",
+                                   "Actual":  "3F8B1AF6A2C208A2549953AD050AF99A89D6FF2452B529E6F7AB8C366DEC0FC6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-downstream-fact-provider-extraction.md",
+                                   "Frozen":  "92DF9C88CC1BEFBE4342CDA5AB254502009E867B1578CFD9A3E651B658B07BB9",
+                                   "Actual":  "92DF9C88CC1BEFBE4342CDA5AB254502009E867B1578CFD9A3E651B658B07BB9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4-context-value-facts-catch-local-source.md",
+                                   "Frozen":  "366D90EAB4B66CD85E7EA7C2BF8BB98E8B7053922A727E9C813C7C2F8D2F7993",
+                                   "Actual":  "366D90EAB4B66CD85E7EA7C2BF8BB98E8B7053922A727E9C813C7C2F8D2F7993",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-residual-context-value-fact-scc.md",
+                                   "Frozen":  "BB85C4181937EC96F7FCDD4E9BA455843C2100210E36DDBA8D950EFCE1793170",
+                                   "Actual":  "BB85C4181937EC96F7FCDD4E9BA455843C2100210E36DDBA8D950EFCE1793170",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-residual-fact-family-audit.json",
+                                   "Frozen":  "1C237DFC76E8FA0FCDAB7708CA2D8611909D1FD911D31693D15F2CE7190725D8",
+                                   "Actual":  "1C237DFC76E8FA0FCDAB7708CA2D8611909D1FD911D31693D15F2CE7190725D8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-residual-fact-family-extraction.md",
+                                   "Frozen":  "596A218D988F0C197C4F3522FDBAFBFC6856A2308C970C5AF0FD3E08F4F48101",
+                                   "Actual":  "596A218D988F0C197C4F3522FDBAFBFC6856A2308C970C5AF0FD3E08F4F48101",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-residual-scc-audit.json",
+                                   "Frozen":  "94407022699AD093C826B0821421D4446A35CB1B2CB5B1AED63CB178B73EECC9",
+                                   "Actual":  "94407022699AD093C826B0821421D4446A35CB1B2CB5B1AED63CB178B73EECC9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-return-condition-ownership.md",
+                                   "Frozen":  "FA744DCE06AD98D9BC0F32EF1533D7BF911B2B4CE607222EE6D1753C9257539D",
+                                   "Actual":  "FA744DCE06AD98D9BC0F32EF1533D7BF911B2B4CE607222EE6D1753C9257539D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-return-condition-ownership-audit.json",
+                                   "Frozen":  "EECD9BF2983BA902F2ED9C830578D0F05C9576ED5F89895A460F64F16321C2FD",
+                                   "Actual":  "EECD9BF2983BA902F2ED9C830578D0F05C9576ED5F89895A460F64F16321C2FD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-runtime-dispatch-stable-source-member-audit.json",
+                                   "Frozen":  "C0019E7C7CCE940D6A6F704FC090E0F8C70998AD2AB412789E16631C8F026C15",
+                                   "Actual":  "C0019E7C7CCE940D6A6F704FC090E0F8C70998AD2AB412789E16631C8F026C15",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-runtime-dispatch-stable-source-member-extraction.md",
+                                   "Frozen":  "26ECDF2B8A08F480D2C5CE45D75ADBA98F29442340B451AB8A4BDDC459184219",
+                                   "Actual":  "26ECDF2B8A08F480D2C5CE45D75ADBA98F29442340B451AB8A4BDDC459184219",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-semantic-model-resolution-and-fact-extraction.md",
+                                   "Frozen":  "8C830FC9B6FD4A31B0A57F46AA278DC4F516E428DC6F3B13E410D7D90DF927F8",
+                                   "Actual":  "8C830FC9B6FD4A31B0A57F46AA278DC4F516E428DC6F3B13E410D7D90DF927F8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-semantic-model-resolution-audit.json",
+                                   "Frozen":  "32D0DB8677078C4350B3FD6BBF1CE910AE4F342AC43BBEE908C98571C69354FB",
+                                   "Actual":  "32D0DB8677078C4350B3FD6BBF1CE910AE4F342AC43BBEE908C98571C69354FB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-sequence-context-element-source-audit.json",
+                                   "Frozen":  "8FB33A351F0E000723F46C0D51299601B436562FBD4CE4854940C31EB05F20F4",
+                                   "Actual":  "8FB33A351F0E000723F46C0D51299601B436562FBD4CE4854940C31EB05F20F4",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4C-sequence-context-element-source-ownership.md",
+                                   "Frozen":  "43C1D1B96E5E0CAAAFBA0B53A511EE25589AA600CB385C338966F50E93E2D015",
+                                   "Actual":  "43C1D1B96E5E0CAAAFBA0B53A511EE25589AA600CB385C338966F50E93E2D015",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4D-dictionary-value-fact-ownership.md",
+                                   "Frozen":  "24534CF4A6FDF0847749B0184D21ADCD5E92F672640F100E451F068A812DEC9C",
+                                   "Actual":  "24534CF4A6FDF0847749B0184D21ADCD5E92F672640F100E451F068A812DEC9C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4D-dictionary-value-fact-ownership-audit.json",
+                                   "Frozen":  "7796EB25DA1AE7AB26B21474F5C71A05E4A8D0945EA04AAB938E47FDEB6737A0",
+                                   "Actual":  "7796EB25DA1AE7AB26B21474F5C71A05E4A8D0945EA04AAB938E47FDEB6737A0",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4E-sequence-range-dictionary-mutation-fact-ownership.md",
+                                   "Frozen":  "BBEFDD930E6C37DB5D44E78342119F45A74F9BCAA880783AD230390EF3D22CFF",
+                                   "Actual":  "BBEFDD930E6C37DB5D44E78342119F45A74F9BCAA880783AD230390EF3D22CFF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4E-sequence-range-dictionary-mutation-fact-ownership-audit.json",
+                                   "Frozen":  "152BF455B9F31A56A1834653EE0D17E89AC9853FC7A129BB689A1346802A0291",
+                                   "Actual":  "152BF455B9F31A56A1834653EE0D17E89AC9853FC7A129BB689A1346802A0291",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4F-successful-sequence-validation-fact-ownership.md",
+                                   "Frozen":  "2A1CC8D5EB682702EEEF0EC33C83D897010B7C5C3C7301B8945EB8DC7B366F4A",
+                                   "Actual":  "2A1CC8D5EB682702EEEF0EC33C83D897010B7C5C3C7301B8945EB8DC7B366F4A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4F-successful-sequence-validation-fact-ownership-audit.json",
+                                   "Frozen":  "F488C8F56001927AD2EE2F1D4159C041C74CD7032D5AD259EAD7B491E8B74900",
+                                   "Actual":  "F488C8F56001927AD2EE2F1D4159C041C74CD7032D5AD259EAD7B491E8B74900",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4G-delegate-target-resolver-ownership.md",
+                                   "Frozen":  "3051AB4B6D17A9545D76FF0989F15F82253218C27910BDECE09FFABBB44E569A",
+                                   "Actual":  "3051AB4B6D17A9545D76FF0989F15F82253218C27910BDECE09FFABBB44E569A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A4G-delegate-target-resolver-ownership-audit.json",
+                                   "Frozen":  "4027B9D995E2A33058C0198863BFE1D78077661B91AB3D696088EFB89E7BB520",
+                                   "Actual":  "4027B9D995E2A33058C0198863BFE1D78077661B91AB3D696088EFB89E7BB520",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5A-contextual-evaluator-boundary-audit.json",
+                                   "Frozen":  "8D82CB65844E7EDAF7B58D3DF7DA04EC3185E9B6C03FB40D2EBC1BE6EFEB3669",
+                                   "Actual":  "8D82CB65844E7EDAF7B58D3DF7DA04EC3185E9B6C03FB40D2EBC1BE6EFEB3669",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5A-contextual-evaluator-boundary-audit.md",
+                                   "Frozen":  "DBF398BA1519FD1813D4F7908C08266E1759FDA0F68674EDD1187606CEE62FEA",
+                                   "Actual":  "DBF398BA1519FD1813D4F7908C08266E1759FDA0F68674EDD1187606CEE62FEA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5A-contextual-evaluator-boundary-matrices.md",
+                                   "Frozen":  "AA64B255AD61609A582371E1FA5DBCB2CB36F298E552C558FF1F8EDDA46A7A7E",
+                                   "Actual":  "AA64B255AD61609A582371E1FA5DBCB2CB36F298E552C558FF1F8EDDA46A7A7E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5B-contextual-fact-evaluator-extraction.md",
+                                   "Frozen":  "8AD3BFDFCAC74A9B07B8A065B41FFB67919431FF422209B8B657714323518254",
+                                   "Actual":  "8AD3BFDFCAC74A9B07B8A065B41FFB67919431FF422209B8B657714323518254",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5B-contextual-fact-evaluator-extraction-audit.json",
+                                   "Frozen":  "7813C4127F88340299E9ED36E0804ED84595BC77444200531B7AB2211FE08ECD",
+                                   "Actual":  "7813C4127F88340299E9ED36E0804ED84595BC77444200531B7AB2211FE08ECD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5C-contextual-evaluator-composition-cleanup.md",
+                                   "Frozen":  "ADD85292451575E9F11C13A9F74677218512CD5821A9DD749CFAF042678B002A",
+                                   "Actual":  "ADD85292451575E9F11C13A9F74677218512CD5821A9DD749CFAF042678B002A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A5C-contextual-evaluator-composition-cleanup-audit.json",
+                                   "Frozen":  "F52AF89A38E4AF2C125F764B92819C7D4FC8ACAE12F4B65C4BE04AAC2E9D4AD2",
+                                   "Actual":  "F52AF89A38E4AF2C125F764B92819C7D4FC8ACAE12F4B65C4BE04AAC2E9D4AD2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6-architecture-readiness-closure.md",
+                                   "Frozen":  "2BEF3422DB66B766FF3EB2A43C48834A00ADEA27AB424597928859D583CC249A",
+                                   "Actual":  "2BEF3422DB66B766FF3EB2A43C48834A00ADEA27AB424597928859D583CC249A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6-architecture-readiness-closure-audit.json",
+                                   "Frozen":  "0977A19DC43B9038A8132DC443A2DF2B23133FE50DC0B0533AE535DD89F216AF",
+                                   "Actual":  "0977A19DC43B9038A8132DC443A2DF2B23133FE50DC0B0533AE535DD89F216AF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6F-historical-core-readiness-matrix.md",
+                                   "Frozen":  "8FD6C5E9CE2AD6AC8348FBE3998CBEB7E8E4957BD6C580E46CA60110313B3F22",
+                                   "Actual":  "8FD6C5E9CE2AD6AC8348FBE3998CBEB7E8E4957BD6C580E46CA60110313B3F22",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6F-summary-orchestration-cycle-closure.md",
+                                   "Frozen":  "8D7A0B20650E94805B1DC7B92726DEC746301469FDF4F4B6F938EE91BF5D52A9",
+                                   "Actual":  "8D7A0B20650E94805B1DC7B92726DEC746301469FDF4F4B6F938EE91BF5D52A9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6F-summary-orchestration-cycle-closure-audit.json",
+                                   "Frozen":  "591E78698402EE8E66D53186847C800910651F5D7CEA734E9D8F133FDE407125",
+                                   "Actual":  "591E78698402EE8E66D53186847C800910651F5D7CEA734E9D8F133FDE407125",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A6-historical-core-readiness-matrix.md",
+                                   "Frozen":  "11FE5BDC2CCFAE32BEA1406B15518C9AA92AC2A7BFD5219F382CC32B15562643",
+                                   "Actual":  "11FE5BDC2CCFAE32BEA1406B15518C9AA92AC2A7BFD5219F382CC32B15562643",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2A-exception-flow-analyzer-decomposition.md",
+                                   "Frozen":  "7338939CEF7799F5879AC0E899850723E7B9FD4621D4C10394079F5BCE17F2CF",
+                                   "Actual":  "7338939CEF7799F5879AC0E899850723E7B9FD4621D4C10394079F5BCE17F2CF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B10-historical-worker-payload-projection.md",
+                                   "Frozen":  "8BED4D4CBBAF41B01009ECEC962264B3FA95C860816BBC4C7BB68FF3D54A43AC",
+                                   "Actual":  "8BED4D4CBBAF41B01009ECEC962264B3FA95C860816BBC4C7BB68FF3D54A43AC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B10-historical-worker-payload-projection-audit.json",
+                                   "Frozen":  "B7B9F8F82B2F2CA723DB65ACA22F13247E5BE07E0BBA7872B8C96ACA1B37B448",
+                                   "Actual":  "B7B9F8F82B2F2CA723DB65ACA22F13247E5BE07E0BBA7872B8C96ACA1B37B448",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B10Proof/Write-Verify-PayloadEvidence.ps1",
+                                   "Frozen":  "525650324C011ACAFB0149D6A9281E2E85365E07DCFB7EDEF4448DEF180C1688",
+                                   "Actual":  "525650324C011ACAFB0149D6A9281E2E85365E07DCFB7EDEF4448DEF180C1688",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B11-historical-external-input-equivalence.md",
+                                   "Frozen":  "7BD185E90987BDF71F0275D432A97E4FF4461A706E76B40BAAAAA0D8E60080B4",
+                                   "Actual":  "7BD185E90987BDF71F0275D432A97E4FF4461A706E76B40BAAAAA0D8E60080B4",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B11-historical-external-input-equivalence-audit.json",
+                                   "Frozen":  "3439BF5FAF7EA0DF01EA63E1E195B1AF7C74BE6B6601A2587786FE8DD3121E05",
+                                   "Actual":  "3439BF5FAF7EA0DF01EA63E1E195B1AF7C74BE6B6601A2587786FE8DD3121E05",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B11Proof/Write-Verify-InputEvidence.ps1",
+                                   "Frozen":  "39E04E13C81D9492EF17CFE3B6FC78FE400A8F80ACC49CC1EC58E827FA2458CA",
+                                   "Actual":  "39E04E13C81D9492EF17CFE3B6FC78FE400A8F80ACC49CC1EC58E827FA2458CA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B12-historical-reference-identity-equivalence.md",
+                                   "Frozen":  "A88024FD85A7EEBAC28C2FDF33235E29EE6BAEE18E86D0940DE887FC6B1D8CEA",
+                                   "Actual":  "A88024FD85A7EEBAC28C2FDF33235E29EE6BAEE18E86D0940DE887FC6B1D8CEA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B12-historical-reference-identity-equivalence-audit.json",
+                                   "Frozen":  "50655EC96FF3D1711D1FFE7D324D2760C9D2000874D853A03C17E92A460EBE34",
+                                   "Actual":  "50655EC96FF3D1711D1FFE7D324D2760C9D2000874D853A03C17E92A460EBE34",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B12Proof/RegressionFilters.json",
+                                   "Frozen":  "046CEA3EA3E6173554F4735BA5DCFED945B58BF04758634D924EB61DEA648FD0",
+                                   "Actual":  "046CEA3EA3E6173554F4735BA5DCFED945B58BF04758634D924EB61DEA648FD0",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B12Proof/Run-Regressions.ps1",
+                                   "Frozen":  "AC577043A980D186CDC1A5FD9408A7AA33B4642452A390D1E0B4851DA798BF4F",
+                                   "Actual":  "AC577043A980D186CDC1A5FD9408A7AA33B4642452A390D1E0B4851DA798BF4F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B12Proof/Write-Verify-ReferenceEvidence.ps1",
+                                   "Frozen":  "E806E3392C24CD1473B6DC402B267616771CD4C6593CA67B83775DE6AF2EB26E",
+                                   "Actual":  "E806E3392C24CD1473B6DC402B267616771CD4C6593CA67B83775DE6AF2EB26E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B13-historical-source-compiler-scope-equivalence.md",
+                                   "Frozen":  "286CAD6A10F5C6E1B97008B8F13A515AA55EE48E7B16FD80A381E12190C6DCDF",
+                                   "Actual":  "286CAD6A10F5C6E1B97008B8F13A515AA55EE48E7B16FD80A381E12190C6DCDF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B13-historical-source-compiler-scope-equivalence-audit.json",
+                                   "Frozen":  "B1F5521EC21B8F32DE962E7AFF58D37F307338A31D9625DB3386AFFFF9D7B4AD",
+                                   "Actual":  "B1F5521EC21B8F32DE962E7AFF58D37F307338A31D9625DB3386AFFFF9D7B4AD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B13Proof/Run-Regressions.ps1",
+                                   "Frozen":  "2FD7B70994AFB6D89C72773A00B3EE0A71BE37C1ED7322BA3A34356316477CF4",
+                                   "Actual":  "2FD7B70994AFB6D89C72773A00B3EE0A71BE37C1ED7322BA3A34356316477CF4",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B13Proof/Write-Verify-ContextEvidence.ps1",
+                                   "Frozen":  "9521B65CEBC9CA6EF7160B1678642B6515B2C66921789EFF799ECB524178B807",
+                                   "Actual":  "9521B65CEBC9CA6EF7160B1678642B6515B2C66921789EFF799ECB524178B807",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B14-historical-supporting-source-scope-equivalence.md",
+                                   "Frozen":  "A29B28F0D8FE0BDD4C3FC03578BBC7AF90EEE2D1D3A7B60E9549A9B456D0AC08",
+                                   "Actual":  "A29B28F0D8FE0BDD4C3FC03578BBC7AF90EEE2D1D3A7B60E9549A9B456D0AC08",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B14-historical-supporting-source-scope-equivalence-audit.json",
+                                   "Frozen":  "60BA86715FDE893943FEA29E97DE837A64474574B3A1A6B3E774A0A49B94ECAE",
+                                   "Actual":  "60BA86715FDE893943FEA29E97DE837A64474574B3A1A6B3E774A0A49B94ECAE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B14Proof/Run-Regressions.ps1",
+                                   "Frozen":  "2C34B5A4D98333D442CD5D113025C10AB364186FB80F1D92708C26731649DE98",
+                                   "Actual":  "2C34B5A4D98333D442CD5D113025C10AB364186FB80F1D92708C26731649DE98",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B14Proof/Write-Verify-ScopeEvidence.ps1",
+                                   "Frozen":  "C489ED5930A8C23D51F6A9F24991E1598765E7D3C3E2A1BC509C24F2C08D9717",
+                                   "Actual":  "C489ED5930A8C23D51F6A9F24991E1598765E7D3C3E2A1BC509C24F2C08D9717",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B15-historical-cross-project-solution-scope-equivalence.md",
+                                   "Frozen":  "0DCE6E0AF75C1E30A00BC5A3BF683C09E833F867F1C570F1C27FBC8DF3FB4BAB",
+                                   "Actual":  "0DCE6E0AF75C1E30A00BC5A3BF683C09E833F867F1C570F1C27FBC8DF3FB4BAB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B15-historical-cross-project-solution-scope-equivalence-audit.json",
+                                   "Frozen":  "6CB81BE3F96847265878A2A41D5E7B2613DDD3DD7F3276A898362DB3A937DC1D",
+                                   "Actual":  "6CB81BE3F96847265878A2A41D5E7B2613DDD3DD7F3276A898362DB3A937DC1D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B15Proof/Run-Regressions.ps1",
+                                   "Frozen":  "F2E30259B60994539B673192F10BE0B13F0EB183A1511F7CCE5EEAC4F7B5CCA0",
+                                   "Actual":  "F2E30259B60994539B673192F10BE0B13F0EB183A1511F7CCE5EEAC4F7B5CCA0",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B15Proof/Write-Verify-SolutionEvidence.ps1",
+                                   "Frozen":  "1905FDD11AD31D4D653F36471580BC991638B546817FA3B92D4CA6D9230EB49D",
+                                   "Actual":  "1905FDD11AD31D4D653F36471580BC991638B546817FA3B92D4CA6D9230EB49D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B16-historical-declared-exceptions-boundary.md",
+                                   "Frozen":  "6DDF203B23BDB46B377FE8E67B24DB6C48FCBA3C4493DA39F671E27AEBF59E3E",
+                                   "Actual":  "6DDF203B23BDB46B377FE8E67B24DB6C48FCBA3C4493DA39F671E27AEBF59E3E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B16-historical-declared-exceptions-boundary-audit.json",
+                                   "Frozen":  "4ED172F913CE152FEBE9CA59FAF7B1311EDACDE95861EB54668C7ADFC66BA14C",
+                                   "Actual":  "4ED172F913CE152FEBE9CA59FAF7B1311EDACDE95861EB54668C7ADFC66BA14C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B16Proof/Run-Regressions.ps1",
+                                   "Frozen":  "B3638C94BACAD48B4DF421865D35B0D967EAD76BE35CB66C8B5296907486B3AD",
+                                   "Actual":  "B3638C94BACAD48B4DF421865D35B0D967EAD76BE35CB66C8B5296907486B3AD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B16Proof/Write-Verify-DeclaredBoundaryEvidence.ps1",
+                                   "Frozen":  "435A72414AB6C48566364C3722B6E2A2A5912C316E9B329C187D932AA139DE36",
+                                   "Actual":  "435A72414AB6C48566364C3722B6E2A2A5912C316E9B329C187D932AA139DE36",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B17-historical-declared-finding-policy-contract.md",
+                                   "Frozen":  "6FA67799E055DB598F2F42C5807BA570A7463581C806E8349127F7D15060DC7D",
+                                   "Actual":  "6FA67799E055DB598F2F42C5807BA570A7463581C806E8349127F7D15060DC7D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B17-historical-declared-finding-policy-contract-audit.json",
+                                   "Frozen":  "F91CF2379E9418317FAAF6860E5C94A067AA572D9457DDCAD708F8AF0C1820A1",
+                                   "Actual":  "F91CF2379E9418317FAAF6860E5C94A067AA572D9457DDCAD708F8AF0C1820A1",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B17Proof/Run-Regressions.ps1",
+                                   "Frozen":  "919CAFE806EF67B82757B00B5AAB87F1C4123DE644B13F95B539F90B16F77E69",
+                                   "Actual":  "919CAFE806EF67B82757B00B5AAB87F1C4123DE644B13F95B539F90B16F77E69",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B17Proof/Write-Verify-PolicyEvidence.ps1",
+                                   "Frozen":  "AB1CAC650AD25A57C984B8E6E735C60806EA0D0F28D243BDDD3C542BF002D818",
+                                   "Actual":  "AB1CAC650AD25A57C984B8E6E735C60806EA0D0F28D243BDDD3C542BF002D818",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B18-historical-declared-activation-boundary.md",
+                                   "Frozen":  "C7A9E2092138B0D6CA6E17D431001F3A9CA549FD0247A43480FC3261956C80B1",
+                                   "Actual":  "C7A9E2092138B0D6CA6E17D431001F3A9CA549FD0247A43480FC3261956C80B1",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B18-historical-declared-activation-boundary-audit.json",
+                                   "Frozen":  "71FFAF052DB5DE7ADF8ED27F1106AE4D3FE8D8E8B3BEAD6915BA33D3255FB334",
+                                   "Actual":  "71FFAF052DB5DE7ADF8ED27F1106AE4D3FE8D8E8B3BEAD6915BA33D3255FB334",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B18Proof/Run-Regressions.ps1",
+                                   "Frozen":  "ED206E92456B61F29307D276EB6BD4F8895615BBD0205F166C25FA8569CCB5A2",
+                                   "Actual":  "ED206E92456B61F29307D276EB6BD4F8895615BBD0205F166C25FA8569CCB5A2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B18Proof/Write-Verify-ReadinessEvidence.ps1",
+                                   "Frozen":  "628CE4FF2A99AFC963BDD836F618F4946EE614C923358EC52B04947FE78F1473",
+                                   "Actual":  "628CE4FF2A99AFC963BDD836F618F4946EE614C923358EC52B04947FE78F1473",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B19-historical-declared-finding-contract.md",
+                                   "Frozen":  "782EC51F39589B3C7FC6A6B370C22091EDDA8A581D736E303AA4344FD0AD71AE",
+                                   "Actual":  "782EC51F39589B3C7FC6A6B370C22091EDDA8A581D736E303AA4344FD0AD71AE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B19-historical-declared-finding-contract-audit.json",
+                                   "Frozen":  "4EF72676DEAD7751FE798742D3CF0E1B499588F533FE174BF2A309F3A60309B2",
+                                   "Actual":  "4EF72676DEAD7751FE798742D3CF0E1B499588F533FE174BF2A309F3A60309B2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B19Proof/Run-Regressions.ps1",
+                                   "Frozen":  "E6E763E9D633FAD7AC8FF7D297696D7B44D68588BDDBE3DCAD3706AECFAE328D",
+                                   "Actual":  "E6E763E9D633FAD7AC8FF7D297696D7B44D68588BDDBE3DCAD3706AECFAE328D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B19Proof/Write-Verify-FindingContract.ps1",
+                                   "Frozen":  "1C0E991F4A17E951C98AB0F2728BBF68B9A8079555A7F173137B62D539B92771",
+                                   "Actual":  "1C0E991F4A17E951C98AB0F2728BBF68B9A8079555A7F173137B62D539B92771",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A2Proof/Directory.Build.props",
+                                   "Frozen":  "571386FAEB27AF12E51737022D58569DA970EABEDF07E22562443935BEC39320",
+                                   "Actual":  "571386FAEB27AF12E51737022D58569DA970EABEDF07E22562443935BEC39320",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A2Proof/SurfaceProofProgram.cs",
+                                   "Frozen":  "52B0A9525FB2015E7025D4D91BFF247E82821C17AB703F339FCFFEAD438BE1F3",
+                                   "Actual":  "52B0A9525FB2015E7025D4D91BFF247E82821C17AB703F339FCFFEAD438BE1F3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A2Proof/Write-Verify-ContractEvidence.ps1",
+                                   "Frozen":  "9240178F230796A1F65047389A70435390A6531A667C1318CA2B07DAE6B2EBDE",
+                                   "Actual":  "9240178F230796A1F65047389A70435390A6531A667C1318CA2B07DAE6B2EBDE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A2-runtime-await-call-site-contract.md",
+                                   "Frozen":  "61592D2ED31C31D1652A03A493D6FD34CE160B314B86FA4E625D70AEEC38CB99",
+                                   "Actual":  "61592D2ED31C31D1652A03A493D6FD34CE160B314B86FA4E625D70AEEC38CB99",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A2-runtime-await-call-site-contract-audit.json",
+                                   "Frozen":  "C9A4330DF589C3E3C72C2BE07EA4EFA7CD7F5BFC275D97949D88EB990ECC6E9D",
+                                   "Actual":  "C9A4330DF589C3E3C72C2BE07EA4EFA7CD7F5BFC275D97949D88EB990ECC6E9D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/CurrentCapabilityProof.csproj",
+                                   "Frozen":  "A7D0407156B158CCF5D4A39003D4573D935C2BE8E37BD292C5F6EDDD4FF77D42",
+                                   "Actual":  "A7D0407156B158CCF5D4A39003D4573D935C2BE8E37BD292C5F6EDDD4FF77D42",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/Directory.Build.props",
+                                   "Frozen":  "E5FA12B6591597BB7B5225CCA891D41F0462B5C9AB90B1C6E1508F7C8D8E4B45",
+                                   "Actual":  "E5FA12B6591597BB7B5225CCA891D41F0462B5C9AB90B1C6E1508F7C8D8E4B45",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/HistoricalCapabilityProof.csproj",
+                                   "Frozen":  "C9BE5E4059FE9CE98F08C59C23ABDDAE989D45AFB85558B93FBC7C7494A61B5A",
+                                   "Actual":  "C9BE5E4059FE9CE98F08C59C23ABDDAE989D45AFB85558B93FBC7C7494A61B5A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/ProofProgram.cs",
+                                   "Frozen":  "E4F7DA4D0B8F50F392A132963E55B4B093F23C7E6006B09F6AD3A33A34101486",
+                                   "Actual":  "E4F7DA4D0B8F50F392A132963E55B4B093F23C7E6006B09F6AD3A33A34101486",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/RuntimeAwaitCapability.cs",
+                                   "Frozen":  "0267700BEE73ED2A831D65058EC008C1397B6B15ABAEF08D63CB702F8AB67557",
+                                   "Actual":  "0267700BEE73ED2A831D65058EC008C1397B6B15ABAEF08D63CB702F8AB67557",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1AProof/Write-Verify-RuntimeAwaitEvidence.ps1",
+                                   "Frozen":  "EA6AB5DCFF9E3DA8A6CDAD1B38764C2BA7836D5B48F92F827D0B23600151715B",
+                                   "Actual":  "EA6AB5DCFF9E3DA8A6CDAD1B38764C2BA7836D5B48F92F827D0B23600151715B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A-runtime-await-compatibility-proof.md",
+                                   "Frozen":  "FB13FC6391E5E2E6B46880EC22FFA1EDA16563146233BA20DE59253AE8819348",
+                                   "Actual":  "FB13FC6391E5E2E6B46880EC22FFA1EDA16563146233BA20DE59253AE8819348",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1A-runtime-await-compatibility-proof-audit.json",
+                                   "Frozen":  "C4B18F025AE4E26D9065D6E88FF7AC5996046445470D2D7632494366F876EC6B",
+                                   "Actual":  "C4B18F025AE4E26D9065D6E88FF7AC5996046445470D2D7632494366F876EC6B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/CompileOnlySemanticEnvironment.cs",
+                                   "Frozen":  "2FAC2CE23D5314121CDC0D511EA6FBADB6D1DEB563AF8F1C9B1C8D8D49B3A836",
+                                   "Actual":  "2FAC2CE23D5314121CDC0D511EA6FBADB6D1DEB563AF8F1C9B1C8D8D49B3A836",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/Directory.Build.props",
+                                   "Frozen":  "8D146405D18016B0161E99065C8B313A8C4BBCF6CD14CC11C7692D1BBF1183AE",
+                                   "Actual":  "8D146405D18016B0161E99065C8B313A8C4BBCF6CD14CC11C7692D1BBF1183AE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/HistoricalCompileProbe.csproj",
+                                   "Frozen":  "796381C641E2B56CC91FA2EC0599B420315D648894698B844F51020050E5FA78",
+                                   "Actual":  "796381C641E2B56CC91FA2EC0599B420315D648894698B844F51020050E5FA78",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/HistoricalSources.props",
+                                   "Frozen":  "E3986BE9E9F9793C2EA0FABE4A9B3E024FB21737061C82FFD2E59B2BD06C94BD",
+                                   "Actual":  "E3986BE9E9F9793C2EA0FABE4A9B3E024FB21737061C82FFD2E59B2BD06C94BD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/MetadataAudit/MetadataAudit.csproj",
+                                   "Frozen":  "124BC43EEA169C778EF839672BD4F7D98A6BA61EF041245B8B21E3CAB76FCA3A",
+                                   "Actual":  "124BC43EEA169C778EF839672BD4F7D98A6BA61EF041245B8B21E3CAB76FCA3A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/MetadataAudit/Program.cs",
+                                   "Frozen":  "E4948502A6EBE8D92C2521D0E03315E8F482990D14740A858EDEF89DF4F982D3",
+                                   "Actual":  "E4948502A6EBE8D92C2521D0E03315E8F482990D14740A858EDEF89DF4F982D3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/Test-BuildFeasibilityEvidence.ps1",
+                                   "Frozen":  "47A8BD7A6E1A3A055A94E4521ADE460157B55139DB39ACD4FB27F228240C7573",
+                                   "Actual":  "47A8BD7A6E1A3A055A94E4521ADE460157B55139DB39ACD4FB27F228240C7573",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1CompileProbe/Write-BuildFeasibilityEvidence.ps1",
+                                   "Frozen":  "376A8046D6E154A868139222E4536C60A3FEDB040A4DDEBA9691DF9DCBA1BE33",
+                                   "Actual":  "376A8046D6E154A868139222E4536C60A3FEDB040A4DDEBA9691DF9DCBA1BE33",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1-historical-roslyn-build-feasibility.md",
+                                   "Frozen":  "19D00AAFB1EBA2F2A2EAB49311C8392336C29C8165460B29249AD546C5E14051",
+                                   "Actual":  "19D00AAFB1EBA2F2A2EAB49311C8392336C29C8165460B29249AD546C5E14051",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1-historical-roslyn-build-feasibility-audit.json",
+                                   "Frozen":  "AAC126CD1E07A81BAF8E8F1DAEB9EDDBF74CCD8175594CCA9C03E23B70C3A2EC",
+                                   "Actual":  "AAC126CD1E07A81BAF8E8F1DAEB9EDDBF74CCD8175594CCA9C03E23B70C3A2EC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B1-roslyn-api-drift-matrix.md",
+                                   "Frozen":  "F13EC64468EBF38CE92704C0B90F4D3570618E05D8AA3CA5AFEBCCE80FE64337",
+                                   "Actual":  "F13EC64468EBF38CE92704C0B90F4D3570618E05D8AA3CA5AFEBCCE80FE64337",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B20-historical-declared-production-boundary.md",
+                                   "Frozen":  "DCFE7A6E88694959ACD39A9F53B7D19CF85CABF1F0F1C67CB9B47A4FCD4A59C1",
+                                   "Actual":  "DCFE7A6E88694959ACD39A9F53B7D19CF85CABF1F0F1C67CB9B47A4FCD4A59C1",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B20-historical-declared-production-boundary-audit.json",
+                                   "Frozen":  "CE984E0CDECE0DF5CE5F7B566F6020707E4BFD8F196726AB488DE12A1E446474",
+                                   "Actual":  "CE984E0CDECE0DF5CE5F7B566F6020707E4BFD8F196726AB488DE12A1E446474",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B20Proof/Run-Regressions.ps1",
+                                   "Frozen":  "ED7DF3D736633A2228A7EEBFD872A87C88D331BE42E95255F4112C5F70FB1AEC",
+                                   "Actual":  "ED7DF3D736633A2228A7EEBFD872A87C88D331BE42E95255F4112C5F70FB1AEC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B20Proof/Write-Verify-ProductionBoundary.ps1",
+                                   "Frozen":  "8E633E40EFCA6196A27584CEB460CF7D36AA1CEF6C1D74C8AF179E3AB8FEC2B6",
+                                   "Actual":  "8E633E40EFCA6196A27584CEB460CF7D36AA1CEF6C1D74C8AF179E3AB8FEC2B6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B21-historical-documentation-binding-attestation.md",
+                                   "Frozen":  "D7D3603D3F1CF02F8E55FF55496E247D732F14607E8D499DFF2D70835D876872",
+                                   "Actual":  "D7D3603D3F1CF02F8E55FF55496E247D732F14607E8D499DFF2D70835D876872",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B21-historical-documentation-binding-attestation-audit.json",
+                                   "Frozen":  "C77F51DD00A172B52F79054AD039954025606B7BBA007CC7322AAAD3294A8477",
+                                   "Actual":  "C77F51DD00A172B52F79054AD039954025606B7BBA007CC7322AAAD3294A8477",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B21Proof/Run-Regressions.ps1",
+                                   "Frozen":  "5E9D667D4E23ACC7690C4AAF08DF69C852F73E9B1433CC8913D96B99B38349CA",
+                                   "Actual":  "5E9D667D4E23ACC7690C4AAF08DF69C852F73E9B1433CC8913D96B99B38349CA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B21Proof/Write-Verify-BindingAttestation.ps1",
+                                   "Frozen":  "8C40B6AF5DDC9E8283F73012469F0F401BD35DA1152647DCBAA55C78A798D684",
+                                   "Actual":  "8C40B6AF5DDC9E8283F73012469F0F401BD35DA1152647DCBAA55C78A798D684",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B22-historical-declared-production-finding-integration.md",
+                                   "Frozen":  "5080097E69D7251472817BFBCF3DC49B0A2469388420206D6558C27C5D8FDC34",
+                                   "Actual":  "5080097E69D7251472817BFBCF3DC49B0A2469388420206D6558C27C5D8FDC34",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B22-historical-declared-production-finding-integration-audit.json",
+                                   "Frozen":  "B1F1F356E7328CB116A5770B78E47530F1365C9AED8FC6C7DAADB93A78E896CC",
+                                   "Actual":  "B1F1F356E7328CB116A5770B78E47530F1365C9AED8FC6C7DAADB93A78E896CC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B22Proof/Run-Regressions.ps1",
+                                   "Frozen":  "5FBED93D5D3F1855AA00816DE356649B859EB104D2590223A886181580517422",
+                                   "Actual":  "5FBED93D5D3F1855AA00816DE356649B859EB104D2590223A886181580517422",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B22Proof/Write-Verify-ProductionFindings.ps1",
+                                   "Frozen":  "70805502D1B72BEEB63F46E4D84FFD7D679AD7E8943A7997E3F4432A0BE8C334",
+                                   "Actual":  "70805502D1B72BEEB63F46E4D84FFD7D679AD7E8943A7997E3F4432A0BE8C334",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23-bounded-external-target-adoption.md",
+                                   "Frozen":  "3C549EA966C225AA697FBF2C5FCA72D04A7FD9A401DE9CC0F706F97170F7CDA2",
+                                   "Actual":  "3C549EA966C225AA697FBF2C5FCA72D04A7FD9A401DE9CC0F706F97170F7CDA2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23-bounded-external-target-adoption-audit.json",
+                                   "Frozen":  "B282146D20ECBF0369C4DD7AE5683D75207DD813D9D8BD022747089EB19EBF0B",
+                                   "Actual":  "B282146D20ECBF0369C4DD7AE5683D75207DD813D9D8BD022747089EB19EBF0B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Capture-Protection.ps1",
+                                   "Frozen":  "988F8A4A25F6CBB37AE43F8387BA0DA104921AF5549993499419207E8362F166",
+                                   "Actual":  "988F8A4A25F6CBB37AE43F8387BA0DA104921AF5549993499419207E8362F166",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Export-Validation.ps1",
+                                   "Frozen":  "E775093B11BCFA81ED3907672F4F66E9AAF1ED0FFA25429D0799D81F0D1573B2",
+                                   "Actual":  "E775093B11BCFA81ED3907672F4F66E9AAF1ED0FFA25429D0799D81F0D1573B2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Format-Owned.ps1",
+                                   "Frozen":  "32F85BE5110C36CE83052245E22DAF5411169FC6B62D190BCF15D5B5BCE3A30B",
+                                   "Actual":  "32F85BE5110C36CE83052245E22DAF5411169FC6B62D190BCF15D5B5BCE3A30B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/job.example.json",
+                                   "Frozen":  "3269C5A15EBC491EAC6AF431AFCBAD197FCC62C0E5B0E6517DA445E280A3C1CF",
+                                   "Actual":  "3269C5A15EBC491EAC6AF431AFCBAD197FCC62C0E5B0E6517DA445E280A3C1CF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Run-Regressions.ps1",
+                                   "Frozen":  "E42CCBB421EA2C7A186DD42EAE57E83C749A09361C03D487692299A1F54CC602",
+                                   "Actual":  "E42CCBB421EA2C7A186DD42EAE57E83C749A09361C03D487692299A1F54CC602",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Sync-Validation.ps1",
+                                   "Frozen":  "AAC6A4440E595A6F5919B23373B031AC83FEF467FAC5FA8C400F9E8594A34665",
+                                   "Actual":  "AAC6A4440E595A6F5919B23373B031AC83FEF467FAC5FA8C400F9E8594A34665",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B23Proof/Write-Verify-ExternalTarget.ps1",
+                                   "Frozen":  "3C0D3F5346568EAC6D76F225455C6A626007CCBC90D1486345765E701A1344F4",
+                                   "Actual":  "3C0D3F5346568EAC6D76F225455C6A626007CCBC90D1486345765E701A1344F4",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24-bounded-finding-contracts.md",
+                                   "Frozen":  "8B9A6854439F7FDCF864B7FA8A6F26895F8CC9AE4707720EC3DD0A495962C163",
+                                   "Actual":  "8B9A6854439F7FDCF864B7FA8A6F26895F8CC9AE4707720EC3DD0A495962C163",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24-bounded-finding-contracts-audit.json",
+                                   "Frozen":  "2E0CAF8026AD4970210B406CE29CCFCCC3A9458F3B45237299FFDCCB03D1A989",
+                                   "Actual":  "2E0CAF8026AD4970210B406CE29CCFCCC3A9458F3B45237299FFDCCB03D1A989",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Capture-ValidationInputs.ps1",
+                                   "Frozen":  "A100B1E15E0B44456E10C9EBF4E97DC2244BDEAF49D89D1A5A8B5FC8435CCD6F",
+                                   "Actual":  "A100B1E15E0B44456E10C9EBF4E97DC2244BDEAF49D89D1A5A8B5FC8435CCD6F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Export-Validation.ps1",
+                                   "Frozen":  "DB142150DBFEA0421611DC58A0584B0E5E80F81249CCE82F2B2B1DDDD3CC1475",
+                                   "Actual":  "DB142150DBFEA0421611DC58A0584B0E5E80F81249CCE82F2B2B1DDDD3CC1475",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Format-Owned.ps1",
+                                   "Frozen":  "F1F5582F85EF73436A37F1D1DB53A68D2275C8AD1CC30D26E11160EF567E396E",
+                                   "Actual":  "F1F5582F85EF73436A37F1D1DB53A68D2275C8AD1CC30D26E11160EF567E396E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/job.example.json",
+                                   "Frozen":  "2F5975EF883B8C1AF5566C6E11AAF8F4CD312E9CC6366D4AF196319BF9835FEF",
+                                   "Actual":  "2F5975EF883B8C1AF5566C6E11AAF8F4CD312E9CC6366D4AF196319BF9835FEF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Prepare-OfflineValidation.ps1",
+                                   "Frozen":  "C29F3D94E47BD77E2F01060CEFFABD7054D517661BAE2AC003D12ED499FED621",
+                                   "Actual":  "C29F3D94E47BD77E2F01060CEFFABD7054D517661BAE2AC003D12ED499FED621",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Run-FollowOnBoundary.ps1",
+                                   "Frozen":  "AB6916728EBD4737789343B42445F00946A5790707DA8AA2A7B1E7E4CC8F6740",
+                                   "Actual":  "AB6916728EBD4737789343B42445F00946A5790707DA8AA2A7B1E7E4CC8F6740",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Run-PidGateAudit.ps1",
+                                   "Frozen":  "E94CD2338019143D0168FE997CAD9EB9BE5C5A1D08C8C0A64B7083628AC72CAA",
+                                   "Actual":  "E94CD2338019143D0168FE997CAD9EB9BE5C5A1D08C8C0A64B7083628AC72CAA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Run-Regressions.ps1",
+                                   "Frozen":  "D80266F910C769C3D3BA67D440248A298177FFC2C44EAD79CBCFE6C6214B726C",
+                                   "Actual":  "D80266F910C769C3D3BA67D440248A298177FFC2C44EAD79CBCFE6C6214B726C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Write-PidGateClosure.ps1",
+                                   "Frozen":  "812A0451174BE82ADA619689F2C771751D408BF4EF76BE9D3397D497F8A5B51C",
+                                   "Actual":  "812A0451174BE82ADA619689F2C771751D408BF4EF76BE9D3397D497F8A5B51C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B24Proof/Write-Verify-Findings.ps1",
+                                   "Frozen":  "D21F9ED56641AF913FC91A17BF1486D26C202EFE540BC6140B8EB15A5D482AD5",
+                                   "Actual":  "D21F9ED56641AF913FC91A17BF1486D26C202EFE540BC6140B8EB15A5D482AD5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2-canonical-exception-type-identity.md",
+                                   "Frozen":  "B0599263B43590F868948E10F3E966E013D9AA87DEFC0ECA972EFE30799072A6",
+                                   "Actual":  "B0599263B43590F868948E10F3E966E013D9AA87DEFC0ECA972EFE30799072A6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2-canonical-exception-type-identity-audit.json",
+                                   "Frozen":  "D92B3847299FC9A4EA46FB541A0B50EC162FDE80FB6A84A98C1883132BFCA34E",
+                                   "Actual":  "D92B3847299FC9A4EA46FB541A0B50EC162FDE80FB6A84A98C1883132BFCA34E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Capture-Start.ps1",
+                                   "Frozen":  "566159B9911576DCEFA65C988222F8972D3AD9E1020CB1EC6CC30A3D1B6634DE",
+                                   "Actual":  "566159B9911576DCEFA65C988222F8972D3AD9E1020CB1EC6CC30A3D1B6634DE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Capture-WipDelta.ps1",
+                                   "Frozen":  "48321BD903DEA02BC2E6CEB9A6661DE061120369CA2AF00A900986E07E291FFA",
+                                   "Actual":  "48321BD903DEA02BC2E6CEB9A6661DE061120369CA2AF00A900986E07E291FFA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Format-Owned.ps1",
+                                   "Frozen":  "B73E102595F1CE08A3B965A328DA5DC07279185DE138BAD489BC60BE21D49027",
+                                   "Actual":  "B73E102595F1CE08A3B965A328DA5DC07279185DE138BAD489BC60BE21D49027",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/gate-vs-b25a-wip.patch.txt",
+                                   "Frozen":  "5490A44D734207CA238A34120D7C4E2D2DB0D873ED3D5219B552AFA03295AB0D",
+                                   "Actual":  "5490A44D734207CA238A34120D7C4E2D2DB0D873ED3D5219B552AFA03295AB0D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "356E221448D6B0BDE1E725FBFD7342B4D9993773D35BADD31A7CD5F002607FDB",
+                                   "Actual":  "356E221448D6B0BDE1E725FBFD7342B4D9993773D35BADD31A7CD5F002607FDB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/README.md",
+                                   "Frozen":  "D6DE09F9B0475151A1407E52E59B7F9A4332C0CDC919CEB755C56607E4547927",
+                                   "Actual":  "D6DE09F9B0475151A1407E52E59B7F9A4332C0CDC919CEB755C56607E4547927",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/register-vs-b25a-wip.patch.txt",
+                                   "Frozen":  "E8486AEC04466F247F3D59C5A0A64F6F7FCA22581242205F5F0CC8FCE030EE2F",
+                                   "Actual":  "E8486AEC04466F247F3D59C5A0A64F6F7FCA22581242205F5F0CC8FCE030EE2F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Run-EvidenceGate.ps1",
+                                   "Frozen":  "CFE246A3B604A2354C81CD548E174D51CA674C78FF7FD5559AEC3A22DC740320",
+                                   "Actual":  "CFE246A3B604A2354C81CD548E174D51CA674C78FF7FD5559AEC3A22DC740320",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Run-Validation.ps1",
+                                   "Frozen":  "ED6638E6D041FD459F2B5079B241841873010C20953BB5D7B8F454CA4D80B9A7",
+                                   "Actual":  "ED6638E6D041FD459F2B5079B241841873010C20953BB5D7B8F454CA4D80B9A7",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Verify-HistoricalEvidence.ps1",
+                                   "Frozen":  "3F7E711B501935BCADD000FFF728FA848D2515CACAB70F91C4D2BE50C1FD2170",
+                                   "Actual":  "3F7E711B501935BCADD000FFF728FA848D2515CACAB70F91C4D2BE50C1FD2170",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Verify-Static.ps1",
+                                   "Frozen":  "A0F18DC80A5BB561821D50F3E05F6E938EEA620017EC3F81EC3D04E7BEF91FBA",
+                                   "Actual":  "A0F18DC80A5BB561821D50F3E05F6E938EEA620017EC3F81EC3D04E7BEF91FBA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A2Proof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "0B652667C01612BD5A19BB521BCAD216CFBB28D994D1245465B3D7E3E78AC2E3",
+                                   "Actual":  "0B652667C01612BD5A19BB521BCAD216CFBB28D994D1245465B3D7E3E78AC2E3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3-constructed-generic-summary-context.md",
+                                   "Frozen":  "64074A1D92CCAF962499E7A2330B528DF3F5D4330BCB9C3A7B08B589ACF298AE",
+                                   "Actual":  "64074A1D92CCAF962499E7A2330B528DF3F5D4330BCB9C3A7B08B589ACF298AE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3-constructed-generic-summary-context-audit.json",
+                                   "Frozen":  "04FEDB1B885058AA1D2FDD166F0C2630855CCFAD86074E6998EEE710582D3ADC",
+                                   "Actual":  "04FEDB1B885058AA1D2FDD166F0C2630855CCFAD86074E6998EEE710582D3ADC",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Format-Owned.ps1",
+                                   "Frozen":  "DAC0BBCBCAADB0446926FC1DD98EC27757EDC02FDBF9D457EE197FF66E645CF9",
+                                   "Actual":  "DAC0BBCBCAADB0446926FC1DD98EC27757EDC02FDBF9D457EE197FF66E645CF9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/gate-vs-c777.patch.txt",
+                                   "Frozen":  "8853F2A5C44F53083BCF144C82E47343AC3923DA951F177EE8BD8E51FB1E0B2A",
+                                   "Actual":  "8853F2A5C44F53083BCF144C82E47343AC3923DA951F177EE8BD8E51FB1E0B2A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "BEB3A76136F7EE74AF6F02DE3EC2CAD496B4BCAC9B4CD3C48F32CD45C23E6452",
+                                   "Actual":  "BEB3A76136F7EE74AF6F02DE3EC2CAD496B4BCAC9B4CD3C48F32CD45C23E6452",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/README.md",
+                                   "Frozen":  "627956401B6DE8137D833EEF75833B40A82FD75FFB98E3B3D61D6243BFED184D",
+                                   "Actual":  "627956401B6DE8137D833EEF75833B40A82FD75FFB98E3B3D61D6243BFED184D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/register-vs-c777.patch.txt",
+                                   "Frozen":  "7EB6CE581CAA91C24E435DE9A4BFE61C5BB7826F272EAAAACE3DD4DFC747CF5D",
+                                   "Actual":  "7EB6CE581CAA91C24E435DE9A4BFE61C5BB7826F272EAAAACE3DD4DFC747CF5D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Run-EvidenceGate.ps1",
+                                   "Frozen":  "B3D8DBE0BDFED5F1CB65B6FAE5FEB6FDADA4464C888EA0294DB94F423CB6E06C",
+                                   "Actual":  "B3D8DBE0BDFED5F1CB65B6FAE5FEB6FDADA4464C888EA0294DB94F423CB6E06C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Run-Validation.ps1",
+                                   "Frozen":  "9789CC49187A607743F988DDF7412A966E9C215398CC373D3617CBDFF206FD14",
+                                   "Actual":  "9789CC49187A607743F988DDF7412A966E9C215398CC373D3617CBDFF206FD14",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Verify-Changes.ps1",
+                                   "Frozen":  "002A356307AF2CC2BFE8DB22C6F2B051211F52BAF1D3D81271EEECEEA99B4250",
+                                   "Actual":  "002A356307AF2CC2BFE8DB22C6F2B051211F52BAF1D3D81271EEECEEA99B4250",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Verify-HistoricalEvidence.ps1",
+                                   "Frozen":  "AF1F00F1E8E682BAA872DAF35AD7EDDA511441E7AEB676BC726ABC68B3F96C92",
+                                   "Actual":  "AF1F00F1E8E682BAA872DAF35AD7EDDA511441E7AEB676BC726ABC68B3F96C92",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Verify-Static.ps1",
+                                   "Frozen":  "F7E524B490EC32F7AE17A73B02E6DB0E648A19718D7591EE83E8815FEEA30B59",
+                                   "Actual":  "F7E524B490EC32F7AE17A73B02E6DB0E648A19718D7591EE83E8815FEEA30B59",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A3Proof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "6A9A9AB7FBDD73D1A8E183BB5A0D758A2503398AEAE07D3A084EFE49D5501B0E",
+                                   "Actual":  "6A9A9AB7FBDD73D1A8E183BB5A0D758A2503398AEAE07D3A084EFE49D5501B0E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4-bounded-generic-context-expansion.md",
+                                   "Frozen":  "E9302B15AAA49D764CA98DFD8D4D00929FFD49CE4E694F273D822712C04E5839",
+                                   "Actual":  "E9302B15AAA49D764CA98DFD8D4D00929FFD49CE4E694F273D822712C04E5839",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4-bounded-generic-context-expansion-audit.json",
+                                   "Frozen":  "4476CD0892741557F9369E508EFC6443C58632492B5F1BC6810F652C16CF55B9",
+                                   "Actual":  "4476CD0892741557F9369E508EFC6443C58632492B5F1BC6810F652C16CF55B9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Format-Owned.ps1",
+                                   "Frozen":  "E233E6B44526083D09663BCC970F1F6468A0BD4D4162F5B01F03C2C8C0884E0F",
+                                   "Actual":  "E233E6B44526083D09663BCC970F1F6468A0BD4D4162F5B01F03C2C8C0884E0F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/gate-vs-inherited-a3-wip.patch.txt",
+                                   "Frozen":  "D11BEC841B7D4FFB69A2288DA583D43E31AD155BB05D300CB3B88C2C1BF36FDA",
+                                   "Actual":  "D11BEC841B7D4FFB69A2288DA583D43E31AD155BB05D300CB3B88C2C1BF36FDA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "72AF28DCA41136B144A1C6CB052985A6449924DEA15723A8A7C1C4B0E517804E",
+                                   "Actual":  "72AF28DCA41136B144A1C6CB052985A6449924DEA15723A8A7C1C4B0E517804E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/README.md",
+                                   "Frozen":  "2D4712C146C810555F31439ECB3D3536F1E8EE5354AA435653594E77B5F81F56",
+                                   "Actual":  "2D4712C146C810555F31439ECB3D3536F1E8EE5354AA435653594E77B5F81F56",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/register-vs-inherited-a3-wip.patch.txt",
+                                   "Frozen":  "DD3F09A84E53AD682CBDFA02CC610AA125B970D932CACB76459814C1AD063EFA",
+                                   "Actual":  "DD3F09A84E53AD682CBDFA02CC610AA125B970D932CACB76459814C1AD063EFA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Run-EvidenceGate.ps1",
+                                   "Frozen":  "65BE609BD8E5FF422D8C11F7BFB6071DF21D1862ABB44FE75E2BF7AE8E648553",
+                                   "Actual":  "65BE609BD8E5FF422D8C11F7BFB6071DF21D1862ABB44FE75E2BF7AE8E648553",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Run-Validation.ps1",
+                                   "Frozen":  "CC102FAEF8B49595C256596360E05DB0470348639B3E673087F00706CFB3B6BD",
+                                   "Actual":  "CC102FAEF8B49595C256596360E05DB0470348639B3E673087F00706CFB3B6BD",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Verify-Changes.ps1",
+                                   "Frozen":  "B37102505C2A0C90BFFCE0D4998F5E739614F0D7E95DCF26A5180B705FAD9910",
+                                   "Actual":  "B37102505C2A0C90BFFCE0D4998F5E739614F0D7E95DCF26A5180B705FAD9910",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Verify-CompiledSources.ps1",
+                                   "Frozen":  "6CCF74B84B8C07FFE7D55C9E272129BC118E0D2C97C692734BAE27BA4FF9811E",
+                                   "Actual":  "6CCF74B84B8C07FFE7D55C9E272129BC118E0D2C97C692734BAE27BA4FF9811E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Verify-HistoricalEvidence.ps1",
+                                   "Frozen":  "A0F4E4740AAB3B1D9BD4A84E288AEE5F1706199895AA65F282943BB394C83C14",
+                                   "Actual":  "A0F4E4740AAB3B1D9BD4A84E288AEE5F1706199895AA65F282943BB394C83C14",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Verify-Static.ps1",
+                                   "Frozen":  "CE9E3C425062A737DBA40E32B317BFE98424956CAD0074758A770964EC6A6C95",
+                                   "Actual":  "CE9E3C425062A737DBA40E32B317BFE98424956CAD0074758A770964EC6A6C95",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A4Proof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "78094F78BD065FC4077369AB1DE163E1CC97EAB7FC9B8B44724BA70D7ABDF550",
+                                   "Actual":  "78094F78BD065FC4077369AB1DE163E1CC97EAB7FC9B8B44724BA70D7ABDF550",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Format-Owned.ps1",
+                                   "Frozen":  "F0F28F5B53C69859A00386A83CED032CBB1EA6A2C1434F12EAB7FCE128DBC291",
+                                   "Actual":  "F0F28F5B53C69859A00386A83CED032CBB1EA6A2C1434F12EAB7FCE128DBC291",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/gate-vs-inherited-a4.patch.txt",
+                                   "Frozen":  "B6B5B40F54056209CAA686EE04AA69635FA72248CDD3FA35A84E6CD1E9BE6505",
+                                   "Actual":  "B6B5B40F54056209CAA686EE04AA69635FA72248CDD3FA35A84E6CD1E9BE6505",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Lifecycle-and-contract.md",
+                                   "Frozen":  "44FC4417EAB42611AAE842583EE4CDB7013CF800545EA9318E97B46AE97BFC39",
+                                   "Actual":  "44FC4417EAB42611AAE842583EE4CDB7013CF800545EA9318E97B46AE97BFC39",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "345663AF0055470BA1222E83A5E9597C2D9F903075476978976B9B74CA54C331",
+                                   "Actual":  "345663AF0055470BA1222E83A5E9597C2D9F903075476978976B9B74CA54C331",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/README.md",
+                                   "Frozen":  "137EA5A4D6A2D6BB34BC3ED33EAC1A9F1C6F8B8C5863E94B320CDEB78D4B3190",
+                                   "Actual":  "137EA5A4D6A2D6BB34BC3ED33EAC1A9F1C6F8B8C5863E94B320CDEB78D4B3190",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Run-EvidenceGate.ps1",
+                                   "Frozen":  "00EE6D88265D69B2AC2A65D6F4B1B04B0B73BC515EA9917CF235DB8695810022",
+                                   "Actual":  "00EE6D88265D69B2AC2A65D6F4B1B04B0B73BC515EA9917CF235DB8695810022",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Run-Validation.ps1",
+                                   "Frozen":  "FB872F331A539CAA92D3DBF8DCAC1D952F8E3C4CE449447A68B3B38174B25B28",
+                                   "Actual":  "FB872F331A539CAA92D3DBF8DCAC1D952F8E3C4CE449447A68B3B38174B25B28",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/test-vs-inherited-a4.patch.txt",
+                                   "Frozen":  "82A231705090E2BBCF6B512CAD38DC4164827EAB377CC79A6A2BF9F86BE16B11",
+                                   "Actual":  "82A231705090E2BBCF6B512CAD38DC4164827EAB377CC79A6A2BF9F86BE16B11",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Trace-ForeignFullFailure.ps1",
+                                   "Frozen":  "FC1C4C39D999969FEF5D98FEFE205BC4246349CC79009F8045B145EC29D6AA9F",
+                                   "Actual":  "FC1C4C39D999969FEF5D98FEFE205BC4246349CC79009F8045B145EC29D6AA9F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Verify-ChangesAndHistory.ps1",
+                                   "Frozen":  "57F359D83CB93C9BB9B8675DF9FB7D4FE9F4F8BA795102BDEDFDEA7F9278D39F",
+                                   "Actual":  "57F359D83CB93C9BB9B8675DF9FB7D4FE9F4F8BA795102BDEDFDEA7F9278D39F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Verify-CompiledSources.ps1",
+                                   "Frozen":  "D9974AB480BAFB0FBE4B3DA890C0539CAF86F8EBED7CABCB2368A0F84C848BB0",
+                                   "Actual":  "D9974AB480BAFB0FBE4B3DA890C0539CAF86F8EBED7CABCB2368A0F84C848BB0",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Verify-Evidence.ps1",
+                                   "Frozen":  "596BD3FD61C41F1A3AB514B44C0CDCBC6BCD94EEDFECB44CAEF77536CBB2312B",
+                                   "Actual":  "596BD3FD61C41F1A3AB514B44C0CDCBC6BCD94EEDFECB44CAEF77536CBB2312B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5Proof/Verify-Static.ps1",
+                                   "Frozen":  "852C610813C29FF89A302E8C86686BDA7C411264B284AF63C5772A63669D5A6F",
+                                   "Actual":  "852C610813C29FF89A302E8C86686BDA7C411264B284AF63C5772A63669D5A6F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5-recursive-summary-scc-closure.md",
+                                   "Frozen":  "B4310EAF58BB390F205B009D2E0489EAE6DBEFBEFFF5B9827B251C8661A41372",
+                                   "Actual":  "B4310EAF58BB390F205B009D2E0489EAE6DBEFBEFFF5B9827B251C8661A41372",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A5-recursive-summary-scc-closure-audit.json",
+                                   "Frozen":  "F835EE3CEAB63ED35F9F5D7D102B72FEF0DBF1E9AB461036F94F6D7A80B36163",
+                                   "Actual":  "F835EE3CEAB63ED35F9F5D7D102B72FEF0DBF1E9AB461036F94F6D7A80B36163",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc.md",
+                                   "Frozen":  "718FC1F50956151795C72E78173BD92B612B614B7A16C7157BAF8025C658B9DE",
+                                   "Actual":  "718FC1F50956151795C72E78173BD92B612B614B7A16C7157BAF8025C658B9DE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc-audit.json",
+                                   "Frozen":  "AC89205EBF3D40F63FDBE00AEC2B2E6F9617577AE3B9C4B42EBFCA6058D85838",
+                                   "Actual":  "AC89205EBF3D40F63FDBE00AEC2B2E6F9617577AE3B9C4B42EBFCA6058D85838",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Format-Owned.ps1",
+                                   "Frozen":  "194EEF26B1447BB4C142FB366EEF8F6D86D7C8F890956C53F03F8547ED2CC54E",
+                                   "Actual":  "194EEF26B1447BB4C142FB366EEF8F6D86D7C8F890956C53F03F8547ED2CC54E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "C30937B0A63DFE265CB9212A2D4BC5F7E40D09DE6574EC343CAF32847AC313BF",
+                                   "Actual":  "C30937B0A63DFE265CB9212A2D4BC5F7E40D09DE6574EC343CAF32847AC313BF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/README.md",
+                                   "Frozen":  "40F8ED2792A8741188560C1F10CC4D012D10DF16F2A05A3E0A2ABAC529C74E14",
+                                   "Actual":  "40F8ED2792A8741188560C1F10CC4D012D10DF16F2A05A3E0A2ABAC529C74E14",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Run-EvidenceGate.ps1",
+                                   "Frozen":  "E4E88389E889A32EA6088F747793EF7EF5B771ABCDEFE79E80B5C66E1A04C015",
+                                   "Actual":  "E4E88389E889A32EA6088F747793EF7EF5B771ABCDEFE79E80B5C66E1A04C015",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Run-Validation.ps1",
+                                   "Frozen":  "C8A5A98F42AB88C301D56E9FC489AAE288064D173DE44CC3C41A8231B2524EF6",
+                                   "Actual":  "C8A5A98F42AB88C301D56E9FC489AAE288064D173DE44CC3C41A8231B2524EF6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Trace-Lifecycle.ps1",
+                                   "Frozen":  "BC1A7ACAD3F2FD50FEF1E5B9BCD9D3EDA50744C5F048217CC07AC9B41F2643D2",
+                                   "Actual":  "BC1A7ACAD3F2FD50FEF1E5B9BCD9D3EDA50744C5F048217CC07AC9B41F2643D2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Verify-CompiledSources.ps1",
+                                   "Frozen":  "A043D89970603752130FD59AAAEC801DD35C86788851733E2BF67DFABC098CB3",
+                                   "Actual":  "A043D89970603752130FD59AAAEC801DD35C86788851733E2BF67DFABC098CB3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Verify-Evidence.ps1",
+                                   "Frozen":  "079F15F560399888A6E3B568FB05226B1CA195F8662E6C23C772A02AC0693F1A",
+                                   "Actual":  "079F15F560399888A6E3B568FB05226B1CA195F8662E6C23C772A02AC0693F1A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Verify-Protection.ps1",
+                                   "Frozen":  "A983E9F97828C05233C7986D9A8BFD4F33DC9D2B1AD6C63FE9A1B37475F41C83",
+                                   "Actual":  "A983E9F97828C05233C7986D9A8BFD4F33DC9D2B1AD6C63FE9A1B37475F41C83",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Verify-Revision.ps1",
+                                   "Frozen":  "CB8F04D402CD77592749184385D14872C4104A5701D84E576FAC52850E44272E",
+                                   "Actual":  "CB8F04D402CD77592749184385D14872C4104A5701D84E576FAC52850E44272E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A6Proof/Verify-Static.ps1",
+                                   "Frozen":  "597BDDFC7040F59DD698BB02B22289BAD31F13276CFA88C5D19CC524FC1B274F",
+                                   "Actual":  "597BDDFC7040F59DD698BB02B22289BAD31F13276CFA88C5D19CC524FC1B274F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A7-finite-parametric-generic-context-contract.md",
+                                   "Frozen":  "A739BF564D016D267B96065105DF8F851B497EEF1E1B382DD271A38522873C83",
+                                   "Actual":  "A739BF564D016D267B96065105DF8F851B497EEF1E1B382DD271A38522873C83",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A7-finite-parametric-generic-context-contract-audit.json",
+                                   "Frozen":  "BA1D0093730A09409FAF0120DDA3ED75E17A2F380BEC0305E415C9D425700293",
+                                   "Actual":  "BA1D0093730A09409FAF0120DDA3ED75E17A2F380BEC0305E415C9D425700293",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A7Proof/Capture-Inventory.ps1",
+                                   "Frozen":  "18E3070ED5585169FB719E58C87BC557A74F15636020A2C72B20D96269671581",
+                                   "Actual":  "18E3070ED5585169FB719E58C87BC557A74F15636020A2C72B20D96269671581",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A7Proof/Run-ContractGate.ps1",
+                                   "Frozen":  "01D3BCF86AC3369154E593D22FEE549B72C9E8FE2BD215E3D9DB582F32DAF0CF",
+                                   "Actual":  "01D3BCF86AC3369154E593D22FEE549B72C9E8FE2BD215E3D9DB582F32DAF0CF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A7Proof/Verify-Contract.ps1",
+                                   "Frozen":  "DD25ECCCCBE329F4C16A960869CC5C6AB3F6975A22B9FE6A6DAAEA6ED726979C",
+                                   "Actual":  "DD25ECCCCBE329F4C16A960869CC5C6AB3F6975A22B9FE6A6DAAEA6ED726979C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8-correlated-recursive-type-family-contract.md",
+                                   "Frozen":  "B8F9DE1AC49B8D8A0DB15E3DDA6F6F1A900F7E1DC22327F0EC8D47D3365C5255",
+                                   "Actual":  "B8F9DE1AC49B8D8A0DB15E3DDA6F6F1A900F7E1DC22327F0EC8D47D3365C5255",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8-correlated-recursive-type-family-contract-audit.json",
+                                   "Frozen":  "D79F6C2A07AE1D6CEC4C1C9336C40B0E010916DA4ACC030F88D8C32C8A86579C",
+                                   "Actual":  "D79F6C2A07AE1D6CEC4C1C9336C40B0E010916DA4ACC030F88D8C32C8A86579C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/.gitignore",
+                                   "Frozen":  "A96F3BAFFAF142C4C90DA2ECDC402A2BEE6D51F118417C4B52AFFFE7CFC33592",
+                                   "Actual":  "A96F3BAFFAF142C4C90DA2ECDC402A2BEE6D51F118417C4B52AFFFE7CFC33592",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Capture-Inventory.ps1",
+                                   "Frozen":  "6773546DEAD26D2D0679F0E3D1E84674AB562506C1C67DEB29C661FE12E2F61E",
+                                   "Actual":  "6773546DEAD26D2D0679F0E3D1E84674AB562506C1C67DEB29C661FE12E2F61E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Characterization-preflight.md",
+                                   "Frozen":  "3F5DC7A6860D7EC693B44AF2BEB5C25FC51B877857AA4D6C57E5EE645B8AF244",
+                                   "Actual":  "3F5DC7A6860D7EC693B44AF2BEB5C25FC51B877857AA4D6C57E5EE645B8AF244",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/FamilyProof.cs",
+                                   "Frozen":  "5AB4C54EB0176FA2B30F836A0141BD9886EFEB251254E90B5FCC639F5AD98447",
+                                   "Actual":  "5AB4C54EB0176FA2B30F836A0141BD9886EFEB251254E90B5FCC639F5AD98447",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/FamilyProof.csproj",
+                                   "Frozen":  "284A2485F034BF0E14F9B08AEA24EFCBFDD9D5F365D351BB277A9AD24684C8D5",
+                                   "Actual":  "284A2485F034BF0E14F9B08AEA24EFCBFDD9D5F365D351BB277A9AD24684C8D5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Format-Owned.ps1",
+                                   "Frozen":  "BF7898EF196C87DCEB28A2B01BDF05DB20AF7C3F0CFDFB058114F6E1156A9772",
+                                   "Actual":  "BF7898EF196C87DCEB28A2B01BDF05DB20AF7C3F0CFDFB058114F6E1156A9772",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Invoke-Inherited.ps1",
+                                   "Frozen":  "A989D73A53459E4EC9D190360E0F6BF95AB939CC01FE60FBEB9C24C9FE80C330",
+                                   "Actual":  "A989D73A53459E4EC9D190360E0F6BF95AB939CC01FE60FBEB9C24C9FE80C330",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/README.md",
+                                   "Frozen":  "F9C8BB6A09CBC469B288C7C29AE5FB7EF9849CB119267F76D2756AE1F695BA72",
+                                   "Actual":  "F9C8BB6A09CBC469B288C7C29AE5FB7EF9849CB119267F76D2756AE1F695BA72",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Run-Gate.ps1",
+                                   "Frozen":  "1E4412D35CB646EF1B9717A0C2FF8E800678CAFD766542AE7A6A445626D85FE8",
+                                   "Actual":  "1E4412D35CB646EF1B9717A0C2FF8E800678CAFD766542AE7A6A445626D85FE8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Run-Harness.ps1",
+                                   "Frozen":  "B35F73C44A45BC5A24087A646BFB7838C3AB31FB5DACA4AEB2AC63F6BE564058",
+                                   "Actual":  "B35F73C44A45BC5A24087A646BFB7838C3AB31FB5DACA4AEB2AC63F6BE564058",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Run-Recorded.ps1",
+                                   "Frozen":  "9DA5D5840C9B4653D3BD71E2AFCA1D4858A9E0791864BD452B3D9315B112E103",
+                                   "Actual":  "9DA5D5840C9B4653D3BD71E2AFCA1D4858A9E0791864BD452B3D9315B112E103",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Trace-Lifecycle.ps1",
+                                   "Frozen":  "E5178D37C229241F84CCDD382F7A9CF8E8472F7DAB8CD463D80F68D478919A67",
+                                   "Actual":  "E5178D37C229241F84CCDD382F7A9CF8E8472F7DAB8CD463D80F68D478919A67",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Verify-A8.ps1",
+                                   "Frozen":  "D78D063EAC5B7E9DB5D9EF1B0DD2B65C7A08DFB230033B6F701E4ADE8FFB292F",
+                                   "Actual":  "D78D063EAC5B7E9DB5D9EF1B0DD2B65C7A08DFB230033B6F701E4ADE8FFB292F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Verify-CompiledSources.ps1",
+                                   "Frozen":  "25124DBFF835036A358E44955B3427F99F4B1F71CDFBB80E7534E59A2FDDBE82",
+                                   "Actual":  "25124DBFF835036A358E44955B3427F99F4B1F71CDFBB80E7534E59A2FDDBE82",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Verify-Protection.ps1",
+                                   "Frozen":  "7C484B3A856E6E409C3C046A5CE7EBFB5323D1A2D4A5B17CE94F4146A6399960",
+                                   "Actual":  "7C484B3A856E6E409C3C046A5CE7EBFB5323D1A2D4A5B17CE94F4146A6399960",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Verify-Revision.ps1",
+                                   "Frozen":  "66980CCA12255522033A2341D990804D86AEEC698D14063449D37562F624BBA2",
+                                   "Actual":  "66980CCA12255522033A2341D990804D86AEEC698D14063449D37562F624BBA2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A8Proof/Verify-Static.ps1",
+                                   "Frozen":  "BB8ED2BB236A1BD655A91F662B6EEDACD45D7C639E9A8D804EAFBCACA374751D",
+                                   "Actual":  "BB8ED2BB236A1BD655A91F662B6EEDACD45D7C639E9A8D804EAFBCACA374751D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A-assembly-qualified-type-ownership.md",
+                                   "Frozen":  "E53AF418954CA46DF39A96D5896F4273A1C6F8B47C4DD4A60A5D714CA8C47A02",
+                                   "Actual":  "E53AF418954CA46DF39A96D5896F4273A1C6F8B47C4DD4A60A5D714CA8C47A02",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25A-assembly-qualified-type-ownership-audit.json",
+                                   "Frozen":  "7FAFFEC507E81061C79E885A304C9869E3E296B86594D69EE9AA588CF0CCF0FF",
+                                   "Actual":  "7FAFFEC507E81061C79E885A304C9869E3E296B86594D69EE9AA588CF0CCF0FF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/candidate-tests.cs.txt",
+                                   "Frozen":  "3EA39871187D6FBCA1FB71C84EAC7F3F9827C02E082DF6005B7B2082BE63EF48",
+                                   "Actual":  "3EA39871187D6FBCA1FB71C84EAC7F3F9827C02E082DF6005B7B2082BE63EF48",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/Close-CandidateDiagnostics.ps1",
+                                   "Frozen":  "1BB3F7E367DFFE0D502E93C9C258BBC6C69CBD87E1AEFD4E5282992238F840CF",
+                                   "Actual":  "1BB3F7E367DFFE0D502E93C9C258BBC6C69CBD87E1AEFD4E5282992238F840CF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/ownership-before-after.json",
+                                   "Frozen":  "FF6C12B285AB5D0F99EF70FC6B6F6F440BA332FC0C1FA6351BF16CF5CE15DF38",
+                                   "Actual":  "FF6C12B285AB5D0F99EF70FC6B6F6F440BA332FC0C1FA6351BF16CF5CE15DF38",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/Prepare-Validation.ps1",
+                                   "Frozen":  "44FC70FE48C95023ABF4E5C47DD93D8E74F163E5D8C1DFAEE7FA06B2ECCA1ADA",
+                                   "Actual":  "44FC70FE48C95023ABF4E5C47DD93D8E74F163E5D8C1DFAEE7FA06B2ECCA1ADA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/Preserve-Candidate.ps1",
+                                   "Frozen":  "8A4BA007541EBAE284EDE841412A639C069F03D2C0127CB171C4FB23EC29F52A",
+                                   "Actual":  "8A4BA007541EBAE284EDE841412A639C069F03D2C0127CB171C4FB23EC29F52A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/README.md",
+                                   "Frozen":  "4BDC87EA96303EE796AE9695C98FEA7BE6259FFD3B89865970C5B4FB4D7A9EBB",
+                                   "Actual":  "4BDC87EA96303EE796AE9695C98FEA7BE6259FFD3B89865970C5B4FB4D7A9EBB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/Run-Validation.ps1",
+                                   "Frozen":  "72EEDCD3AA15CA13ED50CC62C11F217F0560B39140A12EFEF049E3DC082E9717",
+                                   "Actual":  "72EEDCD3AA15CA13ED50CC62C11F217F0560B39140A12EFEF049E3DC082E9717",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/withdrawn-candidate.patch.txt",
+                                   "Frozen":  "E035C42DE3F1AF066F736E638A93C3D7D01E1692C2B16C3A2E122A6D32B16DD5",
+                                   "Actual":  "E035C42DE3F1AF066F736E638A93C3D7D01E1692C2B16C3A2E122A6D32B16DD5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25AProof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "9A37A87DE6638FF310FC5C93F8AC00A3EF8E2351D26326D9F6806E70734D75D9",
+                                   "Actual":  "9A37A87DE6638FF310FC5C93F8AC00A3EF8E2351D26326D9F6806E70734D75D9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25-bounded-solution-finding-adoption.md",
+                                   "Frozen":  "173E1BC926E32F4A1F63FC73A2290334AB20BD227EC28F984D7F3E5AC02658A6",
+                                   "Actual":  "173E1BC926E32F4A1F63FC73A2290334AB20BD227EC28F984D7F3E5AC02658A6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25-bounded-solution-finding-adoption-audit.json",
+                                   "Frozen":  "3BE9033DBE5C95DC9E8C7A5795691E81B35590D9DBF614A4EE287AB4606282E3",
+                                   "Actual":  "3BE9033DBE5C95DC9E8C7A5795691E81B35590D9DBF614A4EE287AB4606282E3",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25Proof/Prepare-Validation.ps1",
+                                   "Frozen":  "7AA2A7B95C031BCD26C53405A878479132BE0AF819DC5E0A641DA8F98586AC95",
+                                   "Actual":  "7AA2A7B95C031BCD26C53405A878479132BE0AF819DC5E0A641DA8F98586AC95",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25Proof/Preserve-ActivationAttempt.ps1",
+                                   "Frozen":  "93695822FD31945C76C2AC724AA41DE3365A125363109A4FFFE6C337BF2E16A8",
+                                   "Actual":  "93695822FD31945C76C2AC724AA41DE3365A125363109A4FFFE6C337BF2E16A8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25Proof/Run-Validation.ps1",
+                                   "Frozen":  "230FE5EB94FA0DE669D4B95584FF9D18E7CCE268BB685F98D5DB74B6546067B2",
+                                   "Actual":  "230FE5EB94FA0DE669D4B95584FF9D18E7CCE268BB685F98D5DB74B6546067B2",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25Proof/Verify-UnsupportedGraphCli.ps1",
+                                   "Frozen":  "53F7A9BE06525F376D86757DE299E6082D7E9AC46E42496002672B40A9E06789",
+                                   "Actual":  "53F7A9BE06525F376D86757DE299E6082D7E9AC46E42496002672B40A9E06789",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B25Proof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "D737328C044D58ABD059EDC65D984E236DCE17CC7DD0E5A5DEA0F077582CD51B",
+                                   "Actual":  "D737328C044D58ABD059EDC65D984E236DCE17CC7DD0E5A5DEA0F077582CD51B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B2-dual-version-build-scaffold.md",
+                                   "Frozen":  "2B4E575E97807DFA70E751C610276B2D3F536A406BDBFE1F6C2A8ADA474AB295",
+                                   "Actual":  "2B4E575E97807DFA70E751C610276B2D3F536A406BDBFE1F6C2A8ADA474AB295",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B2-dual-version-build-scaffold-audit.json",
+                                   "Frozen":  "015FCDE9194EDCF48D0635B04C2A56551635DFE9D4305D500ECFCD4067398A48",
+                                   "Actual":  "015FCDE9194EDCF48D0635B04C2A56551635DFE9D4305D500ECFCD4067398A48",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B2Proof/Write-Verify-ScaffoldEvidence.ps1",
+                                   "Frozen":  "88CD12D21D2CE54A4CD7D0BCBE16A607112502A3DED7E19D1F7E8D0CA54BB4A5",
+                                   "Actual":  "88CD12D21D2CE54A4CD7D0BCBE16A607112502A3DED7E19D1F7E8D0CA54BB4A5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B3-historical-worker-host.md",
+                                   "Frozen":  "D8651444F59AABBE44C949CF683ABCF738D832221560CC70B026A2C8B8B7DA7F",
+                                   "Actual":  "D8651444F59AABBE44C949CF683ABCF738D832221560CC70B026A2C8B8B7DA7F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B3-historical-worker-host-audit.json",
+                                   "Frozen":  "B7C664BA518C377A21CCBD55CB6183C30A3A7E2034DB3147B9C42196EA6A6B8E",
+                                   "Actual":  "B7C664BA518C377A21CCBD55CB6183C30A3A7E2034DB3147B9C42196EA6A6B8E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B3Proof/Write-Verify-WorkerEvidence.ps1",
+                                   "Frozen":  "DC90526003B0BD6E0BBE800C7177AC8CFA8449DE79FBFC17A26F48113784A686",
+                                   "Actual":  "DC90526003B0BD6E0BBE800C7177AC8CFA8449DE79FBFC17A26F48113784A686",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4-main-worker-analysis-boundary.md",
+                                   "Frozen":  "2BFEC15153CD64E713C55F919AD3DEE84075D20205C4023087AB63EC2F04DC76",
+                                   "Actual":  "2BFEC15153CD64E713C55F919AD3DEE84075D20205C4023087AB63EC2F04DC76",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json",
+                                   "Frozen":  "EBC891BCB0E4DDEC308AF061A380984154ECCE5D2BB7D2455455E276429E22CF",
+                                   "Actual":  "EBC891BCB0E4DDEC308AF061A380984154ECCE5D2BB7D2455455E276429E22CF",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4Proof/TestProcess/.gitignore",
+                                   "Frozen":  "A93E8A85963762C68A7EAD48EF3490D34AFD452F4A8E0CCB6D3027611838747F",
+                                   "Actual":  "A93E8A85963762C68A7EAD48EF3490D34AFD452F4A8E0CCB6D3027611838747F",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj",
+                                   "Frozen":  "636E3A2050547C0FF26BD75CDFC83BEE204B0011429D77C1ADC783D1A0B8C436",
+                                   "Actual":  "636E3A2050547C0FF26BD75CDFC83BEE204B0011429D77C1ADC783D1A0B8C436",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4Proof/TestProcess/Directory.Build.props",
+                                   "Frozen":  "A36E223E31367C54EACEA04723B607B54FA30EFD2A1E822EDB0E3CBA57A564D5",
+                                   "Actual":  "A36E223E31367C54EACEA04723B607B54FA30EFD2A1E822EDB0E3CBA57A564D5",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4Proof/TestProcess/Program.cs",
+                                   "Frozen":  "5E2195680D83F141D71913CA43343B5CCB3148DF2CC31B568161577B274FF64A",
+                                   "Actual":  "5E2195680D83F141D71913CA43343B5CCB3148DF2CC31B568161577B274FF64A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B4Proof/Write-Verify-BoundaryEvidence.ps1",
+                                   "Frozen":  "05F2903A4FAD7D7C68AE3BFE23FA1579B5374B46B065B5BF196BF7964BC9CF2D",
+                                   "Actual":  "05F2903A4FAD7D7C68AE3BFE23FA1579B5374B46B065B5BF196BF7964BC9CF2D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B5-explicit-analyzer-routing.md",
+                                   "Frozen":  "3628EF42B9B2131AC0A74DAF86527A38A6FA6F29A809A791C4A38B4FCE8782B6",
+                                   "Actual":  "3628EF42B9B2131AC0A74DAF86527A38A6FA6F29A809A791C4A38B4FCE8782B6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B5-explicit-analyzer-routing-audit.json",
+                                   "Frozen":  "42A8788D42748935C4B10075497B92D5918EA3450B8226FE63F229A56BB6CDAB",
+                                   "Actual":  "42A8788D42748935C4B10075497B92D5918EA3450B8226FE63F229A56BB6CDAB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B5Proof/Write-Verify-RoutingEvidence.ps1",
+                                   "Frozen":  "E12DBB0487338B101F8D4216935B1CB8A853F6B746ECC71EB8AD706B74F905E7",
+                                   "Actual":  "E12DBB0487338B101F8D4216935B1CB8A853F6B746ECC71EB8AD706B74F905E7",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B6-deterministic-analyzer-selection.md",
+                                   "Frozen":  "E594BEF2A2C1C06D03A8376BE157ABE9AB61E163EBEB5F487B1C7B2C4BF971FA",
+                                   "Actual":  "E594BEF2A2C1C06D03A8376BE157ABE9AB61E163EBEB5F487B1C7B2C4BF971FA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B6-deterministic-analyzer-selection-audit.json",
+                                   "Frozen":  "A05DB9468EE9920CF390746CB389DF97B094564A6901D1C4A1ED7064604B315C",
+                                   "Actual":  "A05DB9468EE9920CF390746CB389DF97B094564A6901D1C4A1ED7064604B315C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B6Proof/Write-Verify-SelectionEvidence.ps1",
+                                   "Frozen":  "0432FCCF7870ED6A55BB473EA86A67B80B66D2DE885468D53803ABC8F9B10800",
+                                   "Actual":  "0432FCCF7870ED6A55BB473EA86A67B80B66D2DE885468D53803ABC8F9B10800",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/.gitignore",
+                                   "Frozen":  "27847517DC1CBBA74A9E3B5FC298D4C7D007E715B4343AE1452C5C22847D206E",
+                                   "Actual":  "27847517DC1CBBA74A9E3B5FC298D4C7D007E715B4343AE1452C5C22847D206E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/B11GraphProbe.cs",
+                                   "Frozen":  "3A177A0F6BFEFDEA3F24F19BFACA0E6204965EA7077964981431E9449D09AAF6",
+                                   "Actual":  "3A177A0F6BFEFDEA3F24F19BFACA0E6204965EA7077964981431E9449D09AAF6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/B12ReferenceProbe.cs",
+                                   "Frozen":  "8C8E07724D5C22229616CC16E78651C60D9616048C8069D39C9BE283122D71D9",
+                                   "Actual":  "8C8E07724D5C22229616CC16E78651C60D9616048C8069D39C9BE283122D71D9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/B14ScopeProbe.cs",
+                                   "Frozen":  "3A58BD7AB19BE640A41DAFB8BA073E1D5D5870E6E4642FFBE7DC167ABCAB677D",
+                                   "Actual":  "3A58BD7AB19BE640A41DAFB8BA073E1D5D5870E6E4642FFBE7DC167ABCAB677D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/B15SolutionProbe.cs",
+                                   "Frozen":  "E20B22C6D817B754A83C342EAD5FC586FFF65B892CCFF020F5D1FBEF1C4DDB7D",
+                                   "Actual":  "E20B22C6D817B754A83C342EAD5FC586FFF65B892CCFF020F5D1FBEF1C4DDB7D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/Directory.Build.props",
+                                   "Frozen":  "B13193390EECFFCDF259783BEC0C540DAB8EF7CED65B3E9312499E485C552BEB",
+                                   "Actual":  "B13193390EECFFCDF259783BEC0C540DAB8EF7CED65B3E9312499E485C552BEB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj",
+                                   "Frozen":  "4E4CB780BB761C40711B502A4D2C03F8F83FFC666FB9F6EF772C198E260B2A9B",
+                                   "Actual":  "4E4CB780BB761C40711B502A4D2C03F8F83FFC666FB9F6EF772C198E260B2A9B",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/HistoricalPdbFixture/Program.cs",
+                                   "Frozen":  "A870EC42949F133CFA17D3463AA9DA336A9A6505C5A68C4B2C2CF187906B70A1",
+                                   "Actual":  "A870EC42949F133CFA17D3463AA9DA336A9A6505C5A68C4B2C2CF187906B70A1",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7Proof/Write-Verify-ProjectionEvidence.ps1",
+                                   "Frozen":  "3EF4CE3D34426B76D70C111184428A983EB5C99EEF6F460A360300E9FFBB4856",
+                                   "Actual":  "3EF4CE3D34426B76D70C111184428A983EB5C99EEF6F460A360300E9FFBB4856",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7-trusted-selection-context-projection.md",
+                                   "Frozen":  "4F5E2F0126A3EFDB3EF82D67A5BB9F551877E354DDB7E9AF0957593D5D813069",
+                                   "Actual":  "4F5E2F0126A3EFDB3EF82D67A5BB9F551877E354DDB7E9AF0957593D5D813069",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B7-trusted-selection-context-projection-audit.json",
+                                   "Frozen":  "31D19D50BC563F4D89F8A39E8E042389A68479152B885D9EDAB8098A6118B378",
+                                   "Actual":  "31D19D50BC563F4D89F8A39E8E042389A68479152B885D9EDAB8098A6118B378",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B8-integrated-analyzer-dispatch.md",
+                                   "Frozen":  "18E0001E38F03302268D7E0643788F9B9A625733EF983E57F852CFD2E56E5D34",
+                                   "Actual":  "18E0001E38F03302268D7E0643788F9B9A625733EF983E57F852CFD2E56E5D34",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B8-integrated-analyzer-dispatch-audit.json",
+                                   "Frozen":  "505F7779AA1D92505C5BDEFA32436C4E809AA5D5D95B243DF6900F8FEB9F0AD9",
+                                   "Actual":  "505F7779AA1D92505C5BDEFA32436C4E809AA5D5D95B243DF6900F8FEB9F0AD9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B8Proof/Write-Verify-DispatchEvidence.ps1",
+                                   "Frozen":  "12370F39349B28491A1E35E7FD47860C9B0E0E6EA8F82A8671886FC9678851D8",
+                                   "Actual":  "12370F39349B28491A1E35E7FD47860C9B0E0E6EA8F82A8671886FC9678851D8",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B9-production-analysis-pipeline-adoption.md",
+                                   "Frozen":  "5DF296218C25229B23F96947CD6583A9FD0FCCE17F9E52A3AE48DDB427460DEE",
+                                   "Actual":  "5DF296218C25229B23F96947CD6583A9FD0FCCE17F9E52A3AE48DDB427460DEE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B9-production-analysis-pipeline-adoption-audit.json",
+                                   "Frozen":  "C17B9E4E0E069CD718BB6B795461A5A509997C9E7A96E0D0DB6B4FC93237A29D",
+                                   "Actual":  "C17B9E4E0E069CD718BB6B795461A5A509997C9E7A96E0D0DB6B4FC93237A29D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2B9Proof/Write-Verify-ProductionEvidence.ps1",
+                                   "Frozen":  "7D12093ED2E8ED59958E563435B705EFEE538C1C0493960E8F9A4711C2E49053",
+                                   "Actual":  "7D12093ED2E8ED59958E563435B705EFEE538C1C0493960E8F9A4711C2E49053",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/P5O2-historical-compiler-worker-readiness.md",
+                                   "Frozen":  "4C0DA9DCA5018AEE753A59723837DF96F5003745516DAA6DC835E1B120EDB83E",
+                                   "Actual":  "4C0DA9DCA5018AEE753A59723837DF96F5003745516DAA6DC835E1B120EDB83E",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PID-G1-process-identity-lifetime-gate.md",
+                                   "Frozen":  "09D6FE7B6A95F267003BF4647712B428B35A464714E225CAD11B5EE014109FB7",
+                                   "Actual":  "09D6FE7B6A95F267003BF4647712B428B35A464714E225CAD11B5EE014109FB7",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PID-G1-process-identity-lifetime-gate-audit.json",
+                                   "Frozen":  "601C4E0C845847964AEB175DE78D6C4269866BBDA0C30F6F7667A0C42134558A",
+                                   "Actual":  "601C4E0C845847964AEB175DE78D6C4269866BBDA0C30F6F7667A0C42134558A",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PIDG1Proof/ProcessLifetime.ps1",
+                                   "Frozen":  "C108410DD130B588A1B9EB08B2C32836626C374A87017918019BA1BD19C05765",
+                                   "Actual":  "C108410DD130B588A1B9EB08B2C32836626C374A87017918019BA1BD19C05765",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PIDG1Proof/Run-Validation.ps1",
+                                   "Frozen":  "DE0BDA6E8FFD875D1C58B3B3EA3D9B0F28F31495E27758AB32E2D7ED06F82D65",
+                                   "Actual":  "DE0BDA6E8FFD875D1C58B3B3EA3D9B0F28F31495E27758AB32E2D7ED06F82D65",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PIDG1Proof/Test-ProcessLifetime.ps1",
+                                   "Frozen":  "D721EC277BD9560AAF6AF5ED19637371D6251B93BF5505958F6E9D8162708CFA",
+                                   "Actual":  "D721EC277BD9560AAF6AF5ED19637371D6251B93BF5505958F6E9D8162708CFA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PIDG1Proof/Verify-Scope.ps1",
+                                   "Frozen":  "F66DDB184BFF90D84040B3D41AACA73E8DF190F47F9764630FA2A250B7BCB0ED",
+                                   "Actual":  "F66DDB184BFF90D84040B3D41AACA73E8DF190F47F9764630FA2A250B7BCB0ED",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/PIDG1Proof/Write-Verify-Evidence.ps1",
+                                   "Frozen":  "B66AFA07475C59F5BB8138C49DEE3EF277CA19A3FC82854354764B973C0F338D",
+                                   "Actual":  "B66AFA07475C59F5BB8138C49DEE3EF277CA19A3FC82854354764B973C0F338D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/prepare-real-world-evaluation.ps1",
+                                   "Frozen":  "869292D4F46EB3A26A0401C2D0C2AC15B6EB727A4D53D1FC495CB819612ED39C",
+                                   "Actual":  "869292D4F46EB3A26A0401C2D0C2AC15B6EB727A4D53D1FC495CB819612ED39C",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/README.md",
+                                   "Frozen":  "89828E67577BA9FC49F12599E40FE99E1254CF4AF4C070235451E33398CD6B66",
+                                   "Actual":  "89828E67577BA9FC49F12599E40FE99E1254CF4AF4C070235451E33398CD6B66",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/real-world-evaluation.manifest.json",
+                                   "Frozen":  "E50918EE7D1DDC444211AF3D7F36BA8F81661B8DACB027EC0DFBF62A11F68210",
+                                   "Actual":  "E50918EE7D1DDC444211AF3D7F36BA8F81661B8DACB027EC0DFBF62A11F68210",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/run-real-world-evaluation.ps1",
+                                   "Frozen":  "8D7578509BB2799CAF1F77724C0D7AE04E95CF1B374219C5F9ADDFD35A991358",
+                                   "Actual":  "8D7578509BB2799CAF1F77724C0D7AE04E95CF1B374219C5F9ADDFD35A991358",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/EvaluationArguments.cs",
+                                   "Frozen":  "7ED117864FF446BB161FF4B0D660EA784DB5E31ED07A674F38674D7D2DA95CD6",
+                                   "Actual":  "7ED117864FF446BB161FF4B0D660EA784DB5E31ED07A674F38674D7D2DA95CD6",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/EvaluationManifest.cs",
+                                   "Frozen":  "39DB6410DBE7693866BB78C24F36858CC962925C8E6CCC076318BE38F24319FE",
+                                   "Actual":  "39DB6410DBE7693866BB78C24F36858CC962925C8E6CCC076318BE38F24319FE",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/EvaluationManifestLoader.cs",
+                                   "Frozen":  "47931CE1A934606E2E69CC08D7D9EB8F0829E948F71F2F870F94BC34B0678C91",
+                                   "Actual":  "47931CE1A934606E2E69CC08D7D9EB8F0829E948F71F2F870F94BC34B0678C91",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/EvaluationReport.cs",
+                                   "Frozen":  "364CA311A02C2EC780EA5A8D11F281D9D50FC98D391C6BB87047587EA66BFE25",
+                                   "Actual":  "364CA311A02C2EC780EA5A8D11F281D9D50FC98D391C6BB87047587EA66BFE25",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/EvaluationReportWriter.cs",
+                                   "Frozen":  "52A48EBEF1F1FB343A507BA54E984037B4908F3B35E775D3763C94251EB9F1B9",
+                                   "Actual":  "52A48EBEF1F1FB343A507BA54E984037B4908F3B35E775D3763C94251EB9F1B9",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/G4BReferenceMatrixWriter.cs",
+                                   "Frozen":  "4E342DDA4B9371C53E6E81B26E72B884D31F68FDE7E74591F77403A0387A3CFA",
+                                   "Actual":  "4E342DDA4B9371C53E6E81B26E72B884D31F68FDE7E74591F77403A0387A3CFA",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/G5SigningMatrixWriter.cs",
+                                   "Frozen":  "E9CB6C6E7DDFA3588EF1308110EA10ACBD09D82D39FF1583D5917EEA2B04FDCB",
+                                   "Actual":  "E9CB6C6E7DDFA3588EF1308110EA10ACBD09D82D39FF1583D5917EEA2B04FDCB",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/Program.cs",
+                                   "Frozen":  "6544CA61241CEAF5FB0E76958D1E2DB8302D779ACDE03978EFB1799B9A38519D",
+                                   "Actual":  "6544CA61241CEAF5FB0E76958D1E2DB8302D779ACDE03978EFB1799B9A38519D",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/RealWorldEvaluationRunner.cs",
+                                   "Frozen":  "31024D1CF0FDE98E0A85B3FB4E3FB453B20D0E26A8874CA43D18DE0EF6A73450",
+                                   "Actual":  "31024D1CF0FDE98E0A85B3FB4E3FB453B20D0E26A8874CA43D18DE0EF6A73450",
+                                   "Changed":  false
+                               },
+                               {
+                                   "Path":  "Evaluation/XMLDocNormalizer.Evaluation/XMLDocNormalizer.Evaluation.csproj",
+                                   "Frozen":  "6F5A8076A0FA235934731D4F3E9C45E0450BBE170E297AC174BADF32CB69F7E4",
+                                   "Actual":  "6F5A8076A0FA235934731D4F3E9C45E0450BBE170E297AC174BADF32CB69F7E4",
+                                   "Changed":  false
+                               }
+                           ],
+    "HistoricalChanges":  0,
+    "Stashes":  [
+                    "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+                    "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+                    "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+                    "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+                    "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+                    "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+                ],
+    "StashesUnchanged":  true,
+    "ChangedPaths":  [
+                         ".gitignore",
+                         "Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowBoundedGenericContextTests.cs",
+                         "Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowCanonicalExceptionIdentityTests.cs",
+                         "Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowConstructedInvocationContextTests.cs",
+                         "Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowGenericExpansionBoundaryTests.cs",
+                         "Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs",
+                         "Tools/XMLDocNormalizer/build/ExceptionFlow.HistoricalSources.props",
+                         "Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer.HistoricalWorker/HistoricalAnalysis.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/RoslynCanonicalIdentityResolver.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.InvocationCallContext.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessorDispatch.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessors.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAwaits.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCalls.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCollectionInitializers.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphConstructors.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeclarations.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeconstruction.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDispatch.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDisposals.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphForEach.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitCalls.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitDispatch.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitObjectCreations.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphOperators.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphThrows.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphTraversal.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallContext.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallableKey.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCaughtTypeFilter.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCrossCompilationResolver.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.GraphConstruction.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraph.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryTargetRegistrar.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.Findings.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.cs",
+                         "Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/Dto/ExceptionFlowAnalysisResult.cs"
+                     ],
+    "GitStatus":  [
+                      " M .gitignore",
+                      " M Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowBoundedGenericContextTests.cs",
+                      " M Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowCanonicalExceptionIdentityTests.cs",
+                      " M Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowConstructedInvocationContextTests.cs",
+                      " M Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowGenericExpansionBoundaryTests.cs",
+                      " M Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowHistoricalSolutionFindingTests.cs",
+                      " M Tools/XMLDocNormalizer/build/ExceptionFlow.HistoricalSources.props",
+                      " M Tools/XMLDocNormalizer/build/Verify-DualVersionBuild.ps1",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer.HistoricalWorker/HistoricalAnalysis.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/Canonical/RoslynCanonicalIdentityResolver.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.InvocationCallContext.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessorDispatch.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAccessors.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphAwaits.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCalls.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphCollectionInitializers.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphConstructors.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeclarations.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDeconstruction.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDispatch.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphDisposals.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphForEach.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitCalls.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitDispatch.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphImplicitObjectCreations.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphOperators.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphThrows.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphTraversal.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallContext.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCallableKey.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCaughtTypeFilter.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowCrossCompilationResolver.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.GraphConstruction.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryAnalysisSession.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraph.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryTargetRegistrar.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.Findings.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/XmlDocExceptionSemanticDetector.cs",
+                      " M Tools/XMLDocNormalizer/src/XMLDocNormalizer/Models/Dto/ExceptionFlowAnalysisResult.cs",
+                      "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25A10-finite-orbit-admission-and-projection-audit.json",
+                      "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25A10-finite-orbit-admission-and-projection.md",
+                      "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/",
+                      "?? Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/Worker/ExceptionFlowFiniteOrbitAdmissionTests.cs",
+                      "?? Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitAdmission.cs",
+                      "?? Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitProfile.cs",
+                      "?? Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowInvocationSubstitution.cs",
+                      "?? Tools/XMLDocNormalizer/src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/IExceptionFlowSummaryTargetSink.cs"
+                  ],
+    "B25TestUnchanged":  false,
+    "Commit":  false,
+    "Push":  false,
+    "StashOperation":  false,
+    "FrozenManifestRewritten":  false
+}

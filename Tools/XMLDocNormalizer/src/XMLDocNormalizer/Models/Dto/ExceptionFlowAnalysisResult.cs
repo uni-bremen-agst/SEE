@@ -8,6 +8,11 @@ namespace XMLDocNormalizer.Models.DTO
     /// </summary>
     internal sealed class ExceptionFlowAnalysisResult
     {
+        /// <summary>Gets or sets the internal certified outcome; absent on raw diagnostic results.</summary>
+        internal Checks.Infrastructure.Exception.Flow.ExceptionFlowFiniteOrbitProfile.Certificate? ProfileOutcome { get; set; }
+
+        /// <summary>Gets or sets separate proven ground diagnostics, never a normal exact result.</summary>
+        internal Checks.Infrastructure.Exception.Flow.ExceptionFlowProfileDiagnostics? ProfileDiagnostics { get; set; }
         /// <summary>
         /// Defines the maximum number of distinct paths retained for one
         /// exception type.

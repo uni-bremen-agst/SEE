@@ -47,7 +47,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol constructorSymbol,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -172,7 +172,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal static bool AnalyzeSummaryImplicitConstructor(
             IMethodSymbol constructorSymbol,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -260,7 +260,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -449,7 +449,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool AnalyzeSummaryInstanceMemberInitializers(
             INamedTypeSymbol typeSymbol,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {

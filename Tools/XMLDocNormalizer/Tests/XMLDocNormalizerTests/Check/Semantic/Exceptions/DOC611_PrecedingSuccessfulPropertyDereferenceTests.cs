@@ -155,7 +155,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -280,7 +280,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -510,7 +510,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            AssertArgumentNullFinding(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
     }
 }

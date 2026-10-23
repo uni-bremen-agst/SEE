@@ -101,7 +101,7 @@ namespace XMLDocNormalizerTests.Worker
             var rootOnly = payload with { Context = payload.Context! with { Solution = null, AnalysisMode = mode == ExceptionAnalysisMode.Direct ? "direct" : "project-transitive" } };
             var worker = await Client().AnalyzeAsync(rootOnly);
             if (mode == ExceptionAnalysisMode.Direct) { Assert.True(worker.Success, worker.Failure?.Message); Assert.Equal(local.Result, worker.Result); }
-            else { Assert.False(worker.Success); Assert.Equal(WorkerFailureCode.AnalysisFailure, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result); }
+            else { Assert.False(worker.Success); Assert.Equal(WorkerFailureCode.UnsupportedContext, worker.Failure!.WorkerFailure!.Code); Assert.Null(worker.Result); }
             Stopped(worker); NoHistoricalLoaded();
             await Evidence("local-" + mode, new { Mode = mode, Native = local, Solution = solution, WorkerResult = worker.Result, worker.Failure, GraphRefusedBeforeDispatch = true, NoScopeWidening = true, ProcessesStopped = true });
         }
@@ -185,7 +185,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(result.PayloadProjection.Succeeded); Assert.False(result.Succeeded); Assert.Null(result.Result);
             var routing = result.Dispatch!.Routing!;
             Assert.Null(routing.CurrentAnalysis);
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, routing.HistoricalFailure!.WorkerFailure!.Code);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, routing.HistoricalFailure!.WorkerFailure!.Code);
             Stopped(routing.HistoricalAnalysis!); NoHistoricalLoaded();
             await Evidence("missing-reachable-source", new { routing.HistoricalFailure, ActualReachableSourceMissing = true, NoPartialResult = true, NoLocalOrCurrentFallback = true, ProcessesStopped = true });
         }

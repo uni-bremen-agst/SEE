@@ -104,11 +104,9 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.SolutionTransitive);
 
-            AssertArgumentNullExceptionPresent(
-                projectFindings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
 
-            AssertArgumentNullExceptionPresent(
-                solutionFindings);
         }
 
         /// <summary>

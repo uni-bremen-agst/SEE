@@ -158,7 +158,7 @@ namespace XMLDocNormalizerTests.Worker
 
         [Theory]
         [InlineData("public static class Fixture { public static void Root() { Missing(); } }", "CompilationFailure")]
-        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "AnalysisFailure")]
+        [InlineData("public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }", "UnsupportedContext")]
         public async Task HistoricalAnalysisFailure_PreservesOriginalB4FailureContract(string source, string code)
         {
             ExceptionFlowAnalysisRoutingResult result = await new ExceptionFlowAnalysisRouter(Client()).AnalyzeAsync(new(

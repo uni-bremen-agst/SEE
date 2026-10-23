@@ -233,7 +233,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(WorkerFailureCode.UnsupportedContext, mismatch.Failure!.WorkerFailure!.Code); Assert.Null(mismatch.Result); Assert.Null(mismatch.DeclaredPolicy); Stopped(mismatch);
             var uncertain = Payload("uncertain"); var uncertainNative = Native(uncertain);
             var failed = await Client().AnalyzeAsync(RawOptIn(uncertain, uncertainNative));
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, failed.Failure!.WorkerFailure!.Code); Assert.Null(failed.DeclaredPolicy); Assert.Null(failed.Result); Stopped(failed);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, failed.Failure!.WorkerFailure!.Code); Assert.Null(failed.DeclaredPolicy); Assert.Null(failed.Result); Stopped(failed);
             NoHistoricalLoaded();
             await Evidence("request-negative", new
             {

@@ -442,6 +442,20 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         [Fact]
         public void MultiModuleAssembly_FailsClosed()
         {
+            // AssemblyFile retains its MetadataReader. Keep its PE image alive
+            // until the assertion has finished consuming the rows.
+            static IEnumerable<AssemblyFile> ReadAssemblyFiles(byte[] image)
+            {
+                using MemoryStream stream = new(image, writable: false);
+                using PEReader peReader = new(stream);
+                MetadataReader reader = peReader.GetMetadataReader();
+
+                foreach (AssemblyFileHandle handle in reader.AssemblyFiles)
+                {
+                    yield return reader.GetAssemblyFile(handle);
+                }
+            }
+
             byte[] image = EmitMultiModuleAssembly();
             Assert.Contains(ReadAssemblyFiles(image), file => file.ContainsMetadata);
             ExternalCompilationMetadataReferenceDescriptor expected =

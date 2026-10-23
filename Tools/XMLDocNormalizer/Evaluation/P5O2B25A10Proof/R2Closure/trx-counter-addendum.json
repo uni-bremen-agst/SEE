@@ -1,0 +1,7 @@
+{
+  "Reason": "PowerShell ConvertTo-Json serialized the XML Counter nodes in verification.json as empty arrays. Original verification and TRX are preserved; explicit attributes below supply the machine-readable counts, not a new test run.",
+  "FirstR2": { "Source": "r2-first.trx", "Total": 2, "Executed": 2, "Passed": 2, "Failed": 0, "NotExecuted": 0, "Aborted": 0 },
+  "Combined": { "Source": "a-series.trx", "Total": 149, "Executed": 149, "Passed": 149, "Failed": 0, "NotExecuted": 0, "Aborted": 0 },
+  "OriginalRunRecordsAndTrxUnchanged": true,
+  "NewTestExecution": false
+}

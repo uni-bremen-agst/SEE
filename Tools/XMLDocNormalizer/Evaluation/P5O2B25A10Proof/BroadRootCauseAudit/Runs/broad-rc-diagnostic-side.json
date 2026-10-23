@@ -1,0 +1,15 @@
+{
+    "Name":  "broad-rc-diagnostic-side",
+    "StartedUtc":  "2026-10-23T15:09:15.1895497Z",
+    "FinishedUtc":  "2026-10-23T15:09:18.4646040Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "artifacts/p5o2b25a10/broad-rc-probe-bin-r7/Probe.dll",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-13",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a10/broad-rc-diagnostic-side.json",
+                      "diagnostic-side"
+                  ]
+}

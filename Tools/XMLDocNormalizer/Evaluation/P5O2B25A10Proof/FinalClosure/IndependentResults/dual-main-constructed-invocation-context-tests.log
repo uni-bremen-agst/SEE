@@ -1,0 +1,9 @@
+﻿Testlauf für "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" (.NETCoreApp,Version=v8.0)
+VSTest-Version 17.11.1 (x64)
+
+Die Testausführung wird gestartet, bitte warten...
+Insgesamt 1 Testdateien stimmten mit dem angegebenen Muster überein.
+Ergebnisdatei: D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\artifacts\dual-version-build\constructed-invocation-context.trx
+
+Bestanden!   : Fehler:     0, erfolgreich:    17, übersprungen:     0, gesamt:    17, Dauer: 1 s - XMLDocNormalizerTests.dll (net8.0)
+

@@ -86,6 +86,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ArgumentNullException.ThrowIfNull(knownNonNullParameterMembers);
 
             CallableSymbol = NormalizeSymbol(callableSymbol);
+            InvocationSymbol = callableSymbol;
 
             parameterFacts = new Dictionary<int, ExceptionFlowValueFacts>();
             nonNullParameterMembers = new Dictionary<int, HashSet<ISymbol>>();
@@ -149,6 +150,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// callable symbol.
         /// </value>
         public ISymbol? CallableSymbol { get; }
+
+        /// <summary>Gets the invocation construction separately from the declaration handle.</summary>
+        internal ISymbol? InvocationSymbol { get; private init; }
+
+        /// <summary>Retains facts and the body handle while replacing only the invocation frame.</summary>
+        /// <param name="invocation">The composed invocation construction.</param>
+        /// <returns>A new immutable invocation context.</returns>
+        internal ExceptionFlowCallContext WithInvocation(ISymbol invocation)
+        {
+            return new ExceptionFlowCallContext(CallableSymbol, parameterFacts,
+                nonNullParameterMembers.SelectMany(pair => pair.Value.Select(member =>
+                    new KeyValuePair<int, ISymbol>(pair.Key, member)))) { InvocationSymbol = invocation };
+        }
 
         /// <summary>
         /// Gets a deterministic key that identifies the known parameter and
@@ -361,7 +375,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return new ExceptionFlowCallContext(
                 callableSymbol,
                 parameterFacts,
-                reboundMembers);
+                reboundMembers) { InvocationSymbol = InvocationSymbol };
         }
 
         /// <summary>
@@ -461,11 +475,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
                 }
 
-                CanonicalCallableIdentity? callable = CallableSymbol == null
+                CanonicalCallableIdentity? callable = InvocationSymbol == null
                     ? null
                     : RoslynCanonicalIdentityFactory.CreateCallableIdentity(
-                        CallableSymbol,
-                        normalizeToOriginalDefinition: true);
+                        InvocationSymbol,
+                        normalizeToOriginalDefinition: false);
 
                 return new CanonicalExceptionFlowCallContext(
                     callable,

@@ -75,9 +75,10 @@ namespace XMLDocNormalizer.Execution.Historical
                     {
                         return Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Failure runtime identity does not match.");
                     }
-                    return Fail(response.Failure.Code == WorkerFailureCode.UnsupportedProtocolVersion
+                    // Preserve only the actual identity that passed the checks above; never admit a result or receipt.
+                    return new(null, response.Identity, new(response.Failure.Code == WorkerFailureCode.UnsupportedProtocolVersion
                         ? HistoricalWorkerClientFailureCode.ProtocolMismatch : HistoricalWorkerClientFailureCode.StructuredFailure,
-                        response.Failure.Message, response.Failure);
+                        response.Failure.Message, response.Failure), stderr, processId);
                 }
                 if (exitCode != 0)
                 {

@@ -106,7 +106,7 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Null(result.Result); Assert.Null(result.Dispatch.Routing!.CurrentAnalysis);
             var call = result.Dispatch.Routing.HistoricalAnalysis!;
             Assert.Equal(HistoricalWorkerClientFailureCode.StructuredFailure, call.Failure!.Code);
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, call.Failure.WorkerFailure!.Code);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, call.Failure.WorkerFailure!.Code);
             Assert.Null(call.DeclaredPolicy); Stopped(call); NoHistoricalLoaded();
             await RejectDeclared(payload);
             await Evidence("guard", new

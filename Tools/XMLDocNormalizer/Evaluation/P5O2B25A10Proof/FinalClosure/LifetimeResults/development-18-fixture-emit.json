@@ -1,0 +1,12 @@
+{
+    "Name":  "development-18-fixture-emit",
+    "StartedUtc":  "2026-10-23T19:11:51.7940606Z",
+    "FinishedUtc":  "2026-10-23T19:11:52.5770175Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "C:\\Users\\Krause\\AppData\\Local\\Temp\\a10-277b50ca",
+    "Arguments":  [
+                      "artifacts/exception-flow-historical/HistoricalPdbFixture/bin/Debug/net8.0/HistoricalPdbFixture.dll",
+                      "artifacts/p5o2b7/historical-pdb"
+                  ]
+}

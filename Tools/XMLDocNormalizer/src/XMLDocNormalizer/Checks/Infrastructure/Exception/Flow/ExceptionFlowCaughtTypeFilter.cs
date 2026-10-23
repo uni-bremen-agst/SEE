@@ -39,7 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ArgumentNullException.ThrowIfNull(caughtType);
 
             caughtTypes.Add(
-                caughtType.OriginalDefinition);
+                caughtType);
         }
 
         /// <summary>
@@ -124,9 +124,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             while (currentType != null)
             {
-                if (SymbolEqualityComparer.Default.Equals(
-                        currentType.OriginalDefinition,
-                        baseType.OriginalDefinition))
+                if (Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(currentType).Equals(
+                        Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(baseType)))
                 {
                     return true;
                 }

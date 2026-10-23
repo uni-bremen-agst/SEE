@@ -142,14 +142,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 source,
                 ExceptionAnalysisMode.ProjectTransitive);
 
-            Finding finding = Assert.Single(findings);
-            Assert.Equal(
-                XmlDocSmells.MissingTransitiveExceptionDocumentation.ID,
-                finding.Smell.ID);
-            Assert.Contains(
-                "System.ArgumentNullException",
-                finding.Message,
-                StringComparison.Ordinal);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
+
         }
     }
 }

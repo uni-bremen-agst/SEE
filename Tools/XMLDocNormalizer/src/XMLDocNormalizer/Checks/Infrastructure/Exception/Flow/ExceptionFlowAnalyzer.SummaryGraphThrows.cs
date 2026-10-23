@@ -171,6 +171,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             thrownType ??=
                 throwOperation.Exception.Type;
 
+            if (thrownType != null)
+                thrownType = new ExceptionFlowInvocationSubstitution(callContext.InvocationSymbol, semanticModel.Compilation).Apply(thrownType);
+
             bool addedThrownType =
                 TryAddSummaryThrownTypeSource(
                     thrownType,
@@ -489,7 +492,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<INamedTypeSymbol> addedExceptionTypes)
         {
             INamedTypeSymbol normalizedType =
-                exceptionType.OriginalDefinition;
+                exceptionType;
 
             if (!addedExceptionTypes.Add(
                     normalizedType))

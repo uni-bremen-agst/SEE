@@ -1,0 +1,12 @@
+{
+    "Name":  "development-17-fixture-emit",
+    "StartedUtc":  "2026-10-23T18:16:50.3307134Z",
+    "FinishedUtc":  "2026-10-23T18:16:52.6722572Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "artifacts/exception-flow-historical/HistoricalPdbFixture/bin/Debug/net8.0/HistoricalPdbFixture.dll",
+                      "artifacts/p5o2b7/historical-pdb"
+                  ]
+}

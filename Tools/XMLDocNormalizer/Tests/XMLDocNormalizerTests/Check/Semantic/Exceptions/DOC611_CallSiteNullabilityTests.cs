@@ -441,10 +441,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         /// <summary>
         /// Ensures that foreach elements returned through a project-local
         /// helper backed by <see cref="Enumerable.OfType{TResult}"/> are
-        /// treated as non-null.
+        /// treated as non-null; coverage-outside reports uncertainty, not an exact finding.
         /// </summary>
         [Fact]
-        public void ForeachElementFromOfTypeHelper_DoesNotProduceFinding()
+        public void ForeachElementFromOfTypeHelper_CoverageOutsideShowsUncertainty_NotExactFinding()
         {
             string source =
                 "using System.Collections.Generic;\n" +
@@ -484,7 +484,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Empty(findings);
+            Finding finding = Assert.Single(findings);
+            Assert.Equal("DOC631", finding.Smell.ID);
+            Assert.Contains("System.ArgumentNullException", finding.Message, StringComparison.Ordinal);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>

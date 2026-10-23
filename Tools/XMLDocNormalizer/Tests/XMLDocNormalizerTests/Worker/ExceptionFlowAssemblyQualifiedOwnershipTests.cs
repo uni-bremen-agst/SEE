@@ -24,17 +24,19 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal(DocumentationCommentId.CreateDeclarationId(thrown), DocumentationCommentId.CreateDeclarationId(root));
             var before = (INamedTypeSymbol)typeof(ExceptionFlowSummaryGraphEvaluator)
                 .GetMethod("NormalizeSummaryExceptionType", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [thrown, a])!;
-            Assert.Equal(Identity(root), Identity(before));
-            Assert.NotEqual(Identity(thrown), Identity(before));
+            Assert.NotEqual(Identity(root), Identity(before)); // P11
+            Assert.Equal(Identity(thrown), Identity(before));
             var candidate = Candidate(thrown, a);
             Assert.Equal(Identity(thrown), Identity(candidate));
             Evidence("root-cause", new
             {
                 ActualThrownType = Identity(thrown),
-                BeforeWrongOwner = Identity(before),
+                HistoricalWrongOwner = Identity(root),
+                HistoricalWitness = "Evaluation/P5O2B25AProof/ (frozen pre-A10 evidence)",
+                ActualNormalizedOwner = Identity(before),
                 CandidateCorrectOwner = Identity(candidate),
-                UnsafeLookup = "GetFirstSymbolForDeclarationId",
-                CandidateAdopted = false,
+                Resolution = "Unique complete canonical assembly/module/type identity",
+                CandidateAdopted = true,
                 SolutionFindingAdmission = false
             });
         }
@@ -51,25 +53,30 @@ namespace XMLDocNormalizerTests.Worker
             var caught = owner.GetTypeByMetadataName("Shared.Outer`1")!.Construct(a.GetSpecialType(SpecialType.System_Int32)).GetTypeMembers("Fault").Single();
             Assert.Equal(Identity(thrown), Identity(caught));
             Assert.NotEqual(Identity(thrown), Identity(thrown.OriginalDefinition));
-            Assert.Null(new RoslynCanonicalIdentityResolver(a).ResolveType(Identity(thrown)));
+            var rebound = new RoslynCanonicalIdentityResolver(a).ResolveType(Identity(thrown)); // P12
+            Assert.NotNull(rebound);
+            Assert.Equal(Identity(caught), Identity(rebound));
+            Assert.True(SymbolEqualityComparer.Default.Equals(caught, rebound));
             var normalizedThrown = Candidate(thrown, a);
             var normalizedCaught = Candidate(caught, a);
-            Assert.Same(thrown, normalizedThrown);
-            Assert.Same(caught, normalizedCaught);
-            Assert.False(SymbolEqualityComparer.Default.Equals(normalizedThrown, normalizedCaught));
-            Assert.False(ExceptionFlowCaughtTypeFilter.IsSameOrDerivedFrom(normalizedThrown, normalizedCaught));
+            Assert.Equal(Identity(caught), Identity(normalizedThrown)); // R5
+            Assert.True(SymbolEqualityComparer.Default.Equals(caught, normalizedThrown));
+            Assert.Equal(Identity(caught), Identity(normalizedCaught)); // K17
+            Assert.True(SymbolEqualityComparer.Default.Equals(caught, normalizedCaught));
+            Assert.True(SymbolEqualityComparer.Default.Equals(normalizedThrown, normalizedCaught)); // P12
+            Assert.True(ExceptionFlowCaughtTypeFilter.IsSameOrDerivedFrom(normalizedThrown, normalizedCaught));
             var alternative = ExceptionFlowCrossCompilationResolver.ResolveNamedType(thrown, a);
             Evidence("nested-rebind", new
             {
                 SourceIdentity = Identity(thrown),
                 MetadataCatchIdentity = Identity(caught),
                 CompleteIdentitiesEqual = true,
-                CanonicalRebindAvailable = false,
-                CandidateRetainsActualSource = true,
-                SameTypeCatchWorks = false,
+                CanonicalRebindAvailable = true,
+                CandidateRetainsActualSource = false,
+                SameTypeCatchWorks = true,
                 ExistingCrossCompilationAlternative = alternative == null ? null : Identity(alternative),
-                StopRule = "Constructed containing-type rebinding and catch identity need a separate complete contract",
-                CandidateAdopted = false
+                Contract = "A9-FiniteOrbit-v1 exact nested construction rebinding",
+                CandidateAdopted = true
             });
         }
 
@@ -82,9 +89,9 @@ namespace XMLDocNormalizerTests.Worker
             var caught = definition.Construct(compilation.GetSpecialType(SpecialType.System_String));
             Assert.NotEqual(Identity(thrown), Identity(caught));
             Assert.False(SymbolEqualityComparer.Default.Equals(thrown, caught));
-            // Existing filter compares OriginalDefinition: this is a defect witness, not desired behavior.
-            Assert.True(ExceptionFlowCaughtTypeFilter.IsSameOrDerivedFrom(thrown, caught));
-            Evidence("generic-catch", new { Thrown = Identity(thrown), Caught = Identity(caught), IncorrectlySuppressed = true, ProductionRepaired = false });
+            // P13: invariant generic classes must not match after erasing arguments.
+            Assert.False(ExceptionFlowCaughtTypeFilter.IsSameOrDerivedFrom(thrown, caught));
+            Evidence("generic-catch", new { Thrown = Identity(thrown), Caught = Identity(caught), IncorrectlySuppressed = false, ExactCatchObserved = true });
         }
 
         [Fact]
@@ -101,8 +108,8 @@ namespace XMLDocNormalizerTests.Worker
         {
             string root = ExceptionFlowProductionCurrentParityTests.Root();
             string evaluator = File.ReadAllText(Path.Combine(root, "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs"));
-            Assert.Contains("GetFirstSymbolForDeclarationId", evaluator);
-            Assert.DoesNotContain("RoslynCanonicalIdentityResolver", evaluator);
+            Assert.DoesNotContain("GetFirstSymbolForDeclarationId", evaluator); // P14
+            Assert.Contains("RoslynCanonicalIdentityResolver", evaluator);
             string external = File.ReadAllText(Path.Combine(root, "src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"));
             Assert.Contains("Solution is not admitted", external);
             Assert.DoesNotContain("SupportingProjects", external);
@@ -161,7 +168,7 @@ namespace XMLDocNormalizerTests.Worker
         }
         private static void Evidence(string name, object value)
         {
-            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a/audit-cases", name + ".json");
+            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a10/analysis/a", name + ".json"); // R6
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(value, WorkerProtocol.JsonOptions));
         }

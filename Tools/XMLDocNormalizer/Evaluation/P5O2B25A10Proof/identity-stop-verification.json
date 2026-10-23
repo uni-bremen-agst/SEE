@@ -1,0 +1,97 @@
+{
+    "CapturedUtc":  "2026-10-23T13:08:48.0308477Z",
+    "Status":  "STOP_ProtectedK17ObjectIdentity",
+    "Evidence":  [
+                     {
+                         "Source":  "artifacts/b25a10-development-10/artifacts/p5o2b25a10/diagnostics/canonical-object-identity.json",
+                         "Target":  "Evaluation/P5O2B25A10Proof/IdentityDiagnostics/canonical-object-identity.json",
+                         "Sha256":  "74ADD1F0BEC40D231835BFE85949D156BF212890AB7F1C00A936965D9DDA2740"
+                     },
+                     {
+                         "Source":  "artifacts/b25a10-development-10/artifacts/p5o2b25a10/diagnostics/failure-identity-False.json",
+                         "Target":  "Evaluation/P5O2B25A10Proof/IdentityDiagnostics/failure-identity-False.json",
+                         "Sha256":  "892FCB1094E6479493FD12D10D472559989E1F031430A2398EE92533C911D231"
+                     },
+                     {
+                         "Source":  "artifacts/b25a10-development-10/artifacts/p5o2b25a10/diagnostics/failure-identity-True.json",
+                         "Target":  "Evaluation/P5O2B25A10Proof/IdentityDiagnostics/failure-identity-True.json",
+                         "Sha256":  "F9EA38ECDE4660A5603C6C32053DF9B4E7AEAB5E27A72AF98AFD62038A9B8B14"
+                     },
+                     {
+                         "Source":  "artifacts/b25a10-development-08/artifacts/p5o2b25a10/analysis/b25/ownership-stop-witness.json",
+                         "Target":  "Evaluation/P5O2B25A10Proof/IdentityDiagnostics/ownership-finding-closure.json",
+                         "Sha256":  "3E39EB7D3E6ADA9A5A84DAA935813D75D443CB2EC862268353CC72D1F8223654"
+                     }
+                 ],
+    "CombinedSuite":  {
+                          "Total":  146,
+                          "Passed":  143,
+                          "Failed":  3,
+                          "Skipped":  0
+                      },
+    "Classes":  [
+                    {
+                        "Class":  "ExceptionFlowRecursiveSummaryClosureTests",
+                        "Total":  33,
+                        "Passed":  33,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowConstructedInvocationContextTests",
+                        "Total":  17,
+                        "Passed":  15,
+                        "Failed":  2
+                    },
+                    {
+                        "Class":  "ExceptionFlowHistoricalSolutionFindingTests",
+                        "Total":  27,
+                        "Passed":  27,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowBoundedGenericContextTests",
+                        "Total":  15,
+                        "Passed":  15,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowAssemblyQualifiedOwnershipTests",
+                        "Total":  14,
+                        "Passed":  13,
+                        "Failed":  1
+                    },
+                    {
+                        "Class":  "ExceptionFlowCanonicalExceptionIdentityTests",
+                        "Total":  20,
+                        "Passed":  20,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowFiniteOrbitAdmissionTests",
+                        "Total":  12,
+                        "Passed":  12,
+                        "Failed":  0
+                    },
+                    {
+                        "Class":  "ExceptionFlowGenericExpansionBoundaryTests",
+                        "Total":  8,
+                        "Passed":  8,
+                        "Failed":  0
+                    }
+                ],
+    "B25OwnershipFactPassed":  true,
+    "B25SuitePassed":  27,
+    "DiagnosticTestsPassed":  3,
+    "ProtectedK17AssertionUnchanged":  true,
+    "CandidateHelperUnchanged":  true,
+    "CompleteIdentitiesEqual":  true,
+    "ObjectReferenceObservations":  {
+                                        "Rebound":  false,
+                                        "NormalizedThrown":  false,
+                                        "NormalizedCaught":  false
+                                    },
+    "BothDestinationSymbolsEqual":  true,
+    "ProductionSourceChangesThisContinuation":  0,
+    "B25BActivated":  false,
+    "A10Complete":  false
+}

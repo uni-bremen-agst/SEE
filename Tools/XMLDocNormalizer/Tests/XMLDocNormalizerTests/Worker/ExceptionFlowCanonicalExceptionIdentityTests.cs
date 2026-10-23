@@ -94,7 +94,8 @@ namespace XMLDocNormalizerTests.Worker
             var sources = summaries.SelectMany(pair => pair.Summary.Sources).ToArray();
             Assert.NotEmpty(sources);
             var expected = run.Compilation.GetTypeByMetadataName("Shared.Outer`1")!.Construct(run.Compilation.GetSpecialType(SpecialType.System_Int32)).GetTypeMembers("Leaf").Single();
-            Assert.Single(sources);
+            if (scenario == "two-constructed-callees") { Assert.Equal(2, sources.Length); } // P08
+            else { Assert.Single(sources); }
             Assert.All(summaries, pair => Assert.Empty(pair.Summary.UncertainTargets));
             if (scenario == "closed-source")
             {
@@ -102,17 +103,22 @@ namespace XMLDocNormalizerTests.Worker
             }
             else
             {
-                // The missing call-site substitution precedes the type resolver.
-                Assert.NotEqual(Identity(expected), Identity(sources[0].ExceptionType));
-                Assert.IsAssignableFrom<ITypeParameterSymbol>(Assert.Single(sources[0].ExceptionType.ContainingType.TypeArguments));
-                var callee = Assert.Single(summaries.Where(pair => pair.Key.Symbol.Name == "Throw"));
-                Assert.True(callee.Key.Symbol.ContainingType.IsDefinition);
-                Assert.Empty(callee.Key.CanonicalIdentity!.ContainingType!.TypeArguments);
-                Assert.Empty(callee.Key.CanonicalContext!.Callable!.ContainingType!.TypeArguments);
+                // P08: the invocation frame supplies concrete source types.
+                Assert.Equal(Identity(expected), Identity(sources[0].ExceptionType));
+                Assert.Equal(SpecialType.System_Int32, Assert.Single(sources[0].ExceptionType.ContainingType.TypeArguments).SpecialType);
+                var callees = summaries.Where(pair => pair.Key.Symbol.Name == "Throw").ToArray();
+                if (scenario == "two-constructed-callees") { Assert.Equal(2, callees.Length); }
+                else { Assert.Single(callees); }
+                foreach (var callee in callees)
+                {
+                    Assert.True(callee.Key.Symbol.ContainingType.IsDefinition);
+                    Assert.Empty(callee.Key.CanonicalIdentity!.ContainingType!.TypeArguments);
+                    Assert.Single(callee.Key.CanonicalContext!.Callable!.ContainingType!.TypeArguments);
+                }
                 if (scenario == "two-constructed-callees")
                 {
                     Assert.Equal(2, run.RootSummary.CallEdges.Count);
-                    Assert.Equal(run.RootSummary.CallEdges[0].Target, run.RootSummary.CallEdges[1].Target);
+                    Assert.NotEqual(run.RootSummary.CallEdges[0].Target, run.RootSummary.CallEdges[1].Target);
                 }
             }
             Evidence("summary-origin-" + scenario, new
@@ -142,10 +148,17 @@ namespace XMLDocNormalizerTests.Worker
             Assert.True(historical.Success, historical.Failure?.Message);
             Assert.Empty(historical.Diagnostics);
             Assert.Equal(current, historical.Result);
-            var entry = Assert.Single(current.Entries);
-            Assert.Equal("Leaf", entry.ExceptionType.MetadataName);
-            Assert.Equal("Outer`1", entry.ExceptionType.ContainingType!.MetadataName);
-            Assert.Empty(entry.ExceptionType.ContainingType.TypeArguments);
+            if (scenario == "two-constructed-callees") { Assert.Equal(2, current.Entries.Length); } // P10
+            else { Assert.Single(current.Entries); }
+            foreach (var entry in current.Entries)
+            {
+                Assert.Equal("Leaf", entry.ExceptionType.MetadataName);
+                Assert.Equal("Outer`1", entry.ExceptionType.ContainingType!.MetadataName);
+                Assert.Single(entry.ExceptionType.ContainingType.TypeArguments); // P09
+            }
+            Assert.Equal(scenario == "two-constructed-callees" ? new[] { "Int32", "String" } : ["Int32"],
+                current.Entries.Select(entry => entry.ExceptionType.ContainingType!.TypeArguments.Single().MetadataName)
+                    .Order(StringComparer.Ordinal).ToArray());
             Assert.Empty(current.Uncertainties);
             HistoricalWorkerLifetimeAssertions.Stopped(historical);
             Assert.All(historical.Identity!.LoadedRoslyn, image => Assert.StartsWith("5.0.0-2.25451.107+", image.InformationalVersion));
@@ -158,8 +171,8 @@ namespace XMLDocNormalizerTests.Worker
                 historical.Identity,
                 historical.ProcessExit,
                 Parity = true,
-                CorrectConstructedType = false,
-                ProductionRepaired = false,
+                CorrectConstructedType = true,
+                ConcreteProjectionObserved = true,
                 SolutionFindingAdmission = false
             });
         }
@@ -192,7 +205,7 @@ namespace XMLDocNormalizerTests.Worker
         }
         private static void Evidence(string name, object value)
         {
-            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a2/analysis", name + ".json");
+            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a10/analysis/a2", name + ".json"); // R6
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(value, WorkerProtocol.JsonOptions));
         }

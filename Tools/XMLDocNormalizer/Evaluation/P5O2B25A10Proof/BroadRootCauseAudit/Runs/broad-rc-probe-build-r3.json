@@ -1,0 +1,20 @@
+{
+    "Name":  "broad-rc-probe-build-r3",
+    "StartedUtc":  "2026-10-23T15:02:14.3300863Z",
+    "FinishedUtc":  "2026-10-23T15:02:16.3338016Z",
+    "ExitCode":  1,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "build",
+                      "Evaluation/P5O2B25A10Proof/BroadRootCauseProbe/Probe.csproj",
+                      "-p:AnalyzerOutput=D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-13/Tests/XMLDocNormalizerTests/bin/Debug/net8.0",
+                      "-p:BaseIntermediateOutputPath=D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a10/broad-rc-probe-obj-r3/",
+                      "-p:OutputPath=D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a10/broad-rc-probe-bin-r3/",
+                      "--configfile",
+                      "artifacts/b25a10-development-13/NuGet.Config",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

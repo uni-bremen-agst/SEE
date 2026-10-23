@@ -145,9 +145,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             List<Finding> findings = Analyze(source);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Context.TargetName == "System.ArgumentOutOfRangeException");
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, XMLDocNormalizer.Models.ExceptionAnalysisMode.ProjectTransitive, MetadataReference.CreateFromFile(typeof(SyntaxTree).Assembly.Location));
         }
 
         /// <summary>
@@ -186,9 +184,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             List<Finding> findings = Analyze(source);
 
-            Assert.Contains(
-                findings,
-                finding => finding.Context.TargetName == "System.ArgumentOutOfRangeException");
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, XMLDocNormalizer.Models.ExceptionAnalysisMode.ProjectTransitive, MetadataReference.CreateFromFile(typeof(SyntaxTree).Assembly.Location));
         }
 
         /// <summary>

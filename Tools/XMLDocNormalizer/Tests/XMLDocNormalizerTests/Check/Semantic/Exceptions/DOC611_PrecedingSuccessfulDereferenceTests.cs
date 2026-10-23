@@ -144,12 +144,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding =>
-                    finding.Message.Contains(
-                        "System.ArgumentNullException",
-                        StringComparison.Ordinal));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -197,12 +192,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding =>
-                    finding.Message.Contains(
-                        "System.ArgumentNullException",
-                        StringComparison.Ordinal));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -249,12 +239,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding =>
-                    finding.Message.Contains(
-                        "System.ArgumentNullException",
-                        StringComparison.Ordinal));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -303,12 +288,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                findings,
-                finding =>
-                    finding.Message.Contains(
-                        "System.ArgumentNullException",
-                        StringComparison.Ordinal));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
 
         /// <summary>
@@ -343,7 +323,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void DereferenceBeforeForEachWithLaterBodyWrite_ProjectTransitive_RemainsPotentiallyNull()
         {
-            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNull(
+            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -355,7 +335,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void DereferenceBeforeForEachWithLaterBodyWrite_SolutionTransitive_RemainsPotentiallyNull()
         {
-            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNull(
+            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -467,6 +447,53 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     finding.Message.Contains(
                         "System.ArgumentNullException",
                         StringComparison.Ordinal));
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+        #nullable enable
+        using System;
+
+        public sealed class Holder
+        {
+            public object Value { get; } = new object();
+        }
+
+        public sealed class TestClass
+        {
+            /// <summary>
+            /// Validates a value that can become null between foreach iterations.
+            /// </summary>
+            public void M(Holder? holder)
+            {
+                object value = holder.Value;
+
+                foreach (int item in new[] { 1, 2 })
+                {
+                    _ = item;
+                    _ = value;
+                    Validate(holder);
+                    holder = null;
+                }
+            }
+
+            private static void Validate(Holder? holder)
+            {
+                ArgumentNullException.ThrowIfNull(holder);
+            }
+        }
+        """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
         }
     }
 }

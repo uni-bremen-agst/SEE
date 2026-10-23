@@ -46,16 +46,51 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return null;
             }
 
-            INamedTypeSymbol? containingType = ResolveNamedType(
-                methodSymbol.ContainingType,
-                compilation);
+            INamedTypeSymbol? containingType = ResolveInvocationType(
+                methodSymbol.ContainingType, compilation) as INamedTypeSymbol;
 
             if (containingType == null)
             {
-                return originalMethod;
+                return null;
             }
 
-            return ResolveMethodOnContainingType(originalMethod, containingType) ?? originalMethod;
+            IMethodSymbol? rebound = ResolveMethodOnContainingType(originalMethod, containingType);
+            if (rebound == null) return null;
+            if (methodSymbol.Arity == 0 || SymbolEqualityComparer.Default.Equals(methodSymbol, methodSymbol.OriginalDefinition)) return rebound;
+            ITypeSymbol?[] arguments = methodSymbol.TypeArguments.Select(argument =>
+                ResolveInvocationType(argument, compilation)).ToArray();
+            return arguments.Any(argument => argument == null) ? null : rebound.Construct(arguments.Cast<ITypeSymbol>().ToArray());
+        }
+
+        /// <summary>
+        /// Transfers an invocation template. A caller-owned formal remains that
+        /// exact scoped formal, not a new destination variable or a definition
+        /// substitute. Production admission checks that it belongs to the caller
+        /// map; concrete projection still requires a closed exact destination.
+        /// </summary>
+        private static ITypeSymbol? ResolveInvocationType(ITypeSymbol type, Compilation compilation)
+        {
+            if (type is ITypeParameterSymbol) return type;
+            var identity = Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(type);
+            var resolver = new Canonical.RoslynCanonicalIdentityResolver(compilation);
+            ITypeSymbol? exact = resolver.ResolveType(identity);
+            if (exact != null) return exact;
+            if (type is not INamedTypeSymbol named || named.IsUnboundGenericType) return null;
+            if (resolver.ResolveType(Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(named.OriginalDefinition))
+                is not INamedTypeSymbol declaration) return null;
+            if (named.ContainingType != null)
+            {
+                if (ResolveInvocationType(named.ContainingType, compilation) is not INamedTypeSymbol containing) return null;
+                var candidates = containing.GetTypeMembers(named.Name, named.Arity)
+                    .Where(candidate => Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(candidate.OriginalDefinition)
+                        .Equals(Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(named.OriginalDefinition))).ToArray();
+                if (candidates.Length != 1) return null;
+                declaration = candidates[0];
+            }
+            ITypeSymbol?[] arguments = named.TypeArguments.Select(argument => ResolveInvocationType(argument, compilation)).ToArray();
+            if (arguments.Any(argument => argument == null)) return null;
+            INamedTypeSymbol constructed = named.Arity == 0 ? declaration : declaration.Construct(arguments.Cast<ITypeSymbol>().ToArray());
+            return Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(constructed).Equals(identity) ? constructed : null;
         }
 
         /// <summary>
@@ -71,18 +106,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             INamedTypeSymbol typeSymbol,
             Compilation compilation)
         {
-            string? referenceId = DocumentationCommentId.CreateReferenceId(typeSymbol);
-
-            if (string.IsNullOrEmpty(referenceId))
-            {
-                return null;
-            }
-
-            return GetUniqueMatch(
-                DocumentationCommentId
-                    .GetSymbolsForReferenceId(referenceId, compilation)
-                    .OfType<INamedTypeSymbol>(),
-                candidate => HasSameAssemblyIdentity(candidate, typeSymbol));
+            return new Canonical.RoslynCanonicalIdentityResolver(compilation).ResolveType(
+                Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(typeSymbol)) as INamedTypeSymbol;
         }
 
         /// <summary>

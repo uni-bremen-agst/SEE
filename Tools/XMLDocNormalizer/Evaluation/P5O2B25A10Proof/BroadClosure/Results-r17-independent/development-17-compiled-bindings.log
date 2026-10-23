@@ -1,0 +1,3 @@
+PASS: exact source checksums in Current/Historical/Test PDBs; PE/PDB identities and deterministic SHA256 checksums bound; 0 pure line-ending differences, raw captures unchanged.
+
+STDERR:

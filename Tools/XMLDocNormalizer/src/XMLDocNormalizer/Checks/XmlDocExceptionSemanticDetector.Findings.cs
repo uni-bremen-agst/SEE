@@ -40,6 +40,15 @@ namespace XMLDocNormalizer.Checks
             IEqualityComparer<T> equality, Func<T, bool> isException, Func<T, bool> isLocal,
             Func<T, string> display, ExceptionAnalysisMode mode, bool inheritdoc,
             bool uncertain, HashSet<string> uncertainTargets, IEnumerable<T> externalDocumentation) where T : class
+            => AddExceptionFindingsCore(findings, tags, member, direct, flow, equality, isException, isLocal,
+                display, mode, inheritdoc, uncertain, uncertainTargets, externalDocumentation, allowExactFindings: true);
+
+        private static void AddExceptionFindingsCore<T>(List<Finding> findings, FindingTag<T>[] tags,
+            Func<DeclaredFindingAnchor> member, IEnumerable<T> direct, IEnumerable<T> flow,
+            IEqualityComparer<T> equality, Func<T, bool> isException, Func<T, bool> isLocal,
+            Func<T, string> display, ExceptionAnalysisMode mode, bool inheritdoc,
+            bool uncertain, HashSet<string> uncertainTargets, IEnumerable<T> externalDocumentation,
+            bool allowExactFindings) where T : class
         {
             bool Valid(FindingTag<T> tag) => !string.IsNullOrWhiteSpace(tag.Raw) && tag.HasCref;
             bool Exception(FindingTag<T> tag) => Valid(tag) && tag.Type != null && isException(tag.Type);
@@ -55,8 +64,8 @@ namespace XMLDocNormalizer.Checks
             { AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionCrefNotExceptionType, tag.Snippet, tag.Raw!); }
             if (mode != ExceptionAnalysisMode.Direct)
             {
-                AddDocumentedTransitiveFindings(findings, tags, thrown, external, Relevant, uncertain, uncertainTargets);
-                if (!inheritdoc)
+                AddDocumentedTransitiveFindings(findings, tags, thrown, external, Relevant, uncertain, uncertainTargets, allowExactFindings);
+                if (allowExactFindings && !inheritdoc)
                 {
                     AddMissingExceptionFindings(findings, member, direct, [], documented, equality, isException, display, transitive: false);
                     AddMissingExceptionFindings(findings, member, flow, direct, relevantDocumented, equality, Relevant, display, transitive: true);
@@ -73,7 +82,7 @@ namespace XMLDocNormalizer.Checks
 
         private static void AddDocumentedTransitiveFindings<T>(List<Finding> findings, FindingTag<T>[] tags,
             HashSet<T> thrown, HashSet<T> external, Func<T, bool> relevant, bool uncertain,
-            HashSet<string> uncertainTargets) where T : class
+            HashSet<string> uncertainTargets, bool allowExactFindings = true) where T : class
         {
             string summary = SummarizeUncertainTargets(uncertainTargets, 3);
             foreach (var tag in tags.Where(tag => !string.IsNullOrWhiteSpace(tag.Raw) && tag.HasCref
@@ -86,7 +95,7 @@ namespace XMLDocNormalizer.Checks
                     { detail += ". External XML documentation lists this exception as a possible throw."; }
                     AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionFlowNotDecidable, tag.Snippet, tag.Raw!, detail);
                 }
-                else { AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionTagWithoutTransitiveThrow, tag.Snippet, tag.Raw!); }
+                else if (allowExactFindings) { AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionTagWithoutTransitiveThrow, tag.Snippet, tag.Raw!); }
             }
         }
 

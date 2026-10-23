@@ -1,0 +1,18 @@
+Testlauf für "D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-16\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" (.NETCoreApp,Version=v8.0)
+VSTest-Version 17.11.1 (x64)
+
+Die Testausführung wird gestartet, bitte warten...
+Insgesamt 1 Testdateien stimmten mit dem angegebenen Muster überein.
+  Fehler XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure [1 s]
+  Fehlermeldung:
+   Assert.Contains() Failure: Filter not matched in collection
+Collection: [Profile=A9-FiniteOrbit-v1, Query=CompleteSummaryProjection, Root=1:1|1:0|1:1|1:1|21:HistoricalWorkerInput|1:0|1:0|1:0|1:0|0:|0:|1:0|1:0|1:0|1:1|1:1|21:HistoricalWorkerInput|1:0|1:0|1:0|1:0|0:|0:|1:0|1:0|1:0|25:HistoricalWorkerInput.dll|1:0|0:|0:|7:Fixture|1:0|1:0|1:0|1:0|1:0|1:0|0:|0:|1:0|1:0|0:|0:|1:0|1:0|1:0|4:Root|1:0|1:0|1:1|1:0|1:1|1:1|22:System.Private.CoreLib|1:8|1:0|1:0|1:0|0:|320:00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB|1:1|1:0|1:0|1:1|1:1|22:System.Private.CoreLib|1:8|1:0|1:0|1:0|0:|320:00240000048000009400000006020000002400005253413100040000010001008D56C76F9E8649383049F383C44BE0EC204181822A6C31CF5EB7EF486944D032188EA1D3920763712CCB12D75FB77E9811149E6148E5D32FBAAB37611C1878DDC19E20EF135D0CB2CFF2BFEC3D115810C3D9069638FE4BE215DBF795861920E5AB6F7DB2E2CEEF136AC23D5DD2BF031700AEC232F6C6B1C785B4305C123B37AB|1:1|1:0|1:0|26:System.Private.CoreLib.dll|1:0|0:|22:System.Threading.Tasks|4:Task|1:0|1:0|1:0|1:0|1:0|1:0|0:|0:|1:0|1:0|0:|0:|1:0|1:0|1:0|1:0|1:0|1:0|1:0|1:0|, Scope=39DA79F74B6B12253AD523CB475FBE087119434F7F4448B362806A18B103E3FA, Inventory=A1C4F6FC05A0C3DDB82366B826FAF9B334002446D11C68BF5F928E19066FA800, ···]
+  Stapelverfolgung:
+     at XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure() in D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-16\Tests\XMLDocNormalizerTests\Worker\HistoricalWorkerProcessTests.cs:line 148
+--- End of stack trace from previous location ---
+Ergebnisdatei: D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-16\artifacts\a10-closure-results\broad.trx
+
+Fehler!      : Fehler:     1, erfolgreich:  3337, übersprungen:     0, gesamt:  3338, Dauer: 3 m 38 s - XMLDocNormalizerTests.dll (net8.0)
+
+STDERR:
+[xUnit.net 00:00:16.38]     XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure [FAIL]

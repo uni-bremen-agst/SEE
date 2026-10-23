@@ -493,22 +493,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             INamedTypeSymbol exceptionType,
             Compilation rootCompilation)
         {
-            string? declarationId =
-                DocumentationCommentId.CreateDeclarationId(
-                    exceptionType.OriginalDefinition);
-
-            if (!string.IsNullOrWhiteSpace(
-                    declarationId) &&
-                DocumentationCommentId
-                    .GetFirstSymbolForDeclarationId(
-                        declarationId,
-                        rootCompilation)
-                    is INamedTypeSymbol normalizedType)
-            {
-                return normalizedType;
-            }
-
-            return exceptionType;
+            // Raw diagnostic evaluation may retain its source-owned symbol.
+            // Session.Analyze separately requires every published concrete
+            // result to round-trip uniquely in the destination compilation.
+            return new Canonical.RoslynCanonicalIdentityResolver(rootCompilation).ResolveType(
+                Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(exceptionType)) as INamedTypeSymbol ?? exceptionType;
         }
 
         /// <summary>

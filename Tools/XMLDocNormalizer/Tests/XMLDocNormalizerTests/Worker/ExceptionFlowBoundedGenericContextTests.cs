@@ -85,14 +85,16 @@ namespace XMLDocNormalizerTests.Worker
                 _ => "public static class Api { public static void A<T>() { if (Flags.Stop) throw new Fault<T>(); A<System.Collections.Generic.List<T>>(); } }"
             };
             string call = scenario == "containing" ? "Api<string>.A();" : "Api.A<string>();";
-            var run = ExceptionFlowSummaryGraphTestHelper.Build("public class Fault<T> : System.Exception {} public static class Flags { public static bool Stop; } " + api + " public static class Entry { public static void Root() { " + call + " } }", "Root");
-            var tree = run.Compilation.SyntaxTrees.Single();
-            var model = run.Compilation.GetSemanticModel(tree);
+            string program = "public class Fault<T> : System.Exception {} public static class Flags { public static bool Stop; } " + api + " public static class Entry { public static void Root() { " + call + " } }";
+            var production = ExceptionFlowFiniteOrbitAdmissionTests.Create(program);
+            var outcome = production.Session.Analyze(production.Root).ProfileOutcome!;
+            var tree = production.Compilation.SyntaxTrees.Single();
+            var model = production.Compilation.GetSemanticModel(tree);
             var rootSyntax = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Single(method => method.Identifier.ValueText == "Root");
             var selected = (IMethodSymbol)model.GetSymbolInfo(rootSyntax.DescendantNodes().OfType<InvocationExpressionSyntax>().Single()).Symbol!;
-            var text = run.Compilation.GetSpecialType(SpecialType.System_String);
-            var number = run.Compilation.GetSpecialType(SpecialType.System_Int32);
-            var list = run.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!;
+            var text = production.Compilation.GetSpecialType(SpecialType.System_String);
+            var number = production.Compilation.GetSpecialType(SpecialType.System_Int32);
+            var list = production.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!;
             var firstArgument = scenario == "constant" ? number : scenario is "identity" ? text : list.Construct(text);
             var secondArgument = scenario is "constant" or "identity" ? firstArgument : list.Construct(firstArgument);
             IMethodSymbol Recreate(ITypeSymbol argument) => scenario == "containing"
@@ -102,20 +104,33 @@ namespace XMLDocNormalizerTests.Worker
                 .Select(method => RoslynCanonicalIdentityFactory.CreateCallableIdentity(method)).ToArray();
             int distinct = identities.Distinct().Count();
             Assert.Equal(scenario == "identity" ? 1 : scenario == "constant" ? 2 : 3, distinct);
-            Assert.Equal(scenario == "mutual" ? 3 : 2, run.Graph.Count);
-            var actual = run.GetRequiredSummary(run.RootSummary.CallEdges.Single().Target);
-            Assert.IsAssignableFrom<ITypeParameterSymbol>(Assert.Single(Assert.Single(actual.Sources).ExceptionType.TypeArguments));
+            ExceptionFlowSummaryGraphTestRun? run = null;
+            if (scenario is "identity" or "constant")
+            {
+                Assert.True(outcome.Complete, string.Join("\n", outcome.Details));
+                run = ExceptionFlowSummaryGraphTestHelper.Build(program, "Root");
+                Assert.Equal(scenario == "constant" ? 3 : 2, run.Graph.Count); // P07; identity count unchanged.
+                var actual = run.GetRequiredSummary(run.RootSummary.CallEdges.Single().Target);
+                Assert.Equal(SpecialType.System_String, Assert.Single(Assert.Single(actual.Sources).ExceptionType.TypeArguments).SpecialType); // P06
+            }
+            else // R3: classify before any unbounded exact-context materialization.
+            {
+                Assert.False(outcome.Complete);
+                Assert.Contains(outcome.Reasons, reason => reason.Category == "PositiveConstructorCycle");
+                Assert.Equal(0, ExceptionFlowFiniteOrbitAdmissionTests.Graph(production.Session).Count);
+            }
             Evidence("recurrence-" + scenario, new
             {
                 Scenario = scenario,
                 Source = tree.ToString(),
                 ExactAContexts = identities,
                 DistinctAContexts = distinct,
-                ActualDefinitionGraphCount = run.Graph.Count,
+                ActualGraphCount = run?.Graph.Count,
+                Profile = outcome,
                 Observation = scenario == "mutual" ? "Each A -> B<List<T>> -> A<T> cycle adds one List constructor to A's argument" : scenario,
                 FiniteIllustrationOnly = true,
                 ProductExpansionBudgetAdded = false,
-                CorrectedSummary = false
+                ExactAdmitted = outcome.Complete
             });
         }
 
@@ -186,7 +201,7 @@ namespace XMLDocNormalizerTests.Worker
 
         private static void Evidence(string name, object value, bool b25a5 = false)
         {
-            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), b25a5 ? "artifacts/p5o2b25a5/analysis" : "artifacts/p5o2b25a4/analysis", name + ".json");
+            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), b25a5 ? "artifacts/p5o2b25a10/analysis/a5" : "artifacts/p5o2b25a10/analysis/a4", name + ".json"); // R6
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(value));
         }

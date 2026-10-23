@@ -135,9 +135,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 run.GetRequiredType(
                     "System.ArgumentNullException");
 
-            Assert.Single(
-                run.Result.GetExceptionPaths(
-                    argumentNullException));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(run);
         }
 
         /// <summary>

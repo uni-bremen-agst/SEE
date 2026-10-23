@@ -56,38 +56,13 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Finding projectFinding =
-                Assert.Single(
-                    projectFindings.Where(
-                        candidate =>
-                            candidate.Smell.ID ==
-                            XmlDocSmells
-                                .MissingTransitiveExceptionDocumentation
-                                .ID));
-
-            Assert.Contains(
-                "System.InvalidOperationException",
-                projectFinding.Message,
-                StringComparison.Ordinal);
-
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
             List<Finding> solutionFindings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
                     ExceptionAnalysisMode.SolutionTransitive);
 
-            Finding solutionFinding =
-                Assert.Single(
-                    solutionFindings.Where(
-                        candidate =>
-                            candidate.Smell.ID ==
-                            XmlDocSmells
-                                .MissingTransitiveExceptionDocumentation
-                                .ID));
-
-            Assert.Contains(
-                "System.InvalidOperationException",
-                solutionFinding.Message,
-                StringComparison.Ordinal);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
         }
 
         /// <summary>

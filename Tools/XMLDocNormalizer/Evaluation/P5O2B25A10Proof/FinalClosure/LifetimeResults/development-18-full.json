@@ -1,0 +1,20 @@
+{
+    "Name":  "development-18-full",
+    "StartedUtc":  "2026-10-23T19:12:11.6732384Z",
+    "FinishedUtc":  "2026-10-23T19:15:52.1580454Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "C:\\Users\\Krause\\AppData\\Local\\Temp\\a10-277b50ca",
+    "Arguments":  [
+                      "test",
+                      "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                      "--no-build",
+                      "--no-restore",
+                      "--blame",
+                      "--logger",
+                      "trx;LogFileName=full.trx",
+                      "--results-directory",
+                      "artifacts/a10-closure-results",
+                      "-v:minimal"
+                  ]
+}

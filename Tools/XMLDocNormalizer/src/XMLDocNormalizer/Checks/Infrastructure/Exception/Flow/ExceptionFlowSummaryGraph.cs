@@ -4,7 +4,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Stores compact context-sensitive callable summaries and the work queue
     /// used to build them nonrecursively.
     /// </summary>
-    internal sealed class ExceptionFlowSummaryGraph
+    internal sealed class ExceptionFlowSummaryGraph : IExceptionFlowSummaryTargetSink
     {
         /// <summary>
         /// Stores graph nodes by normalized callable and context key.
@@ -28,12 +28,83 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly Queue<ExceptionFlowCallableKey> pendingKeys =
             new();
 
+        private ExceptionFlowFiniteOrbitSeal? admission;
+        private ExceptionFlowSemanticEnvironment? productionEnvironment;
+        private readonly List<ExceptionFlowCallableKey> transactionNodes = [];
+        private string? scopeDigest;
+
+        /// <summary>Gets or sets the active sequential construction frame.</summary>
+        internal ExceptionFlowCallableKey? BuildingKey { get; set; }
+
+        /// <summary>Gets or sets the active invocation context.</summary>
+        internal ExceptionFlowCallContext? BuildingContext { get; set; }
+
+        /// <summary>Gets or sets the compilation interpreting the active body.</summary>
+        internal Microsoft.CodeAnalysis.Compilation? BuildingCompilation { get; set; }
+
+        /// <summary>Starts a sealed production construction transaction.</summary>
+        /// <param name="inventory">The successfully admitted declaration inventory.</param>
+        internal void BeginProduction(ExceptionFlowFiniteOrbitSeal inventory,
+            ExceptionFlowSemanticEnvironment environment)
+        {
+            if (!inventory.ScopeUnchanged(environment.GetAnalysisScopes().Select(scope => scope.Compilation)))
+                throw new ExceptionFlowProfileViolation("ScopeMapNotClosed", "Scope changed before production registration.");
+            if (scopeDigest != null && scopeDigest != inventory.ScopeDigest)
+            {
+                summaries.Clear(); callContexts.Clear(); pendingKeys.Clear();
+            }
+            scopeDigest = inventory.ScopeDigest;
+            admission = inventory;
+            productionEnvironment = environment;
+            transactionNodes.Clear();
+        }
+
+        /// <summary>Removes newly registered nodes if construction did not complete under its seal.</summary>
+        /// <param name="completed">Whether all pending bodies were constructed under the seal.</param>
+        internal void EndProduction(bool completed)
+        {
+            if (!completed)
+            {
+                foreach (ExceptionFlowCallableKey key in transactionNodes)
+                { summaries.Remove(key); callContexts.Remove(key); }
+                pendingKeys.Clear();
+            }
+            transactionNodes.Clear(); BuildingKey = null; BuildingContext = null; BuildingCompilation = null; admission = null; productionEnvironment = null;
+        }
+
         /// <summary>
         /// Gets the number of callable summaries in the graph.
         /// </summary>
         /// <value>The number of distinct context-sensitive graph nodes.</value>
         public int Count =>
             summaries.Count;
+
+        /// <summary>Registers a target using the graph's normal scheduling rules.</summary>
+        /// <param name="symbol">The target declaration handle.</param>
+        /// <param name="context">The complete call-site context.</param>
+        /// <returns>The graph key associated with the target.</returns>
+        public ExceptionFlowCallableKey RegisterTarget(
+            Microsoft.CodeAnalysis.ISymbol symbol,
+            ExceptionFlowCallContext context)
+        {
+            Microsoft.CodeAnalysis.ISymbol symbolic = context.InvocationSymbol ?? symbol;
+            if (admission != null && (BuildingKey == null || !admission.ContainsTransition(BuildingKey, symbol, symbolic)))
+                throw new ExceptionFlowProfileViolation("TargetOrAnalysisCoverageIncomplete", "Discovered declaration/map was not sealed: "
+                    + ExceptionFlowFiniteOrbitSeal.BodyId(symbol));
+            if (BuildingContext?.InvocationSymbol != null && BuildingCompilation != null)
+                context = context.WithInvocation(new ExceptionFlowInvocationSubstitution(BuildingContext.InvocationSymbol, BuildingCompilation).ApplyCallable(symbolic));
+            ExceptionFlowCallableKey key = new(symbol, context);
+            GetOrAdd(key, context);
+            return key;
+        }
+
+        /// <summary>Local fragments are stored by the session after body analysis.</summary>
+        /// <param name="fragment">The observed local fragment.</param>
+        public void ObserveLocalFragment(ExceptionFlowSummaryFragment fragment)
+        {
+            // The raw graph remains a construction-only diagnostic facility.
+            // Discovery receivers independently retain pre-suppression coverage.
+        }
 
         /// <summary>
         /// Gets an existing summary or creates and schedules a new summary.
@@ -47,6 +118,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public ExceptionFlowSummary GetOrAdd(
             ExceptionFlowCallableKey key)
         {
+            if (admission != null && (!admission.ScopeUnchanged(productionEnvironment!.GetAnalysisScopes().Select(scope => scope.Compilation))
+                || !admission.ContainsContext(key.Symbol, key.CallContext)))
+                throw new ExceptionFlowProfileViolation("ScopeMapNotClosed", "Unsealed, open, or changed-scope context: "
+                    + ExceptionFlowFiniteOrbitSeal.BodyId(key.Symbol));
             if (summaries.TryGetValue(
                     key,
                     out ExceptionFlowSummary? summary))
@@ -59,6 +134,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             summaries.Add(
                 key,
                 summary);
+
+            if (admission != null) transactionNodes.Add(key);
 
             pendingKeys.Enqueue(
                 key);

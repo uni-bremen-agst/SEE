@@ -41,7 +41,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInForEachSource_ProjectTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInForEachSourceDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInForEachSourceDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -53,7 +53,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInForEachSource_SolutionTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInForEachSourceDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInForEachSourceDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -64,7 +64,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedInsideForEachBody_ProjectTransitive_DoesNotPreserveNonNullFact()
         {
-            AssertReceiverReassignedInsideForEachBodyDoesNotPreserveNonNullFact(
+            AssertReceiverReassignedInsideForEachBodyDoesNotPreserveNonNullFactA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -75,7 +75,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedInsideForEachBody_SolutionTransitive_DoesNotPreserveNonNullFact()
         {
-            AssertReceiverReassignedInsideForEachBodyDoesNotPreserveNonNullFact(
+            AssertReceiverReassignedInsideForEachBodyDoesNotPreserveNonNullFactA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -86,7 +86,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedAfterUseInsideForEachBody_ProjectTransitive_DoesNotPreserveNonNullFactAcrossIterations()
         {
-            AssertReceiverReassignedAfterUseInsideForEachBodyDoesNotPreserveNonNullFactAcrossIterations(
+            AssertReceiverReassignedAfterUseInsideForEachBodyDoesNotPreserveNonNullFactAcrossIterationsA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -97,7 +97,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedAfterUseInsideForEachBody_SolutionTransitive_DoesNotPreserveNonNullFactAcrossIterations()
         {
-            AssertReceiverReassignedAfterUseInsideForEachBodyDoesNotPreserveNonNullFactAcrossIterations(
+            AssertReceiverReassignedAfterUseInsideForEachBodyDoesNotPreserveNonNullFactAcrossIterationsA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -108,7 +108,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedInsideForEachSource_ProjectTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertReceiverReassignedInsideForEachSourceDoesNotProveReceiverNonNull(
+            AssertReceiverReassignedInsideForEachSourceDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -119,7 +119,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ReceiverReassignedInsideForEachSource_SolutionTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertReceiverReassignedInsideForEachSourceDoesNotProveReceiverNonNull(
+            AssertReceiverReassignedInsideForEachSourceDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -224,6 +224,50 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 findings);
         }
 
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertConditionalAccessInForEachSourceDoesNotProveReceiverNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates an optionally accessed container.</summary>
+                    public void M(Container? container)
+                    {
+                        foreach (int value in
+                                 container?.Values ?? new[] { 1 })
+                        {
+                            _ = value;
+                            Validate(container);
+                        }
+                    }
+
+                    private static void Validate(Container? container)
+                    {
+                        ArgumentNullException.ThrowIfNull(container);
+                    }
+
+                    public sealed class Container
+                    {
+                        public IReadOnlyList<int> Values { get; } =
+                            Array.Empty<int>();
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
+        }
+
         /// <summary>
         /// Verifies that a write inside the foreach body invalidates the
         /// non-null fact established while evaluating the source expression.
@@ -275,6 +319,50 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 findings);
         }
 
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertReceiverReassignedInsideForEachBodyDoesNotPreserveNonNullFactA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates a reassigned container.</summary>
+                    public void M(Container? container)
+                    {
+                        foreach (int value in container.Values)
+                        {
+                            _ = value;
+                            container = null;
+                            Validate(container);
+                        }
+                    }
+
+                    private static void Validate(Container? container)
+                    {
+                        ArgumentNullException.ThrowIfNull(container);
+                    }
+
+                    public sealed class Container
+                    {
+                        public IReadOnlyList<int> Values { get; } =
+                            Array.Empty<int>();
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
+        }
+
         /// <summary>
         /// Verifies that a write after the guarded use can affect a later
         /// foreach iteration and therefore invalidates the source-derived fact.
@@ -324,6 +412,50 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(
                 findings);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertReceiverReassignedAfterUseInsideForEachBodyDoesNotPreserveNonNullFactAcrossIterationsA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates a container across foreach iterations.</summary>
+                    public void M(Container? container)
+                    {
+                        foreach (int value in container.Values)
+                        {
+                            _ = value;
+                            Validate(container);
+                            container = null;
+                        }
+                    }
+
+                    private static void Validate(Container? container)
+                    {
+                        ArgumentNullException.ThrowIfNull(container);
+                    }
+
+                    public sealed class Container
+                    {
+                        public IReadOnlyList<int> Values { get; } =
+                            new[] { 1, 2 };
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
         }
 
         /// <summary>
@@ -384,6 +516,59 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(
                 findings);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertReceiverReassignedInsideForEachSourceDoesNotProveReceiverNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.Collections.Generic;
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates a receiver reassigned in the foreach source.</summary>
+                    public void M(Container? container)
+                    {
+                        foreach (int value in KeepValues(
+                                     container.Values,
+                                     container = null))
+                        {
+                            _ = value;
+                            Validate(container);
+                        }
+                    }
+
+                    private static IReadOnlyList<int> KeepValues(
+                        IReadOnlyList<int> values,
+                        Container? ignored)
+                    {
+                        _ = ignored;
+                        return values;
+                    }
+
+                    private static void Validate(Container? container)
+                    {
+                        ArgumentNullException.ThrowIfNull(container);
+                    }
+
+                    public sealed class Container
+                    {
+                        public IReadOnlyList<int> Values { get; } =
+                            new[] { 1 };
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
         }
 
         /// <summary>

@@ -1,0 +1,53 @@
+{
+  "Status": "AwaitingAdditionalProductionFindingCharacterizationApproval",
+  "R1ThroughR6Approved": true,
+  "RawLayerDecisionAApproved": true,
+  "AdditionalR7Approved": false,
+  "RawGraphProductionBypassFound": false,
+  "ProductionImplementationStarted": false,
+  "ProductOrTestFilesChanged": 0,
+  "ProtectionCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File Evaluation/P5O2B25A10Proof/Verify-Phase0.ps1",
+  "ProtectionActualExitCode": 0,
+  "Head": "9b76e179a568c64ae972cc3a45980a094e44245e",
+  "PhysicalIndexSha256": "CB38F3D3B845ABD54FEC4C2E111E77BFF7F31B80A73F438A657BAF03173F8158",
+  "SemanticIndexClean": true,
+  "CoreFilesVerified": 23,
+  "StashesVerified": 6,
+  "InheritedManifestFilesVerified": 1092,
+  "Probe": {
+    "Files": 56,
+    "ConstantFixtures": 97,
+    "AnalyzedFixtures": 90,
+    "ModeObservations": 64,
+    "TestMethodsWithObservations": 32,
+    "ExcludedFixtures": 202,
+    "Exhaustive": false,
+    "CompletedExecutionExitCode": 0,
+    "AssertionMapExecutionExitCode": 0,
+    "RecordSha256": "87B71D919037E5C665E2F7557141219297F037C02CEE57232D00ABFA53EFCA38",
+    "AssertionMapSha256": "13E8D8AA043CC6FE4288B19A52DAB797B27B158EECEC2A254BE206A345804653",
+    "ExistingUnitTestMethodsExecuted": false,
+    "InputProgramsExecuted": false,
+    "A10ImplementationValidated": false
+  },
+  "ToolBuilds": [
+    { "Revision": "Initial references", "ExitCode": 0, "Warnings": 2, "WarningKind": "MSB3277 Immutable/Metadata inherited dependency references missing" },
+    { "Revision": "Same inherited dependency DLLs explicitly referenced", "ExitCode": 0, "Warnings": 0 },
+    { "Revision": "Current fixture text distinguished from invoked helper source", "ExitCode": 0, "Warnings": 0 },
+    { "Revision": "Separate static assertion-map mode added", "ExitCode": 0, "Warnings": 0 }
+  ],
+  "EarlierToolExecution": "Aborted at CRLF/LF-only test file hash mismatch. Owned session stopped with exit 1; no completed result. Revised-source execution recorded separately, not a green retry of an unchanged gate.",
+  "ProductBuildRun": false,
+  "TestProjectBuildRun": false,
+  "UnitTestsRunThisContinuation": false,
+  "DualVersionOrWAERun": false,
+  "BroadFullBoundaryRun": false,
+  "NewSelfAnalysisOrCanonicalDiff": false,
+  "CommitPushOrStashOperation": false,
+  "FinalGitStatus": [
+    " M ../../.gitignore",
+    "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection-audit.json",
+    "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection.md",
+    "?? Evaluation/P5O2B25A10Proof/"
+  ]
+}

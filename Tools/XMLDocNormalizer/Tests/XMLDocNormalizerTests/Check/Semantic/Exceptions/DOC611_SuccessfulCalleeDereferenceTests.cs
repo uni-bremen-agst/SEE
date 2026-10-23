@@ -145,7 +145,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertArgumentNullFindingInBothTransitiveModes(
+            AssertArgumentNullFindingInBothTransitiveModesA10Outside(
                 source);
         }
 
@@ -196,7 +196,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertArgumentNullFindingInBothTransitiveModes(
+            AssertArgumentNullFindingInBothTransitiveModesA10Outside(
                 source);
         }
 
@@ -254,6 +254,25 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(
                 solutionFindings);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertArgumentNullFindingInBothTransitiveModesA10Outside(
+            string source)
+        {
+            List<Finding> projectFindings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            List<Finding> solutionFindings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.SolutionTransitive);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
+
         }
 
         /// <summary>

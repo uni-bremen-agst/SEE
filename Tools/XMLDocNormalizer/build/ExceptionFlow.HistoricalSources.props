@@ -122,5 +122,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Utils/SymbolUtils.cs" Link="Utils/SymbolUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Utils/SyntaxUtils.cs" Link="Utils/SyntaxUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowRuntimeAwaitCapability.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowRuntimeAwaitCapability.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/IExceptionFlowSummaryTargetSink.cs" Link="Checks/Infrastructure/Exception/Flow/IExceptionFlowSummaryTargetSink.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitProfile.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitProfile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowInvocationSubstitution.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowInvocationSubstitution.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitAdmission.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitAdmission.cs" />
   </ItemGroup>
 </Project>

@@ -136,7 +136,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullFinding(source);
+            AssertArgumentNullFindingA10Outside(source);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullFinding(source);
+            AssertArgumentNullFindingA10Outside(source);
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullFinding(source);
+            AssertArgumentNullFindingA10Outside(source);
         }
 
         /// <summary>
@@ -320,6 +320,16 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 finding => finding.Message.Contains(
                     "System.ArgumentNullException",
                     StringComparison.Ordinal));
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertArgumentNullFindingA10Outside(string source)
+        {
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
         }
     }
 }

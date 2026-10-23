@@ -1,0 +1,1771 @@
+{
+    "Gate":  "A10",
+    "Package":  "P5O2B25A10",
+    "Adapter":  "A10-owned regression/contract adapter, NOT a rewrite or replay of historical audit output",
+    "CapturedUtc":  "2026-10-23T19:16:17.4429529Z",
+    "Passed":  true,
+    "Checks":  [
+                   {
+                       "Name":  "frozen:Evaluation/CI-CoreProjectFix.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/CI-CoreProjectFix-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/CI-CoreProjectFixProof/.gitattributes",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/CI-CoreProjectFixProof/verify-linux-inputs.sh",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/CI-SelectionEvidenceDirectoryFix.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/.gitignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/ArchitectureClosureAudit.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/CompositionAudit.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/CompositionBaseline.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/ContextualBoundaryAudit.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/ExtractionPlan.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/ExtractionVerification.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/SummaryClosureVerification.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Write-ClosureEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Write-CompositionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Write-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Write-ExtractionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/ContextualBoundaryAudit/Write-SummaryClosureEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/G1-reference-acquisition.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/G2-portable-pdb-acquisition.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/G4B-bounded-remote-artifacts.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/G5-exact-signed-compilation.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/OPEN-PIPELINE-BOUNDARIES.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O1-canonical-exception-flow-ir.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A2-semantic-scope-callable-resolution-seam.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A3-summary-graph-construction-evaluation.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4B-call-context-value-fact-dependency-decomposition.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4B-call-graph-after.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4B-call-graph-before.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-downstream-fact-provider-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-downstream-fact-provider-extraction.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4-context-value-facts-catch-local-source.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-residual-context-value-fact-scc.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-residual-fact-family-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-residual-fact-family-extraction.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-residual-scc-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-return-condition-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-return-condition-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-runtime-dispatch-stable-source-member-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-runtime-dispatch-stable-source-member-extraction.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-semantic-model-resolution-and-fact-extraction.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-semantic-model-resolution-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-sequence-context-element-source-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4C-sequence-context-element-source-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4D-dictionary-value-fact-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4D-dictionary-value-fact-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4E-sequence-range-dictionary-mutation-fact-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4E-sequence-range-dictionary-mutation-fact-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4F-successful-sequence-validation-fact-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4F-successful-sequence-validation-fact-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4G-delegate-target-resolver-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A4G-delegate-target-resolver-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5A-contextual-evaluator-boundary-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5A-contextual-evaluator-boundary-audit.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5A-contextual-evaluator-boundary-matrices.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5B-contextual-fact-evaluator-extraction.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5B-contextual-fact-evaluator-extraction-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5C-contextual-evaluator-composition-cleanup.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A5C-contextual-evaluator-composition-cleanup-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6-architecture-readiness-closure.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6-architecture-readiness-closure-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6F-historical-core-readiness-matrix.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6F-summary-orchestration-cycle-closure.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6F-summary-orchestration-cycle-closure-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A6-historical-core-readiness-matrix.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2A-exception-flow-analyzer-decomposition.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B10-historical-worker-payload-projection.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B10-historical-worker-payload-projection-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B10Proof/Write-Verify-PayloadEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B11-historical-external-input-equivalence.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B11-historical-external-input-equivalence-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B11Proof/Write-Verify-InputEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B12-historical-reference-identity-equivalence.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B12-historical-reference-identity-equivalence-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B12Proof/RegressionFilters.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B12Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B12Proof/Write-Verify-ReferenceEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B13-historical-source-compiler-scope-equivalence.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B13-historical-source-compiler-scope-equivalence-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B13Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B13Proof/Write-Verify-ContextEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B14-historical-supporting-source-scope-equivalence.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B14-historical-supporting-source-scope-equivalence-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B14Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B14Proof/Write-Verify-ScopeEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B15-historical-cross-project-solution-scope-equivalence.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B15-historical-cross-project-solution-scope-equivalence-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B15Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B15Proof/Write-Verify-SolutionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B16-historical-declared-exceptions-boundary.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B16-historical-declared-exceptions-boundary-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B16Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B16Proof/Write-Verify-DeclaredBoundaryEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B17-historical-declared-finding-policy-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B17-historical-declared-finding-policy-contract-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B17Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B17Proof/Write-Verify-PolicyEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B18-historical-declared-activation-boundary.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B18-historical-declared-activation-boundary-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B18Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B18Proof/Write-Verify-ReadinessEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B19-historical-declared-finding-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B19-historical-declared-finding-contract-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B19Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B19Proof/Write-Verify-FindingContract.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A2Proof/Directory.Build.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A2Proof/SurfaceProofProgram.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A2Proof/Write-Verify-ContractEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A2-runtime-await-call-site-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A2-runtime-await-call-site-contract-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/CurrentCapabilityProof.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/Directory.Build.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/HistoricalCapabilityProof.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/ProofProgram.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/RuntimeAwaitCapability.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1AProof/Write-Verify-RuntimeAwaitEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A-runtime-await-compatibility-proof.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1A-runtime-await-compatibility-proof-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/CompileOnlySemanticEnvironment.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/Directory.Build.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/HistoricalCompileProbe.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/HistoricalSources.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/MetadataAudit/MetadataAudit.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/MetadataAudit/Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/Test-BuildFeasibilityEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1CompileProbe/Write-BuildFeasibilityEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1-historical-roslyn-build-feasibility.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1-historical-roslyn-build-feasibility-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B1-roslyn-api-drift-matrix.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B20-historical-declared-production-boundary.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B20-historical-declared-production-boundary-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B20Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B20Proof/Write-Verify-ProductionBoundary.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B21-historical-documentation-binding-attestation.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B21-historical-documentation-binding-attestation-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B21Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B21Proof/Write-Verify-BindingAttestation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B22-historical-declared-production-finding-integration.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B22-historical-declared-production-finding-integration-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B22Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B22Proof/Write-Verify-ProductionFindings.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23-bounded-external-target-adoption.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23-bounded-external-target-adoption-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Capture-Protection.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Export-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/job.example.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Sync-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B23Proof/Write-Verify-ExternalTarget.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24-bounded-finding-contracts.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24-bounded-finding-contracts-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Capture-ValidationInputs.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Export-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/job.example.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Prepare-OfflineValidation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Run-FollowOnBoundary.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Run-PidGateAudit.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Run-Regressions.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Write-PidGateClosure.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B24Proof/Write-Verify-Findings.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2-canonical-exception-type-identity.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2-canonical-exception-type-identity-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Capture-Start.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Capture-WipDelta.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/gate-vs-b25a-wip.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/register-vs-b25a-wip.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Run-EvidenceGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Verify-HistoricalEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A2Proof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3-constructed-generic-summary-context.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3-constructed-generic-summary-context-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/gate-vs-c777.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/register-vs-c777.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Run-EvidenceGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Verify-Changes.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Verify-HistoricalEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A3Proof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4-bounded-generic-context-expansion.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4-bounded-generic-context-expansion-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/gate-vs-inherited-a3-wip.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/register-vs-inherited-a3-wip.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Run-EvidenceGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Verify-Changes.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Verify-CompiledSources.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Verify-HistoricalEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A4Proof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/gate-vs-inherited-a4.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Lifecycle-and-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Run-EvidenceGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/test-vs-inherited-a4.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Trace-ForeignFullFailure.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Verify-ChangesAndHistory.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Verify-CompiledSources.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5-recursive-summary-scc-closure.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A5-recursive-summary-scc-closure-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Run-EvidenceGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Trace-Lifecycle.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Verify-CompiledSources.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Verify-Protection.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Verify-Revision.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A6Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A7-finite-parametric-generic-context-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A7-finite-parametric-generic-context-contract-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A7Proof/Capture-Inventory.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A7Proof/Run-ContractGate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A7Proof/Verify-Contract.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8-correlated-recursive-type-family-contract.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8-correlated-recursive-type-family-contract-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/.gitignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Capture-Inventory.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Characterization-preflight.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/FamilyProof.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/FamilyProof.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Format-Owned.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Invoke-Inherited.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Run-Gate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Run-Harness.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Run-Recorded.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Trace-Lifecycle.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Verify-A8.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Verify-CompiledSources.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Verify-Protection.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Verify-Revision.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A8Proof/Verify-Static.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A-assembly-qualified-type-ownership.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25A-assembly-qualified-type-ownership-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/candidate-tests.cs.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/Close-CandidateDiagnostics.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/ownership-before-after.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/Preserve-Candidate.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/withdrawn-candidate.patch.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25AProof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25-bounded-solution-finding-adoption.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25-bounded-solution-finding-adoption-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25Proof/Prepare-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25Proof/Preserve-ActivationAttempt.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25Proof/Verify-UnsupportedGraphCli.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B25Proof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B2-dual-version-build-scaffold.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B2-dual-version-build-scaffold-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B2Proof/Write-Verify-ScaffoldEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B3-historical-worker-host.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B3-historical-worker-host-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B3Proof/Write-Verify-WorkerEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4-main-worker-analysis-boundary.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4-main-worker-analysis-boundary-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4Proof/TestProcess/.gitignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4Proof/TestProcess/Directory.Build.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4Proof/TestProcess/Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B4Proof/Write-Verify-BoundaryEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B5-explicit-analyzer-routing.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B5-explicit-analyzer-routing-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B5Proof/Write-Verify-RoutingEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B6-deterministic-analyzer-selection.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B6-deterministic-analyzer-selection-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B6Proof/Write-Verify-SelectionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/.gitignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/B11GraphProbe.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/B12ReferenceProbe.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/B14ScopeProbe.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/B15SolutionProbe.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/Directory.Build.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/HistoricalPdbFixture/Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7Proof/Write-Verify-ProjectionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7-trusted-selection-context-projection.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B7-trusted-selection-context-projection-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B8-integrated-analyzer-dispatch.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B8-integrated-analyzer-dispatch-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B8Proof/Write-Verify-DispatchEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B9-production-analysis-pipeline-adoption.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B9-production-analysis-pipeline-adoption-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2B9Proof/Write-Verify-ProductionEvidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/P5O2-historical-compiler-worker-readiness.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PID-G1-process-identity-lifetime-gate.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PID-G1-process-identity-lifetime-gate-audit.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PIDG1Proof/ProcessLifetime.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PIDG1Proof/Run-Validation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PIDG1Proof/Test-ProcessLifetime.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PIDG1Proof/Verify-Scope.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/PIDG1Proof/Write-Verify-Evidence.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/prepare-real-world-evaluation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/README.md",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/real-world-evaluation.manifest.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/run-real-world-evaluation.ps1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/EvaluationArguments.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/EvaluationManifest.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/EvaluationManifestLoader.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/EvaluationReport.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/EvaluationReportWriter.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/G4BReferenceMatrixWriter.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/G5SigningMatrixWriter.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/RealWorldEvaluationRunner.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "frozen:Evaluation/XMLDocNormalizer.Evaluation/XMLDocNormalizer.Evaluation.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\.gitignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.deps.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\ref\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\refint\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.assets.cache",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.FileListAbsolute.txt",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GlobalUsings.g.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.assets.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.nuget.cache",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.dgspec.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.props",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.targets",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "protected:D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\XMLDocNormalizer.ExceptionFlow.Core.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "root-ignore",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "physical-index",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "stashes",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "no-Full-skips",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-runtime:broad",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-runtime:full",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-runtime:boundary",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-runtime:dual",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "exact-PDB-source-and-PE-bindings",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "fresh-class:ExceptionFlowGenericExpansionBoundaryTests",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "fresh-class:ExceptionFlowRecursiveSummaryClosureTests",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "fresh-class:ExceptionFlowFiniteOrbitAdmissionTests",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-eight-fresh-witnesses",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-production-reject-before-root:growth-False-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-independent-prefix-not-bound:growth-False-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-production-reject-before-root:growth-False-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-independent-prefix-not-bound:growth-False-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-production-reject-before-root:growth-True-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-independent-prefix-not-bound:growth-True-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-production-reject-before-root:growth-True-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A6-independent-prefix-not-bound:growth-True-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "complete-Dual",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:0-current-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:1-historical-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:2-current-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:3-historical-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:4-historical-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:5-current-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:worker-0-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:worker-1-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:boundary-test-process-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:projection-pdb-fixture-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "WAE:main-boundary-tests-build",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "eight-frozen-Current-baselines",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:Direct-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:Direct-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:ProjectTransitive-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:ProjectTransitive-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:ProjectTransitiveDeclaredExceptions-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:ProjectTransitiveDeclaredExceptions-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:SolutionTransitive-False.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Current-byte-equal:SolutionTransitive-True.json",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-general-scope-still-STOP",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F1",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F2",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F3",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F4",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F5",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F6",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F7",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F8",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F9",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F10",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F11",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F12",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F13",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A7-obligation:F14",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:a8:FamilyProof.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:a8:FamilyProof.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-image-binding:a8",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-result-binding:a8",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:a9:ProfileProof.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:a9:ProfileProof.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-image-binding:a9",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-result-binding:a9",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:production:Program.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-source-binding:production:Validation.csproj",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-image-binding:production",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "proof-result-binding:production",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A8-fresh-40-checks",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A8-not-general-or-product-proof",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A9-fresh-37-checks",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A9-bounded-profile-not-general-proof",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "A9-outside-without-context-materialization",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "additional-actual-production-queries",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "no-RawGraph-or-new-facade-certification",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-query:production-A-B-C-admitted",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-query:production-A-B-C-composed-substitution",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-query:production-A-B-C-missing-scope-fail-closed",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "required-query:production-cross-scope-growth-outside-before-root",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "no-new-envelope-change:HistoricalWorkerResponseValidation.cs",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "no-new-envelope-change:HistoricalAnalysis.cs",
+                       "Passed":  true
+                   }
+               ],
+    "Failures":  [
+
+                 ],
+    "Error":  null,
+    "FullRemainsFailed":  false,
+    "HistoricalContractChecksAreNotA10ProductionProof":  true,
+    "HistoricalS1Exit1Preserved":  true,
+    "HistoricalEvidenceRewritten":  false,
+    "B25BActivated":  false,
+    "A10Complete":  false,
+    "ClosureGatePassedOnly":  true,
+    "FreshFullRevision":  18,
+    "ReusedIndependentEvidenceRevision":  17,
+    "LifetimeOnlySourceDeltaVerified":  true
+}

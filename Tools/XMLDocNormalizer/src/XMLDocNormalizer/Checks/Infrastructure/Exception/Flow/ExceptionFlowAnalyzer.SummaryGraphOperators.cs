@@ -51,7 +51,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -213,7 +213,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IOperation operationRoot,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -372,7 +372,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ICompoundAssignmentOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -461,7 +461,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IIncrementOrDecrementOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -516,7 +516,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IBinaryOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -583,7 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IUnaryOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -637,7 +637,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IConversionOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -683,7 +683,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IBinaryOperation operation,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -869,7 +869,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)
@@ -943,7 +943,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
             HashSet<string> collectedCallKeys)

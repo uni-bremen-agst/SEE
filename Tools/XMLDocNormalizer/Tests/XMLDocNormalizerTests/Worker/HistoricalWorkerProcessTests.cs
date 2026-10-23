@@ -143,10 +143,20 @@ namespace XMLDocNormalizerTests.Worker
         {
             const string source = "public static class Fixture { public static async System.Threading.Tasks.Task Root() { await System.Threading.Tasks.Task.CompletedTask; } }";
             ProcessResult result = await Run(new(WorkerProtocol.Version, "analyze", new(source, "Fixture", "Root")));
-            AssertFailure(result, "analysisFailure");
+            AssertFailure(result, "unsupportedContext");
             using JsonDocument json = JsonDocument.Parse(result.Stdout);
-            Assert.Contains(json.RootElement.GetProperty("failure").GetProperty("details").EnumerateArray(),
-                detail => detail.GetString() == "Await expression runtime-await information is unavailable.");
+            string[] details = json.RootElement.GetProperty("failure").GetProperty("details")
+                .EnumerateArray().Select(detail => detail.GetString()!).ToArray();
+            Assert.Contains("Profile=A9-FiniteOrbit-v1", details);
+            Assert.Contains("Complete=false", details);
+            Assert.Contains("NormalFindingAdmissionBlocked=true", details);
+            Assert.DoesNotContain("Complete=true", details);
+            Assert.Contains(details, detail =>
+                detail.StartsWith("TargetOrAnalysisCoverageIncomplete: ", StringComparison.Ordinal)
+                && detail.Contains("RuntimeAwait", StringComparison.Ordinal)
+                && detail.Contains("unavailable", StringComparison.Ordinal));
+            Assert.False(json.RootElement.GetProperty("identity")
+                .GetProperty("runtimeAwaitInformationAvailable").GetBoolean());
         }
 
         [Fact]

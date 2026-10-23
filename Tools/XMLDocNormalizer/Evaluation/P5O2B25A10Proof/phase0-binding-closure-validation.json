@@ -1,0 +1,183 @@
+{
+    "Status":  "STATIC_PHASE0_AUDIT_COMPLETE_STOP_NO_IMPLEMENTATION",
+    "CapturedUtc":  "2026-10-23T08:19:01.3810884Z",
+    "Head":  "9b76e179a568c64ae972cc3a45980a094e44245e",
+    "Parent":  "c777f9642c145a57c112c28216c3996128c6234b",
+    "LastCommit":  "9b76e179a568c64ae972cc3a45980a094e44245e 2026-10-22T09:24:48+02:00 Establish sound recursive generic summary contracts.",
+    "Checks":  {
+                   "HeadAndParent":  true,
+                   "IndexBytesUnchanged":  true,
+                   "SemanticIndexClean":  true,
+                   "RootIgnoreBytesUnchanged":  true,
+                   "CoreTurnStartBytesUnchanged":  true,
+                   "BothGeneratedDriftsExplainedByteExactly":  true,
+                   "Inherited1092Unchanged":  true,
+                   "TestHelper340Unchanged":  true,
+                   "Stashes6Unchanged":  true,
+                   "AllObservationsOneToOne":  true,
+                   "AllAssertionSourceSpansMatch":  true,
+                   "All85Methods429CasesBound":  true,
+                   "NoAmbiguousOriginCategory":  true,
+                   "OriginalFinalRequestUnchanged":  true,
+                   "NoProductionTestOrGateChanges":  true,
+                   "AuditNoImplementation":  true
+               },
+    "IndexSha256":  "CB38F3D3B845ABD54FEC4C2E111E77BFF7F31B80A73F438A657BAF03173F8158",
+    "RootIgnoreSha256":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "CachedPaths":  [
+
+                    ],
+    "CoreFiles":  23,
+    "CoreRawFrozenHashMatches":  21,
+    "CoreRawFrozenHashDifferences":  [
+                                         {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                                             "Expected":  "E947C48320ED008527522DDB32FB1B7C907525F5BD7DF26EDF36D4C9F850FB42",
+                                             "Actual":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8"
+                                         },
+                                         {
+                                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                                             "Expected":  "4CC4AB60E2764F626C38F891FAF436A7DCBAB491FF192E32AE533693CA7FD500",
+                                             "Actual":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD"
+                                         }
+                                     ],
+    "CoreUnexplainedDifferences":  [
+
+                                   ],
+    "ProtectionDecision":  "S1",
+    "S1ContentProof":  [
+                           {
+                               "Revision":  "c777f9642c145a57c112c28216c3996128c6234b",
+                               "Attributes":  10,
+                               "AttributeDigest":  "f40ef25c50d27936df56517689e709b511384c5a9e5b09769bc08911af30537c",
+                               "CacheFileSha256":  "4CC4AB60E2764F626C38F891FAF436A7DCBAB491FF192E32AE533693CA7FD500"
+                           },
+                           {
+                               "Revision":  "9b76e179a568c64ae972cc3a45980a094e44245e",
+                               "Attributes":  10,
+                               "AttributeDigest":  "ad95bedee2d8522dcf60ff999589c86bf0b974a05de1699f1d9e4dfc86294fe8",
+                               "CacheFileSha256":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD"
+                           }
+                       ],
+    "ReconstructedOriginalAssemblyInfoSha256":  "E947C48320ED008527522DDB32FB1B7C907525F5BD7DF26EDF36D4C9F850FB42",
+    "CoreMetadata":  [
+                         {
+                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                             "Size":  1347,
+                             "LastWriteTimeUtc":  "2026-10-23T07:16:17.3607204Z",
+                             "Tracked":  false,
+                             "IgnoredBy":  "Core .gitignore:3 obj/",
+                             "Sha256":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8"
+                         },
+                         {
+                             "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                             "Size":  66,
+                             "LastWriteTimeUtc":  "2026-10-23T07:16:17.3515708Z",
+                             "Tracked":  false,
+                             "IgnoredBy":  "Core .gitignore:3 obj/",
+                             "Sha256":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD"
+                         }
+                     ],
+    "HistoricalManifest":  "artifacts/p5o2b25a9/start.json",
+    "HistoricalManifestSha256":  "0DB1AD5F819989A6E1D0DAE978A52B12BBFBF8960C35C5FE45223A29E1CF1805",
+    "HistoricalRawHashVerifierExitCode":  1,
+    "HistoricalGateReclassifiedAsPass":  false,
+    "GateRetried":  false,
+    "ManifestChanged":  false,
+    "BaselineAccepted":  false,
+    "CoreRepairedOrRegenerated":  false,
+    "ActualWriterProved":  false,
+    "InheritedFiles":  1092,
+    "InheritedDifferences":  [
+
+                             ],
+    "TestHelperFiles":  340,
+    "TestHelperDifferences":  [
+
+                              ],
+    "Stashes":  [
+                    "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+                    "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+                    "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+                    "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+                    "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+                    "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+                ],
+    "GitStatus":  [
+                      " M ../../.gitignore",
+                      "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection-audit.json",
+                      "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection.md",
+                      "?? Evaluation/P5O2B25A10Proof/"
+                  ],
+    "Original202CaseCounts":  {
+                                  "Exact":  81,
+                                  "Outside":  96,
+                                  "Diagnostic":  1,
+                                  "Unrelated":  25,
+                                  "Ambiguous":  0
+                              },
+    "SupplementaryMethods":  85,
+    "SupplementaryCases":  429,
+    "SupplementaryObservations":  3202,
+    "Unbound":  0,
+    "InactiveParameterBranchObservations":  607,
+    "OriginCounts":  {
+                         "UNRELATED":  1608,
+                         "OUTSIDE PROFILE":  55,
+                         "EXACT":  1487,
+                         "DIAGNOSTIC":  102
+                     },
+    "NoChangeObservations":  3194,
+    "ExistingGrantOrRequestChangeObservations":  8,
+    "R1ThroughR7PreviouslyApproved":  true,
+    "PendingFinalConditionalRows":  {
+                                        "R8":  32,
+                                        "R9":  27,
+                                        "R10":  14
+                                    },
+    "NewR11Required":  false,
+    "ProductBuilds":  0,
+    "TestBuilds":  0,
+    "TestsRun":  0,
+    "HistoricalWorkersRun":  0,
+    "BroadFullBoundaryDualWaeRun":  false,
+    "SelfAnalysisRun":  false,
+    "CanonicalFindingDiffRun":  false,
+    "ImplementationClearance":  false,
+    "B25BClosed":  true,
+    "ProcessRegistryDumpOrServiceChanges":  false,
+    "StashOperations":  false,
+    "IndexOperations":  false,
+    "Commit":  false,
+    "Push":  false,
+    "A10Evidence":  [
+                        {
+                            "Path":  "Supplementary-resolved-bindings-r2.json",
+                            "Sha256":  "458DC82BBE317730A5D9A6A7885D024CA73D24B39D6C94BAB8EAD0C93D0CB3A0"
+                        },
+                        {
+                            "Path":  "Supplementary-binding-closure.md",
+                            "Sha256":  "E3ADA78A6A3B0E1D0E5F6CD567C02C7990DFD259157A658F194FBFE9F8CD04D7"
+                        },
+                        {
+                            "Path":  "Supplementary-method-reviews.txt",
+                            "Sha256":  "9AB5B86691BDEBE21D8D0B95227305F4161B7E5F23266258C3BC53E1CC78C2F1"
+                        },
+                        {
+                            "Path":  "Resolve-Supplementary.csx",
+                            "Sha256":  "63A06C67DC4D4DD642D380F23CB2981D6C70A8C5C0EFC8D179E35CA0D06DBA96"
+                        },
+                        {
+                            "Path":  "Inspect-Supplementary.csx",
+                            "Sha256":  "1999538308855BD28EABA2DC6814B992F71C9C8D29C47408259D3A07939F20BE"
+                        },
+                        {
+                            "Path":  "Protected-obj-drift-analysis.md",
+                            "Sha256":  "F30712FF0E30B0B33347AC7793D352CE00412C186ABEBBE541A7C93B7DE1DF44"
+                        },
+                        {
+                            "Path":  "Capture-BindingClosure.ps1",
+                            "Sha256":  "E48265AC9813CA25476D4A4085528C542A7A8B0AE57761A860883C28B4232FBF"
+                        }
+                    ]
+}

@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
 using XMLDocNormalizer.Execution.Analysis;
 using XMLDocNormalizer.Execution.Historical;
 using XMLDocNormalizer.HistoricalWorker;
@@ -101,11 +102,32 @@ namespace XMLDocNormalizerTests.Worker
                 var b = summaries.Single(item => item.RootElement.GetProperty("callable").GetProperty("containingType").GetProperty("assembly").GetProperty("name").GetString() == "Original.Solution.P1");
                 string SourceOwner(JsonDocument summary) => summary.RootElement.GetProperty("sources")[0].GetProperty("exceptionType").GetProperty("assembly").GetProperty("name").GetString()!;
                 Assert.Equal("Original.Solution.P0", SourceOwner(a)); Assert.Equal("Original.Solution.P1", SourceOwner(b));
-                var entry = Assert.Single(historical.Result!.Entries);
-                Assert.Equal("Original.Solution.P0", entry.ExceptionType.Assembly!.Name);
+                var entries = historical.Result!.Entries;
+                CanonicalAssemblyIdentity Owner(JsonDocument summary) => JsonSerializer.Deserialize<CanonicalAssemblyIdentity>(
+                    summary.RootElement.GetProperty("sources")[0].GetProperty("exceptionType").GetProperty("assembly").GetRawText(), WorkerProtocol.JsonOptions)!;
+                var p0Owner = Owner(a); var p1Owner = Owner(b);
+                // Additional A10 grant: retain exactly both complete owners.
+                Assert.Equal(2, entries.Length);
+                Assert.Equal(new[] { p0Owner, p1Owner }.OrderBy(owner => owner.Name, StringComparer.Ordinal),
+                    entries.Select(item => item.ExceptionType.Assembly!).OrderBy(owner => owner.Name, StringComparer.Ordinal));
+                // Selection is by complete canonical assembly identity, never position.
+                var entry = Assert.Single(entries.Where(item => p1Owner.Equals(item.ExceptionType.Assembly)));
+                Assert.Equal("Original.Solution.P1", entry.ExceptionType.Assembly!.Name); // Existing P15 grant.
                 Assert.Contains(entry.Paths.SelectMany(path => path.Steps), step => step.FilePath == "/solution/p1/Source.cs" && step.Kind.ToString() == "ExplicitThrow");
-                Assert.Single(native.GetProperty("findings").EnumerateArray());
-                Assert.Equal("DOC611", native.GetProperty("findings")[0].GetProperty("smell").GetProperty("id").GetString());
+                await Evidence("ownership-cardinality", new
+                {
+                    Native = native, Flow = historical.Result, Graph = graph,
+                    ExpectedOwners = new[] { p0Owner, p1Owner }, SelectedOwner = entry.ExceptionType.Assembly,
+                    Selection = "Complete canonical assembly identity equality; not collection position",
+                    Classification = "EXACT / admitted in Current and Historical", FinalFindingAdmission = false
+                });
+                var findings = native.GetProperty("findings").EnumerateArray().ToArray();
+                // Finding-count grant: bind to the verified P0/P1 identities
+                // of this same Native/Flow snapshot, not an unrelated ID count.
+                // The existing Finding DTO has no assembly-owner field; no
+                // positional pairing or stronger per-Finding owner claim is made.
+                Assert.Equal(entries.Length, findings.Length);
+                Assert.All(findings, finding => Assert.Equal("DOC611", finding.GetProperty("smell").GetProperty("id").GetString()));
                 await AssertNoFindingAdmission(fixture.Input);
                 HistoricalWorkerLifetimeAssertions.Stopped(historical.Dispatch!.Routing!.HistoricalAnalysis!); Isolation();
                 await Evidence("ownership-stop-witness", new
@@ -116,7 +138,7 @@ namespace XMLDocNormalizerTests.Worker
                     LocalATypeOwner = SourceOwner(a),
                     LocalBTypeOwner = SourceOwner(b),
                     EvaluatedTypeOwner = entry.ExceptionType.Assembly.Name,
-                    TypeOwnershipLossObserved = true,
+                    TypeOwnershipLossObserved = false, // R6: new A10 output, historical B25 witness is preserved.
                     CurrentHistoricalParityDoesNotProveOwnership = true,
                     FinalFindingAdmission = false
                 });
@@ -192,7 +214,8 @@ namespace XMLDocNormalizerTests.Worker
         public void StopRule_DoesNotIntroducePolicyRoutingAttestationOrPidWorkarounds()
         {
             string evaluator = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs"));
-            Assert.Contains("GetFirstSymbolForDeclarationId", evaluator);
+            Assert.DoesNotContain("GetFirstSymbolForDeclarationId", evaluator); // P16
+            Assert.Contains("RoslynCanonicalIdentityResolver", evaluator);
             string external = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"));
             Assert.Contains("Solution is not admitted", external); Assert.DoesNotContain("SupportingProjects", external);
             string client = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/Historical/HistoricalWorkerClient.cs"));
@@ -290,6 +313,6 @@ namespace XMLDocNormalizerTests.Worker
         private static string Failure(ExternalExceptionFlowAnalysisResult result) => result.PayloadProjection.Failure?.Message + ": " + result.Dispatch?.Routing?.HistoricalAnalysis?.Failure?.Message;
         private static void Isolation() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
-        { string path = Path.Combine(Root(), "artifacts/p5o2b25/audit-cases", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, Json(value)); }
+        { string path = Path.Combine(Root(), "artifacts/p5o2b25a10/analysis/b25", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, Json(value)); } // R6: new witnesses only.
     }
 }

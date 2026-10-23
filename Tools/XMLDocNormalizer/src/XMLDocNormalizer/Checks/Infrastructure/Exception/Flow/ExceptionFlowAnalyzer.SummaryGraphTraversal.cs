@@ -38,7 +38,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -101,7 +101,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -211,6 +211,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 graph,
                 fragment,
                 callContext);
+
+            // A discovery sink observes coverage before an enclosing catch can
+            // remove flow. It has no concrete graph-registration capability.
+            graph.ObserveLocalFragment(fragment);
         }
 
         /// <summary>
@@ -238,7 +242,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             TryStatementSyntax tryStatement,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -256,7 +260,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SuppressCaughtSummaryFlow(
                 tryStatement,
                 semanticModel,
-                tryFragment);
+                tryFragment,
+                callContext);
 
             fragment.Merge(
                 tryFragment);
@@ -312,7 +317,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void SuppressCaughtSummaryFlow(
             TryStatementSyntax tryStatement,
             SemanticModel semanticModel,
-            ExceptionFlowSummaryFragment tryFragment)
+            ExceptionFlowSummaryFragment tryFragment,
+            ExceptionFlowCallContext callContext)
         {
             foreach (CatchClauseSyntax catchClause
                      in tryStatement.Catches)
@@ -339,7 +345,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     is INamedTypeSymbol caughtType)
                 {
                     tryFragment.SuppressCaughtException(
-                        caughtType);
+                        (INamedTypeSymbol)new ExceptionFlowInvocationSubstitution(callContext.InvocationSymbol,
+                            semanticModel.Compilation).Apply(caughtType));
                 }
             }
         }

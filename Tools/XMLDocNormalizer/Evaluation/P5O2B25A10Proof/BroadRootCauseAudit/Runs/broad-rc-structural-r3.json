@@ -1,0 +1,15 @@
+{
+    "Name":  "broad-rc-structural-r3",
+    "StartedUtc":  "2026-10-23T15:05:19.0010227Z",
+    "FinishedUtc":  "2026-10-23T15:05:22.3059075Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:/Repository/SEE/Tools/XMLDocNormalizer",
+    "Arguments":  [
+                      "artifacts/p5o2b25a10/broad-rc-probe-bin-r6/Probe.dll",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/b25a10-development-13",
+                      "D:/Repository/SEE/Tools/XMLDocNormalizer/artifacts/p5o2b25a10/broad-rc-structural-r3.json",
+                      "structural"
+                  ]
+}

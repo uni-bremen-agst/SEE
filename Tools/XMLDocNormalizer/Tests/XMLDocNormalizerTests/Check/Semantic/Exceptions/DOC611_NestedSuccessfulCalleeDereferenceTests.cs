@@ -42,7 +42,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalSourceHelperInInvocationReceiver_ProjectTransitive_DoesNotProveArgumentNonNull()
         {
-            AssertConditionalSourceHelperInInvocationReceiverDoesNotProveArgumentNonNull(
+            AssertConditionalSourceHelperInInvocationReceiverDoesNotProveArgumentNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -54,7 +54,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalSourceHelperInInvocationReceiver_SolutionTransitive_DoesNotProveArgumentNonNull()
         {
-            AssertConditionalSourceHelperInInvocationReceiverDoesNotProveArgumentNonNull(
+            AssertConditionalSourceHelperInInvocationReceiverDoesNotProveArgumentNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -198,6 +198,59 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(
                 findings);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertConditionalSourceHelperInInvocationReceiverDoesNotProveArgumentNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class TestClass
+                {
+                    /// <summary>Validates an item after conditionally observing it.</summary>
+                    public void M(Item? item)
+                    {
+                        int hash = Prepare(item).GetHashCode();
+                        _ = hash;
+                        Validate(item);
+                    }
+
+                    private static Marker Prepare(Item? item)
+                    {
+                        if (item != null)
+                        {
+                            _ = item.Name;
+                        }
+
+                        return new Marker();
+                    }
+
+                    private static void Validate(Item? item)
+                    {
+                        ArgumentNullException.ThrowIfNull(item);
+                    }
+
+                    private sealed class Marker
+                    {
+                    }
+
+                    public sealed class Item
+                    {
+                        public string Name => string.Empty;
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
         }
 
         /// <summary>

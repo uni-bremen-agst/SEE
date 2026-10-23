@@ -65,7 +65,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInIfCondition_ProjectTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInIfConditionDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInIfConditionDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -77,7 +77,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionalAccessInIfCondition_SolutionTransitive_DoesNotProveReceiverNonNull()
         {
-            AssertConditionalAccessInIfConditionDoesNotProveReceiverNonNull(
+            AssertConditionalAccessInIfConditionDoesNotProveReceiverNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -88,7 +88,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionWritingReceiverAfterDereference_ProjectTransitive_DoesNotProveFinalValueNonNull()
         {
-            AssertConditionWritingReceiverAfterDereferenceDoesNotProveFinalValueNonNull(
+            AssertConditionWritingReceiverAfterDereferenceDoesNotProveFinalValueNonNullA10Outside(
                 ExceptionAnalysisMode.ProjectTransitive);
         }
 
@@ -99,7 +99,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         [Fact]
         public void ConditionWritingReceiverAfterDereference_SolutionTransitive_DoesNotProveFinalValueNonNull()
         {
-            AssertConditionWritingReceiverAfterDereferenceDoesNotProveFinalValueNonNull(
+            AssertConditionWritingReceiverAfterDereferenceDoesNotProveFinalValueNonNullA10Outside(
                 ExceptionAnalysisMode.SolutionTransitive);
         }
 
@@ -231,6 +231,41 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 findings);
         }
 
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertConditionalAccessInIfConditionDoesNotProveReceiverNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                "public sealed class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates an optionally accessed item.</summary>\n" +
+                "    public void M(Item? item)\n" +
+                "    {\n" +
+                "        if (item?.Value == null)\n" +
+                "        {\n" +
+                "            Validate(item);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(Item? item)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(item);\n" +
+                "    }\n" +
+                "\n" +
+                "    public sealed class Item\n" +
+                "    {\n" +
+                "        public object? Value { get; set; }\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
+        }
+
         /// <summary>
         /// Verifies the condition-write scenario for one transitive
         /// exception-analysis mode.
@@ -272,6 +307,42 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(
                 findings);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertConditionWritingReceiverAfterDereferenceDoesNotProveFinalValueNonNullA10Outside(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                "public sealed class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates the value left by the condition.</summary>\n" +
+                "    public void M(Item? item)\n" +
+                "    {\n" +
+                "        if (item.Value == null &&\n" +
+                "            (item = null) == null)\n" +
+                "        {\n" +
+                "            Validate(item);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(Item? item)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(item);\n" +
+                "    }\n" +
+                "\n" +
+                "    public sealed class Item\n" +
+                "    {\n" +
+                "        public object? Value { get; set; }\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, mode);
         }
 
         /// <summary>

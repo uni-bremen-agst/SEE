@@ -26,7 +26,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph)
+            IExceptionFlowSummaryTargetSink graph)
         {
             if (requestedTarget.DeclaringSyntaxReferences.Length == 0
                 && semanticContext.TryResolveSupportingSourceMethod(
@@ -42,11 +42,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     resolution.Scope);
             }
 
-            ExceptionFlowCallableKey requestedKey =
-                new(requestedTarget, requestedContext);
-
-            graph.GetOrAdd(requestedKey, requestedContext);
-            return requestedKey;
+            return graph.RegisterTarget(requestedTarget, requestedContext);
         }
 
         /// <summary>
@@ -65,7 +61,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             Compilation bindingCompilation)
         {
             if (requestedTarget.DeclaringSyntaxReferences.Length == 0
@@ -107,7 +103,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol requestedTarget,
             ExceptionFlowCallContext requestedContext,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             IMethodSymbol supportingSourceTarget,
             ExceptionFlowSemanticScope supportingSourceScope)
         {
@@ -125,11 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     memberSymbol,
                     supportingSourceScope.Compilation));
 
-            ExceptionFlowCallableKey supportingSourceKey =
-                new(supportingSourceTarget, supportingSourceContext);
-
-            graph.GetOrAdd(supportingSourceKey, supportingSourceContext);
-            return supportingSourceKey;
+            return graph.RegisterTarget(supportingSourceTarget, supportingSourceContext);
         }
     }
 }

@@ -91,6 +91,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             get { return callContext?.CanonicalContext; }
         }
 
+        /// <summary>Gets the invocation frame for the production registration barrier.</summary>
+        internal ExceptionFlowCallContext? CallContext => callContext;
+
         /// <summary>
         /// Determines whether this key identifies the same callable and call
         /// context as another key.
@@ -118,7 +121,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return SymbolEqualityComparer.Default.Equals(Symbol, other.Symbol)
-                && StringComparer.Ordinal.Equals(ContextKey, other.ContextKey);
+                && StringComparer.Ordinal.Equals(ContextKey, other.ContextKey)
+                && StringComparer.Ordinal.Equals(ConstructionKey, other.ConstructionKey);
         }
 
         /// <summary>
@@ -150,7 +154,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             return HashCode.Combine(
                 SymbolEqualityComparer.Default.GetHashCode(Symbol),
-                StringComparer.Ordinal.GetHashCode(ContextKey));
+                StringComparer.Ordinal.GetHashCode(ContextKey),
+                StringComparer.Ordinal.GetHashCode(ConstructionKey));
+        }
+
+        /// <summary>
+        /// Keeps exact invocation construction separate from the legacy fact
+        /// key and declaration handle. String-only diagnostic keys retain their
+        /// historical definition identity; production never creates such keys.
+        /// </summary>
+        private string ConstructionKey
+        {
+            get
+            {
+                CanonicalExceptionFlowCallContext? context = CanonicalContext;
+                if (context?.Callable == null) return string.Empty;
+                if (context.MemberFacts.Length == 0 && context.Callable.Equals(CanonicalIdentity)) return string.Empty;
+                return context.Key;
+            }
         }
 
         /// <summary>

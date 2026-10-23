@@ -64,6 +64,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal ExceptionFlowAnalysisResult Analyze(
             MemberDeclarationSyntax member)
         {
+            ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext);
+            if (!admission.Outcome.Complete) return Outside(admission.Outcome, admission.DiagnoseGroundFacts());
+            bool completed = false;
+            try
+            {
+            graph.BeginProduction(admission.Seal, semanticContext);
             if (!semanticContext.TryGetSemanticModel(
                     member.SyntaxTree,
                     out SemanticModel rootSemanticModel) ||
@@ -74,16 +80,54 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     out ExceptionFlowCallableKey? rootKey) ||
                 rootKey == null)
             {
-                return new ExceptionFlowAnalysisResult();
+                return Outside(WithReason(admission.Outcome, new("OwnerBindingFailure", "Admitted root could not be registered.")));
             }
 
             BuildPendingSummaryNodes(
                 graph);
 
-            return evaluator.Evaluate(
+            ExceptionFlowAnalysisResult result = evaluator.Evaluate(
                 graph,
                 rootKey,
                 rootSemanticModel.Compilation);
+            if (result.HasUncertainPaths)
+                return Outside(WithReason(admission.Outcome, new("TargetOrAnalysisCoverageIncomplete", "Concrete evaluation has incomplete coverage.")));
+            var resolver = new Canonical.RoslynCanonicalIdentityResolver(rootSemanticModel.Compilation);
+            foreach (var type in result.ThrownExceptions.Concat(result.ExternalDocumentationEvidenceExceptions))
+                if (resolver.ResolveType(Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(type)) is not Microsoft.CodeAnalysis.INamedTypeSymbol)
+                    return Outside(WithReason(admission.Outcome, new("OwnerBindingFailure", "Required exact result projection has no unique destination binding: "
+                        + Canonical.CanonicalIdentityKeyWriter.Write(Canonical.RoslynCanonicalIdentityFactory.CreateTypeIdentity(type)))));
+            // Existing path limits are projection policy, not a termination bound.
+            if (result.ThrownExceptions.Any(result.ArePathsTruncated)
+                || result.ExternalDocumentationEvidenceExceptions.Any(result.AreExternalDocumentationEvidencePathsTruncated))
+            {
+                // Retain explicitly uncertified diagnostic paths; consumers must
+                // use the typed outcome, never promote these to exact findings.
+                result.ProfileOutcome = WithReason(admission.Outcome, new("ProjectionNotCertifiedComplete", "Required flow paths are truncated."));
+                return result;
+            }
+            result.ProfileOutcome = admission.Outcome;
+            completed = true;
+            return result;
+            }
+            catch (ExceptionFlowProfileViolation violation)
+            {
+                return Outside(WithReason(admission.Outcome, violation.Reason));
+            }
+            finally { graph.EndProduction(completed); }
+        }
+
+        private static ExceptionFlowFiniteOrbitProfile.Certificate WithReason(
+            ExceptionFlowFiniteOrbitProfile.Certificate certificate, ExceptionFlowFiniteOrbitProfile.Reason reason)
+            => certificate with { Complete = false, Reasons = certificate.Reasons.Append(reason).Distinct()
+                .OrderBy(item => item.Category, StringComparer.Ordinal).ThenBy(item => item.Witness, StringComparer.Ordinal).ToArray() };
+
+        private static ExceptionFlowAnalysisResult Outside(ExceptionFlowFiniteOrbitProfile.Certificate certificate,
+            ExceptionFlowProfileDiagnostics? diagnostics = null)
+        {
+            ExceptionFlowAnalysisResult result = new() { ProfileOutcome = certificate, ProfileDiagnostics = diagnostics };
+            result.UncertainTargets.UnionWith(certificate.Details);
+            return result;
         }
     }
 }

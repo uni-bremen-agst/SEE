@@ -37,7 +37,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal static bool AnalyzeSummarySymbolDeclarations(
             ISymbol symbol,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -429,7 +429,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             LocalFunctionStatementSyntax localFunction,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -481,7 +481,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnonymousFunctionExpressionSyntax anonymousFunction,
             SemanticModel semanticModel,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
@@ -541,7 +541,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool AnalyzeSummaryAccessor(
             AccessorDeclarationSyntax accessor,
             ExceptionFlowSemanticEnvironment semanticContext,
-            ExceptionFlowSummaryGraph graph,
+            IExceptionFlowSummaryTargetSink graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {

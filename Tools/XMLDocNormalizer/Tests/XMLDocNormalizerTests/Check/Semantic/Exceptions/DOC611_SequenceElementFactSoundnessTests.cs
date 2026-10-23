@@ -135,7 +135,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertSingleArgumentNullFindingInBothTransitiveModes(source);
+            AssertSingleArgumentNullFindingInBothTransitiveModesA10Outside(source);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertSingleArgumentNullFindingInBothTransitiveModes(source);
+            AssertSingleArgumentNullFindingInBothTransitiveModesA10Outside(source);
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertSingleArgumentNullFindingInBothTransitiveModes(source);
+            AssertSingleArgumentNullFindingInBothTransitiveModesA10Outside(source);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            AssertSingleArgumentNullFindingInBothTransitiveModes(source);
+            AssertSingleArgumentNullFindingInBothTransitiveModesA10Outside(source);
         }
 
         /// <summary>
@@ -319,6 +319,25 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullFinding(projectFinding);
             AssertArgumentNullFinding(solutionFinding);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertSingleArgumentNullFindingInBothTransitiveModesA10Outside(
+            string source)
+        {
+            List<Finding> projectFindings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            List<Finding> solutionFindings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.SolutionTransitive);
+
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, projectFindings, ExceptionAnalysisMode.ProjectTransitive);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, solutionFindings, ExceptionAnalysisMode.SolutionTransitive);
+
         }
 
         /// <summary>

@@ -1,0 +1,642 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="4bf0f5e9-9a86-4473-86e3-574ccc18df2c" name="Krause@KRAUSEM 2026-10-23 20:37:12" runUser="Krausem\CodexSandboxOffline" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-23T20:37:12.3569627+02:00" queuing="2026-10-23T20:37:12.3569629+02:00" start="2026-10-23T20:37:09.1262312+02:00" finish="2026-10-23T20:37:54.7341988+02:00" />
+  <TestSettings name="default" id="982375db-90b1-404a-90b1-b12b4ecd0168">
+    <Deployment runDeploymentRoot="Krause_KRAUSEM_2026-10-23_20_37_12" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5824342b-fe15-41c7-967a-4d122cb629d2" testId="df12c3bc-8834-10ef-7cf0-fa87fb63dafd" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;root&quot;)" computerName="KRAUSEM" duration="00:00:01.0474100" startTime="2026-10-23T20:37:15.5647540+02:00" endTime="2026-10-23T20:37:15.5647542+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5824342b-fe15-41c7-967a-4d122cb629d2" />
+    <UnitTestResult executionId="195da184-acb2-423e-9b01-0551984255fb" testId="4b921646-90cf-60e6-69cd-49d6457e5192" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;direct&quot;)" computerName="KRAUSEM" duration="00:00:00.7227498" startTime="2026-10-23T20:37:43.3533251+02:00" endTime="2026-10-23T20:37:43.3533254+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="195da184-acb2-423e-9b01-0551984255fb" />
+    <UnitTestResult executionId="132e6ec0-f207-4b32-866c-21b8955675d5" testId="c835f458-4885-7f06-f3c8-2d9c533d9458" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;positional&quot;)" computerName="KRAUSEM" duration="00:00:00.0000787" startTime="2026-10-23T20:37:41.1948605+02:00" endTime="2026-10-23T20:37:41.1948606+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="132e6ec0-f207-4b32-866c-21b8955675d5" />
+    <UnitTestResult executionId="b3d461c9-a339-47f7-9559-f267f8819d1f" testId="f1ca3725-8e24-eced-ae00-12c21cc5e4c3" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;sarif&quot;)" computerName="KRAUSEM" duration="00:00:02.8876928" startTime="2026-10-23T20:37:49.2105882+02:00" endTime="2026-10-23T20:37:49.2105884+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b3d461c9-a339-47f7-9559-f267f8819d1f" />
+    <UnitTestResult executionId="2d6f2d60-7468-4d7f-ade6-c3c6424e2f98" testId="59a5e3a2-95a2-dbf9-35b2-be1bc9ea087f" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;checksum&quot;)" computerName="KRAUSEM" duration="00:00:01.0132578" startTime="2026-10-23T20:37:13.9807604+02:00" endTime="2026-10-23T20:37:13.9807607+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d6f2d60-7468-4d7f-ade6-c3c6424e2f98" />
+    <UnitTestResult executionId="2d580b0a-c2bc-4a21-982c-4dd5dc39b07c" testId="984f1061-b14b-d14d-12d2-427840f0ee9f" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-pe&quot;)" computerName="KRAUSEM" duration="00:00:00.8733466" startTime="2026-10-23T20:37:12.1366326+02:00" endTime="2026-10-23T20:37:12.1366329+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d580b0a-c2bc-4a21-982c-4dd5dc39b07c" />
+    <UnitTestResult executionId="88857451-ca82-4a9d-a0be-187fb6ccac32" testId="913183dc-c839-9051-5167-e0fc508d5fbd" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--compare-exception-analysis-modes&quot;)" computerName="KRAUSEM" duration="00:00:00.0001200" startTime="2026-10-23T20:37:41.1950292+02:00" endTime="2026-10-23T20:37:41.1950293+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88857451-ca82-4a9d-a0be-187fb6ccac32" />
+    <UnitTestResult executionId="e8dfe6a4-8e08-4946-bf9d-963e0dc55033" testId="396a4138-a59a-080b-6194-50dc82e9ed43" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;json&quot;)" computerName="KRAUSEM" duration="00:00:02.8971548" startTime="2026-10-23T20:37:52.1078822+02:00" endTime="2026-10-23T20:37:52.1078825+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8dfe6a4-8e08-4946-bf9d-963e0dc55033" />
+    <UnitTestResult executionId="63d489c4-39ce-4801-b95b-8e8a786abb04" testId="3ac046a0-f5be-170e-7c84-ab3b780347b5" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;project-transitive&quot;)" computerName="KRAUSEM" duration="00:00:00.7283286" startTime="2026-10-23T20:37:42.6303874+02:00" endTime="2026-10-23T20:37:42.6303883+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="63d489c4-39ce-4801-b95b-8e8a786abb04" />
+    <UnitTestResult executionId="9ff827f0-90e5-4ec5-a446-23dbcc55c6ad" testId="90b0e001-5457-f902-880c-5751dcb6b74e" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;json&quot;)" computerName="KRAUSEM" duration="00:00:02.7909061" startTime="2026-10-23T20:37:38.3491932+02:00" endTime="2026-10-23T20:37:38.3491935+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9ff827f0-90e5-4ec5-a446-23dbcc55c6ad" />
+    <UnitTestResult executionId="fc12ccf1-a6be-4331-8ed7-68e58dd7cf58" testId="afb0dd2b-f189-7951-7c5b-5252ffb642a2" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;profile&quot;)" computerName="KRAUSEM" duration="00:00:00.5363459" startTime="2026-10-23T20:37:14.5171929+02:00" endTime="2026-10-23T20:37:14.5171931+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc12ccf1-a6be-4331-8ed7-68e58dd7cf58" />
+    <UnitTestResult executionId="c8b27a88-5987-499f-93b8-31841b81a910" testId="9768e7ca-76b3-88bb-4991-c64b93bf2dac" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;unknown-property&quot;)" computerName="KRAUSEM" duration="00:00:00.8307069" startTime="2026-10-23T20:37:12.9674390+02:00" endTime="2026-10-23T20:37:12.9674392+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8b27a88-5987-499f-93b8-31841b81a910" />
+    <UnitTestResult executionId="0f7cdfab-362b-4d30-97e5-f19f41e32ffd" testId="33a2bf9f-fd2b-6223-40a0-e41f329f4df1" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;contract&quot;)" computerName="KRAUSEM" duration="00:00:01.1999278" startTime="2026-10-23T20:37:18.9291986+02:00" endTime="2026-10-23T20:37:18.9291987+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f7cdfab-362b-4d30-97e5-f19f41e32ffd" />
+    <UnitTestResult executionId="4ab63d52-ff70-42c4-99ff-d2894ce3b26a" testId="2b312c44-ddf2-19a6-a650-9b62e303065d" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--force-historical&quot;)" computerName="KRAUSEM" duration="00:00:00.0000869" startTime="2026-10-23T20:37:41.1951656+02:00" endTime="2026-10-23T20:37:41.1951657+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4ab63d52-ff70-42c4-99ff-d2894ce3b26a" />
+    <UnitTestResult executionId="aa254437-cf90-49a1-b65d-79d63485f7f5" testId="d8d1c652-bcff-2759-2a21-5be76615c881" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ToolRunner_UsesOrdinaryRunResultExactlyOnceAndRetainsIsolation" computerName="KRAUSEM" duration="00:00:02.5306071" startTime="2026-10-23T20:37:54.6386393+02:00" endTime="2026-10-23T20:37:54.6386395+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aa254437-cf90-49a1-b65d-79d63485f7f5" />
+    <UnitTestResult executionId="e9a28160-827a-491f-a5bd-40504b602f8c" testId="0862a728-3dbb-da3d-9bf2-3ce2d3bf09f3" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;worker-missing&quot;)" computerName="KRAUSEM" duration="00:00:00.8228232" startTime="2026-10-23T20:37:23.8168646+02:00" endTime="2026-10-23T20:37:23.8168647+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e9a28160-827a-491f-a5bd-40504b602f8c" />
+    <UnitTestResult executionId="399c89e7-9513-4ca7-9536-ef5c0b9c23da" testId="9ab678b0-2f90-12ea-0867-8a0741ba70d5" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;sarif&quot;)" computerName="KRAUSEM" duration="00:00:02.7907684" startTime="2026-10-23T20:37:35.5580567+02:00" endTime="2026-10-23T20:37:35.5580570+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="399c89e7-9513-4ca7-9536-ef5c0b9c23da" />
+    <UnitTestResult executionId="10a0b2b3-7a96-4b22-842d-8b72a32fd90d" testId="06455326-c53b-b654-e867-873525d720ec" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;signed&quot;)" computerName="KRAUSEM" duration="00:00:00.3312453" startTime="2026-10-23T20:37:16.7486553+02:00" endTime="2026-10-23T20:37:16.7486554+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="10a0b2b3-7a96-4b22-842d-8b72a32fd90d" />
+    <UnitTestResult executionId="3b431bbd-52ae-4c87-a740-732403de1f2e" testId="ce4b2994-512e-5383-0f21-478d84293a8b" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;duplicate-property&quot;)" computerName="KRAUSEM" duration="00:00:00.8370730" startTime="2026-10-23T20:37:22.9939067+02:00" endTime="2026-10-23T20:37:22.9939069+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3b431bbd-52ae-4c87-a740-732403de1f2e" />
+    <UnitTestResult executionId="918258b7-370f-4319-a818-c8d44a01d9ec" testId="3be4c07c-e042-0a3b-31e7-0bef20332dc4" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--enable-statistics&quot;)" computerName="KRAUSEM" duration="00:00:00.0002425" startTime="2026-10-23T20:37:41.1947506+02:00" endTime="2026-10-23T20:37:41.1947506+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="918258b7-370f-4319-a818-c8d44a01d9ec" />
+    <UnitTestResult executionId="dbe7ebaf-8751-4a94-aa7e-0d91be5a0341" testId="6b30918a-1d82-dca0-d3cc-0536270a8f5b" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;console&quot;)" computerName="KRAUSEM" duration="00:00:02.9693387" startTime="2026-10-23T20:37:46.3227671+02:00" endTime="2026-10-23T20:37:46.3227673+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dbe7ebaf-8751-4a94-aa7e-0d91be5a0341" />
+    <UnitTestResult executionId="7a3f1c45-b67b-42e4-98a8-46cef398a4b1" testId="fe35c545-28c4-0e4b-cd3e-7e2fdb6ac8d6" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;invalid-pdb&quot;)" computerName="KRAUSEM" duration="00:00:01.0849063" startTime="2026-10-23T20:37:20.0142887+02:00" endTime="2026-10-23T20:37:20.0142889+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7a3f1c45-b67b-42e4-98a8-46cef398a4b1" />
+    <UnitTestResult executionId="7e738b36-74ca-4d8d-81b2-063c93a2c6ae" testId="b5cecdff-e174-a662-e9a3-335c5d9b7caa" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;console&quot;)" computerName="KRAUSEM" duration="00:00:02.8406354" startTime="2026-10-23T20:37:41.1899208+02:00" endTime="2026-10-23T20:37:41.1899211+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7e738b36-74ca-4d8d-81b2-063c93a2c6ae" />
+    <UnitTestResult executionId="133c720b-0096-46a3-892d-0139ea288266" testId="16546e65-c7b7-4d9b-d4fb-ffd080aa14b0" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;attestation&quot;)" computerName="KRAUSEM" duration="00:00:03.0936961" startTime="2026-10-23T20:37:26.9108307+02:00" endTime="2026-10-23T20:37:26.9108314+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="133c720b-0096-46a3-892d-0139ea288266" />
+    <UnitTestResult executionId="4219d6c0-9955-4577-923e-8a6aae9221a5" testId="f2563f43-63e0-7e3d-7a70-e1304e108865" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;ambiguous-root&quot;)" computerName="KRAUSEM" duration="00:00:01.0879507" startTime="2026-10-23T20:37:21.1023872+02:00" endTime="2026-10-23T20:37:21.1023873+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4219d6c0-9955-4577-923e-8a6aae9221a5" />
+    <UnitTestResult executionId="032ae152-29da-4a97-bbad-bfcd515907d9" testId="0ae98220-d325-ec70-837a-90f529916a61" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;root-source&quot;)" computerName="KRAUSEM" duration="00:00:00.8524134" startTime="2026-10-23T20:37:16.4173039+02:00" endTime="2026-10-23T20:37:16.4173040+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="032ae152-29da-4a97-bbad-bfcd515907d9" />
+    <UnitTestResult executionId="090a02b8-12a3-45e6-aca7-f01f9b13be9e" testId="5398780d-31b2-81df-204a-10103d88d91c" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--full&quot;)" computerName="KRAUSEM" duration="00:00:00.0000651" startTime="2026-10-23T20:37:41.1952161+02:00" endTime="2026-10-23T20:37:41.1952162+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="090a02b8-12a3-45e6-aca7-f01f9b13be9e" />
+    <UnitTestResult executionId="a6adf5b1-e0f0-47ed-a5bb-c7a7aa8d38e0" testId="93965f9a-f284-390f-acf0-05d6b99139f8" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;worker-error&quot;)" computerName="KRAUSEM" duration="00:00:02.8592724" startTime="2026-10-23T20:37:31.3962388+02:00" endTime="2026-10-23T20:37:31.3962390+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a6adf5b1-e0f0-47ed-a5bb-c7a7aa8d38e0" />
+    <UnitTestResult executionId="ad74d410-496d-46a0-ab24-f24e66b7ae36" testId="773b392a-4e0b-1705-abb1-0bc534e688de" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-source&quot;)" computerName="KRAUSEM" duration="00:00:00.9857293" startTime="2026-10-23T20:37:32.7665966+02:00" endTime="2026-10-23T20:37:32.7665969+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad74d410-496d-46a0-ab24-f24e66b7ae36" />
+    <UnitTestResult executionId="ada5e2fc-1545-4d97-93ab-fcb855b1d6c4" testId="14dd9902-6756-d48c-7284-abcafe9c63a9" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;solution-transitive&quot;)" computerName="KRAUSEM" duration="00:00:00.7065674" startTime="2026-10-23T20:37:41.9018685+02:00" endTime="2026-10-23T20:37:41.9018687+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ada5e2fc-1545-4d97-93ab-fcb855b1d6c4" />
+    <UnitTestResult executionId="b78d743e-039b-435e-b41d-6dc1e2872afe" testId="341aece8-e1a0-933a-3ff3-8a0d4709a17c" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;signature&quot;)" computerName="KRAUSEM" duration="00:00:01.2014301" startTime="2026-10-23T20:37:11.2632381+02:00" endTime="2026-10-23T20:37:11.2632474+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b78d743e-039b-435e-b41d-6dc1e2872afe" />
+    <UnitTestResult executionId="48e0c31b-ff21-42c4-bfbb-98a58dd342bd" testId="d34ad096-90bd-d872-4af5-7d938b654a9d" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;reference&quot;)" computerName="KRAUSEM" duration="00:00:01.0541898" startTime="2026-10-23T20:37:22.1566677+02:00" endTime="2026-10-23T20:37:22.1566679+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="48e0c31b-ff21-42c4-bfbb-98a58dd342bd" />
+    <UnitTestResult executionId="20da44ff-396b-4158-937a-0590701a0c3a" testId="210cca29-5ac4-bc60-2fff-693dd2946cfe" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;wrong-pdb&quot;)" computerName="KRAUSEM" duration="00:00:01.6259150" startTime="2026-10-23T20:37:28.5368004+02:00" endTime="2026-10-23T20:37:28.5368005+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="20da44ff-396b-4158-937a-0590701a0c3a" />
+    <UnitTestResult executionId="0f145fcf-2503-48b4-b5f9-4eb42b60080f" testId="271e3126-dada-371b-272d-748861c9ad78" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--fix&quot;)" computerName="KRAUSEM" duration="00:00:00.0043644" startTime="2026-10-23T20:37:41.1944925+02:00" endTime="2026-10-23T20:37:41.1944926+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f145fcf-2503-48b4-b5f9-4eb42b60080f" />
+    <UnitTestResult executionId="f7d9f313-c689-4738-ad9d-ae0db1618268" testId="dc7d6ab4-73a6-2d9d-431d-78c5d57d699c" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;compiler&quot;)" computerName="KRAUSEM" duration="00:00:00.3843573" startTime="2026-10-23T20:37:31.7807469+02:00" endTime="2026-10-23T20:37:31.7807471+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7d9f313-c689-4738-ad9d-ae0db1618268" />
+    <UnitTestResult executionId="b680c1c3-aa6d-4cf0-91d2-4332a28ec4f9" testId="f14cd5c5-128e-19b9-f45e-6b538f538195" testName="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-pdb&quot;)" computerName="KRAUSEM" duration="00:00:00.9803887" startTime="2026-10-23T20:37:17.7291687+02:00" endTime="2026-10-23T20:37:17.7291691+02:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b680c1c3-aa6d-4cf0-91d2-4332a28ec4f9" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;sarif&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="f1ca3725-8e24-eced-ae00-12c21cc5e4c3">
+      <Execution id="b3d461c9-a339-47f7-9559-f267f8819d1f" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_ReportsExactlyOneHistoricalFinding" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--enable-statistics&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="3be4c07c-e042-0a3b-31e7-0bef20332dc4">
+      <Execution id="918258b7-370f-4319-a818-c8d44a01d9ec" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-pdb&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="f14cd5c5-128e-19b9-f45e-6b538f538195">
+      <Execution id="b680c1c3-aa6d-4cf0-91d2-4332a28ec4f9" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;json&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="90b0e001-5457-f902-880c-5751dcb6b74e">
+      <Execution id="9ff827f0-90e5-4ec5-a446-23dbcc55c6ad" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_NoFindingIsSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;contract&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="33a2bf9f-fd2b-6223-40a0-e41f329f4df1">
+      <Execution id="0f7cdfab-362b-4d30-97e5-f19f41e32ffd" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;console&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="6b30918a-1d82-dca0-d3cc-0536270a8f5b">
+      <Execution id="dbe7ebaf-8751-4a94-aa7e-0d91be5a0341" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_ReportsExactlyOneHistoricalFinding" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;sarif&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="9ab678b0-2f90-12ea-0867-8a0741ba70d5">
+      <Execution id="399c89e7-9513-4ca7-9536-ef5c0b9c23da" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_NoFindingIsSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;worker-error&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="93965f9a-f284-390f-acf0-05d6b99139f8">
+      <Execution id="a6adf5b1-e0f0-47ed-a5bb-c7a7aa8d38e0" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ToolRunner_UsesOrdinaryRunResultExactlyOnceAndRetainsIsolation" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="d8d1c652-bcff-2759-2a21-5be76615c881">
+      <Execution id="aa254437-cf90-49a1-b65d-79d63485f7f5" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ToolRunner_UsesOrdinaryRunResultExactlyOnceAndRetainsIsolation" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-pe&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="984f1061-b14b-d14d-12d2-427840f0ee9f">
+      <Execution id="2d580b0a-c2bc-4a21-982c-4dd5dc39b07c" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;reference&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="d34ad096-90bd-d872-4af5-7d938b654a9d">
+      <Execution id="48e0c31b-ff21-42c4-bfbb-98a58dd342bd" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;direct&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="4b921646-90cf-60e6-69cd-49d6457e5192">
+      <Execution id="195da184-acb2-423e-9b01-0551984255fb" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsOtherHistoricalFindingModes" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--fix&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="271e3126-dada-371b-272d-748861c9ad78">
+      <Execution id="0f145fcf-2503-48b4-b5f9-4eb42b60080f" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;positional&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="c835f458-4885-7f06-f3c8-2d9c533d9458">
+      <Execution id="132e6ec0-f207-4b32-866c-21b8955675d5" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_ReportsExactlyOneHistoricalFinding(format: &quot;json&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="396a4138-a59a-080b-6194-50dc82e9ed43">
+      <Execution id="e8dfe6a4-8e08-4946-bf9d-963e0dc55033" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_ReportsExactlyOneHistoricalFinding" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;root&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="df12c3bc-8834-10ef-7cf0-fa87fb63dafd">
+      <Execution id="5824342b-fe15-41c7-967a-4d122cb629d2" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;signed&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="06455326-c53b-b654-e867-873525d720ec">
+      <Execution id="10a0b2b3-7a96-4b22-842d-8b72a32fd90d" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;project-transitive&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="3ac046a0-f5be-170e-7c84-ab3b780347b5">
+      <Execution id="63d489c4-39ce-4801-b95b-8e8a786abb04" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsOtherHistoricalFindingModes" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsOtherHistoricalFindingModes(mode: &quot;solution-transitive&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="14dd9902-6756-d48c-7284-abcafe9c63a9">
+      <Execution id="ada5e2fc-1545-4d97-93ab-fcb855b1d6c4" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsOtherHistoricalFindingModes" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--force-historical&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="2b312c44-ddf2-19a6-a650-9b62e303065d">
+      <Execution id="4ab63d52-ff70-42c4-99ff-d2894ce3b26a" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;checksum&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="59a5e3a2-95a2-dbf9-35b2-be1bc9ea087f">
+      <Execution id="2d6f2d60-7468-4d7f-ade6-c3c6424e2f98" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;worker-missing&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="0862a728-3dbb-da3d-9bf2-3ce2d3bf09f3">
+      <Execution id="e9a28160-827a-491f-a5bd-40504b602f8c" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_NoFindingIsSuccess(format: &quot;console&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="b5cecdff-e174-a662-e9a3-335c5d9b7caa">
+      <Execution id="7e738b36-74ca-4d8d-81b2-063c93a2c6ae" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_NoFindingIsSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;attestation&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="16546e65-c7b7-4d9b-d4fb-ffd080aa14b0">
+      <Execution id="133c720b-0096-46a3-892d-0139ea288266" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;signature&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="341aece8-e1a0-933a-3ff3-8a0d4709a17c">
+      <Execution id="b78d743e-039b-435e-b41d-6dc1e2872afe" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;duplicate-property&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="ce4b2994-512e-5383-0f21-478d84293a8b">
+      <Execution id="3b431bbd-52ae-4c87-a740-732403de1f2e" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;root-source&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="0ae98220-d325-ec70-837a-90f529916a61">
+      <Execution id="032ae152-29da-4a97-bbad-bfcd515907d9" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;profile&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="afb0dd2b-f189-7951-7c5b-5252ffb642a2">
+      <Execution id="fc12ccf1-a6be-4331-8ed7-68e58dd7cf58" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;wrong-pdb&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="210cca29-5ac4-bc60-2fff-693dd2946cfe">
+      <Execution id="20da44ff-396b-4158-937a-0590701a0c3a" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;ambiguous-root&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="f2563f43-63e0-7e3d-7a70-e1304e108865">
+      <Execution id="4219d6c0-9955-4577-923e-8a6aae9221a5" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;unknown-property&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="9768e7ca-76b3-88bb-4991-c64b93bf2dac">
+      <Execution id="c8b27a88-5987-499f-93b8-31841b81a910" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;missing-source&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="773b392a-4e0b-1705-abb1-0bc534e688de">
+      <Execution id="ad74d410-496d-46a0-ab24-f24e66b7ae36" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--compare-exception-analysis-modes&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="913183dc-c839-9051-5167-e0fc508d5fbd">
+      <Execution id="88857451-ca82-4a9d-a0be-187fb6ccac32" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.ExternalArguments_RejectUnsupportedOperations(extra: &quot;--full&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="5398780d-31b2-81df-204a-10103d88d91c">
+      <Execution id="090a02b8-12a3-45e6-aca7-f01f9b13be9e" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="ExternalArguments_RejectUnsupportedOperations" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;compiler&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="dc7d6ab4-73a6-2d9d-431d-78c5d57d699c">
+      <Execution id="f7d9f313-c689-4738-ad9d-ae0db1618268" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+    <UnitTest name="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests.GenuineCli_RejectsWithoutFindingsFallbackOrSuccess(scenario: &quot;invalid-pdb&quot;)" storage="d:\repository\see\tools\xmldocnormalizer\artifacts\b25a10-development-17\tests\xmldocnormalizertests\bin\debug\net8.0\xmldocnormalizertests.dll" id="fe35c545-28c4-0e4b-cd3e-7e2fdb6ac8d6">
+      <Execution id="7a3f1c45-b67b-42e4-98a8-46cef398a4b1" />
+      <TestMethod codeBase="D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="XMLDocNormalizerTests.Worker.ExceptionFlowExternalTargetCliTests" name="GenuineCli_RejectsWithoutFindingsFallbackOrSuccess" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="df12c3bc-8834-10ef-7cf0-fa87fb63dafd" executionId="5824342b-fe15-41c7-967a-4d122cb629d2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b921646-90cf-60e6-69cd-49d6457e5192" executionId="195da184-acb2-423e-9b01-0551984255fb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c835f458-4885-7f06-f3c8-2d9c533d9458" executionId="132e6ec0-f207-4b32-866c-21b8955675d5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f1ca3725-8e24-eced-ae00-12c21cc5e4c3" executionId="b3d461c9-a339-47f7-9559-f267f8819d1f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="59a5e3a2-95a2-dbf9-35b2-be1bc9ea087f" executionId="2d6f2d60-7468-4d7f-ade6-c3c6424e2f98" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="984f1061-b14b-d14d-12d2-427840f0ee9f" executionId="2d580b0a-c2bc-4a21-982c-4dd5dc39b07c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="913183dc-c839-9051-5167-e0fc508d5fbd" executionId="88857451-ca82-4a9d-a0be-187fb6ccac32" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="396a4138-a59a-080b-6194-50dc82e9ed43" executionId="e8dfe6a4-8e08-4946-bf9d-963e0dc55033" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3ac046a0-f5be-170e-7c84-ab3b780347b5" executionId="63d489c4-39ce-4801-b95b-8e8a786abb04" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="90b0e001-5457-f902-880c-5751dcb6b74e" executionId="9ff827f0-90e5-4ec5-a446-23dbcc55c6ad" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="afb0dd2b-f189-7951-7c5b-5252ffb642a2" executionId="fc12ccf1-a6be-4331-8ed7-68e58dd7cf58" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9768e7ca-76b3-88bb-4991-c64b93bf2dac" executionId="c8b27a88-5987-499f-93b8-31841b81a910" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="33a2bf9f-fd2b-6223-40a0-e41f329f4df1" executionId="0f7cdfab-362b-4d30-97e5-f19f41e32ffd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2b312c44-ddf2-19a6-a650-9b62e303065d" executionId="4ab63d52-ff70-42c4-99ff-d2894ce3b26a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d8d1c652-bcff-2759-2a21-5be76615c881" executionId="aa254437-cf90-49a1-b65d-79d63485f7f5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0862a728-3dbb-da3d-9bf2-3ce2d3bf09f3" executionId="e9a28160-827a-491f-a5bd-40504b602f8c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9ab678b0-2f90-12ea-0867-8a0741ba70d5" executionId="399c89e7-9513-4ca7-9536-ef5c0b9c23da" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="06455326-c53b-b654-e867-873525d720ec" executionId="10a0b2b3-7a96-4b22-842d-8b72a32fd90d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ce4b2994-512e-5383-0f21-478d84293a8b" executionId="3b431bbd-52ae-4c87-a740-732403de1f2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3be4c07c-e042-0a3b-31e7-0bef20332dc4" executionId="918258b7-370f-4319-a818-c8d44a01d9ec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6b30918a-1d82-dca0-d3cc-0536270a8f5b" executionId="dbe7ebaf-8751-4a94-aa7e-0d91be5a0341" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fe35c545-28c4-0e4b-cd3e-7e2fdb6ac8d6" executionId="7a3f1c45-b67b-42e4-98a8-46cef398a4b1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b5cecdff-e174-a662-e9a3-335c5d9b7caa" executionId="7e738b36-74ca-4d8d-81b2-063c93a2c6ae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16546e65-c7b7-4d9b-d4fb-ffd080aa14b0" executionId="133c720b-0096-46a3-892d-0139ea288266" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f2563f43-63e0-7e3d-7a70-e1304e108865" executionId="4219d6c0-9955-4577-923e-8a6aae9221a5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0ae98220-d325-ec70-837a-90f529916a61" executionId="032ae152-29da-4a97-bbad-bfcd515907d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5398780d-31b2-81df-204a-10103d88d91c" executionId="090a02b8-12a3-45e6-aca7-f01f9b13be9e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="93965f9a-f284-390f-acf0-05d6b99139f8" executionId="a6adf5b1-e0f0-47ed-a5bb-c7a7aa8d38e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="773b392a-4e0b-1705-abb1-0bc534e688de" executionId="ad74d410-496d-46a0-ab24-f24e66b7ae36" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14dd9902-6756-d48c-7284-abcafe9c63a9" executionId="ada5e2fc-1545-4d97-93ab-fcb855b1d6c4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="341aece8-e1a0-933a-3ff3-8a0d4709a17c" executionId="b78d743e-039b-435e-b41d-6dc1e2872afe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d34ad096-90bd-d872-4af5-7d938b654a9d" executionId="48e0c31b-ff21-42c4-bfbb-98a58dd342bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="210cca29-5ac4-bc60-2fff-693dd2946cfe" executionId="20da44ff-396b-4158-937a-0590701a0c3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="271e3126-dada-371b-272d-748861c9ad78" executionId="0f145fcf-2503-48b4-b5f9-4eb42b60080f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dc7d6ab4-73a6-2d9d-431d-78c5d57d699c" executionId="f7d9f313-c689-4738-ad9d-ae0db1618268" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f14cd5c5-128e-19b9-f45e-6b538f538195" executionId="b680c1c3-aa6d-4cf0-91d2-4332a28ec4f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Ergebnisse nicht in einer Liste" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Alle geladenen Ergebnisse" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="36" executed="36" passed="36" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.24)&#xD;
+[xUnit.net 00:00:00.07]   Discovering: XMLDocNormalizerTests&#xD;
+[xUnit.net 00:00:00.66]   Discovered:  XMLDocNormalizerTests&#xD;
+[xUnit.net 00:00:00.66]   Starting:    XMLDocNormalizerTests&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Error: External targets require --check --external-target job.json; only format/output, verbose and the legacy Declared mode assertion are supported. Select new bounded modes with job.analysisMode. No positional target, rewrite, comparison or project-scope options.&#xD;
+XMLDocNormalizer - Checks and fixes C# XML documentation.&#xD;
+Usage:&#xD;
+  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]&#xD;
+                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]&#xD;
+                   [--compare-exception-analysis-modes]&#xD;
+  --external-target &lt;job.json&gt;  Explicit local v1 unsigned single-project/root job (--check only); optional job analysisMode: direct|project-transitive|project-transitive-declared-exceptions (default). Paths relative to job file; no discovery or downloads.&#xD;
+                   [--compare-value-documentation-modes]&#xD;
+                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]&#xD;
+                   [--value-documentation-mode mode]&#xD;
+Options:&#xD;
+  --check               Run in check-only mode (no changes).&#xD;
+  --fix                 Run in fix mode (modifies files).&#xD;
+  --full                Analyze all projects in a solution.&#xD;
+  --project &lt;name&gt;      Analyze only the specified project in a solution.&#xD;
+  --test                Use test mode (creates backups).&#xD;
+  --clean-backups       Remove any backup files after run.&#xD;
+  --verbose, -v         Enable verbose logging.&#xD;
+  --format &lt;console|json|sarif&gt;  Output format.&#xD;
+  --output &lt;path&gt;       File path for JSON/SARIF output.&#xD;
+  --exception-analysis-mode &lt;mode&gt;&#xD;
+                       Controls how exception documentation is analyzed.&#xD;
+                       Values:&#xD;
+                         direct&#xD;
+                           Reports only directly thrown exceptions. Alias: d.&#xD;
+                         project-transitive-declared-exceptions&#xD;
+                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.&#xD;
+                           Aliases: ptd, declared, project-declared, project-transitive-declared.&#xD;
+                         project-transitive&#xD;
+                           Follows calls within the reporting scope. Aliases: pt, project.&#xD;
+                         solution-transitive&#xD;
+                           Follows calls across the loaded solution project-reference closure.&#xD;
+                           Aliases: st, solution.&#xD;
+                       Default: solution-transitive.&#xD;
+  --value-documentation-mode &lt;mode&gt;&#xD;
+                       Controls when missing &lt;value&gt; documentation is reported.&#xD;
+                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.&#xD;
+                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.&#xD;
+                       Default: all-readable-properties.&#xD;
+  --compare-exception-analysis-modes&#xD;
+                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.&#xD;
+  --compare-value-documentation-modes&#xD;
+                       Executes all value-documentation modes and writes a comparison report.&#xD;
+  --exception-analysis-comparison-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n measured times.&#xD;
+                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.&#xD;
+                       Default: 1.&#xD;
+  --exception-analysis-comparison-warmup-runs &lt;n&gt;&#xD;
+                       Executes each exception analysis mode n warmup times before measured runs.&#xD;
+                       Warmup runs are excluded from timing statistics.&#xD;
+                       Default: 0.&#xD;
+  --enable-statistics           Generate statistics output for study/evaluation.&#xD;
+  --statistics-output &lt;path&gt;    Write statistics JSON to the specified path.&#xD;
+                       defaults to &lt;output&gt;_statistics.json when --output is set.&#xD;
+  --include-generated   Includes generated files in analysis and metrics.&#xD;
+  --include-tests       Includes test source files in analysis and metrics.&#xD;
+  --help, -h            Show this help message.&#xD;
+Examples:&#xD;
+  XMLDocNormalizer --check --format console src/&#xD;
+  XMLDocNormalizer --fix --test src/&#xD;
+  XMLDocNormalizer --check --full MySolution.sln&#xD;
+  XMLDocNormalizer --check --project MyProject MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln&#xD;
+  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln&#xD;
+  XMLDocNormalizer --check --compare-value-documentation-modes --format json --output value-comparison.json MySolution.sln&#xD;
+Running XMLDocNormalizer with target: D:\Repository\SEE\Tools\XMLDocNormalizer\artifacts\b25a10-development-17\artifacts\p5o2b23\fresh-c01fffc54d4040d28a0971223a88daca\job.json&#xD;
+Bounded external target: selected-root exception findings only; not a full project check.&#xD;
+[xUnit.net 00:00:45.27]   Finished:    XMLDocNormalizerTests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -235,6 +235,20 @@ namespace XMLDocNormalizer.Checks
                         directFlowResult,
                         summaryAnalysisSession);
 
+                if (flowResult.ProfileOutcome is { Complete: false })
+                {
+                    var diagnostic = flowResult.ProfileDiagnostics;
+                    AddExceptionFindingsCore<INamedTypeSymbol>(
+                        findings, NativeTags(tree, filePath, tagInfos),
+                        () => FindingAnchor(tree, filePath, MemberAnchorResolver.GetAnchorPosition(member),
+                            CreateExceptionFlowContext(member, null, filePath)),
+                        [], diagnostic?.ProvenLowerWitnesses ?? [], SymbolEqualityComparer.Default,
+                        type => type.InheritsFromOrEquals(exceptionBase), semanticContext.IsDeclaredInReportingScope,
+                        type => type.ToDisplayString(), options.ExceptionAnalysisMode, doc.HasInheritdoc(),
+                        diagnostic?.HasEscapingUncertainty ?? true, flowResult.UncertainTargets,
+                        diagnostic?.ExternalDocumentation ?? [], allowExactFindings: false);
+                    continue;
+                }
                 AddExceptionFindings<INamedTypeSymbol>(
                     findings, NativeTags(tree, filePath, tagInfos),
                     () => FindingAnchor(tree, filePath, MemberAnchorResolver.GetAnchorPosition(member),

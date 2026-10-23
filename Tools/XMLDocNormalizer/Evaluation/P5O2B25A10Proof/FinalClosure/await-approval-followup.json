@@ -1,0 +1,151 @@
+{
+    "CapturedUtc":  "2026-10-23T18:27:45.3852838Z",
+    "Status":  "STOP_FullForeignFixtureReaderLifetime_NoRetry",
+    "SourceDeltaExactlyApprovedDetailsBlock":  true,
+    "SourceDelta":  [
+                        {
+                            "Path":  "Tests/XMLDocNormalizerTests/Worker/HistoricalWorkerProcessTests.cs",
+                            "BeforeExport16":  "7410B03918FACA593ABB6025B74CA3B2945A65F8887AD0DCF3359D43B0515DCA",
+                            "CurrentAndExport17":  "672A4D48011FD67FD80301F102814EFB2B0C68A97E348C0EF143DD34863F4605"
+                        }
+                    ],
+    "ProductionFilesChangedThisContinuation":  0,
+    "ExistingOtherAssertionsChanged":  false,
+    "ExistingFailureCodeUnchangedFromExport16":  true,
+    "Results":  [
+                    {
+                        "Phase":  "await-first",
+                        "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\artifacts\\a10-closure-results\\await-first.trx",
+                        "Sha256":  "330B78C3A33B204C646CF719346E3CCBB66393ADB49FF4CFAD2D604DCD120D7F",
+                        "Counters":  {
+                                         "total":  1,
+                                         "executed":  1,
+                                         "passed":  1,
+                                         "failed":  0,
+                                         "error":  0,
+                                         "timeout":  0,
+                                         "aborted":  0,
+                                         "inconclusive":  0,
+                                         "passedButRunAborted":  0,
+                                         "notRunnable":  0,
+                                         "notExecuted":  0,
+                                         "disconnected":  0,
+                                         "warning":  0,
+                                         "completed":  0,
+                                         "inProgress":  0,
+                                         "pending":  0
+                                     },
+                        "Failures":  [
+
+                                     ],
+                        "Await":  [
+                                      {
+                                          "testName":  "XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure",
+                                          "outcome":  "Passed"
+                                      }
+                                  ]
+                    },
+                    {
+                        "Phase":  "broad",
+                        "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\artifacts\\a10-closure-results\\broad.trx",
+                        "Sha256":  "24F247DF2FF7C221022C7209DB02BD28C5143C21D44921CF6F7BCDA717BBE648",
+                        "Counters":  {
+                                         "total":  3338,
+                                         "executed":  3338,
+                                         "passed":  3338,
+                                         "failed":  0,
+                                         "error":  0,
+                                         "timeout":  0,
+                                         "aborted":  0,
+                                         "inconclusive":  0,
+                                         "passedButRunAborted":  0,
+                                         "notRunnable":  0,
+                                         "notExecuted":  0,
+                                         "disconnected":  0,
+                                         "warning":  0,
+                                         "completed":  0,
+                                         "inProgress":  0,
+                                         "pending":  0
+                                     },
+                        "Failures":  [
+
+                                     ],
+                        "Await":  [
+                                      {
+                                          "testName":  "XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure",
+                                          "outcome":  "Passed"
+                                      }
+                                  ]
+                    },
+                    {
+                        "Phase":  "full",
+                        "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\artifacts\\a10-closure-results\\full.trx",
+                        "Sha256":  "15DE06A70349D604F82DD2370C12AE46F5D628C34D194422A1D06F616AAA13E5",
+                        "Counters":  {
+                                         "total":  3429,
+                                         "executed":  3429,
+                                         "passed":  3428,
+                                         "failed":  1,
+                                         "error":  0,
+                                         "timeout":  0,
+                                         "aborted":  0,
+                                         "inconclusive":  0,
+                                         "passedButRunAborted":  0,
+                                         "notRunnable":  0,
+                                         "notExecuted":  0,
+                                         "disconnected":  0,
+                                         "warning":  0,
+                                         "completed":  0,
+                                         "inProgress":  0,
+                                         "pending":  0
+                                     },
+                        "Failures":  [
+                                         {
+                                             "Test":  "XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceFactoryTests.MultiModuleAssembly_FailsClosed",
+                                             "Message":  "Assert.Contains() Failure: Filter not matched in collection\r\nCollection: [System.Reflection.Metadata.AssemblyFile]",
+                                             "Stack":  "   at XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceFactoryTests.MultiModuleAssembly_FailsClosed() in D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17\\Tests\\XMLDocNormalizerTests\\Execution\\Semantic\\ExternalMetadataReferenceFactoryTests.cs:line 446\r\n   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)\r\n   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)"
+                                         }
+                                     ],
+                        "Await":  [
+                                      {
+                                          "testName":  "XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests.HistoricalAwait_ActuallyPropagatesUnavailableInformationAsFailure",
+                                          "outcome":  "Passed"
+                                      }
+                                  ]
+                    }
+                ],
+    "BroadGreen":  true,
+    "FullGreen":  false,
+    "ForeignFailure":  {
+                           "Test":  "ExternalMetadataReferenceFactoryTests.MultiModuleAssembly_FailsClosed",
+                           "Line":  446,
+                           "SourceSha256":  "4D959975EEFF758C31517E1D2C0C0EAAA2C805E5E9621B7E581FBB2A7A8420BC",
+                           "HistoricalSourceAndCurrentAndExportEqual":  true,
+                           "MetadataImageSha256":  "CD87C789B7FA364165590F841770CDD481ADF1478849B7F7FC6AD7972BEBAC3D",
+                           "HistoricalAndCurrentDependencyEqual":  true,
+                           "HistoricalDiagnosis":  "artifacts/p5o2b25a5/foreign-full-failure.json",
+                           "HistoricalDiagnosisSha256":  "339F52BC10D04ED3C549B1393C6A7BB4F1AC00857C2D67E21A20700AEFFF3352",
+                           "FactoryReached":  false,
+                           "AnalyzerReachedOnFailingPath":  false,
+                           "ReaderLifetimeHazardConfirmed":  true,
+                           "ExactFreedMemoryReuseProved":  false,
+                           "FixImplemented":  false,
+                           "TestRetried":  false
+                       },
+    "PreviousCliNativeCrashStillUnattributed":  true,
+    "NativeCrashObservedThisContinuation":  false,
+    "BoundaryExecuted":  false,
+    "DualExecuted":  false,
+    "Wae11Verified":  false,
+    "Current8BaselinesVerified":  false,
+    "A6A7A8A9GatesExecuted":  false,
+    "A10EvidenceGateExecuted":  false,
+    "AdditionalProductionHarnessPreparedButNotBuiltOrExecuted":  true,
+    "SelfAnalysisFresh":  false,
+    "CanonicalFindingDiffFresh":  false,
+    "B25BActivated":  false,
+    "A10Complete":  false,
+    "Commit":  false,
+    "Push":  false,
+    "StashOperation":  false
+}

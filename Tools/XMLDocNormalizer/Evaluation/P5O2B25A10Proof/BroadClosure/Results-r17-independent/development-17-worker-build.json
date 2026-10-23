@@ -1,0 +1,15 @@
+{
+    "Name":  "development-17-worker-build",
+    "StartedUtc":  "2026-10-23T18:16:40.2183886Z",
+    "FinishedUtc":  "2026-10-23T18:16:46.8552193Z",
+    "ExitCode":  0,
+    "Executable":  "dotnet",
+    "WorkingDirectory":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\b25a10-development-17",
+    "Arguments":  [
+                      "build",
+                      "src/XMLDocNormalizer.HistoricalWorker/XMLDocNormalizer.HistoricalWorker.csproj",
+                      "-p:UseSharedCompilation=false",
+                      "-warnaserror",
+                      "-v:minimal"
+                  ]
+}

@@ -289,7 +289,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertDownstreamArgumentNullExceptionPresentInBothTransitiveModes(source);
+            AssertDownstreamArgumentNullExceptionPresent(ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M"));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M"));
         }
 
         /// <summary>
@@ -333,7 +334,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertDownstreamArgumentNullExceptionPresentInBothTransitiveModes(source);
+            AssertDownstreamArgumentNullExceptionPresent(ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M"));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M"));
         }
 
         /// <summary>
@@ -378,7 +380,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertDownstreamArgumentNullExceptionPresentInBothTransitiveModes(source);
+            AssertDownstreamArgumentNullExceptionPresent(ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M"));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M"));
         }
 
         /// <summary>
@@ -437,7 +440,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertDownstreamArgumentNullExceptionPresentInBothTransitiveModes(source);
+            AssertDownstreamArgumentNullExceptionPresent(ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M"));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M"));
         }
 
         /// <summary>
@@ -535,7 +539,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertDownstreamArgumentNullExceptionPresentInBothTransitiveModes(source);
+            AssertDownstreamArgumentNullExceptionPresent(ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M"));
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M"));
         }
 
         /// <summary>

@@ -19,8 +19,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             string[] original = ReadSources(probePath);
 
             Assert.Equal(120, original.Length);
-            Assert.Equal(121, shared.Length);
-            Assert.Equal(121, shared.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+            Assert.Equal(125, shared.Length);
+            Assert.Equal(125, shared.Distinct(StringComparer.OrdinalIgnoreCase).Count());
             // The retained B1 Windows probe spells the same tracked Models/Dto path as Models/DTO.
             Assert.All(original, source => Assert.Contains(source, shared, StringComparer.OrdinalIgnoreCase));
             Assert.Single(shared.Except(original, StringComparer.OrdinalIgnoreCase),

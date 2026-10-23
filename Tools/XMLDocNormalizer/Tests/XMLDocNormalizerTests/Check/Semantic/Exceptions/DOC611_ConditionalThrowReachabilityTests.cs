@@ -165,12 +165,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Finding finding = Assert.Single(findings);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(source, findings, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Contains(
-                "System.ArgumentException",
-                finding.Message,
-                StringComparison.Ordinal);
         }
 
         /// <summary>

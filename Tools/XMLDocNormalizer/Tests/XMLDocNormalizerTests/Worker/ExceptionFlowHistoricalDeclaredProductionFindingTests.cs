@@ -83,7 +83,7 @@ namespace XMLDocNormalizerTests.Worker
             JsonElement? graph = null;
             if (scenario == "guard-direct")
             {
-                Assert.False(projectCall.Succeeded); Assert.Equal(WorkerFailureCode.AnalysisFailure,
+                Assert.False(projectCall.Succeeded); Assert.Equal(WorkerFailureCode.UnsupportedContext,
                     projectCall.Dispatch!.Routing!.HistoricalAnalysis!.Failure!.WorkerFailure!.Code);
                 Assert.Single(first.Findings); Assert.Equal("DOC610", first.Findings[0].Smell.ID);
                 Assert.Equal(0, declared.GetProperty("graphCount").GetInt32());
@@ -253,7 +253,7 @@ namespace XMLDocNormalizerTests.Worker
             var result = await XmlDocExceptionSemanticDetector.FindExternalExceptionSmellsAsync(input, Dispatch());
             Assert.False(result.Succeeded); Assert.True(result.GuardReached); Assert.True(result.SummaryRequested); Assert.Empty(result.Findings);
             Assert.True(result.Direct.Succeeded); Assert.NotEmpty(result.Direct.Result!.Entries);
-            Assert.Equal(WorkerFailureCode.AnalysisFailure, result.Summary!.Dispatch!.Routing!.HistoricalAnalysis!.Failure!.WorkerFailure!.Code);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, result.Summary!.Dispatch!.Routing!.HistoricalAnalysis!.Failure!.WorkerFailure!.Code);
             Assert.Null(result.Summary.Result); Assert.Null(result.Direct.Dispatch!.Routing!.CurrentAnalysis); Assert.Null(result.Summary.Dispatch.Routing.CurrentAnalysis);
             Stopped(result.Direct.Dispatch.Routing.HistoricalAnalysis!); Stopped(result.Summary.Dispatch.Routing.HistoricalAnalysis!); NoHistoricalLoaded();
             await Evidence("worker-error", new { Historical = Snapshot(result), NoPartialFindings = true, NoFallback = true, ProcessesStopped = true });

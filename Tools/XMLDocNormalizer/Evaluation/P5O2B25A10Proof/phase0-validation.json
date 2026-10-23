@@ -1,0 +1,24 @@
+{
+  "Command": "powershell -NoProfile -ExecutionPolicy Bypass -File Evaluation/P5O2B25A10Proof/Verify-Phase0.ps1",
+  "ExitCode": 0,
+  "Phase": "0",
+  "Status": "PASS - protection/preflight only, not implementation closure",
+  "Head": "9b76e179a568c64ae972cc3a45980a094e44245e",
+  "IndexSha256": "CB38F3D3B845ABD54FEC4C2E111E77BFF7F31B80A73F438A657BAF03173F8158",
+  "ProtectedCore": 23,
+  "Stashes": 6,
+  "InheritedFilesVerified": 1092,
+  "CharacterizationFiles": 71,
+  "LiteralMatches": 513,
+  "ProductionOrTestChanges": 0,
+  "RuntimeTestsRun": false,
+  "BuildRun": false,
+  "Approval": "Pending R1-R6",
+  "Diagnostic": "Git reported the existing .gitignore LF-to-CRLF warning; no repair performed, protected hashes retained",
+  "GitStatus": [
+    " M ../../.gitignore",
+    "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection-audit.json",
+    "?? Evaluation/P5O2B25A10-finite-orbit-admission-and-projection.md",
+    "?? Evaluation/P5O2B25A10Proof/"
+  ]
+}

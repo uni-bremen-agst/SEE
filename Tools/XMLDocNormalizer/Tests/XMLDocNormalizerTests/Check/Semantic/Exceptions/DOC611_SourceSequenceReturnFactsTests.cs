@@ -209,7 +209,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -479,7 +479,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -529,7 +529,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -576,7 +576,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -604,7 +604,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -646,7 +646,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -683,7 +683,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -722,7 +722,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -765,7 +765,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -811,7 +811,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -896,7 +896,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -976,7 +976,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1013,7 +1013,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1053,7 +1053,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1094,7 +1094,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1139,7 +1139,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1181,7 +1181,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1210,7 +1210,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1254,7 +1254,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }
                 """;
 
-            AssertArgumentNullExceptionPresentInBothModes(source);
+            AssertArgumentNullExceptionPresentInBothModesA10Outside(source);
         }
 
         /// <summary>
@@ -1302,6 +1302,19 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             AssertArgumentNullExceptionPresent(projectRun);
             AssertArgumentNullExceptionPresent(solutionRun);
+        }
+
+        // A10: only explicitly approved outside-profile callers use this variant.
+        private static void AssertArgumentNullExceptionPresentInBothModesA10Outside(string source)
+        {
+            ExceptionFlowAnalyzerTestRun projectRun =
+                ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(source, "M");
+
+            ExceptionFlowAnalyzerTestRun solutionRun =
+                ExceptionFlowAnalyzerTestHelper.AnalyzeSolutionTransitively(source, "M");
+
+            AssertArgumentNullExceptionPresent(projectRun);
+            ExceptionFlowFiniteOrbitAssertions.CoverageOutside(solutionRun);
         }
 
         /// <summary>

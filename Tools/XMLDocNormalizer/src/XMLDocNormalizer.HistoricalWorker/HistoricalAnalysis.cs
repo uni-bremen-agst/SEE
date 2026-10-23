@@ -62,11 +62,14 @@ namespace XMLDocNormalizer.HistoricalWorker
             CanonicalExceptionFlowAnalysisResult result;
             try
             {
-                result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(
+                var native =
                     input.Context?.AnalysisMode == "direct" || input.Context?.DeclaredExecution == WorkerDeclaredExecution.DirectEvidence
                         || input.Context?.Finding?.Execution == WorkerDeclaredExecution.DirectEvidence
                         ? ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(member, environment)
-                        : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment));
+                        : ExceptionFlowSummaryAnalysisSession.AnalyzeSolutionTransitivelyThrownExceptions(member, environment);
+                if (native.ProfileOutcome is { Complete: false } outside)
+                    return Failure(WorkerFailureCode.UnsupportedContext, "Exception-flow request is outside A9-FiniteOrbit-v1.", identity, outside.Details);
+                result = RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(native);
             }
             catch (Exception exception)
             {

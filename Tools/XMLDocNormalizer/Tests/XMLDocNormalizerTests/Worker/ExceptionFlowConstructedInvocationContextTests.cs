@@ -36,9 +36,9 @@ namespace XMLDocNormalizerTests.Worker
             var definition = RoslynCanonicalIdentityFactory.CreateCallableIdentity(selected, normalizeToOriginalDefinition: true);
             Assert.Equal(scenario == "non-generic", exact.Equals(definition));
             Assert.True(SymbolEqualityComparer.Default.Equals(selected.OriginalDefinition, context.CallableSymbol));
-            Assert.Equal(definition, context.CanonicalContext!.Callable);
+            Assert.Equal(scenario == "non-generic" ? definition : exact, context.CanonicalContext!.Callable); // P01
             Assert.Empty(context.Key);
-            if (scenario is "method" or "both" or "nested") { Assert.NotEmpty(exact.TypeArguments); Assert.Empty(context.CanonicalContext.Callable!.TypeArguments); }
+            if (scenario is "method" or "both" or "nested") { Assert.NotEmpty(exact.TypeArguments); Assert.Equal(exact.TypeArguments, context.CanonicalContext.Callable!.TypeArguments); } // P01
             if (scenario is "containing" or "both" or "nested") { Assert.NotEqual(exact.ContainingType, definition.ContainingType); }
             var nodes = Nodes(run);
             Evidence("callsite-" + scenario, new
@@ -63,7 +63,7 @@ namespace XMLDocNormalizerTests.Worker
             var run = ExceptionFlowSummaryGraphTestHelper.Build(Fault + api + "public static class Entry { public static void Root() { " + calls + " } }", "Root");
             var edges = run.RootSummary.CallEdges;
             Assert.Equal(3, edges.Count);
-            Assert.Equal(edges[0].Target, edges[1].Target);
+            Assert.NotEqual(edges[0].Target, edges[1].Target); // P02; identical constructions below still reuse their key.
             Assert.Equal(edges[0].Target, edges[2].Target);
             var tree = run.Compilation.SyntaxTrees.Single();
             var model = run.Compilation.GetSemanticModel(tree);
@@ -87,17 +87,33 @@ namespace XMLDocNormalizerTests.Worker
                 ? "public static class Api<T> { public static void Recur() { if (Flags.Stop) throw new Fault<T>(); Api<" + next + ">.Recur(); } }"
                 : "public static class Api { public static void Recur<T>() { if (Flags.Stop) throw new Fault<T>(); Recur<" + next + ">(); } }";
             string call = containing ? "Api<int>.Recur();" : "Api.Recur<int>();";
-            var run = ExceptionFlowSummaryGraphTestHelper.Build(Fault + "public static class Flags { public static bool Stop; } " + api + " public static class Entry { public static void Root() { " + call + " } }", "Root");
-            var actualNode = Assert.Single(Nodes(run).Where(pair => pair.Key.Symbol.Name == "Recur"));
-            Assert.Contains(actualNode.Summary.CallEdges, edge => edge.Target.Equals(actualNode.Key));
-            var source = Assert.Single(actualNode.Summary.Sources);
-            Assert.IsAssignableFrom<ITypeParameterSymbol>(Assert.Single(source.ExceptionType.TypeArguments));
+            string program = Fault + "public static class Flags { public static bool Stop; } " + api + " public static class Entry { public static void Root() { " + call + " } }";
+            var production = ExceptionFlowFiniteOrbitAdmissionTests.Create(program);
+            var outcome = production.Session.Analyze(production.Root).ProfileOutcome!;
+            ExceptionFlowSummaryGraphTestRun? run = null;
+            CanonicalTypeIdentity? actualSource = null;
+            if (growing) // R1: do not execute an unbounded raw-graph experiment.
+            {
+                Assert.False(outcome.Complete);
+                Assert.Contains(outcome.Reasons, reason => reason.Category == "PositiveConstructorCycle");
+                Assert.Equal(0, ExceptionFlowFiniteOrbitAdmissionTests.Graph(production.Session).Count);
+            }
+            else
+            {
+                Assert.True(outcome.Complete, string.Join("\n", outcome.Details));
+                run = ExceptionFlowSummaryGraphTestHelper.Build(program, "Root");
+                var actualNode = Assert.Single(Nodes(run).Where(pair => pair.Key.Symbol.Name == "Recur"));
+                Assert.Contains(actualNode.Summary.CallEdges, edge => edge.Target.Equals(actualNode.Key));
+                var source = Assert.Single(actualNode.Summary.Sources);
+                Assert.Equal(SpecialType.System_Int32, Assert.Single(source.ExceptionType.TypeArguments).SpecialType); // P03
+                actualSource = RoslynCanonicalIdentityFactory.CreateTypeIdentity(source.ExceptionType);
+            }
 
-            var tree = run.Compilation.SyntaxTrees.Single();
-            var model = run.Compilation.GetSemanticModel(tree);
+            var tree = production.Compilation.SyntaxTrees.Single();
+            var model = production.Compilation.GetSemanticModel(tree);
             var root = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Single(item => item.Identifier.ValueText == "Root");
             var selected = (IMethodSymbol)model.GetSymbolInfo(root.DescendantNodes().OfType<InvocationExpressionSyntax>().Single()).Symbol!;
-            var list = run.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!;
+            var list = production.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!;
             var proposed = new ExceptionFlowSummaryGraph();
             var instances = new Dictionary<ExceptionFlowCallableKey, IMethodSymbol>();
             var visited = new HashSet<CanonicalCallableIdentity>();
@@ -130,8 +146,9 @@ namespace XMLDocNormalizerTests.Worker
             {
                 Containing = containing,
                 Growing = growing,
-                ActualDefinitionNodeCount = run.Graph.Count,
-                ActualOpenSource = RoslynCanonicalIdentityFactory.CreateTypeIdentity(source.ExceptionType),
+                ActualGraphNodeCount = run?.Graph.Count,
+                ActualSource = actualSource,
+                Profile = outcome,
                 TestExpansionSteps = proofSteps,
                 ExactContextsVisited = visited.Count,
                 ExactContextsRegistered = proposed.Count,
@@ -161,7 +178,8 @@ namespace XMLDocNormalizerTests.Worker
             Assert.Equal("B", rebound.ContainingAssembly.Name);
             var expected = RoslynCanonicalIdentityFactory.CreateCallableIdentity(selected);
             var actual = RoslynCanonicalIdentityFactory.CreateCallableIdentity(rebound);
-            Assert.Equal(containing, expected.Equals(actual));
+            if (containing) { Assert.Equal(containing, expected.Equals(actual)); }
+            else { Assert.Equal(expected, actual); } // P05: only the method-construction loss case changes.
             Assert.True(SymbolEqualityComparer.Default.Equals(new ExceptionFlowCallContext(rebound).CallableSymbol, rebound.OriginalDefinition));
             Evidence("cross-project-rebind-" + containing, new { Containing = containing, SelectedMetadataMethod = expected, ReboundSourceMethod = actual, Context = new ExceptionFlowCallContext(rebound).CanonicalContext, ProductionCorrected = false });
         }
@@ -178,7 +196,7 @@ namespace XMLDocNormalizerTests.Worker
             var run = ExceptionFlowSummaryGraphTestHelper.Build(Fault + api + " public static class Entry { public static void Root() { " + call + " } }", "Root");
             var catchTypes = Nodes(run).SelectMany(pair => pair.Summary.CallEdges).SelectMany(edge => edge.CaughtExceptionTypes).ToArray();
             var caught = Assert.Single(catchTypes);
-            Assert.IsAssignableFrom<ITypeParameterSymbol>(Assert.Single(caught.TypeArguments));
+            Assert.Equal(SpecialType.System_Int32, Assert.Single(caught.TypeArguments).SpecialType); // P04
             Evidence("catch-" + containing, new { Containing = containing, CollectedCatchType = RoslynCanonicalIdentityFactory.CreateTypeIdentity(caught), RequiredArgument = "System.Int32", ProductionCorrected = false });
         }
 
@@ -192,21 +210,25 @@ namespace XMLDocNormalizerTests.Worker
                 : "public static class Api { public static void Recur<T>() { if (Flags.Stop) throw new Fault<T>(); Recur<System.Collections.Generic.List<T>>(); } }";
             string call = containing ? "Api<int>.Recur();" : "Api.Recur<int>();";
             string source = Fault + "public static class Flags { public static bool Stop; } " + api + " public static class Entry { public static void Root() { " + call + " } }";
-            var current = (CanonicalExceptionFlowAnalysisResult)typeof(ExceptionFlowCanonicalExceptionIdentityTests)
-                .GetMethod("CurrentResult", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [source])!;
+            var current = ExceptionFlowFiniteOrbitAdmissionTests.WorkerSourceOutcome(source); // R2
             string configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
             string worker = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/exception-flow-historical/XMLDocNormalizer.HistoricalWorker/bin", configuration, "net8.0/XMLDocNormalizer.HistoricalWorker.dll");
             var historical = await new HistoricalWorkerClient("dotnet", worker, TimeSpan.FromSeconds(30))
                 .AnalyzeAsync(new WorkerAnalysisInput(source, "Entry", "Root", new()));
-            Assert.True(historical.Success, historical.Failure?.Message);
-            Assert.Equal(current, historical.Result);
-            var entry = Assert.Single(current.Entries);
-            Assert.Equal("Fault`1", entry.ExceptionType.MetadataName);
-            Assert.Empty(entry.ExceptionType.TypeArguments);
+            Assert.False(current.ProfileOutcome!.Complete);
+            Assert.Contains(current.ProfileOutcome.Reasons, reason => reason.Category == "PositiveConstructorCycle");
+            Assert.Empty(current.ThrownExceptions);
+            Assert.False(historical.Success);
+            Assert.Null(historical.Result);
+            Assert.Equal(WorkerFailureCode.UnsupportedContext, historical.Failure!.WorkerFailure!.Code);
+            Assert.Equal(current.ProfileOutcome.Details.Order(StringComparer.Ordinal),
+                historical.Failure.WorkerFailure.Details.Order(StringComparer.Ordinal));
             HistoricalWorkerLifetimeAssertions.Stopped(historical);
             Assert.All(historical.Identity!.LoadedRoslyn, image => Assert.StartsWith("5.0.0-2.25451.107+", image.InformationalVersion));
             Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name == "XMLDocNormalizer.ExceptionFlow.Historical");
-            Evidence("worker-recursion-" + containing, new { Containing = containing, Current = current, Historical = historical.Result, historical.Identity, historical.ProcessExit, SharedDefinitionFold = true, ConstructedCorrectnessProven = false, ProductionCorrected = false });
+            Evidence("worker-recursion-" + containing, new { Containing = containing, Current = current.ProfileOutcome,
+                Historical = historical.Failure.WorkerFailure, historical.Identity, historical.ProcessExit,
+                ExactComplete = false, ClassifiedRejectionParity = true, SolutionFindingAdmission = false }); // R6
         }
 
         private static List<(ExceptionFlowCallableKey Key, ExceptionFlowSummary Summary)> Nodes(ExceptionFlowSummaryGraphTestRun run)
@@ -233,7 +255,7 @@ namespace XMLDocNormalizerTests.Worker
         }
         private static void Evidence(string name, object value)
         {
-            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a3/analysis", name + ".json");
+            string path = Path.Combine(ExceptionFlowProductionCurrentParityTests.Root(), "artifacts/p5o2b25a10/analysis/a3", name + ".json"); // R6: new witnesses only.
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(value, WorkerProtocol.JsonOptions));
         }
