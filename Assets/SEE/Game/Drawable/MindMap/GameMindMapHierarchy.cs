@@ -146,7 +146,7 @@ namespace SEE.Game.Drawable.MindMap
         }
 
         /// <summary>
-        /// Checks whether another theme node on the same drawable can act
+        /// Checks whether another active theme node on the same drawable can act
         /// as a valid parent for <paramref name="selectedNode"/>.
         /// </summary>
         /// <param name="selectedNode">
@@ -157,14 +157,11 @@ namespace SEE.Game.Drawable.MindMap
         /// </returns>
         private static bool ChangeIsPossible(GameObject selectedNode)
         {
-            GameObject attachedObjects =
-                GameFinder.GetAttachedObjectsObject(selectedNode);
+            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(selectedNode);
 
-            foreach (GameObject node
-                     in attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode))
+            foreach (GameObject node in attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode, false))
             {
-                if (node.GetComponent<MMNodeValueHolder>().NodeKind
-                        == MindMapNodeKind.Theme
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind == MindMapNodeKind.Theme
                     && ParentChangeIsValid(selectedNode, node))
                 {
                     return true;

@@ -176,6 +176,27 @@ namespace SEE.Game.Drawable.MindMap
         }
 
         /// <summary>
+        /// Verifies that an inactive theme cannot make a Theme-to-Subtheme
+        /// transition valid because it cannot be selected as the required parent.
+        /// </summary>
+        [Test]
+        public void TestThemeCannotBecomeSubthemeWithOnlyInactiveTheme()
+        {
+            GameObject node = CreateNode("Node", MindMapNodeKind.Theme);
+
+            GameObject otherTheme = CreateNode("OtherTheme", MindMapNodeKind.Theme);
+
+            otherTheme.SetActive(false);
+
+            bool result = GameMindMapHierarchy.CheckValidNodeKindChange(
+                node,
+                MindMapNodeKind.Subtheme,
+                MindMapNodeKind.Theme);
+
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
         /// Verifies that a theme without children can become a leaf if another theme
         /// can act as its new parent.
         /// </summary>
