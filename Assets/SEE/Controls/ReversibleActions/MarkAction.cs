@@ -84,7 +84,7 @@ namespace SEE.Controls.ReversibleActions
             {
                 memento.NodeID = ger.gameObject.ID();
                 GameNodeMarker.Toggle(ger.gameObject);
-                // TODO : MarkNetAction
+                new MarkNetAction(memento.NodeID).Execute();
                 CurrentState = IReversibleAction.Progress.Completed;
                 result = true;
             }
@@ -112,7 +112,7 @@ namespace SEE.Controls.ReversibleActions
             if (node != null)
             {
                 GameNodeMarker.Toggle(node);
-                // TODO : MarkNetAction
+                new MarkNetAction(memento.NodeID).Execute();
             }
         }
 
@@ -127,7 +127,7 @@ namespace SEE.Controls.ReversibleActions
             if (node != null)
             {
                 GameNodeMarker.Toggle(node);
-                // TODO : MarkNetAction
+                new MarkNetAction(memento.NodeID).Execute();
             }
         }
     }
