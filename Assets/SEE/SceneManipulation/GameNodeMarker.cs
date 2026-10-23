@@ -96,7 +96,7 @@ namespace SEE.SceneManipulation
         }
 
         /// <summary>
-        /// Returns the marking sphere of the <paramref name="node"/> 
+        /// Returns the marking sphere of the <paramref name="node"/>
         /// or null if it is not marked.
         /// </summary>
         /// <param name="node">Node whose marking should be returned.</param>
