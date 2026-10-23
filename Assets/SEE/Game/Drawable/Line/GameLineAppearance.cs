@@ -1,6 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO.Factories;
+using SEE.Factories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Unity.Netcode;
 using RootMotion.FinalIK;
-using SEE.GO;
+using SEE.Extensions;
 
 namespace SEE.Game.Avatars
 {

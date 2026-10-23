@@ -5,15 +5,16 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using MoreLinq.Extensions;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.City;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.CityRendering
 {
@@ -181,7 +182,7 @@ namespace SEE.Game.CityRendering
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         ///
         /// The new game edge will be placed under the root game node (which is determined
         /// via the source and target game nodes of the edge).
@@ -226,7 +227,7 @@ namespace SEE.Game.CityRendering
         /// based on the current settings.
         ///
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
-        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        /// i.e., <see cref="EdgeLayoutKind.None"/>, was chosen in the settings.
         ///
         /// The new game edge will be placed under the root game node (which is determined
         /// via the source and target game nodes of the edge).

@@ -1,20 +1,19 @@
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 using SEE.Game.CityRendering;
-using SEE.GameObjects;
-using SEE.GameObjects.BranchCity;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Components.GameNodes.BranchCity;
+using SEE.Graphs.Config;
 
 namespace SEE.Game.City
 {
@@ -26,13 +25,14 @@ namespace SEE.Game.City
     public class BranchCity : VCSCity, ISelfValidator
     {
         /// <summary>
-        /// A date string in the <see cref="SEEDate.DateFormat"/> format.
+        /// The date from which on commits in the history should be considered,
+        /// the day it names taken in; it denotes the instant that day begins at, in UTC.
         ///
-        /// All commits from the most recent to the latest commit
-        /// before the date are used for the analysis.
+        /// The syntax must conform to a date string in the <see cref="SEEDate.DateFormat"/> format.
         /// </summary>
-        [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
-         Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
+        [InspectorName("Start date (" + SEEDate.DateFormat + ")"),
+         Tooltip("The date from which on commits in the history should be considered (in the " + SEEDate.DateFormat + " syntax), "
+            + "the day it names taken in; it denotes the instant that day begins at, in UTC."),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string Date = SEEDate.Now();
 

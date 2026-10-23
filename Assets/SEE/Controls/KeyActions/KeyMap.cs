@@ -184,7 +184,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Saves the keybindings to the JSON file as a list of key-value pairs <see cref="KeyData"/>
         /// where the key is <see cref="KeyActionDescriptor.KeyCode"/> and its value is
-        /// <see cref=">KeyActionDescriptor.Name"/>.
+        /// <see cref="KeyActionDescriptor.Name"/>.
         /// </summary>
         /// <remarks>Should be called whenever <see cref="keyBindings"/> is updated</remarks>
         internal void Save(string keyBindingsPath)

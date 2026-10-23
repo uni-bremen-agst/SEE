@@ -1,7 +1,7 @@
-﻿using SEE.Game.Drawable.MindMap;
+﻿using SEE.Extensions;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

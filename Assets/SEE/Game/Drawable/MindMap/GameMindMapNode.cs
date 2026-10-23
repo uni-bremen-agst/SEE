@@ -4,7 +4,7 @@ using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.Text;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using System.Linq;
 using TMPro;

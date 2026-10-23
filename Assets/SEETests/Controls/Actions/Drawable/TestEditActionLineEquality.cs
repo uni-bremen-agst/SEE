@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Tests line-configuration equality as used by <see cref="EditAction"/>.

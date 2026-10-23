@@ -1,15 +1,15 @@
-﻿using SEE.Controls;
-using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
+using SEE.Graphs;
 /// Reference in comment.
-using SEE.DataModel.DG;
-using SEE.Game.SceneManipulation;
-using SEE.GO;
+using SEE.SceneManipulation;
+using SEE.Extensions;
 using SEE.Net.Actions.GraphElement;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog
 {

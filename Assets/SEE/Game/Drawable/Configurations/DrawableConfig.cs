@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -283,10 +284,10 @@ namespace SEE.Game.Drawable.Configurations
         {
             writer.Save(ID, SurfaceNameLabel);
             writer.Save(ParentID, SurfaceParentNameLabel);
-            writer.Save(Position, PositionLabel);
-            writer.Save(Rotation, RotationLabel);
-            writer.Save(Scale, ScaleLabel);
-            writer.Save(Color, ColorLabel);
+            writer.SaveVector(Position, PositionLabel);
+            writer.SaveVector(Rotation, RotationLabel);
+            writer.SaveVector(Scale, ScaleLabel);
+            writer.SaveColor(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
             writer.Save(Lighting, LightingLabel);
             writer.Save(OrderInLayer, OrderInLayerLabel);
@@ -367,7 +368,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the position.
             Vector3 position = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref position))
+            if (UnityConfigIO.RestoreVector(attributes, PositionLabel, ref position))
             {
                 Position = position;
             }
@@ -379,7 +380,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the rotation.
             Vector3 rotation = Vector3.zero;
-            if (ConfigIO.Restore(attributes, RotationLabel, ref rotation))
+            if (UnityConfigIO.RestoreVector(attributes, RotationLabel, ref rotation))
             {
                 Rotation = rotation;
             }
@@ -391,7 +392,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the scale.
             Vector3 scale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref scale))
+            if (UnityConfigIO.RestoreVector(attributes, ScaleLabel, ref scale))
             {
                 Scale = scale;
             }
@@ -403,7 +404,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the color.
             Color color = Color.black;
-            if (ConfigIO.Restore(attributes, ColorLabel, ref color))
+            if (UnityConfigIO.RestoreColor(attributes, ColorLabel, ref color))
             {
                 Color = color;
             }

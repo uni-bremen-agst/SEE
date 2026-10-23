@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Controls;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.GraphSearch;
+using SEE.Controls.Players;
+using SEE.Graphs;
+using SEE.Graphs;
+using SEE.Graphs.GraphSearch;
+using SEE.Graphs.Events;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
@@ -44,7 +45,7 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         public bool MainWindow = true;
 
-        private GraphSearch searcher;
+        private NodeSearch searcher;
 
         /// <summary>
         /// Transform of the object containing the items of the tree window.
@@ -69,7 +70,7 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void Start()
         {
-            searcher = new GraphSearch(Graph);
+            searcher = new NodeSearch(Graph);
             grouper = new TreeWindowGrouper(searcher.Filter, Graph);
             subscription = Graph.Subscribe(this);
             base.Start();
@@ -192,7 +193,7 @@ namespace SEE.UI.Window.TreeWindow
                 case NodeEvent nodeEvent:
                     if (nodeEvent.Node.IsRoot() && nodeEvent.Change == ChangeType.Removal)
                     {
-                        WindowSpace winSpace = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                        WindowSpace winSpace = WindowSpaceManager.WindowSpaceOfLocalPlayer;
                         winSpace.CloseWindow(this);
                     }
                     else

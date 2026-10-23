@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.KeyActions;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using TMPro;

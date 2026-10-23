@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -187,7 +188,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <remarks>
         /// Floating-point values are compared using <see cref="Mathf.Approximately(float, float)"/>.
         ///
-        /// This value-based comparison is used, for example, by <see cref="Controls.Actions.Drawable.EditAction"/>
+        /// This value-based comparison is used, for example, by <see cref="Controls.ReversibleActions.Drawable.EditAction"/>
         /// to determine whether a line cap configuration has been modified.
         /// </remarks>
         public bool Equals(LineCapConf other)
@@ -387,13 +388,13 @@ namespace SEE.Game.Drawable.Configurations
             writer.BeginGroup(label);
             writer.Save(CapKind.ToString(), capKindLabel);
             writer.Save(ColorKind.ToString(), colorKindLabel);
-            writer.Save(PrimaryColor, primaryColorLabel);
-            writer.Save(SecondaryColor, secondaryColorLabel);
+            writer.SaveColor(PrimaryColor, primaryColorLabel);
+            writer.SaveColor(SecondaryColor, secondaryColorLabel);
             writer.Save(Thickness, thicknessLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
             writer.Save(FillOutStatus, fillOutStatusLabel);
-            writer.Save(FillOutColor, fillOutColorLabel);
+            writer.SaveColor(FillOutColor, fillOutColorLabel);
             writer.EndGroup();
         }
 
@@ -431,7 +432,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color primary = Color.clear;
-            if (ConfigIO.Restore(attributes, primaryColorLabel, ref primary))
+            if (UnityConfigIO.RestoreColor(attributes, primaryColorLabel, ref primary))
             {
                 PrimaryColor = primary;
             }
@@ -442,7 +443,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color secondary = Color.clear;
-            if (ConfigIO.Restore(attributes, secondaryColorLabel, ref secondary))
+            if (UnityConfigIO.RestoreColor(attributes, secondaryColorLabel, ref secondary))
             {
                 SecondaryColor = secondary;
             }
@@ -494,7 +495,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Color fillOut = Color.clear;
-            if (ConfigIO.Restore(attributes, fillOutColorLabel, ref fillOut))
+            if (UnityConfigIO.RestoreColor(attributes, fillOutColorLabel, ref fillOut))
             {
                 FillOutColor = fillOut;
             }

@@ -1,8 +1,8 @@
 ﻿using SEE.Game.Drawable.Line;
-using SEE.Controls.Actions.Drawable;
+using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable;
 using UnityEngine;
-using SEE.Controls.Actions.Drawable.DrawShapes;
+using SEE.Controls.ReversibleActions.Drawable.DrawShapes;
 
 namespace SEE.Net.Actions.Drawable
 {

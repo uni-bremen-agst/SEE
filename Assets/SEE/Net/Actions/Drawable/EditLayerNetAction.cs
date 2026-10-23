@@ -1,8 +1,8 @@
-﻿using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.StickyNote;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable

@@ -1,13 +1,13 @@
 ﻿using NUnit.Framework;
-using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable.CutCopyPaste;
-using SEE.Utils.History;
+using SEE.Controls.ReversibleActions;
+using SEE.Controls.ReversibleActions.Drawable.CutCopyPaste;
+using SEE.ReversibleActionHistory;
 using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Tests the state resets performed by <see cref="DrawableActionLifecycle"/>.

@@ -1,4 +1,4 @@
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Game.HolisticMetrics;
 using SEE.UI.Notification;
 using UnityEngine;

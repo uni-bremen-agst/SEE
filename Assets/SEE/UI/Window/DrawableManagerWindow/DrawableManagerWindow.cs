@@ -1,9 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel;
-using SEE.DataModel.Drawable;
+using SEE.Graphs;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using SEE.Graphs.Events;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {

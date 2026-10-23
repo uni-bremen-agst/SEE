@@ -22,7 +22,6 @@
 
 using Cysharp.Threading.Tasks;
 using SEE.Utils.IdeRPC;
-using UnityEngine;
 
 namespace SEE.IDE
 {

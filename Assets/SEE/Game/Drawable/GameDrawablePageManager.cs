@@ -1,7 +1,6 @@
-﻿using SEE.DataModel.Drawable;
+﻿using SEE.Extensions;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Linq;

@@ -122,11 +122,11 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
-        /// Verifies that inactive nodes are included when selecting a parent for a
-        /// newly created Mind Map node.
+        /// Verifies that inactive Mind Map nodes are not offered as parent candidates
+        /// when selecting a parent for a newly created node.
         /// </summary>
         [Test]
-        public void TestInactiveParentIsIncludedForNormalSelection()
+        public void TestInactiveParentIsExcludedForNormalSelection()
         {
             firstParent.SetActive(false);
 
@@ -134,7 +134,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == firstParent.name), Is.True);
+            Assert.That(selector.itemList.Exists(item => item.itemTitle == firstParent.name), Is.False);
         }
 
         /// <summary>

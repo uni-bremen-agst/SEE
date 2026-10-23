@@ -1,4 +1,4 @@
-﻿using SEE.GO;
+﻿using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System.Linq;

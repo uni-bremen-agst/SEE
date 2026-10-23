@@ -1,8 +1,8 @@
-﻿using SEE.UI;
-using SEE.Utils.Config;
+﻿using SEE.Graphs.Config;
+using SEE.UI;
 using System.Collections.Generic;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the audio settings for the SEE application. These are attributes
@@ -18,7 +18,7 @@ namespace SEE.User
         /// <summary>
         /// Indicates whether music is muted.
         /// </summary>
-        public bool MusicMuted = false;
+        public bool MusicMuted = true;
 
         /// <summary>
         /// Current sound effects volume.

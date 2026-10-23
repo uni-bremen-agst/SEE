@@ -1,4 +1,4 @@
-using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

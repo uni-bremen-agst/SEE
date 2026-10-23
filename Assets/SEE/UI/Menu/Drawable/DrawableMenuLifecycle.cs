@@ -1,4 +1,5 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
+using SEE.ReversibleActionHistory;
 using SEE.UI.Menu.Drawable.Line;
 using SEE.UI.Menu.Drawable.Shapes;
 using SEE.UI.Menu.Drawable.Text;

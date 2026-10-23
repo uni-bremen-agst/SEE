@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using SEE.Controls.Actions;
-using SEE.Utils.History;
+using SEE.Controls.ReversibleActions;
+using SEE.ReversibleActionHistory;
 using System;
 using System.Linq;
 using System.Reflection;

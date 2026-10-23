@@ -5,7 +5,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Notification;
 using System.Collections.Generic;
@@ -94,22 +94,18 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="addedNode">
         /// The node for which a parent should be chosen.
         /// </param>
-        /// <param name="includeInactive">
-        /// Whether inactive Mind Map nodes should be included.
-        /// </param>
         /// <returns>
         /// All Mind Map nodes that can generally be used as parents.
         /// </returns>
         private static List<GameObject> CollectParentCandidates(
             GameObject attachedObjects,
-            GameObject addedNode,
-            bool includeInactive)
+            GameObject addedNode)
         {
             /// Gets all Mind Map Nodes of the given attached objects object.
             IList<GameObject> allNodes =
                 attachedObjects.FindAllDescendantsWithTag(
                     Tags.MindMapNode,
-                    includeInactive);
+                    false);
 
             /// Gather all Mind Map Nodes with the <see cref="MindMapNodeKind"/>:
             /// <see cref="MindMapNodeKind.Theme"/> or
@@ -175,8 +171,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             List<GameObject> nodes =
                 CollectParentCandidates(
                     attachedObjects,
-                    addedNode,
-                    false);
+                    addedNode);
 
             /// Create an item in the parent selector for the collected nodes.
             PopulateParentSelector(parentSelector, nodes);
@@ -232,7 +227,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 /// <see cref="MindMapNodeKind.Subtheme"/>
                 /// that qualify as a new parent.
                 /// Note: A <see cref="MindMapNodeKind.Leaf"/> can not be a parent.
-                List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
+                List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode);
 
                 /// Nodes are prohibited as a parent if selecting them would create a cycle.
                 nodes.RemoveAll(node => !GameMindMapHierarchy.ParentChangeIsValid(addedNode, node));
@@ -328,7 +323,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             HorizontalSelector parentSelector = InitializeMenu(null);
 
             /// Collect all nodes that can generally serve as parents.
-            List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode, false);
+            List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode);
 
             /// Exclude candidates that would introduce a cycle.
             nodes.RemoveAll(node => !GameMindMapHierarchy.ParentChangeIsValid(addedNode, node));

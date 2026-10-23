@@ -1,5 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu.PopupMenu contextMenu;
+        private readonly PopupMenu contextMenu;
 
         /// <summary>
         /// The function to call to rebuild the tree window.
@@ -67,7 +67,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public DrawableWindowContextMenu(PopupMenu.PopupMenu contextMenu,
+        public DrawableWindowContextMenu(PopupMenu contextMenu,
                                      UnityEvent<List<GameObject>> rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {

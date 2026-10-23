@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.Game.Drawable.Line;
 
-namespace SEE.Controls.Actions.Drawable.DrawShapes
+namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
 {
     /// Tests line-cap-related preview state handling of
     /// <see cref="DrawShapeLineCapController"/>.

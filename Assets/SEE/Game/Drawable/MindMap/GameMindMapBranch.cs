@@ -1,7 +1,7 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
+using SEE.Graphs;
 
 namespace SEE.UI.Window.CodeWindow
 {

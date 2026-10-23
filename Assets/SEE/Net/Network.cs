@@ -1,10 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SEE.Graphs.Config;
 
 namespace SEE.Net
 {
@@ -257,7 +257,7 @@ namespace SEE.Net
         /// the command-line arguments (if not running in the editor mode).
         ///
         /// This method does not really start any server or client. Use <see cref="StartClient(CallBack)"/>,
-        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)/> instead.
+        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)"/> instead.
         /// </summary>
         public void SetUp()
         {
@@ -476,7 +476,7 @@ namespace SEE.Net
         {
             if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsClient)
             {
-                TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
+                TracingHelperService.Initialize(SEE.UserSettings.UserSetting.Instance.Player.PlayerName);
             }
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
@@ -740,7 +740,7 @@ namespace SEE.Net
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
-            TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
+            TracingHelperService.Initialize(SEE.UserSettings.UserSetting.Instance.Player.PlayerName);
         }
 
         /// <summary>

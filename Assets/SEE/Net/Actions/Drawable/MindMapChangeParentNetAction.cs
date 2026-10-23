@@ -1,7 +1,6 @@
-﻿using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
-using SEE.Game.Drawable.MindMap;
 
 namespace SEE.Net.Actions.Drawable
 {

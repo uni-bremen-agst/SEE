@@ -2,7 +2,7 @@
 using SEE.Utils;
 using System;
 using SEE.Controls;
-using SEE.GO.Factories;
+using SEE.Factories;
 
 namespace SEE.Game.Avatars
 {

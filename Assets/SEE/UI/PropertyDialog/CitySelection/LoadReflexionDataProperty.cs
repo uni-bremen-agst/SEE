@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.KeyActions;
 using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;

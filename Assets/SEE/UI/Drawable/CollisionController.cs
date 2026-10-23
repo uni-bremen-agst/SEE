@@ -1,6 +1,6 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.UI.Drawable

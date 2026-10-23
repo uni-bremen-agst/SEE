@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -380,16 +381,16 @@ namespace SEE.Game.Drawable.Configurations
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(ColorKind.ToString(), colorKindLabel);
-            writer.Save(PrimaryColor, primaryColorLabel);
-            writer.Save(SecondaryColor, secondaryColorLabel);
+            writer.SaveColor(PrimaryColor, primaryColorLabel);
+            writer.SaveColor(SecondaryColor, secondaryColorLabel);
             writer.Save(FillOutStatus, fillOutStatusLabel);
-            writer.Save(FillOutColor, fillOutColorLabel);
+            writer.SaveColor(FillOutColor, fillOutColorLabel);
             writer.Save(Thickness, thicknessLabel);
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
-            writer.Save(OriginalStartAnchor, originalStartAnchorLabel);
-            writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
+            writer.SaveVector(OriginalStartAnchor, originalStartAnchorLabel);
+            writer.SaveVector(OriginalEndAnchor, originalEndAnchorLabel);
             writer.Save(FreehandLine, freehandLineLabel);
 
             List<Vector3Config> rendererPositionConfigs = RendererPositions
@@ -429,7 +430,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the primary color.
             Color loadedColor = Color.black;
-            if (ConfigIO.Restore(attributes, primaryColorLabel, ref loadedColor))
+            if (UnityConfigIO.RestoreColor(attributes, primaryColorLabel, ref loadedColor))
             {
                 PrimaryColor = loadedColor;
             }
@@ -441,7 +442,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the secondary color.
             Color loadedSecColor = Color.black;
-            if (ConfigIO.Restore(attributes, secondaryColorLabel, ref loadedSecColor))
+            if (UnityConfigIO.RestoreColor(attributes, secondaryColorLabel, ref loadedSecColor))
             {
                 SecondaryColor = loadedSecColor;
             }
@@ -464,7 +465,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the fill out color.
             Color loadedFOColor = Color.black;
-            if (ConfigIO.Restore(attributes, fillOutColorLabel, ref loadedFOColor))
+            if (UnityConfigIO.RestoreColor(attributes, fillOutColorLabel, ref loadedFOColor))
             {
                 FillOutColor = loadedFOColor;
             }
@@ -511,7 +512,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Vector3 loadedOriginalStartAnchor = Vector3.zero;
-            if (ConfigIO.Restore(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
+            if (UnityConfigIO.RestoreVector(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
             {
                 OriginalStartAnchor = loadedOriginalStartAnchor;
             }
@@ -524,7 +525,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             Vector3 loadedOriginalEndAnchor = Vector3.zero;
-            if (ConfigIO.Restore(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
+            if (UnityConfigIO.RestoreVector(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
             {
                 OriginalEndAnchor = loadedOriginalEndAnchor;
             }

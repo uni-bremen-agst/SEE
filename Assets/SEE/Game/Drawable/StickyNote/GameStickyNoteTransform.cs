@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.StickyNote

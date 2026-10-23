@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.HolisticMetrics;
-using SEE.DataModel;
+using SEE.Controls.ReversibleActions.HolisticMetrics;
+using SEE.Graphs;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.HolisticMetrics.Metrics;
@@ -13,6 +13,7 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.Graphs.Events;
 
 namespace SEE.Game.HolisticMetrics
 {

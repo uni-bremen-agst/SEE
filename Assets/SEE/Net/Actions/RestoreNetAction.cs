@@ -1,5 +1,5 @@
 ﻿using SEE.Game.City;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
 

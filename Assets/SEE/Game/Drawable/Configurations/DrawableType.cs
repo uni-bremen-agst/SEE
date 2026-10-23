@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.Text;
+using SEE.Graphs.Config;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
 using System;
@@ -262,9 +263,9 @@ namespace SEE.Game.Drawable.Configurations
             writer.BeginGroup();
             writer.Save(ID, idLabel);
             writer.Save(AssociatedPage, associatedPageLabel);
-            writer.Save(Position, positionLabel);
-            writer.Save(EulerAngles, eulerAnglesLabel);
-            writer.Save(Scale, scaleLabel);
+            writer.SaveVector(Position, positionLabel);
+            writer.SaveVector(EulerAngles, eulerAnglesLabel);
+            writer.SaveVector(Scale, scaleLabel);
             writer.Save(OrderInLayer, orderInLayerLabel);
             SaveAttributes(writer);
             writer.EndGroup();
@@ -309,7 +310,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the position.
             Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, positionLabel, ref loadedPosition))
+            if (UnityConfigIO.RestoreVector(attributes, positionLabel, ref loadedPosition))
             {
                 Position = loadedPosition;
             }
@@ -321,7 +322,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, eulerAnglesLabel, ref loadedEulerAngles))
+            if (UnityConfigIO.RestoreVector(attributes, eulerAnglesLabel, ref loadedEulerAngles))
             {
                 EulerAngles = loadedEulerAngles;
             }
@@ -333,7 +334,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the scale.
             Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, scaleLabel, ref loadedScale))
+            if (UnityConfigIO.RestoreVector(attributes, scaleLabel, ref loadedScale))
             {
                 Scale = loadedScale;
             }

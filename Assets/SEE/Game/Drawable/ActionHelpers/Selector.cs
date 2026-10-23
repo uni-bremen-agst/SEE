@@ -1,6 +1,6 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 

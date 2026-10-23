@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SEE.Graphs.Config;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
@@ -12,7 +13,7 @@ namespace SEE.Game.City
     /// or a node metric.
     /// </summary>
     [Serializable]
-    public class ColorProperty : ConfigIO.IPersistentConfigItem
+    public class ColorProperty : IPersistentConfigItem
     {
         /// <summary>
         /// Whether color is used to represent the node type or a metric.
@@ -56,7 +57,7 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.RestoreEnum(values, propertyLabel, ref Property);
-                ConfigIO.Restore(values, typeColorLabel, ref TypeColor);
+                UnityConfigIO.RestoreColor(values, typeColorLabel, ref TypeColor);
                 ConfigIO.Restore(values, byLevelLabel, ref ByLevel);
                 ConfigIO.Restore(values, colorMetricLabel, ref ColorMetric);
                 return true;
@@ -77,7 +78,7 @@ namespace SEE.Game.City
         {
             writer.BeginGroup(label);
             writer.Save(Property.ToString(), propertyLabel);
-            writer.Save(TypeColor, typeColorLabel);
+            writer.SaveColor(TypeColor, typeColorLabel);
             writer.Save(ByLevel, byLevelLabel);
             writer.Save(ColorMetric, colorMetricLabel);
             writer.EndGroup();
