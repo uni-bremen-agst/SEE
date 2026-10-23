@@ -157,7 +157,6 @@ namespace SEE.Game.Avatars
             SetSALSAudioSource(audioSource);
             if (gameObject.TryGetComponent(out Salsa salsa))
             {
-
                 salsa.useExternalAnalysis = true;
                 salsa.getExternalAnalysis = GetLiveKitAudioAmplitude;
             }
