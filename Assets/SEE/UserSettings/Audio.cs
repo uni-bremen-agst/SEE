@@ -38,7 +38,7 @@ namespace SEE.UserSettings
         /// <summary>
         /// Stores the microphone settings.
         /// </summary>
-        public Microphone Microphone = new();
+        public readonly Microphone Microphone = new();
 
         #region Configuration I/O
         /// <summary>
