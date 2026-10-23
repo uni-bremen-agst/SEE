@@ -86,6 +86,10 @@ namespace SEE.Controls.ReversibleActions
               new("New Node", "Create a new node",
                   Color.green.Darker(), '+',
                   AddNodeAction.CreateReversibleAction);
+            NewMarker =
+                new("New Marker", "Create a new marker",
+                    Color.green.Darker(), '+',
+                    MarkAction.CreateReversibleAction);
 
             EditNode =
               new("Edit Node", "Edit a node",
@@ -312,6 +316,7 @@ namespace SEE.Controls.ReversibleActions
         public static readonly ActionStateType Hide;
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
+        public static readonly ActionStateType NewMarker;
         public static readonly ActionStateType EditNode;
         public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType Delete;
