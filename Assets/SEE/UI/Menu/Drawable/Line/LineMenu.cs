@@ -83,6 +83,13 @@ namespace SEE.UI.Menu.Drawable.Line
         /// Manages the line-cap and segment selection of this menu.
         /// </summary>
         private LineCapMenu lineCapMenu;
+
+        /// <summary>
+        /// Whether the line menu is currently being configured for a new mode.
+        /// During this initialization, intermediate layout recalculations are
+        /// suppressed until all controls have been configured.
+        /// </summary>
+        private bool isConfiguringMode;
         #endregion
 
         /// <summary>
@@ -340,6 +347,8 @@ namespace SEE.UI.Menu.Drawable.Line
             }
 
             Enable();
+
+            RecalculateHeightIfReady();
         }
 
         #region Drawing
@@ -348,16 +357,26 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         public void EnableForDrawing()
         {
-            EnableLineMenu(withoutMenuLayer: new MenuLayer[]
-                {
-                    MenuLayer.Layer,
-                    MenuLayer.Loop,
-                    MenuLayer.Segment
-                });
+            isConfiguringMode = true;
 
-            drawLineMenu.Enable();
+            try
+            {
+                EnableLineMenu(withoutMenuLayer: new MenuLayer[]
+                    {
+                        MenuLayer.Layer,
+                        MenuLayer.Loop,
+                        MenuLayer.Segment
+                    });
 
-            mode = Mode.Drawing;
+                drawLineMenu.Enable();
+
+                mode = Mode.Drawing;
+            }
+            finally
+            {
+                isConfiguringMode = false;
+            }
+
             MenuHelper.CalculateHeight(gameObject, true);
         }
 
@@ -395,7 +414,14 @@ namespace SEE.UI.Menu.Drawable.Line
             UnityAction returnCall = null,
             UnityAction<LineConf> lineCapsChanged = null)
         {
-            if (newValueHolder is LineConf lineHolder)
+            if (newValueHolder is not LineConf lineHolder)
+            {
+                return;
+            }
+
+            isConfiguringMode = true;
+
+            try
             {
                 bool isFreehandLine =
                     EditLineMenu.IsFreehandLine(selectedLine);
@@ -422,9 +448,13 @@ namespace SEE.UI.Menu.Drawable.Line
                     lineCapsChanged);
 
                 mode = Mode.Edit;
-
-                MenuHelper.CalculateHeight(gameObject, true);
             }
+            finally
+            {
+                isConfiguringMode = false;
+            }
+
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
@@ -500,6 +530,19 @@ namespace SEE.UI.Menu.Drawable.Line
                 color);
         }
 
+        /// <summary>
+        /// Recalculates the line-menu layout unless the menu is currently being
+        /// configured programmatically or its editing controls are being refreshed.
+        /// </summary>
+        private void RecalculateHeightIfReady()
+        {
+            if (!isConfiguringMode
+                && !editLineMenu.IsRefreshingUI)
+            {
+                MenuHelper.CalculateHeight(gameObject, true);
+            }
+        }
+
         #region LineKind
 
         /// <summary>
@@ -518,11 +561,7 @@ namespace SEE.UI.Menu.Drawable.Line
         public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-
-            if (!editLineMenu.IsRefreshingUI)
-            {
-                MenuHelper.CalculateHeight(gameObject, true);
-            }
+            RecalculateHeightIfReady();
         }
 
         /// <summary>
@@ -544,10 +583,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 DisableTilingFromLineMenu();
             }
 
-            if (!editLineMenu.IsRefreshingUI)
-            {
-                MenuHelper.CalculateHeight(gameObject, true);
-            }
+            RecalculateHeightIfReady();
         }
         #endregion
 
@@ -578,10 +614,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 EnableColorAreaFromLineMenu();
             }
 
-            if (!editLineMenu.IsRefreshingUI)
-            {
-                MenuHelper.CalculateHeight(gameObject, true);
-            }
+            RecalculateHeightIfReady();
         }
         #endregion
 
