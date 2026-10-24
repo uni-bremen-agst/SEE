@@ -21,24 +21,23 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   stripSettings: {fileID: 0}
-  defaultLensDirtTexture: {fileID: 2800000, guid: 0bd567658bec947d2b4d2877ccb0faa7,
-    type: 3}
+  defaultLensDirtTexture: {fileID: 0}
   defaultFlareTexture: {fileID: 2800000, guid: 93092410bbc6f4ccba773578db5832d9, type: 3}
-  stripBeautifyTonemappingACES: 0
-  stripBeautifyTonemappingACESFitted: 0
-  stripBeautifyTonemappingAGX: 0
+  stripBeautifyTonemappingACES: 1
+  stripBeautifyTonemappingACESFitted: 1
+  stripBeautifyTonemappingAGX: 1
   stripBeautifyTonemappingPBRNeutral: 1
   stripBeautifySharpen: 0
   stripBeautifySharpenExclusionMask: 1
   stripBeautifyDithering: 0
-  stripBeautifyEdgeAA: 0
-  stripBeautifyLUT: 0
+  stripBeautifyEdgeAA: 1
+  stripBeautifyLUT: 1
   stripBeautifyLUT3D: 1
   stripBeautifyColorTweaks: 0
   stripBeautifyBloom: 0
-  stripBeautifyLensDirt: 0
-  stripBeautifyChromaticAberration: 0
-  stripBeautifyDoF: 0
+  stripBeautifyLensDirt: 1
+  stripBeautifyChromaticAberration: 1
+  stripBeautifyDoF: 1
   stripBeautifyDoFTransparentSupport: 1
   stripBeautifyEyeAdaptation: 1
   stripBeautifyPurkinje: 1
