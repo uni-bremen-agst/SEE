@@ -1,5 +1,61 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-3578835842375450426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cbabd8e2cb2e4f8a930752453adf79a, type: 3}
+  m_Name: BeautifyRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  shader: {fileID: 4800000, guid: 55d70ca4ea7504a38b66170bbe587b2f, type: 3}
+  renderPassEvent: 500
+  ignorePostProcessingOption: 0
+  clearXRColorBuffer: 0
+  cameraLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  stripSettings: {fileID: 0}
+  defaultLensDirtTexture: {fileID: 2800000, guid: 0bd567658bec947d2b4d2877ccb0faa7,
+    type: 3}
+  defaultFlareTexture: {fileID: 2800000, guid: 93092410bbc6f4ccba773578db5832d9, type: 3}
+  stripBeautifyTonemappingACES: 1
+  stripBeautifyTonemappingACESFitted: 1
+  stripBeautifyTonemappingAGX: 1
+  stripBeautifyTonemappingPBRNeutral: 1
+  stripBeautifySharpen: 0
+  stripBeautifySharpenExclusionMask: 1
+  stripBeautifyDithering: 0
+  stripBeautifyEdgeAA: 1
+  stripBeautifyLUT: 1
+  stripBeautifyLUT3D: 1
+  stripBeautifyColorTweaks: 0
+  stripBeautifyBloom: 0
+  stripBeautifyLensDirt: 1
+  stripBeautifyChromaticAberration: 1
+  stripBeautifyDoF: 1
+  stripBeautifyDoFTransparentSupport: 1
+  stripBeautifyEyeAdaptation: 1
+  stripBeautifyPurkinje: 1
+  stripBeautifyVignetting: 0
+  stripBeautifyVignettingMask: 1
+  stripBeautifyOutline: 1
+  stripBeautifyNightVision: 1
+  stripBeautifyThermalVision: 1
+  stripBeautifyFrame: 1
+  stripBeautifyFilmGrain: 1
+  stripUnityFilmGrain: 0
+  stripUnityDithering: 0
+  stripUnityTonemapping: 0
+  stripUnityBloom: 0
+  stripUnityChromaticAberration: 0
+  stripUnityDistortion: 0
+  stripUnityDebugVariants: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,8 +82,9 @@ MonoBehaviour:
     probeSamplingDebugMesh: {fileID: 0}
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
-  m_RendererFeatures: []
-  m_RendererFeatureMap: 
+  m_RendererFeatures:
+  - {fileID: -3578835842375450426}
+  m_RendererFeatureMap: c680c649c36b55ce
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
