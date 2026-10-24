@@ -15,7 +15,7 @@ MonoBehaviour:
   m_Active: 1
   shader: {fileID: 4800000, guid: 55d70ca4ea7504a38b66170bbe587b2f, type: 3}
   renderPassEvent: 500
-  ignorePostProcessingOption: 0
+  ignorePostProcessingOption: 1
   clearXRColorBuffer: 0
   cameraLayerMask:
     serializedVersion: 2
