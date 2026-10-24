@@ -1,6 +1,7 @@
 
 #if UNITY_EDITOR
 
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -74,6 +75,48 @@ namespace SEEEditor
                         // Ignore if files are currently locked.
                         Debug.LogWarning($"Could not delete rulesets folder at {rulesetsPath}. It may be locked by another process.\n");
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Invoked by Unity's asset pipeline before an asset is imported.
+        ///
+        /// Certain NuGet assemblies (such as System.Reactive.dll v7.0.0+) trigger false circular self-reference
+        /// errors during Unity's precompiled assembly validation pass when validateReferences is enabled in their
+        /// .meta files. Because NuGetForUnity regenerates .meta files with validateReferences: 1
+        /// when restoring or updating packages, this postprocessor intercepts the asset import to disable
+        /// reference validation automatically.
+        ///
+        /// Disables the internal validateReferences serialized property on System.Reactive.dll
+        /// inside folder Assets/Packages/ so that Unity loads the assembly without false self-reference errors.
+        /// </summary>
+        /// <remarks>
+        /// Because PluginImporter.ValidateReferences is an internal Unity API, this method modifies
+        /// the underlying validateReferences YAML property via <see cref="SerializedObject"/>.
+        /// </remarks>
+        private void OnPreprocessAsset()
+        {
+            if (!assetPath.StartsWith("Assets/Packages/", StringComparison.OrdinalIgnoreCase) ||
+                !assetPath.EndsWith("/System.Reactive.dll", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (assetImporter is PluginImporter pluginImporter)
+            {
+                using var serializedImporter = new SerializedObject(pluginImporter);
+                SerializedProperty validateProp = serializedImporter.FindProperty("validateReferences");
+
+                if (validateProp != null && validateProp.boolValue)
+                {
+                    validateProp.boolValue = false;
+                    serializedImporter.ApplyModifiedPropertiesWithoutUndo();
+                    Debug.Log($"Disabled validateReferences for {assetPath} to avoid Unity self-reference errors.\n");
+                }
+                else
+                {
+                    Debug.LogWarning($"Could not find validateReferences property for {assetPath}. The assembly may still cause self-reference errors.\n");
                 }
             }
         }
