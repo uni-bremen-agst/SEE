@@ -1,0 +1,2205 @@
+{
+    "CapturedUtc":  "2026-10-24T10:45:43.4762113Z",
+    "Head":  "a2fae5fc29f682461b38385990568fc5da494ae7",
+    "Parent":  "9b76e179a568c64ae972cc3a45980a094e44245e",
+    "Branch":  "fix/documentation",
+    "Upstream":  "origin/fix/documentation",
+    "CachedUpstreamHead":  "a2fae5fc29f682461b38385990568fc5da494ae7",
+    "DirectRemoteHead":  "a2fae5fc29f682461b38385990568fc5da494ae7",
+    "DirectRemoteCommand":  "git --no-optional-locks ls-remote --exit-code origin refs/heads/fix/documentation; read-only escalation after sandbox port22 denial",
+    "HeadConfirmedPushed":  true,
+    "GitStatusShort":  [
+                           " M .gitignore",
+                           "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25BReadiness/"
+                       ],
+    "StagedPaths":  [
+
+                    ],
+    "PhysicalIndexSha256":  "13032C5672F8A79C0F4B923BCF47E51F8A0D5E4115A712BBC9B195C18A526106",
+    "RootIgnoreSha256":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "Stashes":  [
+                    "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+                    "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+                    "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+                    "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+                    "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+                    "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+                ],
+    "Core":  [
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\.gitignore",
+                     "A10ClosureSha256":  "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259",
+                     "ActualSha256":  "84379B203BFD2B91B0C749F26E812CC4F9FCF0575E6FD22935E4733C11BAD259"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.deps.json",
+                     "A10ClosureSha256":  "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7",
+                     "ActualSha256":  "5B8CCA79E133AEE17434FACB4163890B89EB8650E07D53299B3F400A0A80BBD7"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "A10ClosureSha256":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "ActualSha256":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\bin\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                     "A10ClosureSha256":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "ActualSha256":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+                     "A10ClosureSha256":  "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E",
+                     "ActualSha256":  "F7A5D9789C863625E139FF99E1113A503830F6B85A88F6129916DF83AC76B49E"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\ref\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "A10ClosureSha256":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "ActualSha256":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\refint\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "A10ClosureSha256":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941",
+                     "ActualSha256":  "3C393A0C2E4C79E60DA6A5D9F94175614925C099FD59CFEC1AB573FA8639E941"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                     "A10ClosureSha256":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8",
+                     "ActualSha256":  "387EC80969538596DEA6E579EBDE6D60D24DC32015C57CB70C1D4160DB0A7A61"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                     "A10ClosureSha256":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD",
+                     "ActualSha256":  "9EEE97147077E45BEA6A73748F261D8D3F916A742A626A0E0862E5626E3D600D"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.assets.cache",
+                     "A10ClosureSha256":  "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A",
+                     "ActualSha256":  "D345E02A361CF362ED9993A5786392E02AA8EA2C5593CAD42ACFD38F8CFFAD7A"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.CoreCompileInputs.cache",
+                     "A10ClosureSha256":  "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A",
+                     "ActualSha256":  "8D4C2FBB2979E3F6AEE12C16232423B4DF74FA4B84E25E56C299970AD762721A"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.csproj.FileListAbsolute.txt",
+                     "A10ClosureSha256":  "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC",
+                     "ActualSha256":  "6E0EFBE74F96F9ECB54A2A6C5A85AF61756AF65FE79C6AABD8D0D8B37BCD2DEC"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.dll",
+                     "A10ClosureSha256":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212",
+                     "ActualSha256":  "E90A8B7E9A66064C97E3698773550205CB8BEE689344974752D1A54C14941212"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GeneratedMSBuildEditorConfig.editorconfig",
+                     "A10ClosureSha256":  "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977",
+                     "ActualSha256":  "533411EF6435E259E9B1A94A70178E1AC879B47CDBAB690E8C6FBD65CAEFB977"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.GlobalUsings.g.cs",
+                     "A10ClosureSha256":  "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC",
+                     "ActualSha256":  "F3F134E9E825E3E7268090F58B1AF2BDA2DE513F61A09C56F48B9B8D08612ABC"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.pdb",
+                     "A10ClosureSha256":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF",
+                     "ActualSha256":  "7D36C7E4988527415CC64799FF84363A0F724BEC6D0652CEA1B250BED0B1DADF"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.sourcelink.json",
+                     "A10ClosureSha256":  "2B10165F0FBD3A425C6289C2EFC69F1A003776E0F535E1015154441CFA72C06A",
+                     "ActualSha256":  "2B10165F0FBD3A425C6289C2EFC69F1A003776E0F535E1015154441CFA72C06A"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.assets.json",
+                     "A10ClosureSha256":  "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299",
+                     "ActualSha256":  "7833FF830E37B7108628964618293207F266441EA199056E4FC9A5DFCD9CA299"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\project.nuget.cache",
+                     "A10ClosureSha256":  "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0",
+                     "ActualSha256":  "765D5D89D0AF8ECF78AE219558870067A536102FC07BA59402C334C648F070C0"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.dgspec.json",
+                     "A10ClosureSha256":  "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706",
+                     "ActualSha256":  "C9D24C1173B405D5FF691113CDECF422319AB53CACF36D8A874FAB235EE0E706"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.props",
+                     "A10ClosureSha256":  "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B",
+                     "ActualSha256":  "9CF466A301B3194BE0AC9C216894FA6D42D0E70E905657212E287F78D2F3B81B"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\XMLDocNormalizer.ExceptionFlow.Core.csproj.nuget.g.targets",
+                     "A10ClosureSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                     "ActualSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5"
+                 },
+                 {
+                     "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\XMLDocNormalizer.ExceptionFlow.Core.csproj",
+                     "A10ClosureSha256":  "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386",
+                     "ActualSha256":  "5FE4277676BBB34B863D7CAFE086B7614FC00695B2A688B1736392BA5FCAF386"
+                 }
+             ],
+    "PreexistingCoreMetadataDifferences":  [
+                                               {
+                                                   "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfo.cs",
+                                                   "A10ClosureSha256":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8",
+                                                   "ActualSha256":  "387EC80969538596DEA6E579EBDE6D60D24DC32015C57CB70C1D4160DB0A7A61"
+                                               },
+                                               {
+                                                   "Path":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\src\\XMLDocNormalizer.ExceptionFlow.Core\\obj\\Debug\\net8.0\\XMLDocNormalizer.ExceptionFlow.Core.AssemblyInfoInputs.cache",
+                                                   "A10ClosureSha256":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD",
+                                                   "ActualSha256":  "9EEE97147077E45BEA6A73748F261D8D3F916A742A626A0E0862E5626E3D600D"
+                                               }
+                                           ],
+    "GeneratedCommitMetadataOnlyReproduced":  true,
+    "MetadataReconstructions":  [
+                                    {
+                                        "Commit":  "9b76e179a568c64ae972cc3a45980a094e44245e",
+                                        "AssemblyInfoSha256":  "A6B602AD3DABBB3B7AD41B26C8B73CE2C65E8EE2D09DB60DBFF811440F1647E8",
+                                        "CacheDigest":  "ad95bedee2d8522dcf60ff999589c86bf0b974a05de1699f1d9e4dfc86294fe8",
+                                        "CacheFileSha256":  "1284572B6EEED1C6B6668BC02AF762B4DE5040B2D9F343AC90E54F4529B32BCD"
+                                    },
+                                    {
+                                        "Commit":  "a2fae5fc29f682461b38385990568fc5da494ae7",
+                                        "AssemblyInfoSha256":  "387EC80969538596DEA6E579EBDE6D60D24DC32015C57CB70C1D4160DB0A7A61",
+                                        "CacheDigest":  "f3023478887803f8a807c598382ab8c454739ef2260d8b942e5ea0e442a6538f",
+                                        "CacheFileSha256":  "9EEE97147077E45BEA6A73748F261D8D3F916A742A626A0E0862E5626E3D600D"
+                                    }
+                                ],
+    "WriterProcessProved":  false,
+    "HistoricalProtectionManifestChanged":  false,
+    "ArtifactsDirectoryExists":  false,
+    "HistoricalFiles":  [
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25-bounded-solution-finding-adoption-audit.json",
+                                "WorktreeSha256":  "3BE9033DBE5C95DC9E8C7A5795691E81B35590D9DBF614A4EE287AB4606282E3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25-bounded-solution-finding-adoption.md",
+                                "WorktreeSha256":  "173E1BC926E32F4A1F63FC73A2290334AB20BD227EC28F984D7F3E5AC02658A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A-assembly-qualified-type-ownership-audit.json",
+                                "WorktreeSha256":  "7FAFFEC507E81061C79E885A304C9869E3E296B86594D69EE9AA588CF0CCF0FF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A-assembly-qualified-type-ownership.md",
+                                "WorktreeSha256":  "E53AF418954CA46DF39A96D5896F4273A1C6F8B47C4DD4A60A5D714CA8C47A02"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10-finite-orbit-admission-and-projection-audit.json",
+                                "WorktreeSha256":  "021BC8FEB09D2FA6F78337478B61DF297BD82BD38601237959A6A56F2D470D64"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10-finite-orbit-admission-and-projection.md",
+                                "WorktreeSha256":  "CF78C26E18D1786C130CC2706C4B19D4091345633CB429A0B3F47E200EE6C4B7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/.gitignore",
+                                "WorktreeSha256":  "F8E552D7F3049DF92455A63100696CB2F7F3A93BEAF80257BA81CFF0C7401287"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Admission-boundary-stop.md",
+                                "WorktreeSha256":  "B37DF3349EA846C95FD6DC7A3290A108DF5DB03162FA5C848A578908DF6A1450"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Audit-AdmissionBoundary.ps1",
+                                "WorktreeSha256":  "A42E6BD81C77D32DFAD66F1FF7A0C5DA41086056BF38A6B5A2DD018F084913AA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/.gitignore",
+                                "WorktreeSha256":  "06B653AAE9E1317173CCFF934853D4D69363F1197B34C5E67528DB4C06D03B2D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Build-Prerequisites.ps1",
+                                "WorktreeSha256":  "15B80A49D44E96E995DDCB88AA3DFC5653B1D1C6396F7C196FBACE427619B3F6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Capture-AwaitDiagnostic.ps1",
+                                "WorktreeSha256":  "133C73BF8BF0BDB2AF3AC83076E3B48D41D12E370BE482BFC89C5EEE7B3CD91E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Capture-Closure.ps1",
+                                "WorktreeSha256":  "D291FFFA8936A867FA83497DCDF9EF40EFBA66C429531CB64BFAD11BBB63D9E2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/InspectApproved.csproj",
+                                "WorktreeSha256":  "7E355F50153C6EA99386D3088DB525C45F80F977FC7ED58FA67B87CF48F0AE06"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Program.cs",
+                                "WorktreeSha256":  "E4E39F0417E8381265A98B46D3A904CB866140124D8530FDE8518F984772D881"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/README.md",
+                                "WorktreeSha256":  "ECCA01576D3E348B9FA0622945EB7BF546DA80C506E8C8230409EAC49D4BFFA8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/await-first.trx",
+                                "WorktreeSha256":  "330B78C3A33B204C646CF719346E3CCBB66393ADB49FF4CFAD2D604DCD120D7F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/boundary.trx",
+                                "WorktreeSha256":  "23C3D85ECE301206288D2F70AE44557F2FE6D09A8EF97C30B0B0F285D512F2D1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/broad.trx",
+                                "WorktreeSha256":  "24F247DF2FF7C221022C7209DB02BD28C5143C21D44921CF6F7BCDA717BBE648"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a10-gate.json",
+                                "WorktreeSha256":  "167B23B2820588130AE07077A8CBC102B1FD5579BF3FC3907AA4A07A596B99DC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a10-gate.log",
+                                "WorktreeSha256":  "37FA9FCAFFD69A93E1F3688F69521DC48CBF639D59F059E2DD77968A1B72266D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a6-gate.json",
+                                "WorktreeSha256":  "F706BE117026BC8D106D58B4819669BC8B7E8183780DC2A65398E4DADABD7B13"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a6-gate.log",
+                                "WorktreeSha256":  "E920D1DC815205BFF7CE71370E6A3DEEC693E777937974309E2EB774528177FC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a7-gate.json",
+                                "WorktreeSha256":  "BB26239761A2416CE2887E044A3A8537903A873B5426AB15A6FB0C3F656E669D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a7-gate.log",
+                                "WorktreeSha256":  "7BA2BD010A56C17F0A9EEAE00314DE8BB2E311310BB8E977A5D45F2A2BF780B4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-gate.json",
+                                "WorktreeSha256":  "6AA7265B9BBD8B480BB73212B55027B6A95EA7D5DDC96BA4F8DF47B63B2A5E3F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-gate.log",
+                                "WorktreeSha256":  "30BFE3D5AFB783BD0F92246EA446590B51722122EEB71E269EEA2AFBA6FC216D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-proof-build.json",
+                                "WorktreeSha256":  "3520A335CA5301DF5AFCF837CFBB597448093F3EA6E0BAD2AAED309150A922A8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-proof-build.log",
+                                "WorktreeSha256":  "4104B037F21CC6C0259771237EA6A5BBF3E5CAC71E27A7778DA96754BF35585D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-proof.json",
+                                "WorktreeSha256":  "D2441199F53578C26475E1D63B577203F28D800099240AE0BC35D69B3F10F0C4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a8-proof.log",
+                                "WorktreeSha256":  "C251D5B4FA987964EC073B47A970461A6464D76AF7A4D1D192CA8E9A77A6F377"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-gate.json",
+                                "WorktreeSha256":  "95543F1FBCF7BAFC4F6EE49C0231C439B4372FCB208E94C9F2A815027A444A3D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-gate.log",
+                                "WorktreeSha256":  "32FA77D78A511C0919E71D729F88675E072C4C87263E4568B65B0A8A5F25BE51"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-proof-build.json",
+                                "WorktreeSha256":  "EC613E8DF48F3550594F7E349547FA43F0C5D827134F551D78E13E29D0A071D2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-proof-build.log",
+                                "WorktreeSha256":  "17DF61C8FB42D4CF4CC52B5712FAFFA5C18CFA7519F1A9FCB463E13EFC1F8A5A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-proof.json",
+                                "WorktreeSha256":  "B22C2CB817E84F1B4BC7FF267474387E90BC21FD7D04367E76BFDE928E3B63D1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-a9-proof.log",
+                                "WorktreeSha256":  "610E12BC98A42A53F997FB040D518EAF756F7503BE77601BCA9FFE4BE141F38D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-await-first.json",
+                                "WorktreeSha256":  "0A28F6AC48EEA9D00FBF0A21BE3F0284426AF8DE5EF945A4DD9F049416DD7379"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-await-first.log",
+                                "WorktreeSha256":  "1C4C0B5DEBA88B0C3781945F28DB26585735373F2A768602B2E9C5347317B90B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-boundary.json",
+                                "WorktreeSha256":  "FD2039756403B1FF533C9327F6C5DD1EACE476A9793C573E6D2D978BC582A26A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-boundary.log",
+                                "WorktreeSha256":  "3D3D792AE2AA52DC69935E2E328207424F809341AFF8CC2972CE6473F465454D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-broad.json",
+                                "WorktreeSha256":  "C9D82329F3B49CF1D344EB7BB26993E1EBC007B47F203CD744C1ECFAFDDB36A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-broad.log",
+                                "WorktreeSha256":  "A864DC7B72508A120E37141E842B1DEC30DB54742390EE05F4C6C5C6208D1DBD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-compiled-bindings.json",
+                                "WorktreeSha256":  "8EE380D37A3BE6D9F62F4070DD2877F302A7C7CAC473DA31257031C47473568D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-compiled-bindings.log",
+                                "WorktreeSha256":  "0521D0A5950A5F3F1F02001FAAF2F7A9541A931487B0AB9E254A0A192BD971D1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-dual.json",
+                                "WorktreeSha256":  "577D3AD84E492BDFFF34AA9BF1D654CB2069F6267609EEC1580AEEC17B95C613"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-dual.log",
+                                "WorktreeSha256":  "00A10525232DFB5321C81A71BBEF2FC17042FCCF4CF4EB899B991799402011B8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-fixture-build.json",
+                                "WorktreeSha256":  "75663168A16B1289C4B9D4CE8038FF886528C68935BFDC74D2571EC86FB51020"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-fixture-build.log",
+                                "WorktreeSha256":  "22765604534C1B63FBA2D0280D3942095A79C92D2BAAB6A6AA26D4FEA98B1357"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-fixture-emit.json",
+                                "WorktreeSha256":  "F42B97DB12680C1D3E5108385E378CF47AC774D94943D8966498B54B0F8F2B88"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-fixture-emit.log",
+                                "WorktreeSha256":  "52BDAA08700A5477003B6F8795B0B61F2DB459799FC1B85D7F22EB4DF0B978C0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-full.json",
+                                "WorktreeSha256":  "D59E63A7BF18126F9CBF9E6AB395956ED6377B7BC615DA8D1640DE873A38A62D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-full.log",
+                                "WorktreeSha256":  "8175D2607CEF121BC4BEECB19A1691743456DFC91FEC2EC57F08E54B23E18E9C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-peer-build.json",
+                                "WorktreeSha256":  "E2618DC0946086C4546D4E0AD91B4C5AD81C9C9C7C455D27A5184F5DCEAA96BA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-peer-build.log",
+                                "WorktreeSha256":  "D7B29F6DD1CAF7E35ABCDAB5C9879D46DE9A25A85CC93EEB18F12A400BD0CC50"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-production-proof-build.json",
+                                "WorktreeSha256":  "681EFCC3BEC24C24534D29A118343B3A10D1D1AB35144777985B90F1D0730C1C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-production-proof-build.log",
+                                "WorktreeSha256":  "272FE6B280A23DEDD407BB33EE6C2AA508FDFF37A0D456257EE8D1B5ACFB295D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-production-proof.json",
+                                "WorktreeSha256":  "B4FBF54F300D27A4D0D2A4CA008035EC83E4B2CD05CC0F01324F3AD37738B40F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-production-proof.log",
+                                "WorktreeSha256":  "8B928C99746F630B239D56DCABBEF09A3A2AD8E7BE1A1B997D23A0B633EE1E5F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-test-build.json",
+                                "WorktreeSha256":  "D6031BAB484FCB76AD391CF3594D050103CBC511FE8867166FA23755EFE48392"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-test-build.log",
+                                "WorktreeSha256":  "306A303BAEFA104CB514F864A810380C2D3D334F1BBD5B56953D56808782E6AE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-worker-build.json",
+                                "WorktreeSha256":  "D8D9C58EFF5D39CCFA82176F39CE1759DB9FD7779C0CDD2FD915A9C2E0B2728C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/development-17-worker-build.log",
+                                "WorktreeSha256":  "EC955FABC39BD43D999074E466A4A3FF644B4832F3CF38944D192B6D98C16E41"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17-independent/full.trx",
+                                "WorktreeSha256":  "15DE06A70349D604F82DD2370C12AE46F5D628C34D194422A1D06F616AAA13E5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/await-first.trx",
+                                "WorktreeSha256":  "330B78C3A33B204C646CF719346E3CCBB66393ADB49FF4CFAD2D604DCD120D7F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/broad.trx",
+                                "WorktreeSha256":  "24F247DF2FF7C221022C7209DB02BD28C5143C21D44921CF6F7BCDA717BBE648"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-await-first.json",
+                                "WorktreeSha256":  "0A28F6AC48EEA9D00FBF0A21BE3F0284426AF8DE5EF945A4DD9F049416DD7379"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-await-first.log",
+                                "WorktreeSha256":  "1C4C0B5DEBA88B0C3781945F28DB26585735373F2A768602B2E9C5347317B90B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-broad.json",
+                                "WorktreeSha256":  "C9D82329F3B49CF1D344EB7BB26993E1EBC007B47F203CD744C1ECFAFDDB36A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-broad.log",
+                                "WorktreeSha256":  "A864DC7B72508A120E37141E842B1DEC30DB54742390EE05F4C6C5C6208D1DBD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-fixture-build.json",
+                                "WorktreeSha256":  "75663168A16B1289C4B9D4CE8038FF886528C68935BFDC74D2571EC86FB51020"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-fixture-build.log",
+                                "WorktreeSha256":  "22765604534C1B63FBA2D0280D3942095A79C92D2BAAB6A6AA26D4FEA98B1357"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-fixture-emit.json",
+                                "WorktreeSha256":  "F42B97DB12680C1D3E5108385E378CF47AC774D94943D8966498B54B0F8F2B88"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-fixture-emit.log",
+                                "WorktreeSha256":  "52BDAA08700A5477003B6F8795B0B61F2DB459799FC1B85D7F22EB4DF0B978C0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-full.json",
+                                "WorktreeSha256":  "D59E63A7BF18126F9CBF9E6AB395956ED6377B7BC615DA8D1640DE873A38A62D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-full.log",
+                                "WorktreeSha256":  "8175D2607CEF121BC4BEECB19A1691743456DFC91FEC2EC57F08E54B23E18E9C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-peer-build.json",
+                                "WorktreeSha256":  "E2618DC0946086C4546D4E0AD91B4C5AD81C9C9C7C455D27A5184F5DCEAA96BA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-peer-build.log",
+                                "WorktreeSha256":  "D7B29F6DD1CAF7E35ABCDAB5C9879D46DE9A25A85CC93EEB18F12A400BD0CC50"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-test-build.json",
+                                "WorktreeSha256":  "D6031BAB484FCB76AD391CF3594D050103CBC511FE8867166FA23755EFE48392"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-test-build.log",
+                                "WorktreeSha256":  "306A303BAEFA104CB514F864A810380C2D3D334F1BBD5B56953D56808782E6AE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-worker-build.json",
+                                "WorktreeSha256":  "D8D9C58EFF5D39CCFA82176F39CE1759DB9FD7779C0CDD2FD915A9C2E0B2728C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/development-17-worker-build.log",
+                                "WorktreeSha256":  "EC955FABC39BD43D999074E466A4A3FF644B4832F3CF38944D192B6D98C16E41"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results-r17/full.trx",
+                                "WorktreeSha256":  "15DE06A70349D604F82DD2370C12AE46F5D628C34D194422A1D06F616AAA13E5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/broad-closure-targeted.trx",
+                                "WorktreeSha256":  "CA2661FD76ADDAA3420BA8821EA69F21DDF2A50D46A8C15F8859705ED7D74684"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/broad.trx",
+                                "WorktreeSha256":  "AD990781E68623CEB497C50A42C3C415D6B00EB856E2051EFB52E14C109F14BC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-broad-closure-targeted.json",
+                                "WorktreeSha256":  "3C695171FE498D0101EAD6C8CE4FD57DE973793D5D1F7C3ACF7A654FAFF861E5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-broad-closure-targeted.log",
+                                "WorktreeSha256":  "543C211F53C062D0AAB06D5EF3F94D93A72ACDF89EABF01A3493D25B7A8E342C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-broad.json",
+                                "WorktreeSha256":  "A0C37703ECD836F3035ABACDCFC5FAD584D42D1377800E80F4AD704E297DA5F3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-broad.log",
+                                "WorktreeSha256":  "E3C524B8B634928A6E1C529ADDFF585F577815123101F5CC94BB13EE2C1F1927"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-current-certificates.json",
+                                "WorktreeSha256":  "D61C0A076712562D185C7FA4CF6639CEC5A834D0B4BBAE26F3C55B15CBB6804D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-current-certificates.log",
+                                "WorktreeSha256":  "740AF791268E3C0146B6F2067D1F67EB6256DA288BA122FAEAE6D6C28FD46529"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-fixture-build.json",
+                                "WorktreeSha256":  "D02680283B80258C5C8EC3B31821B20B4D24F764914A4DAE3EB26716EE784629"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-fixture-build.log",
+                                "WorktreeSha256":  "4B04166008D136DEF56DADE8A0310C6E9264AAC4FC3A7A74A32A6856331FC710"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-fixture-emit.json",
+                                "WorktreeSha256":  "156EBEB98E786913F26C46EEA4957B873441EF09BFE0BBA2569EAFBF58C8013B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-fixture-emit.log",
+                                "WorktreeSha256":  "52BDAA08700A5477003B6F8795B0B61F2DB459799FC1B85D7F22EB4DF0B978C0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-peer-build.json",
+                                "WorktreeSha256":  "8FF2F615EBECA8C2F49B512CAB75E6D003EF4BA9CCF65D20456B8BF01871B9FB"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-peer-build.log",
+                                "WorktreeSha256":  "5793D340C1E43F48D8E1FBA94F8ED48E0E91AE9B9A622D7AEE6F9C9A1B4C883D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-test-build.json",
+                                "WorktreeSha256":  "99F310B21D089054013A9F1F28C27C621B628D9F689EA0508C151F8EA223E6EE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-test-build.log",
+                                "WorktreeSha256":  "5C19D251A45D7D2534B72FF2BF1489BF6FC71AA212A558D6AE44696A6D68F4AC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-worker-build.json",
+                                "WorktreeSha256":  "EA4E4098CCDE02D3BCFEBFDEEC37519E3F90771DD045FCBB4C1E6A4945057F3F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Results/development-16-worker-build.log",
+                                "WorktreeSha256":  "85E721D7AA09F973F53A923887AE66C2D914A7715071AA1EA2015EF3D5468D08"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/Run-FinalPhases.ps1",
+                                "WorktreeSha256":  "9BAF2F6A078A4CCA34D58DBB1FE0B465F74E5834149CE3183F1CF6F745049301"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/approved-assertion-delta.json",
+                                "WorktreeSha256":  "55C0DE0817B090EBDAE0A624D0D92C10919E2C562DCE38CE3CCDBEBDE463FC1E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/await-details-diagnostic.json",
+                                "WorktreeSha256":  "CE3C061BCB4B697EEC7438C71CA8F054F4112A12B4EB6766E6A1E11DCCBE9D8E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/current-certificates.json",
+                                "WorktreeSha256":  "DBB83B01623CAFEE7F53F27F75E4577CBF8644E5B88327A93B652E3FD9754CA8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/verification-r16-final.json",
+                                "WorktreeSha256":  "C2E5792180A56AC714A2E95C5D2AA3ECA6EEA0C49D98550E207CD98B2E3F1DC7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/verification-r16.json",
+                                "WorktreeSha256":  "C992630255B55077212A22163BC50C54DAC4BA0DB2150909E17ADD02AF1D265A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/verification-r17-final-independent.json",
+                                "WorktreeSha256":  "C052CEF0A9D9C3FDCDA3568793A921A6827F78032DEE9F8EA84D49932DBCE00B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadClosure/verification-r17-final.json",
+                                "WorktreeSha256":  "49FE3A161264E55237C1BB4EA5D642C51936598104184926B9EE7FB98C793EC4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadFollowup/broad.trx",
+                                "WorktreeSha256":  "D16E6EE05A3F656C5FCFE94C9CBDDEC393EA2843C4D3D86E86352291A9F85BBA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadFollowup/categories-addendum.json",
+                                "WorktreeSha256":  "DEDE4232C2B3A957C26841FAAD82006DF056F727C204D8003CFB9A91F650FB7F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadFollowup/run.json",
+                                "WorktreeSha256":  "CD6722655C2D055C4E937D59A9F2A4B1EA9AC69D37DEA620A1A9D0EF20DF8471"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadFollowup/run.log",
+                                "WorktreeSha256":  "BA3418E254DF8098E2A75F24E038A60CC84FD968122B44816994EF69B1CBA565"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadFollowup/verification.json",
+                                "WorktreeSha256":  "B309669F8C565E166F690D89FFA48B18F90251A09D1335B3C98901AB3DF33B5C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Broad-Approval-Batch.md",
+                                "WorktreeSha256":  "8DEFD7962F5047BD4AB584580984CE63A07FB26A29ADE5495710793AA41C24A8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/README.md",
+                                "WorktreeSha256":  "9ACC78B0D7209B3880B0631CA8546206E2957A81160D70C9FD04AD74E9194652"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-diagnostic-side.json",
+                                "WorktreeSha256":  "540989D8E30C2315BD132EA78BD446BFC722D44F70439B46D74F1E484A310429"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-diagnostic-side.log",
+                                "WorktreeSha256":  "7CE73CA726CBF65CD8C80AAC1D71A4AD045A2F56CF92EA10B49A447DE9FDAA3E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-baseline.json",
+                                "WorktreeSha256":  "75164F61E28DA67C46A42F054BEEC19590741AB080E2DB617B2DE17C1813A467"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-baseline.log",
+                                "WorktreeSha256":  "5A0DC083F493EB176B50E438817E05065584518AEE943859C83C9C12A7BA5393"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r2.json",
+                                "WorktreeSha256":  "BEAB894F170E118884C45C0387722393DEF2A4B524A05258943E2C30E6BE4B9A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r2.log",
+                                "WorktreeSha256":  "82A16FE89D1AFE89DE6C490341217AC6C7105E7D9D96E13B51E63B1471A33146"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r3.json",
+                                "WorktreeSha256":  "DC74022453F8805A4A7DDB593E9D57FA88547B893AA044A3209A1413ACC5B6B7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r3.log",
+                                "WorktreeSha256":  "CDE7962D9AD2664281432866A7C62E9D26DDC67C5B4081FAD29A7D44C34E8572"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r4.json",
+                                "WorktreeSha256":  "BF5E218F9B0D0B5C946ADFAE44FC0E0DE6E06B8AEE7B2D27CAAB30A5E853F114"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r4.log",
+                                "WorktreeSha256":  "47536A03F622E17D0C76DE8BE1C6CE9937B6147F6D2B15AB14A13422BC366558"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r5.json",
+                                "WorktreeSha256":  "8E835E49AE4C44159CFAEEEC78DF82CA6AF4E5C8279B1EA2AC19C0CA6885B6DA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r5.log",
+                                "WorktreeSha256":  "C84A6550EBD855F927164EEB720C9960155A14BBC13D5CAD7510B5895A59AD2C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r6.json",
+                                "WorktreeSha256":  "B40F4953630C8A931A71254E7C8AAF6B6E21ED11338CEA25B423DAE4ECB31F25"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r6.log",
+                                "WorktreeSha256":  "F08F236FBB5E7F43A476B330FF1A21FD3E68A8784E239085EC052C5B2272DE8A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r7.json",
+                                "WorktreeSha256":  "5C766DC5C64A6EC8B30E44F09336E6E2CC02D86117DFD255F435E1267C1B619E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build-r7.log",
+                                "WorktreeSha256":  "AD3F1D00CB9750A4B5558F4F49928164AC32F801CF539CC57D92006E2D7E95A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build.json",
+                                "WorktreeSha256":  "1B5E8AE13F0DE250C87DD65B31499AA970BCD1D68F311C3A57FB1F599366CA56"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-build.log",
+                                "WorktreeSha256":  "3A645065C51912D670B1FC13FB6403A16F8E0687D0E12CF851A9DB1D9D268B30"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-current.json",
+                                "WorktreeSha256":  "7DD6991FAC401108863294257F0A8D969EDB570674718266F4768275F3BF9CB9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-probe-current.log",
+                                "WorktreeSha256":  "ACEE7E7BE264E5B9823D9BA502337D502917A567370344F2D51985CB6BBAC53D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural-r2.json",
+                                "WorktreeSha256":  "D87C15646FCD6343C2E6799F869A214EE1AC6F18DC66444DD4A248B42B030751"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural-r2.log",
+                                "WorktreeSha256":  "BCF275D4273FC18F2DDA0B3A953F5B290CAEA7C5BA019554BEB1FDDC3579FD50"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural-r3.json",
+                                "WorktreeSha256":  "7C1AA1020D6DFA66EAE045EF885989DB19EDF3B63F520B300CAC1CF3FDE4225E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural-r3.log",
+                                "WorktreeSha256":  "2AF71530A4D1A05D00EFCB96E720F93661E64B218443950EB5C265E84F0F544A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural.json",
+                                "WorktreeSha256":  "12A02777D15F8548674344BB27FC6718B36B518C3EEE9C7FF8379E377216BD02"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/Runs/broad-rc-structural.log",
+                                "WorktreeSha256":  "4B957BD39C7477DB6F020F626290135D94134822F8531A48D6EB336B13A13179"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/assertion-bindings.json",
+                                "WorktreeSha256":  "5650EF952E719BEA1750A73BDE41EB43BDEAAC2F445E5C6D0E7992031481BE23"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-baseline.json",
+                                "WorktreeSha256":  "9B98222810AD0ACDA558312F31E824793D49CAB25771BF2D9C8F01749F885025"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-current.json",
+                                "WorktreeSha256":  "AE0B4B4D3710DDB132634AFD5FE84811EDD44C220CE59A9E63BC73E8ABC8DA42"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-diagnostic-side.json",
+                                "WorktreeSha256":  "2C67672DE906C7556B14D2299147D1EB954E863D15BB484995C72E93B6771693"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-structural-r2.json",
+                                "WorktreeSha256":  "BBD09F916543504BCB049F48061D96B11B60A5269CF0DBD8493FAB2499C6DE75"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-structural-r3.json",
+                                "WorktreeSha256":  "96A085EA3B75E1DE182C60670349F607A7BD753350CBFF2B49D71DE5C2580943"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/broad-rc-structural.json",
+                                "WorktreeSha256":  "E1E2B2ED16A761E52BCCB28C533EA6A8B51D826E926668CF2452992DC1193736"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/groups.json",
+                                "WorktreeSha256":  "DBD5808A0985A4F9DDB72E185595D8206473BEC207F666E45DC0DF726E54B52D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseAudit/partition.json",
+                                "WorktreeSha256":  "355BF2726CA6EABD71CD65ACEABEAEB09A73ACA9F06AC409C451C3089E691A9A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseProbe/.gitignore",
+                                "WorktreeSha256":  "06D162894E1973324481D43D0EBEF61D3F2B256F3A909FF867BEC943F6BB2FFC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseProbe/Probe.csproj",
+                                "WorktreeSha256":  "02B527FDEA3A8C3F1EB03F6ECEA20EBE1FB4CB9E34A58FED4DD3F22B1C856100"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/BroadRootCauseProbe/Program.cs",
+                                "WorktreeSha256":  "4BA4456DD3FB5178FF3C1AAED5E43268CE60E7128DC8F88F52BA5952029473A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-BindingClosure.ps1",
+                                "WorktreeSha256":  "E48265AC9813CA25476D4A4085528C542A7A8B0AE57761A860883C28B4232FBF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-BroadAssertionBindings.ps1",
+                                "WorktreeSha256":  "72BC9A6E5C405A7A314CE4AE67EA99EFBE166EAABC968D3C158459F0291E0B94"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-BroadFollowup.ps1",
+                                "WorktreeSha256":  "B1505AF8042ADD1332043C323633B157410D69DC3460C36E2BF004EA139DBFB9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-BroadRootCauseAudit.ps1",
+                                "WorktreeSha256":  "E97462AD3FAFB9D277549711DCA3E81F4C775A552E0A970E55788999ED062F09"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-IdentityStop.ps1",
+                                "WorktreeSha256":  "37E6885BD4A48DF075C6BFDD1FA5BD7659AB3D727F34667B6441C4491BA9C7F6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-ImplementationStop.ps1",
+                                "WorktreeSha256":  "404013DC723A69195077A4DF52C91ACD0CBF5551D2F7A19F225D4B810860A610"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-K17P12Followup.ps1",
+                                "WorktreeSha256":  "378AD833249549B79B3FFD88475A6EBA11588ED0779FAABE7536320FDEAB44B5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-OwnershipFollowup.ps1",
+                                "WorktreeSha256":  "4462F619CC2636DF22223711107D9F896A778B2A2A6852844C10A3E0F4B8648E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-R2Closure.ps1",
+                                "WorktreeSha256":  "B6DA69E01A40F97C446D035FAEA1DCCF030E91B042C6D78AA98D4C0B477B5900"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Capture-R5Closure.ps1",
+                                "WorktreeSha256":  "4D47C43F3A2B2FEE204278C254476757DED1DAD2948B923B5D8616F74C326F3C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Characterization-approval-batch.md",
+                                "WorktreeSha256":  "88C47B63172D7D81BF4484E64A1B3330710A1ABBC081DFA8DD45C0AF601A11E0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Complete-fixture-preflight.json",
+                                "WorktreeSha256":  "A93F29CE0C5B10423E3B3692850BD636B257B4FDB79397D1B54E3AEDA3115665"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/ConsolidatePreflight.cs",
+                                "WorktreeSha256":  "87B9671AE63DA722C05D3C7F8DE6828C204B6728DAB122302ABAD751ECF9DA63"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Constructed-reference-identity-stop.md",
+                                "WorktreeSha256":  "955F7144E58F3AA4748A9A2E9FCD7CA755FDE3E558400ABA77B02F85ED501359"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Final-consolidated-approval-batch.md",
+                                "WorktreeSha256":  "154CF129F2923DA07ADA48F8BA32C119E9670C5A2C095AE2C5FF3FE2A5A70C19"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/.gitignore",
+                                "WorktreeSha256":  "0BC52E3E0F27EBF0FCE8CED5C8DC2B9C4BCA786C1D53B283A787EEC177620ECD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-CompiledInputs.ps1",
+                                "WorktreeSha256":  "9FC8B0AC5300009767BAA2E8496F37AC6175C0C2340D22DB5A0DB7019BF81CF7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-Followup.ps1",
+                                "WorktreeSha256":  "35FE2891AE710588DE3FC7FE3A7B3CDB7D1321855007211CA34D1850160C3001"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-Independent.ps1",
+                                "WorktreeSha256":  "6EC7AEFD66B5227E11E8BA7383C67DBF33E46E6EAA41836AFBB5B12B1D34D52F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-LifetimeClosure.ps1",
+                                "WorktreeSha256":  "75FC0D34CE6728028B53B9A06F2F6E61649A01B0EFBD5C1357848CFE45B90D82"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Capture-LifetimeInputs.ps1",
+                                "WorktreeSha256":  "F53C322B211E4120D3E3BABAC70F7D123308E7B7156E7291B4FF333AE4A4DF07"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Harness-lifetime-closure.md",
+                                "WorktreeSha256":  "53A20A02A60BFDA84EBD212A79AB16F10482A1862518EA563CADB00F68D49927"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a10-gate.json",
+                                "WorktreeSha256":  "AFD84B5324B37C6FC99AA72FEDF2607794BAD6E1B2BA34699C7D7A5DC6966F24"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a6-gate.json",
+                                "WorktreeSha256":  "522AEBC76E57998133814FC57271EC86A6602943CEC612CA2096A9CFAB6F0DD4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a7-gate.json",
+                                "WorktreeSha256":  "89D22D0754E19FC389F21AEB12DE34B4F92918E2FA77AE0513692525847BCA0F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a8-gate.json",
+                                "WorktreeSha256":  "6147E4E2BCE5E0EC9241EA7D079CD7E6CA5887AAC01A328105E66C55E1A13C02"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a8-proof.json",
+                                "WorktreeSha256":  "699CA81E662C3D2CABCB0C95CC273E40C9C80858AE20689EC4FAE4E345186CA5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a9-gate.json",
+                                "WorktreeSha256":  "A5599EFBD08E8D646E03E8E43CBEBAE97C6FAA9CFE8F77A39B1F582CA3677529"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/a9-proof.json",
+                                "WorktreeSha256":  "4F8FEA173C4402DE00789C8760B299EE47089C6F939035991B8D5003A5CA63F4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/compiled-source-verification.json",
+                                "WorktreeSha256":  "84EE09AAFB25EEB60448B67CB72016871FD5F26D4CA5F36DE801A5732BE137FF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-0-current-build.log",
+                                "WorktreeSha256":  "A282BDE6134F0FB2F676599AD520641FC17EB7B8ABC1D6BAF0611BD30DA8ED63"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-0-current-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-1-historical-build.log",
+                                "WorktreeSha256":  "FD0FD76C8FF4C1B010A11F194224444E683CA4F49286787C9E698B007C60780E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-1-historical-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-2-current-build.log",
+                                "WorktreeSha256":  "72FA1DA66E665363D80B24B53FEF83A8D75B6EC61D5E93072E83A1ABD04D1F98"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-2-current-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-3-historical-build.log",
+                                "WorktreeSha256":  "D0AE55A3028F7CA245FF35F84FFD9FFBFF560461856E67EB78125EBE24CBD40A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-3-historical-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-4-historical-build.log",
+                                "WorktreeSha256":  "E13D6A299343EC5122C121C4B4116B819743645BE316F5BA8BFD2C63363B1706"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-4-historical-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-5-current-build.log",
+                                "WorktreeSha256":  "6A8B8A328C5532E6369F7941340F3DC1B2F161889DCAA05BF8CF1046E7A470E4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-5-current-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-assembly-qualified-ownership.trx",
+                                "WorktreeSha256":  "75F4A8C17EF149D98F7BD24249166B411817100DC706266A986AFECCF31C2AEE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-audit.json",
+                                "WorktreeSha256":  "7BBDD7786F63758727B7F4E74C96A9778D72045424340706C4B4C059B4289D8B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-boundary-test-process-build.log",
+                                "WorktreeSha256":  "054F4C675D0AC5D3A0AC4FD7C5D0CDD728AC0310BE75B5EF03327AD586BF8E93"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-bounded-findings.trx",
+                                "WorktreeSha256":  "AB4167193921EC25A76E1E90B8B5E682C1EFA490D844E746B3D060977C341E5B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-bounded-generic-context.trx",
+                                "WorktreeSha256":  "01E2076AF8708E318DE8FF4375ECAE6C4A06D05D654E20CCC73F0F0D4A29A165"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-canonical-exception-identity.trx",
+                                "WorktreeSha256":  "8FA1F3083D90A16D4D150992CFA54EDE52C88334D2EFCB6927D14D6C0785AF9B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-constructed-invocation-context.trx",
+                                "WorktreeSha256":  "E14D6BA1651B22DAD5373F33F3A4FEDA251DD8348D88D518BACD9496E23DAE51"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-external-target.trx",
+                                "WorktreeSha256":  "C18C15578B1A33EF6EE031BB3062FB89254AA177431618634F706513BFEE6EFD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-assembly-qualified-ownership-tests.log",
+                                "WorktreeSha256":  "12B6053CA10D589EDC9FA54EE3892361B84C4A710A734EEA1880AF67F54B0A66"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-boundary-tests-build.log",
+                                "WorktreeSha256":  "480E83FD95317A7960677CDA2A33AF386B69C0FF4CC5E4ECB09F25782A368FF5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-boundary-tests.log",
+                                "WorktreeSha256":  "A69090F59D7826F2D063BD8984DC92033E605BB74EBF02274E4E586FD328A51B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-boundary.trx",
+                                "WorktreeSha256":  "B35ABB7C9C06D4051CA6413F75A699D597FC264808AE1F76C11E324CDDFE1FC8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-bounded-finding-tests.log",
+                                "WorktreeSha256":  "ECDED068EB42B8A25317FD1CCF34A917B300E7416BA1A7A5084865E5DE913D5D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-bounded-generic-context-tests.log",
+                                "WorktreeSha256":  "A51163207840C8B4C1555B69B55E04F3867725D411E8C1782709B7638294158B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-canonical-exception-identity-tests.log",
+                                "WorktreeSha256":  "2CB842C6EF707FFF679234AB1581D3601DE35631D4FA3E4458E1EACDBA73447F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-constructed-invocation-context-tests.log",
+                                "WorktreeSha256":  "14DE0045740B5C3EE10AD16D7AAF89CBA1698B1CA96CF49CCA52D32543102046"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-external-target-tests.log",
+                                "WorktreeSha256":  "E9CC80117357A741D49D327B5F5AA27532BEA092FA7895E87C982B3BEB194034"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-recursive-summary-closure-tests.log",
+                                "WorktreeSha256":  "60D38B9FF86C4C319D59A472CF003FB496E917644559857906C2D07D401FCE02"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-main-solution-finding-tests.log",
+                                "WorktreeSha256":  "BA389E20F73F778260B806226256FA25D8F29C2F06A49E1E82814ECE6BAC5B04"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-projection-pdb-fixture-build.log",
+                                "WorktreeSha256":  "4A481FA03BD632A3D5FB89988DABEA1F7BD86997A75F709C6A86DD0FC2C8FE23"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-projection-pdb-fixture-emit.log",
+                                "WorktreeSha256":  "413FF02E8C2ED6EF1F9788AF04D17C14E07B73F8B8F0030A652D3991C1214CFC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-projection-pdb-fixture-restore.log",
+                                "WorktreeSha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-recursive-summary-closure.trx",
+                                "WorktreeSha256":  "22EFD92B1681BB3EBB3E89578A053CC825330453CF9AB067FC828FADBCC4FF1A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-restore-current.log",
+                                "WorktreeSha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-restore-historical.log",
+                                "WorktreeSha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-restore-worker.log",
+                                "WorktreeSha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-solution-findings.trx",
+                                "WorktreeSha256":  "69776F440434F6C468BE1FA96D9379C3563696D5D07E935A1C4F61C192EBB744"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-0-build.log",
+                                "WorktreeSha256":  "F600BCD5ACD8525952BEF426B7119898C552727EB671DC0A373FA55436B9C0BE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-0-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-1-build.log",
+                                "WorktreeSha256":  "E06B469889DDD9AF89B2F00F6A02548D4C45CCB9A96EF15D4DAF7526A96ADDB7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-1-clean.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-identity.json",
+                                "WorktreeSha256":  "C0E4F017CD0E220DABE74EC269F0278D98EA91A8CB24A01258BE09E7717A5BF0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-identity.stderr.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-invalid-version.json",
+                                "WorktreeSha256":  "0EBD459BD857AB56D5CE10666D60A6D12664191615636938FB3A9F4D4BD8F538"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-invalid-version.stderr.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-smoke-first.json",
+                                "WorktreeSha256":  "03725371498CFB582816059197C9D333D64EEAEC464694C1A960A059CA61F918"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-smoke-first.stderr.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-smoke-repeat.json",
+                                "WorktreeSha256":  "03725371498CFB582816059197C9D333D64EEAEC464694C1A960A059CA61F918"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/dual-worker-smoke-repeat.stderr.log",
+                                "WorktreeSha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/export.json",
+                                "WorktreeSha256":  "101BD2EFBDE4DEB5D590D47F4A09093F74835E487F099B7A5B3B7E31C8650F9D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/production-proof.json",
+                                "WorktreeSha256":  "79287FFFD420B1878F5EAE03FE0D8AD3047062706546AE9D63AAC9C43F6D2421"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/proof-inputs.json",
+                                "WorktreeSha256":  "E8200004074A6BBCEAFAAB736859080A1FB6AF2055CC602FD3FBFD1EF31E1BF7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/IndependentResults/validation-inputs.json",
+                                "WorktreeSha256":  "9637EC7F26D8417B9FAC29FF12965490A81E0D86585B1470022039433F6399BD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a10-gate.json",
+                                "WorktreeSha256":  "3054A29D17C00CE2FF03AACD486F84EB7C14B84B95BD7899D1B574D336CEE6DA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-gate.json",
+                                "WorktreeSha256":  "CCE56618714550D174448F7EE7F8BE532830F24AE5E71053742378919C8D1D76"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-finite-False-False.json",
+                                "WorktreeSha256":  "B9D3176CA7BE7CBE91A81A2313F0521B292E6DD4937C01F9401B25C8A5FA317E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-finite-False-True.json",
+                                "WorktreeSha256":  "74D420FAE7725975042BE23AEA2130D9EE82B09751714A8A0654D93541ADB73E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-finite-True-False.json",
+                                "WorktreeSha256":  "3A1529DDCE94A1382A8BEB3189DDFE059DFF3385D10BABBA98B274E7E543ACA0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-finite-True-True.json",
+                                "WorktreeSha256":  "4FB544FED323602E41AC0854C52CCCB600169D6606BB96C36F3277F8F725D767"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-growth-False-False.json",
+                                "WorktreeSha256":  "E3DE1E15D8DC903173AD0368C8418DEE356EF8F6C91CA54E044B938DEDAEA825"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-growth-False-True.json",
+                                "WorktreeSha256":  "6FB4540597F89E799C56A2BEEE8AF8589158A1BF1358A508DB950DB3A847411C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-growth-True-False.json",
+                                "WorktreeSha256":  "0E4C8B7791EE47E08AF1D4DA739FAAE4BB93AFF11ACF6374B6A18A592E293EC6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a6-witness-growth-True-True.json",
+                                "WorktreeSha256":  "311D16268B9CCB7346437E23D4FA5D29F184DD8E741844CD5AC4F14580CB5157"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a7-gate.json",
+                                "WorktreeSha256":  "7DB5148A4672986AA8B308F41347FBFE66F3DF3B650122F44786E1585CDBF2C3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a8-gate.json",
+                                "WorktreeSha256":  "79D249EEB85870BC6EAD5EC8F4CDB7C4727E99DE6C96E812CE702F1E923B9127"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/a9-gate.json",
+                                "WorktreeSha256":  "B6EE677FCA9F7AE909B22A19BD67C8673CCC7A3D42CFC78395B6488C8114C6EF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/compiled-source-verification.json",
+                                "WorktreeSha256":  "A32B8B542EF381E0F4AB44E79D363EBA186C7952FA22B6DED834FE7A93834E41"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a10-gate.json",
+                                "WorktreeSha256":  "9EC6DEBF7A2E284E458F3C0B64CBB0910B4158500A4F219CFFC4AE2997B2C851"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a10-gate.log",
+                                "WorktreeSha256":  "6E40D883DF8A785B0A3E4749C609F51EE320E6B79C1ED7C02C0F48187ED422D9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a6-gate.json",
+                                "WorktreeSha256":  "D7AFEBA4E6364F4A9353F71EFB49908AFAB41DF0E85E05AF24C6A67C04F1A925"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a6-gate.log",
+                                "WorktreeSha256":  "E36897132B878F77A6484748230A70A6CFDB423314532C9911422116DA68BE06"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a7-gate.json",
+                                "WorktreeSha256":  "8B808CD3E9B1D78ED620136A8897B72C150512759679311D0E0003529F401E1D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a7-gate.log",
+                                "WorktreeSha256":  "2F3B518060772C40C5329786F82BFC11D436774B8A0C9F5FEE5CC1BF8F59111E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a8-gate.json",
+                                "WorktreeSha256":  "A506A3E871CFD381DFEA1E61D2290BCCA030B040D609D7B6CC2BF5847333CBA1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a8-gate.log",
+                                "WorktreeSha256":  "8EC3EF13A9E8687B7B38DE08C51567B41480C3BC649464E5E320DC0947009527"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a9-gate.json",
+                                "WorktreeSha256":  "5CC3CE8648BA3783B0518038AC9078BE5F1EE9D5ED3C5EE30D3687DB36EB09A9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-a9-gate.log",
+                                "WorktreeSha256":  "416EBE63FD754D9BCB76BDFCB34C0C07BDC91082FA657D71D8B02FCC74B678CF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-fixture-build.json",
+                                "WorktreeSha256":  "F4CC0622A67F1CE09700E8D85A8D5704369CC32980F97BF2BBD159A750BF8BDC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-fixture-build.log",
+                                "WorktreeSha256":  "E6BDFC9F99489E7E4DA29856108DC667E814CDF857F647FDDECAF81CFFE3A8E9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-fixture-emit.json",
+                                "WorktreeSha256":  "A637616FC13EB154D7C060D78C592DA63C78DE02C036D8A66345EF51743EE1D4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-fixture-emit.log",
+                                "WorktreeSha256":  "52BDAA08700A5477003B6F8795B0B61F2DB459799FC1B85D7F22EB4DF0B978C0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-full.json",
+                                "WorktreeSha256":  "21B8DE16D504EDDA5C359DD2519B423415C44147D5C64605F89C89EEC5B09DC5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-full.log",
+                                "WorktreeSha256":  "B115806B29E39866A244B31A4C85789BE7DFC6C0C18D279AF8A29576BBDC6C39"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-multimodule-first.json",
+                                "WorktreeSha256":  "6416A3C3DA48AF5D6771AAAAFC67E98116C2A7B72A27C7DD8A2977EA94CFA697"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-multimodule-first.log",
+                                "WorktreeSha256":  "EF87831883B93FBE35695B325A196999D3FEB0962382139BF4FC059CB8D2B29C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-peer-build.json",
+                                "WorktreeSha256":  "2413B50DC5F9D434DF7BE3AF5A5E6FD2B4259626A37E61E2328E91CC85E101A0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-peer-build.log",
+                                "WorktreeSha256":  "DD91234B8EFCF0813B5C040ABE1D74CC893D97E3CE9DA20986BDBABF8699B362"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-test-build.json",
+                                "WorktreeSha256":  "D2F933F58485E47CA3EB1700D179842BE4E2FADEA156A121C33C894066FA2FF7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-test-build.log",
+                                "WorktreeSha256":  "D7B319FB9D6D6A0F567EFD4741880E9ED44649691413CD0FF6B788199069B408"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-worker-build.json",
+                                "WorktreeSha256":  "A9DBBBCE2DFAD2C32003A9CD1C3ED9590001E014B69EECF3F05D4F393030C0AD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/development-18-worker-build.log",
+                                "WorktreeSha256":  "54E4B7747919E76C4C2598C37507134EF2E63B2BCFAE5F69C4FE13AF2018DF93"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/export.json",
+                                "WorktreeSha256":  "B2866F6BE4A93DF1549E86F5A672F3F61CDA40807064B0F5CF6BD72F0BCC7AD6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/full.trx",
+                                "WorktreeSha256":  "5FBD304CDB80FD8BEF5CB26E944B76A2811102103939C02C697D61304748E0F0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/lifetime-input-delta.json",
+                                "WorktreeSha256":  "555FA6DA8803EA8ED00538B37E5A3BAFEAE868EE2D3FE42FF52D1DF563DBCEA7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/multimodule-first.trx",
+                                "WorktreeSha256":  "48DEFC01C76FDB009BCCBEE1FB85D255EFADC11DA47993342B438AD52856DFDF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/LifetimeResults/validation-inputs.json",
+                                "WorktreeSha256":  "E0BEEBA856BE4CEE2A34DE3A4C0FE42FEA498BAA97BBE5BDC3F5E2CBE072D0B5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Prepare-LifetimeClosure.ps1",
+                                "WorktreeSha256":  "0F5F673779B8F9193B3A3D2731251B1AAA3F6141839DD2E1202774EBB6B6EC87"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Program.cs",
+                                "WorktreeSha256":  "7253C5DF1D472E5CE15707A6D13D6F07FBCA11A9460E9D0049D46E886BF841D5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/README.md",
+                                "WorktreeSha256":  "2468095B22A5940CFDF2997E8689177AEAB7AF147459018435E1AD712A46A60B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Run-LifetimeClosure.ps1",
+                                "WorktreeSha256":  "2BDEA6C038B450357783C9DFF4CBBB1D7047978B8653FB4CF0CC9B3F309B71A0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Run-LifetimeGates.ps1",
+                                "WorktreeSha256":  "0F27E7519F03E152CD17DFAD71337B1D145D800DD377450FC2A5BF77D9676B74"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Run-Proofs.ps1",
+                                "WorktreeSha256":  "F659F6FD97BE6D7F1F7D85B2614796B732B9265F8F3DE8A94A83BF34F018CDD8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Validation.csproj",
+                                "WorktreeSha256":  "D6D1A32CB9D996F92A1224411A7DFAB3BD8C72A9D806DE9296E9EC939593D687"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Verify-Gate.ps1",
+                                "WorktreeSha256":  "36AD475740319109018774E6627A65C33529FD425D2519D626DCEECA3DEFCCD2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/Verify-LifetimeGate.ps1",
+                                "WorktreeSha256":  "3A2530F2275C07A344332F9B02F60EDB81AF90796C04CF0FB544AF0F13C5531D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/await-approval-followup.json",
+                                "WorktreeSha256":  "76C7C7EAE218ED94D8F1846529892496DFEB649E1B683CA4FFF43F9EA783993A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/independent-validation.json",
+                                "WorktreeSha256":  "0F56CC17E59F9DE64EF051BE6CB8692F4D3D7D9BE9677DE8FE29F80B9FB20853"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/lifetime-closure.json",
+                                "WorktreeSha256":  "20F2384E40EA0AE0BEA68B781607B14417CD0990267E551886F6A07CB59F6EF4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/lifetime-validation-location-short.json",
+                                "WorktreeSha256":  "86BC625F31EB14B54BE837E255B8D3F52451192277F4633CBD59DD40F40E81BF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FinalClosure/lifetime-validation-location.json",
+                                "WorktreeSha256":  "4CBB3109E3ABC9F40748E2286EA7C25EDE49BD9FFE29155AFA9F23191AB1B2E9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FixtureClassification.cs",
+                                "WorktreeSha256":  "32834A2EAA1A47067C5E42A6D7A990905858B94E7F4771227F811DEC439ED3D7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/FixturePreflight.cs",
+                                "WorktreeSha256":  "1296795874A7A770A7A5953CA13933B2655626F03CF1875ACCDF94863D002EDB"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/IdentityDiagnostics/canonical-object-identity.json",
+                                "WorktreeSha256":  "74ADD1F0BEC40D231835BFE85949D156BF212890AB7F1C00A936965D9DDA2740"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/IdentityDiagnostics/failure-identity-False.json",
+                                "WorktreeSha256":  "892FCB1094E6479493FD12D10D472559989E1F031430A2398EE92533C911D231"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/IdentityDiagnostics/failure-identity-True.json",
+                                "WorktreeSha256":  "F9EA38ECDE4660A5603C6C32053DF9B4E7AEAB5E27A72AF98AFD62038A9B8B14"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/IdentityDiagnostics/ownership-finding-closure.json",
+                                "WorktreeSha256":  "3E39EB7D3E6ADA9A5A84DAA935813D75D443CB2EC862268353CC72D1F8223654"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Implementation-progress.md",
+                                "WorktreeSha256":  "0945ABFA29A9FC6BCC412B5B98F3364557F3932260498156C0653BA71D3D9738"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Implementation-stop-ownership-cardinality.md",
+                                "WorktreeSha256":  "1FCF7651EC058CA14A0C6B0C218E996AD509A2FF75B867338416DDEAB413D0AB"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Implemented-assertion-map.md",
+                                "WorktreeSha256":  "D879864F458E694EB052BE8EC833E4062BA62911C8572A20F34BD1073BEC5193"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Inspect-Supplementary.csx",
+                                "WorktreeSha256":  "1999538308855BD28EABA2DC6814B992F71C9C8D29C47408259D3A07939F20BE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17-P12-followup-R5-stop.md",
+                                "WorktreeSha256":  "D3BE0C2CAA680CD2595FE3653A2F65E8AF2C519F08644FBB54DB39968523A30D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/development-11-k17-p12.json",
+                                "WorktreeSha256":  "8DCA51057FC4C9DF19AE298DF250633B3FA4C489CC485D1F8F459DDD0E6F73A7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/development-11-k17-p12.log",
+                                "WorktreeSha256":  "71BB2104750351F07EFD5797C26B6C52A4E2E1984E946C56C5AC30CB8A280065"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/development-11-test-build.json",
+                                "WorktreeSha256":  "D390CE020D4FAD09343C8F774C839525180F112C33337FC29B837E5F6C734285"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/development-11-test-build.log",
+                                "WorktreeSha256":  "94ED06ABDDD07BFBA404CC5E8293259E3EC5727832EB41D099DDFBFDE92C4389"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/k17-p12.trx",
+                                "WorktreeSha256":  "4F4BCF21929365C468F33E4F69D967C33E44CFFBB255346C94D957334E5DF0F3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/K17P12Followup/verification.json",
+                                "WorktreeSha256":  "B353C78F1A64CFE45141051AD4DE91804467FE56848354EA23AB296BEB1D0F6D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Ownership-followup-finding-stop.md",
+                                "WorktreeSha256":  "9D98EECC6E4F85141EABC02F25A0BE8C82A7EA4405A1EBA98536FE4B47366510"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/OwnershipStop/Program.cs",
+                                "WorktreeSha256":  "8C1154854502B6E94B40AFAEE22BE382CB6BE75E20FFD37E7CC4B32F21C33553"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Prepare-Development.ps1",
+                                "WorktreeSha256":  "7244976A7B730B1225AE25AAC18E6D7E206EE7507ADE968F3BCAFC854F315D67"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Production-finding-characterization-batch.md",
+                                "WorktreeSha256":  "B28EB31F2C7A8495D272FA5F993C9651406B9D35017BB59A7FCD2954EF055BE1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/ProductionFindingProbe.cs",
+                                "WorktreeSha256":  "A38847D8CFE768B75C461D7DE7B0EDE3ADF27F8B6C170628E4F80D9F5DC1AD53"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/ProductionFindingProbe.csproj",
+                                "WorktreeSha256":  "5EC8DCF36AA584FD0AFE5DA02F0260B48B78DAC0BF40401D205C33A4DBEB0976"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Protected-obj-drift-analysis.md",
+                                "WorktreeSha256":  "F30712FF0E30B0B33347AC7793D352CE00412C186ABEBBE541A7C93B7DE1DF44"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2-closure-and-Broad-stop.md",
+                                "WorktreeSha256":  "E82BEA530414E920E28DF54EC20294611DFF09E8423757067FE44B33A665C927"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2-lifecycle-and-propagation.md",
+                                "WorktreeSha256":  "5BA431A519B5AEC3E1947959876FC3BB150D27633691A60D78E2725AAF3C5D43"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/a-series.trx",
+                                "WorktreeSha256":  "1A0D6B89F8EEFC0185E39AC7D9A5B6D19055E012E564DD9E5115DA370D814053"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-a-series.json",
+                                "WorktreeSha256":  "E2CC6344EF9A598FF6F0A89AB007968BF3DA5D265977475E0A5C4BFF442F844C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-a-series.log",
+                                "WorktreeSha256":  "4E0DC6C474677D648B07D3347DBCE647AC0B95722BE367913E938FCFDC79CE73"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-fixture-build.json",
+                                "WorktreeSha256":  "6CE0C00E8AFF2A1EA517182502D816AC24672404C608CDC3F21FDD301C506E81"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-fixture-build.log",
+                                "WorktreeSha256":  "81E15C4B999F8B9CEA999FAFF3687B5811FD8DC15E039601AF0ABB38791C3258"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-r2-first.json",
+                                "WorktreeSha256":  "87293A491F7470D3A1E7EB2508079F6E4866572BF10046A95AA620C5564DBB99"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-r2-first.log",
+                                "WorktreeSha256":  "246A177ECA95BB55F6601F905AA1C8D696A248CE68A3414BCEAA41DB24D9809A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-test-build.json",
+                                "WorktreeSha256":  "4936D1701EFC0D4A6BB34765A8529285D4FAC88CAE98D1F265270528C6FF0737"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-test-build.log",
+                                "WorktreeSha256":  "3E40643FD8BA34D6E7945CBEE0A95ADDE4B4F320CC5B9AA74F120F1B6120E0DC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-worker-build.json",
+                                "WorktreeSha256":  "4A9715E30E9B72668898CF9EA98164B68CA78F8B25CE383C72F48E44050546F0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/development-13-worker-build.log",
+                                "WorktreeSha256":  "37D17E81DAA2094546E43477DA924F979449A6F8FADB55424ACA46F961C4AFAC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/failure-identity-False.json",
+                                "WorktreeSha256":  "A1E7A72C28F99C6117AC6F6022826CF40BEEF3089B6C0D0D52A91458440C715E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/failure-identity-True.json",
+                                "WorktreeSha256":  "C72D515A21C4C67C7D6D49EB7C2943BE77C11A23C2635CF714F7FA44BEE4B976"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/r2-first.trx",
+                                "WorktreeSha256":  "722D23976928456D4E67EEF7C270DA7E68406D0B5335EEB3CE03CF71408F97AA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/trx-counter-addendum.json",
+                                "WorktreeSha256":  "22299A83CC6E7B49BC3D88850A06DAB7C3A8B41BBD007D9D03D7EF9835905F38"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/verification.json",
+                                "WorktreeSha256":  "AEC5BE6854C79432E595F0BF35DE1A12894D017348EF5E94217F97F2E38B0438"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/worker-recursion-False.json",
+                                "WorktreeSha256":  "33697CFEEDC61871924E1389EA00DC7582D099E94D63A614CAF600C1C76CB954"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R2Closure/worker-recursion-True.json",
+                                "WorktreeSha256":  "86843B0B570E4FD913034269004A8FAEECA740AF7B573324E2B645571A1954D4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5-semantic-identity-closure.md",
+                                "WorktreeSha256":  "425FAD3CC269F2E155B3BA69125B93B281A9A5AF006CA4DCDC2CD4D56EA576E9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/a-series.trx",
+                                "WorktreeSha256":  "1BD5302C931A67E850431DE0F3BBB86D46D871D9FB6BDD084C4E5C4C967A4710"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/canonical-object-identity.json",
+                                "WorktreeSha256":  "74ADD1F0BEC40D231835BFE85949D156BF212890AB7F1C00A936965D9DDA2740"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-a-series.json",
+                                "WorktreeSha256":  "87EB4A306FEA9F065941757BC589FA51BF392DD0F33DBFC8D06F152CC5FB62C9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-a-series.log",
+                                "WorktreeSha256":  "1DED21240A2CA081F9344A2D8B36E0208B217A71EC9A25B6B173E0C0F469E176"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-fixture-build.json",
+                                "WorktreeSha256":  "7935180BF47EB9CDA953FB1539D95CD32D7AC6C7A7569456415345916EF6A118"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-fixture-build.log",
+                                "WorktreeSha256":  "87FA5234CD9CD9435A8081CA36725852E03883D02680BA3BAE4C20229B08711A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-test-build.json",
+                                "WorktreeSha256":  "CF5476C655F90AE9F4EDEE83730ABCE2BD220B321D2C04E7C481E6F48A86508C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-test-build.log",
+                                "WorktreeSha256":  "A6DAD60C38CD86F7A070D3B2C42AC7DD5ED393E1E4CA61DEC8BC922BA389A5FA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-worker-build.json",
+                                "WorktreeSha256":  "12C2B906682D5F3A8FE709039E9D64AFBDE2A53DD6837E6D2E6C8609AB3A15C7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/development-12-worker-build.log",
+                                "WorktreeSha256":  "BFF9F2819F57F744EC6F437BD4DFFD34D93DEA68889035FC18DDAE0ACA7612FA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/nested-rebind.json",
+                                "WorktreeSha256":  "071F4D76F632660CF9617E6BFFBD0150A57D0EA11C44377BC8391B8C7B606770"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/R5Closure/verification.json",
+                                "WorktreeSha256":  "5338BAD49D4289D2F92EF9646E604022FAB5F1FB3C815EE8A5470812147E12AA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Record-PreflightStop.ps1",
+                                "WorktreeSha256":  "4A33CE0F08D6AFE9EB9E1B19970B898618195C2AEBB82A6FD7DF0E4495DCCC21"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Resolve-Supplementary.csx",
+                                "WorktreeSha256":  "63A06C67DC4D4DD642D380F23CB2981D6C70A8C5C0EFC8D179E35CA0D06DBA96"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Run-Closure.ps1",
+                                "WorktreeSha256":  "BA2D685CB6BD12B7844EAB46BC0237E4CADF91D7550924BA4DB5962D3C13E46B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Run-Recorded.ps1",
+                                "WorktreeSha256":  "93629016F2089421DAD493A2010CE5BE7F58DDB0ED1C92731EF582D735F1795D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Supplementary-assertion-binding-ambiguities.md",
+                                "WorktreeSha256":  "F9648D75D949AD5688A4EEBBBE32F77067CC6F4E6B01A36D04AB20CAB80B9D65"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Supplementary-binding-closure.md",
+                                "WorktreeSha256":  "E3ADA78A6A3B0E1D0E5F6CD567C02C7990DFD259157A658F194FBFE9F8CD04D7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Supplementary-method-reviews.txt",
+                                "WorktreeSha256":  "9AB5B86691BDEBE21D8D0B95227305F4161B7E5F23266258C3BC53E1CC78C2F1"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Supplementary-resolved-bindings-r2.json",
+                                "WorktreeSha256":  "458DC82BBE317730A5D9A6A7885D024CA73D24B39D6C94BAB8EAD0C93D0CB3A0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Supplementary-resolved-bindings.json",
+                                "WorktreeSha256":  "19694D22F104436BBEBCFCC40593BC3B624723A3C61767538E19197421213C1B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/TestPathInventory.cs",
+                                "WorktreeSha256":  "472E760B30DD9F0C79DD27054628BC2FC3A9E6AD165D697ECD5ADF38DD3334D5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Verify-Phase0.ps1",
+                                "WorktreeSha256":  "6ED7433EF4896DC8068EB78F9D81CCA293E812FA4516EE56331314A9E8E9FE1B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/Verify-PreflightClosure.ps1",
+                                "WorktreeSha256":  "42A094D1A448667B6773272AD09D7C85AF9C7D12BB2CB205E95212E9486BAA36"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/WorkerFixturePreflight.cs",
+                                "WorktreeSha256":  "095F3F1C73C32053CE11BBBAE31CC185652B1FAEDBE304F9EAA184326F95DA10"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/continuation-validation.json",
+                                "WorktreeSha256":  "BBE761BE343718DF147668EE4BF89603AD9E71D33DC67016BAD28CD994983A56"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/full-fixture-preflight-validation.json",
+                                "WorktreeSha256":  "83CCCFB30197F4DCB03F36AB9180A46169DA8EED7519D045BD9BFBD4B93CC0AF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/identity-stop-verification.json",
+                                "WorktreeSha256":  "D7B721F1DE10B0D0756879B0CBC66678B233AD215E45F4B66CB7E4703EF185B4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-broad-root-cause-state.json",
+                                "WorktreeSha256":  "77589FF192FAAFEF3B9E4231668BFD11303B7DC800A7926913D0C62D99BF7ABA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-finding-stop-state.json",
+                                "WorktreeSha256":  "0915BC3C74C51EA077636237A4BA561F612D4A8E3B60747B3D0AC01034390069"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-identity-stop-state.json",
+                                "WorktreeSha256":  "47DE2D4E1C625DC95621C1D04776848FEA1AE5D1AD523ABBEFF4D74C03348362"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-k17-p12-r5-stop-state.json",
+                                "WorktreeSha256":  "166553E640FD5CF349ADC7F1CCEC35A5DDB5CC8E9B499B4D53F10AD0A4540936"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-r2-broad-stop-state.json",
+                                "WorktreeSha256":  "51D6A73FD140C5D2F58EAC27D6B977968453120867C7BA21833BC0C3D028349C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-r5-closure-r2-open-state.json",
+                                "WorktreeSha256":  "876123DE1585B2A1ECD83064830C7FBABB1F2AD45D7EC84853EB4FD6D5FD5500"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/implementation-stop-state.json",
+                                "WorktreeSha256":  "BD6E71F6C032E6BBCE34E2F7D0CA3C08411805ABC17E1C5F40368B303AAD60BA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/ownership-cardinality-followup.json",
+                                "WorktreeSha256":  "CFAAC64408F0783BB5813E0A44C57DF4B37DF7B476B01A730B10B1156F6657FC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/ownership-followup-verification.json",
+                                "WorktreeSha256":  "C4D9C92F4FE6BA50777C298AC91F7A81DA1B58F64CC921007B2DD4DAB22160AF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/phase0-binding-closure-validation.json",
+                                "WorktreeSha256":  "E8F43AC549A296C45F8669553E36984E3643567C5D58A6E886D00614108753BA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/phase0-validation.json",
+                                "WorktreeSha256":  "33C0298428719185626C8895787BF1F8EF4A12AA57A5FB4E5216ABA12F21116E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A10Proof/production-preflight-validation.json",
+                                "WorktreeSha256":  "A0FD1BB8B0745693AE3C672FD00458F70DCE2CCF6465806065DCBC5D9B0D39A7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2-canonical-exception-type-identity-audit.json",
+                                "WorktreeSha256":  "D92B3847299FC9A4EA46FB541A0B50EC162FDE80FB6A84A98C1883132BFCA34E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2-canonical-exception-type-identity.md",
+                                "WorktreeSha256":  "B0599263B43590F868948E10F3E966E013D9AA87DEFC0ECA972EFE30799072A6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Capture-Start.ps1",
+                                "WorktreeSha256":  "566159B9911576DCEFA65C988222F8972D3AD9E1020CB1EC6CC30A3D1B6634DE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Capture-WipDelta.ps1",
+                                "WorktreeSha256":  "48321BD903DEA02BC2E6CEB9A6661DE061120369CA2AF00A900986E07E291FFA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "B73E102595F1CE08A3B965A328DA5DC07279185DE138BAD489BC60BE21D49027"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "356E221448D6B0BDE1E725FBFD7342B4D9993773D35BADD31A7CD5F002607FDB"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/README.md",
+                                "WorktreeSha256":  "D6DE09F9B0475151A1407E52E59B7F9A4332C0CDC919CEB755C56607E4547927"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Run-EvidenceGate.ps1",
+                                "WorktreeSha256":  "CFE246A3B604A2354C81CD548E174D51CA674C78FF7FD5559AEC3A22DC740320"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "ED6638E6D041FD459F2B5079B241841873010C20953BB5D7B8F454CA4D80B9A7"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Verify-HistoricalEvidence.ps1",
+                                "WorktreeSha256":  "3F7E711B501935BCADD000FFF728FA848D2515CACAB70F91C4D2BE50C1FD2170"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "A0F18DC80A5BB561821D50F3E05F6E938EEA620017EC3F81EC3D04E7BEF91FBA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/Write-Verify-Evidence.ps1",
+                                "WorktreeSha256":  "0B652667C01612BD5A19BB521BCAD216CFBB28D994D1245465B3D7E3E78AC2E3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/gate-vs-b25a-wip.patch.txt",
+                                "WorktreeSha256":  "5490A44D734207CA238A34120D7C4E2D2DB0D873ED3D5219B552AFA03295AB0D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A2Proof/register-vs-b25a-wip.patch.txt",
+                                "WorktreeSha256":  "E8486AEC04466F247F3D59C5A0A64F6F7FCA22581242205F5F0CC8FCE030EE2F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3-constructed-generic-summary-context-audit.json",
+                                "WorktreeSha256":  "04FEDB1B885058AA1D2FDD166F0C2630855CCFAD86074E6998EEE710582D3ADC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3-constructed-generic-summary-context.md",
+                                "WorktreeSha256":  "64074A1D92CCAF962499E7A2330B528DF3F5D4330BCB9C3A7B08B589ACF298AE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "DAC0BBCBCAADB0446926FC1DD98EC27757EDC02FDBF9D457EE197FF66E645CF9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "BEB3A76136F7EE74AF6F02DE3EC2CAD496B4BCAC9B4CD3C48F32CD45C23E6452"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/README.md",
+                                "WorktreeSha256":  "627956401B6DE8137D833EEF75833B40A82FD75FFB98E3B3D61D6243BFED184D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Run-EvidenceGate.ps1",
+                                "WorktreeSha256":  "B3D8DBE0BDFED5F1CB65B6FAE5FEB6FDADA4464C888EA0294DB94F423CB6E06C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "9789CC49187A607743F988DDF7412A966E9C215398CC373D3617CBDFF206FD14"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Verify-Changes.ps1",
+                                "WorktreeSha256":  "002A356307AF2CC2BFE8DB22C6F2B051211F52BAF1D3D81271EEECEEA99B4250"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Verify-HistoricalEvidence.ps1",
+                                "WorktreeSha256":  "AF1F00F1E8E682BAA872DAF35AD7EDDA511441E7AEB676BC726ABC68B3F96C92"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "F7E524B490EC32F7AE17A73B02E6DB0E648A19718D7591EE83E8815FEEA30B59"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/Write-Verify-Evidence.ps1",
+                                "WorktreeSha256":  "6A9A9AB7FBDD73D1A8E183BB5A0D758A2503398AEAE07D3A084EFE49D5501B0E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/gate-vs-c777.patch.txt",
+                                "WorktreeSha256":  "8853F2A5C44F53083BCF144C82E47343AC3923DA951F177EE8BD8E51FB1E0B2A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A3Proof/register-vs-c777.patch.txt",
+                                "WorktreeSha256":  "7EB6CE581CAA91C24E435DE9A4BFE61C5BB7826F272EAAAACE3DD4DFC747CF5D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4-bounded-generic-context-expansion-audit.json",
+                                "WorktreeSha256":  "4476CD0892741557F9369E508EFC6443C58632492B5F1BC6810F652C16CF55B9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4-bounded-generic-context-expansion.md",
+                                "WorktreeSha256":  "E9302B15AAA49D764CA98DFD8D4D00929FFD49CE4E694F273D822712C04E5839"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "E233E6B44526083D09663BCC970F1F6468A0BD4D4162F5B01F03C2C8C0884E0F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "72AF28DCA41136B144A1C6CB052985A6449924DEA15723A8A7C1C4B0E517804E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/README.md",
+                                "WorktreeSha256":  "2D4712C146C810555F31439ECB3D3536F1E8EE5354AA435653594E77B5F81F56"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Run-EvidenceGate.ps1",
+                                "WorktreeSha256":  "65BE609BD8E5FF422D8C11F7BFB6071DF21D1862ABB44FE75E2BF7AE8E648553"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "CC102FAEF8B49595C256596360E05DB0470348639B3E673087F00706CFB3B6BD"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Verify-Changes.ps1",
+                                "WorktreeSha256":  "B37102505C2A0C90BFFCE0D4998F5E739614F0D7E95DCF26A5180B705FAD9910"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Verify-CompiledSources.ps1",
+                                "WorktreeSha256":  "6CCF74B84B8C07FFE7D55C9E272129BC118E0D2C97C692734BAE27BA4FF9811E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Verify-HistoricalEvidence.ps1",
+                                "WorktreeSha256":  "A0F4E4740AAB3B1D9BD4A84E288AEE5F1706199895AA65F282943BB394C83C14"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "CE9E3C425062A737DBA40E32B317BFE98424956CAD0074758A770964EC6A6C95"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/Write-Verify-Evidence.ps1",
+                                "WorktreeSha256":  "78094F78BD065FC4077369AB1DE163E1CC97EAB7FC9B8B44724BA70D7ABDF550"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/gate-vs-inherited-a3-wip.patch.txt",
+                                "WorktreeSha256":  "D11BEC841B7D4FFB69A2288DA583D43E31AD155BB05D300CB3B88C2C1BF36FDA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A4Proof/register-vs-inherited-a3-wip.patch.txt",
+                                "WorktreeSha256":  "DD3F09A84E53AD682CBDFA02CC610AA125B970D932CACB76459814C1AD063EFA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5-recursive-summary-scc-closure-audit.json",
+                                "WorktreeSha256":  "F835EE3CEAB63ED35F9F5D7D102B72FEF0DBF1E9AB461036F94F6D7A80B36163"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5-recursive-summary-scc-closure.md",
+                                "WorktreeSha256":  "B4310EAF58BB390F205B009D2E0489EAE6DBEFBEFFF5B9827B251C8661A41372"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "F0F28F5B53C69859A00386A83CED032CBB1EA6A2C1434F12EAB7FCE128DBC291"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Lifecycle-and-contract.md",
+                                "WorktreeSha256":  "44FC4417EAB42611AAE842583EE4CDB7013CF800545EA9318E97B46AE97BFC39"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "345663AF0055470BA1222E83A5E9597C2D9F903075476978976B9B74CA54C331"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/README.md",
+                                "WorktreeSha256":  "137EA5A4D6A2D6BB34BC3ED33EAC1A9F1C6F8B8C5863E94B320CDEB78D4B3190"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Run-EvidenceGate.ps1",
+                                "WorktreeSha256":  "00EE6D88265D69B2AC2A65D6F4B1B04B0B73BC515EA9917CF235DB8695810022"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "FB872F331A539CAA92D3DBF8DCAC1D952F8E3C4CE449447A68B3B38174B25B28"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Trace-ForeignFullFailure.ps1",
+                                "WorktreeSha256":  "FC1C4C39D999969FEF5D98FEFE205BC4246349CC79009F8045B145EC29D6AA9F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Verify-ChangesAndHistory.ps1",
+                                "WorktreeSha256":  "57F359D83CB93C9BB9B8675DF9FB7D4FE9F4F8BA795102BDEDFDEA7F9278D39F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Verify-CompiledSources.ps1",
+                                "WorktreeSha256":  "D9974AB480BAFB0FBE4B3DA890C0539CAF86F8EBED7CABCB2368A0F84C848BB0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Verify-Evidence.ps1",
+                                "WorktreeSha256":  "596BD3FD61C41F1A3AB514B44C0CDCBC6BCD94EEDFECB44CAEF77536CBB2312B"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "852C610813C29FF89A302E8C86686BDA7C411264B284AF63C5772A63669D5A6F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/gate-vs-inherited-a4.patch.txt",
+                                "WorktreeSha256":  "B6B5B40F54056209CAA686EE04AA69635FA72248CDD3FA35A84E6CD1E9BE6505"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A5Proof/test-vs-inherited-a4.patch.txt",
+                                "WorktreeSha256":  "82A231705090E2BBCF6B512CAD38DC4164827EAB377CC79A6A2BF9F86BE16B11"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc-audit.json",
+                                "WorktreeSha256":  "AC89205EBF3D40F63FDBE00AEC2B2E6F9617577AE3B9C4B42EBFCA6058D85838"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6-bounded-generic-context-expansion-after-scc.md",
+                                "WorktreeSha256":  "718FC1F50956151795C72E78173BD92B612B614B7A16C7157BAF8025C658B9DE"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "194EEF26B1447BB4C142FB366EEF8F6D86D7C8F890956C53F03F8547ED2CC54E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "C30937B0A63DFE265CB9212A2D4BC5F7E40D09DE6574EC343CAF32847AC313BF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/README.md",
+                                "WorktreeSha256":  "40F8ED2792A8741188560C1F10CC4D012D10DF16F2A05A3E0A2ABAC529C74E14"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Run-EvidenceGate.ps1",
+                                "WorktreeSha256":  "E4E88389E889A32EA6088F747793EF7EF5B771ABCDEFE79E80B5C66E1A04C015"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "C8A5A98F42AB88C301D56E9FC489AAE288064D173DE44CC3C41A8231B2524EF6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Trace-Lifecycle.ps1",
+                                "WorktreeSha256":  "BC1A7ACAD3F2FD50FEF1E5B9BCD9D3EDA50744C5F048217CC07AC9B41F2643D2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Verify-CompiledSources.ps1",
+                                "WorktreeSha256":  "A043D89970603752130FD59AAAEC801DD35C86788851733E2BF67DFABC098CB3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Verify-Evidence.ps1",
+                                "WorktreeSha256":  "079F15F560399888A6E3B568FB05226B1CA195F8662E6C23C772A02AC0693F1A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Verify-Protection.ps1",
+                                "WorktreeSha256":  "A983E9F97828C05233C7986D9A8BFD4F33DC9D2B1AD6C63FE9A1B37475F41C83"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Verify-Revision.ps1",
+                                "WorktreeSha256":  "CB8F04D402CD77592749184385D14872C4104A5701D84E576FAC52850E44272E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A6Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "597BDDFC7040F59DD698BB02B22289BAD31F13276CFA88C5D19CC524FC1B274F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A7-finite-parametric-generic-context-contract-audit.json",
+                                "WorktreeSha256":  "BA1D0093730A09409FAF0120DDA3ED75E17A2F380BEC0305E415C9D425700293"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A7-finite-parametric-generic-context-contract.md",
+                                "WorktreeSha256":  "A739BF564D016D267B96065105DF8F851B497EEF1E1B382DD271A38522873C83"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A7Proof/Capture-Inventory.ps1",
+                                "WorktreeSha256":  "18E3070ED5585169FB719E58C87BC557A74F15636020A2C72B20D96269671581"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A7Proof/Run-ContractGate.ps1",
+                                "WorktreeSha256":  "01D3BCF86AC3369154E593D22FEE549B72C9E8FE2BD215E3D9DB582F32DAF0CF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A7Proof/Verify-Contract.ps1",
+                                "WorktreeSha256":  "DD25ECCCCBE329F4C16A960869CC5C6AB3F6975A22B9FE6A6DAAEA6ED726979C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8-correlated-recursive-type-family-contract-audit.json",
+                                "WorktreeSha256":  "D79F6C2A07AE1D6CEC4C1C9336C40B0E010916DA4ACC030F88D8C32C8A86579C"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8-correlated-recursive-type-family-contract.md",
+                                "WorktreeSha256":  "B8F9DE1AC49B8D8A0DB15E3DDA6F6F1A900F7E1DC22327F0EC8D47D3365C5255"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/.gitignore",
+                                "WorktreeSha256":  "A96F3BAFFAF142C4C90DA2ECDC402A2BEE6D51F118417C4B52AFFFE7CFC33592"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Capture-Inventory.ps1",
+                                "WorktreeSha256":  "6773546DEAD26D2D0679F0E3D1E84674AB562506C1C67DEB29C661FE12E2F61E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Characterization-preflight.md",
+                                "WorktreeSha256":  "3F5DC7A6860D7EC693B44AF2BEB5C25FC51B877857AA4D6C57E5EE645B8AF244"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/FamilyProof.cs",
+                                "WorktreeSha256":  "5AB4C54EB0176FA2B30F836A0141BD9886EFEB251254E90B5FCC639F5AD98447"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/FamilyProof.csproj",
+                                "WorktreeSha256":  "284A2485F034BF0E14F9B08AEA24EFCBFDD9D5F365D351BB277A9AD24684C8D5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "BF7898EF196C87DCEB28A2B01BDF05DB20AF7C3F0CFDFB058114F6E1156A9772"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Invoke-Inherited.ps1",
+                                "WorktreeSha256":  "A989D73A53459E4EC9D190360E0F6BF95AB939CC01FE60FBEB9C24C9FE80C330"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/README.md",
+                                "WorktreeSha256":  "F9C8BB6A09CBC469B288C7C29AE5FB7EF9849CB119267F76D2756AE1F695BA72"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Run-Gate.ps1",
+                                "WorktreeSha256":  "1E4412D35CB646EF1B9717A0C2FF8E800678CAFD766542AE7A6A445626D85FE8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Run-Harness.ps1",
+                                "WorktreeSha256":  "B35F73C44A45BC5A24087A646BFB7838C3AB31FB5DACA4AEB2AC63F6BE564058"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Run-Recorded.ps1",
+                                "WorktreeSha256":  "9DA5D5840C9B4653D3BD71E2AFCA1D4858A9E0791864BD452B3D9315B112E103"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Trace-Lifecycle.ps1",
+                                "WorktreeSha256":  "E5178D37C229241F84CCDD382F7A9CF8E8472F7DAB8CD463D80F68D478919A67"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Verify-A8.ps1",
+                                "WorktreeSha256":  "D78D063EAC5B7E9DB5D9EF1B0DD2B65C7A08DFB230033B6F701E4ADE8FFB292F"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Verify-CompiledSources.ps1",
+                                "WorktreeSha256":  "25124DBFF835036A358E44955B3427F99F4B1F71CDFBB80E7534E59A2FDDBE82"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Verify-Protection.ps1",
+                                "WorktreeSha256":  "7C484B3A856E6E409C3C046A5CE7EBFB5323D1A2D4A5B17CE94F4146A6399960"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Verify-Revision.ps1",
+                                "WorktreeSha256":  "66980CCA12255522033A2341D990804D86AEEC698D14063449D37562F624BBA2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A8Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "BB8ED2BB236A1BD655A91F662B6EEDACD45D7C639E9A8D804EAFBCACA374751D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9-decidable-query-profile-audit.json",
+                                "WorktreeSha256":  "10FA0C41DAEFFED0B07962997F52A4A8B714F496D41444E0B7673FBD7437DA7E"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9-decidable-query-profile.md",
+                                "WorktreeSha256":  "61C915AB918AC1F8A226CF4E7EE4D3D50616C68BD399642C7066825DD9D39529"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/.gitignore",
+                                "WorktreeSha256":  "BFF173B9D91CE5F65241A8FC1887FB6B63C51411F0AE6DD1EBA0F18EAB81DBD4"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Capture-Inventory.ps1",
+                                "WorktreeSha256":  "0BEF8B804B51C01B65EE4CFE843297CCE255D9F9E0424F5E1835508867770801"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Characterization-preflight.md",
+                                "WorktreeSha256":  "C7AEE5E4F1D82944BF4DF53EF0FDF3FD398041EB496554D233F494DB9B94D1E6"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Format-Owned.ps1",
+                                "WorktreeSha256":  "524A8A5AAC106D347A87A6587ADC22206BA1AD2035666D05FC1154B1F5455CD0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Invoke-Inherited.ps1",
+                                "WorktreeSha256":  "C473F3407848F8CBD3168D1701A443B31E3A68025D5F2A06C4973D6428E1D3FC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/ProfileProof.cs",
+                                "WorktreeSha256":  "3BC76D1240C7CBB6A8E7AC0FC00CC8213FA2155A6DFC992052D6CB01A59B19BC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/ProfileProof.csproj",
+                                "WorktreeSha256":  "9BDC72BD39E09EEA567B0522876861002FFE01B2018F17F66DBBB725AD80E5E5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/README.md",
+                                "WorktreeSha256":  "2C1055E00DDCEDAE456B5BE3D64D8B2E391DFECD21B752024000DEAC95EFFA27"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Run-Gate.ps1",
+                                "WorktreeSha256":  "383F2A8CFDA06D81FAE1E8A4B2974352CF1A65E3326BABBE3A2FFB5A65E35C73"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Run-Harness.ps1",
+                                "WorktreeSha256":  "3ACE8DC2BBF44DC737522F1693E0FE2FDADC0CB4B7854624E4A433B72B55A4A3"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Run-Recorded.ps1",
+                                "WorktreeSha256":  "77B1EBCC664A116BED539CF631AD9A6553B9F37B734492C380CBE7EEB9B9DE47"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Trace-Lifecycle.ps1",
+                                "WorktreeSha256":  "668E9A3749886D5CF25B416C77F4AEA72F99D3E2CACC09799E8F8B6C8AC0F8B5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Verify-A9.ps1",
+                                "WorktreeSha256":  "45BE668D78BCBCE1806365FABF48C3FCA2C8B7DD4C84B0A194EE324AF70160C0"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Verify-CompiledSources.ps1",
+                                "WorktreeSha256":  "5897BAA86A9A4DD8BEE627504BC115BC10FFFE56E7EBB9AE555AEA51296555CC"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Verify-Protection.ps1",
+                                "WorktreeSha256":  "4A5970837AFE7FD94EE8E7B9766F3E310FCFE2D5BAED0CB3D5264ADE5191F04D"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Verify-Revision.ps1",
+                                "WorktreeSha256":  "9C397D63BB4FA2FAF3B900315E3F832E1A9A4A4CB5A82E14024E896A5F346CAF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25A9Proof/Verify-Static.ps1",
+                                "WorktreeSha256":  "A259650E6580764C6BE02AB5FFEDCB03583447A91E7B867C2E90A4D736E09F7A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/Close-CandidateDiagnostics.ps1",
+                                "WorktreeSha256":  "1BB3F7E367DFFE0D502E93C9C258BBC6C69CBD87E1AEFD4E5282992238F840CF"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "44FC70FE48C95023ABF4E5C47DD93D8E74F163E5D8C1DFAEE7FA06B2ECCA1ADA"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/Preserve-Candidate.ps1",
+                                "WorktreeSha256":  "8A4BA007541EBAE284EDE841412A639C069F03D2C0127CB171C4FB23EC29F52A"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/README.md",
+                                "WorktreeSha256":  "4BDC87EA96303EE796AE9695C98FEA7BE6259FFD3B89865970C5B4FB4D7A9EBB"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/Run-Validation.ps1",
+                                "WorktreeSha256":  "72EEDCD3AA15CA13ED50CC62C11F217F0560B39140A12EFEF049E3DC082E9717"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/Write-Verify-Evidence.ps1",
+                                "WorktreeSha256":  "9A37A87DE6638FF310FC5C93F8AC00A3EF8E2351D26326D9F6806E70734D75D9"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/candidate-tests.cs.txt",
+                                "WorktreeSha256":  "3EA39871187D6FBCA1FB71C84EAC7F3F9827C02E082DF6005B7B2082BE63EF48"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/ownership-before-after.json",
+                                "WorktreeSha256":  "FF6C12B285AB5D0F99EF70FC6B6F6F440BA332FC0C1FA6351BF16CF5CE15DF38"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25AProof/withdrawn-candidate.patch.txt",
+                                "WorktreeSha256":  "E035C42DE3F1AF066F736E638A93C3D7D01E1692C2B16C3A2E122A6D32B16DD5"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25Proof/Prepare-Validation.ps1",
+                                "WorktreeSha256":  "7AA2A7B95C031BCD26C53405A878479132BE0AF819DC5E0A641DA8F98586AC95"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25Proof/Preserve-ActivationAttempt.ps1",
+                                "WorktreeSha256":  "93695822FD31945C76C2AC724AA41DE3365A125363109A4FFFE6C337BF2E16A8"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25Proof/Run-Validation.ps1",
+                                "WorktreeSha256":  "230FE5EB94FA0DE669D4B95584FF9D18E7CCE268BB685F98D5DB74B6546067B2"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25Proof/Verify-UnsupportedGraphCli.ps1",
+                                "WorktreeSha256":  "53F7A9BE06525F376D86757DE299E6082D7E9AC46E42496002672B40A9E06789"
+                            },
+                            {
+                                "Path":  "Tools/XMLDocNormalizer/Evaluation/P5O2B25Proof/Write-Verify-Evidence.ps1",
+                                "WorktreeSha256":  "D737328C044D58ABD059EDC65D984E236DCE17CC7DD0E5A5DEA0F077582CD51B"
+                            }
+                        ]
+}
