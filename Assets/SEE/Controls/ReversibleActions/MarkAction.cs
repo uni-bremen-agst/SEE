@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using SEE.Extensions;
 using UnityEngine;
 
+using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
 using SEE.SceneManipulation;
