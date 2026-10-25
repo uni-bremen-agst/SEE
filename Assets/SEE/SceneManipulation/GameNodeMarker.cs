@@ -13,27 +13,46 @@ namespace SEE.SceneManipulation
 
 internal static class GameNodeMarker
 {
+    /// <summary>
+    /// The name identifying a marker among a node's immediate children.
+    /// </summary>
     private const string MarkerName = "MarkingSphere";
 
+    /// <summary>
+    /// Returns whether <paramref name="gameNode"/> has a marker.
+    /// </summary>
+    /// <param name="gameNode">The existing graph node to check; must not be null.</param>
+    /// <returns>True if a marker child exists; otherwise, false.</returns>
     internal static bool IsMarked(GameObject gameNode)
     {
         return FindMarker(gameNode) != null;
     }
 
+    /// <summary>
+    /// Applies the requested marking state to <paramref name="gameNode"/>.
+    /// </summary>
+    /// <param name="gameNode">The existing graph node to mark or unmark; must not be null.</param>
+    /// <param name="marked">True to ensure a marker exists; false to remove it if present.</param>
+    /// <exception cref="System.IO.FileNotFoundException">The required marker material resource cannot be loaded.</exception>
     internal static void SetMarked(GameObject gameNode, bool marked)
     {
-        bool isMarked = IsMarked(gameNode);
+        Transform marker = FindMarker(gameNode);
 
-        if (marked && !isMarked)
+        if (marked && marker == null)
         {
             CreateMarker(gameNode);
         }
-        else if (!marked && isMarked)
+        else if (!marked && marker != null)
         {
-            RemoveMarker(gameNode);
+            RemoveMarker(marker);
         }
     }
 
+    /// <summary>
+    /// Adds a sphere decoration above the roof of <paramref name="gameNode"/>.
+    /// </summary>
+    /// <param name="gameNode">The existing, unmarked graph node to decorate; must not be null.</param>
+    /// <exception cref="System.IO.FileNotFoundException">The required marker material resource cannot be loaded.</exception>
     private static void CreateMarker(GameObject gameNode)
     {
         gameNode.WorldSpaceSize(out Vector3 size, out Vector3 center);
@@ -66,18 +85,22 @@ internal static class GameNodeMarker
         Portal.InheritPortal(gameNode, marker);
     }
 
-    private static void RemoveMarker(GameObject gameNode)
+    /// <summary>
+    /// Deactivates, detaches, and destroys the marker decoration.
+    /// </summary>
+    /// <param name="marker">The marker transform to remove; must not be null.</param>
+    private static void RemoveMarker(Transform marker)
     {
-        Transform marker = FindMarker(gameNode);
-
-        if (marker != null)
-        {
-            marker.gameObject.SetActive(false);
-            marker.SetParent(null);
-            Destroyer.Destroy(marker.gameObject);
-        }
+        marker.gameObject.SetActive(false);
+        marker.SetParent(null);
+        Destroyer.Destroy(marker.gameObject);
     }
 
+    /// <summary>
+    /// Finds the immediate child identified by <see cref="MarkerName"/>.
+    /// </summary>
+    /// <param name="gameNode">The graph node whose children are searched; must not be null.</param>
+    /// <returns>The marker transform, or null if no matching child exists.</returns>
     private static Transform FindMarker(GameObject gameNode)
     {
         return gameNode.transform.Find(MarkerName);
