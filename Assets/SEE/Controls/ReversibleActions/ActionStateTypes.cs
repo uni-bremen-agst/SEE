@@ -76,7 +76,6 @@ namespace SEE.Controls.ReversibleActions
               new("Hide", "Hides nodes or edges",
                   Color.yellow.Darker(), Icons.EyeSlash,
                   HideAction.CreateReversibleAction);
-            
             Mark =
                 new("Mark", "Marks or unmarks a node",
                     Color.yellow.Darker(), Icons.EyeSlash,
