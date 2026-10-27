@@ -1,0 +1,405 @@
+﻿{
+    "CapturedUtc":  "2026-10-27T16:01:49.6017381Z",
+    "Applied":  false,
+    "Scope":  "Existing untracked CoverageCompletionProof only; no historical evidence",
+    "FileCount":  66,
+    "Bytes":  22749302,
+    "Files":  [
+                  {
+                      "Path":  "aggregation-closure-inputs.json",
+                      "Bytes":  7275,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "build-aggregation-closure.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-boundary-fixture.log",
+                      "Bytes":  1050,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-cli-integration.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-corrected-cli-fixture.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-final-projection.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-pdb-fixture.log",
+                      "Bytes":  1818,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-1.log",
+                      "Bytes":  10724,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-2.log",
+                      "Bytes":  3666,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-3.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-4.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-5.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-tests-final.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "build-worker-1.log",
+                      "Bytes":  2184,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Capture-CompiledInputs.ps1",
+                      "Bytes":  3397,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "Capture-Protection.ps1",
+                      "Bytes":  3199,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "characterization-files.txt",
+                      "Bytes":  643,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "cli-integration-inputs.json",
+                      "Bytes":  7271,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "corrected-cli-fixture-inputs.json",
+                      "Bytes":  7277,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "emit-static-fixture.log",
+                      "Bytes":  1776,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "export.json",
+                      "Bytes":  453462,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "final-code-inputs.json",
+                      "Bytes":  7266,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "final-projection-inputs.json",
+                      "Bytes":  7272,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "historical-precondition-failure.json",
+                      "Bytes":  517,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "new-contract-1.log",
+                      "Bytes":  1258,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "new-historical-1.log",
+                      "Bytes":  18762,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "new-native-1.log",
+                      "Bytes":  1252,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "normal-cli-contract.log",
+                      "Bytes":  17052,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Preflight.md",
+                      "Bytes":  12119,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "Prepare-Validation.ps1",
+                      "Bytes":  2040,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "prepared-fixtures.json",
+                      "Bytes":  1421,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "protection-20261027-111004.json",
+                      "Bytes":  9104,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "protection-20261027-145324.json",
+                      "Bytes":  9199,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Run-Proofs.ps1",
+                      "Bytes":  2465,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "Run-Validation.ps1",
+                      "Bytes":  5507,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "start.json",
+                      "Bytes":  581187,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Sync-Validation.ps1",
+                      "Bytes":  1245,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "targeted-precondition-audit.json",
+                      "Bytes":  23794,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Verify-Gates.ps1",
+                      "Bytes":  6868,
+                      "Recommendation":  "Keep",
+                      "Reason":  "Reproduction code or small method/preflight note"
+                  },
+                  {
+                      "Path":  "Results/boundary.json",
+                      "Bytes":  2293,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/boundary.log",
+                      "Bytes":  1254,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/boundary.trx",
+                      "Bytes":  981651,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/broad.json",
+                      "Bytes":  30025,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/broad.log",
+                      "Bytes":  1246,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/broad.trx",
+                      "Bytes":  5679763,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/compiled-source-verification.json",
+                      "Bytes":  1078476,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/export.json",
+                      "Bytes":  115,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/full.json",
+                      "Bytes":  1026,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/full.log",
+                      "Bytes":  1244,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/full.trx",
+                      "Bytes":  5818819,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/projection-final.json",
+                      "Bytes":  1270,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/projection-final.log",
+                      "Bytes":  1270,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/projection-final.trx",
+                      "Bytes":  257795,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted-final.json",
+                      "Bytes":  1475,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/targeted-final.log",
+                      "Bytes":  1266,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted-final.trx",
+                      "Bytes":  470875,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.json",
+                      "Bytes":  1413,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.log",
+                      "Bytes":  1270,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.trx",
+                      "Bytes":  2498724,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted.json",
+                      "Bytes":  1397,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/targeted.log",
+                      "Bytes":  161604,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/targeted.trx",
+                      "Bytes":  2633478,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Reason":  "Reproducible full run/debug output; no identified rare runtime evidence"
+                  },
+                  {
+                      "Path":  "Results/validation-inputs.json",
+                      "Bytes":  408414,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/compiled-source-verification.json",
+                      "Bytes":  1078476,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/export.json",
+                      "Bytes":  115,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/validation-inputs.json",
+                      "Bytes":  408414,
+                      "Recommendation":  "DeriveCompactThenDelete",
+                      "Reason":  "Temporary inventory, safety baseline or intermediate result; retain compact conclusions/reproduction data instead"
+                  }
+              ]
+}

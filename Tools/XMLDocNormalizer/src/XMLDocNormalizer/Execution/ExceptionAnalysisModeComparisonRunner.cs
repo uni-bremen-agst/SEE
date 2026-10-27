@@ -863,6 +863,7 @@ namespace XMLDocNormalizer.Execution
             return new ExceptionAnalysisModeRunDto
             {
                 Mode = aggregate.Mode,
+                AnalysisRuns = aggregate.Results.Select(result => result.Report.Analysis).ToList(),
                 ReportPath = aggregate.RepresentativeResult.ReportPath,
                 ReportPaths = aggregate.Results.Select(result => result.ReportPath).ToList(),
                 RunCount = aggregate.Results.Count,

@@ -47,7 +47,8 @@ namespace XMLDocNormalizer.Reporting.Sarif
 
             Dictionary<string, object> properties = new(StringComparer.Ordinal)
             {
-                ["metrics"] = metrics
+                ["metrics"] = metrics,
+                ["analysis"] = result.Coverage.Report()
             };
 
             SarifRun run = new(tool, results, properties);

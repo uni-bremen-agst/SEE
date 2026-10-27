@@ -52,6 +52,7 @@ namespace XMLDocNormalizer.Execution
                 modeRuns.Add(new ValueDocumentationModeRunDto
                 {
                     Mode = mode,
+                    Analysis = result.Coverage.Report(),
                     FindingCount = result.FindingCount,
                     ErrorCount = result.ErrorCount,
                     WarningCount = result.WarningCount,

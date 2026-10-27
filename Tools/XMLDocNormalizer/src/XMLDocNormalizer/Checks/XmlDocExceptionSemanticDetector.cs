@@ -172,7 +172,8 @@ namespace XMLDocNormalizer.Checks
             ProjectClosureSemanticContext semanticContext,
             XmlDocOptions options,
             ExceptionFlowSummaryAnalysisSession?
-                summaryAnalysisSession)
+                summaryAnalysisSession,
+            AnalysisCoverage? coverage = null)
         {
             List<Finding> findings =
                 new();
@@ -185,6 +186,7 @@ namespace XMLDocNormalizer.Checks
 
             if (exceptionBase == null)
             {
+                coverage?.Incomplete("MetadataCoverageIncomplete");
                 return findings;
             }
 
@@ -234,6 +236,13 @@ namespace XMLDocNormalizer.Checks
                         options,
                         directFlowResult,
                         summaryAnalysisSession);
+
+                if (coverage != null)
+                {
+                    AnalysisCoverageObserver.Observe(coverage, directFlowResult, summary: false);
+                    if (!ReferenceEquals(flowResult, directFlowResult))
+                        AnalysisCoverageObserver.Observe(coverage, flowResult, summary: true);
+                }
 
                 if (flowResult.ProfileOutcome is { Complete: false })
                 {

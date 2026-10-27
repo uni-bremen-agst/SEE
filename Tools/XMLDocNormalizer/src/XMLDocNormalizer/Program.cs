@@ -58,7 +58,16 @@ namespace XMLDocNormalizer
             catch (ExternalTargetExecutionException exception) when (options.ExternalTarget)
             {
                 Console.Error.WriteLine("External target failed: " + exception.Message);
+                RunResultConsoleReporter.ReportCoverage(exception.Coverage.Report(), error: true);
                 return ToolExitCodes.ExternalTargetFailure;
+            }
+            catch (Exception)
+            {
+                AnalysisCoverage coverage = new();
+                coverage.Begin("RequestedTarget", options.XmlDocOptions.ExceptionAnalysisMode);
+                coverage.Fail("AnalysisExecutionFailed");
+                RunResultConsoleReporter.ReportCoverage(coverage.Report(), error: true);
+                throw;
             }
 
             EvaluateResult(options, result);

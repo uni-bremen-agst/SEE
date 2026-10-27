@@ -1,4 +1,5 @@
 using XMLDocNormalizer.Models.DTO;
+using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Reporting.Json
 {
@@ -17,5 +18,6 @@ namespace XMLDocNormalizer.Reporting.Json
         DateTime GeneratedAtUtc,
         string TargetPath,
         RunMetricsDto Metrics,
-        List<JsonFindingDto> Findings);
+        List<JsonFindingDto> Findings,
+        AnalysisCoverageReport? Analysis = null);
 }

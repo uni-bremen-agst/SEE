@@ -1,0 +1,581 @@
+﻿{
+    "Package":  "Coverage Completion",
+    "Passed":  true,
+    "BaseCommit":  "aef86f86559fbcc7c355389a407857ed67e5bcfa",
+    "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190",
+    "Sdk":  "8.0.418",
+    "HistoricalVersion":  "5.0.0-2.25451.107",
+    "CurrentRoslynVersion":  "5.0.0",
+    "RuntimeStatus":  "OPEN - recurrent, unattributed process failure",
+    "StyleClosure":  {
+                         "Files":  [
+                                       {
+                                           "Path":  "src/XMLDocNormalizer/Execution/Analysis/AnalysisCoverageObserver.cs",
+                                           "Replacements":  2,
+                                           "OnlyApprovedTypeSyntaxChanged":  true,
+                                           "BeforeSha256":  "B5C40FE5B0921EF06F2CE9DF63D95800854DAA90B265D58A1A1240B105A79B81",
+                                           "AfterSha256":  "51792A12A45F2F0658C45F23808C504444F089DCBE0ED7D1D4A2BDD9C9682C9B"
+                                       },
+                                       {
+                                           "Path":  "Tests/XMLDocNormalizerTests/Execution/CoverageCompletionTests.cs",
+                                           "Replacements":  61,
+                                           "OnlyApprovedTypeSyntaxChanged":  true,
+                                           "BeforeSha256":  "4A6A30832558F8DFFDE6DC97057CEAB031105794940072BEB10A40C247BCAE5D",
+                                           "AfterSha256":  "F87465B59A5796D233FE1884C2E5B0C34DD9CC93CB9166E82756BA145D40B9BF"
+                                       }
+                                   ],
+                         "ReplacedVarTokens":  63,
+                         "LocalSymbolsCompared":  112,
+                         "SameStaticTypesIncludingNullable":  true,
+                         "OnlyTypeSyntaxBytesChanged":  true,
+                         "GateInputMatrix":  "README.md#finale-stilkorrektur-statische-typen-und-gate-inputs",
+                         "AuditPreparationFailures":  [
+                                                          "Temporary audit helper initially had an incorrect relative assembly path",
+                                                          "Next helper build lacked explicit Immutable/Metadata 9 references; exact existing dependencies were supplied, no product versions changed"
+                                                      ],
+                         "ProductGatesFailed":  0,
+                         "EvidenceAdapterFailures":  [
+                                                         "Nested PSScriptRoot rewrite failed before PDB checks",
+                                                         "Continuation scriptblock lacked its own root before gate preparation",
+                                                         "PowerShell 5 serialized the reused proof-input array as a wrapper; corrected to three explicit proof records",
+                                                         "The same PowerShell array-wrapper shape in final style descriptors was flattened before final source-hash verification"
+                                                     ],
+                         "EvidenceGateAttempt1":  {
+                                                      "Checks":  1426,
+                                                      "PassedChecks":  1425,
+                                                      "FailedChecks":  1,
+                                                      "Cause":  "Malformed proof-input metadata, no product assertion failed",
+                                                      "PreservedAsCompactFailure":  true
+                                                  },
+                         "CorrectedEvidenceGateAttempt":  2
+                     },
+    "PreviousRevision":  {
+                             "FinalSourceDigest":  "6FDE9157202A1F6B6920CAAE7895657119FE06E6A01D77837FD5B4860A37996C",
+                             "SourceIdentityScope":  "Final prior projection/broad/boundary/full/dual only; earlier targeted runs are intermediate revisions as labeled",
+                             "Runs":  [
+                                          {
+                                              "Gate":  "targeted",
+                                              "StartedUtc":  "2026-10-27T11:10:01.9718822Z",
+                                              "CompletedUtc":  "2026-10-27T11:14:29.2756872Z",
+                                              "ExitCode":  1,
+                                              "Counters":  {
+                                                               "total":  "1489",
+                                                               "executed":  "1489",
+                                                               "passed":  "1444",
+                                                               "failed":  "45",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Known missing static fixture; no green retry"
+                                          },
+                                          {
+                                              "Gate":  "targeted-prepared",
+                                              "StartedUtc":  "2026-10-27T11:21:23.7292112Z",
+                                              "CompletedUtc":  "2026-10-27T11:26:29.1033037Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "1505",
+                                                               "executed":  "1505",
+                                                               "passed":  "1505",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Documented intermediate revision"
+                                          },
+                                          {
+                                              "Gate":  "targeted-final",
+                                              "StartedUtc":  "2026-10-27T11:28:42.0041536Z",
+                                              "CompletedUtc":  "2026-10-27T11:31:56.0160155Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "271",
+                                                               "executed":  "271",
+                                                               "passed":  "271",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Documented intermediate revision"
+                                          },
+                                          {
+                                              "Gate":  "projection-final",
+                                              "StartedUtc":  "2026-10-27T11:33:42.8393576Z",
+                                              "CompletedUtc":  "2026-10-27T11:35:25.1558949Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "141",
+                                                               "executed":  "141",
+                                                               "passed":  "141",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Final source revision"
+                                          },
+                                          {
+                                              "Gate":  "broad",
+                                              "StartedUtc":  "2026-10-27T11:37:13.3723539Z",
+                                              "CompletedUtc":  "2026-10-27T11:42:23.7638787Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "3450",
+                                                               "executed":  "3450",
+                                                               "passed":  "3450",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Final source revision"
+                                          },
+                                          {
+                                              "Gate":  "boundary",
+                                              "StartedUtc":  "2026-10-27T11:42:32.5876489Z",
+                                              "CompletedUtc":  "2026-10-27T11:45:08.8036736Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "596",
+                                                               "executed":  "596",
+                                                               "passed":  "596",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Final source revision"
+                                          },
+                                          {
+                                              "Gate":  "full",
+                                              "StartedUtc":  "2026-10-27T11:45:42.5228853Z",
+                                              "CompletedUtc":  "2026-10-27T11:50:49.6189394Z",
+                                              "ExitCode":  0,
+                                              "Counters":  {
+                                                               "total":  "3541",
+                                                               "executed":  "3541",
+                                                               "passed":  "3541",
+                                                               "failed":  "0",
+                                                               "notExecuted":  "0"
+                                                           },
+                                              "Context":  "Final source revision"
+                                          },
+                                          {
+                                              "Gate":  "dual",
+                                              "StartedUtc":  "2026-10-27T16:04:25.7683000Z",
+                                              "CompletedUtc":  "2026-10-27T16:14:18.8868580Z",
+                                              "ExitCode":  0,
+                                              "Counters":  null,
+                                              "Context":  "Final source revision"
+                                          }
+                                      ],
+                             "DualTotal":  800,
+                             "ClosureChecks":  1449,
+                             "HistoricalOnly":  true
+                         },
+    "Runs":  [
+                 {
+                     "Gate":  "style-build",
+                     "StartedUtc":  "2026-10-27T17:21:09.8369182Z",
+                     "CompletedUtc":  "2026-10-27T17:21:14.7755630Z",
+                     "ExitCode":  0,
+                     "Counters":  null,
+                     "Executable":  "dotnet",
+                     "Command":  [
+                                     "build",
+                                     "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                                     "--no-restore",
+                                     "-warnaserror",
+                                     "-p:UseSharedCompilation=false",
+                                     "-v:minimal"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 },
+                 {
+                     "Gate":  "projection-final",
+                     "StartedUtc":  "2026-10-27T17:21:14.7852550Z",
+                     "CompletedUtc":  "2026-10-27T17:22:56.2674509Z",
+                     "ExitCode":  0,
+                     "Counters":  {
+                                      "total":  "141",
+                                      "executed":  "141",
+                                      "passed":  "141",
+                                      "failed":  "0",
+                                      "notExecuted":  "0"
+                                  },
+                     "Executable":  "dotnet",
+                     "Command":  [
+                                     "test",
+                                     "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                                     "--no-build",
+                                     "--no-restore",
+                                     "--filter",
+                                     "FullyQualifiedName~CoverageCompletion|FullyQualifiedName~FindingsReporter|FullyQualifiedName~RunResultClone|FullyQualifiedName~ExceptionFlowExternalTargetCliTests",
+                                     "--blame",
+                                     "--logger",
+                                     "trx;LogFileName=projection-final.trx",
+                                     "--results-directory",
+                                     "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\style-closure",
+                                     "-v:minimal"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 },
+                 {
+                     "Gate":  "broad",
+                     "StartedUtc":  "2026-10-27T17:22:56.2924273Z",
+                     "CompletedUtc":  "2026-10-27T17:28:06.8559187Z",
+                     "ExitCode":  0,
+                     "Counters":  {
+                                      "total":  "3450",
+                                      "executed":  "3450",
+                                      "passed":  "3450",
+                                      "failed":  "0",
+                                      "notExecuted":  "0"
+                                  },
+                     "Executable":  "dotnet",
+                     "Command":  [
+                                     "test",
+                                     "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                                     "--no-build",
+                                     "--no-restore",
+                                     "--filter",
+                                     "FullyQualifiedName~XMLDocNormalizerTests.Check.Infrastructure.DocumentationStatisticsCollectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Infrastructure.FindingLocationAndMessageTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Infrastructure.Namespace.NamespaceDocumentationAggregatorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_611_InheritdocExceptionDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_AdvancedTransitiveExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_CaughtDirectExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_KnownFrameworkThrowHelperTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_MissingExceptionTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC610_ProjectTransitiveDeclaredExceptionsDirectTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_632_CrossProjectExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_632_MultipleAndCombinedFindingsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_632_ProjectTransitiveDeclaredExceptions_CrossProjectTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CallContextValueFactDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CallSiteNullabilityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CallSiteValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CatchAllTransitiveExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CatchFilterExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_CaughtTransitiveExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ConditionalThrowReachabilityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ConditionalWeakTableReturnFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_DefinedEnumValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_DictionarySequenceRangeFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_EnclosingConditionDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_EnclosingForEachDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ExceptionTranslationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ExtractedTagElementInvariantTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_GuardedSourceReturnMemberFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ImmutableMemberValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ImmutablePropertyInvariantTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ImplicitObjectCreationParityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_InstanceReadonlyFieldValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_InterpolatedStringValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_IntrinsicNonNullValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_IsPatternConditionDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_KnownNonNullFrameworkReturnTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_MultiReturnStringValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_NestedSuccessfulCalleeDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_OneBasedSourcePositionFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ParameterMemberCallContextTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_PrecedingSuccessfulDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_PrecedingSuccessfulPropertyDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_PrivateHelperCallContextTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ProjectTransitiveDeclaredExceptionsModeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ReducedExtensionCallContextTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SequenceElementCallContextTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SequenceElementFactSoundnessTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_ShortCircuitConditionFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SolutionTransitiveCaughtExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SolutionTransitiveValueFactRegressionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SourceReturnCallContextTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SourceReturnSuccessfulDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SourceSequenceReturnFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_StatisticsProvenanceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_StringConcatenationValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SuccessfulCalleeDereferenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_SuccessfulSequenceElementValidationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC611_WhereSequenceElementFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC630_ExceptionTagWithoutDirectThrowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_632_ProjectVsSolutionTransitiveTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_CatchAllSuppressesUncertaintyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_ExactExceptionCoverageTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_ExternalDocumentationContractTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_ProjectTransitiveDeclaredExceptionsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC631_ProjectTransitiveInternalDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC632_AdvancedTransitiveExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC632_MixedExceptionCoverageTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC632_ProjectTransitiveDeclaredExceptionsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC632_TransitiveExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC660_InvalidExceptionCrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.DOC670_ExceptionCrefNotExceptionTypeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionCoverageExactTypeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowContextualFactEvaluatorDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowContextualFactEvaluatorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowDataFlowFactCacheTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowDictionaryValueFactOwnershipTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowDirectPathTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowExternalDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowFactComponentDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowKnownFrameworkContractInfrastructureTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowLocalAnalysisComponentDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowRecursiveDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowRecursiveLocalCallableTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowReturnValueFactsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowRuntimeAwaitCapabilityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowRuntimeDispatchClassifierTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSequenceRangeDictionaryFactOwnershipTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSequenceSourceHelperTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSuccessfulDereferenceCacheTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryBodyResolutionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryComponentDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryFragmentTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphAccessorDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphAccessorWriteTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphAwaitDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphBuilderTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphCollectionInitializerDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphCollectionInitializerTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphConstructorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDeconstructionDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDeconstructionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDispatchCompletenessTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDisposalDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDisposalTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphDynamicBindingTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphEvaluationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphExpressionBodiedAccessorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphForEachDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphIterationAwaitTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphLocalCallableTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphOperatorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphProductionIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryGraphThrowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryOrchestrationDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSummaryThrowNullabilityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSupportingSourceBindingTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExceptionFlowSupportingSourcePrecedenceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExternalDocumentationExceptionModelTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.ExternalSupportingSourceExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exception.KnownFrameworkExceptionModelTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.CanonicalExceptionFlowTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.CanonicalIdentityTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExceptionFlowAnalysisResultTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExceptionFlowCoreDependencyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExceptionFlowCrossCompilationResolverTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExceptionFlowPathTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExceptionFlowSemanticDependencyGuardTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExternalSupportingSourceAcquisitionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.ExternalSupportingSourceBinaryDiscoveryTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Exceptions.HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Inheritdoc.DOC710_InvalidInheritdocCrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Inheritdoc.DOC711_InheritdocIncompatibleCrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Inheritdoc.DOC720_InheritdocNoSourceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Inheritdoc.DOC730_RedundantInheritdocTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.Inheritdoc.DOC740_AmbiguousInheritdocSourceTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Semantic.See.DOC930_931_InvalidSeeCrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC100_MissingCentralNamespaceDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC110To130_MissingDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC150_TopLevelTagOrderMismatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC200_MissingSummaryTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC200To210_InheritdocSummaryInteractionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC210_EmptySummaryTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC220_230_DuplicateSummaryAndRemarksTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.DOC240_EmptyRemarksTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Basic.Syntax_NoFinding_BasicDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForBasicDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForInheritdocDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForMemberTagDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForNamedTagAndReturnsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForNamespaceDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForSeeDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForSemanticExceptionDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForSyntaxExceptionDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForValueDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Context.FindingContextForWellFormedDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Exception.DOC620_EmptyExceptionDescriptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Exception.DOC640_RethrowCannotInferExceptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Exception.DOC650_DuplicateExceptionTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Exception.DOC680_ExceptionTagOnNonExecutableMemberTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Exception.Syntax_NoFinding_ExceptionDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Inheritdoc.DOC700_InheritdocWithOwnSummaryTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Inheritdoc.DOC750_DuplicateInheritdocTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Inheritdoc.InheritdocMissingDetailTagSuppressionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineDocumentationIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineExceptionIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineNamedTagIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineReturnsValueIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineSeeIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Integration.FullSyntaxPipelineWellFormedIntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.InvalidTag.DOC143_FullMatrixTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC310_MissingParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC320_EmptyParamDescriptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC330_UnknownParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC350_DuplicateParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC360_ParamOrderMismatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC370_ParamRefMissingNameTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC380_UnknownParamRefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.DOC390_InvalidParamRefAttributeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.PrimaryConstructorParamDocumentationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Params.Syntax_NoFinding_ParamDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC500_MissingReturnsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC510_EmptyReturnsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC520_ReturnsOnVoidMemberTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC530_DuplicateReturnsTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC540_ReturnsOnWriteOnlyPropertyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.DOC541_ReturnsOnIndexerTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Returns.Syntax_NoFinding_ReturnsDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC900_SeeMissingTargetTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC901_SeeAlsoMissingTargetTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC910_InvalidSeeAttributeCombinationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC911_InvalidSeeAlsoAttributeCombinationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC912_SeeAlsoLangwordNotAllowedTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC920_InvalidSeeAttributeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC921_InvalidSeeAlsoAttributeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC940_InvalidSeeHrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC941_InvalidSeeAlsoHrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC950_InvalidSeeLangwordTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC960_SeeAlsoNotTopLevelTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC970_DuplicateSeeAlsoTargetTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC980_SeeNotEmptyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.DOC981_SeeAlsoNotEmptyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.See.Syntax_NoFinding_SeeDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC410_MissingTypeParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC420_EmptyTypeParamDescriptionTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC430_UnknownTypeParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC450_DuplicateTypeParamTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC460_TypeParamOrderMismatchTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC470_TypeParamRefMissingNameTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC480_UnknownTypeParamRefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.DOC490_InvalidTypeParamRefAttributeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.TypeParams.Syntax_NoFinding_TypeParamDetector_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC800_MissingValueTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC810_EmptyValueTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC820_DuplicateValueTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC830_ValueOnWriteOnlyPropertyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC831_DOC143_IntegrationTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC831_InvalidMemberMatrixTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC831_InvalidMemberSpecialCasesTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.DOC831_ValueOnInvalidMemberTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.ValueDetector_CombinedFindingsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.ValueDocumentationClassifierTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.Value.ValueDocumentationModeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC140_UnknownTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC141_MissingEndTagTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC300_ParamMissingNameTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC340_ParamRefNotEmptyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC400_TypeParamMissingNameTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC440_TypeParamRefNotEmptyTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.DOC600_ExceptionMissingCrefTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.WellFormed_MultipleFindingsTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Syntax.WellFormed.WellFormed_NoFindings_SmokeTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_BasicDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_ExceptionDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_ParamDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_ReturnsDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_TypeParamDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_ValueDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.Traversal.Syntax.Traversal_NestedTypes_WellFormedDetectorTests|FullyQualifiedName~XMLDocNormalizerTests.Check.WellFormed.DOC142_InvalidXmlTagTests|FullyQualifiedName~XMLDocNormalizerTests.Evaluation.EvaluationArgumentsTests|FullyQualifiedName~XMLDocNormalizerTests.Evaluation.EvaluationManifestLoaderTests|FullyQualifiedName~XMLDocNormalizerTests.Evaluation.EvaluationReportWriterTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.ExceptionAnalysisModeComparisonRunnerPathTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalAssemblyReferenceCatalogTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalAssemblyReferenceDescriptorFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalBinaryCandidateDiscoveryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCompilationProvenanceDescriptorFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCSharpCompilationConfigurationFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCSharpCompilationFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCSharpReconstructionFidelityTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCSharpSyntaxTreeFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalCSharpSyntaxTreeSetFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceCandidateDescriptorFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceMaterialSetFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalMetadataReferenceSetFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalPeDebugDirectoryDescriptorFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalPortablePdbAcquisitionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalPortablePdbDescriptorFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalRemoteReferenceAcquisitionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalSourceAcquisitionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalSourceLineEndingReconstructionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalSupportingSourceReconstructionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ExternalSupportingSourceRegistrationTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.SemanticCompilationScopeTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.SupportingSourceSymbolResolverTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ValidatedExternalMetadataReferenceMaterialFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.Semantic.ValidatedExternalSourceMaterialFactoryTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.ToolRunnerComparisonTimingRegressionTests|FullyQualifiedName~XMLDocNormalizerTests.Execution.ValueDocumentationModeComparisonRunnerPathTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowAnalysisDispatchTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowAnalysisRouterTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowAnalyzerSelectionPolicyTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowAnalyzerSelectionProjectionTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalInputEquivalenceTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowHistoricalPayloadProjectionTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowProductionCurrentParityTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.ExceptionFlowProductionPipelineTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.HistoricalWorkerClientTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.HistoricalWorkerProcessTests|FullyQualifiedName~XMLDocNormalizerTests.Worker.HistoricalWorkerProtocolTests|FullyQualifiedName~ExceptionFlow|FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzer|FullyQualifiedName~CoverageCompletion",
+                                     "--blame",
+                                     "--logger",
+                                     "trx;LogFileName=broad.trx",
+                                     "--results-directory",
+                                     "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\style-closure",
+                                     "-v:minimal"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 },
+                 {
+                     "Gate":  "boundary",
+                     "StartedUtc":  "2026-10-27T17:28:07.0350017Z",
+                     "CompletedUtc":  "2026-10-27T17:30:45.9929425Z",
+                     "ExitCode":  0,
+                     "Counters":  {
+                                      "total":  "596",
+                                      "executed":  "596",
+                                      "passed":  "596",
+                                      "failed":  "0",
+                                      "notExecuted":  "0"
+                                  },
+                     "Executable":  "dotnet",
+                     "Command":  [
+                                     "test",
+                                     "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                                     "--no-build",
+                                     "--no-restore",
+                                     "--filter",
+                                     "FullyQualifiedName~HistoricalWorker|FullyQualifiedName~HistoricalAnalyzerBuildProjectTests|FullyQualifiedName~ExceptionFlowAnalysisRouterTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionPolicyTests|FullyQualifiedName~ExceptionFlowAnalyzerSelectionProjectionTests|FullyQualifiedName~ExceptionFlowAnalysisDispatchTests|FullyQualifiedName~ExceptionFlowProduction|FullyQualifiedName~ExceptionFlowHistoricalPayloadProjectionTests|FullyQualifiedName~ExceptionFlowHistoricalInputEquivalenceTests|FullyQualifiedName~ExceptionFlowHistoricalReferenceIdentityTests|FullyQualifiedName~ExceptionFlowHistoricalSourceContextTests|FullyQualifiedName~ExceptionFlowHistoricalScopeTests|FullyQualifiedName~ExceptionFlowHistoricalSolutionScopeTests|FullyQualifiedName~ExceptionFlowHistoricalDeclaredBoundaryTests|FullyQualifiedName~ExceptionFlowHistoricalDeclaredPolicyTests|FullyQualifiedName~ExceptionFlowHistoricalDeclaredReadinessTests|FullyQualifiedName~ExceptionFlowHistoricalFindingContractTests|FullyQualifiedName~ExceptionFlowHistoricalProductionAdmissionTests|FullyQualifiedName~ExceptionFlowHistoricalDocumentationAttestationTests|FullyQualifiedName~ExceptionFlowHistoricalDeclaredProductionFindingTests",
+                                     "--blame",
+                                     "--logger",
+                                     "trx;LogFileName=boundary.trx",
+                                     "--results-directory",
+                                     "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\style-closure",
+                                     "-v:minimal"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 },
+                 {
+                     "Gate":  "full",
+                     "StartedUtc":  "2026-10-27T17:30:46.0112851Z",
+                     "CompletedUtc":  "2026-10-27T17:36:00.4885982Z",
+                     "ExitCode":  0,
+                     "Counters":  {
+                                      "total":  "3541",
+                                      "executed":  "3541",
+                                      "passed":  "3541",
+                                      "failed":  "0",
+                                      "notExecuted":  "0"
+                                  },
+                     "Executable":  "dotnet",
+                     "Command":  [
+                                     "test",
+                                     "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
+                                     "--no-build",
+                                     "--no-restore",
+                                     "--blame",
+                                     "--logger",
+                                     "trx;LogFileName=full.trx",
+                                     "--results-directory",
+                                     "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\style-closure",
+                                     "-v:minimal"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 },
+                 {
+                     "Gate":  "dual",
+                     "StartedUtc":  "2026-10-27T17:36:00.7019917Z",
+                     "CompletedUtc":  "2026-10-27T17:45:53.3821093Z",
+                     "ExitCode":  0,
+                     "Counters":  null,
+                     "Executable":  "powershell",
+                     "Command":  [
+                                     "-NoProfile",
+                                     "-ExecutionPolicy",
+                                     "Bypass",
+                                     "-File",
+                                     "build/Verify-DualVersionBuild.ps1",
+                                     "-RunMainBoundaryTests",
+                                     "-BuildTestProjectReferences"
+                                 ],
+                     "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190"
+                 }
+             ],
+    "DualVersion":  {
+                        "Passed":  true,
+                        "Suites":  [
+                                       {
+                                           "Suite":  "assembly-qualified-ownership",
+                                           "Total":  14,
+                                           "Passed":  14,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "bounded-findings",
+                                           "Total":  42,
+                                           "Passed":  42,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "bounded-generic-context",
+                                           "Total":  15,
+                                           "Passed":  15,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "canonical-exception-identity",
+                                           "Total":  20,
+                                           "Passed":  20,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "constructed-invocation-context",
+                                           "Total":  17,
+                                           "Passed":  17,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "external-target",
+                                           "Total":  36,
+                                           "Passed":  36,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "main-boundary",
+                                           "Total":  596,
+                                           "Passed":  596,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "recursive-summary-closure",
+                                           "Total":  33,
+                                           "Passed":  33,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       },
+                                       {
+                                           "Suite":  "solution-findings",
+                                           "Total":  27,
+                                           "Passed":  27,
+                                           "Failed":  0,
+                                           "Skipped":  0
+                                       }
+                                   ],
+                        "Total":  800,
+                        "Failed":  0,
+                        "Skipped":  0
+                    },
+    "Wae":  [
+                {
+                    "Step":  "0-current-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "1-historical-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "2-current-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "3-historical-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "4-historical-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "5-current-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "worker-0-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "worker-1-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "boundary-test-process-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "projection-pdb-fixture-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                },
+                {
+                    "Step":  "main-boundary-tests-build",
+                    "ZeroWarnings":  true,
+                    "ZeroErrors":  true
+                }
+            ],
+    "CurrentBaselines":  [
+                             {
+                                 "Name":  "Direct-False.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C",
+                                 "OutputSha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                             },
+                             {
+                                 "Name":  "Direct-True.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498",
+                                 "OutputSha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-False.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78",
+                                 "OutputSha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                             },
+                             {
+                                 "Name":  "ProjectTransitive-True.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6",
+                                 "OutputSha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-False.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8",
+                                 "OutputSha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                             },
+                             {
+                                 "Name":  "ProjectTransitiveDeclaredExceptions-True.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0",
+                                 "OutputSha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-False.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328",
+                                 "OutputSha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                             },
+                             {
+                                 "Name":  "SolutionTransitive-True.json",
+                                 "ByteEqual":  true,
+                                 "ReferenceSha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91",
+                                 "OutputSha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                             }
+                         ],
+    "Proofs":  [
+                   {
+                       "Id":  "a8",
+                       "Checks":  40,
+                       "Passed":  true,
+                       "ReusedUnchangedIndependentInputs":  true,
+                       "Command":  [
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\proofs\\a8\\bin\\Debug\\net8.0\\FamilyProof.dll",
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\closure\\proofs\\a8-proof-detail.json"
+                                   ],
+                       "OriginalSources":  [
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A8Proof\\FamilyProof.cs",
+                                                   "Sha256":  "5AB4C54EB0176FA2B30F836A0141BD9886EFEB251254E90B5FCC639F5AD98447"
+                                               },
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A8Proof\\FamilyProof.csproj",
+                                                   "Sha256":  "284A2485F034BF0E14F9B08AEA24EFCBFDD9D5F365D351BB277A9AD24684C8D5"
+                                               }
+                                           ]
+                   },
+                   {
+                       "Id":  "a9",
+                       "Checks":  37,
+                       "Passed":  true,
+                       "ReusedUnchangedIndependentInputs":  true,
+                       "Command":  [
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\proofs\\a9\\bin\\Debug\\net8.0\\ProfileProof.dll",
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\closure\\proofs\\a9-proof-detail.json"
+                                   ],
+                       "OriginalSources":  [
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.cs",
+                                                   "Sha256":  "3BC76D1240C7CBB6A8E7AC0FC00CC8213FA2155A6DFC992052D6CB01A59B19BC"
+                                               },
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.csproj",
+                                                   "Sha256":  "9BDC72BD39E09EEA567B0522876861002FFE01B2018F17F66DBBB725AD80E5E5"
+                                               }
+                                           ]
+                   },
+                   {
+                       "Id":  "production",
+                       "Checks":  30,
+                       "Passed":  true,
+                       "ReusedUnchangedIndependentInputs":  false,
+                       "Command":  [
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\style-proofs\\production\\bin\\Debug\\net8.0\\Validation.dll",
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e",
+                                       "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\style-closure\\proofs\\production-proof-detail.json"
+                                   ],
+                       "OriginalSources":  [
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A10Proof\\FinalClosure\\Program.cs",
+                                                   "Sha256":  "7253C5DF1D472E5CE15707A6D13D6F07FBCA11A9460E9D0049D46E886BF841D5"
+                                               },
+                                               {
+                                                   "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A10Proof\\FinalClosure\\Validation.csproj",
+                                                   "Sha256":  "D6D1A32CB9D996F92A1224411A7DFAB3BD8C72A9D806DE9296E9EC939593D687"
+                                               }
+                                           ]
+                   }
+               ],
+    "Closure":  {
+                    "Gate":  "Coverage Completion final style closure",
+                    "Passed":  true,
+                    "CapturedUtc":  "2026-10-27T17:47:49.5054006Z",
+                    "Checks":  1449,
+                    "PassedChecks":  1449,
+                    "FailedChecks":  [
+
+                                     ],
+                    "SourceDigest":  "6BB9018658B145B2CDA5F1D187649A8AF874751BF4D784C1B88673FC4B3AC190",
+                    "NewWireDto":  false,
+                    "ExistingTestAssertionsChanged":  0,
+                    "DetailedOutputTemporary":  true
+                },
+    "Witness":  {
+                    "Path":  "witnesses/four-mode-cli.json",
+                    "Sha256":  "E4B0706DAB9B10F0D9254BAF745693534BEAD0DE82BDAA310F605755965CA341",
+                    "Bytes":  15102
+                },
+    "Storage":  "Only selected compact results and reproduction metadata retained; no permanent full logs/TRX",
+    "AffectedGatesReexecutedOnce":  true,
+    "IndependentMathProofsNotRerun":  true
+}

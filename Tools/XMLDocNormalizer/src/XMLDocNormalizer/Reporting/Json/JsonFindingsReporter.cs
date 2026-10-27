@@ -100,7 +100,8 @@ namespace XMLDocNormalizer.Reporting.Json
                 GeneratedAtUtc: DateTime.UtcNow,
                 TargetPath: targetPath,
                 Metrics: metrics,
-                Findings: buffer);
+                Findings: buffer,
+                Analysis: result.Coverage.Report());
 
             JsonReportWriter.Write(outputPath, report);
         }

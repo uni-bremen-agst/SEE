@@ -7,6 +7,9 @@ namespace XMLDocNormalizer.Models.DTO
     /// </summary>
     internal sealed class ExceptionAnalysisModeRunDto
     {
+        /// <summary>Gets or sets coverage of every measured mode run.</summary>
+        public List<AnalysisCoverageReport?> AnalysisRuns { get; set; } = new();
+
         /// <summary>
         /// Gets or sets the analyzed exception analysis mode.
         /// </summary>

@@ -8,6 +8,12 @@ namespace XMLDocNormalizer.Models
     /// </remarks>
     internal sealed class RunResult
     {
+        /// <summary>Gets analysis coverage independently of findings.</summary>
+        public AnalysisCoverage Coverage { get; private set; } = new();
+
+        /// <summary>Adopts a completed scope's coverage without treating an empty accumulator as an analyzed target.</summary>
+        internal void UseCoverage(AnalysisCoverage coverage) => Coverage = coverage.Clone();
+
         /// <summary>
         /// Gets the total SLOC for the analyzed input.
         /// </summary>
@@ -153,6 +159,7 @@ namespace XMLDocNormalizer.Models
         {
             RunResult clone = new()
             {
+                Coverage = Coverage.Clone(),
                 Sloc = Sloc,
                 AnalysisDurationMs = AnalysisDurationMs,
                 ChangedFiles = ChangedFiles,

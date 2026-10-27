@@ -16,6 +16,23 @@ namespace XMLDocNormalizer.Cli.Output
     /// </remarks>
     internal static class RunResultConsoleReporter
     {
+        /// <summary>Writes completion separately from the finding result.</summary>
+        public static void ReportCoverage(AnalysisCoverageReport analysis, bool error = false)
+        {
+            TextWriter writer = error ? Console.Error : Console.Out;
+            string description = analysis.Completion switch
+            {
+                "Complete" => "complete for the selected scope and mode",
+                "Unsupported" => "not fully supported; no complete analysis result",
+                "Incomplete" => "incomplete; do not interpret missing findings as a complete negative result",
+                _ => "not assessed; no complete analysis result"
+            };
+            writer.WriteLine($"Analysis coverage: {description}.");
+            writer.WriteLine($"Analysis execution: {analysis.Execution}. Scope: {analysis.Scope}. Mode: {analysis.Mode}.");
+            if (analysis.ReasonCodes.Length != 0)
+                writer.WriteLine("Coverage reasons: " + string.Join(", ", analysis.ReasonCodes) + ".");
+        }
+
         /// <summary>
         /// Writes the final result of a check run to the console.
         /// </summary>
@@ -30,8 +47,15 @@ namespace XMLDocNormalizer.Cli.Output
 
             RunMetricsDto metrics = RunMetricsCalculator.From(result);
 
+            ReportCoverage(result.Coverage.Report());
+
             if (result.FindingCount == 0)
             {
+                if (result.Coverage.Report().Completion != "Complete")
+                {
+                    Console.WriteLine("No documentation findings reported. This is not a complete negative analysis result.");
+                    return;
+                }
                 WriteColored("Check succeeded", ConsoleColors.Success);
                 Console.WriteLine(": no documentation issues found.");
                 return;
@@ -71,6 +95,7 @@ namespace XMLDocNormalizer.Cli.Output
         public static void ReportFixRunResult(RunResult result, ToolOptions options)
         {
             ConsoleLogger.EndProgress();
+            ReportCoverage(result.Coverage.Report());
 
             RunMetricsDto metrics = RunMetricsCalculator.From(result);
 

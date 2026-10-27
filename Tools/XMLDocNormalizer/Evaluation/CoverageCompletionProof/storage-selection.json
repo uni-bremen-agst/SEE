@@ -1,0 +1,624 @@
+﻿{
+    "Applied":  true,
+    "PolicyFinalized":  false,
+    "Result":  "Authorized Coverage-only selection applied after final source revalidation; no tracked/historical file removed",
+    "InitialCensusBytes":  22749302,
+    "PermanentBytesIncludingThisSelection":  254328,
+    "PermanentFileCount":  25,
+    "OtherProductionTestDocumentation":  "Existing authorized Coverage source/test/README/docs changes retained separately",
+    "Files":  [
+                  {
+                      "Path":  "aggregation-closure-inputs.json",
+                      "Bytes":  7275,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-aggregation-closure.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-boundary-fixture.log",
+                      "Bytes":  1050,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-cli-integration.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-corrected-cli-fixture.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-final-projection.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-pdb-fixture.log",
+                      "Bytes":  1818,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-1.log",
+                      "Bytes":  10724,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-2.log",
+                      "Bytes":  3666,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-3.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-4.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-5.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-tests-final.log",
+                      "Bytes":  1758,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "build-worker-1.log",
+                      "Bytes":  2184,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Capture-CompiledInputs.ps1",
+                      "Bytes":  3397,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "8FFF8D94568E668451F88D1D48436C85EDDB610929AD065F0B39A4804A500BBA"
+                  },
+                  {
+                      "Path":  "Capture-Protection.ps1",
+                      "Bytes":  3199,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "F2813767089FDF987CCD5BC0524B8AA6D5DE29CD3AAAE4ABEBB2FE608A19F335"
+                  },
+                  {
+                      "Path":  "characterization-files.txt",
+                      "Bytes":  643,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "EA7E934418518C8140FDA46C6FD5AC188BD79B4EBDEDA4A143890CD72FB792C5"
+                  },
+                  {
+                      "Path":  "cli-integration-inputs.json",
+                      "Bytes":  7271,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "corrected-cli-fixture-inputs.json",
+                      "Bytes":  7277,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "emit-static-fixture.log",
+                      "Bytes":  1776,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "evidence-classification.json",
+                      "Bytes":  21933,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "F639D2CB635888913044DF3EF8AC4197B3745AD2A6581E91B9A7513DEFCCC9FB"
+                  },
+                  {
+                      "Path":  "EVIDENCE-KEEP-DELETE.md",
+                      "Bytes":  5427,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "7205B3D21A02D504E4A5B3A38D11FAC4A2C6232D2D7A2EC1CD05BFEDBEE94A00"
+                  },
+                  {
+                      "Path":  "export.json",
+                      "Bytes":  453462,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "final-code-inputs.json",
+                      "Bytes":  7266,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "final-projection-inputs.json",
+                      "Bytes":  7272,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "historical-precondition-failure.json",
+                      "Bytes":  517,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "new-contract-1.log",
+                      "Bytes":  1258,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "new-historical-1.log",
+                      "Bytes":  18762,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "new-native-1.log",
+                      "Bytes":  1252,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "normal-cli-contract.log",
+                      "Bytes":  17052,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Preflight.md",
+                      "Bytes":  12119,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "270B0B330CF650FDCEB3E121ED83AAFC43077876AEAC114D066ABFD9BA1A6714"
+                  },
+                  {
+                      "Path":  "prepared-fixtures.json",
+                      "Bytes":  1421,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Prepare-Validation.ps1",
+                      "Bytes":  2154,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "422A3541225F717AA9A8112144EE6B6F8840A20E79A24116509B6951B4FAFDFA"
+                  },
+                  {
+                      "Path":  "protection-20261027-111004.json",
+                      "Bytes":  9104,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "protection-20261027-145324.json",
+                      "Bytes":  9199,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "protection-20261027-161546.json",
+                      "Bytes":  9299,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "protection-20261027-161920.json",
+                      "Bytes":  9299,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "README.md",
+                      "Bytes":  10183,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "1A3D8C01780C83690AA334DA7F21EEE8BF66898B2F7FDD3BC37CCAE5D91B6330"
+                  },
+                  {
+                      "Path":  "Results/a8-proof.json",
+                      "Bytes":  7299,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "8EF5C3C64B96DEC8429E8E339CD8306F8B9D1B8125512A340B12C1261DEDCAE4"
+                  },
+                  {
+                      "Path":  "Results/a9-proof.json",
+                      "Bytes":  7795,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "481EB0B2B0925D197C8EBB93A5D9C1A84D07F48BAC80C969598DA3D0975ABF69"
+                  },
+                  {
+                      "Path":  "Results/boundary.json",
+                      "Bytes":  2293,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/boundary.log",
+                      "Bytes":  1254,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/boundary.trx",
+                      "Bytes":  981651,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/broad.json",
+                      "Bytes":  30025,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/broad.log",
+                      "Bytes":  1246,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/broad.trx",
+                      "Bytes":  5679763,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/closure-gate.json",
+                      "Bytes":  439,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "B9C69F96385D40BB4E98A1A11EFA0B9971608E567755F93CB55B776841EA367F"
+                  },
+                  {
+                      "Path":  "Results/closure-summary.json",
+                      "Bytes":  66245,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "B60DC484104AE3841A7D387C8DEAA642AF761C5ACE83EE325EB96450ABB315B8"
+                  },
+                  {
+                      "Path":  "Results/compiled-source-verification.json",
+                      "Bytes":  1078476,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/dual.json",
+                      "Bytes":  802,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/export.json",
+                      "Bytes":  115,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/compiled-source-verification.json",
+                      "Bytes":  1078476,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/export.json",
+                      "Bytes":  115,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/FinalInputs/validation-inputs.json",
+                      "Bytes":  408414,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/full.json",
+                      "Bytes":  1026,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/full.log",
+                      "Bytes":  1244,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/full.trx",
+                      "Bytes":  5818819,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/production-proof.json",
+                      "Bytes":  6508,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "BB0AEAED03780E8374906667997C567B6CAE9E7066238C812C73BA9033F40ED6"
+                  },
+                  {
+                      "Path":  "Results/projection-final.json",
+                      "Bytes":  1270,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/projection-final.log",
+                      "Bytes":  1270,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/projection-final.trx",
+                      "Bytes":  257795,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/proof-inputs.json",
+                      "Bytes":  4812,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/protection-summary.json",
+                      "Bytes":  1565,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "86E186B83B4381260D78C8F7CBF3884E73798688C2CBA3899F4AA06F179C8930"
+                  },
+                  {
+                      "Path":  "Results/source-identity.json",
+                      "Bytes":  2367,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "0CB065714819C80F9F5C10F9C3E4A2DB667DAC8CFDA2C6DF130668CB02DE9946"
+                  },
+                  {
+                      "Path":  "Results/targeted.json",
+                      "Bytes":  1397,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted.log",
+                      "Bytes":  161604,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted.trx",
+                      "Bytes":  2633478,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-final.json",
+                      "Bytes":  1475,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-final.log",
+                      "Bytes":  1266,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-final.trx",
+                      "Bytes":  470875,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.json",
+                      "Bytes":  1413,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.log",
+                      "Bytes":  1270,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/targeted-prepared.trx",
+                      "Bytes":  2498724,
+                      "Recommendation":  "DeleteAfterEvaluation",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Results/validation-inputs.json",
+                      "Bytes":  408414,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Run-ClosureVerification.ps1",
+                      "Bytes":  1899,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "05C7DDC27B5E83D3765F869F151F1FB1AA56A2BBA76E8696C6DCDB34DBBBFEB8"
+                  },
+                  {
+                      "Path":  "Run-Proofs.ps1",
+                      "Bytes":  3842,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "B1568CF6780D0CEFF09607BF5D3CBE9B17F3E7B16AABAD55AFD08C22599DD82B"
+                  },
+                  {
+                      "Path":  "Run-Validation.ps1",
+                      "Bytes":  5742,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "2F543390BF9473DC9AA82E7AA9E27CADCEA2B4FC60F744F6437130F3801E2CFB"
+                  },
+                  {
+                      "Path":  "start.json",
+                      "Bytes":  581187,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Sync-Validation.ps1",
+                      "Bytes":  1245,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "C7177F7D5F634B4EADF80289929867A6F095983C8EF7CA7B6BE7DB21631B8BDD"
+                  },
+                  {
+                      "Path":  "targeted-precondition-audit.json",
+                      "Bytes":  23794,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "Verify-Gates.ps1",
+                      "Bytes":  7896,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "8CA48F4D94E460A60D02C990DC84AD743F7EF92EE36315B0F6C283A962EEC695"
+                  },
+                  {
+                      "Path":  "witnesses/four-mode-cli.json",
+                      "Bytes":  15102,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "E4B0706DAB9B10F0D9254BAF745693534BEAD0DE82BDAA310F605755965CA341"
+                  },
+                  {
+                      "Path":  "Write-CompactClosure.ps1",
+                      "Bytes":  5735,
+                      "Recommendation":  "Keep",
+                      "Sha256":  "6349D369DEF8C6FB4819444CA1CB6BE5DDB261AF331616A6844BFF8AFBEA830F"
+                  },
+                  {
+                      "Path":  "protection-20261027-171748.json",
+                      "Bytes":  9299,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  },
+                  {
+                      "Path":  "protection-20261027-174649.json",
+                      "Bytes":  9299,
+                      "Recommendation":  "CompactDerivedThenDelete",
+                      "Sha256":  null,
+                      "Removed":  true
+                  }
+              ],
+    "AdditionalKeep":  [
+                           {
+                               "Path":  "Evaluation/coverage-completion-contract.md",
+                               "Bytes":  22243,
+                               "Sha256":  "B64A90831EA01DDE580CBE54E30FF83F9C1FB186E2E6E13BD722607562D46E14"
+                           },
+                           {
+                               "Path":  "Evaluation/evaluation-storage-contract-draft.md",
+                               "Bytes":  11812,
+                               "Sha256":  "B183F2B8DE727293CBD8198D8B65F67230A929B3DB129C59955C7BA5738CF587"
+                           }
+                       ],
+    "TemporaryRawRoots":  [
+                              "artifacts/evaluation/CoverageCompletion/closure",
+                              "artifacts/coverage-completion-3569b15e/artifacts"
+                          ],
+    "ExceptionsRetained":  "No new unidentified runtime failure or required crash primary data in these closure runs",
+    "NoHistoricalChanges":  true,
+    "RemovedFiles":  63,
+    "RemovedBytes":  22754629,
+    "RemovedTransientTrees":  [
+                                  {
+                                      "Path":  "artifacts/evaluation/CoverageCompletion/closure",
+                                      "Files":  13,
+                                      "Bytes":  633569,
+                                      "CrashPrimaryEvidenceFound":  false
+                                  },
+                                  {
+                                      "Path":  "artifacts/coverage-completion-3569b15e/artifacts",
+                                      "Files":  23311,
+                                      "Bytes":  19783122761,
+                                      "CrashPrimaryEvidenceFound":  false
+                                  },
+                                  {
+                                      "Path":  "artifacts/evaluation/CoverageCompletion/style-closure",
+                                      "Files":  112,
+                                      "Bytes":  35434515,
+                                      "CrashPrimaryEvidenceFound":  false
+                                  }
+                              ]
+}

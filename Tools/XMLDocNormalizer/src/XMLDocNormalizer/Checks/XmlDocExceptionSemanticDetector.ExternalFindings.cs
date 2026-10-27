@@ -11,6 +11,9 @@ namespace XMLDocNormalizer.Checks
         ExternalExceptionFlowAnalysisResult? Summary, ImmutableArray<Finding> Findings,
         bool GuardReached, bool SummaryRequested, string? Failure)
     {
+        /// <summary>Main-only product status; never participates in Finding admission.</summary>
+        internal AnalysisCoverage? Coverage { get; init; }
+
         internal bool Succeeded => Failure == null && Direct.Succeeded && (!SummaryRequested || Summary?.Succeeded == true);
     }
 

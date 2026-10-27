@@ -13,6 +13,7 @@ using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Cli.Output;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Execution.Semantic;
+using XMLDocNormalizer.Execution.Analysis;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Keys;
@@ -90,6 +91,7 @@ namespace XMLDocNormalizer.Execution
             ConsoleLogger.Info("Bounded external target: selected-root exception findings only; not a full project check.");
             // No reporter or success result exists until the complete B21/B22 operation succeeds.
             RunResult result = new();
+            result.UseCoverage(analyzed.Coverage!);
             result.AccumulateFindings(analyzed.Findings);
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             foreach (var file in analyzed.Findings.GroupBy(finding => finding.FilePath))
@@ -133,6 +135,7 @@ namespace XMLDocNormalizer.Execution
             });
 
             RunResult result = new();
+            result.Coverage.Begin("Workspace", options.XmlDocOptions.ExceptionAnalysisMode);
             TopLevelTagOrderProjectStatistics? statistics =
                 options.EnableStatistics
                     ? new TopLevelTagOrderProjectStatistics
@@ -143,10 +146,14 @@ namespace XMLDocNormalizer.Execution
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             List<Project> projectsToAnalyze = LoadProjectsToAnalyze(path, options, workspace, progress);
 
+            if (workspace.Diagnostics.Any(diagnostic => diagnostic.Kind == WorkspaceDiagnosticKind.Failure))
+                result.Coverage.Incomplete("WorkspaceLoadIncomplete");
+
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     projectsToAnalyze,
-                    options.XmlDocOptions.ExceptionAnalysisMode);
+                    options.XmlDocOptions.ExceptionAnalysisMode,
+                    result.Coverage.Incomplete);
 
             ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession =
                 CreateExceptionFlowSummaryAnalysisSession(
@@ -171,9 +178,12 @@ namespace XMLDocNormalizer.Execution
 
                 if (compilation == null)
                 {
+                    result.Coverage.Incomplete("CompilationUnavailable");
                     ConsoleLogger.Warn($"Compilation for project {project.Name} is null. Skipping this project.");
                     continue;
                 }
+
+                AnalysisCoverageObserver.ObserveCompilation(result.Coverage, compilation);
 
                 foreach (Document document in project.Documents)
                 {
@@ -183,6 +193,7 @@ namespace XMLDocNormalizer.Execution
                     string? filePath = document.FilePath;
                     if (filePath == null)
                     {
+                        result.Coverage.Incomplete("DocumentPathUnavailable");
                         continue;
                     }
 
@@ -194,6 +205,7 @@ namespace XMLDocNormalizer.Execution
                     SyntaxTree? tree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
                     if (tree == null)
                     {
+                        result.Coverage.Incomplete("SyntaxTreeUnavailable");
                         continue;
                     }
 
@@ -239,7 +251,8 @@ namespace XMLDocNormalizer.Execution
                             semanticModel,
                             semanticContext,
                             options.XmlDocOptions,
-                            summaryAnalysisSession));
+                            summaryAnalysisSession,
+                            result.Coverage));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
@@ -403,6 +416,8 @@ namespace XMLDocNormalizer.Execution
 
             Stopwatch sharedStopwatch = Stopwatch.StartNew();
             PreparedSemanticComparisonInput prepared = PrepareSemanticComparisonInput(projectsToAnalyze, options);
+            if (workspace.Diagnostics.Any(diagnostic => diagnostic.Kind == WorkspaceDiagnosticKind.Failure))
+                prepared.BaselineResult.Coverage.Incomplete("WorkspaceLoadIncomplete");
             sharedStopwatch.Stop();
 
             ExceptionComparisonExecutionResult comparisonResult = new()
@@ -444,6 +459,7 @@ namespace XMLDocNormalizer.Execution
             ToolOptions options)
         {
             PreparedSemanticComparisonInput prepared = new();
+            prepared.BaselineResult.Coverage.Begin("Workspace", options.XmlDocOptions.ExceptionAnalysisMode);
             prepared.Projects.AddRange(projectsToAnalyze);
 
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
@@ -463,8 +479,11 @@ namespace XMLDocNormalizer.Execution
                 if (compilation == null)
                 {
                     ConsoleLogger.Warn($"Compilation for project {project.Name} is null. Skipping this project.");
+                    prepared.BaselineResult.Coverage.Incomplete("CompilationUnavailable");
                     continue;
                 }
+
+                AnalysisCoverageObserver.ObserveCompilation(prepared.BaselineResult.Coverage, compilation);
 
                 foreach (Document document in project.Documents)
                 {
@@ -474,6 +493,7 @@ namespace XMLDocNormalizer.Execution
                     string? filePath = document.FilePath;
                     if (filePath == null)
                     {
+                        prepared.BaselineResult.Coverage.Incomplete("DocumentPathUnavailable");
                         continue;
                     }
 
@@ -485,6 +505,7 @@ namespace XMLDocNormalizer.Execution
                     SyntaxTree? tree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
                     if (tree == null)
                     {
+                        prepared.BaselineResult.Coverage.Incomplete("SyntaxTreeUnavailable");
                         continue;
                     }
 
@@ -609,12 +630,14 @@ namespace XMLDocNormalizer.Execution
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             RunResult modeResult = prepared.BaselineResult.Clone();
+            modeResult.Coverage.Begin("Workspace", mode);
             IFindingsReporter reporter = FindingsReporterFactory.Create(modeOptions);
 
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     prepared.Projects,
-                    modeOptions.XmlDocOptions.ExceptionAnalysisMode);
+                    modeOptions.XmlDocOptions.ExceptionAnalysisMode,
+                    modeResult.Coverage.Incomplete);
 
             ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession =
                 CreateExceptionFlowSummaryAnalysisSession(
@@ -637,7 +660,8 @@ namespace XMLDocNormalizer.Execution
                         document.SemanticModel,
                         semanticContext,
                         modeOptions.XmlDocOptions,
-                        summaryAnalysisSession);
+                        summaryAnalysisSession,
+                        modeResult.Coverage);
 
                 if (exceptionFindings.Count > 0)
                 {
@@ -837,6 +861,9 @@ namespace XMLDocNormalizer.Execution
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             RunResult result = new();
 
+            result.Coverage.Begin("SyntaxOnly", options.XmlDocOptions.ExceptionAnalysisMode);
+            result.Coverage.Unsupported("SemanticInputRequired");
+
             TopLevelTagOrderProjectStatistics? statistics =
                 options.EnableStatistics
                     ? new TopLevelTagOrderProjectStatistics
@@ -917,6 +944,8 @@ namespace XMLDocNormalizer.Execution
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             RunResult result = new();
+            result.Coverage.Begin("SyntaxOnly", options.XmlDocOptions.ExceptionAnalysisMode);
+            result.Coverage.Unsupported("SemanticInputRequired");
 
             foreach (string originalFile in files)
             {

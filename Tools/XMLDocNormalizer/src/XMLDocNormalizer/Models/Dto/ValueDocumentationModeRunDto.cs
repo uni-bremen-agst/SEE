@@ -7,6 +7,9 @@ namespace XMLDocNormalizer.Models.DTO
     /// </summary>
     internal sealed class ValueDocumentationModeRunDto
     {
+        /// <summary>Gets or sets coverage independently of this mode's findings.</summary>
+        public AnalysisCoverageReport? Analysis { get; set; }
+
         /// <summary>
         /// Gets or sets the value-documentation mode.
         /// </summary>

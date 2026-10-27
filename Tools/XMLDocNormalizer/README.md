@@ -187,6 +187,23 @@ Without `--output`, SARIF output defaults to:
 artifacts/findings.sarif
 ```
 
+## Analysis coverage and completion
+
+The finding count and analysis coverage are separate results. **Zero findings does
+not by itself mean that analysis was complete.** Console summaries now show both;
+JSON includes `Analysis`, and SARIF includes `runs[].properties.analysis`.
+
+`Complete` means that the configured checks completed for the selected scope and
+exception mode. `Incomplete` means that some required coverage is missing.
+`Unsupported` means that an input or semantic profile cannot be fully analyzed.
+These are distinct from technical execution failure. File/directory inputs run
+syntax checks without the semantic exception analysis available for projects and
+solutions, so their overall semantic coverage is `Unsupported`.
+
+Exit codes are unchanged: a normal run can return 0 with incomplete coverage.
+CI should inspect coverage as well as findings. See the
+[coverage contract, examples, mode boundaries and failure behavior](docs/analysis-coverage.md).
+
 ## Exception analysis
 
 Exception analysis is configured with:

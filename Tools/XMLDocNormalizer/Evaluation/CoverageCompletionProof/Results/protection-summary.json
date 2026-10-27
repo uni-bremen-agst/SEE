@@ -1,0 +1,25 @@
+﻿{
+    "BeforeHead":  "aef86f86559fbcc7c355389a407857ed67e5bcfa",
+    "AfterHead":  "aef86f86559fbcc7c355389a407857ed67e5bcfa",
+    "Passed":  true,
+    "IndexBefore":  "B20FC96FA500B18812F60820722BB546682F6511AA4D534FE2106BFA92F63DDF",
+    "IndexAfter":  "B20FC96FA500B18812F60820722BB546682F6511AA4D534FE2106BFA92F63DDF",
+    "RootIgnoreSha256":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "IndexUnchanged":  true,
+    "RootIgnoreUnchanged":  true,
+    "StashesUnchanged":  true,
+    "StashIds":  [
+                     "ea2390e44c6f7880b7861ffc8205a8a622eb049b On fix/documentation: WIP full position provenance before P1 extraction",
+                     "7f2ec8f22d27e53b107312d6873380f191aa90b5 On fix/documentation: WIP known-framework position provenance",
+                     "e48eacf48ab1195853451df4270b0c401979f063 On fix/documentation: WIP source sequence return provenance",
+                     "ca21287a63a755f3a05a2e7b0e4fcbf3e5f0f3f1 On fix/documentation: WIP rejected private caller entry facts v2",
+                     "4118ab86b1ee37a871c576ff171df934772f47d9 On fix/documentation: WIP private caller non-null facts soundness rework v2",
+                     "567448595c368c4c3b490b31289d37facd3bdecf On fix/documentation: WIP private caller non-null facts soundness rework."
+                 ],
+    "HistoricalFilesChecked":  1203,
+    "HistoricalDrift":  0,
+    "CoreFilesChecked":  23,
+    "CoreDrift":  0,
+    "SemanticIndexEmpty":  true,
+    "CheckedAfterEvidenceCleanup":  true
+}

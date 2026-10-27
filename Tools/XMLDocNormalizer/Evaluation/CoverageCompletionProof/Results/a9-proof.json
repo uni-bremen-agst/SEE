@@ -1,0 +1,188 @@
+﻿{
+    "Id":  "a9",
+    "Passed":  true,
+    "Checks":  [
+                   {
+                       "Name":  "obvious-identity-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "identity-finite-one-context",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "constant-closing-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "growing-projection-outside",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "membership-before-concrete-expansion",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "zero-weight-mutual-parameter-cycle-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "acyclic-variable-growth-in-call-cycle-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "growth-then-reset-finite",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "scoped-mutual-growing-cycle-outside",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "duplicating-growing-cycle-outside",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "finite-wrapped-source-projection",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "finite-substitution-composition",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "composition-two-scopes",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "simultaneous-not-recursive-text-replacement",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "concrete-catch-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "different-generic-argument-not-caught",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "inheritance-catch-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "base-exception-catch-exact",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "assembly-sensitive-catch",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "nested-containing-identity-preserved",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "finite-union-catch-remainder-partition",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "a8-pcp-shape-outside-before-expansion",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "finite-correlation-is-not-rejected",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "repeated-query-same-classification",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "canonical-equivalent-order-same-classification",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "new-canonical-objects-same-identity",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "owner-sensitive-exact-projections-distinct",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "method-and-containing-binders-distinct",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "nested-projection-two-scopes",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "ambiguous-owner-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "missing-owner-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "cross-scope-map-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "open-root-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "invalid-arity-representation-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "incomplete-skeleton-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "no-normal-findings-from-certificate",
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "membership-finite-schema-enumeration-terminates",
+                       "Passed":  true
+                   }
+               ],
+    "ProductAnalyzerExecuted":  false,
+    "SourceFiles":  [
+                        {
+                            "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.cs",
+                            "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\proofs\\a9\\ProfileProof.cs",
+                            "Sha256":  "3BC76D1240C7CBB6A8E7AC0FC00CC8213FA2155A6DFC992052D6CB01A59B19BC"
+                        },
+                        {
+                            "Original":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\Evaluation\\P5O2B25A9Proof\\ProfileProof.csproj",
+                            "Copied":  "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\proofs\\a9\\ProfileProof.csproj",
+                            "Sha256":  "9BDC72BD39E09EEA567B0522876861002FFE01B2018F17F66DBBB725AD80E5E5"
+                        }
+                    ],
+    "Command":  [
+                    "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\coverage-completion-3569b15e\\artifacts\\coverage\\proofs\\a9\\bin\\Debug\\net8.0\\ProfileProof.dll",
+                    "D:\\Repository\\SEE\\Tools\\XMLDocNormalizer\\artifacts\\evaluation\\CoverageCompletion\\closure\\proofs\\a9-proof-detail.json"
+                ],
+    "RawOutputTemporary":  true,
+    "ContractProofOnly":  true,
+    "NoProductDependency":  true,
+    "Profile":  "A9-FiniteOrbit-v1",
+    "TerminationProofByFiniteEnumeration":  false,
+    "Growth":  {
+                   "Exact":  false,
+                   "ConcreteContextsMaterialized":  0
+               },
+    "HardPattern":  {
+                        "Exact":  false,
+                        "ConcreteContextsMaterialized":  0
+                    },
+    "Reset":  {
+                  "Exact":  true,
+                  "ConcreteContextsMaterialized":  0
+              }
+}

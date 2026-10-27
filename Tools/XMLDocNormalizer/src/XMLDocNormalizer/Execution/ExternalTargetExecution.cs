@@ -14,7 +14,16 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Execution
 {
     /// <summary>A visible failed external operation, never an empty successful analysis.</summary>
-    internal sealed class ExternalTargetExecutionException(string message) : Exception(message);
+    internal sealed class ExternalTargetExecutionException : Exception
+    {
+        internal AnalysisCoverage Coverage { get; }
+
+        internal ExternalTargetExecutionException(string message, AnalysisCoverage? coverage = null) : base(message)
+        {
+            Coverage = coverage ?? new();
+            if (coverage == null) Coverage.Unsupported("ExternalInputUnsupported");
+        }
+    }
 
     /// <summary>Untrusted local file names and a bounded selector, not trusted execution DTOs.</summary>
     internal sealed record ExternalTargetJob([property: JsonRequired] int Version, string? TargetPe, string? PortablePdb,
@@ -150,15 +159,20 @@ namespace XMLDocNormalizer.Execution
                     var failed = result.Summary ?? result.Direct;
                     if (failed.Dispatch?.Decision is { Succeeded: true, Selection: ExceptionFlowAnalyzerSelection.Current })
                     { throw Failure("Selection: validated provenance selects Current; this bounded external input requires the supported Historical compiler, without fallback."); }
-                    throw Failure("B21/B22: " + (failed.PayloadProjection.Failure?.Message ?? failed.Dispatch?.Projection.Failure?.Message
+                    throw new ExternalTargetExecutionException("B21/B22: " + (failed.PayloadProjection.Failure?.Message ?? failed.Dispatch?.Projection.Failure?.Message
                         ?? failed.Dispatch?.Decision?.Failure?.Message ?? failed.Dispatch?.Routing?.RoutingFailure?.Message
-                        ?? failed.Dispatch?.Routing?.HistoricalAnalysis?.Failure?.Message ?? result.Failure));
+                        ?? failed.Dispatch?.Routing?.HistoricalAnalysis?.Failure?.Message ?? result.Failure),
+                        AnalysisCoverageObserver.ExternalFailure(result, mode));
                 }
-                return result;
+                AnalysisCoverage coverage = new(); coverage.Begin("ExternalSelectedRoot", mode);
+                return result with { Coverage = coverage };
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException
                 or ArgumentException or BadImageFormatException or InvalidOperationException or DecoderFallbackException)
-            { throw Failure("Local input/execution: " + exception.Message); }
+            {
+                AnalysisCoverage coverage = new(); coverage.Fail("ExternalInputOrExecutionFailed");
+                throw new ExternalTargetExecutionException("Local input/execution: " + exception.Message, coverage);
+            }
         }
     }
 }

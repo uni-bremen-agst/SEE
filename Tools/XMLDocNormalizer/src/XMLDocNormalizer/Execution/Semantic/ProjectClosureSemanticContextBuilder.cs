@@ -23,7 +23,8 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </exception>
         public static ProjectClosureSemanticContext Build(
             IReadOnlyCollection<Project> reportingProjects,
-            ExceptionAnalysisMode exceptionAnalysisMode)
+            ExceptionAnalysisMode exceptionAnalysisMode,
+            Action<string>? coverageIssue = null)
         {
             if (reportingProjects.Count == 0)
             {
@@ -37,7 +38,7 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             HashSet<ProjectId> analysisProjectIds = exceptionAnalysisMode switch
             {
-                ExceptionAnalysisMode.SolutionTransitive => CollectSolutionClosure(solution, reportingProjectIds),
+                ExceptionAnalysisMode.SolutionTransitive => CollectSolutionClosure(solution, reportingProjectIds, coverageIssue),
                 _ => new HashSet<ProjectId>(reportingProjectIds)
             };
 
@@ -50,12 +51,14 @@ namespace XMLDocNormalizer.Execution.Semantic
                 Project? project = solution.GetProject(projectId);
                 if (project == null)
                 {
+                    coverageIssue?.Invoke("ProjectCoverageIncomplete");
                     continue;
                 }
 
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
                 if (compilation == null)
                 {
+                    coverageIssue?.Invoke("CompilationUnavailable");
                     continue;
                 }
 
@@ -84,7 +87,8 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <returns>The complete recursive project-reference closure.</returns>
         private static HashSet<ProjectId> CollectSolutionClosure(
             Solution solution,
-            HashSet<ProjectId> rootProjectIds)
+            HashSet<ProjectId> rootProjectIds,
+            Action<string>? coverageIssue)
         {
             HashSet<ProjectId> closure = new();
             Stack<ProjectId> stack = new(rootProjectIds);
@@ -101,6 +105,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 Project? project = solution.GetProject(projectId);
                 if (project == null)
                 {
+                    coverageIssue?.Invoke("ProjectCoverageIncomplete");
                     continue;
                 }
 
