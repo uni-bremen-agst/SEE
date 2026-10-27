@@ -1,0 +1,2322 @@
+﻿{
+    "Schema":  "B25B-Evidence-Seal-v1",
+    "ImmutableAfterClosure":  true,
+    "CreatedUtc":  "2026-10-27T09:58:59.9401656Z",
+    "Meaning":  "Hash inventory of this completed package, not a replacement historical Core baseline",
+    "PackageFiles":  463,
+    "PackageBytes":  204910822,
+    "Report":  "Evaluation/P5O2B25B-bounded-solution-finding-adoption.md",
+    "ReportSha256":  "17DC4C08FF319DCBDD415A01EF709B221B08AF9DEFB819A1BC98AE97C1F488AA",
+    "Files":  [
+                  {
+                      "Path":  "Canonical/.gitignore",
+                      "Bytes":  14,
+                      "Sha256":  "85DCDA627B15E2958E8731B3D20F8DA75C9ADAEA1B63E452C7EDFF9551BCCE80"
+                  },
+                  {
+                      "Path":  "Canonical/W4/W4-equal-results-different-graphs.015400A51BCCF584E994652A08CCE89F03C7BE4C08D382F29966E571C60000A1.json.gz",
+                      "Bytes":  37563027,
+                      "Sha256":  "5C8519E45E292379AF5D2392EC6E51F48FC45F68DC4442FAE645E4C2C8E151F1"
+                  },
+                  {
+                      "Path":  "Canonical/W4/W4-equal-results-different-graphs.0223BE1CF879303D8B3EBDC585F6EB98229A1A372D3F206CD85EA92119A2A0EB.json.gz",
+                      "Bytes":  37563024,
+                      "Sha256":  "01013C5EB31B60A7C1D77AE45F35DA9D710166A32C5BE261BF3708D97D6AABAB"
+                  },
+                  {
+                      "Path":  "Canonical/W4/W4-equal-results-different-graphs.3B628C50E9FFA20BD3A30C2CBB1AE15AB52CF9504703AB022290DFB48DCE13D7.json.gz",
+                      "Bytes":  37563027,
+                      "Sha256":  "833BBBD449BE8227C3EBA217D737CB3254A83B19868E70FB1F87B3C6F1C5FA19"
+                  },
+                  {
+                      "Path":  "Canonical/W4/W4-equal-results-different-graphs.C52E0C241DB44C11E007A3ADC81063E9B8CD7710289EBC2171CB9798CEC83C38.json.gz",
+                      "Bytes":  37563024,
+                      "Sha256":  "0168F591AE727B48F9248955BD041384C554500894153FC9A9D61ECDC2B43A31"
+                  },
+                  {
+                      "Path":  "Capture-CompiledInputs.ps1",
+                      "Bytes":  3363,
+                      "Sha256":  "54C7A82469273621FD04927247356E42196EB280522BAE0C61F0585A47026419"
+                  },
+                  {
+                      "Path":  "Configure-Offline.ps1",
+                      "Bytes":  1496,
+                      "Sha256":  "BFA55C8F9181023C26BCEFEB8949AE0142E0E605C4AC06D341CD8C35E82215B3"
+                  },
+                  {
+                      "Path":  "Development/adoption-initial.log",
+                      "Bytes":  3652,
+                      "Sha256":  "B1A9F65D6D1C815FDF8227D3953551D3897654F3087BB7EB1D77453976E79DC5"
+                  },
+                  {
+                      "Path":  "Development/adoption-initial.trx",
+                      "Bytes":  12767,
+                      "Sha256":  "6BF15C2075F2009624F1791896F966E4A691DE515E8A57270EBE352E0CCF877D"
+                  },
+                  {
+                      "Path":  "Development/adoption-owner-and-c1-c3.log",
+                      "Bytes":  1162,
+                      "Sha256":  "D61F65182C810BA2A76766BA764FFFF99AE416A06BB73017515394C7EE40758D"
+                  },
+                  {
+                      "Path":  "Development/adoption-owner-and-c1-c3.trx",
+                      "Bytes":  77802,
+                      "Sha256":  "20849E9FC716CDD004C9C38CFDA9D267B37F966B2EDF44B70C5BFDD77889CAFA"
+                  },
+                  {
+                      "Path":  "Development/build-expanded-witnesses-after-test-exit.log",
+                      "Bytes":  1760,
+                      "Sha256":  "C03F56BD5A51A4EE520895D95E4740B2DF0EA87B46C771FE75D0341EBB63E490"
+                  },
+                  {
+                      "Path":  "Development/build-final-witnesses.log",
+                      "Bytes":  2970,
+                      "Sha256":  "64AEEBAA10061F848E8BE688CAE9A4706DEC9170AC6507A9E6C72219710143C3"
+                  },
+                  {
+                      "Path":  "Development/build-final-witnesses-2.log",
+                      "Bytes":  1760,
+                      "Sha256":  "D1837C496E6FAD6B311F6A4E1CA70A2D5668BE3C0D31B7E33D6288040F600F77"
+                  },
+                  {
+                      "Path":  "Development/build-first.log",
+                      "Bytes":  5762,
+                      "Sha256":  "B1FE4805E646415514E45FC1CDCC64C6ACB83B8F30BC9782C1151D5069768C18"
+                  },
+                  {
+                      "Path":  "Development/build-owner-fix.log",
+                      "Bytes":  2820,
+                      "Sha256":  "284D440EDB1C961770DC4F5EF367DCB477FF16203B4372FDF5702771BB747DAD"
+                  },
+                  {
+                      "Path":  "Development/build-pdb-fixture.log",
+                      "Bytes":  1634,
+                      "Sha256":  "EB881F2C344852BACC3782E7C4A631BE18750E2EDA5979C74C0A994443E4FC29"
+                  },
+                  {
+                      "Path":  "Development/build-pre-targeted.log",
+                      "Bytes":  2820,
+                      "Sha256":  "2A6B80B23179FA1C10B14607CE9642227DD39CFDF6F54F65EC0A29253357D280"
+                  },
+                  {
+                      "Path":  "Development/build-process.log",
+                      "Bytes":  926,
+                      "Sha256":  "0A96C09293C2061DBC39F1B26C4B6AFB6708133C7C2233087FBECDC19A14F2FA"
+                  },
+                  {
+                      "Path":  "Development/build-second.log",
+                      "Bytes":  2954,
+                      "Sha256":  "15555F39CA16B5908738038F8421AF0A45D8DFEFE4FD1F4DAEAB0A6D2CA027A3"
+                  },
+                  {
+                      "Path":  "Development/build-third.log",
+                      "Bytes":  1760,
+                      "Sha256":  "9820A2092E36062C91E0D5B9AAD867D4588E8B17CEA0727C04EB9F366FF028E4"
+                  },
+                  {
+                      "Path":  "Development/build-witness-expansion.log",
+                      "Bytes":  32176,
+                      "Sha256":  "6E6EF63A0B5C6DA6385AC71C269ADFBC7994AFFA7F86266B1F6FB1E9BFFB1025"
+                  },
+                  {
+                      "Path":  "Development/build-worker.log",
+                      "Bytes":  7734,
+                      "Sha256":  "FF2C1ED6DE33096A554EB3EEE5A506B370DED9913445F9A4EFC6953DCE3822B4"
+                  },
+                  {
+                      "Path":  "Development/build-worker-offline.log",
+                      "Bytes":  1936,
+                      "Sha256":  "89531CFBA844B4B150D8889FBCD3C711190DDE676533A9303909762B358D2765"
+                  },
+                  {
+                      "Path":  "Development/emit-fixture.log",
+                      "Bytes":  1776,
+                      "Sha256":  "1CF8A5FB84F626E465F10FFB9D35C44EAD2C4429DF516E38F847607179A6D8FE"
+                  },
+                  {
+                      "Path":  "Development/expanded-witnesses.log",
+                      "Bytes":  3626,
+                      "Sha256":  "C41984A6278751D9201F0E4D0F6E4E3B5F2B6695D0A83F1473E144F5817D04B3"
+                  },
+                  {
+                      "Path":  "Development/expanded-witnesses.trx",
+                      "Bytes":  33474,
+                      "Sha256":  "0BB051DAE8D564ADBA9C6441919D5B7E175CFA760F7DCA3DC347B045D9186D6E"
+                  },
+                  {
+                      "Path":  "Development/final-witnesses.log",
+                      "Bytes":  1144,
+                      "Sha256":  "369C45AEC5E98042BD2ADA42B9E5BB1FB262C3BF82A9BFC937CB0DDE2C315CCA"
+                  },
+                  {
+                      "Path":  "Development/final-witnesses.trx",
+                      "Bytes":  33470,
+                      "Sha256":  "F32E60778336ECF6C4D02C62A0AB8761613B722E05A95E8DD9ABE6F58C15115A"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/ArchiveCodec.cs",
+                      "Bytes":  4410,
+                      "Sha256":  "A942C33B72CEEBE77E0DFE8C6C37558B2238DBA9079BAF949BF1FE727B5BD218"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Capture-ClosureStart.ps1",
+                      "Bytes":  5687,
+                      "Sha256":  "B18DD9EB7965A038383E971621ABAC763A69E9DA90B652408848831F68A23080"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/closure-audit.json",
+                      "Bytes":  3322,
+                      "Sha256":  "67D39B85678D2B6062348C552D395F94D53431D749A1A5B1FAF441A62AC0765D"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Convert-W4Storage.ps1",
+                      "Bytes":  6193,
+                      "Sha256":  "03414D0E7BE7C7265721F999C47C4E5A5642A6C22A72A41346C52C121A2A002D"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/EvidenceStorage.psm1",
+                      "Bytes":  4538,
+                      "Sha256":  "BA934BA3A66E981143D63EECC12C39103F188ED8D529511CC87CA88FDF9F1DD3"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Expand-W4Evidence.ps1",
+                      "Bytes":  1333,
+                      "Sha256":  "92E2B277FDAF75FE00F189469A805072296C958775ACCB22481C39C56A27D53C"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/raw-retirement.json",
+                      "Bytes":  4154,
+                      "Sha256":  "EDE3D2961CBE5EE6B1CFCDABD36FB04693CB70F04CF031C789B2DEC14CD8C28D"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/README.md",
+                      "Bytes":  6270,
+                      "Sha256":  "0F0538959EF42EE7D3601F04350751AF0B5E8CED5BEF8568AAF940F2AC6F31A8"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Reference-Analysis.md",
+                      "Bytes":  6764,
+                      "Sha256":  "0E53CC87A2B4EE8CAA7ECECA0FBB6676363F622B6D5F0954A8504409281583CA"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Seal-EvidencePackage.ps1",
+                      "Bytes":  4449,
+                      "Sha256":  "DF6532B64A8C6C91B0187B3F7707365B7BE73576409BBFAEC140645466A6E5FF"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/start.json",
+                      "Bytes":  611008,
+                      "Sha256":  "50A6650611296F46C05C61311BD709791B4464A44DCFFBCAB43DBB7B053BE76A"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/storage-selfcheck.json",
+                      "Bytes":  705,
+                      "Sha256":  "4DB5FA10565A2036626E586F67E01E0202DA25BEE208E1C4FCD3CF5ADCDF9A4A"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/verification-final.json",
+                      "Bytes":  481233,
+                      "Sha256":  "A54ECD8C29D05D61B60078CEB6B5F3B5A87953FD3F0A98C06A3F3A8AD62A0C96"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/verification-normalized.json",
+                      "Bytes":  480670,
+                      "Sha256":  "2E861E88EC34F32C21B1F032897E39A7DEE1E64E8592013E50D3D008E34AF3E7"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/verification-prepared.json",
+                      "Bytes":  480303,
+                      "Sha256":  "8B13E90E2B2F112AC0F5BD2D0FEAF815BAD463686B3BB606689ECA5C88BA1168"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Verify-EvidenceClosure.ps1",
+                      "Bytes":  10790,
+                      "Sha256":  "453C81CE596C543843FE597C3F1F5689EC902264DFA50280DF6BA3D2E24C8604"
+                  },
+                  {
+                      "Path":  "EvidenceClosure/Verify-StorageSelfCheck.ps1",
+                      "Bytes":  3182,
+                      "Sha256":  "4AA3CD803EE5D3B8DDC75C2DADCC65AE0D8A625AB2E7F3F4720132879936C95E"
+                  },
+                  {
+                      "Path":  "evidence-storage-manifest.json",
+                      "Bytes":  13530,
+                      "Sha256":  "5413411DE07DCC506A895EF5377BA0C5AE0D5EA4C4C70BF1E1DFD45AB2E2551A"
+                  },
+                  {
+                      "Path":  "Finalize-Evidence.ps1",
+                      "Bytes":  4221,
+                      "Sha256":  "2A28C9ADC48B42D29283AC3B970AC2065E5D6289DEF7F8F1C88BAB3A5520D4E1"
+                  },
+                  {
+                      "Path":  "final-protection.json",
+                      "Bytes":  162327,
+                      "Sha256":  "98C64005D228B93BFFECBAB6E130503D7758D723A96F5A08F3E1FB2B2B82F41E"
+                  },
+                  {
+                      "Path":  "Harness-Scheduling.md",
+                      "Bytes":  3168,
+                      "Sha256":  "DABAA2A652114D700A04E9CEC02B168BBA3A8D9C48A4F973EB7D1878ED9A125D"
+                  },
+                  {
+                      "Path":  "implementation-audit.json",
+                      "Bytes":  85849,
+                      "Sha256":  "4231CB69B2015C0B63C774386BA3471A5D37ECBEC0B745360CABFF799C39C2B8"
+                  },
+                  {
+                      "Path":  "implementation-export.json",
+                      "Bytes":  393571,
+                      "Sha256":  "4C5C665B99494D3BBE0C5FFEA21D68C73288163403031A39FD0F91EB57D27266"
+                  },
+                  {
+                      "Path":  "implementation-protection.json",
+                      "Bytes":  162181,
+                      "Sha256":  "92971EC561AE3A4E166245A78AAC5A8F0B6AFA83A14818307CDD8B84DFE3BFFA"
+                  },
+                  {
+                      "Path":  "Preflight/Characterization-Approval-Batch.md",
+                      "Bytes":  13179,
+                      "Sha256":  "4480279E3DA0B25E59FD8220E25754C3359857D71F35BE860072FEDDE106BC83"
+                  },
+                  {
+                      "Path":  "Preflight/characterization-inventory.json",
+                      "Bytes":  230520,
+                      "Sha256":  "F1639F800C44D183ECF526886C9ECB78F24DA3066396F48BF079633495109F48"
+                  },
+                  {
+                      "Path":  "Preflight/Freeze-Preflight.ps1",
+                      "Bytes":  8162,
+                      "Sha256":  "29709121DD132714EF0DDC466B01B70623FC78F1F135CEB461A5E3657378CC8E"
+                  },
+                  {
+                      "Path":  "Preflight/README.md",
+                      "Bytes":  31180,
+                      "Sha256":  "CF7800052FE2C6D31E01C6AF5BF4AB222DCD451CCBAC03808E43F2D077BCEC1C"
+                  },
+                  {
+                      "Path":  "Preflight/start.json",
+                      "Bytes":  516409,
+                      "Sha256":  "4EFCBA5188C138AE9B20ADC46E1C737002002E2384264AD95CD5208C7C065A66"
+                  },
+                  {
+                      "Path":  "Preflight/verification.json",
+                      "Bytes":  1349,
+                      "Sha256":  "E3E1807AA5408D941998E8B5F4F14D2D91F8CEF1F4FCAE452D7D2C6FB4B51B09"
+                  },
+                  {
+                      "Path":  "Prepare-Validation.ps1",
+                      "Bytes":  2490,
+                      "Sha256":  "C34DCA47899B64BEB25A0271CB7FB68E931F42024D4005C16AD052672E90B22D"
+                  },
+                  {
+                      "Path":  "Receipt-Contract.md",
+                      "Bytes":  4327,
+                      "Sha256":  "48B8A1FE90D0EA0F4D70C2C989F58924D4EDB0CB36D90A1B7C0290328E3BD361"
+                  },
+                  {
+                      "Path":  "Results/A6/finite-False-False.json",
+                      "Bytes":  18462,
+                      "Sha256":  "B9D3176CA7BE7CBE91A81A2313F0521B292E6DD4937C01F9401B25C8A5FA317E"
+                  },
+                  {
+                      "Path":  "Results/A6/finite-False-True.json",
+                      "Bytes":  18459,
+                      "Sha256":  "74D420FAE7725975042BE23AEA2130D9EE82B09751714A8A0654D93541ADB73E"
+                  },
+                  {
+                      "Path":  "Results/A6/finite-True-False.json",
+                      "Bytes":  18782,
+                      "Sha256":  "3A1529DDCE94A1382A8BEB3189DDFE059DFF3385D10BABBA98B274E7E543ACA0"
+                  },
+                  {
+                      "Path":  "Results/A6/finite-True-True.json",
+                      "Bytes":  18779,
+                      "Sha256":  "4FB544FED323602E41AC0854C52CCCB600169D6606BB96C36F3277F8F725D767"
+                  },
+                  {
+                      "Path":  "Results/A6/growth-False-False.json",
+                      "Bytes":  660776,
+                      "Sha256":  "E3DE1E15D8DC903173AD0368C8418DEE356EF8F6C91CA54E044B938DEDAEA825"
+                  },
+                  {
+                      "Path":  "Results/A6/growth-False-True.json",
+                      "Bytes":  1711832,
+                      "Sha256":  "6FB4540597F89E799C56A2BEEE8AF8589158A1BF1358A508DB950DB3A847411C"
+                  },
+                  {
+                      "Path":  "Results/A6/growth-True-False.json",
+                      "Bytes":  661127,
+                      "Sha256":  "0E4C8B7791EE47E08AF1D4DA739FAAE4BB93AFF11ACF6374B6A18A592E293EC6"
+                  },
+                  {
+                      "Path":  "Results/A6/growth-True-True.json",
+                      "Bytes":  1712183,
+                      "Sha256":  "311D16268B9CCB7346437E23D4FA5D29F184DD8E741844CD5AC4F14580CB5157"
+                  },
+                  {
+                      "Path":  "Results/a8-proof.json",
+                      "Bytes":  8726,
+                      "Sha256":  "1296222A87EF750AA51E56F33C206ADCE314F7950F3BCE85A856E3F6B2450F49"
+                  },
+                  {
+                      "Path":  "Results/a8-proof.log",
+                      "Bytes":  224,
+                      "Sha256":  "AFBE99C20A998649297A95D9313B5033F4E41FD26C18EBE4F4880B2150A4493B"
+                  },
+                  {
+                      "Path":  "Results/a8-proof-build.log",
+                      "Bytes":  864,
+                      "Sha256":  "4C8808E4167780F33A37DE211A6F43A110DBF77101E69083C9B498F385EE1521"
+                  },
+                  {
+                      "Path":  "Results/a9-proof.json",
+                      "Bytes":  7781,
+                      "Sha256":  "4F8FEA173C4402DE00789C8760B299EE47089C6F939035991B8D5003A5CA63F4"
+                  },
+                  {
+                      "Path":  "Results/a9-proof.log",
+                      "Bytes":  188,
+                      "Sha256":  "C7D5B18DF1C9C16BE664E2BEC650FD85EE4B87AA6FD2BE18D8BF3FBB1EEE56B7"
+                  },
+                  {
+                      "Path":  "Results/a9-proof-build.log",
+                      "Bytes":  870,
+                      "Sha256":  "6E7C089206B6DBAC06FAA44B70EFAB497884429C18324E5FC9527522141685CA"
+                  },
+                  {
+                      "Path":  "Results/b25b-gates.json",
+                      "Bytes":  126583,
+                      "Sha256":  "7CB972350A34ACDE28219109E1EC5B7DC819B4928CB4BA065F0C0C02E733EC30"
+                  },
+                  {
+                      "Path":  "Results/boundary.json",
+                      "Bytes":  2262,
+                      "Sha256":  "1F95B21D90DA19C95EEB4BFECA5B2115A99EF2BE56E4B67951DA3343283D89D1"
+                  },
+                  {
+                      "Path":  "Results/boundary.log",
+                      "Bytes":  1130,
+                      "Sha256":  "BE7EE24D6D80B66EAD03D21E55DED176EF877013D39B6D251BBD547886F35ED4"
+                  },
+                  {
+                      "Path":  "Results/boundary.trx",
+                      "Bytes":  944699,
+                      "Sha256":  "80C41988A31EB91876111C06424179496D2E2EFC3D3FE638F642FFA1ECFCFA48"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W2-chain.json",
+                      "Bytes":  43333,
+                      "Sha256":  "46D30D09192D3833FD6C08FA34F42FB199F797B6C73796B2130ED38650FA8ADC"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "6282DDB4C5EF61DC57886DB40C48C54A57AE6F3C61A56E16D2F386212A401008"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W3-chain.json",
+                      "Bytes":  63439,
+                      "Sha256":  "46444DF8298FEB58B561261CAFDBE4F60FE8D39E85FED8C7E34CA9E02FA0C5BE"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "F40E1A8C5FD9E3EDD6C12F039CD1B8F4DF39175DB841B25A343488758AE809FE"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16041,
+                      "Sha256":  "BEC7B1C66F593D8D1287AC8285FC6CBAACE2F16DB30D24142ADF19561B29364E"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "5D52D77BF179D85956E876918BBF77CB417D9CCC4B402DD10C07ADD3DB09C10C"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "FFA7709DC7345FC26310A6B896A3A146D826F95F8DC98463E1F524FB503C91B7"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "6A86432017C594B2C5AAB2F7AA3E663A322998959FBA99041BEE942D0DDB1753"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "6C51D670C52B6B7F5584C0ADF7327A7A83FDE9D38E17647CD2998DD54AC87600"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "C68775B48608BAE93315347E5D2F2D475DC45D1F2C9B2C1022E7FCAA55B6264F"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "F3D64A67D0C59410C23FB8FC25225BDBBC4A257DA910F4F9AF03E5F05E0500BA"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "8E0D44E747F9BB79EF624E7104FCE662AC34B3D72CA9BFE5C18560F6EE579E05"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "6D2BBEB31B1D95CBAD73BF242A0C05CD5BE795FC95426AE62F4EBCEE991DC215"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "9E0751E32D98FD14FD24E27308B7A7849A361D31F7BD921560A4EE023F6074DD"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12753,
+                      "Sha256":  "48F501E5176054A1FD6120DE954B9A9F5BC2D2F37F177118BC403183330D1961"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "28FA7A86EDA905EE52BF9C3618C2B348CEE19FD047D937C8CEC211B3F2292A8E"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  553,
+                      "Sha256":  "B35D34506047633F6C78FE162C110F7E1B3F00AE8352F2CDF618AB2DB3803003"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "E5AC57AFC3317818069B5FCEA954BF1D97747B4E3F510658F6F6BB767CDE459A"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/boundary-evidence/capture-manifest.json",
+                      "Bytes":  1019,
+                      "Sha256":  "AE4DE0F3196205F427E8584D56A7C24864228A748FED50907818DE119857B6A3"
+                  },
+                  {
+                      "Path":  "Results/broad.json",
+                      "Bytes":  31282,
+                      "Sha256":  "3E02DD515E875C0B8D595DCED933E70A8666B277CA1FBCB2E1B3722B0602D8A4"
+                  },
+                  {
+                      "Path":  "Results/broad.log",
+                      "Bytes":  1124,
+                      "Sha256":  "0685EAE55E9C3D4B31B19EEC2063E4DF57976243E0A2E9662EFCE434DF862CBE"
+                  },
+                  {
+                      "Path":  "Results/broad.trx",
+                      "Bytes":  5325668,
+                      "Sha256":  "894E96A1BF9130A5C680FFE5236C7ECEC1BC61B55C0B606869BCAB8D5D8A9537"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W2-chain.json",
+                      "Bytes":  43333,
+                      "Sha256":  "46D30D09192D3833FD6C08FA34F42FB199F797B6C73796B2130ED38650FA8ADC"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "6282DDB4C5EF61DC57886DB40C48C54A57AE6F3C61A56E16D2F386212A401008"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W3-chain.json",
+                      "Bytes":  63439,
+                      "Sha256":  "46444DF8298FEB58B561261CAFDBE4F60FE8D39E85FED8C7E34CA9E02FA0C5BE"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "F40E1A8C5FD9E3EDD6C12F039CD1B8F4DF39175DB841B25A343488758AE809FE"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16041,
+                      "Sha256":  "BEC7B1C66F593D8D1287AC8285FC6CBAACE2F16DB30D24142ADF19561B29364E"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "5D52D77BF179D85956E876918BBF77CB417D9CCC4B402DD10C07ADD3DB09C10C"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "FFA7709DC7345FC26310A6B896A3A146D826F95F8DC98463E1F524FB503C91B7"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "6A86432017C594B2C5AAB2F7AA3E663A322998959FBA99041BEE942D0DDB1753"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "6C51D670C52B6B7F5584C0ADF7327A7A83FDE9D38E17647CD2998DD54AC87600"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "C68775B48608BAE93315347E5D2F2D475DC45D1F2C9B2C1022E7FCAA55B6264F"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "F3D64A67D0C59410C23FB8FC25225BDBBC4A257DA910F4F9AF03E5F05E0500BA"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "8E0D44E747F9BB79EF624E7104FCE662AC34B3D72CA9BFE5C18560F6EE579E05"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "6D2BBEB31B1D95CBAD73BF242A0C05CD5BE795FC95426AE62F4EBCEE991DC215"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "9E0751E32D98FD14FD24E27308B7A7849A361D31F7BD921560A4EE023F6074DD"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12753,
+                      "Sha256":  "48F501E5176054A1FD6120DE954B9A9F5BC2D2F37F177118BC403183330D1961"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "28FA7A86EDA905EE52BF9C3618C2B348CEE19FD047D937C8CEC211B3F2292A8E"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  553,
+                      "Sha256":  "B35D34506047633F6C78FE162C110F7E1B3F00AE8352F2CDF618AB2DB3803003"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "E5AC57AFC3317818069B5FCEA954BF1D97747B4E3F510658F6F6BB767CDE459A"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/broad-evidence/capture-manifest.json",
+                      "Bytes":  1012,
+                      "Sha256":  "109B7AE2BD69478FD64E70F1B68D0127732F78C4F49C0137F8D288BABD184B22"
+                  },
+                  {
+                      "Path":  "Results/broad-harness.json",
+                      "Bytes":  31297,
+                      "Sha256":  "ECB6DBA54BC1A760AAA251055536538B51B24C1729A52272E05BDDE94F93C7F6"
+                  },
+                  {
+                      "Path":  "Results/broad-harness.log",
+                      "Bytes":  1140,
+                      "Sha256":  "970035341717E8D279ED8D93FAC2D1D46A43FA60B167C986563BC6EF76BD16F4"
+                  },
+                  {
+                      "Path":  "Results/broad-harness.trx",
+                      "Bytes":  5325668,
+                      "Sha256":  "161202B4ABB99E79939C25ED56AED3712F018EBE06A3642F4B9AC330E7C9BED1"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W2-chain.json",
+                      "Bytes":  43331,
+                      "Sha256":  "F2FC1C80A2F8F68EC7CCA5C7EF112E6CACA47E0ABD8A81E77E7EE140DB227814"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "0C497C118D4A72E400D4394C574F9DD7C2F703906E44B1B27087B35548982E4C"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W3-chain.json",
+                      "Bytes":  63439,
+                      "Sha256":  "43993B0960616BAD16961A005FBA46689018F10C8108F2577A325ACBB40C3999"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "3CE2DE0D9D873DCC8AA0B6DDD0059E8C749D3624F4973E689A3EB2CE0A20C1EC"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16041,
+                      "Sha256":  "71BE587BE7099DEC99BEA3CB02E1779CA63836D78F061F7597A8B638D6A8EEEF"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "F953205EB42A497D08D0421EAFF3E0C651E856D25D379DB01E3F3A0313ED1A00"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "4BB21FAD64CC0005285FDC1CA4299F213B874EACFE22A98B18CE90EBAB4557EC"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "503FB367682BB94A2B70C5B5AB5F35BA9B55AA450CAE9281AE4188875D63AC64"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "E2CF51582EB0E0C983C58C56965722810C8ACA307AE72DFD0F41608F373DBA9F"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "CA7F0269468DB62F36E463144ADB0D3007F3DECA0967DDF5DAAD07ABF1F8A621"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "C2E13F2023BEC9798CFBBEBCA4C9C2C0941D1ADEC2C5AE48F374B2E42C7A3259"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "3A98930656E2A5A75116239EEECC7CCAE818C0AF52155C65629636AD9A82B756"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "56990645808DFC03F9B13855B5BBBE1319D41A908CD06846691D4FC8E2FE2714"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6784,
+                      "Sha256":  "09C687989131FD7B2D236F5F6C826F6228837670278DABC21697E77AA414E16F"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12751,
+                      "Sha256":  "80870C354038EB4569C89377384F5057528BD9A5AD733F120B8D44066DBF5A2B"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "0C72535663282C53F0AEAA3E36D4BD8AC7FA5883817A4823ABA49C57C2609BF3"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  554,
+                      "Sha256":  "A9A7F4E8E1909D2F2417F461C6990F38AD3EC79E916D7D93A752EB15CE78AD91"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "BFE8412E15CA5CC271224E6CB707ED2AF54BACFD94CDB8E8433E4FAADA9099ED"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/broad-harness-evidence/capture-manifest.json",
+                      "Bytes":  1036,
+                      "Sha256":  "5214125690A8D057DC141971847EB76715FF04359CBC7E14400436A9D264D1EC"
+                  },
+                  {
+                      "Path":  "Results/compiled-inputs.log",
+                      "Bytes":  360,
+                      "Sha256":  "80059F8DBFC4CC87ED52D4D3B9603922349C508367C77EA657BEF64D589C0194"
+                  },
+                  {
+                      "Path":  "Results/compiled-source-verification.json",
+                      "Bytes":  1047905,
+                      "Sha256":  "66AFE1E2BA70DBF9FEE8235A2885F511927B9EF3A8A6FCBF515A600745B64401"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/Direct-False.json",
+                      "Bytes":  1254,
+                      "Sha256":  "EF19B2E7E74C8B88E06292AEAD3A3C19EAA9221B206F63901C51E7F1B4E1CD5C"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/Direct-True.json",
+                      "Bytes":  1253,
+                      "Sha256":  "2FEDCE45F34028569A5343A513F3A63606FF63478F7E3088ACA1E0A0D25EB498"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/ProjectTransitiveDeclaredExceptions-False.json",
+                      "Bytes":  142,
+                      "Sha256":  "5BDF8E84BFCB4B819A352EC5AE955FE8467F1BDC86038795CFEB9373B36A7CB8"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/ProjectTransitiveDeclaredExceptions-True.json",
+                      "Bytes":  141,
+                      "Sha256":  "63673B723772865498DBB73FA72C3DF3D94D79DC8ABC04E9FE39AAAC6D3D84F0"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/ProjectTransitive-False.json",
+                      "Bytes":  2633,
+                      "Sha256":  "36702F26350B25B5E5366C97EF059E8B47DE94DD6A533AE8C160351D9F41AC78"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/ProjectTransitive-True.json",
+                      "Bytes":  2632,
+                      "Sha256":  "881922722F0E2F09029BED5F40836204EAA66777458AE2F32B13F22941E456F6"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/SolutionTransitive-False.json",
+                      "Bytes":  2634,
+                      "Sha256":  "7CA4BDACB9F0E3D992F58D599788B64D22AA369E62E63BB1AB3BDB599A729328"
+                  },
+                  {
+                      "Path":  "Results/Current-Baselines/SolutionTransitive-True.json",
+                      "Bytes":  2633,
+                      "Sha256":  "4F36F4488BFA3F6DEC981C35C7E8C1A41EFA403485BCE819A0DF6404C67BCC91"
+                  },
+                  {
+                      "Path":  "Results/dual.json",
+                      "Bytes":  615,
+                      "Sha256":  "CC79398E9B2E08255555D89E3D6EDF9012110DFB427066034DD2B3D611D3A259"
+                  },
+                  {
+                      "Path":  "Results/dual.log",
+                      "Bytes":  22608,
+                      "Sha256":  "4CADE730D0B32F11FF3DF7D7344D67BA36174EBEA59D18EBB480DB78D56555EE"
+                  },
+                  {
+                      "Path":  "Results/Dual/0-current-build.log",
+                      "Bytes":  253,
+                      "Sha256":  "BD044245265664D2DA40F446400D82FEB352FA767309AC32AF787BCD098D8816"
+                  },
+                  {
+                      "Path":  "Results/Dual/0-current-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/1-historical-build.log",
+                      "Bytes":  360,
+                      "Sha256":  "DB6E3855EACC656E268EC1322156DFAF57866519DDBA44EA2900BED780484244"
+                  },
+                  {
+                      "Path":  "Results/Dual/1-historical-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/2-current-build.log",
+                      "Bytes":  253,
+                      "Sha256":  "49A8CAD46E4C557174D849180740767F2BFAB3D80DA9DDF17A1DDA81491298C7"
+                  },
+                  {
+                      "Path":  "Results/Dual/2-current-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/3-historical-build.log",
+                      "Bytes":  360,
+                      "Sha256":  "3908A9F6F89CF72C40F20ED880BC394EC24DDBDA51BDACBF4B0A7ED16AA6495A"
+                  },
+                  {
+                      "Path":  "Results/Dual/3-historical-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/4-historical-build.log",
+                      "Bytes":  360,
+                      "Sha256":  "B3C7F3D83B21583CADC9334AD0389AD197A509DBBAA9448F954C21F968409D04"
+                  },
+                  {
+                      "Path":  "Results/Dual/4-historical-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/5-current-build.log",
+                      "Bytes":  253,
+                      "Sha256":  "EE6F2B4680ABC05BC796A0E2AE0C41165CCD549F35046CFCDD57AF389D520EA4"
+                  },
+                  {
+                      "Path":  "Results/Dual/5-current-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/assembly-qualified-ownership.trx",
+                      "Bytes":  24095,
+                      "Sha256":  "F8D92876B4D753F0290BBE4E380BFB8499BEAEBE63EFCFD338814205596FA93E"
+                  },
+                  {
+                      "Path":  "Results/Dual/audit.json",
+                      "Bytes":  150577,
+                      "Sha256":  "C42B0F80757D0DB5C19B4BF624AA8FE6C41D08975201BFD4C6A4EC085AE36E27"
+                  },
+                  {
+                      "Path":  "Results/Dual/boundary-test-process-build.log",
+                      "Bytes":  468,
+                      "Sha256":  "4EA29508B4BCFA40174F23124800FF48B1C5080021C946A52810B84600F2B333"
+                  },
+                  {
+                      "Path":  "Results/Dual/bounded-findings.trx",
+                      "Bytes":  68456,
+                      "Sha256":  "4CF79015744913A83979F4CFEECE6B556414431A39E7DE67BC4A72EDFC637315"
+                  },
+                  {
+                      "Path":  "Results/Dual/bounded-generic-context.trx",
+                      "Bytes":  25444,
+                      "Sha256":  "E24FBE29A39FBA1A74ED9C6D2FBDC73C9429D67E5F4924B671F60F6F4DE8E56F"
+                  },
+                  {
+                      "Path":  "Results/Dual/canonical-exception-identity.trx",
+                      "Bytes":  36747,
+                      "Sha256":  "81660BB7E03E9379083D9BDD23228B32C106D3B4197FBC248846668F5924BC6E"
+                  },
+                  {
+                      "Path":  "Results/Dual/constructed-invocation-context.trx",
+                      "Bytes":  30529,
+                      "Sha256":  "DD0724D0EE4C6272C551B671D0AA92728B98CDBA559C450D879CD328054535E2"
+                  },
+                  {
+                      "Path":  "Results/Dual/external-target.trx",
+                      "Bytes":  88945,
+                      "Sha256":  "37E53A37848F1365FA5C96F0515A9037AAFF13AEC454A2B3151927372F5A6686"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-assembly-qualified-ownership-tests.log",
+                      "Bytes":  590,
+                      "Sha256":  "232672762548BE5C5338DBBCBE5ED022447EC473C2D026C4163CC5A34708016B"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-boundary.trx",
+                      "Bytes":  944699,
+                      "Sha256":  "9FE7FEE6B7782484E9761B3BA521208CC705703E351659B562F1A3A8456D8256"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-boundary-tests.log",
+                      "Bytes":  580,
+                      "Sha256":  "D1156F06E417DDFA08E188C6166D6845616CB85D67B1CB1AA67D65797C51B128"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-boundary-tests-build.log",
+                      "Bytes":  886,
+                      "Sha256":  "C35A125F3E20B629CCB1CA938CA8C4C039E4DC9AA57CF3CC58E62DEE647A7C0F"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-bounded-finding-tests.log",
+                      "Bytes":  583,
+                      "Sha256":  "123ACEFB88251A998C316544A072FCBE4362742609C57AB80E62B3B7C039A9A0"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-bounded-generic-context-tests.log",
+                      "Bytes":  585,
+                      "Sha256":  "2C0D35E82F647063A71A0B03EE0A7714DD1F800672680ADB301699E9AA09DB10"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-canonical-exception-identity-tests.log",
+                      "Bytes":  590,
+                      "Sha256":  "6F0FCA7A24379986C20BBFF08C1766D60617B901CF8CE967970B04FF76469C82"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-constructed-invocation-context-tests.log",
+                      "Bytes":  592,
+                      "Sha256":  "7FFBCB5C58D47ADCAA1BBF3A2E26A2DDBFD19BAD1CBB42A4B2B472ED65315735"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-external-target-tests.log",
+                      "Bytes":  578,
+                      "Sha256":  "A4F4C6BED6B4F0B26A92F2C05B39F196602C08CB26FE78C16DA6D4EE4DE35A72"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-recursive-summary-closure-tests.log",
+                      "Bytes":  587,
+                      "Sha256":  "1ED11318912C251F74237F8BD59E1F5A64728E84AAFF0537942B6B43C3846C92"
+                  },
+                  {
+                      "Path":  "Results/Dual/main-solution-finding-tests.log",
+                      "Bytes":  584,
+                      "Sha256":  "B80B45FF5E084FFB2BE80A304F5891FA89669AA5693B0005D1F135AA1AEDF1F4"
+                  },
+                  {
+                      "Path":  "Results/Dual/projection-pdb-fixture-build.log",
+                      "Bytes":  297,
+                      "Sha256":  "BD7F1795C5594B5735C20C0E4B7EC8A4BB1A3DC944AFBD046EF7EDA66EEC9B5C"
+                  },
+                  {
+                      "Path":  "Results/Dual/projection-pdb-fixture-emit.log",
+                      "Bytes":  892,
+                      "Sha256":  "413FF02E8C2ED6EF1F9788AF04D17C14E07B73F8B8F0030A652D3991C1214CFC"
+                  },
+                  {
+                      "Path":  "Results/Dual/projection-pdb-fixture-restore.log",
+                      "Bytes":  292,
+                      "Sha256":  "0C284BD062F054BEB6A063027160EA3D1B3659B2E29E1D93E706B0C3CCBA4440"
+                  },
+                  {
+                      "Path":  "Results/Dual/recursive-summary-closure.trx",
+                      "Bytes":  52832,
+                      "Sha256":  "34D5B12CB80A4747D7407C2963236122D57AFB8AC653CDD131F26130E6441597"
+                  },
+                  {
+                      "Path":  "Results/Dual/restore-current.log",
+                      "Bytes":  131,
+                      "Sha256":  "A77A8125FE8DAE4DA2F0F2C19B5F3B5C95F1FB7135899ABD322301C9AC5BA899"
+                  },
+                  {
+                      "Path":  "Results/Dual/restore-historical.log",
+                      "Bytes":  238,
+                      "Sha256":  "3888D83B7C978E643F3D22D10040D406AB9161620CD00986DB9E8CAB79A386E8"
+                  },
+                  {
+                      "Path":  "Results/Dual/restore-worker.log",
+                      "Bytes":  300,
+                      "Sha256":  "7DFA72865A0DF952CD0478A77D8288B303E9FD88F8F5D4F7A31FCCE01EAD2687"
+                  },
+                  {
+                      "Path":  "Results/Dual/solution-findings.trx",
+                      "Bytes":  45860,
+                      "Sha256":  "053087542696D317FA5B8BAFADA6B9AB7FB9657A15559A66BCDE42582F2174EB"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-0-build.log",
+                      "Bytes":  336,
+                      "Sha256":  "D8CDA352F897DB6C885788C040E277326C6E0F119E36535B46847F5BE33CFA41"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-0-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-1-build.log",
+                      "Bytes":  336,
+                      "Sha256":  "E0DE8A86826585FDF67A6A4BF0F7361BCBAE6F7997E4DC39A232EFC01E216DEA"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-1-clean.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-identity.json",
+                      "Bytes":  1255,
+                      "Sha256":  "1C4D7EADCDDFF6EF797F5257D919055D36653FB1A3B790377366AFF8C6CA5ECC"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-identity.stderr.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-invalid-version.json",
+                      "Bytes":  167,
+                      "Sha256":  "0EBD459BD857AB56D5CE10666D60A6D12664191615636938FB3A9F4D4BD8F538"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-invalid-version.stderr.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-smoke-first.json",
+                      "Bytes":  3288,
+                      "Sha256":  "07161411CF0C6F767F36EADCC979BC03D4CC8DC834B7714FB9E0D6E121893A07"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-smoke-first.stderr.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-smoke-repeat.json",
+                      "Bytes":  3288,
+                      "Sha256":  "07161411CF0C6F767F36EADCC979BC03D4CC8DC834B7714FB9E0D6E121893A07"
+                  },
+                  {
+                      "Path":  "Results/Dual/worker-smoke-repeat.stderr.log",
+                      "Bytes":  5,
+                      "Sha256":  "F01A374E9C81E3DB89B3A42940C4D6A5447684986A1296E42BF13F196EED6295"
+                  },
+                  {
+                      "Path":  "Results/export.json",
+                      "Bytes":  84,
+                      "Sha256":  "21D86830DD15BB76BE05C1502156D3A67738DC5ECAF190AC5A3732190B18CFA3"
+                  },
+                  {
+                      "Path":  "Results/full.json",
+                      "Bytes":  995,
+                      "Sha256":  "4859454AAB3E3F4F4A51B2816F7F42B037E9DF322050D02B9FB33E938F45A7C3"
+                  },
+                  {
+                      "Path":  "Results/full.log",
+                      "Bytes":  3544,
+                      "Sha256":  "27B3D518997F243F441A3CA3A2B1A9F935E1D09110766B8905D70806E486D7EA"
+                  },
+                  {
+                      "Path":  "Results/full.trx",
+                      "Bytes":  5460645,
+                      "Sha256":  "416024D6638F83AF1764BED1E33816EAB07C5C79299FB077176A6D9998F2D1E3"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W2-chain.json",
+                      "Bytes":  43333,
+                      "Sha256":  "0E35305DF552594B0DEAA137ABA487A624ECCE5CD77D804DFFA537DD7A719990"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "87AA818DDB830A043DF0B91622C708185E7D6EBE115842CF23A8DD2CA75E463F"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W3-chain.json",
+                      "Bytes":  63439,
+                      "Sha256":  "66CAB8E9AB945E3E9ECE5A51697AE28CBDF3C393ECB69E31A915D74451C2CB13"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "3D11C5CD777B3E74BB9D27098017987F2DBF6925E6B6E4C87547DEFE31D31AEA"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16041,
+                      "Sha256":  "C20BC2B4022BF04180ECAA1E77F49134E4C5E9268798ED280F8127F276A48F4E"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "68B621A323D7C2946A584F8C244FEC239AE7BB0D032580B5A55B4211982343BC"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "07D73C94EC268CB1A126FB24160DE9DB9E369AF1AC49484A6534867136FAA5F8"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "1201FFD3755D2CFE17E772A6F2EDD200D3512421E77C0579161BD5F8B7CF1EE7"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "9236ED5350968A447F1873E78DABDB0C5E28BECA5837B512989D471B90935182"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "BBCF549F12A45AF21378701E1F02D3CD47B3000E02611AB235F23A35C8A6390A"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "BC44BF49EBEBC8EC6AE11DCF4B326D0FD5D4C9B3FBC63E931F8D5B55BCA3C409"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "2A34523C873F0CF789D0ED7ABE376C5483E85CF6C785BEC6704D92996391C28D"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "9EB33A337D5EB805BDB99C6FDCF5EA6A4BEDDE00FB595D2BA686E2EE1C2F0BA6"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "1138D886450A9A319D7A5F207807DDEC20A7760BECB5C5E234000D427D73EB22"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12751,
+                      "Sha256":  "8E2B2CC1E14DF94F804CBA15D7F4778F660FC6D5AA62F1C57501DB4AB4885BD2"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "FA31F565FE5F6600CF2A9C2B8207322AD1440423CF23BF5ED92217BB9AD204CA"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  554,
+                      "Sha256":  "EFFC039906E503EC145E491DE6817E262BF96C148FE8CA33EDADCAF7D9B38308"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "8BCC92FE561575CA97BD032AF5A4A287C40A483148570C35CE7B2D60F98AA631"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/full-evidence/capture-manifest.json",
+                      "Bytes":  1009,
+                      "Sha256":  "7E8ECBC30A6D347E1069A913F02855922BB7C84BFF48D2D2E53332876B6F7C88"
+                  },
+                  {
+                      "Path":  "Results/full-harness.json",
+                      "Bytes":  1010,
+                      "Sha256":  "7FED1A05A27A2F17C2DA7C5893B9982BE1E6863A09129F60EE9BDFBD576AC76E"
+                  },
+                  {
+                      "Path":  "Results/full-harness.log",
+                      "Bytes":  1138,
+                      "Sha256":  "D13D2B5EF2D9304BCCE05C98F94923908AFFF9B604355143C4E69B7ADA397A4B"
+                  },
+                  {
+                      "Path":  "Results/full-harness.trx",
+                      "Bytes":  5459082,
+                      "Sha256":  "E9F9063174AF9DAC4F9C78DF89C380DB37F96089C1D04DB745184EC138BE1012"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W2-chain.json",
+                      "Bytes":  43333,
+                      "Sha256":  "57ED332F0C2164288109753665F3772066EE7C119BBA5C6A7B9DE7785908A4EC"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "DC4DE1EA33BF1FC11AEB93BF9734D8CC3F1E5FB2D254320C09C52D1F277E3F6C"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W3-chain.json",
+                      "Bytes":  63437,
+                      "Sha256":  "A726D1674E42E608EED22546BFBDFFCA6DB64F16D6D05887A24AFB509F0AA0ED"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "BF7A0770C5D721C7AAAC4974447E7144B4C3B4A09338903BBAA4E881202C83AA"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16043,
+                      "Sha256":  "2CCEEE00336C6CF9D930EB16612CD6E6DDB793680B71D7C109128862A219963E"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "1C3617643C23AF1789F73F17305B96D4554649FB9C00BEFC72D1519F9034281F"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "656CBB781D1F5876420B0B3970C0DEB137D95B520C9300A82848697FA7D95A64"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "677D92E7479E9181F4D2BC30504812316A1CA20C929948207777B196983F162B"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "93B94C1A9DD656BA0AB7B2A6A523E22A2ADE16C161BB2D29E9480C383A159B9A"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "A04062AC78C0310B04DAF0C5D476FD6E61A1BEFBB99998B80A437569EFD50228"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6784,
+                      "Sha256":  "7128F20357DF0A3CEFFE8768F56681A705B416F462B2C3D2572558DE66BF12A7"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "724AF48FA9FC5E97AC07211A4B2DE586C5E30B790852C9E70B4DF40D5585FF1B"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "E55A62523465A51931AB96A0D23BAB3C2F6C3BB69878E768B886A7095ABEF419"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "7685C60EF42A6007E4881E98668C55B789FBA929B5212D17DE80AEEE11310B5A"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12753,
+                      "Sha256":  "95FE32693171C8D4161532D812165C27A079C4ED2ED720F5696B56353BC9C4EB"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "0D6C9DC0DC0C75C0E5C7A6C1481546FA36C8398CB32733D07DCD5195FF111DC9"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  553,
+                      "Sha256":  "756483AEF76EDB8C77A560A2FD3335CC16D19A01C61741F3D93F125670F410DF"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "CC1AC91583FE2175497A6C758479777C0D5B3AFE984F5588E45916839A9905E6"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/full-harness-evidence/capture-manifest.json",
+                      "Bytes":  1033,
+                      "Sha256":  "BF3ECE5A1E7445B73DCB7B36CC2B268752EB80CCE310467C6DEADA3E93E0A470"
+                  },
+                  {
+                      "Path":  "Results/harness-build.log",
+                      "Bytes":  3678,
+                      "Sha256":  "97DFB157FE91CF2CA9EE365B04643AF1ECDB778FDD4EF5CF6474DA777EB21105"
+                  },
+                  {
+                      "Path":  "Results/harness-coordination-build.log",
+                      "Bytes":  1760,
+                      "Sha256":  "0DA3A655735A812CD11039802DA9D3EB2D35DCF6EDA04FF25558674276887E8F"
+                  },
+                  {
+                      "Path":  "Results/harness-coordination-delta.json",
+                      "Bytes":  880,
+                      "Sha256":  "8D1C0FE2EC5F316D727E130E2AD078448D60C286E3C0DCF6FD493C40F942DE24"
+                  },
+                  {
+                      "Path":  "Results/harness-delta.json",
+                      "Bytes":  886,
+                      "Sha256":  "93CF2F8287DC33DC05695C1AC8AFECD9A96207FD1806843D17906E67D34A16C2"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated.json",
+                      "Bytes":  1190,
+                      "Sha256":  "FD94649D62CCF92CECBD87D1FB1EAFD15798402B3857E5217E90BC29ACFCCEFE"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated.log",
+                      "Bytes":  1142,
+                      "Sha256":  "222EE06515E38AAF41A9344C9D6B3605FCE00DA6041D8D2F2AB1DDD32A2494E9"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated.trx",
+                      "Bytes":  3197,
+                      "Sha256":  "AF9332435EE0C2DE079E7AB39F229DB7BD3791965FB3B0858B7D9C4330779530"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/containing.json",
+                      "Bytes":  40818,
+                      "Sha256":  "59C337DF8D19E4C341EF9DEC7BBADF041922487E50C13443485BA1B0DFB58247"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/direct-summary.json",
+                      "Bytes":  43649,
+                      "Sha256":  "028441F60B87F31D8291C567149581A683C69FE17BC3574E00E03AB297406B15"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/generic-catch.json",
+                      "Bytes":  40833,
+                      "Sha256":  "63AE9445CB58CF09C1E6718CC5A1CE187CB3D61B5FE0480ED3FF69830EA24A56"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W2-chain.json",
+                      "Bytes":  43333,
+                      "Sha256":  "0E35305DF552594B0DEAA137ABA487A624ECCE5CD77D804DFFA537DD7A719990"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W2-same-name-types.json",
+                      "Bytes":  46213,
+                      "Sha256":  "87AA818DDB830A043DF0B91622C708185E7D6EBE115842CF23A8DD2CA75E463F"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W3-chain.json",
+                      "Bytes":  63439,
+                      "Sha256":  "66CAB8E9AB945E3E9ECE5A51697AE28CBDF3C393ECB69E31A915D74451C2CB13"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W3-multiple.json",
+                      "Bytes":  135595,
+                      "Sha256":  "3D11C5CD777B3E74BB9D27098017987F2DBF6925E6B6E4C87547DEFE31D31AEA"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W4-original-stages.json",
+                      "Bytes":  16041,
+                      "Sha256":  "C20BC2B4022BF04180ECAA1E77F49134E4C5E9268798ED280F8127F276A48F4E"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W5-generic-final.json",
+                      "Bytes":  38878,
+                      "Sha256":  "68B621A323D7C2946A584F8C244FEC239AE7BB0D032580B5A55B4211982343BC"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W5-growing.json",
+                      "Bytes":  24336,
+                      "Sha256":  "07D73C94EC268CB1A126FB24160DE9DB9E369AF1AC49484A6534867136FAA5F8"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W5-uncovered-call.json",
+                      "Bytes":  9370,
+                      "Sha256":  "1201FFD3755D2CFE17E772A6F2EDD200D3512421E77C0579161BD5F8B7CF1EE7"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-2-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "9236ED5350968A447F1873E78DABDB0C5E28BECA5837B512989D471B90935182"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-2-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "BBCF549F12A45AF21378701E1F02D3CD47B3000E02611AB235F23A35C8A6390A"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-2-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "BC44BF49EBEBC8EC6AE11DCF4B326D0FD5D4C9B3FBC63E931F8D5B55BCA3C409"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-3-console.json",
+                      "Bytes":  653,
+                      "Sha256":  "2A34523C873F0CF789D0ED7ABE376C5483E85CF6C785BEC6704D92996391C28D"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-3-json.json",
+                      "Bytes":  4978,
+                      "Sha256":  "9EB33A337D5EB805BDB99C6FDCF5EA6A4BEDDE00FB595D2BA686E2EE1C2F0BA6"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-cli-3-sarif.json",
+                      "Bytes":  6785,
+                      "Sha256":  "1138D886450A9A319D7A5F207807DDEC20A7760BECB5C5E234000D427D73EB22"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/adoption/W6-wrong-physical-worker.json",
+                      "Bytes":  12751,
+                      "Sha256":  "8E2B2CC1E14DF94F804CBA15D7F4778F660FC6D5AA62F1C57501DB4AB4885BD2"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-base.json",
+                      "Bytes":  98318,
+                      "Sha256":  "3DB67826FAAFFA0272A8ACACC118865786ECEE61D40C366E0891CA6AE0D55319"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-chain.json",
+                      "Bytes":  97471,
+                      "Sha256":  "928114BA01AFA719D024289D30268E924993B0213E9F2B2FB7A8942701135552"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-empty.json",
+                      "Bytes":  85088,
+                      "Sha256":  "779FFFA966A5C6BAF5DD254070FAB518BF8861C998228584E5D117661119C3AD"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-exact.json",
+                      "Bytes":  96683,
+                      "Sha256":  "6CBF369F3455E3A1FF6278AC370B6D5C6D0EC3A1FE2E534711FD21BE5FBE9AA7"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-inheritdoc.json",
+                      "Bytes":  96688,
+                      "Sha256":  "BC4742AC57AF384BAAA59533EF98BC72DF4F781462173EAB5EB8B534A2CE9861"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-invalid.json",
+                      "Bytes":  98241,
+                      "Sha256":  "3A6BFAF62126FB24D6F7016A3BD266C9709161026040E32DB48B049A2DFF8AA8"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-mixed.json",
+                      "Bytes":  104389,
+                      "Sha256":  "7AA15EDD8A05BD3B9DF7229A3259459F27E88B0D7F764F4AC0CB1936340EBA72"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-multiple.json",
+                      "Bytes":  297274,
+                      "Sha256":  "15525DE43E1B87D52A42B9C3A6C9688DD3DDA80899EBA03158213DDB8CD58454"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-no-doc.json",
+                      "Bytes":  96685,
+                      "Sha256":  "61F7F7DCDD1BB2E3DD4FA3182E134C361A3B0C07455B39C9ACC88ACCCBCC866E"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-2-source-type.json",
+                      "Bytes":  93403,
+                      "Sha256":  "88425FDA1223B5C0693E7B337F7742F62AB8B37787F2A1CA2592DFCD922206E3"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-3-chain.json",
+                      "Bytes":  157351,
+                      "Sha256":  "3334E469F12065DFC5CA639F93592F0C777637613BD40101FA66EA19D1177B06"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-3-empty.json",
+                      "Bytes":  144632,
+                      "Sha256":  "F68EE89236BC68812F07C5B120EF3033E6227D001857C55934656A8530DB88FC"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-3-mixed.json",
+                      "Bytes":  164269,
+                      "Sha256":  "7DA32961CF6109E188778DC85BE6F0ED0D7A0C6BA698B1862E140FF24A92555C"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-3-multiple.json",
+                      "Bytes":  358834,
+                      "Sha256":  "4889C17B7DF19FE9B7E774A05EAD3439E6753BD07D602A95FB9EC304D3A3B096"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/baseline-3-supporting-sources.json",
+                      "Bytes":  164618,
+                      "Sha256":  "B33F7567D801BB5FBE6BF4D944FD8665A4818D17B816BB22DBFA54C017992721"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/cli-unsupported-2-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "FA31F565FE5F6600CF2A9C2B8207322AD1440423CF23BF5ED92217BB9AD204CA"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/cli-unsupported-2-True.json",
+                      "Bytes":  554,
+                      "Sha256":  "EFFC039906E503EC145E491DE6817E262BF96C148FE8CA33EDADCAF7D9B38308"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/cli-unsupported-3-False.json",
+                      "Bytes":  555,
+                      "Sha256":  "8BCC92FE561575CA97BD032AF5A4A287C40A483148570C35CE7B2D60F98AA631"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-dependency-project.json",
+                      "Bytes":  163,
+                      "Sha256":  "86295EA697B3C0A1C8D0F210B3FEA76B180C213A090CCBA4C43D9487DBDCD91A"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-duplicate-path.json",
+                      "Bytes":  159,
+                      "Sha256":  "DC74374FAEC6B629DFB725863BF8280FD612E501F8A78CA4697E2654B7E669EE"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-missing-edge.json",
+                      "Bytes":  157,
+                      "Sha256":  "F0407CC8ACA2EBFFD149DBFF6DDBF22C8B6B364A652E24677DD6E9835F94F0D7"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-reference-mvid.json",
+                      "Bytes":  159,
+                      "Sha256":  "ED64A75C5C2A067C8B9831AF437A156F05CBA9BCCFD921F8F1D3EB0E66B15499"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-root-member.json",
+                      "Bytes":  156,
+                      "Sha256":  "26DA0C8C7C59E8C22AABAFC5148FEAD6249DB2F9C3FB56435CDB84C697CD4414"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-root-project.json",
+                      "Bytes":  157,
+                      "Sha256":  "9FB320F9BCB5853ECBA6418B74C1DE21F395AA7790BFE78ADE431AD9E617ED7A"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/graph-negative-source-project.json",
+                      "Bytes":  159,
+                      "Sha256":  "D772CC042A8A4075D7AEE233941C85CBABA71B062408F92428BEEAA44A0E3B5F"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/ownership-cardinality.json",
+                      "Bytes":  101200,
+                      "Sha256":  "6FD1269F702B4257F2F34253AFB52D51C31314D0E52373C26DEBB10FBDCE0A5F"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/b25/ownership-stop-witness.json",
+                      "Bytes":  100670,
+                      "Sha256":  "3FEAC8AFB54E6CD7D00D2B9466A3516FB651F0E9A5EF2F0B9545B30D8BDD37F8"
+                  },
+                  {
+                      "Path":  "Results/harness-isolated-evidence/capture-manifest.json",
+                      "Bytes":  1034,
+                      "Sha256":  "500810260CECC747EABE2401CF70B58581EA17EB14A08C0FCC005018644EF091"
+                  },
+                  {
+                      "Path":  "Results/production-proof.json",
+                      "Bytes":  251199,
+                      "Sha256":  "DE225319888A1C5E846993E999A426810FA3C1811CB045A5514EDCD518C68F57"
+                  },
+                  {
+                      "Path":  "Results/production-proof.log",
+                      "Bytes":  158,
+                      "Sha256":  "F1503C4CB97E9D2F0F891553AE882CD1E70212DE5A7D927C590E6FDCF4C5FA91"
+                  },
+                  {
+                      "Path":  "Results/production-proof-build.log",
+                      "Bytes":  890,
+                      "Sha256":  "BD94BDDE2FB3C4205E94B15B559306DAF839150C3E8F2C3C025CA7DB54CC6601"
+                  },
+                  {
+                      "Path":  "Results/proof-inputs.json",
+                      "Bytes":  4503,
+                      "Sha256":  "53DD4723076E24624EDEAEA3EDA684D8908E0DC218345EEBB13E36D64D7DCC11"
+                  },
+                  {
+                      "Path":  "Results/scheduler-after.json",
+                      "Bytes":  328,
+                      "Sha256":  "B9F640E943C47BB7EC14C616BB301552B23DF64B8555A8EBAE581494498625A7"
+                  },
+                  {
+                      "Path":  "Results/scheduler-after.log",
+                      "Bytes":  114,
+                      "Sha256":  "CE283BF62C95C5A4D7A13BD6C335B057EAA2F99CC0CA33D9DFFEDD0E09E2909A"
+                  },
+                  {
+                      "Path":  "Results/scheduler-before.json",
+                      "Bytes":  1124,
+                      "Sha256":  "0D85BD58E91F1F35AF6B28FA9EE048ABCCBB9000B33F125D3E8FA6CAC15D5D55"
+                  },
+                  {
+                      "Path":  "Results/scheduler-before.log",
+                      "Bytes":  116,
+                      "Sha256":  "065C04EFDFFE2E581205985DF45F39AD21D8AE7C03703B366766F65B50A4C0D6"
+                  },
+                  {
+                      "Path":  "Results/scheduler-probe-build.log",
+                      "Bytes":  882,
+                      "Sha256":  "037D8A4FEDDF4E3B9A95E068DB3E13D1417CF464A7A1BAA254CC19C4D8B9B99C"
+                  },
+                  {
+                      "Path":  "Results/scheduler-probe-build-2.log",
+                      "Bytes":  26064,
+                      "Sha256":  "F43C68A586D1C7ADDE0A8EDC516130BF3BC0BD0F2E391EEB0F028F0F12723F93"
+                  },
+                  {
+                      "Path":  "Results/scheduler-probe-build-3.log",
+                      "Bytes":  754,
+                      "Sha256":  "E5F8EE86EBC7196B5B8B6925E52FC00DAE7FA0050D209637875A029B15E5AF1F"
+                  },
+                  {
+                      "Path":  "Results/targeted.json",
+                      "Bytes":  1171,
+                      "Sha256":  "170BCB64D6EDD5D274454F0B06372A34A3D7DF3E83AD67CA26013A9B51429B29"
+                  },
+                  {
+                      "Path":  "Results/targeted.log",
+                      "Bytes":  1130,
+                      "Sha256":  "B2F1E9DB0F9BA1B7C126EBEF844EB6B0E3E4BC4B6657AE295DD6D7FCE9D6CB2C"
+                  },
+                  {
+                      "Path":  "Results/targeted.trx",
+                      "Bytes":  2281862,
+                      "Sha256":  "B1539CF47F63701E73325993F7CCF0A249D542B1BC2CA1E50C5FB73685420956"
+                  },
+                  {
+                      "Path":  "Results/validation-inputs.json",
+                      "Bytes":  407275,
+                      "Sha256":  "FAEA152FCF6CFA4505BCFBD6DA8761B98320154152A3CE26A2610FFBDADC676C"
+                  },
+                  {
+                      "Path":  "Run-Proofs.ps1",
+                      "Bytes":  2617,
+                      "Sha256":  "389259D6BD561267CE8E8933FC0B8AFBB615107F4EF3DFD5B774B4408EBFB414"
+                  },
+                  {
+                      "Path":  "RuntimeCrash/windows-events.txt",
+                      "Bytes":  0,
+                      "Sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "Path":  "Run-Validation.ps1",
+                      "Bytes":  5932,
+                      "Sha256":  "15ADAFA820AD1D7C11B13B401D17A11BC5C1C98FFF996711DCA9ADD51A9BD538"
+                  },
+                  {
+                      "Path":  "SchedulerProbe/.gitignore",
+                      "Bytes":  23,
+                      "Sha256":  "09DE5B6DFECBD9C731D0A17BBE8D118ADC815E055CF76E8BD4CD4E598811CD45"
+                  },
+                  {
+                      "Path":  "SchedulerProbe/Program.cs",
+                      "Bytes":  3355,
+                      "Sha256":  "76BED04842E2EE8809AF0967510EAC12AD27D5E4BBCAEBBADDAFFD0725345F0F"
+                  },
+                  {
+                      "Path":  "SchedulerProbe/SchedulerProbe.csproj",
+                      "Bytes":  528,
+                      "Sha256":  "AF6A4C8173A21E094A6063EABDA2747E4B35FDB88F21F56332536961F1C6E42E"
+                  },
+                  {
+                      "Path":  "Verify-Gates.ps1",
+                      "Bytes":  10697,
+                      "Sha256":  "FFFD2874EBD4F840FE3188A4EBD67C9F24B6530887CE5687100898754F294DE0"
+                  },
+                  {
+                      "Path":  "Verify-Protection.ps1",
+                      "Bytes":  1917,
+                      "Sha256":  "D22164F507C06792AF7D26AE5AD97E5E1CCA23CAD05FEABEA0D2423459F1CD70"
+                  },
+                  {
+                      "Path":  "Witness-Index.md",
+                      "Bytes":  4167,
+                      "Sha256":  "2B8F95748E7680078A7A9AE9B84827388C68F354EE0B1997A52633212A203E5B"
+                  }
+              ]
+}

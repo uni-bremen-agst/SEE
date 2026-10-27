@@ -1,0 +1,9 @@
+﻿Testlauf für "C:\Users\Krause\AppData\Local\Temp\b25b-ceda9861\Tests\XMLDocNormalizerTests\bin\Debug\net8.0\XMLDocNormalizerTests.dll" (.NETCoreApp,Version=v8.0)
+VSTest-Version 17.11.1 (x64)
+
+Die Testausführung wird gestartet, bitte warten...
+Insgesamt 1 Testdateien stimmten mit dem angegebenen Muster überein.
+Ergebnisdatei: C:\Users\Krause\AppData\Local\Temp\b25b-ceda9861\artifacts\dual-version-build\external-target.trx
+
+Bestanden!   : Fehler:     0, erfolgreich:    36, übersprungen:     0, gesamt:    36, Dauer: 49 s - XMLDocNormalizerTests.dll (net8.0)
+

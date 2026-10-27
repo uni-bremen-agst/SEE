@@ -1,0 +1,17 @@
+﻿{
+    "Path":  "Tests/XMLDocNormalizerTests/Execution/Semantic/ExternalSourceLineEndingReconstructionTests.cs",
+    "BeforeSha256":  "10E9B19D3FE3FCE96B65472AB149C8CC67D600A12DAA9CA73CD18B0BF0ED550D",
+    "AfterSha256":  "259E86F67E8903E5529F19CAD19C4E41CE22D0989E7AE6B2449745E66E975836",
+    "ExactCoordinationWrapperOnly":  true,
+    "AllExistingAssertionsUnchanged":  true,
+    "TimeoutUnchanged":  true,
+    "OutsidePriorFilters":  false,
+    "PriorFilterOccurrences":  [
+                                   0,
+                                   19,
+                                   0
+                               ],
+    "ProductionChanges":  0,
+    "RejectedAttempt":  "ConfigureAwait(false): xUnit1030; removed, not suppressed",
+    "Permission":  "Original B25B section 12: local test/helper/harness defect, no existing semantic assertion changed"
+}

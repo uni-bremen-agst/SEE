@@ -22,6 +22,8 @@ namespace XMLDocNormalizer.Checks
             CancellationToken cancellationToken = default)
         {
             if (input?.Finding != null) { return await FindIndependentExternalExceptionSmellsAsync(input, dispatch, cancellationToken); }
+            if (input?.AnalysisMode == ExceptionAnalysisMode.SolutionTransitive && input.DeclaredPolicy == null)
+            { return await FindSolutionExternalExceptionSmellsAsync(input, dispatch, cancellationToken); }
             var direct = await AnalyzeFindingEvidenceAsync(input, dispatch, WorkerDeclaredExecution.DirectEvidence, cancellationToken);
             ExternalExceptionFindingAnalysisResult Fail(string message, bool guarded = false, ExternalExceptionFlowAnalysisResult? summary = null)
                 => new(direct, summary, [], guarded, summary != null, message);
@@ -134,6 +136,30 @@ namespace XMLDocNormalizer.Checks
             var request = new ExceptionFlowAnalysisDispatchRequest.PortablePdb(projected.Value!.Provenance,
                 new ExceptionFlowAnalysisDispatchRequest.ExecutionPayload.Worker(projected.Value.Payload));
             return new(projected, await AnalyzeConfiguredExceptionFlowAsync(request, dispatch, cancellationToken));
+        }
+
+        private static async Task<ExternalExceptionFindingAnalysisResult> FindSolutionExternalExceptionSmellsAsync(
+            HistoricalWorkerPayloadProjectionInput input, ExceptionFlowAnalysisDispatch dispatch, CancellationToken cancellationToken)
+        {
+            if (!HistoricalSolutionFindingOperation.TryPrepare(input, out var operation, out var projected))
+            { return new(new(projected, null), null, [], false, false, "Solution Finding input is not admitted by the bounded graph contract."); }
+            async Task<ExternalExceptionFlowAnalysisResult> Execute(HistoricalWorkerPayloadProjectionResult stage)
+            {
+                var value = stage.Value!;
+                var request = new ExceptionFlowAnalysisDispatchRequest.PortablePdb(value.Provenance,
+                    new ExceptionFlowAnalysisDispatchRequest.ExecutionPayload.Worker(value.Payload));
+                return new(stage, await AnalyzeConfiguredExceptionFlowAsync(request, dispatch, cancellationToken));
+            }
+            var direct = await Execute(operation!.Direct);
+            if (!direct.Succeeded || !operation.TryAdmitDirect(direct.Dispatch?.Routing?.HistoricalAnalysis, out var first))
+            { return new(direct, null, [], false, false, "Solution Direct/document receipt requires its original validated execution."); }
+            if (!first!.Documentation.HasDocumentation) { return new(direct, null, [], true, false, null); }
+            var summary = await Execute(operation.Summary);
+            if (!summary.Succeeded || !operation.TryComplete(direct.Dispatch?.Routing?.HistoricalAnalysis,
+                summary.Dispatch?.Routing?.HistoricalAnalysis, out first, out var document))
+            { return new(direct, summary, [], true, true, "Solution Summary requires an exact complete graph/root/scope/execution-bound receipt pair."); }
+            return new(direct, summary, RenderBoundedFindingEvidence(document!, first!.DirectResult, summary.Result!,
+                _ => throw new InvalidOperationException("Solution must not ask Declared relevance."), ExceptionAnalysisMode.SolutionTransitive), true, true, null);
         }
     }
 }

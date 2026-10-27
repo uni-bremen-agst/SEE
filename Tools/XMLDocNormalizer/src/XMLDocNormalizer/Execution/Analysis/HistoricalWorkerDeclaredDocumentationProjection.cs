@@ -94,6 +94,37 @@ namespace XMLDocNormalizer.Execution.Analysis
             }
             return TryValidateBindings(input, origin, evidence, direct, flow, null, out facts);
         }
+
+        /// <summary>Extend validated root documentation with exact original-PE displays for an admitted solution flow.</summary>
+        internal static bool TryExtendSolutionTypes(WorkerAnalysisInput directInput, DeclaredFindingDocumentationFacts document,
+            CanonicalExceptionFlowAnalysisResult summary, ImmutableArray<IMethodSymbol> supportingPeRoots,
+            out DeclaredFindingDocumentationFacts? extended)
+        {
+            extended = null;
+            if (!origins.TryGetValue(directInput, out var origin) || origin.Provenance != WorkerProtocol.Provenance(directInput)
+                || !document.Method.Equals(origin.Request.Method)) { return false; }
+            var displays = document.TypeDisplays.ToDictionary(item => item.Type!, item => item);
+            foreach (var entry in summary.Entries)
+            {
+                bool resolved = TryType(origin, entry.ExceptionType, out var type, out var exceptionBase);
+                if (!resolved)
+                {
+                    // Some original PE selectors were bound without their dependencies. Do not invent a compilation
+                    // or resolve by name: use the original supporting PE only if it is in the root's exact reference world.
+                    var candidates = supportingPeRoots.Where(root =>
+                        RoslynCanonicalIdentityFactory.CreateAssemblyIdentity(root.ContainingAssembly).Equals(entry.ExceptionType.Assembly)
+                        && directInput.Context!.References!.Any(reference => reference.Identity!.Equals(entry.ExceptionType.Assembly)
+                            && reference.ModuleName == entry.ExceptionType.Module!.Name)).ToArray();
+                    resolved = candidates.Length == 1 && TryType(candidates[0], entry.ExceptionType, out type, out exceptionBase);
+                }
+                if (!resolved
+                    || !type!.InheritsFromOrEquals(exceptionBase!) || type!.IsGenericType) { return false; }
+                displays.TryAdd(entry.ExceptionType, new(entry.ExceptionType, type!.ToDisplayString()));
+            }
+            extended = document with { TypeDisplays = displays.OrderBy(pair => Json(pair.Key), StringComparer.Ordinal)
+                .Select(pair => pair.Value).ToImmutableArray() };
+            return true;
+        }
         private static bool TryValidateBindings(WorkerAnalysisInput input, Origin origin, WorkerDeclaredDocumentationEvidence evidence,
             CanonicalExceptionFlowAnalysisResult direct, CanonicalExceptionFlowAnalysisResult summary,
             WorkerExceptionDeclaration[]? declarations, out DeclaredFindingDocumentationFacts? facts)
@@ -138,11 +169,14 @@ namespace XMLDocNormalizer.Execution.Analysis
             return true;
         }
         private static bool TryType(Origin origin, CanonicalTypeIdentity identity, out INamedTypeSymbol? type, out INamedTypeSymbol? exceptionBase)
+            => TryType(origin.Root, identity, out type, out exceptionBase);
+
+        private static bool TryType(IMethodSymbol root, CanonicalTypeIdentity identity, out INamedTypeSymbol? type, out INamedTypeSymbol? exceptionBase)
         {
             type = null; exceptionBase = null;
             if (identity.Kind != CanonicalTypeIdentityKind.Named || string.IsNullOrWhiteSpace(identity.MetadataName) || identity.TypeArguments.Length != 0 || identity.IsUnboundGenericType
                 || identity.MetadataName.Contains('`')) { return false; }
-            var assemblies = origin.Root.ContainingModule.ReferencedAssemblySymbols.Append(origin.Root.ContainingAssembly).ToArray();
+            var assemblies = root.ContainingModule.ReferencedAssemblySymbols.Append(root.ContainingAssembly).ToArray();
             var matching = assemblies.Where(assembly => RoslynCanonicalIdentityFactory.CreateAssemblyIdentity(assembly).Equals(identity.Assembly)).ToArray();
             if (matching.Length != 1) { return false; }
             type = matching[0].GetTypeByMetadataName(HistoricalDeclaredDocumentationFacts.MetadataName(identity));

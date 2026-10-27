@@ -1,0 +1,14 @@
+﻿{
+    "Passed":  true,
+    "Scope":  "Storage I/O only, no product/test execution",
+    "Scratch":  "C:\\Users\\Krause\\AppData\\Local\\Temp\\b25b-evidence-io-18e8118908cb4dd0bdcf4ad78abaa15b",
+    "RawRestoreSha256":  "0223BE1CF879303D8B3EBDC585F6EB98229A1A372D3F206CD85EA92119A2A0EB",
+    "GateSnapshots":  2,
+    "PhysicalCanonicalPayloads":  1,
+    "RawCopiesInSnapshots":  0,
+    "IncorrectRawSha256Rejected":  true,
+    "ArchiveSha256":  "01013C5EB31B60A7C1D77AE45F35DA9D710166A32C5BE261BF3708D97D6AABAB",
+    "OriginalArchiveSha256":  "01013C5EB31B60A7C1D77AE45F35DA9D710166A32C5BE261BF3708D97D6AABAB",
+    "SameEncoderArchiveByteIdentical":  true,
+    "ProductTestsStarted":  0
+}

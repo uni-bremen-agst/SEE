@@ -334,10 +334,12 @@ namespace XMLDocNormalizerTests.Execution.Semantic
                 sourceLink,
                 configuration,
                 out _));
-            await entered.Task;
-
-            Assert.False(acquisition.TryAcquire(document, sourceLink, configuration, out _));
-            release.SetResult();
+            await Task.Run(async () =>
+            {
+                await entered.Task;
+                Assert.False(acquisition.TryAcquire(document, sourceLink, configuration, out _));
+                release.SetResult();
+            });
             Assert.True(await first);
             Assert.Equal(1, handler.RequestCount);
             Assert.Equal(1, acquisition.GetStatistics().ReconstructionAttemptCount);

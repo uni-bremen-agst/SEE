@@ -17,9 +17,15 @@ namespace XMLDocNormalizer.Execution.Historical
         internal sealed class DocumentationExecution { }
         private sealed record WorkerImage(string Name, string Version, string Mvid, string Sha256);
         private sealed record CompletedDocumentationExchange(WorkerAnalysisInput Input, string Request, string Response,
-            string Diagnostics, int ExitCode, int ProcessId, WorkerImage Image);
+            string Diagnostics, int ExitCode, int ProcessId, WorkerImage Image, object? Capture);
         private static readonly ConditionalWeakTable<DocumentationExecution, CompletedDocumentationExchange> documentationExecutions = new();
         private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, OwnedProcessExit> processExits = new();
+        private static readonly ConditionalWeakTable<WorkerAnalysisInput, object> executionCaptureRequests = new();
+        // A capture request is not an attestation. Only the completed private exchange below can mint one.
+        internal static object RequestExecutionCapture(WorkerAnalysisInput input)
+        {
+            var capture = new object(); executionCaptureRequests.Add(input, capture); return capture;
+        }
         internal static bool TryGetProcessExit(HistoricalWorkerCallResult? call, out OwnedProcessExit? exit)
         { exit = null; return call != null && processExits.TryGetValue(call, out exit); }
         internal const int MaximumResponseCharacters = 1048576;
@@ -61,8 +67,11 @@ namespace XMLDocNormalizer.Execution.Historical
             }
 
             // Only the opt-in B19 trust boundary needs an execution-image witness. Legacy transport is unchanged.
+            executionCaptureRequests.TryGetValue(input, out var requestedCapture);
+            if (requestedCapture != null && !executionCaptureRequests.Remove(input)) { requestedCapture = null; }
             WorkerImage? documentationImage = null;
-            if (input.Context?.DeclaredPolicy?.Documentation != null || input.Context?.Finding?.Documentation != null)
+            if (input.Context?.DeclaredPolicy?.Documentation != null || input.Context?.Finding?.Documentation != null
+                || requestedCapture != null)
             {
                 try { documentationImage = ReadWorkerImage(); }
                 catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or BadImageFormatException)
@@ -124,7 +133,7 @@ namespace XMLDocNormalizer.Execution.Historical
                     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or BadImageFormatException)
                     { return Observe(Fail(HistoricalWorkerClientFailureCode.IdentityMismatch, "Documentation Worker image is no longer available.", pid)); }
                     execution = new();
-                    documentationExecutions.Add(execution, new(input, request, response, diagnostics, process.ExitCode, pid, documentationImage));
+                    documentationExecutions.Add(execution, new(input, request, response, diagnostics, process.ExitCode, pid, documentationImage, requestedCapture));
                 }
                 try { return Observe(HistoricalWorkerResponseValidation.Validate(response, diagnostics, process.ExitCode, input, pid, execution)); }
                 finally { if (execution != null) { documentationExecutions.Remove(execution); } }
@@ -164,9 +173,10 @@ namespace XMLDocNormalizer.Execution.Historical
 
         /// <summary>Consumes only an exact completed exchange branded by this client's private execution path.</summary>
         internal static bool TryConsumeDocumentationExecution(DocumentationExecution? execution, WorkerAnalysisInput input,
-            string response, string diagnostics, int exitCode, int? processId, out Func<WorkerAssemblyIdentity?, bool>? matchesWorker)
+            string response, string diagnostics, int exitCode, int? processId, out Func<WorkerAssemblyIdentity?, bool>? matchesWorker,
+            out object? capture)
         {
-            matchesWorker = null;
+            matchesWorker = null; capture = null;
             if (execution == null || !documentationExecutions.TryGetValue(execution, out var completed)
                 || !documentationExecutions.Remove(execution)) { return false; }
             if (!ReferenceEquals(completed.Input, input) || completed.Request != JsonSerializer.Serialize(new WorkerRequest(WorkerProtocol.Version, "analyze", input), WorkerProtocol.JsonOptions)
@@ -174,6 +184,7 @@ namespace XMLDocNormalizer.Execution.Historical
             { return false; }
             // Copy only the physical image identity; no caller DTO hash or mutable input survives as authority.
             WorkerImage image = completed.Image;
+            capture = completed.Capture;
             matchesWorker = identity => identity != null && image.Name == "XMLDocNormalizer.HistoricalWorker"
                 && identity.Name == image.Name && identity.AssemblyVersion == image.Version && identity.Mvid == image.Mvid && identity.Sha256 == image.Sha256;
             return true;

@@ -14,6 +14,18 @@ namespace XMLDocNormalizer.Execution.Historical
     {
         private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, DeclaredPolicyFacts> policyReceipts = new();
         private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, HistoricalFindingFacts> findingReceipts = new();
+        private sealed record ValidatedExecution(WorkerAnalysisInput Input, string Snapshot, string ResultSnapshot, object? Capture);
+        private static readonly ConditionalWeakTable<HistoricalWorkerCallResult, ValidatedExecution> validatedExecutions = new();
+        private static string ResultSnapshot(HistoricalWorkerCallResult call)
+            => JsonSerializer.Serialize(new { call.Identity, call.Provenance, call.Result }, WorkerProtocol.JsonOptions);
+
+        /// <summary>Exact original request and genuine validated execution, not equality of caller-authored result DTOs.</summary>
+        internal static bool HasValidatedExecution(HistoricalWorkerCallResult? call, WorkerAnalysisInput input, string snapshot, object capture)
+            => call?.Success == true && validatedExecutions.TryGetValue(call, out var execution)
+                && ReferenceEquals(execution.Input, input) && execution.Snapshot == snapshot
+                && ReferenceEquals(execution.Capture, capture)
+                && execution.ResultSnapshot == ResultSnapshot(call)
+                && snapshot == JsonSerializer.Serialize(input, WorkerProtocol.JsonOptions);
         internal static bool TryGetFindingFacts(HistoricalWorkerCallResult? call, out HistoricalFindingFacts? facts)
         {
             facts = null;
@@ -38,7 +50,7 @@ namespace XMLDocNormalizer.Execution.Historical
             try
             {
                 bool executedDocumentation = HistoricalWorkerClient.TryConsumeDocumentationExecution(documentationExecution,
-                    input, stdout, stderr, exitCode, processId, out var matchesExecutedWorker);
+                    input, stdout, stderr, exitCode, processId, out var matchesExecutedWorker, out var capture);
                 using JsonDocument document = JsonDocument.Parse(stdout, new JsonDocumentOptions { MaxDepth = 64 });
                 JsonElement root = document.RootElement;
                 RejectDuplicateProperties(root);
@@ -118,6 +130,7 @@ namespace XMLDocNormalizer.Execution.Historical
                         DeclaredDocumentation: response.DeclaredDocumentation);
                     findingReceipts.Add(admitted, new(direct, response.Result, documentation!, finding.Documentation!.Mode!.Value, finding.Execution,
                         JsonSerializer.Serialize(input.Context.Scope, WorkerProtocol.JsonOptions), documentationExecution!));
+                    validatedExecutions.Add(admitted, new(input, JsonSerializer.Serialize(input, WorkerProtocol.JsonOptions), ResultSnapshot(admitted), capture));
                     return admitted;
                 }
                 if (response.FindingDirect != null) { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Unrequested independent Finding evidence."); }
@@ -129,6 +142,8 @@ namespace XMLDocNormalizer.Execution.Historical
                 if (documentation != null && (!executedDocumentation || matchesExecutedWorker?.Invoke(response.Identity!.Worker) != true))
                 { return Fail(HistoricalWorkerClientFailureCode.MalformedResponse, "Documentation binding requires its exact single-use completed Worker execution attestation."); }
                 var call = new HistoricalWorkerCallResult(response.Result, response.Identity, null, stderr, processId, response.Provenance, response.DeclaredPolicy, response.DeclaredDocumentation);
+                if (executedDocumentation && matchesExecutedWorker?.Invoke(response.Identity!.Worker) == true)
+                { validatedExecutions.Add(call, new(input, JsonSerializer.Serialize(input, WorkerProtocol.JsonOptions), ResultSnapshot(call), capture)); }
                 if (response.DeclaredPolicy != null)
                 {
                     policyReceipts.Add(call, new(response.DeclaredPolicy, response.Result, documentation,

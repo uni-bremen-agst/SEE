@@ -64,7 +64,7 @@ namespace XMLDocNormalizerTests.Worker
                 Assert.Contains("/solution/p1/Source.cs", throwOwners); Assert.Contains("/solution/p2/Source.cs", throwOwners);
                 Assert.Single(native.GetProperty("findings").EnumerateArray());
             }
-            await AssertNoFindingAdmission(fixture.Input);
+            var adopted = await AssertBoundedFindingAdmission(fixture.Input);
             foreach (var run in new[] { first, repeat })
             {
                 Assert.Equal(ExceptionFlowAnalyzerSelection.Historical, run.Dispatch!.Decision!.Selection);
@@ -81,7 +81,7 @@ namespace XMLDocNormalizerTests.Worker
                 Owners = owners,
                 FullFlowGraphParity = true,
                 RepeatEqual = true,
-                FinalFindingAdmission = false
+                FinalFindingAdmission = adopted.Succeeded, adopted.SummaryRequested, FindingCount = adopted.Findings.Length
             });
         }
 
@@ -119,7 +119,7 @@ namespace XMLDocNormalizerTests.Worker
                     Native = native, Flow = historical.Result, Graph = graph,
                     ExpectedOwners = new[] { p0Owner, p1Owner }, SelectedOwner = entry.ExceptionType.Assembly,
                     Selection = "Complete canonical assembly identity equality; not collection position",
-                    Classification = "EXACT / admitted in Current and Historical", FinalFindingAdmission = false
+                    Classification = "EXACT / admitted in Current and Historical"
                 });
                 var findings = native.GetProperty("findings").EnumerateArray().ToArray();
                 // Finding-count grant: bind to the verified P0/P1 identities
@@ -128,7 +128,7 @@ namespace XMLDocNormalizerTests.Worker
                 // positional pairing or stronger per-Finding owner claim is made.
                 Assert.Equal(entries.Length, findings.Length);
                 Assert.All(findings, finding => Assert.Equal("DOC611", finding.GetProperty("smell").GetProperty("id").GetString()));
-                await AssertNoFindingAdmission(fixture.Input);
+                var adopted = await AssertBoundedFindingAdmission(fixture.Input);
                 HistoricalWorkerLifetimeAssertions.Stopped(historical.Dispatch!.Routing!.HistoricalAnalysis!); Isolation();
                 await Evidence("ownership-stop-witness", new
                 {
@@ -140,7 +140,7 @@ namespace XMLDocNormalizerTests.Worker
                     EvaluatedTypeOwner = entry.ExceptionType.Assembly.Name,
                     TypeOwnershipLossObserved = false, // R6: new A10 output, historical B25 witness is preserved.
                     CurrentHistoricalParityDoesNotProveOwnership = true,
-                    FinalFindingAdmission = false
+                    FinalFindingAdmission = adopted.Succeeded, adopted.SummaryRequested, FindingCount = adopted.Findings.Length
                 });
             }
             finally { foreach (var summary in summaries) { summary.Dispose(); } }
@@ -211,21 +211,36 @@ namespace XMLDocNormalizerTests.Worker
         }
 
         [Fact]
-        public void StopRule_DoesNotIntroducePolicyRoutingAttestationOrPidWorkarounds()
+        public async Task StopRule_DoesNotIntroducePolicyRoutingAttestationOrPidWorkarounds()
         {
             string evaluator = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs"));
             Assert.DoesNotContain("GetFirstSymbolForDeclarationId", evaluator); // P16
             Assert.Contains("RoslynCanonicalIdentityResolver", evaluator);
-            string external = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"));
-            Assert.Contains("Solution is not admitted", external); Assert.DoesNotContain("SupportingProjects", external);
+            await ExceptionFlowHistoricalSolutionAdoptionTests.AssertBoundedProductionBoundary(); // C2
             string client = File.ReadAllText(Path.Combine(Root(), "src/XMLDocNormalizer/Execution/Historical/HistoricalWorkerClient.cs"));
             Assert.Contains("OwnedProcessExit.Capture(process)", client); Assert.DoesNotContain("GetProcessById", client); Isolation();
         }
 
-        private static async Task AssertNoFindingAdmission(HistoricalWorkerPayloadProjectionInput input)
+        private static async Task<ExternalExceptionFindingAnalysisResult> AssertBoundedFindingAdmission(HistoricalWorkerPayloadProjectionInput input)
         {
+            var native = Native(HistoricalWorkerPayloadProjection.Project(input).Value!.Payload);
             var result = await XmlDocExceptionSemanticDetector.FindExternalExceptionSmellsAsync(input, new(new(Client())));
-            Assert.False(result.Succeeded); Assert.Empty(result.Findings); Assert.Null(result.Direct.Dispatch); Assert.Null(result.Summary);
+            Assert.True(result.Succeeded, result.Failure + ": " + Failure(result.Summary ?? result.Direct));
+            Assert.Equal(native.GetProperty("findings").EnumerateArray().Select(finding => finding.GetRawText()).OrderBy(value => value, StringComparer.Ordinal),
+                result.Findings.Select(finding => Json(finding)).OrderBy(value => value, StringComparer.Ordinal));
+            Assert.Equal(ExceptionFlowAnalyzerSelection.Historical, result.Direct.Dispatch!.Decision!.Selection);
+            Assert.Null(result.Direct.Dispatch.Routing!.CurrentAnalysis);
+            HistoricalWorkerLifetimeAssertions.Stopped(result.Direct.Dispatch.Routing.HistoricalAnalysis!);
+            Assert.True(HistoricalWorkerResponseValidation.TryGetFindingFacts(result.Direct.Dispatch.Routing.HistoricalAnalysis, out var directFacts));
+            Assert.Equal(directFacts!.Documentation.HasDocumentation, result.SummaryRequested);
+            if (result.SummaryRequested)
+            {
+                Assert.NotNull(result.Summary); Assert.True(result.Summary.Succeeded);
+                Assert.Equal(ExceptionFlowAnalyzerSelection.Historical, result.Summary.Dispatch!.Decision!.Selection);
+                Assert.Null(result.Summary.Dispatch.Routing!.CurrentAnalysis);
+                HistoricalWorkerLifetimeAssertions.Stopped(result.Summary.Dispatch.Routing.HistoricalAnalysis!);
+            }
+            else { Assert.Null(result.Summary); Assert.Empty(result.Findings); }
             var directProfile = input with
             {
                 Finding = new(WorkerDeclaredExecution.DirectEvidence,
@@ -233,6 +248,7 @@ namespace XMLDocNormalizerTests.Worker
             };
             var mismoded = await XmlDocExceptionSemanticDetector.FindExternalExceptionSmellsAsync(directProfile, new(new(Client())));
             Assert.False(mismoded.Succeeded); Assert.Empty(mismoded.Findings); Assert.Null(mismoded.Direct.Dispatch);
+            return result;
         }
         private sealed record Fixture(HistoricalWorkerPayloadProjectionInput Input, string Directory, string Job);
         private static async Task<Fixture> Create(int count, string scenario)
@@ -313,6 +329,6 @@ namespace XMLDocNormalizerTests.Worker
         private static string Failure(ExternalExceptionFlowAnalysisResult result) => result.PayloadProjection.Failure?.Message + ": " + result.Dispatch?.Routing?.HistoricalAnalysis?.Failure?.Message;
         private static void Isolation() => Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), assembly => assembly.GetName().Name is "XMLDocNormalizer.ExceptionFlow.Historical" or "XMLDocNormalizer.HistoricalWorker");
         private static async Task Evidence(string name, object value)
-        { string path = Path.Combine(Root(), "artifacts/p5o2b25a10/analysis/b25", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, Json(value)); } // R6: new witnesses only.
+        { string path = Path.Combine(Root(), "artifacts/p5o2b25b/b25", name + ".json"); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, Json(value)); } // B25B: never overwrite historical witnesses.
     }
 }

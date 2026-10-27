@@ -104,15 +104,13 @@ namespace XMLDocNormalizerTests.Worker
         }
 
         [Fact]
-        public void StopRule_LeavesOriginalProductionAndClosedFindingAdmission()
+        public async Task StopRule_LeavesOriginalProductionAndClosedFindingAdmission()
         {
             string root = ExceptionFlowProductionCurrentParityTests.Root();
             string evaluator = File.ReadAllText(Path.Combine(root, "src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowSummaryGraphEvaluator.cs"));
             Assert.DoesNotContain("GetFirstSymbolForDeclarationId", evaluator); // P14
             Assert.Contains("RoslynCanonicalIdentityResolver", evaluator);
-            string external = File.ReadAllText(Path.Combine(root, "src/XMLDocNormalizer/Execution/ExternalTargetExecution.cs"));
-            Assert.Contains("Solution is not admitted", external);
-            Assert.DoesNotContain("SupportingProjects", external);
+            await ExceptionFlowHistoricalSolutionAdoptionTests.AssertBoundedProductionBoundary(); // C3
         }
 
         [Theory]

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
@@ -18,7 +19,10 @@ namespace XMLDocNormalizer.Execution
     /// <summary>Untrusted local file names and a bounded selector, not trusted execution DTOs.</summary>
     internal sealed record ExternalTargetJob([property: JsonRequired] int Version, string? TargetPe, string? PortablePdb,
         ExternalTargetSource[]? Sources, string[]? References, ExternalTargetRoot? Root,
-        string? WorkerAssembly, string? DotnetHost = null, string? AnalysisMode = null);
+        string? WorkerAssembly, string? DotnetHost = null, string? AnalysisMode = null,
+        ExternalTargetProject[]? SupportingProjects = null);
+    internal sealed record ExternalTargetProject(string? TargetPe, string? PortablePdb,
+        ExternalTargetSource[]? Sources, string[]? References, ExternalTargetRoot? Root);
     internal sealed record ExternalTargetSource([property: JsonRequired] int DocumentOrdinal, string? Path);
     internal sealed record ExternalTargetRoot(string? TypeMetadataName, string? MethodName, [property: JsonRequired] int DocumentOrdinal);
 
@@ -57,8 +61,11 @@ namespace XMLDocNormalizer.Execution
                     null or "project-transitive-declared-exceptions" => ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions,
                     "direct" => ExceptionAnalysisMode.Direct,
                     "project-transitive" => ExceptionAnalysisMode.ProjectTransitive,
+                    "solution-transitive" when job.SupportingProjects?.Length is 1 or 2 => ExceptionAnalysisMode.SolutionTransitive,
                     _ => throw Failure("Input: bounded external Findings support only direct, project-transitive or project-transitive-declared-exceptions; Solution is not admitted.")
                 };
+                if (mode != ExceptionAnalysisMode.SolutionTransitive && job.SupportingProjects != null)
+                { throw Failure("Input: supporting projects require the explicit bounded Solution profile."); }
                 if (assertedMode != null && assertedMode != mode) { throw Failure("Input: explicit CLI analysis mode conflicts with the external job analysisMode."); }
                 string Local(string? path)
                 {
@@ -67,8 +74,18 @@ namespace XMLDocNormalizer.Execution
                 }
                 string worker = Local(job.WorkerAssembly);
                 if (!File.Exists(worker)) { throw Failure("Worker: configured local assembly is missing."); }
-                byte[] peBytes = File.ReadAllBytes(Local(job.TargetPe));
-                string[] referencePaths = job.References.Select(Local).ToArray();
+                HistoricalWorkerPayloadProjectionInput Load(ExternalTargetProject project)
+                {
+                if (project.Sources == null || project.References == null || project.Root == null
+                    || project.Sources.Length is < 1 or > WorkerProtocol.MaximumProjectSources
+                    || project.References.Length is < 1 or > WorkerProtocol.MaximumReferenceCount
+                    || project.Sources.Any(source => source == null || source.DocumentOrdinal < 0)
+                    || project.Sources.Select(source => source.DocumentOrdinal).Distinct().Count() != project.Sources.Length
+                    || !project.Sources.Any(source => source.DocumentOrdinal == project.Root.DocumentOrdinal)
+                    || string.IsNullOrWhiteSpace(project.Root.TypeMetadataName) || string.IsNullOrWhiteSpace(project.Root.MethodName))
+                { throw Failure("Input: each project requires complete local sources/references and one metadata selector."); }
+                byte[] peBytes = File.ReadAllBytes(Local(project.TargetPe));
+                string[] referencePaths = project.References.Select(Local).ToArray();
                 if (referencePaths.Sum(path => new FileInfo(path).Length) > WorkerProtocol.MaximumReferenceBytes)
                 { throw Failure("P5C: reference materials exceed the bounded Worker image budget."); }
                 byte[][] referenceImages = referencePaths.Select(File.ReadAllBytes).ToArray();
@@ -82,12 +99,12 @@ namespace XMLDocNormalizer.Execution
                 { throw Failure("P3: target is not a bound assembly PE."); }
                 using var pe = new MemoryStream(peBytes, writable: false);
                 if (!ExternalPeDebugDirectoryDescriptorFactory.TryCreate(target, pe, out var debug)
-                    || !ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(debug, Local(job.PortablePdb), out var provenance))
+                    || !ExternalCompilationProvenanceDescriptorFactory.TryCreateFromFile(debug, Local(project.PortablePdb), out var provenance))
                 { throw Failure("P4/P5A: missing, invalid or non-matching PE/PDB provenance."); }
                 if (!ExternalCSharpCompilationConfigurationFactory.TryCreate(provenance, out var configuration))
                 { throw Failure("P5G: unsupported compilation/parse/signing configuration."); }
                 var sources = new List<ExternalCSharpSyntaxTree>();
-                foreach (var source in job.Sources)
+                foreach (var source in project.Sources)
                 {
                     if (source.DocumentOrdinal >= provenance.PortablePdb.Documents.Length)
                     { throw Failure("P5H: source document ordinal is outside the validated PDB."); }
@@ -112,16 +129,20 @@ namespace XMLDocNormalizer.Execution
                 }
                 if (!ExternalMetadataReferenceSetFactory.TryCreate(provenance, materials, out var referenceSet))
                 { throw Failure("P5C/P5E: ordered exact reference materials are incomplete or invalid."); }
-                var methods = assembly.GetTypeByMetadataName(job.Root.TypeMetadataName)?.GetMembers(job.Root.MethodName).OfType<IMethodSymbol>().ToArray();
+                var methods = assembly.GetTypeByMetadataName(project.Root.TypeMetadataName)?.GetMembers(project.Root.MethodName).OfType<IMethodSymbol>().ToArray();
                 if (methods == null || methods.Length != 1) { throw Failure("Root: exactly one metadata method is required; ambiguous selectors are unsupported."); }
-                var rootSource = sources[job.Sources.ToList().FindIndex(source => source.DocumentOrdinal == job.Root.DocumentOrdinal)];
+                var rootSource = sources[project.Sources.ToList().FindIndex(source => source.DocumentOrdinal == project.Root.DocumentOrdinal)];
                 var policy = new WorkerDeclaredPolicyRequest(WorkerDeclaredPolicyContract.Profile, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions,
                     Documentation: new(WorkerDeclaredDocumentationContract.Profile, WorkerDeclaredPolicyMode.ProjectTransitiveDeclaredExceptions));
-                var input = new HistoricalWorkerPayloadProjectionInput(provenance, rootSource, methods[0],
+                return new HistoricalWorkerPayloadProjectionInput(provenance, rootSource, methods[0],
                     mode, referenceSet, configuration, sourceSet,
                     DeclaredPolicy: mode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions ? policy : null,
-                    Finding: mode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions ? null : new(WorkerDeclaredExecution.DirectEvidence,
+                    Finding: mode is ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions or ExceptionAnalysisMode.SolutionTransitive ? null : new(WorkerDeclaredExecution.DirectEvidence,
                         new(WorkerFindingContract.Profile, mode == ExceptionAnalysisMode.Direct ? WorkerDeclaredPolicyMode.Direct : WorkerDeclaredPolicyMode.ProjectTransitive)));
+                }
+                var input = Load(new(job.TargetPe, job.PortablePdb, job.Sources, job.References, job.Root));
+                if (mode == ExceptionAnalysisMode.SolutionTransitive)
+                { input = input with { SupportingProjects = job.SupportingProjects!.Select(Load).ToImmutableArray() }; }
                 var dispatch = new ExceptionFlowAnalysisDispatch(new(new HistoricalWorkerClient(job.DotnetHost ?? "dotnet", worker, TimeSpan.FromSeconds(60))));
                 var result = await XmlDocExceptionSemanticDetector.FindExternalExceptionSmellsAsync(input, dispatch);
                 if (!result.Succeeded)

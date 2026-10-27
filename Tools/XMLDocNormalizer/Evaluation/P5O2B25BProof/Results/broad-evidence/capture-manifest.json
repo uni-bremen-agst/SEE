@@ -1,0 +1,19 @@
+﻿{
+    "Schema":  "B25B-Capture-v1",
+    "Migration":  "Lossless relocation of original snapshot, not a new runtime gate",
+    "Gate":  "broad",
+    "GateRecord":  "Results/broad.json",
+    "GateRecordSha256":  "3E02DD515E875C0B8D595DCED933E70A8666B277CA1FBCB2E1B3722B0602D8A4",
+    "ProducerGate":  "broad",
+    "ProducedInCapturedGate":  true,
+    "Files":  [
+                  {
+                      "OriginalRelativePath":  "adoption/W4-equal-results-different-graphs.json",
+                      "RawSha256":  "C52E0C241DB44C11E007A3ADC81063E9B8CD7710289EBC2171CB9798CEC83C38",
+                      "RawBytes":  94643221,
+                      "CanonicalArchive":  "Canonical/W4/W4-equal-results-different-graphs.C52E0C241DB44C11E007A3ADC81063E9B8CD7710289EBC2171CB9798CEC83C38.json.gz",
+                      "ArchiveSha256":  "0168F591AE727B48F9248955BD041384C554500894153FC9A9D61ECDC2B43A31",
+                      "Storage":  "CanonicalGzip"
+                  }
+              ]
+}

@@ -1,0 +1,10 @@
+{
+  "Experiment": "Actual unchanged assertions under deliberately held caller SynchronizationContext",
+  "CapturedCallerContext": true,
+  "CompletedWhileContextHeld": false,
+  "Passed": true,
+  "Failure": null,
+  "ProductionOrTimeoutChanged": false,
+  "FullSchedulingTelemetryCaptured": false,
+  "OfficialGate": false
+}

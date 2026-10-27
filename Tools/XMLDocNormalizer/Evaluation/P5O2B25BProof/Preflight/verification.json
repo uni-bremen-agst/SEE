@@ -1,0 +1,37 @@
+{
+    "CapturedUtc":  "2026-10-24T11:54:59.6310814Z",
+    "Head":  "1ef19a37bbecc2ba1f9f2b9e2be27f7cc092c65e",
+    "IndexSha256":  "B732C003645BA96DD01289F48BD9EAA1AA38BB8688232CE120B492E722ADF1AA",
+    "RootIgnoreSha256":  "7FA827563D3AD2A24C52417F5EA208ED0A3018EA825F847B7E130B10264FF9E5",
+    "IndexUnchanged":  true,
+    "SemanticIndexClean":  true,
+    "RootIgnoreUnchanged":  true,
+    "SixStashesUnchanged":  true,
+    "CoreChecked":  23,
+    "NewCoreDifferences":  [
+
+                           ],
+    "HistoricalEvaluationFilesChecked":  735,
+    "CodeAndTestFilesChecked":  761,
+    "Differences":  [
+
+                    ],
+    "GitStatusShort":  [
+                           " M .gitignore",
+                           "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25B-bounded-solution-finding-adoption.md",
+                           "?? Tools/XMLDocNormalizer/Evaluation/P5O2B25BProof/"
+                       ],
+    "ProductionChanges":  0,
+    "ExistingTestChanges":  0,
+    "NewTests":  0,
+    "Builds":  0,
+    "TestRuns":  0,
+    "Status":  "STOP_AwaitingOneConsolidatedCharacterizationApproval",
+    "B25BActivated":  false,
+    "WireDtoChanged":  false,
+    "WorkerProfileChanged":  false,
+    "Commit":  false,
+    "Push":  false,
+    "StashOperations":  false,
+    "HistoryRewrite":  false
+}

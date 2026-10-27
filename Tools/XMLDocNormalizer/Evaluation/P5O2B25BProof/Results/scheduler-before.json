@@ -1,0 +1,10 @@
+{
+  "Experiment": "Actual unchanged assertions under deliberately held caller SynchronizationContext",
+  "CapturedCallerContext": true,
+  "CompletedWhileContextHeld": false,
+  "Passed": false,
+  "Failure": "Xunit.Sdk.TrueException: Assert.True() Failure\r\nExpected: True\r\nActual:   False\r\n   at Xunit.Assert.True(Nullable\u00601 condition, String userMessage) in /_/src/xunit.assert/Asserts/BooleanAsserts.cs:line 146\r\n   at Xunit.Assert.True(Boolean condition) in /_/src/xunit.assert/Asserts/BooleanAsserts.cs:line 97\r\n   at XMLDocNormalizerTests.Execution.Semantic.ExternalSourceLineEndingReconstructionTests.ConcurrentReconstruction_PerformsOneRequestAndOneAttempt() in C:\\Users\\Krause\\AppData\\Local\\Temp\\b25b-ceda9861\\Tests\\XMLDocNormalizerTests\\Execution\\Semantic\\ExternalSourceLineEndingReconstructionTests.cs:line 341\r\n   at Program.\u003CMain\u003E$(String[] args) in C:\\Users\\Krause\\AppData\\Local\\Temp\\b25b-ceda9861\\artifacts\\p5o2b25b\\scheduler\\Program.cs:line 38",
+  "ProductionOrTimeoutChanged": false,
+  "FullSchedulingTelemetryCaptured": false,
+  "OfficialGate": false
+}
