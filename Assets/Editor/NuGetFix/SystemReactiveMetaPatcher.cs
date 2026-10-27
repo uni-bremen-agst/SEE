@@ -13,6 +13,9 @@ using System.IO;
 [InitializeOnLoad]
 public class SystemReactiveMetaPatcher
 {
+    /// <summary>
+    /// Triggers <see cref="PatchSystemReactiveMetaFiles"/>.
+    /// </summary>
     static SystemReactiveMetaPatcher()
     {
         PatchSystemReactiveMetaFiles();
