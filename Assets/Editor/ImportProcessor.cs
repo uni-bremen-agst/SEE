@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace SEEEditor
 {
+    /// <summary>
+    /// A processor of imported assets. Fixes the issue with the Microsoft.CodeAnalysis.Analyzers NuGet package
+    /// that causes Unity to report errors in the console when importing.
+    /// </summary>
     public class ImportProcessor : AssetPostprocessor
     {
         /// <summary>
