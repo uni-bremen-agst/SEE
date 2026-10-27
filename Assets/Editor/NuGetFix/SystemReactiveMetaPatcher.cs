@@ -40,15 +40,31 @@ public class SystemReactiveMetaPatcher
             // Target System.Reactive related meta files
             if (metaFile.Contains("System.Reactive", System.StringComparison.OrdinalIgnoreCase))
             {
-                string content = File.ReadAllText(metaFile);
+                string content;
+                try
+                {
+                    content = File.ReadAllText(metaFile);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"Could not read meta file at {metaFile}: {ex.Message}\n");
+                    continue;
+                }
 
                 // If reference validation is enabled, disable it
                 if (content.Contains($"{validateReferences}: 1"))
                 {
                     content = content.Replace($"{validateReferences}: 1", $"{validateReferences}: 0");
-                    File.WriteAllText(metaFile, content);
-                    Debug.Log($"[{nameof(SystemReactiveMetaPatcher)}] Set {validateReferences} to 0 in: {metaFile}");
-                    changesMade = true;
+                    try
+                    {
+                        File.WriteAllText(metaFile, content);
+                        Debug.Log($"[{nameof(SystemReactiveMetaPatcher)}] Set {validateReferences} to 0 in: {metaFile}");
+                        changesMade = true;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"Could not write meta file at {metaFile}: {ex.Message}\n");
+                    }
                 }
             }
         }
