@@ -73,10 +73,10 @@ namespace SEEEditor
 
                         AssetDatabase.Refresh();
                     }
-                    catch (System.Exception)
+                    catch (System.Exception ex)
                     {
                         // Ignore if files are currently locked.
-                        Debug.LogWarning($"Could not delete rulesets folder at {rulesetsPath}. It may be locked by another process.\n");
+                        Debug.LogWarning($"Could not delete rulesets folder at {rulesetsPath}. It may be locked by another process. {ex.Message}\n");
                     }
                 }
             }
