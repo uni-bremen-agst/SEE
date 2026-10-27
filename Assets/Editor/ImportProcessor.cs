@@ -100,6 +100,7 @@ namespace SEEEditor
             if (!assetPath.StartsWith("Assets/Packages/", StringComparison.OrdinalIgnoreCase) ||
                 !assetPath.EndsWith("/System.Reactive.dll", StringComparison.OrdinalIgnoreCase))
             {
+                Debug.Log($"There is no {assetPath} to fix a self reference.\n");
                 return;
             }
 
