@@ -171,12 +171,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 nodesToPaste,
                 GameFinder.GetAttachedObjectsObject(newSurface));
 
-            int currentPage =
-                newSurface.GetComponent<DrawableHolder>().CurrentPage;
+            int currentPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
 
             foreach (DrawableType type in nodesToPaste.GetAllDrawableTypes())
             {
-                type.AssociatedPage = currentPage;
+                AssignAssociatedPage(type, currentPage);
                 DrawableType.Restore(type, newSurface);
             }
 
@@ -194,6 +193,35 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
 
             newValueHolder = MindMapNodeConf.GetNodeConf(newObject);
+        }
+
+        /// <summary>
+        /// Assigns the given page to a pasted drawable configuration and to
+        /// nested Mind Map configurations that belong to the same node.
+        /// </summary>
+        /// <param name="type">
+        /// The drawable configuration whose associated page should be updated.
+        /// </param>
+        /// <param name="associatedPage">
+        /// The page on which the pasted drawable should be restored.
+        /// </param>
+        private static void AssignAssociatedPage(
+            DrawableType type,
+            int associatedPage)
+        {
+            type.AssociatedPage = associatedPage;
+
+            if (type is MindMapNodeConf node)
+            {
+                node.BorderConf.AssociatedPage = associatedPage;
+                node.TextConf.AssociatedPage = associatedPage;
+
+                if (node.BranchLineConf != null)
+                {
+                    node.BranchLineConf.AssociatedPage =
+                        associatedPage;
+                }
+            }
         }
 
         /// <summary>

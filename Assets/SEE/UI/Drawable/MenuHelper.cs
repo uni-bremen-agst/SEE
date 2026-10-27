@@ -130,6 +130,8 @@ namespace SEE.UI.Drawable
             contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentTransform);
+
             float newHeight = contentTransform.rect.height;
             float diffHeight = oldHeight - newHeight;
 
