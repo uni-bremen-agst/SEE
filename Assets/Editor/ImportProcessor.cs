@@ -1,7 +1,6 @@
 
 #if UNITY_EDITOR
 
-using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -78,6 +77,7 @@ namespace SEEEditor
                 }
             }
         }
+<<<<<<< HEAD
 
         /// <summary>
         /// Invoked by Unity's asset pipeline before an asset is imported.
@@ -121,6 +121,8 @@ namespace SEEEditor
                 }
             }
         }
+=======
+>>>>>>> 62e64857de17b8115ea7288c21b7e05e7bc01718
     }
 }
 
