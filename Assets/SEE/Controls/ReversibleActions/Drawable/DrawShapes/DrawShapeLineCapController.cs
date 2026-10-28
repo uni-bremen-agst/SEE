@@ -174,6 +174,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
             regularPreviewLineKind = ValueHolder.CurrentLineKind;
         }
 
+
         /// <summary>
         /// Creates the currently selected start and end line-cap configurations.
         /// </summary>
@@ -186,9 +187,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <returns>
         /// The created start and end line-cap configurations and whether a reference cap is used.
         /// </returns>
-        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference)
-            CreateSelectedLineCapConfs(GameObject shape, GameObject surface, LineConf shapeConf,
-                bool sendLineKindChange)
+        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference) CreateSelectedLineCapConfs(
+            GameObject shape,
+            GameObject surface,
+            LineConf shapeConf,
+            bool sendLineKindChange)
         {
             LineCapConf startConf = ShapeMenu.GetLineStartCapConf();
             LineCapConf endConf = ShapeMenu.GetLineEndCapConf();
@@ -214,6 +217,14 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 shapeConf.LineKind,
                 regularPreviewLineKind);
 
+            // Preserve the regular line style for cap inheritance.
+            // Reference changes the main line to Dashed25, but unrelated
+            // caps must not inherit this forced style.
+            LineConf capSourceConf = shapeConf.Clone();
+            capSourceConf.LineKind = hasReference
+                ? regularPreviewLineKind
+                : lineKind;
+
             GameLineAppearance.ChangeLineKind(shape, lineKind, shapeConf.Tiling);
             shapeConf.LineKind = lineKind;
 
@@ -238,13 +249,13 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                     : endCap;
 
             startConf = CreateSelectedLineCapConf(
-                shapeConf,
+                capSourceConf,
                 startConf,
                 actualStartCap,
                 startCap);
 
             endConf = CreateSelectedLineCapConf(
-                shapeConf,
+                capSourceConf,
                 endConf,
                 actualEndCap,
                 endCap);
@@ -260,17 +271,31 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="actualCap">The actual cap kind to draw.</param>
         /// <param name="selectedCap">The cap kind selected in the shape menu.</param>
         /// <returns>The normalized line-cap configuration.</returns>
-        private static LineCapConf CreateSelectedLineCapConf(LineConf shapeConf,
-            LineCapConf existingCapConf, LineCap actualCap, LineCap selectedCap)
+        private static LineCapConf CreateSelectedLineCapConf(
+            LineConf shapeConf,
+            LineCapConf existingCapConf,
+            LineCap actualCap,
+            LineCap selectedCap)
         {
-            LineCapConf reusableCapConf = existingCapConf != null
-                && existingCapConf.CapKind == actualCap
+            // Reference is rendered as Arrow, but its existing visual
+            // configuration must still be preserved.
+            bool isExistingReference =
+                selectedCap == LineCap.Reference
+                && existingCapConf?.CapKind == LineCap.Reference;
+
+            LineCapConf reusableCapConf =
+                existingCapConf != null
                 && existingCapConf.UseOwnVisuals
+                && (existingCapConf.CapKind == actualCap
+                    || isExistingReference)
                     ? existingCapConf
                     : null;
 
             LineCapConf capConf =
-                GameLineCapConfiguration.CreateLineCapConf(shapeConf, reusableCapConf, actualCap);
+                GameLineCapConfiguration.CreateLineCapConf(
+                    shapeConf,
+                    reusableCapConf,
+                    actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);
 

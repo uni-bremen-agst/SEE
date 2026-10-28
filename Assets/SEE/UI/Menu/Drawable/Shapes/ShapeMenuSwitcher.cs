@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Menu.Drawable.Line;
 using UnityEngine;
@@ -110,6 +111,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// Synchronizes edited preview line caps with the shape-menu state.
         /// </summary>
         /// <param name="line">The updated preview line configuration.</param>
+
         private static void SynchronizePreviewLineCaps(LineConf line)
         {
             if (line == null)
@@ -117,9 +119,26 @@ namespace SEE.UI.Menu.Drawable.Shapes
                 return;
             }
 
-            ShapeMenu.SetLineCaps(
-                line.LineCapStart,
-                line.LineCapEnd);
+            LineCapConf startCap = line.LineCapStart?.Clone();
+            LineCapConf endCap = line.LineCapEnd?.Clone();
+
+            // Reference is rendered internally as Arrow.
+            // Preserve the logical Reference selection in the shape menu.
+            if (startCap != null
+                && ShapeMenu.GetLineStartCap() == LineCap.Reference
+                && startCap.CapKind == LineCap.Arrow)
+            {
+                startCap.CapKind = LineCap.Reference;
+            }
+
+            if (endCap != null
+                && ShapeMenu.GetLineEndCap() == LineCap.Reference
+                && endCap.CapKind == LineCap.Arrow)
+            {
+                endCap.CapKind = LineCap.Reference;
+            }
+
+            ShapeMenu.SetLineCaps(startCap, endCap);
         }
 
         /// <summary>
