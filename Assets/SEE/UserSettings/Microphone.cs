@@ -67,7 +67,6 @@ namespace SEE.UserSettings
             writer.Save(NoiseSuppression, noiseSuppressionLabel);
             writer.Save(AutoGainControl, autoGainControlLabel);
             writer.EndGroup();
-
         }
 
         public virtual void Restore(Dictionary<string, object> attributes, string label)

@@ -117,7 +117,6 @@ namespace SEE.UI
         /// </summary>
         private static StatusIndicator livekitAudio;
 
-
         /// <summary>
         /// The main webcam status icon. Its color reflects whether the webcam is active.
         /// </summary>

@@ -454,7 +454,6 @@ namespace SEE.UI
             noiseSuppressionToggle = settingsMenuGameObject.FindDescendant("NoiseSuppressionToggle").MustGetComponent<Toggle>();
             autoGainControlToggle = settingsMenuGameObject.FindDescendant("AutoGainControlToggle").MustGetComponent<Toggle>();
 
-
             audioManager = AudioManagerImpl.Instance();
             musicVolumeSlider.value = audioManager.MusicVolume;
             musicVolumeSlider.interactable = !audioManager.MusicMuted;
@@ -487,13 +486,11 @@ namespace SEE.UI
             noiseSuppressionToggle.onValueChanged.AddListener((value) =>
             {
                 UserSetting.Instance.Audio.Microphone.NoiseSuppression = value;
-
             });
 
             autoGainControlToggle.onValueChanged.AddListener((value) =>
             {
                 UserSetting.Instance.Audio.Microphone.AutoGainControl = value;
-
             });
 
             sfxVolumeSlider.onValueChanged.AddListener((value) =>
