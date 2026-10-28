@@ -75,7 +75,7 @@ namespace SEE.Game.Drawable.Text
             tmp.font = Resources.Load<TMP_FontAsset>(drawableTextFontName);
             tmp.rectTransform.sizeDelta = GameTextGeometry.CalculateWidthAndHeight(text, tmp.font, fontSize, styles);
             tmp.color = fontColor;
-            tmp.faceColor = fontColor;
+            tmp.faceColor = Color.white;
             tmp.fontSize = fontSize;
             tmp.outlineColor = outlineColor;
             tmp.outlineWidth = outlineThickness;

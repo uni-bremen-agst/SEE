@@ -115,7 +115,7 @@ namespace SEE.Game.Drawable.Editing
             {
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.color = color;
-                textMesh.faceColor = color;
+                textMesh.faceColor = Color.white;
             }
         }
 
