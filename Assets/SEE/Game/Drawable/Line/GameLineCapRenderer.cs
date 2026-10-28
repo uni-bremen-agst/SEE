@@ -149,7 +149,7 @@ namespace SEE.Game.Drawable.Line
             capObject.transform.localEulerAngles =
                 new Vector3(0.0f, 0.0f, angleInDegrees);
             capObject.transform.localPosition =
-                new Vector3(anchor.x, anchor.y, shape.transform.localPosition.z);
+                new Vector3(anchor.x, anchor.y, anchor.z);
             capObject.tag = Tags.LineCap;
 
             LineCapValueHolder capValueHolder =

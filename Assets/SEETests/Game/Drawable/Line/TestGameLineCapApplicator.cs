@@ -150,5 +150,66 @@ namespace SEE.Game.Drawable.Line
                 Is.EqualTo(originalPositions[
                     originalPositions.Length - 1]));
         }
+
+
+        /// <summary>
+        /// Verifies that generated start and end caps lie on the
+        /// same depth plane as their parent line.
+        /// </summary>
+        [Test]
+        public void TestLineCapsShareParentLineDepth()
+        {
+            LineConf lineConf = LineConf.GetLine(line);
+
+            LineCapConf startCap =
+                GameLineCapConfiguration.CreateLineCapConf(
+                    lineConf,
+                    LineCapConf.CreateNone(),
+                    LineCap.Arrowhead);
+
+            LineCapConf endCap =
+                GameLineCapConfiguration.CreateLineCapConf(
+                    lineConf,
+                    LineCapConf.CreateNone(),
+                    LineCap.Arrow);
+
+            GameLineCapApplicator.ApplyLineCaps(
+                line,
+                startCap,
+                endCap);
+
+            Assert.That(
+                GameLineCapRenderer.GetLineCapObjects(line, true),
+                Has.Count.EqualTo(1));
+
+            Assert.That(
+                GameLineCapRenderer.GetLineCapObjects(line, false),
+                Has.Count.EqualTo(1));
+
+            Transform startTransform =
+                GameLineCapRenderer.GetLineCapObjects(line, true)[0]
+                    .transform;
+
+            Transform endTransform =
+                GameLineCapRenderer.GetLineCapObjects(line, false)[0]
+                    .transform;
+
+            Assert.That(
+                Mathf.Abs(line.transform.localPosition.z),
+                Is.GreaterThan(0.000001f),
+                "The test requires a nonzero parent depth.");
+
+            Assert.That(
+                startTransform.localPosition.z,
+                Is.EqualTo(originalPositions[0].z).Within(0.000001f),
+                "The start cap must not repeat its parent's depth.");
+
+            Assert.That(
+                endTransform.localPosition.z,
+                Is.EqualTo(
+                    originalPositions[originalPositions.Length - 1].z)
+                    .Within(0.000001f),
+                "The end cap must not repeat its parent's depth.");
+        }
     }
 }
