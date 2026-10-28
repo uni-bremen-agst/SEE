@@ -120,8 +120,16 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 if (!GameMindMapHierarchy.CheckValidNodeKindChange(addedNode, newNodeKind, oldNodeKind)
                     && newNodeKind != oldNodeKind)
                 {
+                    MindMapParentSelectionMenu.Instance.Destroy();
+
                     nodeKindSelector.index = GameMindMap.GetNodeKinds().IndexOf(oldNodeKind);
-                    nodeKindSelector.UpdateUI();
+
+                    // HorizontalSelector.UpdateUI() uses Object.Destroy internally, which is not
+                    // allowed in EditMode tests. The visual refresh is only required at runtime.
+                    if (Application.isPlaying)
+                    {
+                        nodeKindSelector.UpdateUI();
+                    }
 
                     ShowNotification.Warn(
                         "Cannot transform",

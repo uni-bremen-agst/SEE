@@ -208,12 +208,22 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         }
 
         /// <summary>
-        /// Deactivates the blink effect if it is still active and destroys the
-        /// cut-copy-paste menu.
+        /// Stops this action and cleans up its current interaction state.
+        /// If a Mind Map paste is waiting for a parent selection, the temporary
+        /// paste is rolled back and a cut original is restored.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
+
+            if (progressState == ProgressState.OpenSelectParentMenu
+                || progressState == ProgressState.SelectParent)
+            {
+                mindMapPasteOperation.Cancel();
+                SetToInitialState();
+                return;
+            }
+
             BlinkEffect.Deactivate(selectedObj);
 
             if (cutCopyPasteMenu != null)

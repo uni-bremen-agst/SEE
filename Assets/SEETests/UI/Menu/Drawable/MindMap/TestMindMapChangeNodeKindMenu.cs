@@ -194,6 +194,85 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
+        /// Verifies that rejecting a node-kind change also cancels a pending
+        /// parent selection from a previously selected node kind.
+        /// </summary>
+        [Test]
+        public void TestRejectedNodeKindChangeCancelsPendingParentSelection()
+        {
+            MMNodeValueHolder nodeValueHolder =
+                node.GetComponent<MMNodeValueHolder>();
+
+            InitializeValueHolder(nodeValueHolder);
+            nodeValueHolder.NodeKind = MindMapNodeKind.Theme;
+
+            CreateParentCandidate();
+
+            GameObject child = new GameObject("Child");
+            child.tag = Tags.MindMapNode;
+            child.transform.SetParent(attachedObjects.transform);
+
+            MMNodeValueHolder childValueHolder =
+                child.AddComponent<MMNodeValueHolder>();
+
+            InitializeValueHolder(childValueHolder);
+            childValueHolder.NodeKind = MindMapNodeKind.Leaf;
+
+            GameObject branchLine = new GameObject("BranchLine");
+            branchLine.transform.SetParent(attachedObjects.transform);
+
+            nodeValueHolder.AddChild(child, branchLine);
+
+            MindMapNodeConf configuration = new MindMapNodeConf
+            {
+                NodeKind = MindMapNodeKind.Theme
+            };
+
+            MindMapChangeNodeKindMenu.Enable(
+                node,
+                configuration,
+                () => { });
+
+            HorizontalSelector selector = FindNodeKindSelector();
+
+            int subthemeIndex =
+                GameMindMap.GetNodeKinds()
+                    .IndexOf(MindMapNodeKind.Subtheme);
+
+            selector.index = subthemeIndex;
+            selector.selectorEvent.Invoke(subthemeIndex);
+
+            Assert.That(
+                MindMapParentSelectionMenu.Instance.IsOpen(),
+                Is.True);
+
+            int leafIndex =
+                GameMindMap.GetNodeKinds()
+                    .IndexOf(MindMapNodeKind.Leaf);
+
+            selector.index = leafIndex;
+            selector.selectorEvent.Invoke(leafIndex);
+
+            Assert.That(
+                selector.index,
+                Is.EqualTo(
+                    GameMindMap.GetNodeKinds()
+                        .IndexOf(MindMapNodeKind.Theme)));
+
+            Assert.That(
+                MindMapParentSelectionMenu.Instance.IsOpen(),
+                Is.False);
+
+            Assert.That(
+                nodeValueHolder.NodeKind,
+                Is.EqualTo(MindMapNodeKind.Theme));
+
+            Assert.That(
+                configuration.NodeKind,
+                Is.EqualTo(MindMapNodeKind.Theme));
+        }
+
+        /// <summary>
         /// Finds the node kind selector of the currently instantiated menu.
         /// </summary>
         /// <returns>The node kind selector.</returns>
