@@ -1,53 +1,81 @@
-name: Issue task sync prototype
+name: Issue task sync
 
-on:
+"on":
   push:
     branches:
-      - refactor/961-split-drawable-components
+      - '**'
+  pull_request:
+    types: [closed]
+    branches: [master]
 
 permissions:
-  contents: read
   issues: write
 
 concurrency:
-  group: issue-task-sync-961
+  group: issue-task-sync-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  check-issue-task:
+  sync:
+    if: >-
+      (github.event_name == 'push' && github.ref != 'refs/heads/master') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check issue tasks from commit messages
+      - name: Synchronize issue checklist
         uses: actions/github-script@v9
         with:
           script: |
-            const issueNumber = 961;
-            const branch = context.ref.replace(/^refs\/heads\//, "");
-            const branchId = Buffer.from(branch).toString("base64url");
-
-            const nimSuffix =
-              ` 🟡 **NIM** <!-- issue-task-sync branch=${branchId} -->`;
-
-            const commits = context.payload.commits ?? [];
-            const tasks = [];
-
-            for (const commit of commits) {
-              const pattern = /^Checks\s+#961:\s*(.+)$/gmi;
-              let match;
-
-              while ((match = pattern.exec(commit.message)) !== null) {
-                tasks.push(match[1].trim());
-              }
+            // Supported branch names: refactor/961-description, fix/1022-description, ...
+            // A Checks #N directive can update issue N only when N is in the branch name.
+            function issueFromBranch(branch) {
+              const match = branch.match(/^[a-z][a-z0-9_-]*\/([1-9]\d*)(?:[-/]|$)/i);
+              return match === null ? null : Number(match[1]);
             }
 
-            if (tasks.length === 0) {
-              core.info("No Checks #961 directives found.");
+            function normalize(value) {
+              return value.trim().replace(/\s+/g, ' ');
+            }
+
+            const nimSuffix = /\s+🟡\s+\*\*NIM\*\*\s+<!--\s*issue-task-sync branch=([A-Za-z0-9_-]+)\s*-->\s*$/;
+
+            function taskFromLine(line) {
+              const match = line.match(/^\s*[-*+]\s+\[[ xX]\]\s+(.*)$/);
+              return match === null
+                ? null
+                : normalize(match[1].replace(nimSuffix, ''));
+            }
+
+            function isChecked(line) {
+              return /^\s*[-*+]\s+\[[xX]\]/.test(line);
+            }
+
+            const isPush = context.eventName === 'push';
+            const pull = context.payload.pull_request;
+            const branch = isPush
+              ? context.ref.replace(/^refs\/heads\//, '')
+              : pull?.head?.ref;
+
+            if (!branch || (isPush && context.payload.deleted)) {
+              core.info('No active branch to synchronize.');
               return;
             }
 
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const issueNumber = issueFromBranch(branch);
+            if (issueNumber === null) {
+              core.info(`Branch '${branch}' does not contain a supported issue number.`);
+              return;
+            }
+
+            const marker = Buffer.from(branch).toString('base64url');
+            const { owner, repo } = context.repo;
+
+            if (!isPush && (!pull?.merged || pull?.head?.repo?.full_name !== `${owner}/${repo}`)) {
+              core.info('Pull request was not merged from this repository.');
+              return;
+            }
 
             const issue = await github.rest.issues.get({
               owner,
@@ -55,91 +83,70 @@ jobs:
               issue_number: issueNumber
             });
 
-            const body = issue.data.body ?? "";
-            const lines = body.split("\n");
-
-            function normalize(text) {
-              return text
-                .trim()
-                .replace(/\s+/g, " ");
+            // Issues and pull requests share an endpoint: never edit a PR body.
+            if (issue.data.pull_request) {
+              core.warning(`Number #${issueNumber} refers to a pull request, not an issue.`);
+              return;
             }
 
-            function getTaskText(line) {
-              const match =
-                line.match(/^\s*[-*+]\s+\[[ xX]\]\s+(.*)$/);
+            const lines = (issue.data.body ?? '').split('\n');
+            let changes = 0;
 
-              if (match === null) {
-                return null;
-              }
-
-              return normalize(
-                match[1]
-                  .replace(
-                    /\s*🟡\s*\*\*NIM\*\*\s*<!--\s*issue-task-sync branch=[A-Za-z0-9_-]+\s*-->\s*$/,
-                    ""
-                  )
-              );
-            }
-
-            let changed = false;
-
-            for (const requestedTask of tasks) {
-              const normalizedRequestedTask = normalize(requestedTask);
-
-              const matches = [];
-
-              for (let index = 0; index < lines.length; index++) {
-                const taskText = getTaskText(lines[index]);
-
-                if (taskText === normalizedRequestedTask) {
-                  matches.push(index);
+            if (isPush) {
+              const tasks = new Set();
+              const commits = context.payload.commits ?? [];
+              for (const commit of commits) {
+                const pattern = /^Checks\s+#(\d+):\s*(.+)$/gmi;
+                for (const match of commit.message.matchAll(pattern)) {
+                  if (Number(match[1]) !== issueNumber) {
+                    core.warning(`Ignoring Checks #${match[1]} on branch '${branch}'.`);
+                    continue;
+                  }
+                  tasks.add(normalize(match[2]));
                 }
               }
 
-              if (matches.length === 0) {
-                core.warning(
-                  `Task "${requestedTask}" was not found in issue #961.`
-                );
-                continue;
-              }
-
-              if (matches.length > 1) {
-                core.warning(
-                  `Task "${requestedTask}" occurs multiple times in issue #961. ` +
-                  "No change was made for safety."
-                );
-                continue;
-              }
-
-              const index = matches[0];
-              const line = lines[index];
-
-              if (/^\s*[-*+]\s+\[[xX]\]/.test(line)) {
-                if (line.includes("issue-task-sync")) {
-                  core.info(
-                    `Task "${requestedTask}" is already marked as NIM.`
-                  );
-                } else {
-                  core.info(
-                    `Task "${requestedTask}" is already completed without NIM.`
-                  );
+              for (const task of tasks) {
+                const matches = [];
+                for (let i = 0; i < lines.length; i++) {
+                  if (taskFromLine(lines[i]) === task) {
+                    matches.push(i);
+                  }
                 }
 
-                continue;
+                if (matches.length !== 1) {
+                  core.warning(`Expected exactly one checklist entry for '${task}', found ${matches.length}.`);
+                  continue;
+                }
+
+                const index = matches[0];
+                if (isChecked(lines[index])) {
+                  core.info(`Already checked: '${task}'.`);
+                  continue;
+                }
+
+                lines[index] = lines[index].replace(/\[\s\]/, '[x]') +
+                  ` 🟡 **NIM** <!-- issue-task-sync branch=${marker} -->`;
+                changes++;
+                core.info(`Checked '${task}' in issue #${issueNumber}.`);
               }
-
-              lines[index] =
-                line.replace(/\[\s\]/, "[x]") + nimSuffix;
-
-              changed = true;
-
-              core.info(
-                `Marked "${requestedTask}" as completed on branch "${branch}" with NIM.`
-              );
+            } else {
+              // On merge, remove only NIM tags owned by this exact source branch.
+              for (let i = 0; i < lines.length; i++) {
+                if (!isChecked(lines[i])) {
+                  continue;
+                }
+                const suffix = lines[i].match(nimSuffix);
+                if (suffix !== null && suffix[1] === marker) {
+                  lines[i] = lines[i].replace(nimSuffix, '');
+                  changes++;
+                }
+              }
+              core.info(`Removed ${changes} NIM markers after merging '${branch}'.`);
             }
 
-            if (!changed) {
-              core.info("Issue body does not need to be updated.");
+            if (changes === 0) {
+              core.info('Issue checklist is already up to date.');
               return;
             }
 
@@ -147,7 +154,6 @@ jobs:
               owner,
               repo,
               issue_number: issueNumber,
-              body: lines.join("\n")
+              body: lines.join('\n')
             });
-
-            core.info(`Issue #${issueNumber} successfully updated.`);
+            core.info(`Updated issue #${issueNumber} (${changes} changes).`);
