@@ -3878,13 +3878,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 3
@@ -3896,7 +3889,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -3905,7 +3898,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -3926,7 +3919,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -3965,10 +3958,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4007,7 +4000,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -4016,7 +4009,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -4037,7 +4030,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -4076,10 +4069,10 @@ MonoBehaviour:
       Data: 0.1
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4118,7 +4111,7 @@ MonoBehaviour:
       Data: Directory
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -4127,7 +4120,7 @@ MonoBehaviour:
       Data: 1
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -4148,7 +4141,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -4187,10 +4180,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4232,7 +4225,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 20|SEE.Game.City.MarkerAttributes, SEE
+      Data: 19|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -4298,7 +4291,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 21|SEE.Game.City.LabelAttributes, SEE
+      Data: 20|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -4337,13 +4330,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 22|SEE.Game.City.ColorMap, SEE
+      Data: 21|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 23|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 22|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 2
@@ -4466,20 +4456,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 24|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 23|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 24|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 26|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 25|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 27|SEE.Utils.Paths.DataPath, SEE
+      Data: 26|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -6003,13 +5993,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 17
@@ -6021,7 +6004,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6030,7 +6013,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6051,7 +6034,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6090,10 +6073,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6132,7 +6115,7 @@ MonoBehaviour:
       Data: Class
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6141,7 +6124,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6162,7 +6145,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -6201,10 +6184,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -6249,7 +6232,7 @@ MonoBehaviour:
       Data: Method
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -6258,7 +6241,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6279,7 +6262,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6318,10 +6301,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6360,7 +6343,7 @@ MonoBehaviour:
       Data: Member
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -6369,7 +6352,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6390,7 +6373,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6429,10 +6412,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6471,7 +6454,7 @@ MonoBehaviour:
       Data: Namespace
     - Name: $v
       Entry: 7
-      Data: 25|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 24|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6480,7 +6463,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6501,7 +6484,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 27|SEE.Game.City.ColorProperty, SEE
+      Data: 26|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6540,10 +6523,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 28|SEE.Game.City.AntennaAttributes, SEE
+      Data: 27|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 28|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6582,7 +6565,7 @@ MonoBehaviour:
       Data: UNKNOWNTYPE
     - Name: $v
       Entry: 7
-      Data: 30|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 29|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6591,7 +6574,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 31|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 30|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6612,7 +6595,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 32|SEE.Game.City.ColorProperty, SEE
+      Data: 31|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6651,10 +6634,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 33|SEE.Game.City.AntennaAttributes, SEE
+      Data: 32|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 33|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6693,7 +6676,7 @@ MonoBehaviour:
       Data: Interface
     - Name: $v
       Entry: 7
-      Data: 35|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 34|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6702,7 +6685,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 35|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6723,7 +6706,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 37|SEE.Game.City.ColorProperty, SEE
+      Data: 36|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6762,10 +6745,10 @@ MonoBehaviour:
       Data: 0.2
     - Name: AntennaSettings
       Entry: 7
-      Data: 38|SEE.Game.City.AntennaAttributes, SEE
+      Data: 37|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 39|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 38|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
@@ -6807,7 +6790,7 @@ MonoBehaviour:
       Data: Module
     - Name: $v
       Entry: 7
-      Data: 40|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 39|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -6816,7 +6799,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 40|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6837,7 +6820,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 42|SEE.Game.City.ColorProperty, SEE
+      Data: 41|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6876,10 +6859,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 43|SEE.Game.City.AntennaAttributes, SEE
+      Data: 42|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 44|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 43|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6918,7 +6901,7 @@ MonoBehaviour:
       Data: Routine
     - Name: $v
       Entry: 7
-      Data: 45|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 44|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -6927,7 +6910,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 46|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 45|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -6948,7 +6931,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 47|SEE.Game.City.ColorProperty, SEE
+      Data: 46|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -6987,10 +6970,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 48|SEE.Game.City.AntennaAttributes, SEE
+      Data: 47|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 49|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 48|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7029,7 +7012,7 @@ MonoBehaviour:
       Data: Constant
     - Name: $v
       Entry: 7
-      Data: 50|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 49|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -7038,7 +7021,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 51|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 50|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7059,7 +7042,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 52|SEE.Game.City.ColorProperty, SEE
+      Data: 51|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7098,10 +7081,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 53|SEE.Game.City.AntennaAttributes, SEE
+      Data: 52|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 54|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 53|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7140,7 +7123,7 @@ MonoBehaviour:
       Data: Type
     - Name: $v
       Entry: 7
-      Data: 55|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 54|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -7149,7 +7132,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 56|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 55|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7170,7 +7153,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 57|SEE.Game.City.ColorProperty, SEE
+      Data: 56|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7209,10 +7192,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 58|SEE.Game.City.AntennaAttributes, SEE
+      Data: 57|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 59|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 58|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7251,7 +7234,7 @@ MonoBehaviour:
       Data: Method_Template
     - Name: $v
       Entry: 7
-      Data: 60|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 59|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -7260,7 +7243,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 61|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 60|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7281,7 +7264,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 62|SEE.Game.City.ColorProperty, SEE
+      Data: 61|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7320,10 +7303,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 63|SEE.Game.City.AntennaAttributes, SEE
+      Data: 62|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 64|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 63|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7362,7 +7345,7 @@ MonoBehaviour:
       Data: Class_Template
     - Name: $v
       Entry: 7
-      Data: 65|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 64|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -7371,7 +7354,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 66|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 65|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7392,7 +7375,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 67|SEE.Game.City.ColorProperty, SEE
+      Data: 66|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -7431,10 +7414,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 68|SEE.Game.City.AntennaAttributes, SEE
+      Data: 67|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 69|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 68|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -7479,7 +7462,7 @@ MonoBehaviour:
       Data: Interface_Template
     - Name: $v
       Entry: 7
-      Data: 70|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 69|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -7488,7 +7471,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 71|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 70|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7509,7 +7492,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 72|SEE.Game.City.ColorProperty, SEE
+      Data: 71|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7548,10 +7531,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 73|SEE.Game.City.AntennaAttributes, SEE
+      Data: 72|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 73|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
@@ -7593,7 +7576,7 @@ MonoBehaviour:
       Data: Cluster
     - Name: $v
       Entry: 7
-      Data: 75|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 74|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -7602,7 +7585,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 76|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 75|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7623,7 +7606,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 77|SEE.Game.City.ColorProperty, SEE
+      Data: 76|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7662,10 +7645,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 78|SEE.Game.City.AntennaAttributes, SEE
+      Data: 77|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 79|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 78|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7704,7 +7687,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 80|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 79|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -7713,7 +7696,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 81|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 80|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7734,7 +7717,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 82|SEE.Game.City.ColorProperty, SEE
+      Data: 81|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7773,10 +7756,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 83|SEE.Game.City.AntennaAttributes, SEE
+      Data: 82|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 84|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 83|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7815,7 +7798,7 @@ MonoBehaviour:
       Data: Package
     - Name: $v
       Entry: 7
-      Data: 85|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 84|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -7824,7 +7807,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 86|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 85|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -7845,7 +7828,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 87|SEE.Game.City.ColorProperty, SEE
+      Data: 86|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -7884,10 +7867,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 88|SEE.Game.City.AntennaAttributes, SEE
+      Data: 87|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 89|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 88|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7929,7 +7912,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 90|SEE.Game.City.MarkerAttributes, SEE
+      Data: 89|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -7995,7 +7978,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 91|SEE.Game.City.LabelAttributes, SEE
+      Data: 90|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -8034,13 +8017,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 92|SEE.Game.City.ColorMap, SEE
+      Data: 91|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 93|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 92|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 7
@@ -8433,20 +8413,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 94|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 93|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 95|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 94|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 96|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 95|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 97|SEE.Utils.Paths.DataPath, SEE
+      Data: 96|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -8927,13 +8907,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 4
@@ -8945,7 +8918,7 @@ MonoBehaviour:
       Data: UNKNOWNTYPE
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -8954,7 +8927,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -8975,7 +8948,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -9014,10 +8987,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -9056,7 +9029,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -9065,7 +9038,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -9086,7 +9059,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -9125,10 +9098,10 @@ MonoBehaviour:
       Data: 0.2
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -9167,7 +9140,7 @@ MonoBehaviour:
       Data: Directory
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -9176,7 +9149,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -9197,7 +9170,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -9236,10 +9209,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -9278,7 +9251,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -9287,7 +9260,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -9308,7 +9281,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -9347,10 +9320,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -9392,7 +9365,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 25|SEE.Game.City.MarkerAttributes, SEE
+      Data: 24|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -9458,7 +9431,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.City.LabelAttributes, SEE
+      Data: 25|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -9497,13 +9470,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 27|SEE.Game.City.ColorMap, SEE
+      Data: 26|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 28|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 27|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 2
@@ -9626,20 +9596,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 29|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
+      Data: 28|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 30|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
+      Data: 29|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 31|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
+      Data: 30|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
     - Name: GXLDirectory
       Entry: 7
-      Data: 32|SEE.Utils.Paths.DataPath, SEE
+      Data: 31|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -13688,13 +13658,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 4
@@ -13706,7 +13669,7 @@ MonoBehaviour:
       Data: Repository
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -13715,7 +13678,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -13736,7 +13699,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -13775,10 +13738,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -13817,7 +13780,7 @@ MonoBehaviour:
       Data: Directory
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -13826,7 +13789,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -13847,7 +13810,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -13886,10 +13849,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -13928,7 +13891,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -13937,7 +13900,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -13958,7 +13921,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -13997,10 +13960,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -14048,7 +14011,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -14057,7 +14020,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -14078,7 +14041,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -14117,10 +14080,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -14162,7 +14125,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 25|SEE.Game.City.MarkerAttributes, SEE
+      Data: 24|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -14228,7 +14191,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.City.LabelAttributes, SEE
+      Data: 25|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -14267,13 +14230,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 27|SEE.Game.City.ColorMap, SEE
+      Data: 26|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 28|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 27|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 5
@@ -14558,23 +14518,23 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 29|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 28|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 30|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 29|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 31|SEE.GraphProviders.GitBranchesGraphProvider, SEE
+      Data: 30|SEE.GraphProviders.GitBranchesGraphProvider, SEE
     - Name: GitRepository
       Entry: 7
-      Data: 32|SEE.VCS.GitRepository, SEE
+      Data: 31|SEE.VCS.GitRepository, SEE
     - Name: RepositoryPath
       Entry: 7
-      Data: 33|SEE.Utils.Paths.DataPath, SEE
+      Data: 32|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 1
@@ -14589,13 +14549,10 @@ MonoBehaviour:
       Data: 
     - Name: VCSFilter
       Entry: 7
-      Data: 34|SEE.VCS.Filter, SEE
+      Data: 33|SEE.VCS.Filter, SEE
     - Name: Globbing
       Entry: 7
-      Data: 35|SEE.Utils.Globbing, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 34|SEE.Utils.Globbing, SEE
     - Name: 
       Entry: 12
       Data: 1
@@ -14619,7 +14576,7 @@ MonoBehaviour:
       Data: 
     - Name: RepositoryPaths
       Entry: 7
-      Data: 36|System.String[], mscorlib
+      Data: 35|System.String[], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -14637,7 +14594,7 @@ MonoBehaviour:
       Data: 
     - Name: Branches
       Entry: 7
-      Data: 37|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 36|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 1
@@ -17005,13 +16962,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 10
@@ -17023,7 +16973,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -17032,7 +16982,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17053,7 +17003,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17092,10 +17042,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17134,7 +17084,7 @@ MonoBehaviour:
       Data: Package
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -17143,7 +17093,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17164,7 +17114,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17203,10 +17153,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17245,7 +17195,7 @@ MonoBehaviour:
       Data: Class
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -17254,7 +17204,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17275,7 +17225,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17314,10 +17264,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17356,7 +17306,7 @@ MonoBehaviour:
       Data: Member
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -17365,7 +17315,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17386,7 +17336,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17425,10 +17375,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17467,7 +17417,7 @@ MonoBehaviour:
       Data: Method
     - Name: $v
       Entry: 7
-      Data: 25|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 24|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -17476,7 +17426,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17497,7 +17447,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 27|SEE.Game.City.ColorProperty, SEE
+      Data: 26|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -17536,10 +17486,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 28|SEE.Game.City.AntennaAttributes, SEE
+      Data: 27|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 28|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17578,7 +17528,7 @@ MonoBehaviour:
       Data: Method_Template
     - Name: $v
       Entry: 7
-      Data: 30|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 29|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -17587,7 +17537,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 31|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 30|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17608,7 +17558,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 32|SEE.Game.City.ColorProperty, SEE
+      Data: 31|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -17647,10 +17597,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 33|SEE.Game.City.AntennaAttributes, SEE
+      Data: 32|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 33|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17689,7 +17639,7 @@ MonoBehaviour:
       Data: Type
     - Name: $v
       Entry: 7
-      Data: 35|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 34|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -17698,7 +17648,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 35|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17719,7 +17669,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 37|SEE.Game.City.ColorProperty, SEE
+      Data: 36|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17758,10 +17708,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 38|SEE.Game.City.AntennaAttributes, SEE
+      Data: 37|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 39|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 38|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17800,7 +17750,7 @@ MonoBehaviour:
       Data: Interface
     - Name: $v
       Entry: 7
-      Data: 40|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 39|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -17809,7 +17759,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 40|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17830,7 +17780,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 42|SEE.Game.City.ColorProperty, SEE
+      Data: 41|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17869,10 +17819,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 43|SEE.Game.City.AntennaAttributes, SEE
+      Data: 42|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 44|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 43|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17911,7 +17861,7 @@ MonoBehaviour:
       Data: Constant
     - Name: $v
       Entry: 7
-      Data: 45|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 44|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -17920,7 +17870,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 46|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 45|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -17941,7 +17891,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 47|SEE.Game.City.ColorProperty, SEE
+      Data: 46|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -17980,10 +17930,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 48|SEE.Game.City.AntennaAttributes, SEE
+      Data: 47|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 49|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 48|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -18022,7 +17972,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 50|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 49|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -18031,7 +17981,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 51|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 50|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -18052,7 +18002,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 52|SEE.Game.City.ColorProperty, SEE
+      Data: 51|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -18091,10 +18041,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 53|SEE.Game.City.AntennaAttributes, SEE
+      Data: 52|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 54|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 53|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -18136,7 +18086,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 55|SEE.Game.City.MarkerAttributes, SEE
+      Data: 54|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -18202,7 +18152,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 56|SEE.Game.City.LabelAttributes, SEE
+      Data: 55|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -18241,13 +18191,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 57|SEE.Game.City.ColorMap, SEE
+      Data: 56|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 58|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 57|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 1
@@ -18316,20 +18263,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 59|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 58|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 60|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 59|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 61|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 60|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 62|SEE.Utils.Paths.DataPath, SEE
+      Data: 61|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -18347,23 +18294,23 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 63|SEE.GraphProviders.MergeDiffGraphProvider, SEE
+      Data: 62|SEE.GraphProviders.MergeDiffGraphProvider, SEE
     - Name: OldGraph
       Entry: 7
-      Data: 64|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 63|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 65|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 64|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 66|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 65|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 67|SEE.Utils.Paths.DataPath, SEE
+      Data: 66|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -18393,10 +18340,10 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 68|SEE.GraphProviders.ReportGraphProvider, SEE
+      Data: 67|SEE.GraphProviders.ReportGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 69|SEE.Utils.Paths.DataPath, SEE
+      Data: 68|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -18410,25 +18357,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: ParsingConfig
-      Entry: 7
-      Data: 70|SEE.DataModel.DG.IO.ReportImports.JaCoCoParsingConfig, SEE
-    - Name: ToolId
-      Entry: 1
-      Data: JaCoCo
-    - Name: SourceRootMarker
-      Entry: 1
-      Data: 
-    - Name: XPathMapping
-      Entry: 7
-      Data: 71|SEE.DataModel.DG.IO.ReportImports.XPathMapping, SEE
-    - Name: MetricLocation
       Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -19213,6 +19142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 3805298196
   InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -24785,13 +24715,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 4
@@ -24803,7 +24726,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -24812,7 +24735,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -24833,7 +24756,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -24872,10 +24795,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -24914,7 +24837,7 @@ MonoBehaviour:
       Data: Directory
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -24923,7 +24846,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -24944,7 +24867,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -24983,10 +24906,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -25025,7 +24948,7 @@ MonoBehaviour:
       Data: Repository
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -25034,7 +24957,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -25055,7 +24978,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -25094,10 +25017,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -25136,7 +25059,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -25145,7 +25068,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -25166,7 +25089,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -25205,10 +25128,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -25250,7 +25173,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 25|SEE.Game.City.MarkerAttributes, SEE
+      Data: 24|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -25316,7 +25239,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 26|SEE.Game.City.LabelAttributes, SEE
+      Data: 25|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -25355,13 +25278,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 27|SEE.Game.City.ColorMap, SEE
+      Data: 26|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 28|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 27|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 1
@@ -25430,23 +25350,23 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 29|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 28|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 30|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 29|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 31|SEE.GraphProviders.BetweenCommitsGraphProvider, SEE
+      Data: 30|SEE.GraphProviders.BetweenCommitsGraphProvider, SEE
     - Name: GitRepository
       Entry: 7
-      Data: 32|SEE.VCS.GitRepository, SEE
+      Data: 31|SEE.VCS.GitRepository, SEE
     - Name: RepositoryPath
       Entry: 7
-      Data: 33|SEE.Utils.Paths.DataPath, SEE
+      Data: 32|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 1
@@ -25461,13 +25381,10 @@ MonoBehaviour:
       Data: 
     - Name: VCSFilter
       Entry: 7
-      Data: 34|SEE.VCS.Filter, SEE
+      Data: 33|SEE.VCS.Filter, SEE
     - Name: Globbing
       Entry: 7
-      Data: 35|SEE.Utils.Globbing, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 34|SEE.Utils.Globbing, SEE
     - Name: 
       Entry: 12
       Data: 1
@@ -25491,7 +25408,7 @@ MonoBehaviour:
       Data: 
     - Name: RepositoryPaths
       Entry: 7
-      Data: 36|System.String[], mscorlib
+      Data: 35|System.String[], mscorlib
     - Name: 
       Entry: 12
       Data: 1
@@ -25506,7 +25423,7 @@ MonoBehaviour:
       Data: 
     - Name: Branches
       Entry: 7
-      Data: 37|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 36|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 1
@@ -28259,13 +28176,6 @@ MonoBehaviour:
     - Name: map
       Entry: 7
       Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 13
@@ -28277,7 +28187,7 @@ MonoBehaviour:
       Data: Cluster
     - Name: $v
       Entry: 7
-      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28286,7 +28196,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28307,7 +28217,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 7|SEE.Game.City.ColorProperty, SEE
+      Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -28346,10 +28256,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28388,7 +28298,7 @@ MonoBehaviour:
       Data: File
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28397,7 +28307,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28418,7 +28328,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
+      Data: 11|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -28457,10 +28367,10 @@ MonoBehaviour:
       Data: 0.2
     - Name: AntennaSettings
       Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+      Data: 12|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28499,7 +28409,7 @@ MonoBehaviour:
       Data: Module
     - Name: $v
       Entry: 7
-      Data: 15|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28508,7 +28418,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28529,7 +28439,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 16|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -28568,10 +28478,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 17|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28610,7 +28520,7 @@ MonoBehaviour:
       Data: UNKNOWNTYPE
     - Name: $v
       Entry: 7
-      Data: 20|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28619,7 +28529,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28640,7 +28550,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 22|SEE.Game.City.ColorProperty, SEE
+      Data: 21|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -28679,10 +28589,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 23|SEE.Game.City.AntennaAttributes, SEE
+      Data: 22|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28721,7 +28631,7 @@ MonoBehaviour:
       Data: Routine
     - Name: $v
       Entry: 7
-      Data: 25|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 24|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -28730,7 +28640,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28751,7 +28661,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 27|SEE.Game.City.ColorProperty, SEE
+      Data: 26|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -28790,10 +28700,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 28|SEE.Game.City.AntennaAttributes, SEE
+      Data: 27|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 28|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28832,7 +28742,7 @@ MonoBehaviour:
       Data: Variable
     - Name: $v
       Entry: 7
-      Data: 30|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 29|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28841,7 +28751,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 31|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 30|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28862,7 +28772,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 32|SEE.Game.City.ColorProperty, SEE
+      Data: 31|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -28901,10 +28811,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 33|SEE.Game.City.AntennaAttributes, SEE
+      Data: 32|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 33|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -28943,7 +28853,7 @@ MonoBehaviour:
       Data: Member
     - Name: $v
       Entry: 7
-      Data: 35|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 34|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -28952,7 +28862,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 35|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -28973,7 +28883,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 37|SEE.Game.City.ColorProperty, SEE
+      Data: 36|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29012,10 +28922,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 38|SEE.Game.City.AntennaAttributes, SEE
+      Data: 37|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 39|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 38|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29054,7 +28964,7 @@ MonoBehaviour:
       Data: Class
     - Name: $v
       Entry: 7
-      Data: 40|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 39|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -29063,7 +28973,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 40|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29084,7 +28994,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 42|SEE.Game.City.ColorProperty, SEE
+      Data: 41|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29123,10 +29033,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 43|SEE.Game.City.AntennaAttributes, SEE
+      Data: 42|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 44|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 43|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29165,7 +29075,7 @@ MonoBehaviour:
       Data: Type
     - Name: $v
       Entry: 7
-      Data: 45|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 44|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: false
@@ -29174,7 +29084,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 46|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 45|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29195,7 +29105,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 47|SEE.Game.City.ColorProperty, SEE
+      Data: 46|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29234,10 +29144,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 48|SEE.Game.City.AntennaAttributes, SEE
+      Data: 47|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 49|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 48|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29276,7 +29186,7 @@ MonoBehaviour:
       Data: Constant
     - Name: $v
       Entry: 7
-      Data: 50|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 49|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -29285,7 +29195,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 51|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 50|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29306,7 +29216,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 52|SEE.Game.City.ColorProperty, SEE
+      Data: 51|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29345,10 +29255,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 53|SEE.Game.City.AntennaAttributes, SEE
+      Data: 52|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 54|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 53|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29387,7 +29297,7 @@ MonoBehaviour:
       Data: ROOT
     - Name: $v
       Entry: 7
-      Data: 55|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 54|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -29396,7 +29306,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 56|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 55|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29417,7 +29327,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 57|SEE.Game.City.ColorProperty, SEE
+      Data: 56|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29456,10 +29366,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 58|SEE.Game.City.AntennaAttributes, SEE
+      Data: 57|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 59|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 58|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29498,7 +29408,7 @@ MonoBehaviour:
       Data: ARCHITECTURE
     - Name: $v
       Entry: 7
-      Data: 60|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 59|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -29507,7 +29417,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 61|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 60|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29528,7 +29438,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 62|SEE.Game.City.ColorProperty, SEE
+      Data: 61|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29567,10 +29477,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 63|SEE.Game.City.AntennaAttributes, SEE
+      Data: 62|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 64|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 63|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29609,7 +29519,7 @@ MonoBehaviour:
       Data: IMPLEMENTATION
     - Name: $v
       Entry: 7
-      Data: 65|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 64|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -29618,7 +29528,7 @@ MonoBehaviour:
       Data: 0
     - Name: MetricToLength
       Entry: 7
-      Data: 66|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 65|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -29639,7 +29549,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 67|SEE.Game.City.ColorProperty, SEE
+      Data: 66|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -29678,10 +29588,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 68|SEE.Game.City.AntennaAttributes, SEE
+      Data: 67|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 69|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+      Data: 68|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -29723,7 +29633,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 70|SEE.Game.City.MarkerAttributes, SEE
+      Data: 69|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -29789,7 +29699,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 71|SEE.Game.City.LabelAttributes, SEE
+      Data: 70|SEE.Game.City.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -29828,13 +29738,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 72|SEE.Game.City.ColorMap, SEE
+      Data: 71|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 73|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
+      Data: 72|SEE.Game.City.ColorRangeMapping, SEE
     - Name: 
       Entry: 12
       Data: 2
@@ -29957,20 +29864,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 74|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 75|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 76|SEE.GraphProviders.ReflexionGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 77|SEE.Utils.Paths.DataPath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -29985,7 +29892,7 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 78|SEE.Utils.Paths.DataPath, SEE
+      Data: 77|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -30000,7 +29907,7 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 79|SEE.Utils.Paths.DataPath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
