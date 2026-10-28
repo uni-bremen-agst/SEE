@@ -73,7 +73,7 @@ No routing, worker pool/daemon or ALC. The expanded gate builds the adversarial 
 fixture and -RunMainBoundaryTests executes Main E2E/parity/identity/lifecycle tests.
 Local tests use BuildProjectReferences=false to preserve Core WIP; on a clean CI
 checkout, additionally use -BuildTestProjectReferences. CI enables both switches.
-See `Evaluation/P5O2B3-historical-worker-host.md` for the runtime proof and limits.
+See the external [runtime proof and limits](https://github.com/Cyclone1337/XMLDocNormalizer-Evaluation/blob/main/historical/P5O2B3-historical-worker-host.md).
 
 The older B1/B1A/B1A2 Evaluation compile probes are retained historical evidence;
 their compile-regression role is superseded by this permanent target. No probe

@@ -235,11 +235,11 @@ try {
     $invalidVersion = Invoke-Worker 'worker-invalid-version' $w.Properties.TargetPath '{"protocolVersion":99,"operation":"identity"}'
     Require ($invalidVersion.ExitCode -eq 1 -and -not $invalidVersion.Response.Success -and $invalidVersion.Response.Failure.Code -eq 'unsupportedProtocolVersion') 'Worker failed-open protocol version.'
     # One existing gate/CI owner; this fixture is only an adversarial pipe peer, never another Analyzer.
-    Invoke-DotNet 'boundary-test-process-build' @('build', (Join-Path $repoRoot 'Evaluation/P5O2B4Proof/TestProcess/BoundaryTestProcess.csproj'), "-p:Configuration=$Configuration", '-warnaserror')
+    Invoke-DotNet 'boundary-test-process-build' @('build', (Join-Path $repoRoot 'Tests/Fixtures/BoundaryTestProcess/BoundaryTestProcess.csproj'), "-p:Configuration=$Configuration", '-warnaserror')
     $mainBoundaryExecuted = $false
     if ($RunMainBoundaryTests) {
         # Test fixture emits a real PDB with the loaded Historical compiler, not the SDK that built the Analyzer DLL.
-        $pdbFixture = Join-Path $repoRoot 'Evaluation/P5O2B7Proof/HistoricalPdbFixture/HistoricalPdbFixture.csproj'
+        $pdbFixture = Join-Path $repoRoot 'Tests/Fixtures/HistoricalPdbFixture/HistoricalPdbFixture.csproj'
         Invoke-DotNet 'projection-pdb-fixture-restore' @('restore', $pdbFixture, '--configfile', (Join-Path $repoRoot 'src/XMLDocNormalizer.ExceptionFlow.Historical/NuGet.Config'))
         Invoke-DotNet 'projection-pdb-fixture-build' @('build', $pdbFixture, '--no-restore', "-p:Configuration=$Configuration", '-warnaserror', '-p:BuildProjectReferences=false')
         $pdbFixtureDll = Join-Path $repoRoot "artifacts/exception-flow-historical/HistoricalPdbFixture/bin/$Configuration/net8.0/HistoricalPdbFixture.dll"

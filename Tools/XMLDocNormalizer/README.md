@@ -500,11 +500,9 @@ test run and is started explicitly as documented in the test README.
 ## Opt-in real-world evaluation
 
 The pinned, opt-in E1 harness and its explicit package preparation and Source Link run
-commands are documented in:
-
-```text
-Evaluation/README.md
-```
+commands are maintained in the separate
+[XMLDocNormalizer-Evaluation repository](https://github.com/Cyclone1337/XMLDocNormalizer-Evaluation).
+The harness and its evaluation-specific tests live there; normal product tests remain in SEE.
 
 Generated inputs and reports remain below the ignored `artifacts/real-world-evaluation`
 workspace and are not part of the normal CLI or test execution.
@@ -519,5 +517,5 @@ embedded symbols, known local paths, safe sibling/root probes, and configured
 `.nupkg`/`.snupkg` archives. Every candidate must pass the unchanged P4B exact
 identity and checksum validation. Explicit PDB paths remain authoritative, and
 the local G2 pipeline performs no network access, restore, build, global scan,
-or persistent caching. See `Evaluation/G2-portable-pdb-acquisition.md` for the
+or persistent caching. See the external [G2 evaluation report](https://github.com/Cyclone1337/XMLDocNormalizer-Evaluation/blob/main/historical/G2-portable-pdb-acquisition.md) for the
 artifact analysis and security boundary.

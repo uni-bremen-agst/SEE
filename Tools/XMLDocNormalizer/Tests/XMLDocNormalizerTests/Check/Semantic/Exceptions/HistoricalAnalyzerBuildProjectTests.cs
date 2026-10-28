@@ -14,7 +14,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         {
             string root = FindRoot();
             string manifestPath = Path.Combine(root, "build", "ExceptionFlow.HistoricalSources.props");
-            string probePath = Path.Combine(root, "Evaluation", "P5O2B1CompileProbe", "HistoricalSources.props");
+            string probePath = Path.Combine(root, "Tests", "Fixtures", "HistoricalSourceBaseline", "HistoricalSources.props");
             string[] shared = ReadSources(manifestPath);
             string[] original = ReadSources(probePath);
 
@@ -91,7 +91,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                 "src/XMLDocNormalizer/XMLDocNormalizer.csproj",
                 "src/XMLDocNormalizer.ExceptionFlow.Core/XMLDocNormalizer.ExceptionFlow.Core.csproj",
                 "Tests/XMLDocNormalizerTests/XMLDocNormalizerTests.csproj",
-                "Evaluation/XMLDocNormalizer.Evaluation/XMLDocNormalizer.Evaluation.csproj"
+                "Tests/Fixtures/BoundaryTestProcess/BoundaryTestProcess.csproj"
             ];
             Assert.All(normalProjects, path => Assert.DoesNotContain("ExceptionFlow.Historical",
                 File.ReadAllText(Path.Combine(root, path))));

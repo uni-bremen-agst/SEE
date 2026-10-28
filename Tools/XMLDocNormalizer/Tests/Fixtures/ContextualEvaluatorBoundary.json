@@ -1,0 +1,195 @@
+{
+    "Scc":  {
+                "Members":  [
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AddExplicitArgumentFacts(Microsoft.CodeAnalysis.IMethodSymbol, Microsoft.CodeAnalysis.SeparatedSyntaxList\u003cMicrosoft.CodeAnalysis.CSharp.Syntax.ArgumentSyntax\u003e, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.Dictionary\u003cint, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts\u003e, System.Collections.Generic.HashSet\u003cint\u003e, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e?)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreAllConditionalWeakTableFieldValuesDefinitelyNonNull(Microsoft.CodeAnalysis.IFieldSymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreAllReturnValuesDefinitelyNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.BlockSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreDictionaryValuesProvenNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreSequenceElementsProvenDefinedEnumValues(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreSequenceElementsProvenNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.AreSequenceElementsProvenNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.CreateCallContext(Microsoft.CodeAnalysis.IMethodSymbol, Microsoft.CodeAnalysis.SeparatedSyntaxList\u003cMicrosoft.CodeAnalysis.CSharp.Syntax.ArgumentSyntax\u003e, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesDictionaryTryGetValueAliasPreserveNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.DoesSourceDictionaryParameterPreserveNonNullValues(Microsoft.CodeAnalysis.IParameterSymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetDefinedEnumValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetExpressionValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetExpressionValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetFactsProvenByCurrentLocalStablePropertyInitializer(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetGetOnlyPropertyValueFacts(Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetImmutableMemberValueFacts(Microsoft.CodeAnalysis.ISymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetInstanceReadonlyFieldValueFacts(Microsoft.CodeAnalysis.IFieldSymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetKnownFrameworkInvocationValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetSourceReturnExpressionValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetStaticReadonlyFieldValueFacts(Microsoft.CodeAnalysis.IFieldSymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.GetStringConcatenationValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.BinaryExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsCallbackReturnDefinitelyNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsConditionalWeakTableGetValueResultDefinitelyNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDefinitelyNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryInsertionValueProvenNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryMemberInvocationSafeForNonNullValues(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryOfSequencesProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryReferenceSafeForNonNullValues(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequenceAliasReferenceSafe(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequencePropertyInvariantPreserved(Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySequencePropertyReferenceSafe(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionarySourceHelperArgumentSafeForNonNullValues(Microsoft.CodeAnalysis.CSharp.Syntax.ArgumentSyntax, Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryTryGetValueOutSequenceProvenNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsDictionaryValuesExpressionProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsForeachGroupingLocalProvenToExcludeNullElements(Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsForeachIterationVariableProvenDefinedEnumValue(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsForeachIterationVariableProvenNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsForeachLocalProvenNonNull(Microsoft.CodeAnalysis.SyntaxNode, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsGroupingSequenceProvenToContainNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsInvocationResultDefinitelyNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAddOfDefinedEnumValue(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAddRangeReferenceSafeForNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsListAliasMemberInvocationSafe(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalDictionaryProvenToExcludeNullValues(Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalGuaranteedNonNull(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListProvenToContainOnlyDefinedEnumValues(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListReferenceSafeForNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalListWithRangeAddsProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsLocalSequenceExpressionProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.ILocalSymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsPrivateDictionaryFieldReferenceSafeForNonNullValues(Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsPrivateReadonlyDictionaryFieldProvenToExcludeNullValues(Microsoft.CodeAnalysis.IFieldSymbol, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsRangeSourceProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsRangeSourceProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToContainOnlyDefinedEnumValues(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsSequenceExpressionProvenToExcludeNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.IsStoredSequenceExpressionProvenNonNullElements(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetGetOnlyPropertyInitializerFacts(Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetInstanceFieldInitializerFacts(Microsoft.CodeAnalysis.CSharp.Syntax.VariableDeclaratorSyntax, Microsoft.CodeAnalysis.SemanticModel, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetPropertyAssignmentFacts(Microsoft.CodeAnalysis.CSharp.Syntax.InitializerExpressionSyntax, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetSourceInvocationReturnValueFacts(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetStablePropertyDeclarationInitializerFacts(Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryGetStablePropertyFactsFromLocalObjectSource(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax, Microsoft.CodeAnalysis.IPropertySymbol, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e, out bool, out XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowValueFacts)"
+                                },
+                                {
+                                    "Id":  "XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowAnalyzer.TryProveSourceInvocationDefinedEnumElements(Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax, Microsoft.CodeAnalysis.SemanticModel, XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowCallContext, System.Collections.Generic.HashSet\u003cMicrosoft.CodeAnalysis.ISymbol\u003e)"
+                                }
+                            ]
+            }
+}

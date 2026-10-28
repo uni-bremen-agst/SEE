@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         public void AuditedScc_HasExactlyTheNewOwnerAndFourInternalEntries()
         {
             using JsonDocument audit = JsonDocument.Parse(File.ReadAllText(Path.Combine(
-                GetRoot(), "Evaluation", "P5O2A5A-contextual-evaluator-boundary-audit.json")));
+                GetRoot(), "Tests", "Fixtures", "ContextualEvaluatorBoundary.json")));
             string[] expected = audit.RootElement.GetProperty("Scc").GetProperty("Members")
                 .EnumerateArray().Select(member => member.GetProperty("Id").GetString()!
                     .Replace("ExceptionFlowAnalyzer", "ExceptionFlowContextualFactEvaluator", StringComparison.Ordinal)
