@@ -7,13 +7,26 @@ name: Issue task sync
   pull_request:
     types: [closed]
     branches: [master]
+  # Manual fallback, for example when the initial PR introducing this workflow
+  # was merged before GitHub could run its pull_request.closed handler.
+  workflow_dispatch:
+    inputs:
+      pull_request_number:
+        description: 'Number of the already merged pull request'
+        required: true
+        type: number
 
 permissions:
   issues: write
+  pull-requests: read
 
+# Serialize all issue body updates, including pushes to different branches and
+# PR merges. queue: max is necessary: cancel-in-progress: false alone still
+# replaces older pending runs in the same concurrency group.
 concurrency:
-  group: issue-task-sync-${{ github.event_name }}-${{ github.ref }}
+  group: issue-task-sync-global
   cancel-in-progress: false
+  queue: max
 
 jobs:
   sync:
@@ -21,7 +34,8 @@ jobs:
       (github.event_name == 'push' && github.ref != 'refs/heads/master') ||
       (github.event_name == 'pull_request' &&
        github.event.pull_request.merged == true &&
-       github.event.pull_request.head.repo.full_name == github.repository)
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Synchronize issue checklist
@@ -29,10 +43,14 @@ jobs:
         with:
           script: |
             // Supported branch names: refactor/961-description, fix/1022-description, ...
-            // A Checks #N directive can update issue N only when N is in the branch name.
+            // Directives must reference the issue encoded in the branch name.
             function issueFromBranch(branch) {
               const match = branch.match(/^[a-z][a-z0-9_-]*\/([1-9]\d*)(?:[-/]|$)/i);
-              return match === null ? null : Number(match[1]);
+              if (match === null) {
+                return null;
+              }
+              const issue = Number(match[1]);
+              return Number.isSafeInteger(issue) ? issue : null;
             }
 
             function normalize(value) {
@@ -43,9 +61,7 @@ jobs:
 
             function taskFromLine(line) {
               const match = line.match(/^\s*[-*+]\s+\[[ xX]\]\s+(.*)$/);
-              return match === null
-                ? null
-                : normalize(match[1].replace(nimSuffix, ''));
+              return match === null ? null : normalize(match[1].replace(nimSuffix, ''));
             }
 
             function isChecked(line) {
@@ -53,13 +69,34 @@ jobs:
             }
 
             const isPush = context.eventName === 'push';
-            const pull = context.payload.pull_request;
+            const isManual = context.eventName === 'workflow_dispatch';
+            let pull = context.payload.pull_request;
+            if (isManual) {
+              const input = Number(context.payload.inputs?.pull_request_number);
+              if (!Number.isSafeInteger(input) || input < 1) {
+                core.warning('A valid pull request number is required.');
+                return;
+              }
+              pull = (await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: input
+              })).data;
+            }
+
             const branch = isPush
               ? context.ref.replace(/^refs\/heads\//, '')
               : pull?.head?.ref;
 
             if (!branch || (isPush && context.payload.deleted)) {
-              core.info('No active branch to synchronize.');
+              core.info('No active source branch to synchronize.');
+              return;
+            }
+
+            if (!isPush &&
+                (!pull?.merged || pull?.head?.repo?.full_name !== context.repo.owner + '/' + context.repo.repo ||
+                 pull?.base?.ref !== 'master')) {
+              core.info('Pull request is not a merged same-repository PR targeting master.');
               return;
             }
 
@@ -69,23 +106,22 @@ jobs:
               return;
             }
 
-            const marker = Buffer.from(branch).toString('base64url');
             const { owner, repo } = context.repo;
-
-            if (!isPush && (!pull?.merged || pull?.head?.repo?.full_name !== `${owner}/${repo}`)) {
-              core.info('Pull request was not merged from this repository.');
-              return;
+            const marker = Buffer.from(branch).toString('base64url');
+            let issue;
+            try {
+              issue = await github.rest.issues.get({ owner, repo, issue_number: issueNumber });
+            } catch (error) {
+              if (error.status === 404) {
+                core.warning(`Issue #${issueNumber} does not exist or is inaccessible.`);
+                return;
+              }
+              throw error;
             }
 
-            const issue = await github.rest.issues.get({
-              owner,
-              repo,
-              issue_number: issueNumber
-            });
-
-            // Issues and pull requests share an endpoint: never edit a PR body.
+            // Issues and pull requests share the issue endpoint.
             if (issue.data.pull_request) {
-              core.warning(`Number #${issueNumber} refers to a pull request, not an issue.`);
+              core.warning(`#${issueNumber} refers to a PR, not an issue.`);
               return;
             }
 
@@ -94,15 +130,14 @@ jobs:
 
             if (isPush) {
               const tasks = new Set();
-              const commits = context.payload.commits ?? [];
-              for (const commit of commits) {
+              for (const commit of context.payload.commits ?? []) {
                 const pattern = /^Checks\s+#(\d+):\s*(.+)$/gmi;
                 for (const match of commit.message.matchAll(pattern)) {
-                  if (Number(match[1]) !== issueNumber) {
+                  if (Number(match[1]) === issueNumber) {
+                    tasks.add(normalize(match[2]));
+                  } else {
                     core.warning(`Ignoring Checks #${match[1]} on branch '${branch}'.`);
-                    continue;
                   }
-                  tasks.add(normalize(match[2]));
                 }
               }
 
@@ -113,36 +148,32 @@ jobs:
                     matches.push(i);
                   }
                 }
-
                 if (matches.length !== 1) {
-                  core.warning(`Expected exactly one checklist entry for '${task}', found ${matches.length}.`);
+                  core.warning(`Expected one checklist entry for '${task}', found ${matches.length}.`);
                   continue;
                 }
-
                 const index = matches[0];
                 if (isChecked(lines[index])) {
                   core.info(`Already checked: '${task}'.`);
                   continue;
                 }
-
                 lines[index] = lines[index].replace(/\[\s\]/, '[x]') +
                   ` 🟡 **NIM** <!-- issue-task-sync branch=${marker} -->`;
                 changes++;
                 core.info(`Checked '${task}' in issue #${issueNumber}.`);
               }
             } else {
-              // On merge, remove only NIM tags owned by this exact source branch.
+              // Only remove markers belonging to the exact merged source branch.
               for (let i = 0; i < lines.length; i++) {
-                if (!isChecked(lines[i])) {
-                  continue;
-                }
-                const suffix = lines[i].match(nimSuffix);
-                if (suffix !== null && suffix[1] === marker) {
-                  lines[i] = lines[i].replace(nimSuffix, '');
-                  changes++;
+                if (isChecked(lines[i])) {
+                  const suffix = lines[i].match(nimSuffix);
+                  if (suffix !== null && suffix[1] === marker) {
+                    lines[i] = lines[i].replace(nimSuffix, '');
+                    changes++;
+                  }
                 }
               }
-              core.info(`Removed ${changes} NIM markers after merging '${branch}'.`);
+              core.info(`Removed ${changes} NIM markers for '${branch}'.`);
             }
 
             if (changes === 0) {
@@ -151,9 +182,6 @@ jobs:
             }
 
             await github.rest.issues.update({
-              owner,
-              repo,
-              issue_number: issueNumber,
-              body: lines.join('\n')
+              owner, repo, issue_number: issueNumber, body: lines.join('\n')
             });
             core.info(`Updated issue #${issueNumber} (${changes} changes).`);
