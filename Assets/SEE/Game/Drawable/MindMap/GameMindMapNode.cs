@@ -385,6 +385,7 @@ namespace SEE.Game.Drawable.MindMap
             node.FindDescendantWithTag(Tags.DText).GetComponent<Collider>().enabled = false;
         }
 
+
         /// <summary>
         /// Recreates a Mind Map node based on the given configuration.
         /// </summary>
@@ -436,6 +437,12 @@ namespace SEE.Game.Drawable.MindMap
             border.transform.SetParent(createdNode.transform);
             text.transform.SetParent(createdNode.transform);
 
+            // The node controls page visibility for its children.
+            // Restoring a node on an inactive page must not leave its
+            // border and text individually disabled.
+            border.SetActive(true);
+            text.SetActive(true);
+
             // Text and border are edited through their owning Mind Map node.
             text.GetComponent<MeshCollider>().enabled = false;
             border.GetComponent<MeshCollider>().enabled = false;
@@ -455,10 +462,8 @@ namespace SEE.Game.Drawable.MindMap
             border.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
             text.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
 
-            if (conf.AssociatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
-            {
-                createdNode.SetActive(false);
-            }
+            createdNode.SetActive(
+                conf.AssociatedPage == holder.CurrentPage);
 
             return createdNode;
         }

@@ -26,6 +26,7 @@ namespace SEE.Game.Drawable.MindMap
         /// and child identifiers.
         /// </param>
         /// <returns>The created or recreated branch line.</returns>
+
         public static GameObject CreateBranchLine(
             GameObject child,
             GameObject parent,
@@ -85,10 +86,21 @@ namespace SEE.Game.Drawable.MindMap
 
             childValueHolder.SetParent(parent, branchLine);
 
-            GameMindMapHierarchy.UpdateMindMapLayer(childValueHolder, parentValueHolder);
+            GameMindMapHierarchy.UpdateMindMapLayer(
+                childValueHolder, parentValueHolder);
 
-            // Disable the branch-line collider because branch lines belong to the
-            // Mind Map relation and should not be edited as regular drawable lines.
+            // Branch lines must belong to the same page as their Mind Map nodes.
+            // The currently active surface page may differ during restoration.
+            int associatedPage =
+                child.GetComponent<AssociatedPageHolder>().AssociatedPage;
+
+            branchLine.GetComponent<AssociatedPageHolder>().AssociatedPage =
+                associatedPage;
+
+            branchLine.SetActive(
+                associatedPage == surface.GetComponent<DrawableHolder>().CurrentPage);
+
+            // Branch lines are edited through their Mind Map nodes.
             branchLine.GetComponent<MeshCollider>().enabled = false;
 
             return branchLine;
