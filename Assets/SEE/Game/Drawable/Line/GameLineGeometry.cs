@@ -348,6 +348,21 @@ namespace SEE.Game.Drawable.Line
 
             UpdateOriginalAnchors(line, positions);
 
+            LineAnchorValueHolder anchorHolder =
+                line.GetComponent<LineAnchorValueHolder>();
+
+            if (anchorHolder != null
+                && anchorHolder.UsesExplicitLoopCapGeometry)
+            {
+                anchorHolder.OriginalRendererPositions =
+                    new Vector3[positions.Length];
+
+                Array.Copy(
+                    positions,
+                    anchorHolder.OriginalRendererPositions,
+                    positions.Length);
+            }
+
             LineConf lineConf = LineConf.GetLine(line);
             if (lineConf == null)
             {
