@@ -168,7 +168,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
               + Direction
               + ", ID=" + Id
               + ", occupied=" + Occupied
-              + ", rectangle=" + Rectangle.ToString()
+              + ", rectangle=" + Rectangle
               + ", =" + (Left == null ? "" : Left.ToString())
               + ", =" + (Right == null ? "" : Right.ToString())
               + ")";
@@ -192,7 +192,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return "("
               + "ID=" + Id
               + ", occupied=" + Occupied
-              + ", rectangle=" + Rectangle.ToString()
+              + ", rectangle=" + Rectangle
               + ")";
         }
     }
