@@ -56,7 +56,6 @@ namespace SEE.SceneManipulation
             Vector3 nodeScale = node.transform.lossyScale;
             float diameter = Mathf.Min(nodeScale.x, nodeScale.z);
 
-            marker.transform.SetParent(null);
             marker.transform.localScale = new Vector3(diameter, diameter, diameter);
 
             Vector3 roofCenter = node.GetTop();
@@ -96,7 +95,7 @@ namespace SEE.SceneManipulation
         }
 
         /// <summary>
-        /// Returns the marking sphere of the <paramref name="node"/> 
+        /// Returns the marking sphere of the <paramref name="node"/>
         /// or null if it is not marked.
         /// </summary>
         /// <param name="node">Node whose marking should be returned.</param>
@@ -110,14 +109,7 @@ namespace SEE.SceneManipulation
 
             Transform markerTransform = node.transform.Find(MarkerName);
 
-            if (markerTransform != null)
-            {
-                return markerTransform.gameObject;
-            }
-            else
-            {
-                return null;
-            }
+            return markerTransform != null ? markerTransform.gameObject : null;
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
-    /// This class is responsible for marking or unmarking a node via 
+    /// This class is responsible for marking or unmarking a node via
     /// network from one client to all others and to the server.
     /// </summary>
     public class MarkNetAction : NodeNetAction
