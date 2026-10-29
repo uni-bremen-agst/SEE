@@ -114,14 +114,11 @@ namespace SEE.Layout.NodeLayouts
             // Handle Edge Case 2: The list contains exclusively leaf nodes (no nested hierarchy)
             {
                 int numberOfLeaves = 0;
-                foreach (ILayoutNode node in layoutNodeList)
+                foreach (ILayoutNode node in layoutNodeList.Where(n => n.IsLeaf))
                 {
-                    if (node.IsLeaf)
-                    {
-                        Vector3 scale = node.AbsoluteScale;
-                        layoutResult[node] = new NodeTransform(0, 0, scale);
-                        numberOfLeaves++;
-                    }
+                    Vector3 scale = node.AbsoluteScale;
+                    layoutResult[node] = new NodeTransform(0, 0, scale);
+                    numberOfLeaves++;
                 }
                 if (numberOfLeaves == layoutNodeList.Count)
                 {
@@ -175,14 +172,11 @@ namespace SEE.Layout.NodeLayouts
             {
                 ICollection<ILayoutNode> children = node.Children();
 
-                foreach (ILayoutNode child in children)
+                foreach (ILayoutNode child in children.Where(c => !c.IsLeaf))
                 {
-                    if (!child.IsLeaf)
-                    {
-                        Vector2 childArea = PlaceNodes(layout, child, groundLevel);
-                        layout[child] = new NodeTransform(0, 0,
-                                                          new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
-                    }
+                    Vector2 childArea = PlaceNodes(layout, child, groundLevel);
+                    layout[child] = new NodeTransform(0, 0,
+                                                      new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
                 }
                 if (children.Count > 0)
                 {
