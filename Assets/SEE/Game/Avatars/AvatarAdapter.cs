@@ -47,6 +47,11 @@ namespace SEE.Game.Avatars
         private const float playerTopToEyeDistance = 0.14f;
 
         /// <summary>
+        /// Factor to apply at the audio amplitude.
+        /// </summary>
+        private const float amplifyLivekitAudioFactor = 3.5f;
+
+        /// <summary>
         /// If this code is executed for the local player, the necessary player type
         /// for the environment we are currently running on are added to this game object.
         /// </summary>
@@ -125,6 +130,93 @@ namespace SEE.Game.Avatars
         private static DissonanceComms dissonanceComms;
 
         /// <summary>
+        /// The audio source used for Dissonance voice playback. This is retained as a fallback
+        /// while LiveKit audio is active.
+        /// </summary>
+        private AudioSource dissonanceAudioSource;
+
+        /// <summary>
+        /// The audio source used for LiveKit voice playback, if a LiveKit audio track is subscribed.
+        /// LiveKit takes precedence over <see cref="dissonanceAudioSource"/> for lip syncing.
+        /// </summary>
+        private AudioSource liveKitAudioSource;
+
+        /// <summary>
+        /// Reusable, power-of-two sample buffer for analyzing LiveKit playback without allocating
+        /// on each SALSA poll.
+        /// </summary>
+        private readonly float[] liveKitAudioSamples = new float[512];
+
+        /// <summary>
+        /// Binds a LiveKit playback source to this avatar's SALSA component.
+        /// </summary>
+        /// <param name="audioSource">The playback source of this avatar's LiveKit participant.</param>
+        internal void SetLiveKitAudioSource(AudioSource audioSource)
+        {
+            liveKitAudioSource = audioSource;
+            SetSALSAudioSource(audioSource);
+            if (gameObject.TryGetComponent(out Salsa salsa))
+            {
+                salsa.useExternalAnalysis = true;
+                salsa.getExternalAnalysis = GetLiveKitAudioAmplitude;
+            }
+        }
+
+        /// <summary>
+        /// Returns the mean absolute amplitude of LiveKit playback for SALSA's external analysis.
+        /// </summary>
+        /// <returns>The playback amplitude, or zero when the source is absent or silent.</returns>
+        private float GetLiveKitAudioAmplitude()
+        {
+            if (liveKitAudioSource == null || !liveKitAudioSource.isActiveAndEnabled
+                || !liveKitAudioSource.isPlaying || liveKitAudioSource.mute)
+            {
+                return 0f;
+            }
+
+            liveKitAudioSource.GetOutputData(liveKitAudioSamples, 0);
+            float amplitude = 0f;
+            foreach (float sample in liveKitAudioSamples)
+            {
+                amplitude += Mathf.Abs(sample);
+            }
+            return amplitude / liveKitAudioSamples.Length * amplifyLivekitAudioFactor;
+        }
+
+        /// <summary>
+        /// Removes a LiveKit playback source from this avatar's SALSA component. External analysis
+        /// then returns silence; Dissonance is disabled when LiveKit is the selected voice chat.
+        /// </summary>
+        /// <param name="audioSource">The LiveKit source that is being removed.</param>
+        internal void ClearLiveKitAudioSource(AudioSource audioSource)
+        {
+            // Do not clear a newer subscription when an older track is removed.
+            if (liveKitAudioSource != audioSource)
+            {
+                return;
+            }
+
+            liveKitAudioSource = null;
+            SetSALSAudioSource(null);
+        }
+
+        /// <summary>
+        /// Assigns <paramref name="audioSource"/> to SALSA, if this avatar has a SALSA component.
+        /// </summary>
+        /// <param name="audioSource">The audio source SALSA should analyze; may be null.</param>
+        private void SetSALSAudioSource(AudioSource audioSource)
+        {
+            if (gameObject.TryGetComponent(out Salsa salsa))
+            {
+                salsa.audioSrc = audioSource;
+            }
+            else
+            {
+                Debug.LogWarning($"{name} has no {typeof(Salsa)}.\n");
+            }
+        }
+
+        /// <summary>
         /// A coroutine setting up SALSA for lipsync.
         /// More specifically, the audio source of the <see cref="Salsa"/> component of this
         /// game object be the audio source of the remote player under the Dissonance communication
@@ -154,22 +246,17 @@ namespace SEE.Game.Avatars
                         yield return null;
                     }
 
-                    if (dissonancePlayer.TryGetComponent(out AudioSource audioSource)
-                        && gameObject.TryGetComponent(out Salsa salsa))
+                    if (dissonancePlayer.TryGetComponent(out AudioSource audioSource))
                     {
-                        salsa.audioSrc = audioSource;
+                        dissonanceAudioSource = audioSource;
+                        if (liveKitAudioSource == null)
+                        {
+                            SetSALSAudioSource(audioSource);
+                        }
                     }
                     else
                     {
-                        if (audioSource == null)
-                        {
-                            Debug.LogWarning($"{dissonancePlayer.name} has no {typeof(AudioSource)}.\n");
-                        }
-
-                        if (!gameObject.TryGetComponent(out Salsa _))
-                        {
-                            Debug.LogWarning($"{name} has no {typeof(Salsa)}.\n");
-                        }
+                        Debug.LogWarning($"{dissonancePlayer.name} has no {typeof(AudioSource)}.\n");
                     }
                 }
                 else
@@ -505,5 +592,3 @@ namespace SEE.Game.Avatars
 #endif
 
 #endregion ENABLE_VR
-
-
