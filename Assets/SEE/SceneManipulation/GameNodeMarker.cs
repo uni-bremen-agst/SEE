@@ -20,10 +20,10 @@ namespace SEE.SceneManipulation
         /// <param name="node">The node to add/remove the mark to.</param>
         public static void AddMark(GameObject node)
         {
-            GameObject mark = IsMarked(node);
+            Transform mark = IsMarked(node);
             if (mark != null)
             {
-                RemoveMark(mark);
+                RemoveMark(mark.gameObject);
             }
             else
             {
@@ -36,9 +36,9 @@ namespace SEE.SceneManipulation
         /// returns said mark or null if not marked
         /// </summary>
         /// <param name="node">The node to check for a mark.</param>
-        public static GameObject IsMarked(GameObject node)
+        public static Transform IsMarked(GameObject node)
         {
-            return node.transform.Find("Mark").gameObject;
+            return node.transform.Find("Mark");
         }
 
         /// <summary>
@@ -63,13 +63,12 @@ namespace SEE.SceneManipulation
                 float diameter = Mathf.Min(renderer.bounds.size.x, renderer.bounds.size.z);
 
                 GameObject mark = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
                 mark.name = "Mark";
 
                 mark.transform.localScale = Vector3.one * diameter;
 
-                Vector3 top = parent.GetTop();
-
-                mark.transform.position = top + Vector3.up * (diameter / 2f);
+                mark.transform.position = parent.GetTop() + Vector3.up * (diameter / 2);
 
                 mark.transform.SetParent(parent.transform, true);
             }
