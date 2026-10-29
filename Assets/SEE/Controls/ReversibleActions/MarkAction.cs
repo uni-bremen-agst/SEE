@@ -7,18 +7,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.ReversibleActions
-{   
+{
     /// <summary>
-    /// Marking a node by showing a sphere above the selected node 
+    /// Marking a node by showing a sphere above the selected node.
     /// </summary>
-    
     internal class MarkAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// The ID of the node marked or unmarked by this action. It is needed
+        /// to undo and redo the marking.
+        /// </summary>
         private string markedNodeID;
 
-
         /// <summary>
-        /// returns ActionStateType
+        /// Returns ActionStateType.
         /// </summary>
         public override ActionStateType GetActionStateType()
         {
@@ -26,7 +28,7 @@ namespace SEE.Controls.ReversibleActions
         }
 
         /// <summary>
-        /// Returns all ID's of GameObjects manipulated by this action
+        /// Returns all IDs of GameObjects manipulated by this action.
         /// </summary>
         public override HashSet<string> GetChangedObjects()
         {
@@ -36,24 +38,21 @@ namespace SEE.Controls.ReversibleActions
             };
         }
 
-
         /// <summary>
         /// Undoes this action.
         /// </summary>
         public override void Undo()
         {
-  
-            base.Undo(); //security from AbstarctPlayerAction
+            base.Undo(); 
 
             GameObject node = GraphElementIDMap.Find(markedNodeID);
 
-            if (node != null) 
+            if (node != null)
             {
                 GameNodeMarker.ToggleMark(node);
 
                 new MarkNetAction(markedNodeID).Execute();
             }
-               
 
         }
 
@@ -72,17 +71,15 @@ namespace SEE.Controls.ReversibleActions
 
                 new MarkNetAction(markedNodeID).Execute();
             }
-
         }
 
         /// <summary>
-        /// creates new Object, useful for after the action was carried out
+        /// Creates new Object, useful for after the action was carried out.
         /// </summary>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
-
 
         /// <summary>
         /// Creating a new MarkAction object.
@@ -93,7 +90,7 @@ namespace SEE.Controls.ReversibleActions
         }
 
         /// <summary>
-        /// Reacting if user carries out new action, GameNodeMarker creates sphere, broadcasting to all clients
+        /// Reacting if user carries out new action, GameNodeMarker creates sphere, broadcasting to all clients.
         /// </summary>
         public override bool Update()
         {

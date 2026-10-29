@@ -1,20 +1,19 @@
 ﻿using SEE.SceneManipulation;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 
 namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
-    ///broadcast an action of the local player to all clients, that is, to replicate
-    ///the action in all client code cities such that all players always have a consistent view of the SEE scenery
+    /// Broadcasts an action of the local player to all clients, that is, to replicate
+    /// the action in all client code cities such that all players always have a consistent view of the SEE scenery.
     /// </summary>
     internal class MarkNetAction : NodeNetAction
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="gameNodeID">The ID of the game node to be marked or unmarked.</param>
         public MarkNetAction(string gameNodeID) : base(gameNodeID)
         {
-
         }
 
         /// <summary>

@@ -9,7 +9,6 @@ namespace SEE.SceneManipulation
     /// </summary>
     public static class GameNodeMarker
     {
-
         /// <summary>
         /// Toggles the marking of the given <paramref name="node"/>: if the node is not
         /// yet marked, a sphere is created above it whose diameter is the minimum of the
@@ -24,7 +23,6 @@ namespace SEE.SceneManipulation
             if (existingSphere != null)
             {
                 Destroyer.Destroy(existingSphere.gameObject);
-
             }
             else
             {
@@ -39,10 +37,7 @@ namespace SEE.SceneManipulation
                 sphere.transform.position = top;
                 sphere.name = "MarkingSphere";
                 sphere.transform.SetParent(node.transform);
-
             }
-
         }
-
     }
 }
