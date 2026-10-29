@@ -38,29 +38,85 @@ namespace SEE.UI.Drawable
         public UnityEvent<float> OnValueChanged = new();
 
         /// <summary>
+        /// Whether the slider controller has already initialized its UI references
+        /// and event handlers.
+        /// </summary>
+        private bool initialized;
+
+        /// <summary>
         /// Initializes the slider controller.
         /// </summary>
         private void Awake()
         {
-            manager = GetComponentInChildren<SliderManager>();
-            inputField = GetComponentInChildren<TMP_InputField>();
-            /// Adds the slider change method
-            manager.mainSlider.onValueChanged.AddListener(SliderChanged);
-            /// Adds the input field change method.
-            inputField.onValueChanged.AddListener(InputChanged);
-            /// Minimum degree
-            manager.mainSlider.minValue = 0f;
-            /// Maximum degree
-            manager.mainSlider.maxValue = 359.9f;
+            Initialize();
         }
 
         /// <summary>
-        /// Removes the handler of the slider and the input field.
+        /// Initializes the UI references and event handlers of this slider controller.
+        /// This method is idempotent so that the controller can also be initialized
+        /// before Unity invokes <see cref="Awake"/>.
+        /// </summary>
+        /// <exception cref="MissingComponentException">
+        /// Thrown if the required slider manager, slider, or input field cannot be found.
+        /// </exception>
+        private void Initialize()
+        {
+            if (initialized)
+            {
+                return;
+            }
+
+            manager = GetComponentInChildren<SliderManager>();
+            inputField = GetComponentInChildren<TMP_InputField>();
+
+            if (manager == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(RotationSliderController)} requires a {nameof(SliderManager)}.");
+            }
+
+            if (manager.mainSlider == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(SliderManager)} requires a slider.");
+            }
+
+            if (inputField == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(RotationSliderController)} requires a {nameof(TMP_InputField)}.");
+            }
+
+            manager.mainSlider.onValueChanged.AddListener(SliderChanged);
+            inputField.onValueChanged.AddListener(InputChanged);
+
+            manager.mainSlider.minValue = 0.0f;
+            manager.mainSlider.maxValue = 359.9f;
+
+            initialized = true;
+        }
+
+        /// <summary>
+        /// Removes the handlers of the slider and input field.
         /// </summary>
         private void OnDestroy()
         {
-            manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
-            inputField.onValueChanged.RemoveListener(InputChanged);
+            if (!initialized)
+            {
+                return;
+            }
+
+            if (manager != null && manager.mainSlider != null)
+            {
+                manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
+            }
+
+            if (inputField != null)
+            {
+                inputField.onValueChanged.RemoveListener(InputChanged);
+            }
+
+            initialized = false;
         }
 
         /// <summary>
@@ -110,6 +166,8 @@ namespace SEE.UI.Drawable
         /// <param name="value">The value that should be assigned.</param>
         public void AssignValue(float value)
         {
+            Initialize();
+
             if (value % 1 == 0)
             {
                 inputField.text = value.ToString();

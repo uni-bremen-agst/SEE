@@ -2,8 +2,9 @@ using SEE.Controls.KeyActions;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.Line;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -98,21 +99,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
         }
 
         /// <summary>
-        /// Enables the line menu and initializes the required Handler.
-        /// </summary>
-        public override void Awake()
-        {
-            base.Awake();
-            LineMenu.Instance.EnableForDrawing();
-        }
-
-        /// <summary>
-        /// Stops the <see cref="DrawFreehandAction"/> and hides the line menu.
+        /// Stops the <see cref="DrawFreehandAction"/> and removes an unfinished line.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            LineMenu.Instance.Disable();
             if (progressState != ProgressState.FinishDrawing)
             {
                 Destroyer.Destroy(line);
@@ -174,7 +165,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;
             /// Create the line object.
-            line = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
+            line = GameLineDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                 ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
                 ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, freehandLine: true);
             /// Transform the first position in local space.
@@ -198,8 +189,8 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
             Vector3 nPos = new(newPosition.x, newPosition.y, 0);
-            if (nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been
-                                          // executed (because of GameDrawer.UpdateZPositions()).
+            if (nPos != positions.Last()) /// This query is required if <see cref="GameLineDrawer.Drawing"/> has already been
+                                          /// executed (because of <see cref="GameLineGeometry.UpdateOriginalAnchors"/>).
             {
                 /// Add newPosition to the line renderer and and start drawing over the network.
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -207,7 +198,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 newPositions[^1] = newPosition;
                 positions = newPositions;
 
-                GameDrawer.Drawing(line, positions);
+                GameLineDrawer.Drawing(line, positions);
                 new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, newPosition, newPositions.Length - 1).Execute();
             }
         }
@@ -228,10 +219,10 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             if (progressState == ProgressState.FinishDrawing)
             {
-                if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
+                if (GameLineGeometry.DifferentMeshVerticesCounter(line) >= 3)
                 {
                     finishDrawing = true;
-                    line = GameDrawer.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
+                    line = GameLineGeometry.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(Surface, currentLine);
                     new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name,
@@ -274,7 +265,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
+            line = GameLineDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
             if (line != null)
             {
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,

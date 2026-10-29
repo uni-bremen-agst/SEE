@@ -73,7 +73,7 @@ namespace SEE.UI.Drawable
                     page = holder.MaxPageSize - 1;
                 };
                 Notification();
-                GameDrawableManager.ChangeCurrentPage(gameObject, page);
+                GameDrawablePageManager.ChangeCurrentPage(gameObject, page);
                 new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(gameObject))).Execute();
             });
 
@@ -89,7 +89,7 @@ namespace SEE.UI.Drawable
                     page = 0;
                 }
                 Notification();
-                GameDrawableManager.ChangeCurrentPage(gameObject, page);
+                GameDrawablePageManager.ChangeCurrentPage(gameObject, page);
                 new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(gameObject))).Execute();
             });
 
@@ -163,7 +163,7 @@ namespace SEE.UI.Drawable
         /// <param name="page">The page to switch to.</param>
         public void SetPage(int page)
         {
-            GameDrawableManager.ChangeCurrentPage(gameObject, page);
+            GameDrawablePageManager.ChangeCurrentPage(gameObject, page);
             new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(gameObject))).Execute();
         }
 

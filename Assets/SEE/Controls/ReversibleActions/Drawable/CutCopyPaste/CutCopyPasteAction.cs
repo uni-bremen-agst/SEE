@@ -1,0 +1,713 @@
+﻿using Michsky.UI.ModernUIPack;
+using SEE.Controls.KeyActions;
+using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
+using SEE.UI;
+using SEE.UI.Notification;
+using SEE.Utils;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
+
+{
+    /// <summary>
+    /// This action provides the cut, copy, and paste functionality
+    /// for a <see cref="DrawableType"/> object.
+    /// </summary>
+    public class CutCopyPasteAction : DrawableAction
+    {
+        /// <summary>
+        /// Holds the current progress state.
+        /// </summary>
+        private ProgressState progressState = ProgressState.SelectObject;
+
+        /// <summary>
+        /// The progress states of the <see cref="CutCopyPasteAction"/>.
+        /// </summary>
+        private enum ProgressState
+        {
+            SelectObject,
+            CutCopyPaste,
+            OpenSelectParentMenu,
+            SelectParent,
+            Finish
+        }
+
+        /// <summary>
+        /// Handles pasting non-mind-map drawable objects.
+        /// </summary>
+        private readonly CutCopyPastePrimitivePasteOperation primitivePasteOperation = new();
+
+        /// <summary>
+        /// Handles pasting mind-map subtrees and integrating them into the target mind map.
+        /// </summary>
+        private readonly CutCopyPasteMindMapPasteOperation mindMapPasteOperation = new();
+
+        /// <summary>
+        /// Holds the current state.
+        /// </summary>
+        private CutCopy state = CutCopy.None;
+
+        /// <summary>
+        /// The state of cut or copy is chosen.
+        /// </summary>
+        private enum CutCopy
+        {
+            None,
+            Cut,
+            Copy
+        }
+
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
+        private Memento memento;
+
+        /// <summary>
+        /// This struct can store all the information needed to
+        /// revert or repeat a <see cref="CutCopyPasteAction"/>.
+        /// </summary>
+        private struct Memento
+        {
+            /// <summary>
+            /// The old values of the drawable type object.
+            /// </summary>
+            public readonly DrawableType OldValueHolder;
+            /// <summary>
+            /// The new values of the drawable type object.
+            /// </summary>
+            public readonly DrawableType NewValueHolder;
+            /// <summary>
+            /// The drawable surface on which the drawable type object was displayed.
+            /// </summary>
+            public readonly DrawableConfig OldSurface;
+            /// <summary>
+            /// The drawable surface on which the drawable type object is now displayed.
+            /// </summary>
+            public readonly DrawableConfig NewSurface;
+            /// <summary>
+            /// Holds the original configurations for the children and branches of a mind map node.
+            /// </summary>
+            public DrawableConfig OldNodesHolder;
+            /// <summary>
+            /// Holds the new configurations for the children and branches of a mind map node.
+            /// </summary>
+            public DrawableConfig NewNodesHolder;
+            /// <summary>
+            /// The old branch line config; will be needed for restore the visual data of it.
+            /// </summary>
+            public LineConf OldBranchLineConfig;
+            /// <summary>
+            /// The state if it was copied or cut.
+            /// </summary>
+            public readonly CutCopy State;
+
+            /// <summary>
+            /// The constructor, which simply assigns its parameters to the fields of this class.
+            /// </summary>
+            /// <param name="oldValueHolder">The old values of the drawable type object.</param>
+            /// <param name="newValueHolder">The new edited values of the drawable type object.</param>
+            /// <param name="oldSurface">The drawable surface on which the drawable type object was displayed.</param>
+            /// <param name="newSurface">The drawable surface on which the drawable type object is displayed.</param>
+            /// <param name="cutCopy">The state whether it was cut or copied.</param>
+            public Memento(DrawableType oldValueHolder,
+                DrawableType newValueHolder, GameObject oldSurface, GameObject newSurface, CutCopy cutCopy)
+            {
+                OldValueHolder = oldValueHolder;
+                NewValueHolder = newValueHolder;
+                OldSurface = DrawableConfigManager.GetDrawableConfig(oldSurface);
+                NewSurface = DrawableConfigManager.GetDrawableConfig(newSurface);
+                State = cutCopy;
+                OldNodesHolder = null;
+                NewNodesHolder = null;
+                OldBranchLineConfig = null;
+            }
+        }
+
+        /// <summary>
+        /// The prefab of the cut-copy-paste menu.
+        /// </summary>
+        private const string cutCopyPasteMenuPrefab = "Prefabs/UI/Drawable/CutCopyPaste";
+        /// <summary>
+        /// The instance of the cut-copy-paste menu
+        /// </summary>
+        private GameObject cutCopyPasteMenu;
+
+        /// <summary>
+        /// The newly created object.
+        /// </summary>
+        private GameObject newObject;
+
+        /// <summary>
+        /// The selected drawable type object that should be cut or copied.
+        /// </summary>
+        private GameObject selectedObj;
+
+        /// <summary>
+        /// The old selected object of the privous run.
+        /// </summary>
+        private static GameObject oldSelectedObj;
+
+        /// <summary>
+        /// True if the left mouse button was released after finish.
+        /// It is necessary to prevent the previously selected object from being accidentally selected again.
+        /// After the action has successfully completed, it starts again, allowing for the selection of a new object.
+        /// This option enables the immediate selection of another object while pressing the mouse button.
+        /// </summary>
+        private static bool mouseWasReleased = true;
+
+        /// <summary>
+        /// The old values of the selected drawable type.
+        /// </summary>
+        private DrawableType oldValueHolder;
+
+        /// <summary>
+        /// The new values of the selected drawable type.
+        /// </summary>
+        private DrawableType newValueHolder;
+
+        /// <summary>
+        /// The drawable surface where the selected object was displayed.
+        /// </summary>
+        private GameObject oldSurface;
+
+        /// <summary>
+        /// The drawable surface where the new object is displayed.
+        /// </summary>
+        private GameObject newSurface;
+
+        /// <summary>
+        /// The configuration that includes the node children and their branch lines.
+        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>.
+        /// </summary>
+        private DrawableConfig oldNodesBranchLineHolder = null;
+        /// <summary>
+        /// The configuration that includes the changed node children and their branch lines.
+        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>.
+        /// </summary>
+        private DrawableConfig newNodesBranchLineHolder = null;
+        /// <summary>
+        /// The configuration of the old branch line to parent.
+        /// </summary>
+        private LineConf oldBranchLineConf = null;
+
+        /// <summary>
+        /// Resets the old selected object, if the action state will be left.
+        /// </summary>
+        public static void Reset()
+        {
+            oldSelectedObj = null;
+            mouseWasReleased = true;
+        }
+
+        /// <summary>
+        /// Stops this action and cleans up its current interaction state.
+        /// If a Mind Map paste is waiting for a parent selection, the temporary
+        /// paste is rolled back and a cut original is restored.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+
+            if (progressState == ProgressState.OpenSelectParentMenu
+                || progressState == ProgressState.SelectParent)
+            {
+                mindMapPasteOperation.Cancel();
+                SetToInitialState();
+                return;
+            }
+
+            BlinkEffect.Deactivate(selectedObj);
+
+            if (cutCopyPasteMenu != null)
+            {
+                Destroyer.Destroy(cutCopyPasteMenu);
+            }
+        }
+
+        /// <summary>
+        /// Adds the necessary handler for the cut, copy and paste button.
+        /// </summary>
+        /// <param name="menu">The instance of the cut copy paste menu.</param>
+        private void SetupButtons(GameObject menu)
+        {
+            Transform content = menu.transform.Find("Content");
+            ButtonManagerBasic cut = content.Find("Cut").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic copy = content.Find("Copy").GetComponent<ButtonManagerBasic>();
+
+            cut.clickEvent.AddListener(() =>
+            {
+                state = CutCopy.Cut;
+                ShowNotification.Info("Select position", "Choose a suitable position for pasting the cut object.", 2);
+            });
+
+            copy.clickEvent.AddListener(() =>
+            {
+                state = CutCopy.Copy;
+                ShowNotification.Info("Select position", "Choose a suitable position for pasting the copied object.", 2);
+            });
+        }
+
+        /// <summary>
+        /// This method manages the player's interaction with the action <see cref="ActionStateType.CutCopyPaste"/>.
+        /// It allows to cut or copy drawable type objects and paste them on a specific position on a specific drawable.
+        /// </summary>
+        /// <returns>Whether this action is finished.</returns>
+        public override bool Update()
+        {
+            /// Block for canceling the action.
+            Cancel();
+
+            if (!Raycasting.IsMouseOverGUI())
+            {
+                switch (progressState)
+                {
+                    /// Block for selecting the drawable type object to copy/cut.
+                    case ProgressState.SelectObject:
+                        SelectObject();
+                        break;
+
+                    /// Block in which the object is duplicated at the desired location,
+                    /// and the original may be deleted if necessary.
+                    case ProgressState.CutCopyPaste:
+                        CutCopyPaste();
+                        break;
+
+                    /// Block in which the selected parent menu will be open.
+                    case ProgressState.OpenSelectParentMenu:
+                        OpenSelectParent();
+                        break;
+
+                    /// Block in which we will wait for the user selection.
+                    case ProgressState.SelectParent:
+                        SelectParent();
+                        break;
+
+                    /// Block to finish this action.
+                    case ProgressState.Finish:
+                        mouseWasReleased = false;
+                        memento = new Memento(oldValueHolder, newValueHolder, oldSurface, newSurface, state)
+                        {
+                            OldNodesHolder = oldNodesBranchLineHolder,
+                            NewNodesHolder = newNodesBranchLineHolder,
+                            OldBranchLineConfig = oldBranchLineConf
+                        };
+                        CurrentState = IReversibleAction.Progress.Completed;
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action.
+        /// </summary>
+        private void Cancel()
+        {
+            if (!SEEInput.Cancel())
+            {
+                return;
+            }
+
+            if (progressState == ProgressState.OpenSelectParentMenu
+                || progressState == ProgressState.SelectParent)
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                mindMapPasteOperation.Cancel();
+                SetToInitialState();
+                return;
+            }
+
+            if (selectedObj != null)
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                SetToInitialState();
+            }
+        }
+
+        /// <summary>
+        /// Allows the user to choose a Drawable Type Object for copying/cutting.
+        /// It activates the blink effect and enables the cut-copy-paste menu.
+        /// </summary>
+        private void SelectObject()
+        {
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                false, true, false))
+            {
+                oldSurface = GameFinder.GetDrawableSurface(selectedObj);
+                oldValueHolder = DrawableType.Get(selectedObj);
+                if (selectedObj.CompareTag(Tags.MindMapNode))
+                {
+                    oldNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(selectedObj);
+                    newNodesBranchLineHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(selectedObj);
+                }
+                cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
+                                                                        UICanvas.Canvas.transform, false);
+                SetupButtons(cutCopyPasteMenu);
+            }
+
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedObj == null)
+            {
+                mouseWasReleased = true;
+            }
+
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedObj != null)
+            {
+                progressState = ProgressState.CutCopyPaste;
+            }
+        }
+
+        /// <summary>
+        /// Provides the interaction for cut/copy/paste.
+        /// It closes the CutCopyPasteMenu, deactivates the BlinkEffect,
+        /// and restores the drawable-type object to the new position.
+        /// If Cut was chosen, the original object is destroyed.
+        /// If no action (Cut/Copy) was chosen, and a left-click occurs, then the action is reset.
+        /// </summary>
+        private void CutCopyPaste()
+        {
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
+                && selectedObj != null
+                && selectedObj.GetComponent<BlinkEffect>() != null
+                && state != CutCopy.None)
+            {
+                Destroyer.Destroy(cutCopyPasteMenu);
+                selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                Vector3 newPosition = raycastHit.point;
+                newSurface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
+
+                switch (DrawableType.Get(selectedObj))
+                {
+                    case LineConf:
+                    case TextConf:
+                    case ImageConf:
+                        newObject = primitivePasteOperation.Execute(
+                            selectedObj,
+                            newSurface,
+                            newPosition);
+
+                        newValueHolder = DrawableType.Get(newObject);
+                        break;
+
+                    case MindMapNodeConf:
+                        mindMapPasteOperation.Paste(
+                            selectedObj,
+                            oldSurface,
+                            oldValueHolder,
+                            oldNodesBranchLineHolder,
+                            newNodesBranchLineHolder,
+                            newSurface,
+                            newPosition,
+                            state == CutCopy.Cut);
+
+                        ApplyMindMapPasteResult();
+                        break;
+                }
+
+                Cut();
+
+                if (newObject.CompareTag(Tags.MindMapNode) &&
+                    newObject.GetComponent<MMNodeValueHolder>().NodeKind != MindMapNodeKind.Theme)
+                {
+                    progressState = ProgressState.OpenSelectParentMenu;
+                }
+            }
+
+            if (SEEInput.MouseUp(MouseButton.Left) && state != CutCopy.None && newObject != null
+                && progressState == ProgressState.CutCopyPaste)
+            {
+                progressState = ProgressState.Finish;
+            }
+
+            if (SEEInput.LeftMouseInteraction() && state == CutCopy.None)
+            {
+                SetToInitialState();
+            }
+        }
+
+        /// <summary>
+        /// Applies the current mind-map paste result to the action state.
+        /// </summary>
+        private void ApplyMindMapPasteResult()
+        {
+            CutCopyPasteMindMapPasteOperation.Result result =
+                mindMapPasteOperation.CurrentResult;
+
+            newObject = result.NewObject;
+            newValueHolder = result.NewValueHolder;
+            newNodesBranchLineHolder = result.NewNodesHolder;
+            oldBranchLineConf = result.OldBranchLineConfig;
+        }
+
+        /// <summary>
+        /// Resets the action to its initial state.
+        /// </summary>
+        private void SetToInitialState()
+        {
+            Destroyer.Destroy(cutCopyPasteMenu);
+
+            if (selectedObj != null)
+            {
+                BlinkEffect.Deactivate(selectedObj);
+            }
+
+            selectedObj = null;
+            mouseWasReleased = false;
+            state = CutCopy.None;
+            progressState = ProgressState.SelectObject;
+        }
+
+        /// <summary>
+        /// Deletes the original drawable type objects that were cut after pasting.
+        /// </summary>
+        private void Cut()
+        {
+            if (state == CutCopy.Cut)
+            {
+                if (selectedObj.CompareTag(Tags.MindMapNode))
+                {
+                    MMNodeValueHolder valueHolder = selectedObj.GetComponent<MMNodeValueHolder>();
+                    if (valueHolder.GetParent() != null)
+                    {
+                        valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(selectedObj);
+                        new MindMapRemoveChildNetAction(oldSurface.name,
+                            GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                            MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
+                    }
+
+                    if (valueHolder.GetParentBranchLine() != null)
+                    {
+                        new EraseNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                            valueHolder.GetParentBranchLine().name).Execute();
+                        Destroyer.Destroy(valueHolder.GetParentBranchLine());
+                    }
+                    foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+                    {
+                        new EraseNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                            pair.Value.name).Execute();
+                        Destroyer.Destroy(pair.Value);
+
+                        new EraseNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                            pair.Key.name).Execute();
+                        Destroyer.Destroy(pair.Key);
+                    }
+                }
+                new EraseNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                    selectedObj.name).Execute();
+                Destroyer.Destroy(selectedObj);
+            }
+        }
+
+        /// <summary>
+        /// Opens the parent-selection menu for the pasted mind-map node.
+        /// </summary>
+        private void OpenSelectParent()
+        {
+            if (mindMapPasteOperation.TryOpenParentSelection())
+            {
+                progressState = ProgressState.SelectParent;
+            }
+        }
+
+        /// <summary>
+        /// Updates the parent selection for the pasted mind-map node.
+        /// </summary>
+        private void SelectParent()
+        {
+            switch (mindMapPasteOperation.UpdateParentSelection())
+            {
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.Completed:
+                    ApplyMindMapPasteResult();
+                    progressState = ProgressState.Finish;
+                    break;
+
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.Reset:
+                    SetToInitialState();
+                    break;
+
+                case CutCopyPasteMindMapPasteOperation.ParentSelectionResult.InProgress:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Reverts this action, i.e., restores the old object and destroys the new one.
+        /// </summary>
+        public override void Undo()
+        {
+            base.Undo();
+            /// Block to restore the original cut object.
+            if (memento.State == CutCopy.Cut)
+            {
+                GameObject oldSurface = memento.OldSurface.GetDrawableSurface();
+
+                if (memento.OldValueHolder is MindMapNodeConf)
+                {
+                    foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
+                    {
+                        DrawableType.Restore(type, oldSurface);
+                    }
+                    if (memento.OldBranchLineConfig != null)
+                    {
+                        GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(oldSurface, memento.OldValueHolder.ID);
+                        if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
+                        {
+                            GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
+                                GetParentBranchLine();
+                            GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                            new EditLineNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
+                                LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
+                        }
+                    }
+                }
+                else
+                {
+                    DrawableType.Restore(memento.OldValueHolder, oldSurface);
+                }
+            }
+
+            /// Block to destroy the clone object.
+            GameObject clonedObject = GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(),
+                memento.NewValueHolder.ID);
+            if (clonedObject.CompareTag(Tags.MindMapNode))
+            {
+                MMNodeValueHolder valueHolder = clonedObject.GetComponent<MMNodeValueHolder>();
+                if (valueHolder.GetParentBranchLine() != null)
+                {
+                    new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
+                        valueHolder.GetParentBranchLine().name).Execute();
+                    Destroyer.Destroy(valueHolder.GetParentBranchLine());
+
+                    valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(clonedObject);
+                    new MindMapRemoveChildNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
+                        MindMapNodeConf.GetNodeConf(clonedObject)).Execute();
+                }
+                foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
+                {
+                    new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, type.ID).Execute();
+                    Destroyer.Destroy(GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(), type.ID));
+                }
+            }
+            new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, clonedObject.name).Execute();
+            Destroyer.Destroy(clonedObject);
+        }
+
+        /// <summary>
+        /// Repeats this action, i.e., creates again the new object and deletes the old one if it was cut.
+        /// </summary>
+        public override void Redo()
+        {
+            base.Redo();
+            /// Block to restore the clone object.
+            GameObject newSurface = memento.NewSurface.GetDrawableSurface();
+
+            if (memento.NewValueHolder is MindMapNodeConf)
+            {
+                GameObject obj = DrawableType.Restore(memento.NewValueHolder, newSurface);
+                foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
+                {
+                    DrawableType.Restore(type, newSurface);
+                }
+                if (memento.OldBranchLineConfig != null)
+                {
+                    GameObject restoredObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, memento.NewValueHolder.ID);
+                    if (restoredObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
+                    {
+                        GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>().
+                            GetParentBranchLine();
+                        GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                        new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
+                            LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
+                    }
+                }
+            }
+            else
+            {
+                DrawableType.Restore(memento.NewValueHolder, newSurface);
+            }
+
+            /// Block to destroy the original object, if cut was selected.
+            if (memento.State == CutCopy.Cut)
+            {
+                GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(memento.OldSurface.GetDrawableSurface(),
+                    memento.OldValueHolder.ID);
+                if (oldObject.CompareTag(Tags.MindMapNode))
+                {
+                    MMNodeValueHolder valueHolder = oldObject.GetComponent<MMNodeValueHolder>();
+                    if (valueHolder.GetParentBranchLine() != null)
+                    {
+                        new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID,
+                            valueHolder.GetParentBranchLine().name).Execute();
+                        Destroyer.Destroy(valueHolder.GetParentBranchLine());
+
+                        valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(oldObject);
+                        new MindMapRemoveChildNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID,
+                            MindMapNodeConf.GetNodeConf(oldObject)).Execute();
+                    }
+                    foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
+                    {
+                        new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, type.ID).Execute();
+                        Destroyer.Destroy(GameFinder.FindAttachedOrLocalDescendant(memento.OldSurface.GetDrawableSurface(), type.ID));
+                    }
+                }
+                new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, oldObject.name).Execute();
+                Destroyer.Destroy(oldObject);
+            }
+        }
+
+        /// <summary>
+        /// A new instance of <see cref="CutCopyPasteActyion"/>.
+        /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
+        /// </summary>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
+        public static IReversibleAction CreateReversibleAction()
+        {
+            return new CutCopyPasteAction();
+        }
+
+        /// <summary>
+        /// A new instance of <see cref="CutCopyPasteAction"/>.
+        /// See <see cref="ReversibleAction.NewInstance"/>.
+        /// </summary>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
+        public override IReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.CutCopyPaste"/>.</returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateTypes.CutCopyPaste;
+        }
+
+        /// <summary>
+        /// The set of IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object,
+        /// an empty set is always returned.
+        /// </summary>
+        /// <returns>The object id of the changed object.</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>
+                {
+                    memento.OldValueHolder.ID,
+                    memento.NewValueHolder.ID
+                };
+        }
+    }
+}

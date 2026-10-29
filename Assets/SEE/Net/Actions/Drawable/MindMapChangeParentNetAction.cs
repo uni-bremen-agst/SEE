@@ -1,6 +1,6 @@
 ﻿using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Node != null && Node.ID != "")
             {
-                GameMindMap.ChangeParent(FindChild(Node.BorderConf.ID).transform.parent.gameObject, FindChild(Node.ParentNode));
+                GameMindMapEdit.ChangeParent(FindChild(Node.BorderConf.ID).transform.parent.gameObject, FindChild(Node.ParentNode));
             }
             else
             {

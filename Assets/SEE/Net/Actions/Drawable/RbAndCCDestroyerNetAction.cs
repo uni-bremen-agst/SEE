@@ -1,4 +1,4 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.MindMap;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -30,7 +30,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(FindChild(NodeID));
+            GameMindMapTransform.DestroyRigidBodiesAndCollisionControllersOfChildren(FindChild(NodeID));
         }
     }
 }

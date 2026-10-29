@@ -1,14 +1,15 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
-using SEE.Extensions;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -157,7 +158,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
                     string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                    GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                    GameLineGeometry.MovePoint(selectedLine, Indices, oldPointPosition);
                     new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                         oldPointPosition).Execute();
                 }
@@ -229,7 +230,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     if (GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
                     {
                         newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
-                        GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                        GameLineGeometry.MovePoint(selectedLine, Indices, newPointPosition);
                         new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name,
                             Indices, newPointPosition).Execute();
                     }
@@ -246,7 +247,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 && selectedLine.GetComponent<BlinkEffect>() == null)
             {
                 progressState = ProgressState.Finish;
-                GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                GameLineGeometry.MovePoint(selectedLine, Indices, newPointPosition);
                 new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name, Indices,
                     newPointPosition).Execute();
             }
@@ -265,7 +266,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             {
                 GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                GameLineGeometry.MovePoint(selectedLine, Indices, oldPointPosition);
                 new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                     oldPointPosition).Execute();
             }
@@ -284,7 +285,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             if (memento.Line != null)
             {
-                GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.OldPointPosition);
+                GameLineGeometry.MovePoint(memento.Line, memento.Indices, memento.OldPointPosition);
                 new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.OldPointPosition).Execute();
             }
@@ -302,7 +303,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
             if (memento.Line != null)
             {
-                GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.NewPointPosition);
+                GameLineGeometry.MovePoint(memento.Line, memento.Indices, memento.NewPointPosition);
                 new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.NewPointPosition).Execute();
             }

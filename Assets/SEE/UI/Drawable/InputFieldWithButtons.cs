@@ -68,31 +68,98 @@ namespace SEE.UI.Drawable
         public UnityEvent<float> OnProportionalValueChanged = null;
 
         /// <summary>
-        /// Get and sets up the input field and the buttons.
+        /// Whether this component has already initialized its UI references and handlers.
+        /// </summary>
+        private bool initialized;
+
+        /// <summary>
+        /// Initializes the input field with its buttons.
         /// </summary>
         private void Awake()
         {
-            inputField = GetComponentInChildren<TMP_InputField>();
-            GameObject up = transform.Find("UpDown").Find("UpBtn").gameObject;
-            upBtn = up.GetComponent<ButtonManagerBasic>();
+            Initialize();
+        }
 
-            GameObject down = transform.Find("UpDown").Find("DownBtn").gameObject;
+        /// <summary>
+        /// Initializes the UI references and event handlers of this input field.
+        /// This method is idempotent so that the component can also be initialized
+        /// before Unity invokes <see cref="Awake"/>.
+        /// </summary>
+        /// <exception cref="MissingComponentException">
+        /// Thrown if one of the required UI controls cannot be found.
+        /// </exception>
+        private void Initialize()
+        {
+            if (initialized)
+            {
+                return;
+            }
+
+            inputField = GetComponentInChildren<TMP_InputField>(true);
+            if (inputField == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(InputFieldWithButtons)} requires a {nameof(TMP_InputField)}.");
+            }
+
+            Transform upDown = transform.Find("UpDown");
+            if (upDown == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(InputFieldWithButtons)} requires a child named 'UpDown'.");
+            }
+
+            Transform up = upDown.Find("UpBtn");
+            if (up == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(InputFieldWithButtons)} requires a child named 'UpBtn'.");
+            }
+
+            Transform down = upDown.Find("DownBtn");
+            if (down == null)
+            {
+                throw new MissingComponentException(
+                    $"{nameof(InputFieldWithButtons)} requires a child named 'DownBtn'.");
+            }
+
+            upBtn = up.GetComponent<ButtonManagerBasic>();
+            if (upBtn == null)
+            {
+                throw new MissingComponentException(
+                    $"The 'UpBtn' object requires a {nameof(ButtonManagerBasic)}.");
+            }
+
             downBtn = down.GetComponent<ButtonManagerBasic>();
+            if (downBtn == null)
+            {
+                throw new MissingComponentException(
+                    $"The 'DownBtn' object requires a {nameof(ButtonManagerBasic)}.");
+            }
+
             /// Adds the handler for the normal left click.
             upBtn.clickEvent.AddListener(ClickUp);
-            /// Adds the component for the option that the button can be holded (right click).
-            up.AddComponent<ButtonHeld>().SetAction(ClickUp);
+
+            /// Adds the component for the option that the button can be held.
+            up.gameObject.AddComponent<ButtonHeld>().SetAction(ClickUp);
+
             /// Adds the handler for the normal left click.
             downBtn.clickEvent.AddListener(ClickDown);
-            /// Adds the component for the option that the button can be holded (right click).
-            down.AddComponent<ButtonHeld>().SetAction(ClickDown);
-            /// Adds a hover tool tip to the buttons.
-            up.AddComponent<UIHoverTooltip>().SetMessage("Left mouse button for a single click, " +
-                "right mouse button can be held down (performs multiple steps).");
-            down.AddComponent<UIHoverTooltip>().SetMessage("Left mouse button for a single click, " +
-                "right mouse button can be held down (performs multiple steps).");
+
+            /// Adds the component for the option that the button can be held.
+            down.gameObject.AddComponent<ButtonHeld>().SetAction(ClickDown);
+
+            /// Adds hover tooltips to the buttons.
+            up.gameObject.AddComponent<UIHoverTooltip>().SetMessage(
+                "Left mouse button for a single click, right mouse button can be held down "
+                + "(performs multiple steps).");
+            down.gameObject.AddComponent<UIHoverTooltip>().SetMessage(
+                "Left mouse button for a single click, right mouse button can be held down "
+                + "(performs multiple steps).");
 
             inputField.onEndEdit.AddListener(ValueChanged);
+
+            initialized = true;
         }
 
         /// <summary>
@@ -141,6 +208,8 @@ namespace SEE.UI.Drawable
         /// <param name="assignValue">The value that should assigned.</param>
         public void AssignValue(float assignValue)
         {
+            Initialize();
+
             /// If the value would be less then the <see cref="minValue"/>.
             /// Set to <see cref="minValue"/>.
             if (assignValue < minValue)
@@ -219,6 +288,7 @@ namespace SEE.UI.Drawable
         /// <returns>The value.</returns>
         public float GetValue()
         {
+            Initialize();
             return value;
         }
 

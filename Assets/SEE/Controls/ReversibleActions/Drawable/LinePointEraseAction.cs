@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             foreach (Memento mem in reverseList)
             {
                 GameObject surface = mem.Surface.GetDrawableSurface();
-                GameDrawer.ReDrawLine(surface, mem.OriginalLine);
+                GameLineDrawer.ReDrawLine(surface, mem.OriginalLine);
                 new DrawNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine).Execute();
 
                 foreach (LineConf line in mem.Lines)
@@ -98,7 +99,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
                 foreach (LineConf line in mem.Lines)
                 {
-                    GameDrawer.ReDrawLine(surface, line);
+                    GameLineDrawer.ReDrawLine(surface, line);
                     new DrawNetAction(mem.Surface.ID, mem.Surface.ParentID, line).Execute();
                 }
             }

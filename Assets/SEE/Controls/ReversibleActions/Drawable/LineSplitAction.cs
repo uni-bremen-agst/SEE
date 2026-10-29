@@ -2,6 +2,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
@@ -87,7 +88,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// Calculates the pivot point for the marker.
             Vector3 position = hitObject.transform.TransformPoint(splitPos);
             GameObject surface = GameFinder.GetDrawableSurface(hitObject);
-            position = GameDrawer.GetConvertedPosition(surface, position);
+            position = GameLineGeometry.GetConvertedPosition(surface, position);
 
             /// Calculates the negativ color for the marker.
             Color color = GetColor(hitObject);
@@ -97,12 +98,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
                 ValueHolder.LineSplitMarkerRadius, ValueHolder.LineSplitMarkerVertices);
             /// Creates the marker polygon.
-            GameObject point = GameDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
-                GameDrawer.ColorKind.Monochrome,
+            GameObject point = GameLineDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
+                ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
-                false, GameDrawer.LineKind.Solid, 1f, increaseCurrentOrder: false);
+                false, LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
-            GameDrawer.SetPivotShape(point, position);
+            GameLineGeometry.SetPivotShape(point, position);
             /// Adds the point on all clients.
             new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), LineConf.GetLine(point)).Execute();
             /// Adds a blink effect.
@@ -116,9 +117,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
         /// <summary>
         /// Delivers the color for the complementary color calculation.
-        /// For <see cref="GameDrawer.ColorKind.Monochrome"/>, it is the normal line color.
-        /// For <see cref="GameDrawer.ColorKind.Gradient"/>, it is a mix of the start and the end color.
-        /// For <see cref="GameDrawer.ColorKind.TwoDashed"/>, it is a mix of the two material colors.
+        /// For <see cref="ColorKind.Monochrome"/>, it is the normal line color.
+        /// For <see cref="ColorKind.Gradient"/>, it is a mix of the start and the end color.
+        /// For <see cref="ColorKind.TwoDashed"/>, it is a mix of the two material colors.
         /// </summary>
         /// <param name="line">The split line.</param>
         /// <returns>The color for the complementary color calculation.</returns>
@@ -129,13 +130,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             switch (holder.ColorKind)
             {
-                case GameDrawer.ColorKind.Monochrome:
+                case ColorKind.Monochrome:
                     color = line.GetColor();
                     break;
-                case GameDrawer.ColorKind.Gradient:
+                case ColorKind.Gradient:
                     color = (renderer.startColor + renderer.endColor) / 2;
                     break;
-                case GameDrawer.ColorKind.TwoDashed:
+                case ColorKind.TwoDashed:
                     color = (renderer.materials[0].color + renderer.materials[1].color) / 2;
                     break;
             }
@@ -149,7 +150,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             base.Undo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameDrawer.ReDrawLine(surface, memento.OriginalLine);
+            GameLineDrawer.ReDrawLine(surface, memento.OriginalLine);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine).Execute();
 
             foreach (LineConf line in memento.Lines)
@@ -173,7 +174,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameDrawer.ReDrawLine(surface, line);
+                GameLineDrawer.ReDrawLine(surface, line);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, line).Execute();
             }
         }

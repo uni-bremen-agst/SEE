@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.UI.Menu.Drawable;
+using UnityEngine;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -12,5 +13,14 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// The surface on which the drawables are displayed.
         /// </summary>
         protected GameObject Surface { get; set; }
+
+        /// <summary>
+        /// Initializes the shared action and menu lifecycles for drawable actions.
+        /// </summary>
+        protected DrawableAction()
+        {
+            DrawableActionLifecycle.Initialize();
+            DrawableMenuLifecycle.Initialize();
+        }
     }
 }

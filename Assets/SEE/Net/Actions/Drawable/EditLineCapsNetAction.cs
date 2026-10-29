@@ -1,5 +1,6 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Editing;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.Net.Actions.Drawable
@@ -58,7 +59,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeLineCaps(FindChild(LineName), LineConf, StartCap, EndCap);
+            GameLineEdit.ChangeLineCaps(FindChild(LineName), LineConf, StartCap, EndCap);
         }
     }
 }

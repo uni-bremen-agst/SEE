@@ -30,14 +30,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Whether this class has a source in store that hasn't been fetched yet.
+        /// Whether a source has been selected but not yet consumed.
         /// </summary>
-        private static bool gotSource;
+        private bool gotSource;
 
         /// <summary>
-        /// If <see cref="gotSource"/> is true, this contains the source which the player selected.
+        /// The selected image source.
         /// </summary>
-        private static Source chosenSource;
+        private Source chosenSource = Source.None;
 
         /// <summary>
         /// The different sources
@@ -50,62 +50,91 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the image source menu and registers the needed handler to the buttons.
+        /// Enables the image source menu and registers the required button handlers.
         /// </summary>
-        public static void EnableMenu()
+        public override void Enable()
         {
-            if (Instance.gameObject == null)
+            if (gameObject != null)
             {
-                Instance.Instantiate(imageSourceMenuPrefab);
-
-                /// Initialize the button for loading the image from local disk.
-                ButtonManagerBasic local = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Local")
-                    .GetComponent<ButtonManagerBasic>();
-                local.clickEvent.AddListener(() =>
-                {
-                    gotSource = true;
-                    chosenSource = Source.Local;
-                    Instance.Destroy();
-                });
-
-                /// Initialize the button for loading the image from the web.
-                ButtonManagerBasic web = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Web")
-                    .GetComponent<ButtonManagerBasic>();
-                web.clickEvent.AddListener(() =>
-                {
-                    gotSource = true;
-                    chosenSource = Source.Web;
-                    Instance.Destroy();
-                });
-
-                /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Cancel")
-                    .GetComponent<ButtonManagerBasic>();
-                cancelBtn.clickEvent.AddListener(() =>
-                {
-                    Instance.Destroy();
-                });
+                return;
             }
+
+            gotSource = false;
+            chosenSource = Source.None;
+
+            Instantiate(imageSourceMenuPrefab);
+
+            ButtonManagerBasic local =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Local")
+                    .GetComponent<ButtonManagerBasic>();
+
+            local.clickEvent.AddListener(() =>
+            {
+                SelectSource(Source.Local);
+            });
+
+            ButtonManagerBasic web =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Web")
+                    .GetComponent<ButtonManagerBasic>();
+
+            web.clickEvent.AddListener(() =>
+            {
+                SelectSource(Source.Web);
+            });
+
+            ButtonManagerBasic cancelButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Cancel")
+                    .GetComponent<ButtonManagerBasic>();
+
+            cancelButton.clickEvent.AddListener(Destroy);
         }
 
         /// <summary>
-        /// If <see cref="gotSource"/> is true, the <paramref name="source"/> will be the chosen source by the
-        /// player. Otherwise it will be some dummy value.
+        /// Stores the selected source until it is consumed by the image action
+        /// and hides the source menu.
         /// </summary>
-        /// <param name="source">The source the player confirmed, if that doesn't exist, some dummy value.</param>
-        /// <returns><see cref="gotSource"/>.</returns>
-        public static bool TryGetSource(out Source source)
+        /// <param name="source">The selected image source.</param>
+        private void SelectSource(Source source)
         {
-            if (gotSource)
+            chosenSource = source;
+            gotSource = true;
+
+            Disable();
+        }
+
+        /// <summary>
+        /// Returns the selected image source if one is waiting to be consumed.
+        /// </summary>
+        /// <param name="source">
+        /// The selected source, or <see cref="Source.None"/> if none is available.
+        /// </param>
+        /// <returns>Whether a source was available.</returns>
+        public bool TryGetSource(out Source source)
+        {
+            if (!gotSource)
             {
-                source = chosenSource;
-                gotSource = false;
-                Instance.Destroy();
-                return true;
+                source = Source.None;
+                return false;
             }
 
-            source = Source.None;
-            return false;
+            source = chosenSource;
+
+            gotSource = false;
+            chosenSource = Source.None;
+
+            Destroy();
+            return true;
+        }
+
+        /// <summary>
+        /// Destroys the menu and discards any pending source selection.
+        /// </summary>
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            gotSource = false;
+            chosenSource = Source.None;
         }
     }
 }

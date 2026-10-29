@@ -1,18 +1,20 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.MindMap;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.UI.Menu.Drawable.MindMapMenu;
-using SEE.Controls.KeyActions;
+using static SEE.UI.Menu.Drawable.MindMap.MindMapMenu;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -117,7 +119,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         public override void Awake()
         {
             base.Awake();
-            MindMapMenu.Instance.Enable();
+            Instance.Enable();
         }
 
         /// <summary>
@@ -126,7 +128,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         public override void Stop()
         {
             base.Stop();
-            MindMapMenu.Instance.Destroy();
+            Instance.Destroy();
             MindMapParentSelectionMenu.Instance.Destroy();
 
             if (progress != ProgressState.Finish && node != null)
@@ -148,7 +150,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                if (MindMapMenu.TryGetOperation(out Operation operation))
+                if (TryGetOperation(out Operation operation))
                 {
                     chosenOperation = operation;
                 }
@@ -199,7 +201,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     MindMapParentSelectionMenu.Instance.Destroy();
                     Destroyer.Destroy(branchLine);
-                    branchLine = GameMindMap.CreateBranchLine(node, parent);
+                    branchLine = GameMindMapBranch.CreateBranchLine(node, parent);
                     progress = ProgressState.Finish;
                 }
             }
@@ -247,7 +249,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit))
             {
-                MindMapMenu.Instance.Destroy();
+                Instance.Destroy();
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 if (CheckValid(GameFinder.GetAttachedObjectsObject(Surface)))
                 {
@@ -261,7 +263,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     Surface = null;
                     chosenOperation = Operation.None;
-                    MindMapMenu.Instance.Enable();
+                    Instance.Enable();
                     return false;
                 }
             }
@@ -286,7 +288,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (writeTextDialog.WasCanceled())
             {
                 chosenOperation = Operation.None;
-                MindMapMenu.Instance.Enable();
+                Instance.Enable();
                 progress = ProgressState.SelectPosition;
             }
         }
@@ -298,7 +300,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// </summary>
         private void AddNode()
         {
-            node = GameMindMap.Create(Surface, GetPrefix(), writtenText, position);
+            node = GameMindMapNode.Create(Surface, GetPrefix(), writtenText, position);
             if (chosenOperation == Operation.Theme)
             {
                 progress = ProgressState.Finish;
@@ -309,9 +311,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 ShowNotification.Info("Select a Parent Node", "Now select a parent node.\n" +
                     "To select, click on the specific parent node or choose it from the menu.", 3);
                 /// The following block is for a branch line preview.
-                branchLine = GameDrawer.StartDrawing(Surface, new Vector3[] { position },
-                    GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
-                    ValueHolder.StandardLineThickness, GameDrawer.LineKind.Solid,
+                branchLine = GameLineDrawer.StartDrawing(Surface, new Vector3[] { position },
+                    ColorKind.Monochrome, Color.black, Color.clear,
+                    ValueHolder.StandardLineThickness, LineKind.Solid,
                     ValueHolder.StandardLineTiling);
                 branchLine.transform.SetParent(node.transform);
                 branchLineRenderer = branchLine.GetComponent<LineRenderer>();
@@ -356,7 +358,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(GameFinder.GetDrawableSurface(node)))
                 {
                     Destroyer.Destroy(branchLine);
-                    branchLine = GameMindMap.CreateBranchLine(node, hit.collider.gameObject);
+                    branchLine = GameMindMapBranch.CreateBranchLine(node, hit.collider.gameObject);
                     progress = ProgressState.Finish;
                 }
                 else
@@ -390,7 +392,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 chosenOperation = Operation.None;
                 node = null;
                 branchLine = null;
-                MindMapMenu.Instance.Enable();
+                Instance.Enable();
             }
         }
 
@@ -407,10 +409,10 @@ namespace SEE.Controls.ReversibleActions.Drawable
         }
 
         /// <summary>
-        /// This method checks for validity by verifying
-        /// if at least one theme exists on the drawable.
-        /// If not, it provides an appropriate prompt
-        /// when attempting to add a node that is not a theme.
+        /// This method checks for validity by verifying whether at least one
+        /// parent-capable Mind Map node exists on the active drawable page.
+        /// If not, it provides an appropriate prompt when attempting to add a
+        /// node that is not a theme.
         /// </summary>
         /// <param name="attachedObjects">The attached objects of the drawable.</param>
         /// <returns>The result of the validation.</returns>
@@ -421,21 +423,27 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null
-                && attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null)
             {
-                return true;
-            }
-            else
-            {
-                ShowNotification.Warn("Cannot add", "First you need to add a theme.");
+                foreach (GameObject candidate in
+                         attachedObjects.FindAllDescendantsWithTag(
+                             Tags.MindMapNode,
+                             false))
+                {
+                    if (candidate.TryGetComponent(out MMNodeValueHolder valueHolder)
+                        && valueHolder.NodeKind != MindMapNodeKind.Leaf)
+                    {
+                        return true;
+                    }
+                }
             }
 
+            ShowNotification.Warn("Cannot add", "First you need to add a theme.");
             return false;
         }
 
         /// <summary>
-        /// Gets the prefix of the chosen <see cref="MindMapMenu.Operation"/>
+        /// Gets the prefix of the chosen <see cref="Operation"/>
         /// </summary>
         /// <returns>The prefix.</returns>
         private string GetPrefix()

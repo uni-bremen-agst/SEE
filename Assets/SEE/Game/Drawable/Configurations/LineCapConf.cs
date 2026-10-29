@@ -1,11 +1,11 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -188,7 +188,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <remarks>
         /// Floating-point values are compared using <see cref="Mathf.Approximately(float, float)"/>.
         ///
-        /// This value-based comparison is used, for example, by <see cref="Controls.Actions.Drawable.EditAction"/>
+        /// This value-based comparison is used, for example, by <see cref="Controls.ReversibleActions.Drawable.EditAction"/>
         /// to determine whether a line cap configuration has been modified.
         /// </remarks>
         public bool Equals(LineCapConf other)
@@ -305,7 +305,7 @@ namespace SEE.Game.Drawable.Configurations
                 return CreateNone();
             }
 
-            List<GameObject> caps = GetLineCapObjects(line, startCap);
+            List<GameObject> caps = GameLineCapRenderer.GetLineCapObjects(line, startCap);
             if (caps.Count == 0)
             {
                 return CreateNone();

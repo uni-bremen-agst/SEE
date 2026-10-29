@@ -434,7 +434,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// Sets the page.
             void SetPage(int page)
             {
-                GameDrawableManager.ChangeCurrentPage(surface, page);
+                GameDrawablePageManager.ChangeCurrentPage(surface, page);
                 new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
             }
 
@@ -446,13 +446,13 @@ namespace SEE.UI.Window.DrawableManagerWindow
                     string deleteMessage = $"Do you really want to delete page {page}?\nThis action cannot be undone.";
                     if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
                     {
-                        GameDrawableManager.RemovePage(surface, page);
+                        GameDrawablePageManager.RemovePage(surface, page);
                         new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
                     }
                 }
                 else
                 {
-                    GameDrawableManager.RemovePage(surface, page);
+                    GameDrawablePageManager.RemovePage(surface, page);
                     new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
                 }
             }

@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.ValueHolders;
+﻿using SEE.Game.Drawable.Text;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
@@ -71,7 +72,7 @@ namespace SEE.Game.Drawable.Configurations
                     Text = tmp.text,
                     FontColor = tmp.color,
                     OutlineColor = tmp.outlineColor,
-                    IsOutlined = tmp.fontMaterial.IsKeywordEnabled(GameTexter.OutlineKeyWord),
+                    IsOutlined = GameTextAppearance.IsOutlineEnabled(tmp),
                     OutlineThickness = tmp.outlineWidth,
                     FontStyles = tmp.fontStyle,
                     FontSize = tmp.fontSize,

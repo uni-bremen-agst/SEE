@@ -1,6 +1,8 @@
-﻿using SEE.Controls.ReversibleActions.Drawable;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable;
 using UnityEngine;
+using SEE.Controls.ReversibleActions.Drawable.DrawShapes;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -66,11 +68,11 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (FillOutStatus)
                 {
-                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                    GameLineDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
                 }
                 else
                 {
-                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, null);
+                    GameLineDrawer.FinishDrawing(FindChild(LineID), Loop, null);
                 }
             }
             else

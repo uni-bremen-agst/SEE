@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -48,7 +49,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (LineID != null && LineID != "")
             {
-                GameDrawer.DrawPoint(FindChild(LineID), Position, Index);
+                GameLineDrawer.DrawPoint(FindChild(LineID), Position, Index);
             }
             else
             {
