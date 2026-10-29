@@ -1,10 +1,15 @@
 using System;
-using SEE.UserSetting;
+using System.Collections.Generic;
+using UnityEngine;
+
 using SEE.XR;
-using SEE.Net.Actions.MarkNetAction;
+using SEE.Extensions;
+using SEE.SceneManipulation;
 using SEE.GraphElementRefs;
-using SEE.SceneManipulation.GameModeMarker;
 using SEE.Controls.KeyActions;
+using SEE.Net.Actions.GraphElement;
+using SEE.UserSettings;
+using SEE.Utils;
 
 namespace SEE.Controls.ReversibleActions
 {
@@ -42,6 +47,8 @@ namespace SEE.Controls.ReversibleActions
                 MarkNode(raycastHit.collider.gameObject);
                 result = true;
             }
+
+            return result;
         }
 
         /// <summary>
@@ -50,22 +57,16 @@ namespace SEE.Controls.ReversibleActions
         /// <param name="node">The node on which to place the sphere / mark.</param>
         private void MarkNode(GameObject node)
         {
-            addedMark = GameNodeMarker.AddMark(node);
-            lastParent = addedMark.Parent;
-            new MarkNetAction(lastParent.NodeID).Execute;
+            GameNodeMarker.AddMark(node);
+            addedMarkParent = node;
+            new MarkNetAction(node.name).Execute();
         }
 
         /// <summary>
-        /// The mark that was added when this action was executed. It is saved so
-        /// that it can be removed on <see cref="Undo"/>.
+        /// The parent that got markes when this action was executed. It is saved so
+        /// that it can be marked/unmarked again <see cref="Undo"/>.
         /// </summary>
-        private GameObject addedMark;
-
-        /// <summary>
-        /// The mark that was added when this action was executed. It is saved so
-        /// that it can be removed on <see cref="Undo"/>.
-        /// </summary>
-        private GameObject lastParent;
+        private GameObject addedMarkParent;
 
         /// <summary>
         /// Undoes this action.
@@ -74,8 +75,7 @@ namespace SEE.Controls.ReversibleActions
         {
             base.Undo();
 
-            MarkNode(lastParent);
-
+            MarkNode(addedMarkParent);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace SEE.Controls.ReversibleActions
         {
             base.Redo();
 
-            MarkNode(lastParent);
+            MarkNode(addedMarkParent);
         }
 
         /// <summary>
@@ -121,16 +121,9 @@ namespace SEE.Controls.ReversibleActions
         /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return addedMark != null ?
-                return lastParent != null ?
-                    new HashSet<string> {
-                        lastParent.NodeID,
-                        addedMark.ID,
-                    } :
-                new HashSet<string> {
-                    lastParent.NodeID,
-                } :
-            new HashSet<string> {};
+            return new HashSet<string> {
+                addedMarkParent.name
+            };
         }
     }
 }

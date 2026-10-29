@@ -10,7 +10,7 @@ namespace SEE.Net.Actions.GraphElement
     internal class MarkNetAction : NodeNetAction
     {
 
-        public GameOnject node;
+        public string ID;
 
         /// <summary>
         /// Constructor.
@@ -19,7 +19,7 @@ namespace SEE.Net.Actions.GraphElement
         public MarkNetAction(string nodeID)
             : base(nodeID)
         {
-            node = nodeID;
+            ID = nodeID;
         }
 
         /// <summary>
@@ -27,6 +27,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
+            GameObject node = Find(ID);
             GameNodeMarker.AddMark(node);
         }
     }

@@ -1,6 +1,10 @@
 using SEE.Extensions;
 using SEE.GraphElementRefs;
+using SEE.SceneManipulation;
+using SEE.Utils;
+
 using UnityEngine;
+using System;
 
 namespace SEE.SceneManipulation
 {
@@ -11,15 +15,19 @@ namespace SEE.SceneManipulation
     {
 
         /// <summary>
-        /// adds mark to node
+        /// adds or removes mark to/from node
         /// </summary>
-        /// <param name="node">The node to add the mark to.</param>
-        public void AddMark(GameObject node)
+        /// <param name="node">The node to add/remove the mark to.</param>
+        public static void AddMark(GameObject node)
         {
             GameObject mark = IsMarked(node);
-            mark != null ? RemoveMark(node, mark) :
+            if (mark != null)
             {
-                addedMark = PaintMark(node)
+                RemoveMark(mark);
+            }
+            else
+            {
+                PaintMark(node);
             }
         }
 
@@ -28,44 +36,33 @@ namespace SEE.SceneManipulation
         /// returns said mark or null if not marked
         /// </summary>
         /// <param name="node">The node to check for a mark.</param>
-        public GameObject IsMarked(GameObject node)
+        public static GameObject IsMarked(GameObject node)
         {
-            GameObject result = null;
-            foreach(GameObject n in node.GetChildren())
-            {
-                if(n.name == "Mark")
-                {
-                    result = n;
-                }
-            }
-            return result;
+            return node.transform.Find("Mark").gameObject;
         }
 
         /// <summary>
         /// removes mark from node
         /// </summary>
         /// <param name="node">The node from which to remove the mark.</param>
-        public void RemoveMark(GameObject node, GameObject mark)
+        public static void RemoveMark(GameObject mark)
         {
-            Destroyer.Destroy(mark.NodeID);
+            Destroyer.Destroy(mark);
         }
 
-
         /// <summary>
-        /// paints the actual mark and returns it
+        /// paints the actual mark
         /// </summary>
         /// <param name="parent">the parent of the supposed mark</param>
-        public GameObject PaintMark(GameObject parent)
+        public static void PaintMark(GameObject parent)
         {
-            GameObject mark;
-
             Renderer renderer = parent.GetComponent<Renderer>();
 
             if (renderer != null)
             {
                 float diameter = Mathf.Min(renderer.bounds.size.x, renderer.bounds.size.z);
 
-                GameObject mark = UnityEnginge.GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                GameObject mark = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 mark.name = "Mark";
 
                 mark.transform.localScale = Vector3.one * diameter;
@@ -76,7 +73,6 @@ namespace SEE.SceneManipulation
 
                 mark.transform.SetParent(parent.transform, true);
             }
-
         }
     }
 }
