@@ -50,12 +50,9 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
             packer.PerformHistory(circles, parentID, containerCenter, lastPositionsParam);
 
             float maxCircleDiame = 0f;
-            foreach (TheCircle circle in circles)
+            foreach (TheCircle circle in circles.Where(c => c.Radius * 2f > maxCircleDiame))
             {
-                if (circle.Radius * 2f > maxCircleDiame)
-                {
-                    maxCircleDiame = circle.Radius * 2f;
-                }
+                maxCircleDiame = circle.Radius * 2f;
             }
             IncrementalCirclePackerExtended packerExtended = new IncrementalCirclePackerExtended(maxCircleDiame);
             packerExtended.PbdIterations = 10;
