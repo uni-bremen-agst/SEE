@@ -52,6 +52,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticContext);
         }
 
+        /// <summary>Shares the environment's compiler status with reporting coverage.</summary>
+        /// <param name="compilation">The exact reporting compilation.</param>
+        /// <returns>Whether a compiler error other than CS5001 is present.</returns>
+        internal bool HasBlockingCompilationErrors(Compilation compilation)
+            => semanticContext.HasBlockingCompilationErrors(compilation);
+
         /// <summary>
         /// Adds one root to the shared graph, completes newly discovered
         /// summaries, and evaluates the root's escaping exception flow.

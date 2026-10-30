@@ -159,8 +159,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 // is fully bound. CS5001 cannot change a type/map/transfer rule;
                 // all binding, syntax, reference and constraint errors remain
                 // rejection inputs. Build validation is a separate unchanged gate.
-                if (model.Compilation.GetDiagnostics().Any(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error
-                        && diagnostic.Id != "CS5001"))
+                if (environment.HasBlockingCompilationErrors(model.Compilation))
                     reasons.Add(new("RepresentationOutsideGrammar", currentDefinition + " / source compilation has errors"));
                 foreach (SyntaxNode node in declaration.DescendantNodesAndSelf(child =>
                              ReferenceEquals(child, declaration) || child is not MemberDeclarationSyntax

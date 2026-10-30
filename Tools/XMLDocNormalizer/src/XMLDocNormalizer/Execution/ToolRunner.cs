@@ -183,7 +183,7 @@ namespace XMLDocNormalizer.Execution
                     continue;
                 }
 
-                AnalysisCoverageObserver.ObserveCompilation(result.Coverage, compilation);
+                AnalysisCoverageObserver.ObserveCompilation(result.Coverage, compilation, summaryAnalysisSession);
 
                 foreach (Document document in project.Documents)
                 {

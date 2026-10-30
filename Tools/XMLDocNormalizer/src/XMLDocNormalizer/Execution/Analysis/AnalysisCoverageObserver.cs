@@ -4,6 +4,7 @@ using XMLDocNormalizer.HistoricalWorker;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 
 namespace XMLDocNormalizer.Execution.Analysis;
 
@@ -11,9 +12,11 @@ namespace XMLDocNormalizer.Execution.Analysis;
 internal static class AnalysisCoverageObserver
 {
     /// <summary>Uses existing compiler diagnostics once per reporting compilation.</summary>
-    internal static void ObserveCompilation(AnalysisCoverage coverage, Compilation compilation)
+    internal static void ObserveCompilation(AnalysisCoverage coverage, Compilation compilation,
+        ExceptionFlowSummaryAnalysisSession? summarySession = null)
     {
-        if (compilation.GetDiagnostics().Any(item => item.Severity == DiagnosticSeverity.Error && item.Id != "CS5001"))
+        if (summarySession?.HasBlockingCompilationErrors(compilation)
+            ?? compilation.GetDiagnostics().Any(item => item.Severity == DiagnosticSeverity.Error && item.Id != "CS5001"))
             coverage.Incomplete("SourceBindingIncomplete");
     }
 
