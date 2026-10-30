@@ -17,7 +17,7 @@ namespace SEE.Net.Actions.GraphElement
         }
 
         /// <summary>
-        /// Creates a new GameObject (Mark) on each client.
+        /// Creates a new GameObject  on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {

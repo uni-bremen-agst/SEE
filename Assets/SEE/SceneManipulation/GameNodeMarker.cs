@@ -57,21 +57,21 @@ namespace SEE.SceneManipulation
             sphere.name = MarkerName;
 
             // Removing the collider so it doesn't interfere with other interactions
-            if (sphere.TryGetComponent<Collider>(out var collider))
+            if (sphere.TryGetComponent(out Collider collider))
             {
                 Destroyer.Destroy(collider);
             }
 
             // Getting the renderer and setting the color
-            if (sphere.TryGetComponent<Renderer>(out var renderer))
+            if (sphere.TryGetComponent(out Renderer renderer))
             {
                 renderer.material.color = Color.green;
             }
 
-            var size = gameNode.WorldSpaceSize();
+            Vector3 size = gameNode.WorldSpaceSize();
 
             // The diameter of the sphere must be the minimum of the width (x axis) and depth (z axis) of the marked node.
-            var diameter = Mathf.Min(size.x, size.z);
+            float diameter = Mathf.Min(size.x, size.z);
             sphere.transform.localScale = Vector3.one * diameter;
 
             // The sphere is to be placed above the X/Z center of the node to be marked.
@@ -88,7 +88,7 @@ namespace SEE.SceneManipulation
         /// <param name="gameNode">The game node to remove the marker from.</param>
         private static void RemoveMarker(GameObject gameNode)
         {
-            var marker = gameNode.transform.Find(MarkerName);
+            Transform marker = gameNode.transform.Find(MarkerName);
             if (marker != null)
             {
                 Destroyer.Destroy(marker.gameObject);
