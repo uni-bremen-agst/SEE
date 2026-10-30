@@ -19,6 +19,48 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly Dictionary<Compilation, bool> blockingCompilationErrors =
             new(ReferenceEqualityComparer.Instance);
 
+        // Only positive, exact model reads are replayable. Acquisition APIs
+        // exclude the entire local inspection, including unsuccessful lookups.
+        private AdmissionReads? admissionReads;
+
+        internal AdmissionReads BeginAdmissionReads()
+        {
+            var reads = new AdmissionReads(this, admissionReads);
+            admissionReads = reads;
+            return reads;
+        }
+
+        internal void ExcludeAdmissionReuse()
+        {
+            for (var reads = admissionReads; reads != null; reads = reads.Parent)
+                reads.Reusable = false;
+        }
+
+        private void ObserveAdmissionModel(SyntaxTree tree, SemanticModel? model)
+        {
+            for (var reads = admissionReads; reads != null; reads = reads.Parent)
+            {
+                if (model == null) reads.Reusable = false;
+                else if (reads.Models.TryGetValue(tree, out var previous)
+                    && !ReferenceEquals(previous, model.Compilation)) reads.Reusable = false;
+                else reads.Models[tree] = model.Compilation;
+            }
+        }
+
+        /// <summary>A sequential local read transaction; never retained by a published fact.</summary>
+        internal sealed class AdmissionReads : IDisposable
+        {
+            private readonly ExceptionFlowSemanticEnvironment environment;
+            internal AdmissionReads? Parent { get; }
+            internal bool Reusable { get; set; } = true;
+            internal Dictionary<SyntaxTree, Compilation> Models { get; } = new(ReferenceEqualityComparer.Instance);
+
+            internal AdmissionReads(ExceptionFlowSemanticEnvironment environment, AdmissionReads? parent)
+            { this.environment = environment; Parent = parent; }
+
+            public void Dispose() => environment.admissionReads = Parent;
+        }
+
         /// <summary>
         /// Gets the A9 blocking-error status once per exact compilation in this
         /// sequential environment. Executable packaging error CS5001 is ignored.

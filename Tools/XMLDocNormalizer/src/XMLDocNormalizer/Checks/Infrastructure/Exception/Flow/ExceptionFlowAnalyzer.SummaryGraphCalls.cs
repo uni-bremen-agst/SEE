@@ -93,6 +93,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (!hasCompleteSourceCoverage)
                 {
+                    if (methodSymbol.DeclaringSyntaxReferences.IsDefaultOrEmpty)
+                        semanticContext.ExcludeAdmissionReuse();
                     ExceptionFlowExternalDocumentationEvidence.AddToSummaryFragment(
                         invocation,
                         methodSymbol,

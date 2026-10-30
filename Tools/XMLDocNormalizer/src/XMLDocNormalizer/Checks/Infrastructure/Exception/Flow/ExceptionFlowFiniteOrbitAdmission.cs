@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.Canonical;
 using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowFiniteOrbitProfile;
 
@@ -27,6 +28,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private string? currentDefinition;
         private Certificate? certificate;
         private ExceptionFlowFiniteOrbitSeal? seal;
+        private LocalRecording? recording;
 
         private ExceptionFlowFiniteOrbitAdmission(ExceptionFlowSemanticEnvironment environment)
         {
@@ -99,6 +101,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             // occurs here. The independent queue contains definition IDs only.
             ExceptionFlowCallableKey key = new(symbol, context);
             edgeWitnesses.Add(key, edges.Count - 1);
+            recording?.Register(symbol, context, key);
             return key;
         }
 
@@ -106,6 +109,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">The not-yet-suppressed local fragment.</param>
         public void ObserveLocalFragment(ExceptionFlowSummaryFragment fragment)
         {
+            recording?.Observe(fragment);
             if (currentDefinition == null) throw new InvalidOperationException("No discovery body frame.");
             foreach (var source in fragment.Sources) templates[currentDefinition].Add(ToTerm(source.ExceptionType));
             foreach (var edge in fragment.CallEdges)
@@ -159,25 +163,43 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 // is fully bound. CS5001 cannot change a type/map/transfer rule;
                 // all binding, syntax, reference and constraint errors remain
                 // rejection inputs. Build validation is a separate unchanged gate.
-                if (environment.HasBlockingCompilationErrors(model.Compilation))
-                    reasons.Add(new("RepresentationOutsideGrammar", currentDefinition + " / source compilation has errors"));
+                CheckCompilation(model.Compilation);
                 foreach (SyntaxNode node in declaration.DescendantNodesAndSelf(child =>
                              ReferenceEquals(child, declaration) || child is not MemberDeclarationSyntax
                                  && child is not LocalFunctionStatementSyntax && child is not AnonymousFunctionExpressionSyntax))
                 {
                     if (node is AwaitExpressionSyntax)
-                        reasons.Add(new("TargetOrAnalysisCoverageIncomplete", currentDefinition + " / await requires unavailable shared RuntimeAwait capability"));
+                        LocalReason("TargetOrAnalysisCoverageIncomplete", " / await requires unavailable shared RuntimeAwait capability");
                     if (node is CatchDeclarationSyntax caught && model.GetTypeInfo(caught.Type).Type is ITypeSymbol caughtType)
-                        templates[currentDefinition!].Add(ToTerm(caughtType));
+                        CatchTemplate(caughtType);
                 }
             }
             ExceptionFlowSummaryFragment fragment = new();
             bool hasBody = ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(definition, environment,
                     this, fragment, new ExceptionFlowCallContext(definition));
             if (!hasBody)
-                reasons.Add(new("TargetOrAnalysisCoverageIncomplete", currentDefinition + " / executable body unavailable"));
+                LocalReason("TargetOrAnalysisCoverageIncomplete", " / executable body unavailable");
             ObserveLocalFragment(fragment);
             diagnosticDefinitions.Add(currentDefinition!, (fragment, hasBody));
+        }
+
+        private void CheckCompilation(Compilation compilation)
+        {
+            recording?.Events.Add(new CompilationEvent(compilation));
+            if (environment.HasBlockingCompilationErrors(compilation))
+                reasons.Add(new("RepresentationOutsideGrammar", currentDefinition + " / source compilation has errors"));
+        }
+
+        private void LocalReason(string category, string suffix)
+        {
+            recording?.Events.Add(new ReasonEvent(category, suffix));
+            reasons.Add(new(category, currentDefinition + suffix));
+        }
+
+        private void CatchTemplate(ITypeSymbol type)
+        {
+            recording?.Events.Add(new CatchEvent(type));
+            templates[currentDefinition!].Add(ToTerm(type));
         }
 
         /// <summary>Performs the finite definition prepass without a production graph.</summary>
@@ -185,9 +207,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="environment">The existing validated semantic environment.</param>
         /// <returns>The sealed inventory and classified outcome.</returns>
         internal static ExceptionFlowFiniteOrbitAdmission Discover(
-            MemberDeclarationSyntax member, ExceptionFlowSemanticEnvironment environment)
+            MemberDeclarationSyntax member, ExceptionFlowSemanticEnvironment environment, FactStore? facts = null)
         {
             ExceptionFlowFiniteOrbitAdmission admission = new(environment);
+            var world = facts?.Begin(environment);
+            List<(ISymbol Definition, LocalFact Fact)> staged = [];
             string root = "unresolved:" + member.SyntaxTree.FilePath + ":" + member.SpanStart;
             Term[] seed = [];
             if (!environment.TryGetSemanticModel(member.SyntaxTree, out SemanticModel model)
@@ -204,7 +228,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 while (admission.pendingDefinitions.TryDequeue(out string? body))
                 {
                     admission.currentDefinition = body;
-                    admission.InspectDeclaration(admission.declarations[body]);
+                    ISymbol definition = admission.declarations[body];
+                    if (facts != null && world != null && facts.TryGet(environment, world, definition, out var fact))
+                        admission.Replay(fact);
+                    else
+                    {
+                        using var reads = environment.BeginAdmissionReads();
+                        admission.recording = facts != null && world != null ? new LocalRecording() : null;
+                        facts?.Inspecting?.Invoke(definition);
+                        admission.InspectDeclaration(definition);
+                        if (admission.recording is { Valid: true } recorded && reads.Reusable
+                            && facts!.Owns(environment, world!, definition, reads.Models))
+                        {
+                            staged.Add((definition, new LocalFact(admission, reads.Models)));
+                        }
+                        admission.recording = null;
+                    }
                 }
             }
             admission.currentDefinition = null;
@@ -229,7 +268,167 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 admission.seal = new(admission.Outcome, admission.declarations,
                     admission.edgeTemplates, admission.knownAssemblies,
                     environment.GetAnalysisScopes().Select(item => item.Compilation));
+            // No facts escape a throwing discovery, including facts completed
+            // before the failing body. OUTSIDE is a completed classified result.
+            if (facts != null && world != null) facts.Publish(environment, world, staged);
             return admission;
+        }
+
+        /// <summary>
+        /// Session-owned store for the original-definition/empty-context schema
+        /// only. It never accepts a concrete production context or root product.
+        /// A view replacement retires all facts, even for equal scope digests.
+        /// </summary>
+        internal sealed class FactStore
+        {
+            private readonly ExceptionFlowSemanticEnvironment environment;
+            private IReadOnlyList<ExceptionFlowSemanticScope>? view;
+            private ExceptionFlowSemanticScope[] world = [];
+            private readonly Dictionary<ISymbol, LocalFact> completed = new(SymbolEqualityComparer.Default);
+            internal Action<ISymbol>? Inspecting { get; }
+
+            internal FactStore(ExceptionFlowSemanticEnvironment environment, Action<ISymbol>? inspecting = null)
+            { this.environment = environment; Inspecting = inspecting; }
+
+            internal ExceptionFlowSemanticScope[] Begin(ExceptionFlowSemanticEnvironment current)
+            {
+                if (!ReferenceEquals(environment, current)) throw new InvalidOperationException("Foreign admission environment.");
+                var scopes = current.GetAnalysisScopes();
+                if (!ReferenceEquals(view, scopes) || !SameMembers(scopes))
+                {
+                    completed.Clear();
+                    view = scopes;
+                    world = scopes.ToArray();
+                }
+                return world;
+            }
+
+            private bool SameMembers(IReadOnlyList<ExceptionFlowSemanticScope> scopes)
+                => scopes.Count == world.Length && scopes.Select((scope, index) =>
+                    ReferenceEquals(scope, world[index]) && ReferenceEquals(scope.Compilation, world[index].Compilation)).All(equal => equal);
+
+            private bool Current(ExceptionFlowSemanticEnvironment current, ExceptionFlowSemanticScope[] expected)
+                => ReferenceEquals(Begin(current), expected);
+
+            internal bool Owns(ExceptionFlowSemanticEnvironment current, ExceptionFlowSemanticScope[] expected,
+                ISymbol definition, IEnumerable<KeyValuePair<SyntaxTree, Compilation>> dependencies)
+                => Current(current, expected)
+                    && SymbolEqualityComparer.Default.Equals(definition, definition.OriginalDefinition)
+                    && expected.Count(scope => ReferenceEquals(scope.Compilation.Assembly, definition.ContainingAssembly)) == 1
+                    && dependencies.All(pair => expected.Any(scope => ReferenceEquals(scope.Compilation, pair.Value))
+                        && pair.Value.ContainsSyntaxTree(pair.Key));
+
+            internal bool TryGet(ExceptionFlowSemanticEnvironment current, ExceptionFlowSemanticScope[] expected,
+                ISymbol definition, out LocalFact fact)
+            {
+                fact = null!;
+                if (!Current(current, expected) || !completed.TryGetValue(definition, out var candidate)
+                    || !Owns(current, expected, definition, candidate.Models)) return false;
+                foreach (var pair in candidate.Models)
+                    if (!current.TryGetSemanticModel(pair.Key, out var model) || !ReferenceEquals(model.Compilation, pair.Value))
+                        return false;
+                fact = candidate;
+                return true;
+            }
+
+            internal void Publish(ExceptionFlowSemanticEnvironment current, ExceptionFlowSemanticScope[] expected,
+                IEnumerable<(ISymbol Definition, LocalFact Fact)> staged)
+            {
+                if (!Current(current, expected)) return;
+                foreach (var item in staged) completed.TryAdd(item.Definition, item.Fact);
+            }
+        }
+
+        private void Replay(LocalFact fact)
+            => fact.Replay(this);
+
+        // Private arrays are owned by completed facts and never exposed. Every
+        // replay allocates mutable fragments and target keys anew. RegisterTarget
+        // itself allocates assignment arrays, preserving its empty/nonempty alias
+        // behavior before the unchanged final Edge.Distinct().
+        internal sealed class LocalFact
+        {
+            private readonly LocalEvent[] events;
+            private readonly FragmentSnapshot final;
+            private readonly bool hasBody;
+            internal IReadOnlyList<KeyValuePair<SyntaxTree, Compilation>> Models { get; }
+
+            internal LocalFact(ExceptionFlowFiniteOrbitAdmission admission, IReadOnlyDictionary<SyntaxTree, Compilation> models)
+            {
+                var recorded = admission.recording!;
+                var diagnostic = admission.diagnosticDefinitions[admission.currentDefinition!];
+                events = recorded.Events.ToArray();
+                final = recorded.Snapshot(diagnostic.Fragment);
+                hasBody = diagnostic.HasBody;
+                Models = Array.AsReadOnly(models.ToArray());
+            }
+
+            internal void Replay(ExceptionFlowFiniteOrbitAdmission admission)
+            {
+                List<ExceptionFlowCallableKey> keys = [];
+                foreach (var entry in events) entry.Apply(admission, keys);
+                admission.diagnosticDefinitions.Add(admission.currentDefinition!, (final.Create(keys), hasBody));
+            }
+        }
+        private abstract record LocalEvent
+        { internal abstract void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys); }
+        private sealed record CompilationEvent(Compilation Compilation) : LocalEvent
+        { internal override void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys) => admission.CheckCompilation(Compilation); }
+        private sealed record ReasonEvent(string Category, string Suffix) : LocalEvent
+        { internal override void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys) => admission.LocalReason(Category, Suffix); }
+        private sealed record CatchEvent(ITypeSymbol Type) : LocalEvent
+        { internal override void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys) => admission.CatchTemplate(Type); }
+        private sealed record RegisterEvent(ISymbol Symbol, ExceptionFlowCallContext Context) : LocalEvent
+        { internal override void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys) => keys.Add(admission.RegisterTarget(Symbol, Context)); }
+        private sealed record ObserveEvent(FragmentSnapshot Fragment) : LocalEvent
+        { internal override void Apply(ExceptionFlowFiniteOrbitAdmission admission, List<ExceptionFlowCallableKey> keys) => admission.ObserveLocalFragment(Fragment.Create(keys)); }
+
+        private sealed class LocalRecording
+        {
+            internal List<LocalEvent> Events { get; } = [];
+            private readonly Dictionary<ExceptionFlowCallableKey, int> keys = new(ReferenceEqualityComparer.Instance);
+            internal bool Valid { get; private set; } = true;
+            internal void Register(ISymbol symbol, ExceptionFlowCallContext context, ExceptionFlowCallableKey key)
+            { keys.Add(key, keys.Count); Events.Add(new RegisterEvent(symbol, context)); }
+            internal void Observe(ExceptionFlowSummaryFragment fragment) => Events.Add(new ObserveEvent(Snapshot(fragment)));
+            internal FragmentSnapshot Snapshot(ExceptionFlowSummaryFragment fragment)
+                => new(fragment.Sources.Select(source => new SourceSnapshot(source.ExceptionType, source.Kind,
+                        source.LocalPath.Steps.ToArray())).ToArray(),
+                    fragment.CallEdges.Select(edge =>
+                    {
+                        if (!keys.TryGetValue(edge.Target, out int index)) { Valid = false; index = -1; }
+                        return new CallSnapshot(index, edge.CallSiteStep, edge.CaughtExceptionTypes.ToArray());
+                    }).ToArray(), fragment.UncertainTargets.ToArray());
+        }
+
+        private sealed record SourceSnapshot(INamedTypeSymbol Type, ExceptionFlowSourceKind Kind, ExceptionFlowPathStep[] Steps)
+        {
+            internal ExceptionFlowSummarySource Create()
+            {
+                var path = new ExceptionFlowPath(Steps[^1]);
+                for (int index = Steps.Length - 2; index >= 0; index--) path = path.Prepend(Steps[index]);
+                return new(Type, path, Kind);
+            }
+        }
+        private sealed record CallSnapshot(int Index, ExceptionFlowPathStep Site, INamedTypeSymbol[] Caught)
+        {
+            internal ExceptionFlowSummaryCallEdge Create(IReadOnlyList<ExceptionFlowCallableKey> keys)
+            {
+                var edge = new ExceptionFlowSummaryCallEdge(keys[Index], Site);
+                foreach (var type in Caught) edge.AddCaughtExceptionType(type);
+                return edge;
+            }
+        }
+        private sealed record FragmentSnapshot(SourceSnapshot[] Sources, CallSnapshot[] Calls, string[] Uncertain)
+        {
+            internal ExceptionFlowSummaryFragment Create(IReadOnlyList<ExceptionFlowCallableKey> keys)
+            {
+                var fragment = new ExceptionFlowSummaryFragment();
+                foreach (var source in Sources) fragment.AddSource(source.Create());
+                foreach (var call in Calls) fragment.AddCallEdge(call.Create(keys));
+                foreach (var target in Uncertain) fragment.AddUncertainTarget(target);
+                return fragment;
+            }
         }
 
         /// <summary>Binds all registered source/assembly inputs, independently of compiler object identity.</summary>

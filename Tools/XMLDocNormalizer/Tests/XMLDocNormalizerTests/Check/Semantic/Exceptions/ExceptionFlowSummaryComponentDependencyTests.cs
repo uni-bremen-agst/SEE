@@ -103,8 +103,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures only the session composes shared graph state with the two
-        /// extracted components.
+        /// Ensures only the session composes graph state, completed admission
+        /// facts and the two extracted components.
         /// </summary>
         [Fact]
         public void Session_OwnsExactlyTheExpectedLongLivedState()
@@ -119,6 +119,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.Equal(
                 new[]
                 {
+                    typeof(ExceptionFlowFiniteOrbitAdmission.FactStore),
                     typeof(ExceptionFlowSemanticEnvironment),
                     typeof(ExceptionFlowSummaryGraph),
                     typeof(ExceptionFlowSummaryGraphBuilder),
@@ -126,6 +127,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 }.OrderBy(type => type.FullName),
                 fields.Select(field => field.FieldType)
                     .OrderBy(type => type.FullName));
+            Assert.All(fields, field => Assert.True(field.IsInitOnly));
         }
     }
 }

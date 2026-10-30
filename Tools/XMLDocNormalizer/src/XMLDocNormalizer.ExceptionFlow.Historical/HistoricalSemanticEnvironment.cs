@@ -37,7 +37,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>Only the exact owned tree can retrieve the request's stable model.</summary>
         internal bool TryGetSemanticModel(SyntaxTree tree, out SemanticModel semanticModel)
         {
-            return models.TryGetValue(tree, out semanticModel!);
+            bool found = models.TryGetValue(tree, out semanticModel!);
+            ObserveAdmissionModel(tree, found ? semanticModel : null);
+            return found;
         }
 
         /// <summary>Returns the request-owned deterministic project scopes.</summary>
@@ -47,6 +49,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal bool TryResolveSupportingSourceMethod(
             IMethodSymbol methodSymbol, out ExceptionFlowSupportingSourceMethod resolution)
         {
+            ExcludeAdmissionReuse();
             var destination = scopes.SingleOrDefault(item => item.Compilation.Assembly.Identity.Equals(methodSymbol.ContainingAssembly.Identity));
             var resolved = destination == null ? null
                 : SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, destination.Compilation.Assembly)
@@ -72,6 +75,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol, Compilation bindingCompilation,
             out ExceptionFlowSupportingSourceMethod resolution)
         {
+            ExcludeAdmissionReuse();
             if ((ReferenceEquals(bindingCompilation, scope.Compilation)
                     || scopes.Any(item => ReferenceEquals(item.Compilation, bindingCompilation)))
                 && (SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingAssembly, bindingCompilation.Assembly)
@@ -89,6 +93,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             Compilation bindingCompilation, IAssemblySymbol assemblySymbol,
             out ExceptionFlowSemanticScope scope)
         {
+            ExcludeAdmissionReuse();
             scope = null!;
             if (!scopes.Any(item => ReferenceEquals(item.Compilation, bindingCompilation))
                 || !IsBoundReference(bindingCompilation, assemblySymbol)) { return false; }

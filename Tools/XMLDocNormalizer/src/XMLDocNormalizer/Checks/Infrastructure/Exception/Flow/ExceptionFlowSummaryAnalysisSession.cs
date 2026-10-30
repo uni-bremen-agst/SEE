@@ -19,6 +19,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic environment shared by all analyzed roots.
         /// </summary>
         private readonly ExceptionFlowSemanticEnvironment semanticContext;
+        private readonly ExceptionFlowFiniteOrbitAdmission.FactStore admissionFacts;
 
         /// <summary>
         /// The graph reused by every root in this session.
@@ -42,10 +43,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="semanticContext">The semantic environment.</param>
         internal ExceptionFlowSummaryAnalysisSession(
-            ExceptionFlowSemanticEnvironment semanticContext)
+            ExceptionFlowSemanticEnvironment semanticContext, Action<ISymbol>? inspectingAdmission = null)
         {
             this.semanticContext =
                 semanticContext;
+            admissionFacts = new(semanticContext, inspectingAdmission);
 
             builder =
                 new ExceptionFlowSummaryGraphBuilder(
@@ -70,7 +72,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         internal ExceptionFlowAnalysisResult Analyze(
             MemberDeclarationSyntax member)
         {
-            ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext);
+            ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext, admissionFacts);
             if (!admission.Outcome.Complete) return Outside(admission.Outcome, admission.DiagnoseGroundFacts());
             bool completed = false;
             try

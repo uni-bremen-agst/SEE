@@ -41,7 +41,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxTree tree,
             out SemanticModel semanticModel)
         {
-            return semanticContext.TryGetSemanticModel(tree, out semanticModel);
+            bool found = semanticContext.TryGetSemanticModel(tree, out semanticModel);
+            ObserveAdmissionModel(tree, found ? semanticModel : null);
+            return found;
         }
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             out ExceptionFlowSupportingSourceMethod resolution)
         {
+            ExcludeAdmissionReuse();
             if (!SupportingSourceSymbolResolver.TryResolveMethod(
                     methodSymbol,
                     semanticContext,
@@ -98,6 +101,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             Compilation bindingCompilation,
             out ExceptionFlowSupportingSourceMethod resolution)
         {
+            ExcludeAdmissionReuse();
             if (!SupportingSourceSymbolResolver.TryResolveMethod(
                     methodSymbol,
                     bindingCompilation,
@@ -131,6 +135,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IAssemblySymbol assemblySymbol,
             out ExceptionFlowSemanticScope scope)
         {
+            ExcludeAdmissionReuse();
             if (!SupportingSourceSymbolResolver.TryGetExternalSupportingSourceScope(
                     bindingCompilation,
                     assemblySymbol,
