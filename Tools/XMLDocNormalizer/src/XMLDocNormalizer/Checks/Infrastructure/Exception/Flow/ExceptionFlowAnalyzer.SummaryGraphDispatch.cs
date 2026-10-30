@@ -842,6 +842,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                INamedTypeSymbol? scopedNamedReceiverType =
+                    receiverType is INamedTypeSymbol namedReceiverType
+                        ? ExceptionFlowCrossCompilationResolver.ResolveNamedType(
+                            namedReceiverType,
+                            scope.Compilation)
+                        : null;
+
                 if (exactReceiverType != null)
                 {
                     INamedTypeSymbol? scopedExactReceiverType =
@@ -853,6 +860,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         IsSummaryCompatibleRuntimeReceiver(
                             scopedExactReceiverType,
                             receiverType,
+                            scopedNamedReceiverType,
                             scope.Compilation))
                     {
                         TryAddSummaryRuntimeTarget(
@@ -870,6 +878,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     if (!IsSummaryCompatibleRuntimeReceiver(
                             candidateType,
                             receiverType,
+                            scopedNamedReceiverType,
                             scope.Compilation))
                     {
                         continue;

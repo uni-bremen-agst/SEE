@@ -617,6 +617,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="receiverType">
         /// The static receiver type or type parameter.
         /// </param>
+        /// <param name="scopedNamedReceiverType">
+        /// The named receiver rebound once into the compilation containing
+        /// <paramref name="runtimeType"/>, or <see langword="null"/> when
+        /// the receiver is not named or cannot be rebound.
+        /// </param>
         /// <param name="compilation">
         /// The compilation containing <paramref name="runtimeType"/>.
         /// </param>
@@ -627,6 +632,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsSummaryCompatibleRuntimeReceiver(
             INamedTypeSymbol runtimeType,
             ITypeSymbol? receiverType,
+            INamedTypeSymbol? scopedNamedReceiverType,
             Compilation compilation)
         {
             if (receiverType == null ||
@@ -637,29 +643,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if (receiverType
-                is INamedTypeSymbol namedReceiverType)
+                is INamedTypeSymbol)
             {
-                INamedTypeSymbol? scopedReceiverType =
-                    ExceptionFlowCrossCompilationResolver.ResolveNamedType(
-                        namedReceiverType,
-                        compilation);
-
-                if (scopedReceiverType == null)
+                if (scopedNamedReceiverType == null)
                 {
                     return false;
                 }
 
-                if (scopedReceiverType.TypeKind ==
+                if (scopedNamedReceiverType.TypeKind ==
                     TypeKind.Interface)
                 {
                     return FindSummaryMatchingInterface(
                                runtimeType,
-                               scopedReceiverType) != null;
+                               scopedNamedReceiverType) != null;
                 }
 
                 return FindSummaryMatchingBaseType(
                            runtimeType,
-                           scopedReceiverType) != null;
+                           scopedNamedReceiverType) != null;
             }
 
             if (receiverType

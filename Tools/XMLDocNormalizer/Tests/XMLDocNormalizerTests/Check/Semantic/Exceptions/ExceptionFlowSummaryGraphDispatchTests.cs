@@ -835,6 +835,118 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that a constructed generic interface receiver includes
+        /// only implementations with the same type argument.
+        /// </summary>
+        [Fact]
+        public void ConstructedGenericInterfaceReceiver_FiltersTypeArguments()
+        {
+            const string source =
+                """
+                public static class EntryPoint
+                {
+                    public static void M(IService<string> service)
+                    {
+                        service.Execute();
+                    }
+                }
+
+                public interface IService<T>
+                {
+                    void Execute();
+                }
+
+                public sealed class StringService : IService<string>
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+
+                public sealed class IntService : IService<int>
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+                """;
+
+            ExceptionFlowSummaryGraphTestRun run =
+                ExceptionFlowSummaryGraphTestHelper.Build(
+                    source,
+                    "M");
+
+            ExceptionFlowSummaryCallEdge edge =
+                Assert.Single(
+                    GetDispatchEdges(run));
+
+            Assert.Equal(
+                "StringService",
+                GetTargetMethod(edge).ContainingType.Name);
+        }
+
+        /// <summary>
+        /// Ensures that a receiver nested in a constructed generic type
+        /// preserves both enclosing and nested type arguments.
+        /// </summary>
+        [Fact]
+        public void NestedConstructedGenericInterfaceReceiver_FiltersAllTypeArguments()
+        {
+            const string source =
+                """
+                public static class EntryPoint
+                {
+                    public static void M(Outer<int>.IService<string> service)
+                    {
+                        service.Execute();
+                    }
+                }
+
+                public class Outer<TOuter>
+                {
+                    public interface IService<TValue>
+                    {
+                        void Execute();
+                    }
+                }
+
+                public sealed class MatchingService : Outer<int>.IService<string>
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+
+                public sealed class WrongOuterService : Outer<string>.IService<string>
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+
+                public sealed class WrongValueService : Outer<int>.IService<int>
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+                """;
+
+            ExceptionFlowSummaryGraphTestRun run =
+                ExceptionFlowSummaryGraphTestHelper.Build(
+                    source,
+                    "M");
+
+            ExceptionFlowSummaryCallEdge edge =
+                Assert.Single(
+                    GetDispatchEdges(run));
+
+            Assert.Equal(
+                "MatchingService",
+                GetTargetMethod(edge).ContainingType.Name);
+        }
+
+        /// <summary>
         /// Ensures that an interface method selected from dependency metadata
         /// is mapped back to the dependency's source compilation and its
         /// nested implementation body.
