@@ -250,7 +250,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             Body[] bodies = admission.declarations.Select(pair => new Body(pair.Key,
                 ExceptionFlowInvocationSubstitution.Bindings(pair.Value).Select(binding => ExceptionFlowInvocationSubstitution.Binder(binding.Formal)).ToArray(),
                 admission.templates[pair.Key].DistinctBy(term => term.Key).OrderBy(term => term.Key, StringComparer.Ordinal).ToArray())).ToArray();
-            string scope = ScopeDigest(environment);
+            string scope = environment.GetScopeDigest(ScopeDigest);
             foreach (var owners in environment.GetAnalysisScopes().GroupBy(item => AssemblyKey(item.Compilation.Assembly), StringComparer.Ordinal))
                 if (owners.Select(item => item.Compilation).Distinct(ReferenceEqualityComparer.Instance).Count() != 1)
                     admission.reasons.Add(new("OwnerBindingFailure", "Conflicting registered source owners: " + owners.Key));

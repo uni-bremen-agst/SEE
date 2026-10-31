@@ -19,6 +19,31 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly Dictionary<Compilation, bool> blockingCompilationErrors =
             new(ReferenceEqualityComparer.Instance);
 
+        private IReadOnlyList<ExceptionFlowSemanticScope>? scopeDigestView;
+        private string? scopeDigest;
+
+        /// <summary>
+        /// Materializes only the finished digest of the current host-owned
+        /// immutable scope snapshot in this sequential environment.
+        /// </summary>
+        /// <param name="compute">The existing digest calculation, supplied by admission and never retained.</param>
+        /// <returns>The existing source/reference fingerprint.</returns>
+        internal string GetScopeDigest(Func<ExceptionFlowSemanticEnvironment, string> compute)
+        {
+            var view = GetAnalysisScopes();
+            if (ReferenceEquals(scopeDigestView, view) && scopeDigest != null)
+                return scopeDigest;
+
+            // Retire the previous view before attempting the new one. A
+            // throwing computation publishes neither a value nor a marker.
+            scopeDigestView = null;
+            scopeDigest = null;
+            string digest = compute(this);
+            scopeDigestView = view;
+            scopeDigest = digest;
+            return digest;
+        }
+
         // Only positive, exact model reads are replayable. Acquisition APIs
         // exclude the entire local inspection, including unsuccessful lookups.
         private AdmissionReads? admissionReads;
