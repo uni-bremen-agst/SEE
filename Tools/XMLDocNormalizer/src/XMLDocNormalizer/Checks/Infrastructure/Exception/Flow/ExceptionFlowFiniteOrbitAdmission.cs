@@ -29,6 +29,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private Certificate? certificate;
         private ExceptionFlowFiniteOrbitSeal? seal;
         private LocalRecording? recording;
+        private readonly Dictionary<string, Compilation?> metadataBindings = new(StringComparer.Ordinal);
+        private Compilation? metadataCallerCompilation;
+        private IEnumerable<Compilation>? metadataCallerModels;
 
         private ExceptionFlowFiniteOrbitAdmission(ExceptionFlowSemanticEnvironment environment)
         {
@@ -104,6 +107,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallableKey key = new(symbol, context);
             edgeWitnesses.Add(key, edges.Count - 1);
             recording?.Register(symbol, context, key);
+            // A metadata symbol can be shared by Roslyn across compilers. Keep
+            // the actual source-frame/model owner as a root-local receipt;
+            // ambiguous or out-of-view reads must never authorize a hit.
+            Compilation? binding = metadataCallerCompilation != null
+                && metadataCallerModels != null && metadataCallerModels.Any()
+                && metadataCallerModels.All(model => ReferenceEquals(model, metadataCallerCompilation))
+                    ? metadataCallerCompilation : null;
+            if (!metadataBindings.TryAdd(target, binding) && !ReferenceEquals(metadataBindings[target], binding))
+                metadataBindings[target] = null;
             return key;
         }
 
@@ -150,7 +162,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 RoslynCanonicalIdentityFactory.CreateTypeIdentity(named.OriginalDefinition)), arguments.ToArray());
         }
 
-        private void InspectDeclaration(ISymbol definition)
+        private void InspectDeclaration(ISymbol definition, bool knownMetadataNoBody = false)
         {
             foreach (SyntaxReference syntax in definition.DeclaringSyntaxReferences)
             {
@@ -177,7 +189,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
             ExceptionFlowSummaryFragment fragment = new();
-            bool hasBody = ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(definition, environment,
+            bool hasBody = !knownMetadataNoBody && ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(definition, environment,
                     this, fragment, new ExceptionFlowCallContext(definition));
             if (!hasBody)
                 LocalReason("TargetOrAnalysisCoverageIncomplete", " / executable body unavailable");
@@ -214,6 +226,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowFiniteOrbitAdmission admission = new(environment);
             var world = facts?.Begin(environment);
             List<(ISymbol Definition, LocalFact Fact)> staged = [];
+            List<(Compilation Compilation, ISymbol Definition)> stagedMetadataNoBody = [];
             string root = "unresolved:" + member.SyntaxTree.FilePath + ":" + member.SpanStart;
             Term[] seed = [];
             if (!environment.TryGetSemanticModel(member.SyntaxTree, out SemanticModel model)
@@ -231,24 +244,52 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     admission.currentDefinition = body;
                     ISymbol definition = admission.declarations[body];
+                    admission.metadataCallerCompilation = null;
+                    if (world != null)
+                    {
+                        var owners = world.Where(scope => ReferenceEquals(scope.Compilation.Assembly, definition.ContainingAssembly)).ToArray();
+                        if (owners.Length == 1) admission.metadataCallerCompilation = owners[0].Compilation;
+                    }
                     if (facts != null && world != null && facts.TryGet(environment, world, definition, out var fact))
+                    {
+                        admission.metadataCallerModels = fact.Models.Select(pair => pair.Value);
                         admission.Replay(fact);
+                    }
                     else
                     {
                         using var reads = environment.BeginAdmissionReads();
+                        admission.metadataCallerModels = reads.Models.Values;
                         admission.recording = facts != null && world != null ? new LocalRecording() : null;
+                        admission.metadataBindings.TryGetValue(body, out Compilation? bindingCompilation);
+                        bool knownMetadataNoBody = facts != null && world != null
+                            && facts.HasMetadataNoBody(environment, world, definition, bindingCompilation);
                         facts?.Inspecting?.Invoke(definition);
-                        admission.InspectDeclaration(definition);
+                        admission.InspectDeclaration(definition, knownMetadataNoBody);
                         if (admission.recording is { Valid: true } recorded && reads.Reusable
                             && facts!.Owns(environment, world!, definition, reads.Models))
                         {
                             staged.Add((definition, new LocalFact(admission, reads.Models)));
                         }
+                        var diagnostic = admission.diagnosticDefinitions[body];
+                        if (!knownMetadataNoBody && reads.Reusable && !diagnostic.HasBody
+                            && diagnostic.Fragment.Sources.Count == 0 && diagnostic.Fragment.CallEdges.Count == 0
+                            && diagnostic.Fragment.UncertainTargets.Count == 0
+                            && admission.recording is { Valid: true, Events.Count: 2 } metadataRecording
+                            && metadataRecording.Events[0] is ReasonEvent { Category: "TargetOrAnalysisCoverageIncomplete",
+                                Suffix: " / executable body unavailable" }
+                            && metadataRecording.Events[1] is ObserveEvent
+                            && facts!.QualifiesMetadataNoBody(environment, world!, definition, bindingCompilation))
+                        {
+                            facts.MetadataNoBodyProduced?.Invoke(definition);
+                            stagedMetadataNoBody.Add((bindingCompilation!, definition));
+                        }
                         admission.recording = null;
                     }
+                    admission.metadataCallerModels = null;
                 }
             }
             admission.currentDefinition = null;
+            admission.metadataCallerCompilation = null;
             Body[] bodies = admission.declarations.Select(pair => new Body(pair.Key,
                 ExceptionFlowInvocationSubstitution.Bindings(pair.Value).Select(binding => ExceptionFlowInvocationSubstitution.Binder(binding.Formal)).ToArray(),
                 admission.templates[pair.Key].DistinctBy(term => term.Key).OrderBy(term => term.Key, StringComparer.Ordinal).ToArray())).ToArray();
@@ -272,13 +313,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     environment.GetAnalysisScopes().Select(item => item.Compilation));
             // No facts escape a throwing discovery, including facts completed
             // before the failing body. OUTSIDE is a completed classified result.
-            if (facts != null && world != null) facts.Publish(environment, world, staged);
+            if (facts != null && world != null)
+            {
+                facts.Publish(environment, world, staged);
+                facts.PublishMetadataNoBody(environment, world, stagedMetadataNoBody);
+            }
             return admission;
         }
 
         /// <summary>
-        /// Session-owned store for the original-definition/empty-context schema
-        /// only. It never accepts a concrete production context or root product.
+        /// Session-owned store for original-definition/empty-context facts and
+        /// qualified PE NoBody markers, never concrete contexts or root products.
         /// A view replacement retires all facts, even for equal scope digests.
         /// </summary>
         internal sealed class FactStore
@@ -287,10 +332,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             private IReadOnlyList<ExceptionFlowSemanticScope>? view;
             private ExceptionFlowSemanticScope[] world = [];
             private readonly Dictionary<ISymbol, LocalFact> completed = new(SymbolEqualityComparer.Default);
+            // Set membership is the entire payload. Compiler, exact PE owner
+            // and original definition are identity only, never a binding cache.
+            private readonly HashSet<(Compilation Compilation, ISymbol Definition)> metadataNoBody = new(new MetadataMethodComparer());
             internal Action<ISymbol>? Inspecting { get; }
+            // Optional test sentinel at the completed producer boundary, just
+            // like Inspecting; normal sessions supply neither observer.
+            internal Action<ISymbol>? MetadataNoBodyProduced { get; }
 
-            internal FactStore(ExceptionFlowSemanticEnvironment environment, Action<ISymbol>? inspecting = null)
-            { this.environment = environment; Inspecting = inspecting; }
+            internal FactStore(ExceptionFlowSemanticEnvironment environment, Action<ISymbol>? inspecting = null,
+                Action<ISymbol>? metadataNoBodyProduced = null)
+            { this.environment = environment; Inspecting = inspecting; MetadataNoBodyProduced = metadataNoBodyProduced; }
 
             internal ExceptionFlowSemanticScope[] Begin(ExceptionFlowSemanticEnvironment current)
             {
@@ -299,6 +351,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (!ReferenceEquals(view, scopes) || !SameMembers(scopes))
                 {
                     completed.Clear();
+                    metadataNoBody.Clear();
                     view = scopes;
                     world = scopes.ToArray();
                 }
@@ -338,6 +391,54 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 if (!Current(current, expected)) return;
                 foreach (var item in staged) completed.TryAdd(item.Definition, item.Fact);
+            }
+
+            internal bool HasMetadataNoBody(ExceptionFlowSemanticEnvironment current,
+                ExceptionFlowSemanticScope[] expected, ISymbol definition, Compilation? bindingCompilation)
+                => bindingCompilation != null && Current(current, expected) && metadataNoBody.Contains((bindingCompilation, definition));
+
+            internal bool QualifiesMetadataNoBody(ExceptionFlowSemanticEnvironment current,
+                ExceptionFlowSemanticScope[] expected, ISymbol definition, Compilation? bindingCompilation)
+            {
+                if (!Current(current, expected) || bindingCompilation == null
+                    || expected.Count(scope => ReferenceEquals(scope.Compilation, bindingCompilation)) != 1
+                    || definition is not IMethodSymbol method
+                    || !SymbolEqualityComparer.Default.Equals(method, method.OriginalDefinition)
+                    || method.IsImplicitlyDeclared || method.ContainingType is not { TypeKind: not TypeKind.Error }
+                    || method.MethodKind is not (MethodKind.Ordinary or MethodKind.Constructor
+                        or MethodKind.PropertyGet or MethodKind.PropertySet)
+                    || !method.DeclaringSyntaxReferences.IsEmpty || method.Locations.IsDefaultOrEmpty
+                    || method.Locations.Any(location => !location.IsInMetadata)) return false;
+                if (method.MethodKind == MethodKind.PropertyGet
+                    && (method.AssociatedSymbol is not IPropertySymbol property
+                        || !property.DeclaringSyntaxReferences.IsEmpty)) return false;
+
+                // Assembly inventories have already bound the view's reference
+                // managers. Read their existing exact-owner association only;
+                // never resolve/acquire source or inspect a metadata image here.
+                if (!bindingCompilation.SourceModule.ReferencedAssemblySymbols.Any(assembly =>
+                        ReferenceEquals(assembly, method.ContainingAssembly))) return false;
+                return bindingCompilation.GetMetadataReference(method.ContainingAssembly)
+                    is PortableExecutableReference { Properties.Kind: MetadataImageKind.Assembly };
+            }
+
+            internal void PublishMetadataNoBody(ExceptionFlowSemanticEnvironment current,
+                ExceptionFlowSemanticScope[] expected, IEnumerable<(Compilation Compilation, ISymbol Definition)> staged)
+            {
+                if (!Current(current, expected)) return;
+                foreach (var key in staged) metadataNoBody.Add(key);
+            }
+
+            private sealed class MetadataMethodComparer : IEqualityComparer<(Compilation Compilation, ISymbol Definition)>
+            {
+                public bool Equals((Compilation Compilation, ISymbol Definition) x, (Compilation Compilation, ISymbol Definition) y)
+                    => ReferenceEquals(x.Compilation, y.Compilation)
+                        && ReferenceEquals(x.Definition.ContainingAssembly, y.Definition.ContainingAssembly)
+                        && SymbolEqualityComparer.Default.Equals(x.Definition, y.Definition);
+                public int GetHashCode((Compilation Compilation, ISymbol Definition) value)
+                    => HashCode.Combine(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value.Compilation),
+                        System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value.Definition.ContainingAssembly),
+                        SymbolEqualityComparer.Default.GetHashCode(value.Definition));
             }
         }
 
