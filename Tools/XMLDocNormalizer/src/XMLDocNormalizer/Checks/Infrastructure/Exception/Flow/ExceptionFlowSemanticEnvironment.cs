@@ -22,6 +22,40 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private IReadOnlyList<ExceptionFlowSemanticScope>? scopeDigestView;
         private string? scopeDigest;
 
+        private IReadOnlyList<ExceptionFlowSemanticScope>? assemblyInventoryView;
+        private string[]? assemblyInventory;
+
+        /// <summary>
+        /// Adds the current view's canonical assembly keys to a root-owned set.
+        /// Only a completed inventory is retained in this sequential environment.
+        /// </summary>
+        /// <param name="consumer">The admission's own cumulative assembly set, never retained.</param>
+        /// <param name="enumerate">The existing ordered key projection, supplied by admission and never retained.</param>
+        internal void IncludeAssemblyInventory(HashSet<string> consumer,
+            Func<ExceptionFlowSemanticEnvironment, IEnumerable<string>> enumerate)
+        {
+            var view = GetAnalysisScopes();
+            if (ReferenceEquals(assemblyInventoryView, view) && assemblyInventory != null)
+            {
+                consumer.UnionWith(assemblyInventory);
+                return;
+            }
+
+            assemblyInventoryView = null;
+            assemblyInventory = null;
+            HashSet<string> keys = new(StringComparer.Ordinal);
+            foreach (string key in enumerate(this))
+            {
+                // Preserve the consumer's existing prefix if a later read fails.
+                // The separate, unpublished builder is never shared on failure.
+                consumer.Add(key);
+                keys.Add(key);
+            }
+            string[] completed = keys.ToArray();
+            assemblyInventory = completed;
+            assemblyInventoryView = view;
+        }
+
         /// <summary>
         /// Materializes only the finished digest of the current host-owned
         /// immutable scope snapshot in this sequential environment.

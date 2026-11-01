@@ -33,10 +33,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private ExceptionFlowFiniteOrbitAdmission(ExceptionFlowSemanticEnvironment environment)
         {
             this.environment = environment;
-            foreach (var scope in environment.GetAnalysisScopes())
-            foreach (IAssemblySymbol assembly in new[] { scope.Compilation.Assembly }
-                         .Concat(scope.Compilation.SourceModule.ReferencedAssemblySymbols))
-                knownAssemblies.Add(AssemblyKey(assembly));
+            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory);
         }
 
         /// <summary>Gets the sealed classified outcome and its complete finite witness.</summary>
@@ -52,6 +49,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static string AssemblyKey(IAssemblySymbol assembly)
             => JsonSerializer.Serialize(RoslynCanonicalIdentityFactory.CreateAssemblyIdentity(assembly));
 
+        private static IEnumerable<string> AssemblyInventory(ExceptionFlowSemanticEnvironment environment)
+        {
+            foreach (var scope in environment.GetAnalysisScopes())
+            foreach (IAssemblySymbol assembly in new[] { scope.Compilation.Assembly }
+                         .Concat(scope.Compilation.SourceModule.ReferencedAssemblySymbols))
+                yield return AssemblyKey(assembly);
+        }
+
         internal static string BodyId(ISymbol symbol)
             => CanonicalIdentityKeyWriter.Write(RoslynCanonicalIdentityFactory.CreateCallableIdentity(symbol, true));
 
@@ -63,10 +68,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         private string AddDefinition(ISymbol symbol)
         {
-            foreach (var scope in environment.GetAnalysisScopes())
-            foreach (IAssemblySymbol assembly in new[] { scope.Compilation.Assembly }
-                         .Concat(scope.Compilation.SourceModule.ReferencedAssemblySymbols))
-                knownAssemblies.Add(AssemblyKey(assembly));
+            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory);
             ISymbol definition = symbol.OriginalDefinition;
             string id = BodyId(definition);
             if (declarations.TryAdd(id, definition))

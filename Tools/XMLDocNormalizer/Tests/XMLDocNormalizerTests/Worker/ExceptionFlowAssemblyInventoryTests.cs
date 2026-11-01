@@ -47,14 +47,14 @@ public sealed class ExceptionFlowAssemblyInventoryTests
         var admission = New(run.Environment);
         Assert.Equal(1, probe.Enumerations);
         Frame(admission, fixture.Symbol("A"));
-        Assert.Equal(2, probe.Enumerations);
+        Assert.Equal(1, probe.Enumerations);
         var expected = Expected(fixture.Compilation); var consumer = Known(admission);
         for (int i = 0; i < count; i++)
         {
             admission.RegisterTarget(fixture.Symbol("Leaf"), new(fixture.Symbol("Leaf")));
             Equal(expected, consumer); Assert.Same(consumer, Known(admission));
         }
-        Assert.Equal(2 + count, probe.Enumerations);
+        Assert.Equal(1, probe.Enumerations);
         Assert.Equal(2, admission.DefinitionCount);
         Assert.Equal(count, AdmissionCharacterization.Field<IList>(admission, "edges").Count);
     }
@@ -330,7 +330,7 @@ public sealed class ExceptionFlowAssemblyInventoryTests
         var consumer = Known(admission); consumer.Clear(); consumer.Add("test-only root sentinel");
         int enumerations = probe.Enumerations;
         fact.Replay(admission); // Actual published product fact, not a test replayer.
-        Assert.Equal(enumerations + 1, probe.Enumerations); // Shared has exactly one RegisterEvent (Leaf).
+        Assert.Equal(enumerations, probe.Enumerations); // Shared still registers Leaf; the fixed inventory is reused.
         var expected = Expected(fixture.Compilation); expected.Add("test-only root sentinel"); Equal(expected, consumer);
         Assert.Equal(2, admission.DefinitionCount); Assert.Single(AdmissionCharacterization.Field<IList>(admission, "edges"));
         Assert.Equal(1, cold["Shared"]);
