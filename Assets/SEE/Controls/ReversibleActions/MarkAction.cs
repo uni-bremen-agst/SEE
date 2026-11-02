@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +5,6 @@ using SEE.XR;
 using SEE.Extensions;
 using SEE.SceneManipulation;
 using SEE.GraphElementRefs;
-using SEE.Controls.KeyActions;
 using SEE.Net.Actions.GraphElement;
 using SEE.UserSettings;
 using SEE.Utils;
@@ -18,7 +16,6 @@ namespace SEE.Controls.ReversibleActions
     /// </summary>
     internal class MarkAction : AbstractPlayerAction
     {
-
         /// <summary>
         /// If the user clicks with the mouse hitting a node
         /// the node gets marked (or unmarked)
@@ -58,15 +55,15 @@ namespace SEE.Controls.ReversibleActions
         private void MarkNode(GameObject node)
         {
             GameNodeMarker.AddMark(node);
-            addedMarkParent = node;
+            markedGameNode = node;
             new MarkNetAction(node.name).Execute();
         }
 
         /// <summary>
-        /// The parent that got markes when this action was executed. It is saved so
+        /// The parent that got marked when this action was executed. It is saved so
         /// that it can be marked/unmarked again <see cref="Undo"/>.
         /// </summary>
-        private GameObject addedMarkParent;
+        private GameObject markedGameNode;
 
         /// <summary>
         /// Undoes this action.
@@ -74,8 +71,7 @@ namespace SEE.Controls.ReversibleActions
         public override void Undo()
         {
             base.Undo();
-
-            MarkNode(addedMarkParent);
+            MarkNode(markedGameNode);
         }
 
         /// <summary>
@@ -84,8 +80,7 @@ namespace SEE.Controls.ReversibleActions
         public override void Redo()
         {
             base.Redo();
-
-            MarkNode(addedMarkParent);
+            MarkNode(markedGameNode);
         }
 
         /// <summary>
@@ -122,7 +117,7 @@ namespace SEE.Controls.ReversibleActions
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> {
-                addedMarkParent.name
+                markedGameNode.name
             };
         }
     }

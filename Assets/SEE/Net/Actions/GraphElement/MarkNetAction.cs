@@ -1,4 +1,3 @@
-using SEE.GraphElementRefs;
 using SEE.SceneManipulation;
 using UnityEngine;
 
@@ -9,8 +8,10 @@ namespace SEE.Net.Actions.GraphElement
     /// </summary>
     internal class MarkNetAction : NodeNetAction
     {
-
-        public readonly string ID;
+        /// <summary>
+        /// The node to be marked or unmarked.
+        /// </summary>
+        public readonly GameObject node;
 
         /// <summary>
         /// Constructor.
@@ -19,7 +20,7 @@ namespace SEE.Net.Actions.GraphElement
         public MarkNetAction(string nodeID)
             : base(nodeID)
         {
-            ID = nodeID;
+            node = Find(nodeID);
         }
 
         /// <summary>
@@ -27,7 +28,6 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject node = Find(ID);
             GameNodeMarker.AddMark(node);
         }
     }
