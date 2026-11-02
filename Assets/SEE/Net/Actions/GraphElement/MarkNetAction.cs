@@ -10,7 +10,7 @@ namespace SEE.Net.Actions.GraphElement
     internal class MarkNetAction : NodeNetAction
     {
 
-        public string ID;
+        public readonly string ID;
 
         /// <summary>
         /// Constructor.
