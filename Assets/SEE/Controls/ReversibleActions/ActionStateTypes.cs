@@ -77,6 +77,11 @@ namespace SEE.Controls.ReversibleActions
                   Color.yellow.Darker(), Icons.EyeSlash,
                   HideAction.CreateReversibleAction);
 
+            Mark =
+              new("Mark", "Toggle a sphere marking above a node",
+                  Color.cyan.Darker(), Icons.CircleCheckmark,
+                  MarkAction.CreateReversibleAction);
+
             NewEdge =
               new("New Edge", "Draw a new edge between two nodes",
                   Color.green.Darker(), Icons.Edge,
@@ -310,6 +315,12 @@ namespace SEE.Controls.ReversibleActions
 
         public static readonly ActionStateType Move;
         public static readonly ActionStateType Hide;
+
+        /// <summary>
+        /// Action to toggle a sphere marking above a node.
+        /// </summary>
+        public static readonly ActionStateType Mark;
+
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
