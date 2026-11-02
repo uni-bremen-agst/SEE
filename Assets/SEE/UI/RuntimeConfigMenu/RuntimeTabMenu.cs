@@ -405,7 +405,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // creates the button
             GameObject button = PrefabInstantiator.InstantiatePrefab(buttonPrefab, configButtonList.transform, false);
             button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
-            ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
+            ButtonManager buttonManager = button.GetComponent<ButtonManager>();
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
@@ -1161,7 +1161,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
                 removeBtnTransform.gameObject.SetActive(true);
-                ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
+                ButtonManager removeBtn = removeBtnTransform.GetComponent<ButtonManager>();
                 removeBtn.onClick.AddListener(() =>
                 {
                     RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
@@ -1177,7 +1177,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="dict">The dictionary.</param>
         private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
         {
-            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
+            ButtonManager addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManager>();
             addBtn.onClick.AddListener(() =>
             {
                 Type keyType = GetType(true);
@@ -2119,12 +2119,12 @@ namespace SEE.UI.RuntimeConfigMenu
             GameObject addButton =
                 PrefabInstantiator.InstantiatePrefab(addElementButtonPrefab, buttonContainer.transform);
             addButton.name = "AddElementButton";
-            ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
+            ButtonManager addButtonManager = addButton.GetComponent<ButtonManager>();
 
             GameObject removeButton =
                 PrefabInstantiator.InstantiatePrefab(removeElementButtonPrefab, buttonContainer.transform);
             removeButton.name = "RemoveElementButton";
-            ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
+            ButtonManager removeButtonManager = removeButton.GetComponent<ButtonManager>();
 
             // list settings
             UpdateListChildren(list, parent);
