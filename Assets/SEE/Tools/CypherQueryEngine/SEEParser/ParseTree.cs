@@ -40,14 +40,6 @@ namespace Cypher
             tokens = new CommonTokenStream(lexer);
             parser = new CypherParser(tokens);
 
-            /*
-            // test
-            Console.WriteLine("CurrentQuery");
-            Console.WriteLine(CurrentQuery);
-            Console.WriteLine("+++++++++++++++++++");
-            //
-            */
-
             tree = parser.statements();
 
             if (tree == null)
@@ -57,7 +49,7 @@ namespace Cypher
 
             //CypherVisitor visitor = new CypherVisitor(); // Fehler?
             visitor = new CypherVisitor();
-            
+
         }
 
         public ASTRoot GetTypedTree()

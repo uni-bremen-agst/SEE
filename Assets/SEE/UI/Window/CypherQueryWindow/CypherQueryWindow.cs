@@ -95,8 +95,6 @@ namespace SEE.UI.Window.CypherQueryWindow
 
         /// <summary>
         /// Output of the Cypher-Query in form of a table.
-        /// // TODO is supposed to write Exceptions, Errors, Highlight Success and Highlight failure
-        /// // TODO horizontal Scrollbar
         /// </summary>
         private TMP_Text outputText;
         private Transform resultContent;
@@ -160,7 +158,7 @@ namespace SEE.UI.Window.CypherQueryWindow
                 .Find("Content/ExecuteButton")
                 .GetComponent<Button>();
 
-            executeButton.onClick.AddListener(ExecuteQuery);
+            executeButton.onClick.AddListener(ExecuteCatch);
 
             // CLEAR HIGHLIGHTS BUTTON
             clearButton = root.transform
@@ -168,6 +166,19 @@ namespace SEE.UI.Window.CypherQueryWindow
                 .GetComponent<Button>();
 
             clearButton.onClick.AddListener(Clear);
+        }
+
+        private void ExecuteCatch()
+        {
+            try
+            {
+                ExecuteQuery();
+            }
+            catch (Exception e)
+            {
+                outputText.text += $"Fehler: {e.Message}\n";
+                Debug.LogException(e);
+            }
         }
 
         /// <summary>
@@ -179,7 +190,7 @@ namespace SEE.UI.Window.CypherQueryWindow
         /// </summary>
         private void ExecuteQuery()
         {
-            outputText.text = "Fehler in der Abfrage";
+            outputText.text = "Fehler in der Abfrage\n";
             allLoadedGraphs = new List<Graph>();
             ClearResult();
 
@@ -212,7 +223,8 @@ namespace SEE.UI.Window.CypherQueryWindow
             // GRAPH INPUT
             if (allLoadedGraphs.Count == 0) // No Input Graph found, use following test graph
             {
-                allLoadedGraphs.Add(CreateTestGraph());
+                allLoadedGraphs = CreateTestGraphs();
+                //allLoadedGraphs = CreateRunTimeGraphs(100,100);
             }
 
             // ENGINE
@@ -320,7 +332,7 @@ namespace SEE.UI.Window.CypherQueryWindow
             );
 
             TMP_Text title = titleObject.MustGetComponent<TMP_Text>();
-            title.text = qr.graphName;
+            title.text = "Graph Name: " + qr.graphName;
 
             return AddHeaderRow(qr.Columns);
         }
@@ -401,7 +413,7 @@ namespace SEE.UI.Window.CypherQueryWindow
             ClearResult();
 
             // reset Window Text
-            queryInput.text = "";
+            //queryInput.text = "";
             outputText.text = helpText;
 
         }
@@ -435,9 +447,10 @@ namespace SEE.UI.Window.CypherQueryWindow
         /// Graph supports Attributes.
         /// </summary>
         /// <returns>Test Graph</returns>
-        private Graph CreateTestGraph()
+        private List<Graph> CreateTestGraphs()
         {
-            Graph graph = new("TESTPATH", "Test Graph");
+            List<Graph> result = new();
+            Graph graph = new("TESTPATH", "Test Graph 1");
 
             Node n1 = new()
             {
@@ -468,11 +481,9 @@ namespace SEE.UI.Window.CypherQueryWindow
 
             n2.SetString("Name", "FunctionB");
             n2.SetInt("TestInt", 20);
-            n2.SetFloat("Complexity", 4.2f);
 
             n3.SetString("Name", "FunctionC");
-            n3.SetInt("TestInt", 30);
-            n3.SetFloat("Complexity", 1.7f);
+            n3.SetInt("TestInt", 20);
 
             // Add Nodes to Graph
             graph.AddNode(n1);
@@ -488,8 +499,112 @@ namespace SEE.UI.Window.CypherQueryWindow
 
             graph.AddEdge(n3, n1, "call");
 
-            return graph;
+            result.Add(graph);
+
+
+
+            graph = new("TESTPATH", "Test Graph 2");
+
+            Node n4 = new()
+            {
+                ID = "n4",
+                SourceName = "n4",
+                Type = "Type3"
+            };
+
+            Node n5 = new()
+            {
+                ID = "n5",
+                SourceName = "n5",
+                Type = "Type1"
+            };
+
+            Node n6 = new()
+            {
+                ID = "n6",
+                SourceName = "n6",
+                Type = "Type2"
+            };
+
+            Edge e8 = new(n4,n5,"use");
+            Edge e9 = new(n5,n4,"call");
+            Edge e10 = new(n4,n6,"use");
+
+            // Attribute
+            n4.SetString("Name", "FunctionA");
+            n4.SetInt("TestInt", 100);
+            n4.SetInt("TestInt.Test", 100); // TODO
+
+            n5.SetString("Name", "FunctionD");
+            n5.SetInt("TestInt", 20);
+
+            n6.SetString("Name", "FunctionE");
+            n6.SetInt("TestInt", -20);
+
+            e8.SetInt("TestInt", 20);
+            e9.SetInt("TestInt", 10);
+            e10.SetInt("TestInt", 10);
+
+            // Add Nodes to Graph
+            graph.AddNode(n4);
+            graph.AddNode(n5);
+            graph.AddNode(n6);
+
+            // Add Edges to Graph
+            graph.AddEdge(n6, n6, "call");
+            graph.AddEdge(n6, n4, "call");
+            graph.AddEdge(e8);
+            graph.AddEdge(e9);
+            graph.AddEdge(e10);
+
+            result.Add(graph);
+
+            graph = new("TESTPATH", "Test Graph 3");
+            result.Add(graph);
+
+            return result;
         }
         #endregion
+        // Graphgenerator für Laufzeitanalyse
+        private List<Graph> CreateRunTimeGraphs(int nNodes, int nEdges)
+        {
+            List<Graph> gs = new();
+            Graph g = new();
+            int counter = 1;
+            Node n = new();
+            while (counter <= nNodes || counter <= nEdges)
+            {
+
+                if (counter <= nNodes)
+                {
+                    n = new()
+                    {
+                        ID = $"n{counter}",
+                        SourceName = $"n{counter}",
+                        Type = "Type1"
+                    };
+                    n.SetInt("TestInt", 20);
+                    g.AddNode(n);
+                }
+
+                if (counter <= nEdges)
+                {
+
+                    Edge e = new()
+                    {
+                        ID = $"e{counter}",
+                        Type = "Type2",
+                        Source = n,
+                        Target = n
+                    };
+                    e.SetInt("TestInt", 20);
+                    g.AddEdge(e);
+                }
+
+                counter += 1;
+            }
+            gs.Add(g);
+            return gs;
+        }
     }
 }

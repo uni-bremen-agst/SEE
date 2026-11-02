@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
+using UnityEngine;
+
 namespace Cypher
 {
     /// <summary>
@@ -92,12 +94,23 @@ namespace Cypher
             {
                 switch (expr.Operator.ToUpper())
                 {
+                    case "NOT": // anders machen // TODO
+                            if (expr.leftNode == null)
+                            {
+                                throw new InvalidOperationException(
+                                    "NOT requires an operand.");
+                            }
+
+                            Condition operand = ConvertCondition(expr.leftNode);
+                            return new Condition(operand, null, "NOT");
+
                     case "AND":
                     case "OR":
-                    case "NOT": // anders machen // TODO
                     case "=":
                     case "<":
                     case ">":
+                    case "<=":
+                    case ">=":
                             string op = expr.Operator;
                             Condition l = ConvertCondition(expr.leftNode!);
                             Condition r = ConvertCondition(expr.rightNode!);
@@ -116,7 +129,20 @@ namespace Cypher
             }
             // Single Value
             object v = expr.Value;
-            return new Condition(v);
+            switch (expr.Type)
+            {
+                case "Numeric":
+                    if (expr.Value.Contains('.'))
+                    {
+                        return new Condition(Convert.ToSingle(v));
+                    }
+
+                    return new Condition(Convert.ToInt32(v));
+
+                default:
+                    return new Condition(v);
+            }
+
         }
 
         /// <summary>

@@ -617,7 +617,7 @@ namespace Cypher
             // SEE only supports one property // Das funktioniert nicht richtig TODO
             var postfixes = context.postFix();
             string pName = ""; // working
-            if (postfixes.Count() != 1)
+            if (postfixes.Count() >= 1) // vorher != 1
             {
                 // working
                 foreach (var postfix in postfixes)

@@ -105,30 +105,30 @@ namespace Cypher
                     right = GetValue(c.Right!, match);
                     if (left == null || right == null) {return false;}
 
-                    return Convert.ToInt32(left)
-                         > Convert.ToInt32(right);
+                    return Convert.ToSingle(left)
+                         > Convert.ToSingle(right);
 
                 case "<":
                     left = GetValue(c.Left!, match);
                     right = GetValue(c.Right!, match);
                     if (left == null || right == null) {return false;}
 
-                    return Convert.ToInt32(left)
-                         < Convert.ToInt32(right);
+                    return Convert.ToSingle(left)
+                         < Convert.ToSingle(right);
                 case ">=":
                     left = GetValue(c.Left!, match);
                     right = GetValue(c.Right!, match);
                     if (left == null || right == null) {return false;}
 
-                    return Convert.ToInt32(left)
-                         >= Convert.ToInt32(right);
+                    return Convert.ToSingle(left)
+                         >= Convert.ToSingle(right);
                 case "<=":
                     left = GetValue(c.Left!, match);
                     right = GetValue(c.Right!, match);
                     if (left == null || right == null) {return false;}
 
-                    return Convert.ToInt32(left)
-                         <= Convert.ToInt32(right);
+                    return Convert.ToSingle(left)
+                         <= Convert.ToSingle(right);
 
                 default:
                     throw new Exception("Not supported Operator in WHERE");
@@ -174,6 +174,7 @@ namespace Cypher
 
     */
     /*
+        Previous Evalute from the parser.
         public object Evaluate ()
         {
             var l = leftNode.Evaluate();

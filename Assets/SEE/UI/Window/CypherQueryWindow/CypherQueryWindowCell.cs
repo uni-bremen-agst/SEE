@@ -16,6 +16,8 @@ using TMPro;
 using UnityEngine.UI;
 using Cypher;
 
+using HighlightPlus;
+
 namespace SEE.UI.Window.CypherQueryWindow
 {
     /// <summary>
@@ -47,7 +49,7 @@ namespace SEE.UI.Window.CypherQueryWindow
                 this.Reference = r;
                 buttonText.text = element.ToShortString();
                 button.interactable = true;
-                button.onClick.AddListener(OpenMenu);
+                button.onClick.AddListener(HighlightFromCell);
             }
             else
             {
@@ -94,9 +96,20 @@ namespace SEE.UI.Window.CypherQueryWindow
             layoutElement.preferredWidth = width;
         }
 
-        private void OpenMenu()
+        private void HighlightFromCell()
         {
-        // TODO
+            if (Reference != null) {
+                GameObject g = Reference.gameObject;
+                HighlightEffect effect = g.GetHighlightEffect();
+                if (effect.outlineColor == Color.yellow) {
+                    effect.outlineColor = Color.red;
+                    effect.glowHQColor = Color.red;
+                } else
+                {
+                    effect.outlineColor = Color.yellow;
+                    effect.glowHQColor = Color.yellow;
+                }
+            }
         }
     }
 }

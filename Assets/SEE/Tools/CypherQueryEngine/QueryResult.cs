@@ -37,21 +37,5 @@ namespace Cypher
             Columns = columns;
             Rows = rows;
         }
-        /*
-        public List<GraphElement> graphElementsInTable()
-        {
-            List<GraphElement> result = new();
-            foreach (List<object> row in this.Rows)
-            {
-                foreach (object obj in row)
-                {
-                    if (obj is GraphElement)
-                    {
-                        result.Add(obj);
-                    }
-                }
-            }
-            return result;
-        }*/
     }
 }

@@ -1,5 +1,6 @@
 /*
-
+This was the previous idea, but is not used as the current QueryResult.
+For current QueryResult see QueryResult.cs in the Parent Folder.
 
 using System.Data;
 
@@ -102,7 +103,7 @@ namespace Cypher
         /// </summary>
         /// <returns>Result number.</returns>
         public int? GetIntegerSingleResult()
-        { 
+        {
             return ResultType == Content.Integer ? (int?)SingleResult : null;
         }
 

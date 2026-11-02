@@ -4,7 +4,6 @@ using System;
 using SEE.DataModel.DG;
 using UnityEngine;
 using System.Diagnostics;
-//using System.Diagnostics;
 
 
 namespace Cypher
@@ -46,7 +45,7 @@ namespace Cypher
         /// <param name="graph">Graph to search in</param>
         /// <param name="pattern">Uses Pattern to search</param>
         /// <returns>List<MatchResult> to gather found pairings for each node/edge in graph</returns>
-        List<MatchResult> FindPattern(Graph graph, Pattern pattern)
+        public List<MatchResult> FindPattern(Graph graph, Pattern pattern)
         {
             if (pattern.Goal == null)
             {
@@ -95,7 +94,7 @@ namespace Cypher
         /// <summary>
         /// Extension for FindPattern() // TODO combine them into one
         /// </summary>
-        List<MatchResult> FindNodes(Graph graph, Pattern pattern)
+        public List<MatchResult> FindNodes(Graph graph, Pattern pattern)
         {
             List<MatchResult> found = new();
             foreach (Node node in graph.Nodes())
@@ -127,7 +126,7 @@ namespace Cypher
         /// <param name="found">Found Matches in graph</param>
         /// <param name="c">Filter Condition</param>
         /// <returns>Filtered List</returns>
-        List<MatchResult> FilterPatternsWhereCondition(List<MatchResult> found, Condition c)
+        public List<MatchResult> FilterPatternsWhereCondition(List<MatchResult> found, Condition c)
         {
             List<MatchResult> filtered = new();
             foreach (Cypher.MatchResult match in found)
@@ -148,7 +147,7 @@ namespace Cypher
         /// <param name="matches">Determines the Rows of the table</param>
         /// <param name="returns">Determines the Columns of the table</param>
         /// <returns>QueryResult table</returns>
-        QueryResult ExecuteReturn(List<MatchResult> matches, ReturnRequest returns)
+        public QueryResult ExecuteReturn(List<MatchResult> matches, ReturnRequest returns)
         {
             // Build Table for n:m
             // Build Columns
@@ -197,44 +196,7 @@ namespace Cypher
             return qr;
         }
         #endregion
-        /*
-        void HighlightGraphElements(QueryResult qr)
-        {
-            foreach (List<object> row in qr.Rows)
-            {
-                foreach (object obj in row)
-                {
-                    if (obj is GraphElement)
-                    {
-                        // Highlight Methode
-                        // highlight(findUnityObject());
-                    }
-                }
-            }
 
-        }
-
-        void WriteQueryResultTable(QueryResult qr)
-        {
-            Console.WriteLine("------------------------");
-            string chainedString = "|";
-            foreach (string s in qr.Columns)
-            {
-                chainedString += $" {s} |";
-            }
-            Console.WriteLine(chainedString);
-            foreach (List<object> row in qr.Rows)
-            {
-                chainedString = "|";
-                foreach (object obj in row)
-                {
-                    chainedString += $" {obj.ToString()} |";
-                }
-                Console.WriteLine(chainedString);
-            }
-            Console.WriteLine("------------------------");
-        }
-        */
         #region Exceptions
         // Throw Exceptions /////////////////////////////////////////////////////// // TODO need to be integrated into Window
         public void CompareReturnVariableWithPattern(Pattern pattern, ReturnRequest returns)
@@ -248,16 +210,35 @@ namespace Cypher
                 }
             }
         }
-        /* veraltet
-        public void CompareConditionVariableWithPattern(Pattern pattern, Condition condition)
+
+        public void CompareConditionVariableWithPattern(
+            Pattern pattern, Condition condition)
         {
-            if (condition.Variable != pattern.Start.Variable && condition.Variable != pattern.Goal?.Variable && condition.Variable != pattern.Relation?.Variable)
+            // check if condition has variable
+            if (!string.IsNullOrEmpty(condition.Variable))
             {
-                throw new Exception(
-                    $"WHERE Variable '{condition.Variable}' NOT in MATCH");
+                if (condition.Variable != pattern.Start.Variable &&
+                    condition.Variable != pattern.Goal?.Variable &&
+                    condition.Variable != pattern.Relation?.Variable)
+                {
+                    throw new Exception(
+                        $"WHERE Variable '{condition.Variable}' NOT in MATCH");
+                }
+            }
+
+            // Linken Teilbaum prüfen
+            if (condition.Left != null)
+            {
+                CompareConditionVariableWithPattern(pattern, condition.Left);
+            }
+
+            // Rechten Teilbaum prüfen
+            if (condition.Right != null)
+            {
+                CompareConditionVariableWithPattern(pattern, condition.Right);
             }
         }
-        */
+
         public void CompareVariablesInPattern(Pattern pattern)
         {
             // check if a variable in pattern is used more than once
@@ -286,9 +267,17 @@ namespace Cypher
         /// <param name="query">User Input</param>
         public void PrepareExecute(string query)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             Cypher.ParseTree pt = new Cypher.ParseTree(query);
             Cypher.ASTRoot root = pt.GetTypedTree();
+
+            stopwatch.Stop();
+            double elapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"Parsing: {elapsedMilliseconds:F4} ms");
             // ASTRoot Evaluation ////////////////////////////////
+            stopwatch.Restart();
+
             Cypher.MatchASTNode parsePattern = root.Match;
             Cypher.ExpressionASTNode? parseCondition = root.Match.Where;
             Cypher.ReturnASTNode parseReturns = root.Return;
@@ -301,18 +290,26 @@ namespace Cypher
                 condition = ConvertAST.ConvertCondition(parseCondition!);
             }
             returns = ConvertAST.ConvertReturn(parseReturns);
+
+            stopwatch.Stop();
+            elapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"ConvertAST: {elapsedMilliseconds:F4} ms");
+
             // Throw Exceptions //////////////////////////////////
+            stopwatch.Restart();
+
             // check if all variables in returns exist in pattern
             CompareReturnVariableWithPattern(pattern, returns);
-            /* funktioniert gerade nicht TODO
             // check if the condition variable exist in pattern
             if (whereExists)
             {
                 CompareConditionVariableWithPattern(pattern, condition!);
             }
-            */
             // check if a variable in pattern is used more than once
             CompareVariablesInPattern(pattern);
+            stopwatch.Stop();
+            elapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"Exceptions: {elapsedMilliseconds:F4} ms");
         }
         /// <summary>
         /// Gathers QueryResult tables for each Graph in graphs
@@ -324,22 +321,37 @@ namespace Cypher
         {
             List<QueryResult> result = new List<QueryResult>();
             QueryResult qr;
+
+            Stopwatch watchmatch = new Stopwatch();
+            Stopwatch watchwhere = new Stopwatch();
+            Stopwatch watchreturn = new Stopwatch();
             foreach (Graph graph in graphs)
             {
                 // MATCH
+                watchmatch.Start();
                 List<MatchResult> foundPatterns = FindPattern(graph, pattern);
+                watchmatch.Stop();
                 // WHERE
                 if (whereExists)
                 {
+                    watchwhere.Start();
                     foundPatterns = FilterPatternsWhereCondition(foundPatterns, condition!);
+                    watchwhere.Stop();
                 }
                 // RETURN
+                watchreturn.Start();
                 qr = ExecuteReturn(foundPatterns, returns);
+                watchreturn.Stop();
                 qr.graphName = graph.Name;
                 result.Add(qr);
             }
-            //WriteQueryResultTable(result); // For Tests
-            //HighlightGraphElement(result); // TODO
+
+            double match_elapsedMilliseconds = watchmatch.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"MATCH: {match_elapsedMilliseconds:F4} ms");
+            double where_elapsedMilliseconds = watchwhere.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"WHERE: {where_elapsedMilliseconds:F4} ms");
+            double return_elapsedMilliseconds = watchreturn.Elapsed.TotalMilliseconds;
+            UnityEngine.Debug.Log($"RETURN: {return_elapsedMilliseconds:F4} ms");
             return result;
         }
         /// <summary>
