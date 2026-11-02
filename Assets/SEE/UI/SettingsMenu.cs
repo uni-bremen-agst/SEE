@@ -19,6 +19,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using MoreLinq;
 
 namespace SEE.UI
 {
@@ -87,6 +88,26 @@ namespace SEE.UI
         /// The toggle that allows to mute the remote sound effects.
         /// </summary>
         private Toggle remoteSfxToggle;
+
+        /// <summary>
+        /// Dropdown for selecting the microphone device to use.
+        /// </summary>
+        private Dropdown microphoneDropdown;
+
+        /// <summary>
+        /// Checkbox whenever echo cancellation should be enabled.
+        /// </summary>
+        private Toggle echoCancellationToggle;
+
+        /// <summary>
+        /// Checkbox whenever noise suppression should be enabled.
+        /// </summary>
+        private Toggle noiseSuppressionToggle;
+
+        /// <summary>
+        /// Checkbox whenever auto gain control should be enabled.
+        /// </summary>
+        private Toggle autoGainControlToggle;
 
         /// <summary>
         /// The slider that allows to change the sound effect volume.
@@ -299,7 +320,7 @@ namespace SEE.UI
             ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
             disconnectGO.SetActive(false);
 
-            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitManager liveKitVideoManager))
             {
                 UpdateLiveKitSettings();
 
@@ -355,26 +376,26 @@ namespace SEE.UI
                         liveKitVideoManager.FetchTokenAndJoinRoomAsync().ToCoroutine()
                     );
 
-                    while (liveKitVideoManager.ConnectionState == LiveKitVideoManager.ConnectionStatus.Disconnected)
+                    while (liveKitVideoManager.ConnectionState == LiveKitManager.ConnectionStatus.Disconnected)
                     {
                         yield return null;
                     }
 
                     switch (liveKitVideoManager.ConnectionState)
                     {
-                        case LiveKitVideoManager.ConnectionStatus.Connected:
+                        case LiveKitManager.ConnectionStatus.Connected:
                             connectGO.SetActive(false);
                             disconnectGO.SetActive(true);
                             liveKitURLInputField.SetNormalState();
                             roomNameInputField.SetNormalState();
                             tokenURLInputField.SetNormalState();
                             break;
-                        case LiveKitVideoManager.ConnectionStatus.TokenFailed:
+                        case LiveKitManager.ConnectionStatus.TokenFailed:
                             tokenURLInputField.SetErrorState();
                             liveKitURLInputField.SetNormalState();
                             roomNameInputField.SetNormalState();
                             break;
-                        case LiveKitVideoManager.ConnectionStatus.RoomConnectionFailed:
+                        case LiveKitManager.ConnectionStatus.RoomConnectionFailed:
                             liveKitURLInputField.SetErrorState();
                             roomNameInputField.SetErrorState();
                             tokenURLInputField.SetNormalState();
@@ -428,6 +449,11 @@ namespace SEE.UI
             sfxVolumeSlider = settingsMenuGameObject.FindDescendant("SFXVolumeSlider").MustGetComponent<Slider>();
             remoteSfxToggle = settingsMenuGameObject.FindDescendant("RemoteSFXToggle").MustGetComponent<Toggle>();
 
+            microphoneDropdown = settingsMenuGameObject.FindDescendant("MicrophoneSelectDropdown").MustGetComponent<Dropdown>();
+            echoCancellationToggle = settingsMenuGameObject.FindDescendant("EchoCancellationToggle").MustGetComponent<Toggle>();
+            noiseSuppressionToggle = settingsMenuGameObject.FindDescendant("NoiseSuppressionToggle").MustGetComponent<Toggle>();
+            autoGainControlToggle = settingsMenuGameObject.FindDescendant("AutoGainControlToggle").MustGetComponent<Toggle>();
+
             audioManager = AudioManagerImpl.Instance();
             musicVolumeSlider.value = audioManager.MusicVolume;
             musicVolumeSlider.interactable = !audioManager.MusicMuted;
@@ -437,6 +463,35 @@ namespace SEE.UI
             sfxToggle.isOn = !audioManager.SoundEffectsMuted;
             remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
             remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+            echoCancellationToggle.isOn = UserSetting.Instance.Audio.Microphone.EchoCancellation;
+            noiseSuppressionToggle.isOn = UserSetting.Instance.Audio.Microphone.NoiseSuppression;
+            autoGainControlToggle.isOn = UserSetting.Instance.Audio.Microphone.AutoGainControl;
+
+            foreach (string mic in UnityEngine.Microphone.devices)
+            {
+                microphoneDropdown.options.Add(new Dropdown.OptionData(mic));
+            }
+            microphoneDropdown.value = UnityEngine.Microphone.devices.ToList().IndexOf(UserSetting.Instance.Audio.Microphone.MicrophoneDevice);
+
+            microphoneDropdown.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.MicrophoneDevice = UnityEngine.Microphone.devices[value];
+            });
+
+            echoCancellationToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.EchoCancellation = value;
+            });
+
+            noiseSuppressionToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.NoiseSuppression = value;
+            });
+
+            autoGainControlToggle.onValueChanged.AddListener((value) =>
+            {
+                UserSetting.Instance.Audio.Microphone.AutoGainControl = value;
+            });
 
             sfxVolumeSlider.onValueChanged.AddListener((value) =>
             {
