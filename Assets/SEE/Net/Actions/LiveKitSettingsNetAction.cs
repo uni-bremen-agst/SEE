@@ -42,7 +42,7 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// Executes the action on the client side by applying the received
-        /// LiveKit configuration values to the local <see cref="LiveKitVideoManager"/>.
+        /// LiveKit configuration values to the local <see cref="LiveKitManager"/>.
         /// </summary>
         public override void ExecuteOnClient()
         {
