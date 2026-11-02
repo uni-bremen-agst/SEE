@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Operator;
 using SEE.Extensions;
 using SEE.Utils;

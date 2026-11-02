@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Utils;
 using TMPro;

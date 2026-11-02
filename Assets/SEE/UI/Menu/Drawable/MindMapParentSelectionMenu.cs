@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -99,8 +99,8 @@ namespace SEE.UI.Menu.Drawable
             parentSelector.defaultIndex = 0;
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
-            finish.clickEvent.AddListener(() =>
+            ButtonManager finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>();
+            finish.onClick.AddListener(() =>
             {
                 gotSelection = true;
 
@@ -132,8 +132,8 @@ namespace SEE.UI.Menu.Drawable
                 if (returnCall != null)
                 {
                     /// Adds the return call back to the return button.
-                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                        .clickEvent.AddListener(returnCall);
+                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>()
+                        .onClick.AddListener(returnCall);
                 }
                 else
                 {
@@ -220,8 +220,8 @@ namespace SEE.UI.Menu.Drawable
                 }
                 else
                 {
-                    ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
-                    finish.clickEvent.AddListener(() =>
+                    ButtonManager finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>();
+                    finish.onClick.AddListener(() =>
                     {
                         gotSelection = true;
                     });

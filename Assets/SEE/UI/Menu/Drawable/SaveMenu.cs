@@ -1,7 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
-using SEE.Utils;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.UI.Menu.Drawable
@@ -34,17 +32,17 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the save single or more drawable button.
         /// </summary>
-        private static ButtonManagerBasic saveButton;
+        private static ButtonManager saveButton;
 
         /// <summary>
         /// The instance for the save current page button.
         /// </summary>
-        private static ButtonManagerBasic saveCurrentPageButton;
+        private static ButtonManager saveCurrentPageButton;
 
         /// <summary>
         /// The instance for the save all drawables button.
         /// </summary>
-        private static ButtonManagerBasic saveAllButton;
+        private static ButtonManager saveAllButton;
 
         /// <summary>
         /// Creates the save menu.
@@ -58,17 +56,17 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             Instance.Instantiate(saveMenuPrefab);
-            saveButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Save").GetComponent<ButtonManagerBasic>();
+            saveButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Save").GetComponent<ButtonManager>();
             saveCurrentPageButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SaveCurrentPage")
-                .GetComponent<ButtonManagerBasic>();
-            saveAllButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SaveAll").GetComponent<ButtonManagerBasic>();
+                .GetComponent<ButtonManager>();
+            saveAllButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SaveAll").GetComponent<ButtonManager>();
 
             /// Adds a handler for the <paramref name="saveButtonCall"/>.
-            saveButton.clickEvent.AddListener(saveButtonCall);
+            saveButton.onClick.AddListener(saveButtonCall);
             /// Adds a handler for the <paramref name="saveCurrentPageButtonCall"/>.
-            saveCurrentPageButton.clickEvent.AddListener(saveCurrentPageButtonCall);
+            saveCurrentPageButton.onClick.AddListener(saveCurrentPageButtonCall);
             /// Adds a handler for the <paramref name="saveAllButtonCall"/>.
-            saveAllButton.clickEvent.AddListener(saveAllButtonCall);
+            saveAllButton.onClick.AddListener(saveAllButtonCall);
         }
     }
 }

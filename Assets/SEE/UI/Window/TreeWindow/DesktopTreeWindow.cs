@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Graphs;
 using SEE.Extensions;
 using SEE.UI.Notification;
@@ -65,17 +65,17 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private ButtonManagerBasic filterButton;
+        private ButtonManager filterButton;
 
         /// <summary>
         /// The button that opens the grouping menu.
         /// </summary>
-        private ButtonManagerBasic groupButton;
+        private ButtonManager groupButton;
 
         /// <summary>
         /// The button that opens the sorting menu.
         /// </summary>
-        private ButtonManagerBasic sortButton;
+        private ButtonManager sortButton;
 
         /// <summary>
         /// Orders the tree below the given <paramref name="orderBelow"/> group according to the graph hierarchy.
@@ -889,16 +889,16 @@ namespace SEE.UI.Window.TreeWindow
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             searchField.onValueChanged.AddListener(SearchFor);
 
-            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            filterButton.clickEvent.AddListener(() => {
+            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManager>();
+            filterButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
-            sortButton.clickEvent.AddListener(() => {
+            sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManager>();
+            sortButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
-            groupButton.clickEvent.AddListener(() => {
+            groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManager>();
+            groupButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
             PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();

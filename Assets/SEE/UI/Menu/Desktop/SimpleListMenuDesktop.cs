@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using MoreLinq;
 using SEE.Extensions;
 using SEE.Utils;
@@ -23,7 +23,7 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// Prefab for each menu entry.
-        /// Required components: ButtonManagerBasic, PointerHelper and Image.
+        /// Required components: ButtonManager, PointerHelper and Image.
         /// </summary>
         protected virtual string EntryPrefab => $"{UIPrefabFolder}Button";
 
@@ -113,7 +113,7 @@ namespace SEE.UI.Menu
 
             // title and icon
             button.name = entry.Title;
-            ButtonManagerBasic buttonManager = button.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager buttonManager = button.MustGetComponent<ButtonManager>();
             TextMeshProUGUI iconText = button.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             buttonManager.buttonText = entry.Title;
             iconText.text = entry.Icon.ToString();
@@ -129,7 +129,7 @@ namespace SEE.UI.Menu
             // adds clickEvent listener or show that button is disabled
             if (entry.Enabled)
             {
-                buttonManager.clickEvent.AddListener(() => SelectEntry(entry));
+                buttonManager.onClick.AddListener(() => SelectEntry(entry));
             }
             else
             {

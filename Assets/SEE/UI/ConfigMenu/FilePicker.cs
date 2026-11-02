@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.UserSettings;
 using SEE.Utils.Paths;
 using SimpleFileBrowser;
@@ -51,7 +51,7 @@ namespace SEE.UI.ConfigMenu
         private CustomDropdown dropdown;
         private TMP_InputField customInput;
         private TextMeshProUGUI labelText;
-        private ButtonManagerBasic pickerButton;
+        private ButtonManager pickerButton;
 
         /// <summary>
         /// The DataPath instance this file picker manipulates.
@@ -92,7 +92,7 @@ namespace SEE.UI.ConfigMenu
             dropdown.isListItem = true;
             dropdown.listParent = FindCanvas(gameObject);
 
-            pickerButton.clickEvent.AddListener(() =>
+            pickerButton.onClick.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },

@@ -1,4 +1,4 @@
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
@@ -108,9 +108,9 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Adds listeners and tooltips to the BaseWindow buttons.
         /// </summary>
         protected override void StartDesktop() {
-            RunButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(Run);
-            DebugAdapterConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenDebugAdapterConfig);
-            LaunchConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenLaunchConfig);
+            RunButton.MustGetComponent<ButtonManager>().onClick.AddListener(Run);
+            DebugAdapterConfigButton.MustGetComponent<ButtonManager>().onClick.AddListener(OpenDebugAdapterConfig);
+            LaunchConfigButton.MustGetComponent<ButtonManager>().onClick.AddListener(OpenLaunchConfig);
 
             PointerHelper pointerHelper = RunButton.MustGetComponent<PointerHelper>();
             pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Run"));

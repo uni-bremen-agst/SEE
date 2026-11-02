@@ -1,5 +1,5 @@
 ﻿using HSVPicker;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable;
 using UnityEngine;

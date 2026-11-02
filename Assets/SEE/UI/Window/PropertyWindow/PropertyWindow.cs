@@ -1,5 +1,5 @@
 ﻿using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using MoreLinq;
 using SEE.Controls.KeyActions;
 using SEE.Extensions;
@@ -335,9 +335,9 @@ namespace SEE.UI.Window.PropertyWindow
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
-            ButtonManagerBasic filterButton = propertyWindow.transform.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            ButtonManagerBasic sortButton = propertyWindow.transform.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
-            ButtonManagerBasic groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager filterButton = propertyWindow.transform.Find("Search/Filter").gameObject.MustGetComponent<ButtonManager>();
+            ButtonManager sortButton = propertyWindow.transform.Find("Search/Sort").gameObject.MustGetComponent<ButtonManager>();
+            ButtonManager groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManager>();
             PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             UnityEvent rebuild = new();
             rebuild.AddListener(Rebuild);

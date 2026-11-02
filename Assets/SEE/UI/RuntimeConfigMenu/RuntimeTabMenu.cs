@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using HSVPicker;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using MoreLinq;
 using SEE.Graphs;
 using SEE.Game;
@@ -411,17 +411,17 @@ namespace SEE.UI.RuntimeConfigMenu
             // add button listeners
             if (IsLoadMethod(methodInfo))
             {
-                buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
+                buttonManager.onClick.AddListener(() => ExecuteLoadAsync().Forget());
             }
             else
             {
-                buttonManager.clickEvent.AddListener(() =>
+                buttonManager.onClick.AddListener(() =>
                 {
                     // calls the method and updates the menu
                     methodInfo.Invoke(city, null);
                     OnUpdateMenuValues?.Invoke();
                 });
-                buttonManager.clickEvent.AddListener(() =>
+                buttonManager.onClick.AddListener(() =>
                 {
                     UpdateCityMethodNetAction netAction = new()
                     {
@@ -430,8 +430,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     };
                     netAction.Execute();
                 });
-                buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
-                buttonManager.clickEvent.AddListener(() => RestorePreviousScrollPosition());
+                buttonManager.onClick.AddListener(() => CheckControlConditionsWithDelay());
+                buttonManager.onClick.AddListener(() => RestorePreviousScrollPosition());
             }
 
             // add network listener
@@ -1162,7 +1162,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
                 removeBtnTransform.gameObject.SetActive(true);
                 ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
-                removeBtn.clickEvent.AddListener(() =>
+                removeBtn.onClick.AddListener(() =>
                 {
                     RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
                 });
@@ -1178,7 +1178,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
         {
             ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
-            addBtn.clickEvent.AddListener(() =>
+            addBtn.onClick.AddListener(() =>
             {
                 Type keyType = GetType(true);
                 if (keyType != typeof(string))
@@ -2131,7 +2131,7 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonContainer.transform.SetAsLastSibling();
 
             // AddButton listener adding a new instance at the end of the list
-            addButtonManager.clickEvent.AddListener(() =>
+            addButtonManager.onClick.AddListener(() =>
             {
                 list.Add(newT());
                 UpdateListChildren(list, parent);
@@ -2145,7 +2145,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             // RemoveButton listener removing the last element in the list
-            removeButtonManager.clickEvent.AddListener(() =>
+            removeButtonManager.onClick.AddListener(() =>
             {
                 if (list.Count == 0)
                 {

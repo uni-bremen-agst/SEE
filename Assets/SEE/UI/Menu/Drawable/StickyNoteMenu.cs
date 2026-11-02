@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
 using static SEE.Controls.ReversibleActions.Drawable.StickyNoteAction;
@@ -51,9 +51,9 @@ namespace SEE.UI.Menu.Drawable
             base.Enable();
 
             /// Initialize the button for the spawn option.
-            ButtonManagerBasic spawn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Spawn")
-                .GetComponent<ButtonManagerBasic>();
-            spawn.clickEvent.AddListener(() =>
+            ButtonManager spawn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Spawn")
+                .GetComponent<ButtonManager>();
+            spawn.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Spawn;
@@ -61,9 +61,9 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the move option.
-            ButtonManagerBasic move = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Move")
-                .GetComponent<ButtonManagerBasic>();
-            move.clickEvent.AddListener(() =>
+            ButtonManager move = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Move")
+                .GetComponent<ButtonManager>();
+            move.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Move;
@@ -71,9 +71,9 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the edit option.
-            ButtonManagerBasic edit = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Edit")
-                .GetComponent<ButtonManagerBasic>();
-            edit.clickEvent.AddListener(() =>
+            ButtonManager edit = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Edit")
+                .GetComponent<ButtonManager>();
+            edit.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Edit;
@@ -81,9 +81,9 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the delete option.
-            ButtonManagerBasic delete = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Delete")
-                .GetComponent<ButtonManagerBasic>();
-            delete.clickEvent.AddListener(() =>
+            ButtonManager delete = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Delete")
+                .GetComponent<ButtonManager>();
+            delete.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Delete;

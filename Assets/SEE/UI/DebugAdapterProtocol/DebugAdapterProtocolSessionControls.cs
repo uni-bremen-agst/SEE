@@ -1,4 +1,4 @@
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls.Players;
@@ -48,7 +48,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 foreach (var (name, (action, description)) in listeners)
                 {
                     GameObject button = controls.transform.Find(name).gameObject;
-                    button.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(() => action());
+                    button.MustGetComponent<ButtonManager>().onClick.AddListener(() => action());
                     if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                     {
                         pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(description));

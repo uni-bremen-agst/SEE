@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
@@ -54,8 +54,8 @@ namespace SEE.UI.Menu.Drawable
                 Instance.Instantiate(nodeKindSelectionMenuPrefab);
 
                 /// Adds the return call to the return button, to return to the parent menu.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
 
                 /// Initialize the node kind selector.
                 nodeKindSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Selection").GetComponent<HorizontalSelector>();

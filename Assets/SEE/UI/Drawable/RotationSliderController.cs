@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.UI.Notification;
 using System.Globalization;
 using System.Linq;

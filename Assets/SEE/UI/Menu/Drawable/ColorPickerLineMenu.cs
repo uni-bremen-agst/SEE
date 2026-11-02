@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -59,8 +59,8 @@ namespace SEE.UI.Menu.Drawable
         {
             GameObject primary = GameFinder.FindAttachedOrLocalDescendant(instance, "Primary");
             SetImageColor(primary, conf.PrimaryColor);
-            ButtonManagerBasic bmb = primary.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+            ButtonManager bmb = primary.GetComponent<ButtonManager>();
+            bmb.onClick.AddListener(() =>
             {
                 chosenColor = conf.PrimaryColor;
                 gotColor = true;
@@ -75,8 +75,8 @@ namespace SEE.UI.Menu.Drawable
         {
             GameObject secondary = GameFinder.FindAttachedOrLocalDescendant(instance, "Secondary");
             SetImageColor(secondary, conf.SecondaryColor);
-            ButtonManagerBasic bmb = secondary.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+            ButtonManager bmb = secondary.GetComponent<ButtonManager>();
+            bmb.onClick.AddListener(() =>
             {
                 chosenColor = conf.SecondaryColor;
                 gotColor = true;
@@ -91,8 +91,8 @@ namespace SEE.UI.Menu.Drawable
         {
             GameObject fillOut = GameFinder.FindAttachedOrLocalDescendant(instance, "FillOut");
             SetImageColor(fillOut, conf.FillOutColor);
-            ButtonManagerBasic bmb = fillOut.GetComponent<ButtonManagerBasic>();
-            bmb.clickEvent.AddListener(() =>
+            ButtonManager bmb = fillOut.GetComponent<ButtonManager>();
+            bmb.onClick.AddListener(() =>
             {
                 chosenColor = conf.FillOutColor;
                 gotColor = true;

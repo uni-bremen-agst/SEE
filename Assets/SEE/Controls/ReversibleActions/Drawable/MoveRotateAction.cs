@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -289,7 +289,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
                                                               UICanvas.Canvas.transform, false);
             /// Adds the functionality to the move button
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManager>().clickEvent
                 .AddListener(() =>
                 {
                     progressState = ProgressState.Move;
@@ -297,7 +297,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     Destroyer.Destroy(switchMenu);
                 });
             /// Adds the funcitonality to the rotate button.
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManager>().onClick.
                 AddListener(() =>
                 {
                     progressState = ProgressState.Rotate;

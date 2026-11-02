@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using SEE.Utils;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Avatars;
 using TMPro;
 using SEE.Extensions;
@@ -132,7 +132,7 @@ namespace SEE.UI
             PersonalAssistantBrain.Instance?.Say(text.text);
             {
                 instructions.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-                manager.clickEvent.AddListener(Close);
+                manager.onClick.AddListener(Close);
             }
         }
 

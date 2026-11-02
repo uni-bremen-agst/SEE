@@ -1,7 +1,6 @@
 ﻿using System;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.KeyActions;
-using SEE.Extensions;
 using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -63,7 +62,7 @@ namespace SEE.UI.FilePicker
         /// <summary>
         ///     The picker button.
         /// </summary>
-        protected ButtonManagerBasic PickerButton { get; private set; }
+        protected ButtonManager PickerButton { get; private set; }
 
         /// <summary>
         ///     The label.
@@ -82,7 +81,7 @@ namespace SEE.UI.FilePicker
             Dropdown = Menu.transform.Find(DropdownPath).GetComponent<CustomDropdown>();
             CustomInput = Menu.transform.Find(CustomInputPath).GetComponent<TMP_InputField>();
             LabelText = Menu.transform.Find(LabelPath).GetComponent<TextMeshProUGUI>();
-            PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManagerBasic>();
+            PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManager>();
 
             TMP_InputField inputField = Menu.transform.Find("DropdownCombo/SelectableInput/Input")
                                             .GetComponent<TMP_InputField>();
@@ -106,7 +105,7 @@ namespace SEE.UI.FilePicker
             });
 
             // opens a file picker with the picker button
-            PickerButton.clickEvent.AddListener(() =>
+            PickerButton.onClick.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },

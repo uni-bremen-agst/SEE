@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.ReversibleActions.Drawable;
 using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable;
@@ -127,12 +127,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Button manager for chosing the primary color.
         /// </summary>
-        private static readonly ButtonManagerBasic primaryColorBMB;
+        private static readonly ButtonManager primaryColorBMB;
 
         /// <summary>
         /// Button manager for chosing the secondary color.
         /// </summary>
-        private static readonly ButtonManagerBasic secondaryColorBMB;
+        private static readonly ButtonManager secondaryColorBMB;
 
         /// <summary>
         /// The HSVPicker ColorPicker component of the line menu.
@@ -142,12 +142,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Button manager for chosing the color-kind area.
         /// </summary>
-        private static readonly ButtonManagerBasic colorKindBMB;
+        private static readonly ButtonManager colorKindBMB;
 
         /// <summary>
         /// Button manager for chosing the fill-out area.
         /// </summary>
-        private static readonly ButtonManagerBasic fillOutBMB;
+        private static readonly ButtonManager fillOutBMB;
 
         /// <summary>
         /// The switch manager for the fill-out status.
@@ -270,22 +270,22 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initialize the remaining GUI elements.
             loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManager>();
             primaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManager>();
             secondaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             tilingSlider = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
-            colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
+            colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManager>();
             colorKindBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
             colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
+            fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManager>();
             fillOutBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
             fillOutManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
             Instance.Disable();
@@ -656,11 +656,11 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpPrimaryColorButtonForDrawing()
         {
             /// Removes old handler.
-            primaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
             /// Adds the mutually exclusive mode.
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Adds the new handler for saving in global value.
-            primaryColorBMB.clickEvent.AddListener(() =>
+            primaryColorBMB.onClick.AddListener(() =>
             {
                 AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
             });
@@ -676,11 +676,11 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpSecondaryColorButtonForDrawing()
         {
             /// Removes old handler.
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             /// Adds the mutually exclusive mode.
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Adds the new handler for saving in global value.
-            secondaryColorBMB.clickEvent.AddListener(() =>
+            secondaryColorBMB.onClick.AddListener(() =>
             {
                 ValueHolder.CurrentSecondaryColor = EnsureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
                 AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
@@ -709,9 +709,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void SetUpColorKindTypeButtonForDrawing()
         {
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            colorKindBMB.clickEvent.AddListener(() =>
+            colorKindBMB.onClick.RemoveAllListeners();
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.onClick.AddListener(() =>
             {
                 DisableFillOut();
                 EnableColorKind();
@@ -734,9 +734,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void SetUpFillOutTypeButtonForDrawing()
         {
-            fillOutBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            fillOutBMB.clickEvent.AddListener(() =>
+            fillOutBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.onClick.AddListener(() =>
             {
                 DisableColorKind();
                 EnableFillOut();
@@ -906,9 +906,9 @@ namespace SEE.UI.Menu.Drawable
             if (returnCall != null)
             {
                 EnableReturn();
-                ButtonManagerBasic returnBtn = GameFinder.FindAttachedOrLocalDescendant(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
-                returnBtn.clickEvent.RemoveAllListeners();
-                returnBtn.clickEvent.AddListener(returnCall);
+                ButtonManager returnBtn = GameFinder.FindAttachedOrLocalDescendant(gameObject, "ReturnBtn").GetComponent<ButtonManager>();
+                returnBtn.onClick.RemoveAllListeners();
+                returnBtn.onClick.AddListener(returnCall);
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
@@ -1389,11 +1389,11 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler
-            primaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
             /// Add mutually exclusive mode.
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            primaryColorBMB.clickEvent.AddListener(() =>
+            primaryColorBMB.onClick.AddListener(() =>
             {
                 if (segment == Segment.Main)
                 {
@@ -1437,12 +1437,12 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler.
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             /// Add mutually exclusive mode.
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
 
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            secondaryColorBMB.clickEvent.AddListener(() =>
+            secondaryColorBMB.onClick.AddListener(() =>
             {
                 if (segment == Segment.Main)
                 {
@@ -1671,10 +1671,10 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpColorKindTypeButtonForEditing(GameObject selectedLine,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.onClick.RemoveAllListeners();
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
-            colorKindBMB.clickEvent.AddListener(() =>
+            colorKindBMB.onClick.AddListener(() =>
             {
                 DisableFillOut();
                 EnableColorKind();
@@ -1762,10 +1762,10 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpFillOutTypeButtonForEditing(GameObject selectedLine, LineConf lineHolder,
             GameObject surface, string surfaceParentName)
         {
-            fillOutBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
-            fillOutBMB.clickEvent.AddListener(() =>
+            fillOutBMB.onClick.AddListener(() =>
             {
                 DisableColorKind();
                 EnableFillOut();
@@ -2249,16 +2249,16 @@ namespace SEE.UI.Menu.Drawable
                 gameObject.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
                 tilingAction = null;
             }
-            primaryColorBMB.clickEvent.RemoveAllListeners();
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             gameObject.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
             gameObject.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
             fillOutManager.OffEvents.RemoveAllListeners();
             fillOutManager.OnEvents.RemoveAllListeners();
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.RemoveAllListeners();
+            colorKindBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.RemoveAllListeners();
 
             if (colorAction != null)
             {

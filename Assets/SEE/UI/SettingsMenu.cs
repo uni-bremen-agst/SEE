@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Audio;
 using SEE.Controls.KeyActions;
 using SEE.Game;
@@ -348,19 +348,19 @@ namespace SEE.UI
                     UserSetting.Instance.Save();
                 });
 
-                share.clickEvent.AddListener(() =>
+                share.onClick.AddListener(() =>
                 {
                     new LiveKitSettingsNetAction(UserSetting.Instance.Video.LiveKitUrl,
                                                  UserSetting.Instance.Video.TokenUrl,
                                                  UserSetting.Instance.Video.RoomName).Execute();
                 });
 
-                connect.clickEvent.AddListener(() =>
+                connect.onClick.AddListener(() =>
                 {
                     StartCoroutine(ConnectRoutine());
                 });
 
-                disconnect.clickEvent.AddListener(() =>
+                disconnect.onClick.AddListener(() =>
                 {
                     liveKitVideoManager.Disconnect();
                     disconnectGO.SetActive(false);
