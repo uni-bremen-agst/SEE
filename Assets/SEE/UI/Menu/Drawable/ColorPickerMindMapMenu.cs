@@ -161,7 +161,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If the node has no parent, there is consequently no branch line to the parent.
                 /// Therefore, in this case, the button will be disabled.
-                branchLineButtonArea.GetComponent<ButtonManager>().enabled = false;
+                branchLineButtonArea.GetComponent<ButtonManager>().Interactable(false);
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
         }

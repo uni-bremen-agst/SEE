@@ -225,6 +225,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -362,6 +363,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -668,6 +670,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputText: {fileID: 0}
   inputFieldAnimator: {fileID: 0}
+  processSubmit: 0
+  clearOnSubmit: 1
+  setEventSystem: 0
+  onSubmit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8077329023944246148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -681,13 +689,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
-  images:
-  - {fileID: 4455396941605349560}
-  - {fileID: 8267873363616257165}
-  texts:
-  - {fileID: 8077329023320129079}
-  - {fileID: 8077329024008539462}
+  overrideColors: 0
+  overrideFonts: 0
+  mainText: {fileID: 8077329023320129077}
+  placeholderText: {fileID: 8077329024008539460}
+  filledImage: {fileID: 2674702658400400517}
+  backgroundImage: {fileID: 5836245590327565853}
 --- !u!114 &278820234878124279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -816,6 +823,7 @@ MonoBehaviour:
   m_VerticalAlignment: 1024
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

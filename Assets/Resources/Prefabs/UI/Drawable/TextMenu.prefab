@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6137684583970155137}
   - component: {fileID: 4569561222453738478}
   - component: {fileID: 2138912430109751827}
+  - component: {fileID: 2608955255186384662}
   m_Layer: 5
   m_Name: Italic
   m_TagString: Untagged
@@ -58,11 +59,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 18849294875685354}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: I
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 7917838345160167773}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 6674792137092660109}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -78,21 +129,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 7917838345160167773}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 6674792137092660109}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -100,6 +147,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &4569561222453738478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,6 +223,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &2608955255186384662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18849294875685354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &106595442581304447
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,11 +292,15 @@ MonoBehaviour:
   valueText: {fileID: 0}
   popupValueText: {fileID: 0}
   enableSaving: 0
+  invokeOnAwake: 1
   sliderTag: Tag Text
   usePercent: 0
   showValue: 0
   showPopupValue: 0
   useRoundValue: 0
+  decimalFormat: 1
+  minValue: 0
+  maxValue: 0
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -310,7 +375,8 @@ MonoBehaviour:
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
   hasLabel: 0
   hasPopupLabel: 0
-  webglMode: 0
+  overrideColors: 0
+  overrideFonts: 0
   background: {fileID: 6153541016479747615}
   bar: {fileID: 9174687001982296038}
   handle: {fileID: 48246171636091989}
@@ -420,20 +486,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -555,20 +624,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -690,20 +762,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -826,6 +901,7 @@ GameObject:
   - component: {fileID: 6485564227934615468}
   - component: {fileID: 8758991616477051357}
   - component: {fileID: 197809793515122073}
+  - component: {fileID: 7062415457249826499}
   m_Layer: 5
   m_Name: OutlineColorBtn
   m_TagString: Untagged
@@ -871,11 +947,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 794536797042757860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Outline Color
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 8284728480219366645}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 3929886681768346824}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -891,21 +1017,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 8284728480219366645}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 3929886681768346824}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -913,6 +1035,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &8758991616477051357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -987,6 +1111,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &7062415457249826499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794536797042757860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &822010213453982025
 GameObject:
   m_ObjectHideFlags: 0
@@ -1177,7 +1313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -1192,7 +1328,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -1207,7 +1343,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -1235,6 +1371,7 @@ GameObject:
   - component: {fileID: 4154924006424641339}
   - component: {fileID: 5634326901811814179}
   - component: {fileID: 7582811153741706154}
+  - component: {fileID: 8347438354608195681}
   m_Layer: 5
   m_Name: EditText
   m_TagString: Untagged
@@ -1280,11 +1417,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 979490588307293967}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Edit Text
-  clickEvent:
+  iconScale: 1
+  textSize: 22.5
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 1825821336795976598}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 5444199867448499055}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1300,21 +1487,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 1825821336795976598}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 5444199867448499055}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -1322,6 +1505,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &5634326901811814179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1396,6 +1581,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &8347438354608195681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979490588307293967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1020473094529478976
 GameObject:
   m_ObjectHideFlags: 0
@@ -1795,7 +1992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -1810,7 +2007,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -1825,7 +2022,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2069,7 +2266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2084,7 +2281,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2099,7 +2296,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2127,6 +2324,7 @@ GameObject:
   - component: {fileID: 1173677778887539403}
   - component: {fileID: 6880187118559358052}
   - component: {fileID: 1768574485387118311}
+  - component: {fileID: 8637044895064448554}
   m_Layer: 5
   m_Name: Bold
   m_TagString: Untagged
@@ -2172,11 +2370,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 1547349926937566016}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: B
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 1540636886849443720}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 3703247481352001855}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -2192,21 +2440,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 1540636886849443720}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 3703247481352001855}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -2214,6 +2458,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6880187118559358052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2288,6 +2534,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &8637044895064448554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547349926937566016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1657175183061339347
 GameObject:
   m_ObjectHideFlags: 0
@@ -2456,10 +2714,10 @@ MonoBehaviour:
   upAndDownValue: 0.01
   minValue: 0.15
   maxValue: 5
-  onValueChanged:
+  OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  onProportionalValueChanged:
+  OnProportionalValueChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1877573849825860358
@@ -2587,20 +2845,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -2772,7 +3033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2787,7 +3048,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -2802,7 +3063,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -3102,10 +3363,13 @@ MonoBehaviour:
   m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
+  m_KeepTextSelectionVisible: 0
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
+  isAlert: 0
   m_InputValidator: {fileID: 0}
+  m_ShouldActivateOnSelect: 1
 --- !u!114 &4954663744948776008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3226,6 +3490,7 @@ GameObject:
   - component: {fileID: 1147214365747761181}
   - component: {fileID: 6923296002166062981}
   - component: {fileID: 3535310556599206460}
+  - component: {fileID: 3234581290497039383}
   m_Layer: 5
   m_Name: SmallCaps
   m_TagString: Untagged
@@ -3271,11 +3536,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 2547046961301995788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: SC
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 1951496568206805337}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 3222809865319271481}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -3291,21 +3606,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 1951496568206805337}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 3222809865319271481}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -3313,6 +3624,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6923296002166062981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3387,6 +3700,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &3234581290497039383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2547046961301995788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2819880816893929559
 GameObject:
   m_ObjectHideFlags: 0
@@ -3666,7 +3991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -3681,7 +4006,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -3696,7 +4021,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -3815,20 +4140,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -3949,20 +4277,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4266,20 +4597,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4354,11 +4688,15 @@ MonoBehaviour:
   valueText: {fileID: 0}
   popupValueText: {fileID: 0}
   enableSaving: 0
+  invokeOnAwake: 1
   sliderTag: Tag Text
   usePercent: 0
   showValue: 0
   showPopupValue: 0
   useRoundValue: 0
+  decimalFormat: 1
+  minValue: 0
+  maxValue: 0
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4433,7 +4771,8 @@ MonoBehaviour:
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
   hasLabel: 0
   hasPopupLabel: 0
-  webglMode: 0
+  overrideColors: 0
+  overrideFonts: 0
   background: {fileID: 7885960769547440771}
   bar: {fileID: 4093895276722279530}
   handle: {fileID: 5921639694743970364}
@@ -4542,20 +4881,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4586,6 +4928,7 @@ GameObject:
   - component: {fileID: 4174744625854728825}
   - component: {fileID: 8987353856772293763}
   - component: {fileID: 8317463745541882915}
+  - component: {fileID: 7948783432363262585}
   m_Layer: 5
   m_Name: FontColorBtn
   m_TagString: Untagged
@@ -4631,11 +4974,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 3539579640540166278}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Font Color
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 8507881766738925116}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 5739401886855425210}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -4651,21 +5044,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 8507881766738925116}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 5739401886855425210}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -4673,6 +5062,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &8987353856772293763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4747,6 +5138,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &7948783432363262585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3539579640540166278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3562209866349193691
 GameObject:
   m_ObjectHideFlags: 0
@@ -4990,7 +5393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -5005,7 +5408,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -5020,7 +5423,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -5249,20 +5652,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -5457,6 +5863,7 @@ GameObject:
   - component: {fileID: 1815263179659558300}
   - component: {fileID: 5168343382872202965}
   - component: {fileID: 7212423190518953326}
+  - component: {fileID: 4908298445204216393}
   m_Layer: 5
   m_Name: Underline
   m_TagString: Untagged
@@ -5502,11 +5909,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 4109305480871260350}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: U
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 9137689811794718577}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 6647626052200455252}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -5522,21 +5979,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 9137689811794718577}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 6647626052200455252}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -5544,6 +5997,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &5168343382872202965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5618,6 +6073,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &4908298445204216393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4109305480871260350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4328932778332521006
 GameObject:
   m_ObjectHideFlags: 0
@@ -5766,8 +6233,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55380a2c17ece834c96a5c7bfa74d470, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  picker: {fileID: 233835711553808483}
-  presets:
+  Picker: {fileID: 233835711553808483}
+  Presets:
   - {fileID: 2933515715207377886}
   - {fileID: 7395910328031744337}
   - {fileID: 1924403498175439768}
@@ -5779,7 +6246,7 @@ MonoBehaviour:
   - {fileID: 7454130128945911433}
   - {fileID: 1532012846565655705}
   - {fileID: 1274036571771771376}
-  createPresetImage: {fileID: 1523935109281026726}
+  CreatePresetImage: {fileID: 1523935109281026726}
 --- !u!1 &4334683341927353039
 GameObject:
   m_ObjectHideFlags: 0
@@ -5881,6 +6348,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a058d8729a0602458c4c9045eeddbf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
   OnEvents:
     m_PersistentCalls:
       m_Calls: []
@@ -5956,14 +6426,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
+  overrideColors: 0
   border: {fileID: 1297902780235997106}
   background: {fileID: 8073806450327962221}
   handleOn: {fileID: 2906349749080646393}
   handleOff: {fileID: 6455613209477358298}
 --- !u!95 &7484590242104565440
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5977,6 +6447,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -6025,6 +6496,7 @@ GameObject:
   - component: {fileID: 8344011638174798938}
   - component: {fileID: 7517954830031169950}
   - component: {fileID: 2667417626661716556}
+  - component: {fileID: 2185003300312028359}
   m_Layer: 5
   m_Name: DownBtn
   m_TagString: Untagged
@@ -6070,11 +6542,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 4386723489321655277}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: ^
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 7476581739865125305}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 8064792069902934376}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -6090,21 +6612,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 7476581739865125305}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 8064792069902934376}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -6112,6 +6630,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &7517954830031169950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6186,6 +6706,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &2185003300312028359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4386723489321655277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4424837773998061282
 GameObject:
   m_ObjectHideFlags: 0
@@ -6288,6 +6820,7 @@ GameObject:
   - component: {fileID: 4706495286919816470}
   - component: {fileID: 8373046722435264708}
   - component: {fileID: 9057794378638174730}
+  - component: {fileID: 7330680892736578591}
   m_Layer: 5
   m_Name: UpBtn
   m_TagString: Untagged
@@ -6333,11 +6866,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 4453639033608569311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: ^
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 1150402738223332820}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 4424837773998061282}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -6353,21 +6936,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 1150402738223332820}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 4424837773998061282}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -6375,6 +6954,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &8373046722435264708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6449,6 +7030,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &7330680892736578591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4453639033608569311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4547537222361660125
 GameObject:
   m_ObjectHideFlags: 0
@@ -6554,20 +7147,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -6708,20 +7304,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7118,7 +7717,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -7133,7 +7732,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -7148,7 +7747,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -7176,6 +7775,7 @@ GameObject:
   - component: {fileID: 1014088328023937816}
   - component: {fileID: 8862253970971667242}
   - component: {fileID: 5880254766322856438}
+  - component: {fileID: 171741268763585036}
   m_Layer: 5
   m_Name: ReturnBtn
   m_TagString: Untagged
@@ -7221,11 +7821,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 4938225899957055744}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Return to Mind Map Edit Menu
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 6019710594044667711}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 8387057682033067475}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -7241,21 +7891,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 6019710594044667711}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 8387057682033067475}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -7263,6 +7909,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &8862253970971667242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7337,6 +7985,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &171741268763585036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4938225899957055744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5052352016966876311
 GameObject:
   m_ObjectHideFlags: 0
@@ -7462,20 +8122,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7597,20 +8260,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7731,20 +8397,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_TextWrappingMode: 3
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7990,20 +8659,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -8110,7 +8782,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 4413719490958164342}
   tmpText: {fileID: 3722899700816745210}
-  onValueChanged:
+  OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &5444199867448499055
@@ -8215,6 +8887,7 @@ GameObject:
   - component: {fileID: 4329875905243801598}
   - component: {fileID: 6613497551856512499}
   - component: {fileID: 5131742028535347360}
+  - component: {fileID: 4557106309613761965}
   m_Layer: 5
   m_Name: Strikethrough
   m_TagString: Untagged
@@ -8260,11 +8933,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 5490297373374541638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: S
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 683928622881767143}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 2819880816893929559}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -8280,21 +9003,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 683928622881767143}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 2819880816893929559}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -8302,6 +9021,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6613497551856512499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8376,6 +9097,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &4557106309613761965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5490297373374541638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5585242933302493379
 GameObject:
   m_ObjectHideFlags: 0
@@ -8479,20 +9212,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -8968,7 +9704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -8983,7 +9719,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -8998,7 +9734,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -9116,20 +9852,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -9301,7 +10040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -9316,7 +10055,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -9331,7 +10070,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -9409,7 +10148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragArea: {fileID: 0}
   dragObject: {fileID: 4985421093549351610}
-  topOnClick: 1
+  topOnDrag: 1
 --- !u!114 &1378373156935747248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10161,7 +10900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10176,7 +10915,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10191,7 +10930,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10310,20 +11049,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -10354,6 +11096,7 @@ GameObject:
   - component: {fileID: 7411977564542366482}
   - component: {fileID: 1331225240620425537}
   - component: {fileID: 2052241540100638896}
+  - component: {fileID: 7977191000417898238}
   m_Layer: 5
   m_Name: LowerCase
   m_TagString: Untagged
@@ -10399,11 +11142,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 7436769122755181462}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: ab
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 4733086870829994017}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 6680156417092858079}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -10419,21 +11212,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 4733086870829994017}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 6680156417092858079}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -10441,6 +11230,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &1331225240620425537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10515,6 +11306,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &7977191000417898238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7436769122755181462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7454130128945911433
 GameObject:
   m_ObjectHideFlags: 0
@@ -10669,7 +11472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10684,7 +11487,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10699,7 +11502,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7859118300596664044}
@@ -10802,6 +11605,7 @@ GameObject:
   - component: {fileID: 5796394110274235939}
   - component: {fileID: 5794562875018873299}
   - component: {fileID: 3882310793251795825}
+  - component: {fileID: 7091961180414763427}
   m_Layer: 5
   m_Name: UpperCase
   m_TagString: Untagged
@@ -10847,11 +11651,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 7574703023549139942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: AB
-  clickEvent:
+  iconScale: 1
+  textSize: 14
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 7779136669975548012}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 3562209866349193691}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -10867,21 +11721,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 7779136669975548012}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 3562209866349193691}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -10889,6 +11739,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &5794562875018873299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10963,6 +11815,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &7091961180414763427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7574703023549139942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7860740486394346284
 GameObject:
   m_ObjectHideFlags: 0
@@ -11067,20 +11931,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 5
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -11290,20 +12157,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -11424,20 +12294,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -11760,20 +12633,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -12726,6 +13602,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 326370227258344758, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 473728276618931899, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -12817,6 +13698,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 2042142435846476716, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 2356398483926951466, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -12994,6 +13880,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 5337678097716369149, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 5349439747052562945, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -13026,6 +13917,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 5349439747052562945, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 5493264123930492142, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -13057,6 +13953,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 5493264123930492142, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -13090,6 +13991,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294704125
       objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 6902966852220138908, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -13120,6 +14026,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7008529064164788781, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 7199539176213212952, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -13149,6 +14060,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7547463640195977829, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 7781454041237124995, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -13263,6 +14179,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 7954934987403382009, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 8363915173054809253, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -13325,6 +14246,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 8727449310617686932, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 8731585516226021777, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -13377,6 +14303,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839826584184242325, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

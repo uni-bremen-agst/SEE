@@ -323,6 +323,7 @@ namespace SEE.UI.Menu.Drawable
             fontColorBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FontColorBtn").GetComponent<Button>();
             fontColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FontColorBtn").GetComponent<ButtonManager>();
             fontColorBtn.interactable = false;
+            fontColorBMB.Interactable(false);
             fontColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline color button and adds an exclusion mechanism with the font color button.
@@ -745,7 +746,9 @@ namespace SEE.UI.Menu.Drawable
         private static void MutuallyExclusiveColorButtons()
         {
             fontColorBtn.interactable = !fontColorBtn.IsInteractable();
+            fontColorBMB.Interactable(fontColorBtn.interactable);
             outlineColorBtn.interactable = !outlineColorBtn.IsInteractable();
+            outlineColorBMB.Interactable(outlineColorBtn.interactable);
             if (!outlineColorBtn.interactable)
             {
                 thicknessLayer.SetActive(true);

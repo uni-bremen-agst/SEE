@@ -473,7 +473,7 @@ namespace SEE.UI.Menu.Drawable
             configBMB = drawableSwitch.GetComponentsInChildren<ButtonManager>()[1];
             configBMB.onClick.AddListener(ConfigOnClick);
             shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
+            shapeBMB.Interactable(false);
         }
 
         /// <summary>
@@ -1167,8 +1167,8 @@ namespace SEE.UI.Menu.Drawable
         private static void ConfigOnClick()
         {
             configBtn.interactable = false;
-            configBMB.enabled = false;
-            shapeBMB.enabled = true;
+            configBMB.Interactable(false);
+            shapeBMB.Interactable(true);
             shapeBtn.interactable = true;
             if (DrawShapesAction.currentShape == null)
             {
@@ -1209,9 +1209,9 @@ namespace SEE.UI.Menu.Drawable
         private static void ShapeOnClick()
         {
             shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
+            shapeBMB.Interactable(false);
             configBtn.interactable = true;
-            configBMB.enabled = true;
+            configBMB.Interactable(true);
             LineMenu.Instance.Disable();
             BindShapeMenu();
             shapeMenu.SetActive(true);

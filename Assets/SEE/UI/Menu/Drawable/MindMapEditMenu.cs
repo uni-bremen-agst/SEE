@@ -206,7 +206,7 @@ namespace SEE.Game.UI.Menu.Drawable
             else
             {
                 /// If no parent branch line exist for this node, deactivate the button.
-                branchLineButtonArea.GetComponent<ButtonManager>().enabled = false;
+                branchLineButtonArea.GetComponent<ButtonManager>().Interactable(false);
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
         }

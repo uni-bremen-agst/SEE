@@ -87,6 +87,12 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private void Awake()
         {
+            Canvas canvas = GetComponent<Canvas>();
+            if (canvas.worldCamera == null)
+            {
+                canvas.worldCamera = MainCamera.Camera;
+            }
+
             houseIcon = Resources.Load<Sprite>(houseIconPath);
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetsPath);
             metricTypes = Metric.GetTypes();
@@ -98,6 +104,20 @@ namespace SEE.Game.HolisticMetrics
             graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
         }
 
+        /// <summary>
+        /// Keeps the dropdown state consistent with MUIP hiding its list on re-enable.
+        /// </summary>
+        private void OnDisable()
+        {
+            if (citySelection != null)
+            {
+                citySelection.isOn = false;
+                if (citySelection.triggerObject != null)
+                {
+                    citySelection.triggerObject.SetActive(false);
+                }
+            }
+        }
         /// <summary>
         /// Returns the title of this manager's metrics board.
         /// </summary>
