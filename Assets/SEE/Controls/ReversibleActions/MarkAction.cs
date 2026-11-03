@@ -7,7 +7,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
@@ -64,24 +63,19 @@ namespace SEE.Controls.ReversibleActions
         {
             bool clickedOnTheBuilding = false;
 
-
             if (UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
                 && ger.gameObject.TryGetComponent(out InteractableObject io)
                 && io.IsInteractable(raycastHit.point))
             {
 
-                GameObject clickedBuilding = ger.gameObject;
+                GameObject gameNode = ger.gameObject;
 
+                GameNodeMarker.ToggleMark(gameNode);
 
-                GameNodeMarker.ToggleMark(clickedBuilding);
-
-
-                markedNodeID = clickedBuilding.name;
-
+                markedNodeID = gameNode.name;
 
                 new MarkNetAction(markedNodeID).Execute();
-
 
                 CurrentState = IReversibleAction.Progress.Completed;
 
@@ -104,7 +98,6 @@ namespace SEE.Controls.ReversibleActions
             {
 
                 GameNodeMarker.ToggleMark(node);
-
 
                 new MarkNetAction(markedNodeID).Execute();
 

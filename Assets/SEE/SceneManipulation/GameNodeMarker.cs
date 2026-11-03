@@ -14,7 +14,7 @@ namespace SEE.SceneManipulation
         /// <summary>
         /// Used to find the marker sphere later.
         /// </summary>
-        const string sphereName = "sphereObj";
+        private const string sphereName = "sphereObj";
 
         /// <summary>
         /// Adds a sphere if it is not marked, removes it if it is marked.
@@ -39,8 +39,8 @@ namespace SEE.SceneManipulation
                 newSphere.transform.SetParent(obj.transform, true);
 
             }
-            else { 
-                Destroyer.Destroy(sphereFound.gameObject); 
+            else {
+                Destroyer.Destroy(sphereFound.gameObject);
             }
 
         }
