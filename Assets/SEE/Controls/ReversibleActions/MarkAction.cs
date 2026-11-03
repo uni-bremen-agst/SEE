@@ -68,7 +68,6 @@ namespace SEE.Controls.ReversibleActions
                 && ger.gameObject.TryGetComponent(out InteractableObject io)
                 && io.IsInteractable(raycastHit.point))
             {
-
                 GameObject gameNode = ger.gameObject;
 
                 GameNodeMarker.ToggleMark(gameNode);
@@ -81,7 +80,6 @@ namespace SEE.Controls.ReversibleActions
 
                 clickedOnTheBuilding = true;
             }
-
             return clickedOnTheBuilding;
         }
 
