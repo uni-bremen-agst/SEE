@@ -271,20 +271,16 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize the remaining GUI elements.
             loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
             primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManager>();
-            primaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
             primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
-            primaryColorBMB.buttonVar.interactable = false;
+            primaryColorBMB.Interactable(false);
             secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManager>();
-            secondaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
             secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             tilingSlider = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
             colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManager>();
-            colorKindBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
             colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
-            colorKindBMB.buttonVar.interactable = false;
+            colorKindBMB.Interactable(false);
             fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManager>();
-            fillOutBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
             fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
             fillOutManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
@@ -311,7 +307,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             /// Register the handler for switching the line kind.
-            lineKindSelector.selectorEvent.AddListener(index =>
+            lineKindSelector.onValueChanged.AddListener(index =>
             {
                 if (GetLineKinds()[index] == LineKind.Dashed)
                 {
@@ -356,7 +352,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             /// Register the handler for switching the color kind.
-            colorKindSelector.selectorEvent.AddListener(index =>
+            colorKindSelector.onValueChanged.AddListener(index =>
             {
                 bool isDashed = selectedLineKind != LineKind.Solid;
                 ColorKind newColorKind = GetColorKinds(true)[index];
@@ -588,7 +584,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the old action of the selector
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             /// Creates the new action for changing the line kind on the selector.
@@ -607,7 +603,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Add the action to the selector.
-            lineKindSelector.selectorEvent.AddListener(lineKindAction);
+            lineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -628,7 +624,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the old action of the selector
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
             }
 
             /// Creates the new action for changing the color kind on the selector.
@@ -645,7 +641,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the action to the selector.
-            colorKindSelector.selectorEvent.AddListener(colorKindAction);
+            colorKindSelector.onValueChanged.AddListener(colorKindAction);
         }
 
         /// <summary>
@@ -665,7 +661,7 @@ namespace SEE.UI.Menu.Drawable
                 AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
             });
             /// Makes the button not clickable.
-            primaryColorBMB.buttonVar.interactable = false;
+            primaryColorBMB.Interactable(false);
         }
 
         /// <summary>
@@ -686,7 +682,7 @@ namespace SEE.UI.Menu.Drawable
                 AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
             });
             /// Makes the button not clickable.
-            secondaryColorBMB.buttonVar.interactable = true;
+            secondaryColorBMB.Interactable(true);
         }
         /// <summary>
         /// Sets up the outline thickness slider for drawing mode.
@@ -716,7 +712,7 @@ namespace SEE.UI.Menu.Drawable
                 DisableFillOut();
                 EnableColorKind();
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
-                if (!primaryColorBMB.buttonVar.interactable)
+                if (!primaryColorBMB.isInteractable)
                 {
                     AssignColorArea(color => { ValueHolder.CurrentPrimaryColor = color; }, ValueHolder.CurrentPrimaryColor);
                 }
@@ -726,7 +722,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
                 }
             });
-            colorKindBMB.buttonVar.interactable = false;
+            colorKindBMB.Interactable(false);
         }
 
         /// <summary>
@@ -747,7 +743,7 @@ namespace SEE.UI.Menu.Drawable
                 }
                 AssignColorArea(color => { ValueHolder.CurrentTertiaryColor = color; }, ValueHolder.CurrentTertiaryColor);
             });
-            fillOutBMB.buttonVar.interactable = true;
+            fillOutBMB.Interactable(true);
         }
 
         /// <summary>
@@ -954,7 +950,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the current line kind action of the line kind selector.
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             /// Creates a new line kind selector action
@@ -1014,7 +1010,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the line kind selector action.
-            lineKindSelector.selectorEvent.AddListener(lineKindAction);
+            lineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -1038,7 +1034,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the current color-kind action of the color-kind selector.
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
             }
 
             /// Creates a new color-kind selector action
@@ -1090,7 +1086,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the color-kind selector action.
-            colorKindSelector.selectorEvent.AddListener(colorKindAction);
+            colorKindSelector.onValueChanged.AddListener(colorKindAction);
         }
 
         /// <summary>
@@ -1114,7 +1110,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
             }
             segmentAction = index =>
             {
@@ -1138,7 +1134,7 @@ namespace SEE.UI.Menu.Drawable
                 RefreshEditingUIForCurrentSegment(selectedLine, lineHolder, surface, surfaceParentName);
                 ResetColorTypeSelectionToDefault();
             };
-            segmentSelector.selectorEvent.AddListener(segmentAction);
+            segmentSelector.onValueChanged.AddListener(segmentAction);
         }
 
         /// <summary>
@@ -1180,7 +1176,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
             }
             lineCapAction = index =>
             {
@@ -1257,7 +1253,7 @@ namespace SEE.UI.Menu.Drawable
                     RecalculateMenuHeightDelayedAsync().Forget();
                 }
             };
-            lineCapSelector.selectorEvent.AddListener(lineCapAction);
+            lineCapSelector.onValueChanged.AddListener(lineCapAction);
         }
 
         /// <summary>
@@ -1421,7 +1417,7 @@ namespace SEE.UI.Menu.Drawable
 
             });
             /// Makes the button unclickable.
-            primaryColorBMB.buttonVar.interactable = false;
+            primaryColorBMB.Interactable(false);
         }
 
         /// <summary>
@@ -1473,7 +1469,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             });
             /// Makes the button unclickable.
-            secondaryColorBMB.buttonVar.interactable = true;
+            secondaryColorBMB.Interactable(true);
         }
 
         /// <summary>
@@ -1681,7 +1677,7 @@ namespace SEE.UI.Menu.Drawable
 
                 if (segment == Segment.Main)
                 {
-                    if (!primaryColorBMB.buttonVar.interactable)
+                    if (!primaryColorBMB.isInteractable)
                     {
                         AssignColorArea(color =>
                         {
@@ -1723,7 +1719,7 @@ namespace SEE.UI.Menu.Drawable
                         return;
                     }
 
-                    if (!primaryColorBMB.buttonVar.interactable)
+                    if (!primaryColorBMB.isInteractable)
                     {
                         AssignColorArea(color =>
                         {
@@ -1749,7 +1745,7 @@ namespace SEE.UI.Menu.Drawable
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
             });
 
-            colorKindBMB.buttonVar.interactable = false;
+            colorKindBMB.Interactable(false);
         }
 
         /// <summary>
@@ -1817,7 +1813,7 @@ namespace SEE.UI.Menu.Drawable
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
             });
 
-            fillOutBMB.buttonVar.interactable = true;
+            fillOutBMB.Interactable(true);
         }
 
         /// <summary>
@@ -1929,7 +1925,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="clearFillOutAction">Action to clear the value.</param>
         public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
-            if (Instance.IsInEditMode() && !fillOutBMB.buttonVar.interactable)
+            if (Instance.IsInEditMode() && !fillOutBMB.isInteractable)
             {
                 if (fillOut != null && setFillOutAction != null)
                 {
@@ -2218,25 +2214,25 @@ namespace SEE.UI.Menu.Drawable
 
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
                 lineKindAction = null;
             }
 
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
                 colorKindAction = null;
             }
 
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
                 segmentAction = null;
             }
 
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
                 lineCapAction = null;
             }
 
@@ -2379,8 +2375,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void MutuallyExclusiveColorButtons()
         {
-            primaryColorBMB.buttonVar.interactable = !primaryColorBMB.buttonVar.IsInteractable();
-            secondaryColorBMB.buttonVar.interactable = !secondaryColorBMB.buttonVar.IsInteractable();
+            primaryColorBMB.Interactable(!primaryColorBMB.isInteractable);
+            secondaryColorBMB.Interactable(!secondaryColorBMB.isInteractable);
         }
 
 
@@ -2390,8 +2386,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void MutuallyExclusiveColorTypeButtons()
         {
-            colorKindBMB.buttonVar.interactable = !colorKindBMB.buttonVar.IsInteractable();
-            fillOutBMB.buttonVar.interactable = !fillOutBMB.buttonVar.IsInteractable();
+            colorKindBMB.Interactable(!colorKindBMB.isInteractable);
+            fillOutBMB.Interactable(!fillOutBMB.isInteractable);
         }
 
         /// <summary>
@@ -2402,8 +2398,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void ResetColorTypeSelectionToDefault()
         {
-            colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB.buttonVar.interactable = true;
+            colorKindBMB.Interactable(false);
+            fillOutBMB.Interactable(true);
         }
         #endregion
 
