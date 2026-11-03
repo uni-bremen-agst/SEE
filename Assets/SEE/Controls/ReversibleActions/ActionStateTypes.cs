@@ -106,6 +106,10 @@ namespace SEE.Controls.ReversibleActions
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
                   ShowCodeAction.CreateReversibleAction);
+            Mark =
+                new("Mark", "Mark or unmark a node",
+                    Color.yellow.Darker(), Icons.CircleCheckmark,
+                    MarkAction.CreateReversibleAction);
 
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
@@ -317,6 +321,7 @@ namespace SEE.Controls.ReversibleActions
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
+        public static readonly ActionStateType Mark;
 
         public static readonly ActionStateTypeGroup MetricBoard;
         public static readonly ActionStateType AddBoard;
