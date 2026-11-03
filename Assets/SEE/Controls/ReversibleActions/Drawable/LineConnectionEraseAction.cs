@@ -42,8 +42,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     {
                         isActive = true;
 
-                        memento = EraseSelectedLinePart(hitObject, raycastHit.point,
-                            GameLineSplit.EraseLinePointConnection);
+                        memento = EraseSelectedLinePart(
+                            hitObject,
+                            raycastHit.point,
+                            GameLineSplit.EraseLinePointConnection,
+                            selectConnection: true);
                     }
                 }
 
