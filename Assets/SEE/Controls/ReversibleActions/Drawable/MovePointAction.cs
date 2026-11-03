@@ -169,8 +169,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
         /// <summary>
         /// Allows the user to select a line, and based on the mouse position
-        /// at the moment of the click, it searches for the nearest point on the line.
-        /// Additionally, the blink effect is activated to show which line has been chosen.
+        /// at the moment of the click, it searches for the nearest point(s).
+        /// Rendered indices are translated to original line indices before
+        /// the selected points are accessed or modified.
+        /// Additionally, the blink effect is activated to show which line
+        /// has been chosen.
         /// </summary>
         private void SelectLine()
         {
@@ -185,28 +188,44 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     selectedLine = hitObject.transform.parent.gameObject;
 
-                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                    bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+                    LineRenderer renderer =
+                        selectedLine.GetComponent<LineRenderer>();
+
+                    bool startCapSelected =
+                        hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
 
                     Indices = new List<int>
                     {
                         startCapSelected ? 0 : renderer.positionCount - 1
                     };
-
-                    Vector3[] originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine);
-                    oldPointPosition = originalPositions[Indices[0]];
                 }
                 else
                 {
                     selectedLine = hitObject;
-                    NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
-                        out List<Vector3> _, out List<int> matchedIndices);
+
+                    NearestPoints.GetNearestPoints(
+                        selectedLine,
+                        raycastHit.point,
+                        out List<Vector3> _,
+                        out List<int> matchedIndices);
 
                     Indices = matchedIndices;
-
-                    Vector3[] originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine);
-                    oldPointPosition = originalPositions[Indices[0]];
                 }
+
+                Indices = LinePositionHelper.ToLogicalIndices(
+                    selectedLine,
+                    Indices);
+
+                if (Indices.Count == 0)
+                {
+                    selectedLine = null;
+                    return;
+                }
+
+                Vector3[] originalPositions =
+                    LinePositionHelper.GetSafeOriginalPositions(selectedLine);
+
+                oldPointPosition = originalPositions[Indices[0]];
 
                 selectedLine.AddOrGetComponent<BlinkEffect>();
             }
