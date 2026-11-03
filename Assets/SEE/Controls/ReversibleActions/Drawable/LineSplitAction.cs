@@ -26,9 +26,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// </summary>
         private Vector3? splitMarkerPosition;
 
+
         /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineSplit"/>.
-        /// Specifically: Allows the user to split a line. One action run allows to split the line one time.
+        /// This method manages the player's interaction with the mode
+        /// <see cref="ActionStateType.LineSplit"/>.
+        /// Specifically: Allows the user to split a line.
+        /// One action run allows to split the line one time.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
         public override bool Update()
@@ -66,7 +69,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                         GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
                             matchedIndices, originalPositions, lines, false);
 
-                        /// Showes a notification if the split was successfully.
+                        /// Shows a notification if the split was successful.
                         if (lines.Count > 1 || (originLine.Loop && lines.Count == 1))
                         {
                             string description = lines.Count > 1
@@ -75,15 +78,20 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
                             ShowNotification.Info("Line split", description);
 
-                            splitMarkerPosition = originalPositions[matchedIndices[0]];
-                            MarkSplitPosition(hitObject, splitMarkerPosition.Value);
+                            Vector3 markerPosition =
+                                originalPositions[matchedIndices[0]];
+
+                            splitMarkerPosition = markerPosition;
+                            MarkSplitPosition(hitObject, markerPosition);
                         }
+
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                             memento.OriginalLine.ID).Execute();
                         Destroyer.Destroy(hitObject);
                     }
                 }
+
                 /// This block completes the action.
                 if (SEEInput.MouseUp(MouseButton.Left) && isActive)
                 {
