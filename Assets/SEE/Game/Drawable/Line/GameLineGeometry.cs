@@ -212,6 +212,22 @@ namespace SEE.Game.Drawable.Line
         }
 
         /// <summary>
+        /// Determines whether the original line positions already
+        /// contain an explicit closing point.
+        /// </summary>
+        /// <param name="positions">The original line positions.</param>
+        /// <returns>
+        /// True if the first and last positions are exactly equal;
+        /// otherwise, false.
+        /// </returns>
+        internal static bool HasExplicitClosingPoint(Vector3[] positions)
+        {
+            return positions != null
+                && positions.Length >= 2
+                && positions[0].Equals(positions[positions.Length - 1]);
+        }
+
+        /// <summary>
         /// Gets the original unshortened line positions for the given line.
         /// The first and last positions are restored from the stored original anchors
         /// if available.

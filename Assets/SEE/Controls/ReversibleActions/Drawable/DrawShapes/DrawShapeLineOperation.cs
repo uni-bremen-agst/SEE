@@ -427,6 +427,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
 
         /// <summary>
         /// Finalizes the geometry of the currently drawn line.
+        /// An explicit closing point prevents an additional implicit loop.
         /// </summary>
         /// <param name="shape">The currently drawn line.</param>
         /// <param name="surface">The drawable surface containing the line.</param>
@@ -440,7 +441,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
             DrawShapeLineCapController lineCapController)
         {
             GameLineDrawer.Drawing(shape, positions);
-            shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
+
+            bool enableLoop =
+                ShapeMenu.GetBoolValue()
+                && !GameLineGeometry.HasExplicitClosingPoint(positions);
+
+            shape.GetComponent<LineRenderer>().loop = enableLoop;
 
             GameObject finishedShape =
                 GameLineGeometry.SetPivot(shape, fillOutColor);

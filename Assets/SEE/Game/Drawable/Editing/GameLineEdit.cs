@@ -31,9 +31,10 @@ namespace SEE.Game.Drawable.Editing
         /// <summary>
         /// Changes the loop state of a line and reapplies its line caps
         /// based on the original, unshortened line geometry.
+        /// A redundant loop cannot be enabled for explicitly closed lines.
         /// </summary>
         /// <param name="line">The line whose loop state should be changed.</param>
-        /// <param name="loop">The new loop state.</param>
+        /// <param name="loop">The requested loop state.</param>
         internal static void ChangeLoop(GameObject line, bool loop)
         {
             if (line == null || !line.CompareTag(Tags.Line))
@@ -45,6 +46,11 @@ namespace SEE.Game.Drawable.Editing
                 GameLineGeometry.GetOriginalLinePositions(line);
 
             if (originalPositions == null)
+            {
+                return;
+            }
+
+            if (loop && GameLineGeometry.HasExplicitClosingPoint(originalPositions))
             {
                 return;
             }

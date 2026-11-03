@@ -445,35 +445,64 @@ namespace SEE.Game.Drawable.Line
         }
 
         /// <summary>
-        /// Redraws or updates the line of the given <see cref="LineConf"/> to the <paramref name="surface"/>.
-        /// It calls <see cref="ReDrawLine(GameObject, string, Vector3[], ColorKind, Color, Color,
-        /// float, int, Vector3, Vector3, Vector3, bool, LineKind, float)"/>.
+        /// Redraws or updates a line from its stored configuration.
+        /// Prevents a redundant loop when the original geometry
+        /// already contains an explicit closing point.
         /// </summary>
-        /// <param name="surface">The drawable surface on which the line should be displayed.</param>
-        /// <param name="lineToRedraw">The configuration of the line to be restore.</param>
-        /// <returns>The created line.</returns>
-        public static GameObject ReDrawLine(GameObject surface, LineConf lineToRedraw)
+        /// <param name="surface">The drawable surface.</param>
+        /// <param name="lineToRedraw">The stored line configuration.</param>
+        /// <returns>The restored line.</returns>
+        public static GameObject ReDrawLine(
+            GameObject surface,
+            LineConf lineToRedraw)
         {
-            GameObject line = ReDrawLine(surface,
-                 lineToRedraw.ID,
-                 lineToRedraw.RendererPositions,
-                 lineToRedraw.ColorKind,
-                 lineToRedraw.PrimaryColor,
-                 lineToRedraw.SecondaryColor,
-                 lineToRedraw.Thickness,
-                 lineToRedraw.OrderInLayer,
-                 lineToRedraw.Position,
-                 lineToRedraw.EulerAngles,
-                 lineToRedraw.Scale,
-                 lineToRedraw.Loop,
-                 lineToRedraw.LineKind,
-                 lineToRedraw.Tiling,
-                 lineToRedraw.AssociatedPage,
-                 LineConf.GetFillOutColor(lineToRedraw));
+            bool hasExplicitClosingPoint =
+                GameLineGeometry.HasExplicitClosingPoint(
+                    lineToRedraw.RendererPositions);
 
-            line.GetComponent<LineValueHolder>().Initialize(lineToRedraw.FreehandLine);
+            bool hasCaps =
+                lineToRedraw.LineCapStart != null
+                    && lineToRedraw.LineCapStart.CapKind != LineCap.None
+                || lineToRedraw.LineCapEnd != null
+                    && lineToRedraw.LineCapEnd.CapKind != LineCap.None;
 
-            GameLineGeometry.ApplyStoredOriginalAnchors(line, lineToRedraw);
+            // Caps may shorten the renderer endpoints. For saved
+            // capped lines, the original anchors describe the
+            // unshortened geometry.
+            if (!hasExplicitClosingPoint && hasCaps)
+            {
+                hasExplicitClosingPoint =
+                    lineToRedraw.OriginalStartAnchor.Equals(
+                        lineToRedraw.OriginalEndAnchor);
+            }
+
+            bool effectiveLoop =
+                lineToRedraw.Loop && !hasExplicitClosingPoint;
+
+            GameObject line = ReDrawLine(
+                surface,
+                lineToRedraw.ID,
+                lineToRedraw.RendererPositions,
+                lineToRedraw.ColorKind,
+                lineToRedraw.PrimaryColor,
+                lineToRedraw.SecondaryColor,
+                lineToRedraw.Thickness,
+                lineToRedraw.OrderInLayer,
+                lineToRedraw.Position,
+                lineToRedraw.EulerAngles,
+                lineToRedraw.Scale,
+                effectiveLoop,
+                lineToRedraw.LineKind,
+                lineToRedraw.Tiling,
+                lineToRedraw.AssociatedPage,
+                LineConf.GetFillOutColor(lineToRedraw));
+
+            line.GetComponent<LineValueHolder>()
+                .Initialize(lineToRedraw.FreehandLine);
+
+            GameLineGeometry.ApplyStoredOriginalAnchors(
+                line,
+                lineToRedraw);
 
             if (lineToRedraw.LineCapStart.CapKind != LineCap.None
                 || lineToRedraw.LineCapEnd.CapKind != LineCap.None)

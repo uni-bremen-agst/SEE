@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using UnityEngine;
@@ -17,6 +18,11 @@ namespace SEE.UI.Menu.Drawable.Line
         /// The shared UI controls of the line menu.
         /// </summary>
         private readonly LineMenuControls controls;
+
+        /// <summary>
+        /// Whether an implicit loop is available for the edited line.
+        /// </summary>
+        private bool canEnableLoop = true;
 
         /// <summary>
         /// Initializes the object-property editing part of the line menu.
@@ -60,6 +66,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
         /// <summary>
         /// Sets up the loop switch for editing.
+        /// Explicitly closed lines cannot enable an additional loop.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The edited line configuration.</param>
@@ -71,40 +78,61 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject surface,
             string surfaceParentName)
         {
+            Vector3[] originalPositions =
+                GameLineGeometry.GetOriginalLinePositions(selectedLine);
+
+            canEnableLoop =
+                !GameLineGeometry.HasExplicitClosingPoint(originalPositions);
+
             controls.LoopManager.OnEvents.RemoveAllListeners();
             controls.LoopManager.OffEvents.RemoveAllListeners();
 
-            controls.LoopManager.OnEvents.AddListener(() =>
+            if (canEnableLoop)
             {
-                GameLineEdit.ChangeLoop(selectedLine, true);
-                lineHolder.Loop = true;
+                controls.LoopManager.OnEvents.AddListener(() =>
+                {
+                    GameLineEdit.ChangeLoop(selectedLine, true);
 
-                new EditLineLoopNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    true).Execute();
-            });
+                    LineConf appliedLine = LineConf.GetLine(selectedLine);
 
-            controls.LoopManager.OffEvents.AddListener(() =>
-            {
-                GameLineEdit.ChangeLoop(selectedLine, false);
-                lineHolder.Loop = false;
+                    if (appliedLine == null || !appliedLine.Loop)
+                    {
+                        controls.LoopManager.isOn = false;
+                        controls.LoopManager.UpdateUI();
+                        return;
+                    }
 
-                new EditLineLoopNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    false).Execute();
-            });
+                    lineHolder.Loop = true;
 
-            controls.LoopManager.isOn = lineHolder.Loop;
+                    new EditLineLoopNetAction(
+                        surface.name,
+                        surfaceParentName,
+                        selectedLine.name,
+                        true).Execute();
+                });
+
+                controls.LoopManager.OffEvents.AddListener(() =>
+                {
+                    GameLineEdit.ChangeLoop(selectedLine, false);
+                    lineHolder.Loop = false;
+
+                    new EditLineLoopNetAction(
+                        surface.name,
+                        surfaceParentName,
+                        selectedLine.name,
+                        false).Execute();
+                });
+            }
+
+            controls.LoopManager.isOn =
+                canEnableLoop && lineHolder.Loop;
+
             RefreshLoop();
         }
 
         /// <summary>
-        /// Updates the visibility of the object-level controls for the currently
-        /// selected line segment.
+        /// Updates the visibility of the object-level controls for
+        /// the currently selected line segment.
         /// </summary>
         /// <param name="isMainSegment">
         /// Whether the main line segment is currently selected.
@@ -115,7 +143,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 controls.LayerObject.SetActive(true);
                 controls.LayerSlider.interactable = true;
-                controls.LoopObject.SetActive(true);
+                controls.LoopObject.SetActive(canEnableLoop);
             }
             else
             {
@@ -145,12 +173,13 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Refreshes the loop switch.
+        /// Refreshes the loop switch while respecting whether
+        /// an implicit loop is available.
         /// </summary>
         private void RefreshLoop()
         {
             controls.LoopObject.SetActive(false);
-            controls.LoopObject.SetActive(true);
+            controls.LoopObject.SetActive(canEnableLoop);
         }
     }
 }
