@@ -217,11 +217,17 @@ namespace SEE.UI.PropertyDialog
             // Change the color of the input text and of the placeholder text.
             TextMeshProUGUI textTMP = inputField.FindDescendant("Text Area").GetComponentInChildren<TextMeshProUGUI>();
             textTMP.faceColor = color;
+            textTMP.color = color.WithAlpha(textTMP.color.a);
             inputField.FindDescendant("Placeholder").GetComponent<TextMeshProUGUI>().color = color;
 
             // Change the color of the input field background (the underlaying line).
             UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();
-            managerInputField.UIManagerAsset.inputFieldColor = color;
+            managerInputField.overrideColors = true;
+            foreach (string imageName in new[] { "Background", "Filled" })
+            {
+                Image image = inputField.FindDescendant(imageName).GetComponent<Image>();
+                image.color = color.WithAlpha(image.color.a);
+            }
         }
     }
 }
