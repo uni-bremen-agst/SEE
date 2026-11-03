@@ -205,7 +205,11 @@ namespace SEE.UI.Notification
                 manager.icon = Icon;
                 manager.timer = Timer;
                 manager.enableTimer = Timer >= 1f && TimerEnabled;
-                manager.destroyAfterPlaying = DestroyAfterPlaying;
+                manager.closeBehaviour = DestroyAfterPlaying
+                    ? NotificationManager.CloseBehaviour.Destroy
+                    : NotificationManager.CloseBehaviour.Disable;
+                manager.startBehaviour = NotificationManager.StartBehaviour.None;
+                manager.UpdateUI();
                 manager.OpenNotification();
 
                 // Close the notification when clicking on it
