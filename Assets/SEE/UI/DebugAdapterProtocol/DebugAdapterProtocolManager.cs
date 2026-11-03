@@ -196,7 +196,7 @@ namespace SEE.UI.DebugAdapterProtocol
             OnAdapterChanged();
             debugAdapterProperty.OnComponentInitialized += () =>
             {
-                debugAdapterProperty.HorizontalSelector.selectorEvent.AddListener(_ =>
+                debugAdapterProperty.HorizontalSelector.onValueChanged.AddListener(_ =>
                 {
                     UpdateValues();
                     adapter = adapters[debugAdapterProperty.HorizontalSelector.index];

@@ -636,7 +636,7 @@ namespace SEE.UI.Menu.Drawable
                 selector.CreateNewItem(value.ToString());
             }
 
-            selector.selectorEvent.AddListener(index =>
+            selector.onValueChanged.AddListener(index =>
             {
                 onSelected(values[index]);
             });

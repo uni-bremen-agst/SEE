@@ -91,7 +91,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf boarderConf = newConf.BorderConf;
             LineConf parentBranchLineConf = newConf.BranchLineConf;
 
-            nodeKindSelector.selectorEvent.AddListener(index =>
+            nodeKindSelector.onValueChanged.AddListener(index =>
             {
                 /// Gets the new and the old node kind.
                 GameMindMap.NodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];

@@ -343,12 +343,12 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupCitySwitcher()
         {
             // init the list
-            citySwitcher.itemList.Clear();
+            citySwitcher.items.Clear();
             citySwitcher.defaultIndex = CityIndex;
             RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
             citySwitcher.SetupSelector();
 
-            citySwitcher.selectorEvent.AddListener(index =>
+            citySwitcher.onValueChanged.AddListener(index =>
             {
                 OnSwitchCity?.Invoke(index);
                 citySwitcher.index = CityIndex;
@@ -361,12 +361,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void UpdateCitySwitcher()
         {
-            citySwitcher.itemList.Clear();
+            citySwitcher.items.Clear();
             citySwitcher.defaultIndex = CityIndex;
             RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
-            citySwitcher.selectorEvent.RemoveAllListeners();
+            citySwitcher.onValueChanged.RemoveAllListeners();
             citySwitcher.SetupSelector();
-            citySwitcher.selectorEvent.AddListener(index =>
+            citySwitcher.onValueChanged.AddListener(index =>
             {
                 OnSwitchCity?.Invoke(index);
                 citySwitcher.index = CityIndex;
@@ -1824,15 +1824,13 @@ namespace SEE.UI.RuntimeConfigMenu
             getWidgetName ??= () => dropDownGameObject.FullName();
 
             // dropdown settings
-            dropdown.isListItem = true;
-            dropdown.listParent = !recursive ? Menu.transform : Canvas.transform;
             dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
-            valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
+            valueArray.ForEach(s => dropdown.items.Add(new() { itemName = s }));
             dropdown.SetupDropdown();
 
             // add listeners
-            dropdown.dropdownEvent.AddListener(setter);
-            dropdown.dropdownEvent.AddListener(changedValue =>
+            dropdown.onValueChanged.AddListener(setter);
+            dropdown.onValueChanged.AddListener(changedValue =>
             {
                 UpdateCityAttributeNetAction<int> action = new()
                 {
@@ -1843,8 +1841,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 action.Execute();
             });
 
-            dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
-            dropdown.dropdownEvent.AddListener(_ => CheckControlConditions());
+            dropdown.onValueChanged.AddListener(_ => CheckImmediateRedraw());
+            dropdown.onValueChanged.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 

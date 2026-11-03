@@ -91,8 +91,8 @@ namespace SEE.Game.HolisticMetrics
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetsPath);
             metricTypes = Metric.GetTypes();
 
-            citySelection.dropdownEvent.AddListener(Redraw);
-            citySelection.dropdownEvent.AddListener(CitySelectionChanged);
+            citySelection.onValueChanged.AddListener(Redraw);
+            citySelection.onValueChanged.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
 
             graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
@@ -237,7 +237,7 @@ namespace SEE.Game.HolisticMetrics
         {
             cities = FindObjectsOfType<SEECity>().Where(c => c?.LoadedGraph != null).ToArray();
             string oldSelection = citySelection.selectedText.text;
-            citySelection.dropdownItems.Clear();
+            citySelection.items.Clear();
             foreach (SEECity city in cities)
             {
                 citySelection.CreateNewItem(city.name, houseIcon);
@@ -247,8 +247,8 @@ namespace SEE.Game.HolisticMetrics
             // might change as soon as the player first clicks the dropdown to expand it.
             if (cities.Any(city => city.name.Equals(oldSelection)))
             {
-                citySelection.selectedItemIndex = citySelection.dropdownItems.IndexOf(
-                    citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
+                citySelection.selectedItemIndex = citySelection.items.IndexOf(
+                    citySelection.items.Find(item => item.itemName.Equals(oldSelection)));
             }
 
             citySelection.SetupDropdown();
@@ -354,7 +354,7 @@ namespace SEE.Game.HolisticMetrics
             // requester
             OnCitySelectionClick();
 
-            int indexInDropdown = citySelection.dropdownItems
+            int indexInDropdown = citySelection.items
                 .FindIndex(city => city.itemName.Equals(cityName));
             if (indexInDropdown == -1)  // The return value if it was not found
             {

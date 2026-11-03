@@ -91,7 +91,7 @@ namespace SEE.UI.Menu.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Adds a handler to the parent selector so that the selected node is set as the chosen node.
-            parentSelector.selectorEvent.AddListener(index =>
+            parentSelector.onValueChanged.AddListener(index =>
             {
                 chosenObject = nodes[index];
             });
@@ -204,7 +204,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Adds the handler for changing the parent to the parent selector.
-                parentSelector.selectorEvent.AddListener(index =>
+                parentSelector.onValueChanged.AddListener(index =>
                 {
                     chosenObject = nodes[index];
                     ChangeParent(addedNode, newConf, surface);

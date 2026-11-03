@@ -151,8 +151,8 @@ namespace SEE.UI.ConfigMenu
             if (valuesUpdates.Count > 0)
             {
                 List<string> newValues = valuesUpdates.Dequeue();
-                // Populate the item collection without resetting the selected index for each item.
                 dropdown.items.Clear();
+                // Add items directly because CreateNewItem() can reset the selected index.
                 if (Mode == ComboSelectMode.Combo)
                 {
                     dropdown.items.Add(new() { itemName = customInputText });

@@ -81,7 +81,7 @@ namespace SEE.UI.Window.SnapshotsWindow
             item.name = GetDisplayName;
 
             downloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManager>();
-            downloadButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
+            downloadButton.onHover.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
             downloadButton.onClick.AddListener(() => OnClickDownloadAsync().Forget());
 
             TextMeshProUGUI textMesh = item.transform.Find(textPath).gameObject.MustGetComponent<TextMeshProUGUI>();

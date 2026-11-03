@@ -89,16 +89,14 @@ namespace SEE.UI.FilePicker
             LabelText.text = Label;
 
             // setup dropdown
-            Dropdown.isListItem = true;
-            Dropdown.listParent = Canvas.transform;
-            Dropdown.dropdownItems.Clear();
+            Dropdown.items.Clear();
             foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
             {
-                Dropdown.CreateNewItemFast(kind.ToString(), null);
+                Dropdown.items.Add(new() { itemName = kind.ToString() });
             }
-            Dropdown.dropdownEvent.AddListener(index =>
+            Dropdown.onValueChanged.AddListener(index =>
             {
-                string selectedItem = Dropdown.dropdownItems[index].itemName;
+                string selectedItem = Dropdown.items[index].itemName;
                 Enum.TryParse(selectedItem, out DataPathInstance.Root);
                 UpdateInput();
                 OnChangedDropdown?.Invoke();
@@ -197,7 +195,7 @@ namespace SEE.UI.FilePicker
         private void UpdateDropdown()
         {
             Dropdown.selectedItemIndex =
-                Dropdown.dropdownItems.FindIndex(item => item.itemName == DataPathInstance.Root.ToString());
+                Dropdown.items.FindIndex(item => item.itemName == DataPathInstance.Root.ToString());
             Dropdown.SetupDropdown();
         }
 
@@ -226,7 +224,7 @@ namespace SEE.UI.FilePicker
 
         public void SyncDropdown(int newValue)
         {
-            string selectedItem = Dropdown.dropdownItems[newValue].itemName;
+            string selectedItem = Dropdown.items[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
             UpdateDropdown();
             UpdateInput();

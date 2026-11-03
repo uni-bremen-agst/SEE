@@ -289,7 +289,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
                                                               UICanvas.Canvas.transform, false);
             /// Adds the functionality to the move button
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManager>().clickEvent
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManager>().onClick
                 .AddListener(() =>
                 {
                     progressState = ProgressState.Move;
