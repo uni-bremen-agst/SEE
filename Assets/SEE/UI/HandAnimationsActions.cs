@@ -131,7 +131,7 @@ namespace SEE.UI
             text.fontSize = 18;
             PersonalAssistantBrain.Instance?.Say(text.text);
             {
-                instructions.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
+                instructions.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManager manager);
                 manager.onClick.AddListener(Close);
             }
         }

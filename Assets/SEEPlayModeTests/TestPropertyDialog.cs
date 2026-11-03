@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using NUnit.Framework;
 using TMPro;
 using UnityEngine;

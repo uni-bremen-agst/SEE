@@ -312,12 +312,12 @@ namespace SEE.UI
                 .GetComponentInChildren<TMP_InputField>();
 
             // Buttons and important GameObjects of the LiveKit settings page.
-            ButtonManagerWithIcon share = settingsMenuGameObject.FindDescendant("Share")
-                .MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager share = settingsMenuGameObject.FindDescendant("Share")
+                .MustGetComponent<ButtonManager>();
             GameObject connectGO = settingsMenuGameObject.FindDescendant("Connect");
-            ButtonManagerWithIcon connect = connectGO.MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager connect = connectGO.MustGetComponent<ButtonManager>();
             GameObject disconnectGO = settingsMenuGameObject.FindDescendant("Disconnect");
-            ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager disconnect = disconnectGO.MustGetComponent<ButtonManager>();
             disconnectGO.SetActive(false);
 
             if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitManager liveKitVideoManager))
