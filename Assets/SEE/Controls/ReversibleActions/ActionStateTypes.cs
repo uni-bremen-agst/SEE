@@ -1,9 +1,10 @@
-﻿using UnityEngine;
-using SEE.Utils;
-using SEE.Extensions;
+﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Controls.ReversibleActions.HolisticMetrics;
-using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Controls.ReversibleActions.Tables;
+using SEE.Extensions;
+using SEE.Utils;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Controls.ReversibleActions
 {
@@ -111,6 +112,11 @@ namespace SEE.Controls.ReversibleActions
               new("Accept Divergence", "Accept a diverging edge into the architecture",
                   Color.grey.Darker(), Icons.CheckedCheckbox,
                   AcceptDivergenceAction.CreateReversibleAction);
+
+            Mark =
+              new("Mark", "Mark or unmark a node",
+                  Color.cyan.Darker(), '+',
+                  MarkAction.CreateReversibleAction);
 
             // Metric Board actions
             MetricBoard =
@@ -317,6 +323,7 @@ namespace SEE.Controls.ReversibleActions
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
+        public static readonly ActionStateType Mark;
 
         public static readonly ActionStateTypeGroup MetricBoard;
         public static readonly ActionStateType AddBoard;
