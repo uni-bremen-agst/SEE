@@ -57,8 +57,11 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Synchronizes <see cref="Button.interactable"/> with <see cref="ButtonManager.isInteractable"/>.
+        /// Applies the authoritative <see cref="ButtonManager.isInteractable"/> state to the Unity button.
         /// </summary>
+        /// <remarks>
+        /// Change interaction through <see cref="ButtonManager.Interactable(bool)"/> so both click handlers agree.
+        /// </remarks>
         private void LateUpdate()
         {
             button.interactable = manager.isInteractable;

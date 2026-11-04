@@ -70,7 +70,7 @@ namespace SEE.UI.ConfigMenu
             buttonManager = GetComponent<ButtonManager>();
             button = buttonManager.GetComponent<Button>();
 
-            buttonManager.normalText.text = ButtonText;
+            buttonManager.SetText(ButtonText);
 
             ResetStyles();
             group.Subscribe(this);

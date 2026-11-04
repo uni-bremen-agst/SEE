@@ -25,7 +25,8 @@ namespace SEE.Utils
         /// If the prefab cannot be instantiated, an exception is thrown.
         /// </summary>
         /// <remarks>
-        /// Draggable UI windows without an assigned drag area use their containing canvas.
+        /// Draggable UI windows without an assigned drag area use their containing canvas
+        /// when a canvas ancestor already exists during instantiation.
         /// </remarks>
         /// <param name="prefabName">The path of the prefab relative to the Resources folder.</param>
         /// <param name="parent">The parent of the instantiate prefab; can be null.</param>

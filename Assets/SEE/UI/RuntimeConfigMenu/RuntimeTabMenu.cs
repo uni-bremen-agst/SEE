@@ -1029,6 +1029,11 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     continue;
                 }
+                if (comp is ButtonManager buttonManager)
+                {
+                    buttonManager.Interactable(interactable);
+                    continue;
+                }
                 Type type = comp.GetType();
 
                 // Check property

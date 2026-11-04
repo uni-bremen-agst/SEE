@@ -169,6 +169,8 @@ MonoBehaviour:
   enableText: 1
   enableIcon: 1
   animationSolution: 0
+  useUINavigation: 1
+  navigationMode: 3
   isInteractable: 1
 --- !u!114 &5068481639303119560
 MonoBehaviour:
