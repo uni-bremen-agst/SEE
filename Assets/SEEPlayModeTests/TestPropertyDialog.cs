@@ -20,6 +20,55 @@ namespace SEE.UI.PropertyDialog
     internal class TestPropertyDialog : TestUI
     {
         /// <summary>
+        /// Dialog owners that must be destroyed even after a failed assertion.
+        /// </summary>
+        private readonly List<GameObject> dialogOwners = new();
+
+        /// <summary>
+        /// Canvases belonging to the scene before a test creates its dialogs.
+        /// </summary>
+        private HashSet<Canvas> previousCanvases;
+
+        /// <summary>
+        /// Records existing canvases so that cleanup preserves the original scene UI.
+        /// </summary>
+        /// <returns>An enumerator that completes without waiting.</returns>
+        [UnitySetUp]
+        public IEnumerator RecordExistingCanvases()
+        {
+            previousCanvases = new(UnityEngine.Object.FindObjectsByType<Canvas>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None));
+            yield break;
+        }
+
+        /// <summary>
+        /// Removes dialog owners and canvases created by the test.
+        /// </summary>
+        /// <returns>An enumerator that waits for managed UI and canvas destruction.</returns>
+        [UnityTearDown]
+        public IEnumerator DestroyDialogObjects()
+        {
+            foreach (GameObject owner in dialogOwners)
+            {
+                if (owner != null)
+                {
+                    UnityEngine.Object.Destroy(owner);
+                }
+            }
+            dialogOwners.Clear();
+            yield return null;
+            foreach (Canvas canvas in UnityEngine.Object.FindObjectsByType<Canvas>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (!previousCanvases.Contains(canvas))
+                {
+                    UnityEngine.Object.Destroy(canvas.gameObject);
+                }
+            }
+            yield return null;
+        }
+
+        /// <summary>
         /// Checks entered text, selection changes, and the dialog confirmation callback.
         /// </summary>
         /// <returns>An enumerator that waits for dialog initialization and confirmation.</returns>
@@ -30,7 +79,8 @@ namespace SEE.UI.PropertyDialog
             LogAssert.ignoreFailingMessages = true;
 
             // Set up the dialog.
-            GameObject gameObject = new GameObject("Dialog");
+            GameObject gameObject = new("Dialog");
+            dialogOwners.Add(gameObject);
 
             StringProperty stringProperty = gameObject.AddComponent<StringProperty>();
             stringProperty.Name = "Enter your name";
@@ -115,6 +165,7 @@ namespace SEE.UI.PropertyDialog
             for (int optionCount = 1; optionCount <= 2; optionCount++)
             {
                 GameObject container = new("Dialog with short selection");
+                dialogOwners.Add(container);
                 SelectionProperty selection = container.AddComponent<SelectionProperty>();
                 selection.Name = "Short selection";
                 List<string> options = new() { "First" };
@@ -132,7 +183,15 @@ namespace SEE.UI.PropertyDialog
                 dialog.Title = "Short selection dialog";
                 dialog.AddGroup(group);
                 dialog.DialogShouldBeShown = true;
-                yield return new WaitForSeconds(0.2f);
+                float initializationDeadline = Time.realtimeSinceStartup + 5f;
+                while ((selection.HorizontalSelector == null
+                        || selection.HorizontalSelector.indicatorParent == null
+                        || selection.HorizontalSelector.indicatorParent.childCount != optionCount
+                        || selection.Value != options[optionCount - 1])
+                       && Time.realtimeSinceStartup < initializationDeadline)
+                {
+                    yield return null;
+                }
 
                 HorizontalSelector selector = selection.HorizontalSelector;
                 Assert.That(selector, Is.Not.Null);

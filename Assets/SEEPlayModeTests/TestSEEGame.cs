@@ -101,7 +101,12 @@ namespace SEE.Net
         {
             Debug.Log($"[SetUp] Wait until prior scene has been unloaded (if any): {currentlyLoadedScene}...\n");
             // Wait until host is shut down.
-            yield return new WaitUntil(() => currentlyLoadedScene == "");
+            float previousSceneDeadline = Time.realtimeSinceStartup + 10f;
+            while (currentlyLoadedScene != string.Empty && Time.realtimeSinceStartup < previousSceneDeadline)
+            {
+                yield return null;
+            }
+            Assert.That(currentlyLoadedScene, Is.Empty, "The previous test scene was not unloaded.");
             Debug.Log($"[SetUp] Starting the game by loading {StartScene}...\n");
 
             SceneManager.LoadScene(StartScene, LoadSceneMode.Single);
@@ -111,7 +116,12 @@ namespace SEE.Net
 
             // Wait until StartScene is loaded.
             Debug.Log($"[SetUp] Waiting for scene {StartScene} to be loaded...\n");
-            yield return new WaitUntil(() => currentlyLoadedScene == StartScene);
+            float startSceneDeadline = Time.realtimeSinceStartup + 30f;
+            while (currentlyLoadedScene != StartScene && Time.realtimeSinceStartup < startSceneDeadline)
+            {
+                yield return null;
+            }
+            Assert.That(currentlyLoadedScene, Is.EqualTo(StartScene), "The start scene did not load.");
             Debug.Log($"[SetUp] Scene {StartScene} has been loaded...\n");
 
             // Make sure we have our network manager.
@@ -146,30 +156,39 @@ namespace SEE.Net
         {
             Debug.Log($"[TearDown] Started.\n");
 
-            Unity.Netcode.NetworkManager networkManager = Unity.Netcode.NetworkManager.Singleton;
-            if (networkManager != null)
+            bool shutdownCompleted = true;
+            try
             {
-                if (networkManager.IsListening)
+                Unity.Netcode.NetworkManager networkManager = Unity.Netcode.NetworkManager.Singleton;
+                if (networkManager != null)
                 {
-                    networkManager.Shutdown();
+                    if (networkManager.IsListening)
+                    {
+                        networkManager.Shutdown();
+                    }
+                    float shutdownDeadline = Time.realtimeSinceStartup + 10f;
+                    while (networkManager != null && networkManager.ShutdownInProgress
+                           && Time.realtimeSinceStartup < shutdownDeadline)
+                    {
+                        yield return null;
+                    }
+                    shutdownCompleted = networkManager == null || !networkManager.ShutdownInProgress;
                 }
-                float shutdownDeadline = Time.realtimeSinceStartup + 10f;
-                while (networkManager != null && networkManager.ShutdownInProgress
-                       && Time.realtimeSinceStartup < shutdownDeadline)
-                {
-                    yield return null;
-                }
-                Assert.That(networkManager == null || !networkManager.ShutdownInProgress, Is.True,
-                            "The network did not shut down before unloading the test scene.");
+            }
+            finally
+            {
+                SceneManager.LoadScene(EmptyScene, LoadSceneMode.Single);
+                currentlyLoadedScene = string.Empty;
             }
 
-            // Load an empty scene to trigger the unloading of the currently loaded scene.
-            SceneManager.LoadScene(EmptyScene, LoadSceneMode.Single);
-            // SceneManager.LoadScene loads the scene in the next frame, that is, it does not load
-            // immediately. That is why wait until the next frame.
-            yield return new WaitForEndOfFrame();
-
-            currentlyLoadedScene = string.Empty;
+            float emptySceneDeadline = Time.realtimeSinceStartup + 30f;
+            while (SceneManager.GetActiveScene().name != EmptyScene && Time.realtimeSinceStartup < emptySceneDeadline)
+            {
+                yield return null;
+            }
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo(EmptyScene),
+                        "The test scene was not unloaded.");
+            Assert.That(shutdownCompleted, Is.True, "The network did not shut down before unloading the test scene.");
             Debug.Log($"[TearDown] Finished.\n");
             yield return null;
         }

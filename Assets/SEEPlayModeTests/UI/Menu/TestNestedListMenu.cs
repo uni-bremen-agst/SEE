@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using SEE.UserSettings;
 
 /// <summary>
 /// Menus for the SEE user interface.
@@ -28,14 +28,40 @@ namespace SEE.UI.Menu
         private GameObject eventSystem;
 
         /// <summary>
-        /// Creates a canvas and an event system for each test.
+        /// Whether this fixture created the event system it must remove.
+        /// </summary>
+        private bool ownsEventSystem;
+
+        /// <summary>
+        /// The authoritative settings used while constructing the menu.
+        /// </summary>
+        private UserSetting settings;
+
+        /// <summary>
+        /// The input mode restored after the test.
+        /// </summary>
+        private PlayerInputType previousInputType;
+
+
+        /// <summary>
+        /// Creates a test canvas and temporarily selects desktop input using the authoritative settings.
         /// </summary>
         [SetUp]
         public void SetUp()
         {
             canvas = new("UI Canvas", typeof(Canvas));
             canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            eventSystem = new("Menu prefab events", typeof(EventSystem));
+            ownsEventSystem = EventSystem.current == null;
+            eventSystem = ownsEventSystem ? new("Menu prefab events", typeof(EventSystem)) : EventSystem.current.gameObject;
+            settings = Object.FindAnyObjectByType<UserSetting>();
+            if (settings == null)
+            {
+                settings = canvas.AddComponent<UserSetting>();
+                settings.enabled = false;
+            }
+            settings = UserSetting.Instance;
+            previousInputType = settings.InputType;
+            settings.InputType = PlayerInputType.DesktopPlayer;
         }
 
         /// <summary>
@@ -45,8 +71,15 @@ namespace SEE.UI.Menu
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            if (settings != null)
+            {
+                settings.InputType = previousInputType;
+            }
             Object.Destroy(canvas);
-            Object.Destroy(eventSystem);
+            if (ownsEventSystem)
+            {
+                Object.Destroy(eventSystem);
+            }
             yield return null;
         }
 
@@ -88,8 +121,6 @@ namespace SEE.UI.Menu
         [UnityTest]
         public IEnumerator RequiredSelectionMenuKeepsCloseHiddenAfterTitleChanges()
         {
-            UserSettings.UserSetting settings = canvas.AddComponent<UserSettings.UserSetting>();
-            settings.enabled = false;
             GameObject container = new("Required selection menu");
             container.transform.SetParent(canvas.transform);
             NestedListMenu menu = container.AddComponent<NestedListMenu>();
