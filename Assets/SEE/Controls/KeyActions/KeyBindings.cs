@@ -274,7 +274,7 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.CameraPaths, "Starts/stops the automated camera movement along a path.");
 
             // EchoFace
-            Register(KeyAction.ToggleEchoFace, KeyCode.F10, "Toggle EchoFace",
+            Register(KeyAction.ToggleEchoFace, KeyCode.F, "Toggle EchoFace",
                      KeyActionCategory.General, "Toggles facial tracking with EchoFace on and off.");
         }
 

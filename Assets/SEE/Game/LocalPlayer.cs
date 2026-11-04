@@ -142,12 +142,12 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the <see cref="LiveKitVideoManager"/> attached to the local player <see cref="Instance"/>
+        /// Returns the <see cref="LiveKitManager"/> attached to the local player <see cref="Instance"/>
         /// or any of its descendants (including inactive ones).
         /// </summary>
-        /// <param name="manager">The resulting <see cref="LiveKitVideoManager"/>; null if none could be found.</param>
-        /// <returns>True if a <see cref="LiveKitVideoManager"/> could be found.</returns>
-        internal static bool TryGetLiveKitVideoManager(out LiveKitVideoManager manager)
+        /// <param name="manager">The resulting <see cref="LiveKitManager"/>; null if none could be found.</param>
+        /// <returns>True if a <see cref="LiveKitManager"/> could be found.</returns>
+        internal static bool TryGetLiveKitVideoManager(out LiveKitManager manager)
         {
             if (Instance == null)
             {
@@ -155,10 +155,10 @@ namespace SEE.Game
                 manager = null;
                 return false;
             }
-            manager = Instance.GetComponentInChildren<LiveKitVideoManager>();
+            manager = Instance.GetComponentInChildren<LiveKitManager>();
             if (manager == null)
             {
-                Debug.LogError($"Couldn't find component '{nameof(LiveKitVideoManager)}' "
+                Debug.LogError($"Couldn't find component '{nameof(LiveKitManager)}' "
                                + $"on local player named '{Instance.name}'.\n");
                 return false;
             }
