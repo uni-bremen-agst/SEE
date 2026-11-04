@@ -112,6 +112,11 @@ namespace SEE.Controls.ReversibleActions
                   Color.grey.Darker(), Icons.CheckedCheckbox,
                   AcceptDivergenceAction.CreateReversibleAction);
 
+            MarkNode =
+               new("Mark Node", "Highlight a node by showing a sphere above the selected node",
+               Color.yellow.Darker(), Icons.Hand,
+               MarkAction.CreateReversibleAction);
+
             // Metric Board actions
             MetricBoard =
                 new("Metric Board", "Manipulate a metric board",
@@ -317,6 +322,7 @@ namespace SEE.Controls.ReversibleActions
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
+        public static readonly ActionStateType MarkNode;
 
         public static readonly ActionStateTypeGroup MetricBoard;
         public static readonly ActionStateType AddBoard;
