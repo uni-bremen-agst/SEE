@@ -58,10 +58,7 @@ namespace XMLDocNormalizer.Checks
             var external = new HashSet<T>(externalDocumentation, equality);
             var documented = new HashSet<T>(tags.Where(Exception).Select(tag => tag.Type!), equality);
             var relevantDocumented = new HashSet<T>(documented.Where(Relevant), equality);
-            foreach (var tag in tags.Where(tag => Valid(tag) && !tag.Resolved))
-            { AddFinding(findings, tag.Anchor, XmlDocSmells.InvalidExceptionCref, tag.Snippet, tag.Raw!); }
-            foreach (var tag in tags.Where(tag => Valid(tag) && tag.Type != null && !isException(tag.Type)))
-            { AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionCrefNotExceptionType, tag.Snippet, tag.Raw!); }
+            AddExceptionCrefFindings(findings, tags, isException);
             if (mode != ExceptionAnalysisMode.Direct)
             {
                 AddDocumentedTransitiveFindings(findings, tags, thrown, external, Relevant, uncertain, uncertainTargets, allowExactFindings);
@@ -78,6 +75,16 @@ namespace XMLDocNormalizer.Checks
                 if (!inheritdoc)
                 { AddMissingExceptionFindings(findings, member, flow, [], documented, equality, isException, display, transitive: false); }
             }
+        }
+
+        private static void AddExceptionCrefFindings<T>(List<Finding> findings, FindingTag<T>[] tags,
+            Func<T, bool> isException) where T : class
+        {
+            bool Valid(FindingTag<T> tag) => !string.IsNullOrWhiteSpace(tag.Raw) && tag.HasCref;
+            foreach (var tag in tags.Where(tag => Valid(tag) && !tag.Resolved))
+            { AddFinding(findings, tag.Anchor, XmlDocSmells.InvalidExceptionCref, tag.Snippet, tag.Raw!); }
+            foreach (var tag in tags.Where(tag => Valid(tag) && tag.Type != null && !isException(tag.Type)))
+            { AddFinding(findings, tag.Anchor, XmlDocSmells.ExceptionCrefNotExceptionType, tag.Snippet, tag.Raw!); }
         }
 
         private static void AddDocumentedTransitiveFindings<T>(List<Finding> findings, FindingTag<T>[] tags,

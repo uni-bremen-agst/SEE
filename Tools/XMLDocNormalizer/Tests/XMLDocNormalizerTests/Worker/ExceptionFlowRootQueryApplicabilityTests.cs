@@ -108,8 +108,10 @@ public sealed class ExceptionFlowRootQueryApplicabilityTests(ITestOutputHelper o
         Assert.Equal(reasons.Length != 0, result.HasUncertainPaths);
         var detected = Detect(fixture, run.Context, run.Session);
         Assert.Equal("Succeeded", detected.Coverage.Execution);
-        Assert.Equal(reasons.Length == 0 ? "Complete" : "Incomplete", detected.Coverage.Completion);
-        Assert.Equal(PublicReasons(reasons), detected.Coverage.ReasonCodes);
+        bool typeQuerySkipped = name is "class" or "struct" or "record" or "record-struct" or "interface"
+            or "enum" or "delegate" or "generic-type" or "class-with-initializers" or "nested-type";
+        Assert.Equal(reasons.Length == 0 || typeQuerySkipped ? "Complete" : "Incomplete", detected.Coverage.Completion);
+        Assert.Equal(typeQuerySkipped ? Array.Empty<string>() : PublicReasons(reasons), detected.Coverage.ReasonCodes);
         Assert.DoesNotContain(detected.Findings, finding => finding.Smell.ID is "DOC631" or "DOC632");
         Write(name, root, symbol, admission, result, detected);
     }
@@ -117,14 +119,14 @@ public sealed class ExceptionFlowRootQueryApplicabilityTests(ITestOutputHelper o
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void TypeNoBodyCanContributeCoverageWithOrWithoutAnExceptionTag(bool withTag)
+    public void TypeNoBodyIsNotANativeQueryWithOrWithoutAnExceptionTag(bool withTag)
     {
         var fixture = Fixture("/// <summary></summary>\n" + (withTag ? Tag : "") + "class Entry {}");
         var run = fixture.Session();
         var detected = Detect(fixture, run.Context, run.Session);
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], detected.Coverage.ReasonCodes);
-        Assert.Equal(withTag ? 1 : 0, detected.Findings.Count(finding => finding.Smell.ID == "DOC631"));
-        Assert.DoesNotContain(detected.Findings, finding => finding.Smell.ID == "DOC632");
+        Assert.Empty(detected.Coverage.ReasonCodes);
+        Assert.Equal("Complete", detected.Coverage.Completion);
+        Assert.Empty(detected.Findings);
         // Ordinary XML rules still process the documented type independently of exception flow.
         Assert.Contains(XmlDocBasicDetector.FindBasicSmells(fixture.Compilation.SyntaxTrees.Single(), "/C2/Root.cs"),
             finding => finding.Smell.ID == "DOC210");
@@ -177,8 +179,8 @@ public sealed class ExceptionFlowRootQueryApplicabilityTests(ITestOutputHelper o
         var fixture = Fixture(typeFirst ? type + method : method + type);
         var run = fixture.Session();
         var detected = Detect(fixture, run.Context, run.Session);
-        Assert.Equal("Incomplete", detected.Coverage.Completion);
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], detected.Coverage.ReasonCodes);
+        Assert.Equal("Complete", detected.Coverage.Completion);
+        Assert.Empty(detected.Coverage.ReasonCodes);
         Assert.Single(detected.Findings, finding => finding.Smell.ID == "DOC632");
         Assert.DoesNotContain(detected.Findings, finding => finding.Smell.ID == "DOC631");
         Assert.True(run.Session.Analyze(fixture.Root("Run")).ProfileOutcome!.Complete);
@@ -309,7 +311,8 @@ public sealed class ExceptionFlowRootQueryApplicabilityTests(ITestOutputHelper o
         }
         var detected = Detect(fixture, run.Context, run.Session);
         Assert.Empty(detected.Findings);
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], detected.Coverage.ReasonCodes);
+        Assert.Empty(detected.Coverage.ReasonCodes);
+        Assert.Equal("Complete", detected.Coverage.Completion);
     }
 
     private static AdmissionCharacterization.Fixture Fixture(string source)

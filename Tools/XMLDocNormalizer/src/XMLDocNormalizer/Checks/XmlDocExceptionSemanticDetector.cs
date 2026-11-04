@@ -221,6 +221,18 @@ namespace XMLDocNormalizer.Checks
                         member,
                         filePath);
 
+                // A type container is not an executable exception root. Keep
+                // Cref validation, and leave primary-constructor declarations
+                // on their existing path until that separate contract is closed.
+                if ((member is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax)
+                    && member is not TypeDeclarationSyntax { ParameterList: not null }
+                    && semanticModel.GetDeclaredSymbol(member) is INamedTypeSymbol)
+                {
+                    AddExceptionCrefFindings(findings, NativeTags(tree, filePath, tagInfos),
+                        type => type.InheritsFromOrEquals(exceptionBase));
+                    continue;
+                }
+
                 ExceptionFlowAnalysisResult directFlowResult =
                     ExceptionFlowLocalSourceAnalyzer
                         .AnalyzeDirectlyThrownExceptions(

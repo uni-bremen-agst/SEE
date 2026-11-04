@@ -17,7 +17,7 @@ using Xunit.Abstractions;
 
 namespace XMLDocNormalizerTests.Worker;
 
-/// <summary>Joint current tag/query contracts and constructor controls; no applicability implementation.</summary>
+/// <summary>Independent tag/query contracts, including native type-root eligibility and constructor controls.</summary>
 public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputHelper output)
 {
     private const string Doc = "/// <summary>Root.</summary>\n";
@@ -84,9 +84,11 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
         var placementFindings = products.Syntax.SelectMany(p => p.Findings).Where(f => f.Smell.ID is "DOC143" or "DOC680").ToArray();
         if (tagged && placement.Length != 0) Assert.Equal(placement, Assert.Single(placementFindings).Smell.ID);
         else Assert.Empty(placementFindings);
-        if (tagged) Assert.Equal(complete ? "DOC632" : "DOC631", Assert.Single(products.Semantic).Smell.ID);
+        bool typeQuerySkipped = name is "class" or "generic-class" or "nested-generic-class" or "struct"
+            or "record-class" or "record-struct" or "interface" or "enum" or "delegate";
+        if (tagged && !typeQuerySkipped) Assert.Equal(complete ? "DOC632" : "DOC631", Assert.Single(products.Semantic).Smell.ID);
         else Assert.Empty(products.Semantic);
-        Assert.Equal(complete ? "Complete" : "Incomplete", products.Coverage.Completion);
+        Assert.Equal(complete || typeQuerySkipped ? "Complete" : "Incomplete", products.Coverage.Completion);
         Assert.Equal("Succeeded", products.Coverage.Execution);
         Assert.DoesNotContain(products.Syntax.SelectMany(p => p.Findings), f => f.Smell.ID == "DOC600");
         if (name.StartsWith("primary-", StringComparison.Ordinal))
@@ -95,7 +97,7 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
     }
 
     [Theory]
-    [InlineData("valid", "System.InvalidOperationException", "DOC631")]
+    [InlineData("valid", "System.InvalidOperationException", "")]
     [InlineData("unresolved", "MissingExceptionType", "DOC660")]
     [InlineData("not-exception", "System.String", "DOC670")]
     [InlineData("missing", "", "")]
@@ -114,7 +116,8 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
         if (semanticRule.Length != 0) Assert.Equal(semanticRule, Assert.Single(products.Semantic).Smell.ID);
         else Assert.Empty(products.Semantic);
         Assert.DoesNotContain(products.Semantic, f => f.Smell.ID == "DOC632");
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], products.Coverage.ReasonCodes);
+        Assert.Empty(products.Coverage.ReasonCodes);
+        Assert.Equal("Complete", products.Coverage.Completion);
         Write("cref-" + name, Assert.Single(Documented(fixture)), run.Session.Analyze(Assert.Single(Documented(fixture))), products, fixture);
     }
 
@@ -165,7 +168,8 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
         var products = Pipeline(fixture, run.Context, run.Session);
         Assert.Equal("DOC611", Assert.Single(products.Semantic).Smell.ID);
         Assert.Equal("Run", products.Semantic.Single().Context.SymbolName);
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], products.Coverage.ReasonCodes);
+        Assert.Empty(products.Coverage.ReasonCodes);
+        Assert.Equal("Complete", products.Coverage.Completion);
         if (!implicitConstructor)
         {
             var root = Assert.Single(Documented(fixture).OfType<ConstructorDeclarationSyntax>());
@@ -277,7 +281,8 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
         var products = Pipeline(fixture, run.Context, run.Session);
         Assert.Equal(["DOC611", "DOC632"], products.Semantic.Select(f => f.Smell.ID).Order(StringComparer.Ordinal));
         Assert.DoesNotContain(products.Semantic, f => f.Smell.ID == "DOC631");
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], products.Coverage.ReasonCodes);
+        Assert.Empty(products.Coverage.ReasonCodes);
+        Assert.Equal("Complete", products.Coverage.Completion);
         foreach (var root in roots) Write("mixed-" + reverse, root, run.Session.Analyze(root), products, fixture);
     }
 

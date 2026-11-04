@@ -29,17 +29,17 @@ public sealed class ExceptionFlowRootReasonFindingAttributionTests(ITestOutputHe
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void TypeTagChangesFindingEligibilityWithoutChangingTheNoBodyCause(bool tagged)
+    public void NativeTypeQueryIsSkippedWithoutChangingTheRawNoBodyCause(bool tagged)
     {
         var fixture = Fixture(("Type", Doc + (tagged ? Tag : "") + "class Entry {}"));
         var run = fixture.Session();
-        var capture = Capture("type-" + tagged, fixture, OneRoot(fixture), run.Context, run.Environment, run.Session, Started());
+        var capture = Capture("type-" + tagged, fixture, OneRoot(fixture), run.Context, run.Environment, run.Session, Started(), typeQuerySkipped: true);
         Assert.Single(capture.Result.ProfileOutcome!.Reasons);
         AssertNoBodyReason(capture, capture.Symbol!);
         Assert.False(Producer(capture.Symbol!, run.Environment).HasBody);
-        Assert.Equal(["OutsideProfile", "TargetCoverageIncomplete"], capture.RootCoverage.ReasonCodes);
-        Assert.Equal(tagged ? 1 : 0, capture.Findings.Length);
-        if (tagged) Assert.Equal("DOC631", Assert.Single(capture.Findings).Smell.ID);
+        Assert.Empty(capture.RootCoverage.ReasonCodes);
+        Assert.Equal("Complete", capture.RootCoverage.Completion);
+        Assert.Empty(capture.Findings);
         // The binding/producer facts, not the presence of a tag, determine the query outcome.
         var noTag = Fixture(("Type", Doc + "class Entry {}"));
         var noTagRun = noTag.Session();
@@ -170,7 +170,8 @@ public sealed class ExceptionFlowRootReasonFindingAttributionTests(ITestOutputHe
         var allFindings = new List<Finding>();
         foreach (var root in reverse ? roots.Reverse() : roots)
         {
-            var capture = Capture("mixed-" + reverse, fixture, root, run.Context, run.Environment, run.Session, global);
+            var capture = Capture("mixed-" + reverse, fixture, root, run.Context, run.Environment, run.Session, global,
+                typeQuerySkipped: root is TypeDeclarationSyntax);
             bool clean = root is MethodDeclarationSyntax method && method.Identifier.ValueText == "Clean";
             Assert.Equal(clean, capture.Result.ProfileOutcome!.Complete);
             if (clean) Assert.Equal("DOC632", Assert.Single(capture.Findings).Smell.ID);
@@ -277,7 +278,7 @@ public sealed class ExceptionFlowRootReasonFindingAttributionTests(ITestOutputHe
 
     private Observation Capture(string scenario, AdmissionCharacterization.Fixture fixture, MemberDeclarationSyntax root,
         ProjectClosureSemanticContext context, ExceptionFlowSemanticEnvironment environment,
-        ExceptionFlowSummaryAnalysisSession session, AnalysisCoverage global)
+        ExceptionFlowSummaryAnalysisSession session, AnalysisCoverage global, bool typeQuerySkipped = false)
     {
         var view = environment.GetAnalysisScopes();
         Assert.True(environment.TryGetSemanticModel(root.SyntaxTree, out var model));
@@ -290,8 +291,11 @@ public sealed class ExceptionFlowRootReasonFindingAttributionTests(ITestOutputHe
         Assert.Same(view, environment.GetAnalysisScopes());
         Assert.Equal(JsonSerializer.Serialize(AdmissionCharacterization.Flow(before)), JsonSerializer.Serialize(AdmissionCharacterization.Flow(after)));
         var expected = Started();
-        AnalysisCoverageObserver.Observe(expected, ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(root, environment), summary: false);
-        AnalysisCoverageObserver.Observe(expected, after, summary: true);
+        if (!typeQuerySkipped)
+        {
+            AnalysisCoverageObserver.Observe(expected, ExceptionFlowLocalSourceAnalyzer.AnalyzeDirectlyThrownExceptions(root, environment), summary: false);
+            AnalysisCoverageObserver.Observe(expected, after, summary: true);
+        }
         Assert.Equal(expected.Report().ReasonCodes, local.Report().ReasonCodes);
         Assert.Equal(expected.Report().Completion, local.Report().Completion);
         global.Merge(local);
