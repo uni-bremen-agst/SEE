@@ -1,12 +1,15 @@
 ﻿using NUnit.Framework;
-using SEE.UserSettings;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using SEE.UserSettings;
 
+/// <summary>
+/// Tests for SEE networking.
+/// </summary>
 namespace SEE.Net
 {
     /// <summary>
@@ -92,7 +95,7 @@ namespace SEE.Net
         /// (identified by <see cref="HostButtonPath"/>) in the dialog to select the network
         /// configuration and start the game. After that, play-mode tests can be run.
         /// </summary>
-        /// <returns>as to whether to continue this co-routine</returns>
+        /// <returns>An enumerator that waits for the scene transition.</returns>
         [UnitySetUp]
         public IEnumerator SetUp()
         {
@@ -117,6 +120,11 @@ namespace SEE.Net
 
             // Simulate that the Host button in the Network Configuration dialog is
             // pressed by the user.
+            float menuDeadline = Time.realtimeSinceStartup + 10f;
+            while (GameObject.Find(HostButtonPath) == null && Time.realtimeSinceStartup < menuDeadline)
+            {
+                yield return null;
+            }
             Debug.Log($"[SetUp] Pressing button {HostButtonPath}...\n");
             PressButton(HostButtonPath);
             yield return new WaitForEndOfFrame();
@@ -128,15 +136,32 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Called after the completion of every single test case. It will trigger the
+        /// Shuts down the network after each test case and triggers the
         /// unloading of the <see cref="currentlyLoadedScene"/> by loading <see cref="EmptyScene"/>.
         /// <see cref="currentlyLoadedScene"/> will be the empty string after calling this method.
         /// </summary>
-        /// <returns>as to whether to continue this co-routine</returns>
+        /// <returns>An enumerator that waits for the scene transition.</returns>
         [UnityTearDown]
         public IEnumerator TearDown()
         {
             Debug.Log($"[TearDown] Started.\n");
+
+            Unity.Netcode.NetworkManager networkManager = Unity.Netcode.NetworkManager.Singleton;
+            if (networkManager != null)
+            {
+                if (networkManager.IsListening)
+                {
+                    networkManager.Shutdown();
+                }
+                float shutdownDeadline = Time.realtimeSinceStartup + 10f;
+                while (networkManager != null && networkManager.ShutdownInProgress
+                       && Time.realtimeSinceStartup < shutdownDeadline)
+                {
+                    yield return null;
+                }
+                Assert.That(networkManager == null || !networkManager.ShutdownInProgress, Is.True,
+                            "The network did not shut down before unloading the test scene.");
+            }
 
             // Load an empty scene to trigger the unloading of the currently loaded scene.
             SceneManager.LoadScene(EmptyScene, LoadSceneMode.Single);
@@ -164,7 +189,7 @@ namespace SEE.Net
         /// <summary>
         /// The full name of the button to select the "Host" network configuration.
         /// </summary>
-        private const string HostButtonPath = "/UI Canvas/Network Configuration/Main Content/Content Mask/Content/Menu Entries/Scroll Area/List/Host";
+        private const string HostButtonPath = "/UI Canvas/Configuration/Main Content/Content Mask/Content/Menu Entries/Scroll Area/List/Host";
 
         /// <summary>
         /// Simulates that a user presses the button identified by <paramref name="buttonPath"/>.
