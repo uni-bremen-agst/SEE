@@ -245,15 +245,16 @@ public sealed class ExceptionFlowTypeRootApplicabilityContractTests(ITestOutputH
         {
             var root = Assert.Single(Documented(fixture).OfType<ConstructorDeclarationSyntax>());
             var flow = run.Session.Analyze(root);
-            Assert.True(flow.ProfileOutcome!.Complete);
-            Assert.Equal(bodyThrows, flow.ThrownExceptions.Any(t => t.Name == "InvalidOperationException"));
+            Assert.Equal(!field, flow.ProfileOutcome!.Complete);
+            Assert.Equal(bodyThrows && !field, flow.ThrownExceptions.Any(t => t.Name == "InvalidOperationException"));
+            Assert.Equal(bodyThrows, body.Fragment.Sources.Any(s => s.ExceptionType.Name == "InvalidOperationException"));
             AssertFullFlowEqual(flow, reverse.Session.Analyze(root));
             Write("static-root-" + kind, root, flow, Pipeline(fixture, run.Context, run.Session), fixture);
         }
-        Assert.True(before.ProfileOutcome!.Complete);
+        Assert.False(before.ProfileOutcome!.Complete);
         Assert.Empty(before.ThrownExceptions);
         var products = Pipeline(fixture, run.Context, run.Session);
-        if (explicitConstructor && !bodyThrows) Assert.Equal("DOC632", Assert.Single(products.Semantic).Smell.ID);
+        if (explicitConstructor && field) Assert.Equal("DOC631", Assert.Single(products.Semantic).Smell.ID);
         else Assert.Empty(products.Semantic);
         Write("static-caller-" + kind, caller, before, products, fixture);
         WriteConstructor(constructor, body);

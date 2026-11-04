@@ -23,6 +23,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly Dictionary<ExceptionFlowCallableKey, int> edgeWitnesses = new(ReferenceEqualityComparer.Instance);
         private readonly HashSet<int> locatedEdges = [];
         private readonly List<Reason> reasons = [];
+        private readonly HashSet<string> staticInitializationGaps = new(StringComparer.Ordinal);
         private readonly HashSet<string> knownAssemblies = new(StringComparer.Ordinal);
         private readonly Dictionary<string, (ExceptionFlowSummaryFragment Fragment, bool HasBody)> diagnosticDefinitions = new(StringComparer.Ordinal);
         private string? currentDefinition;
@@ -125,6 +126,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             recording?.Observe(fragment);
             if (currentDefinition == null) throw new InvalidOperationException("No discovery body frame.");
+            foreach (string gap in fragment.StaticInitializationGaps)
+            {
+                staticInitializationGaps.Add(currentDefinition);
+                reasons.Add(new("TargetOrAnalysisCoverageIncomplete", currentDefinition + " / " + gap));
+            }
             foreach (var source in fragment.Sources) templates[currentDefinition].Add(ToTerm(source.ExceptionType));
             foreach (var edge in fragment.CallEdges)
                 if (edgeWitnesses.TryGetValue(edge.Target, out int index) && locatedEdges.Add(index))
@@ -501,7 +507,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     {
                         if (!keys.TryGetValue(edge.Target, out int index)) { Valid = false; index = -1; }
                         return new CallSnapshot(index, edge.CallSiteStep, edge.CaughtExceptionTypes.ToArray());
-                    }).ToArray(), fragment.UncertainTargets.ToArray());
+                    }).ToArray(), fragment.UncertainTargets.ToArray(), fragment.StaticInitializationGaps.ToArray(),
+                    fragment.BoundedWitnessRecipes.ToArray());
         }
 
         private sealed record SourceSnapshot(INamedTypeSymbol Type, ExceptionFlowSourceKind Kind, ExceptionFlowPathStep[] Steps)
@@ -522,7 +529,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return edge;
             }
         }
-        private sealed record FragmentSnapshot(SourceSnapshot[] Sources, CallSnapshot[] Calls, string[] Uncertain)
+        private sealed record FragmentSnapshot(SourceSnapshot[] Sources, CallSnapshot[] Calls, string[] Uncertain, string[] InitializationGaps,
+            ExceptionFlowBoundedLowerWitness.Recipe[] WitnessRecipes)
         {
             internal ExceptionFlowSummaryFragment Create(IReadOnlyList<ExceptionFlowCallableKey> keys)
             {
@@ -530,6 +538,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 foreach (var source in Sources) fragment.AddSource(source.Create());
                 foreach (var call in Calls) fragment.AddCallEdge(call.Create(keys));
                 foreach (var target in Uncertain) fragment.AddUncertainTarget(target);
+                fragment.StaticInitializationGaps.UnionWith(InitializationGaps);
+                fragment.BoundedWitnessRecipes.AddRange(WitnessRecipes);
                 return fragment;
             }
         }
@@ -641,9 +651,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
                 }
             } while (changed);
+            // A previously admitted body projection is not an independent
+            // witness across an uncovered initialization boundary (C3D F4).
+            // Keep the original local facts; do not invent wrapper sources.
+            if (staticInitializationGaps.Count != 0)
+                return new([], external[root].OrderBy(pair => pair.Key, StringComparer.Ordinal).Select(pair => pair.Value).ToArray(), true,
+                    ["Uncovered static initialization; local candidates are not independent lower witnesses.", "Inventory=" + Outcome.InventoryDigest]);
             return new(known[root].OrderBy(pair => pair.Key, StringComparer.Ordinal).Select(pair => pair.Value).ToArray(),
                 external[root].OrderBy(pair => pair.Key, StringComparer.Ordinal).Select(pair => pair.Value).ToArray(), unknown[root],
                 ["Ground parameterless declaration equations; whole-result admission remains blocked.", "Inventory=" + Outcome.InventoryDigest]);
+        }
+
+        /// <summary>Composes only separately qualified finite source recipes, never an Outside graph.</summary>
+        internal ExceptionFlowBoundedLowerWitness.Witness[] DiagnoseBoundedLowerWitnesses()
+        {
+            if (staticInitializationGaps.Count == 0 || Outcome.Complete
+                || Outcome.Reasons.Any(reason => reason.Category != "TargetOrAnalysisCoverageIncomplete")
+                || !declarations.TryGetValue(Outcome.Root, out var root)
+                || !diagnosticDefinitions.TryGetValue(Outcome.Root, out var diagnostic)) return [];
+            return diagnostic.Fragment.BoundedWitnessRecipes
+                .Select(recipe => ExceptionFlowBoundedLowerWitness.Compose(recipe, root, environment))
+                .OfType<ExceptionFlowBoundedLowerWitness.Witness>().ToArray();
         }
 
         private static bool ExactGroundCatch(INamedTypeSymbol thrown, INamedTypeSymbol caught)
@@ -721,6 +749,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         INamedTypeSymbol[] ExternalDocumentation, bool HasEscapingUncertainty, string[] Proof)
     {
         internal bool NormalFindingAdmissionBlocked => true;
+        internal ExceptionFlowBoundedLowerWitness.Witness[] QualifiedLowerWitnesses { get; init; } = [];
     }
 
     /// <summary>A typed invalidation of a production inventory or exact binding.</summary>

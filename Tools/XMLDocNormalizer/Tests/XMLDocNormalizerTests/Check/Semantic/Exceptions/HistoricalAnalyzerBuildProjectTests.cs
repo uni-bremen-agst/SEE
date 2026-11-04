@@ -8,7 +8,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
     /// </summary>
     public sealed class HistoricalAnalyzerBuildProjectTests
     {
-        /// <summary>Preserves the exact original boundary plus the real capability.</summary>
+        /// <summary>Preserves the original boundary and the six explicitly admitted shared components.</summary>
         [Fact]
         public void SharedManifest_MatchesProvenBoundaryAndCurrentPhysicalSources()
         {
@@ -19,12 +19,25 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             string[] original = ReadSources(probePath);
 
             Assert.Equal(120, original.Length);
-            Assert.Equal(125, shared.Length);
-            Assert.Equal(125, shared.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+            Assert.Equal(126, shared.Length);
+            Assert.Equal(126, shared.Distinct(StringComparer.OrdinalIgnoreCase).Count());
             // The retained B1 Windows probe spells the same tracked Models/Dto path as Models/DTO.
             Assert.All(original, source => Assert.Contains(source, shared, StringComparer.OrdinalIgnoreCase));
             Assert.Single(shared.Except(original, StringComparer.OrdinalIgnoreCase),
                 source => source.EndsWith("ExceptionFlowRuntimeAwaitCapability.cs", StringComparison.Ordinal));
+            string[] extensionNames =
+            [
+                "ExceptionFlowRuntimeAwaitCapability.cs",
+                "IExceptionFlowSummaryTargetSink.cs",
+                "ExceptionFlowFiniteOrbitProfile.cs",
+                "ExceptionFlowInvocationSubstitution.cs",
+                "ExceptionFlowFiniteOrbitAdmission.cs",
+                "ExceptionFlowAnalyzer.SummaryGraphStaticInitialization.cs"
+            ];
+            string[] extensions = shared.Except(original, StringComparer.OrdinalIgnoreCase).ToArray();
+            Assert.Equal(extensionNames.Length, extensions.Length);
+            Assert.All(extensionNames, name => Assert.Contains(Path.Combine(root, "src", "XMLDocNormalizer",
+                "Checks", "Infrastructure", "Exception", "Flow", name), extensions, StringComparer.OrdinalIgnoreCase));
             string mainRoot = Path.Combine(root, "src", "XMLDocNormalizer") + Path.DirectorySeparatorChar;
             Assert.All(shared, source =>
             {

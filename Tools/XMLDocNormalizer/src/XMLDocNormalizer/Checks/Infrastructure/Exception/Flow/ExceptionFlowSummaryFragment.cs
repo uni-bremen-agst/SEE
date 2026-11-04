@@ -30,6 +30,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly HashSet<string> uncertainTargets =
             new(StringComparer.Ordinal);
 
+        // Coverage is independent of escape-flow suppression by catch clauses.
+        internal HashSet<string> StaticInitializationGaps { get; } = new(StringComparer.Ordinal);
+
+        // Immutable source schemas, not root results or initialized-state facts.
+        internal List<ExceptionFlowBoundedLowerWitness.Recipe> BoundedWitnessRecipes { get; } = [];
+
         /// <summary>
         /// Gets the directly collected exception sources.
         /// </summary>
@@ -137,9 +143,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             uncertainTargets.UnionWith(
                 source.uncertainTargets);
 
+            StaticInitializationGaps.UnionWith(source.StaticInitializationGaps);
+            BoundedWitnessRecipes.AddRange(source.BoundedWitnessRecipes);
+
             source.sources.Clear();
             source.callEdges.Clear();
             source.uncertainTargets.Clear();
+            source.StaticInitializationGaps.Clear();
+            source.BoundedWitnessRecipes.Clear();
         }
 
         /// <summary>
@@ -170,6 +181,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         .IsSameOrDerivedFrom(
                             source.ExceptionType,
                             caughtType));
+            BoundedWitnessRecipes.RemoveAll(recipe => ExceptionFlowCaughtTypeFilter
+                .IsSameOrDerivedFrom(recipe.Guard.ContainingType, caughtType));
 
             foreach (ExceptionFlowSummaryCallEdge callEdge
                      in callEdges)
@@ -188,6 +201,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </remarks>
         public void SuppressAll()
         {
+            BoundedWitnessRecipes.Clear();
             sources.Clear();
             callEdges.Clear();
             uncertainTargets.Clear();

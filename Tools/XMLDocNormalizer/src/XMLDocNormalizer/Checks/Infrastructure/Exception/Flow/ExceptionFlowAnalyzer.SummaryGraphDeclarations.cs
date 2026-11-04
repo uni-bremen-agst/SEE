@@ -41,6 +41,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
+            ObserveStaticInitializationEntry(symbol, semanticContext, fragment);
+            if (ExceptionFlowBoundedLowerWitness.CreateRecipe(symbol, semanticContext) is { } recipe)
+                fragment.BoundedWitnessRecipes.Add(recipe);
             if (symbol is IMethodSymbol implicitConstructor &&
                 implicitConstructor.MethodKind ==
                     MethodKind.Constructor &&

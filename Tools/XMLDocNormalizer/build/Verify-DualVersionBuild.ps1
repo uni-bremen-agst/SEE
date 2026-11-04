@@ -132,9 +132,9 @@ try {
     }
     $mainSourceRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'src/XMLDocNormalizer')) + [IO.Path]::DirectorySeparatorChar
     $shared = @($h.Items.Compile | Where-Object { $_.FullPath.StartsWith($mainSourceRoot, [StringComparison]::OrdinalIgnoreCase) })
-    Require ($shared.Count -eq 125 -and @($h.Items.Compile).Count -eq 126) 'Expected original 120 + capability + four A10 same-source components + one compile-local semantic host.'
+    Require ($shared.Count -eq 126 -and @($h.Items.Compile).Count -eq 127) 'Expected original 120 + capability + four A10 same-source components + C3E/C3H static-initialization coverage/lower evidence + one compile-local semantic host.'
     Require (@($h.Items.Compile | Where-Object { $_.Identity -eq 'HistoricalSemanticEnvironment.cs' }).Count -eq 1) 'Executable Historical host missing.'
-    Require (@($shared.FullPath | Sort-Object -Unique).Count -eq 125) 'Duplicate shared sources.'
+    Require (@($shared.FullPath | Sort-Object -Unique).Count -eq 126) 'Duplicate shared sources.'
     Require (@($shared | Where-Object { $_.FullPath.EndsWith('ExceptionFlowRuntimeAwaitCapability.cs') }).Count -eq 1) 'Shared capability missing.'
     $fingerprints = @($shared | Sort-Object FullPath | ForEach-Object {
         Require ($c.Items.Compile.FullPath -contains $_.FullPath) "Not shared with Current: $($_.FullPath)"
@@ -274,7 +274,7 @@ try {
         WorkerRuntimeChecks = @($identityRun, $firstSmoke, $secondSmoke, $invalidVersion)
         CurrentPackages = $cg; HistoricalPackages = $hg; HistoricalPackageSources = $provenance
         CurrentCompilerReferences = $currentReferences; HistoricalCompilerReferences = $historicalReferences
-        SharedSourceFingerprints = $fingerprints; SharedCount = 121; HostCount = 1
+        SharedSourceFingerprints = $fingerprints; SharedCount = $shared.Count; HostCount = 1
         Steps = @($steps.ToArray()); BuildImages = @($images.ToArray()); Passed = $true
         RuntimeExecuted = $true
         MainBoundaryExecuted = $mainBoundaryExecuted

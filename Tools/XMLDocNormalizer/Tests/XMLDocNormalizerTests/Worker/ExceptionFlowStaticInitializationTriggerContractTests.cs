@@ -48,13 +48,14 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var run = fixture.Session();
         var root = fixture.Root("Read");
         var flow = run.Session.Analyze(root);
-        Assert.True(flow.ProfileOutcome!.Complete);
+        bool complete = access == "typeof";
+        Assert.Equal(complete, flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
-        Assert.Empty(flow.UncertainTargets);
+        Assert.Equal(!complete, flow.HasUncertainPaths);
         var products = Detect(fixture, root);
-        Assert.Equal(new[] { "DOC632", "DOC632" }, products.Findings.Select(f => f.Smell.ID));
-        Assert.Equal("Complete", products.Coverage.Completion);
-        Assert.Empty(products.Coverage.ReasonCodes);
+        Assert.Equal(Enumerable.Repeat(complete ? "DOC632" : "DOC631", 2), products.Findings.Select(f => f.Smell.ID));
+        Assert.Equal(complete ? "Complete" : "Incomplete", products.Coverage.Completion);
+        Assert.Equal(complete ? Array.Empty<string>() : ["OutsideProfile", "TargetCoverageIncomplete"], products.Coverage.ReasonCodes);
         var runtime = Execute(fixture);
         Assert.Equal(!explicitConstructor, runtime.BeforeFieldInit);
         if (access == "typeof" && explicitConstructor) {
@@ -96,7 +97,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var fixture = Fixture(source);
         var run = fixture.Session();
         var flow = run.Session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var runtime = Execute(fixture);
         Assert.Equal(1, runtime.Attempts);
@@ -118,7 +119,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var fixture = Fixture(source);
         var run = fixture.Session();
         var flow = run.Session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var runtime = Execute(fixture, "Configuration");
         Assert.All(runtime.Calls, c => Assert.Equal("System.TypeInitializationException", c.Outer));
@@ -137,7 +138,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
             "public static int Read() { try { return Target.Value; } catch (" + caught + ") { return 9; } } }";
         var fixture = Fixture(source);
         var flow = fixture.Session().Session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var runtime = Execute(fixture);
         Assert.All(runtime.Calls, c => Assert.Equal(outer, c.Outer));
@@ -171,8 +172,8 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var constructorRoot = constructor.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as ConstructorDeclarationSyntax;
         var constructorFlow = constructorRoot is null ? null : run.Session.Analyze(constructorRoot);
         if (constructorFlow is not null) {
-            Assert.True(constructorFlow.ProfileOutcome!.Complete);
-            Assert.Equal(bodyThrows ? 1 : 0, constructorFlow.ThrownExceptions.Count);
+            Assert.False(constructorFlow.ProfileOutcome!.Complete);
+            Assert.Empty(constructorFlow.ThrownExceptions); // Raw body sources above remain intact; no unsupported exact projection.
         }
         Write("producer-" + explicitConstructor + "-" + bodyThrows, source, new {
             constructor.IsImplicitlyDeclared, MethodKind = constructor.MethodKind.ToString(),
@@ -207,7 +208,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var products = Detect(fixture, root);
         Assert.Equal("Incomplete", products.Coverage.Completion);
         Assert.Equal(new[] { "OutsideProfile", "TargetCoverageIncomplete" }, products.Coverage.ReasonCodes);
-        Assert.Equal(2, products.Findings.Count(f => f.Smell.ID == "DOC632"));
+        Assert.Equal(2, products.Findings.Count(f => f.Smell.ID == "DOC631"));
         Write("type-independent-order", source, new {
             Flow = AdmissionCharacterization.Flow(run.Session.Analyze(root)), TypeFlow = AdmissionCharacterization.Flow(typeFlow),
             Independent = AdmissionCharacterization.Flow(independent), products,
@@ -236,7 +237,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
             """;
         var fixture = Fixture(source);
         var flow = fixture.Session().Session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var runtime = Execute(fixture, "Target`1");
         Assert.Equal(11, runtime.Attempts);
@@ -288,12 +289,12 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var fixture = new AdmissionCharacterization.Fixture([("/C3C/Consumer.cs", source)],
             MetadataReferences.Default.Concat([MetadataReference.CreateFromImage(image.ToArray())]), assemblyName: "C3C.MetadataConsumer");
         var flow = fixture.Session().Session.Analyze(fixture.Root("Read"));
-        Assert.Equal(!callMethod, flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var products = Detect(fixture, fixture.Root("Read"));
         Assert.Equal(2, products.Findings.Length);
-        Assert.All(products.Findings, f => Assert.Equal(callMethod ? "DOC631" : "DOC632", f.Smell.ID));
-        Assert.Equal(callMethod ? "Incomplete" : "Complete", products.Coverage.Completion);
+        Assert.All(products.Findings, f => Assert.Equal("DOC631", f.Smell.ID));
+        Assert.Equal("Incomplete", products.Coverage.Completion);
         Write("metadata-" + callMethod, source, new { DependencySource = target, Flow = AdmissionCharacterization.Flow(flow), products });
     }
 
@@ -312,7 +313,7 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
         var environment = new ExceptionFlowSemanticEnvironment(context);
         var session = new ExceptionFlowSummaryAnalysisSession(environment);
         var flow = session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var coverage = new AnalysisCoverage();
         coverage.Begin("C3C-supporting", ExceptionAnalysisMode.SolutionTransitive);
@@ -321,8 +322,8 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
             fixture.Compilation.GetSemanticModel(root.SyntaxTree), context,
             new XmlDocOptions { ExceptionAnalysisMode = ExceptionAnalysisMode.SolutionTransitive }, session, coverage);
         Assert.Equal(2, findings.Count);
-        Assert.All(findings, f => Assert.Equal("DOC632", f.Smell.ID));
-        Assert.Equal("Complete", coverage.Report().Completion);
+        Assert.All(findings, f => Assert.Equal("DOC631", f.Smell.ID));
+        Assert.Equal("Incomplete", coverage.Report().Completion);
         Write("supporting-" + callMethod, source, new {
             DependencySource = target, Flow = AdmissionCharacterization.Flow(flow), Findings = findings, Coverage = coverage.Report(),
             EvidenceScope = "Current compilation-reference and registered supporting-source control, no historical runtime claim."
@@ -338,12 +339,12 @@ public sealed class ExceptionFlowStaticInitializationTriggerContractTests(ITestO
             (tagged ? Docs : "/// <summary>Read.</summary>\n") + "public static int Read() => Target.Method(); }";
         var fixture = Fixture(source);
         var flow = fixture.Session().Session.Analyze(fixture.Root("Read"));
-        Assert.True(flow.ProfileOutcome!.Complete);
+        Assert.False(flow.ProfileOutcome!.Complete);
         Assert.Empty(flow.ThrownExceptions);
         var products = Detect(fixture, fixture.Root("Read"));
         Assert.Equal(tagged ? 2 : 0, products.Findings.Length);
-        Assert.All(products.Findings, f => Assert.Equal("DOC632", f.Smell.ID));
-        Assert.Equal("Complete", products.Coverage.Completion);
+        Assert.All(products.Findings, f => Assert.Equal("DOC631", f.Smell.ID));
+        Assert.Equal("Incomplete", products.Coverage.Completion);
         var runtime = Execute(fixture);
         Assert.All(runtime.Calls, c => Assert.Equal("System.TypeInitializationException", c.Outer));
         Assert.All(runtime.Calls, c => Assert.Equal("System.InvalidOperationException", c.Inner));

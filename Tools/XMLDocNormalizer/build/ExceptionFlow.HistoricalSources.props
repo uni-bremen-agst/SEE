@@ -127,4 +127,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowInvocationSubstitution.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowInvocationSubstitution.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitAdmission.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowFiniteOrbitAdmission.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)../src/XMLDocNormalizer/Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphStaticInitialization.cs" Link="Checks/Infrastructure/Exception/Flow/ExceptionFlowAnalyzer.SummaryGraphStaticInitialization.cs" />
+  </ItemGroup>
 </Project>

@@ -73,7 +73,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             MemberDeclarationSyntax member)
         {
             ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext, admissionFacts);
-            if (!admission.Outcome.Complete) return Outside(admission.Outcome, admission.DiagnoseGroundFacts());
+            if (!admission.Outcome.Complete) return Outside(admission.Outcome, admission.DiagnoseGroundFacts(),
+                admission.DiagnoseBoundedLowerWitnesses());
             bool completed = false;
             try
             {
@@ -131,10 +132,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 .OrderBy(item => item.Category, StringComparer.Ordinal).ThenBy(item => item.Witness, StringComparer.Ordinal).ToArray() };
 
         private static ExceptionFlowAnalysisResult Outside(ExceptionFlowFiniteOrbitProfile.Certificate certificate,
-            ExceptionFlowProfileDiagnostics? diagnostics = null)
+            ExceptionFlowProfileDiagnostics? diagnostics = null,
+            ExceptionFlowBoundedLowerWitness.Witness[]? qualifiedLower = null)
         {
             ExceptionFlowAnalysisResult result = new() { ProfileOutcome = certificate, ProfileDiagnostics = diagnostics };
             result.UncertainTargets.UnionWith(certificate.Details);
+            if (qualifiedLower is { Length: > 0 } && diagnostics != null)
+            {
+                foreach (var witness in qualifiedLower) result.AddExceptionPath(witness.Source.ExceptionType, witness.Source.LocalPath);
+                result.ProfileDiagnostics = diagnostics with
+                {
+                    ProvenLowerWitnesses = diagnostics.ProvenLowerWitnesses.Concat(qualifiedLower.Select(witness => witness.Source.ExceptionType))
+                        .Distinct<Microsoft.CodeAnalysis.INamedTypeSymbol>(SymbolEqualityComparer.Default).ToArray(),
+                    QualifiedLowerWitnesses = qualifiedLower,
+                    Proof = diagnostics.Proof.Concat(qualifiedLower.Select(witness =>
+                        "Qualified finite normal-initialization/default-return/argument/escape composition: "
+                        + witness.Schema.ReceiverField.ToDisplayString() + " -> " + witness.Schema.Getter.ToDisplayString()
+                        + " -> default(" + witness.ClosedReturn.ToDisplayString() + ") -> "
+                        + witness.Schema.Validator.ToDisplayString() + "; coverage remains incomplete.")).ToArray()
+                };
+            }
             return result;
         }
     }

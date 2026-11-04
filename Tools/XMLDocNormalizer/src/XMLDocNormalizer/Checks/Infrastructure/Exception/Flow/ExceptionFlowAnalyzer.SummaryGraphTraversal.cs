@@ -105,6 +105,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
+            ObserveStaticInitializationOperations(node, semanticModel, semanticContext, fragment);
             AnalyzeSummaryThrows(
                 node,
                 semanticModel,
@@ -214,6 +215,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             // A discovery sink observes coverage before an enclosing catch can
             // remove flow. It has no concrete graph-registration capability.
+            ObserveStaticInitializationTargets(fragment, semanticModel, semanticContext);
             graph.ObserveLocalFragment(fragment);
         }
 
