@@ -1469,12 +1469,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  images:
-  - {fileID: 7464359843007923698}
-  - {fileID: 7464359843721662981}
-  texts:
-  - {fileID: 7464359842575645082}
-  - {fileID: 7464359843272370246}
+  mainText: {fileID: 7464359843272370240}
+  placeholderText: {fileID: 7464359842575645076}
+  backgroundImage: {fileID: 7464359843007923468}
+  filledImage: {fileID: 7464359843721662983}
 --- !u!1 &7464359843272370246
 GameObject:
   m_ObjectHideFlags: 0
@@ -2139,14 +2137,14 @@ MonoBehaviour:
   itemParent: {fileID: 7851307473279866743}
   itemObject: {fileID: 1168081051609938, guid: a10f1ce858922584bbbcc45f2e1d1ab1, type: 3}
   scrollbar: {fileID: 1325751005180270734}
-  itemList: {fileID: 0}
+  itemList: {fileID: 661510374186502803}
   currentListParent: {fileID: 0}
   listParent: {fileID: 0}
   soundSource: {fileID: 0}
   enableIcon: 0
   enableTrigger: 1
   enableScrollbar: 1
-  setHighPriorty: 0
+  setHighPriority: 0
   outOnPointerExit: 0
   isListItem: 0
   invokeAtStart: 0
@@ -2156,9 +2154,9 @@ MonoBehaviour:
   useHoverSound: 1
   useClickSound: 1
   saveSelected: 0
-  dropdownTag: Dropdown
-  dropdownItems: []
-  dropdownEvent:
+  saveKey: Dropdown
+  items: []
+  onValueChanged:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}

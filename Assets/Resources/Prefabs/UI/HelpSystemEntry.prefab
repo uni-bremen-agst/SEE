@@ -919,22 +919,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2608457271897771148}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 235512031997920898}
-  highlightedIcon: {fileID: 5026328459586133323}
+  normalImage: {fileID: 235512031997920898}
+  highlightImage: {fileID: 5026328459586133323}
   normalText: {fileID: 2206175525486875778}
   highlightedText: {fileID: 8823448361004790007}
   soundSource: {fileID: 0}
@@ -945,7 +944,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -954,6 +953,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 998320862077241935}
+  highlightCG: {fileID: 7460149057947808317}
 --- !u!114 &4514273845132393069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2034,6 +2041,7 @@ GameObject:
   - component: {fileID: 7649812528314171092}
   - component: {fileID: 7895180741848650392}
   - component: {fileID: 6290102532265961823}
+  - component: {fileID: 9139184366195678656}
   m_Layer: 5
   m_Name: Forward
   m_TagString: Untagged
@@ -2053,7 +2061,7 @@ RectTransform:
   m_LocalScale: {x: 0.35, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4937104503565170860}
+  - {fileID: 9139184366195678660}
   - {fileID: 9032850633920345208}
   m_Father: {fileID: 8430945386506331931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2079,20 +2087,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 4507050969482077026}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a54a7257a6436d41b873f1053130384, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: c7b4eec4e1d4fbd4d8964583bb9b6ba5, type: 3}
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 4579262349876864460}
+  normalImage: {fileID: 4579262349876864460}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 3211323546070827545}
   useCustomContent: 0
@@ -2108,6 +2115,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 24
+  enableText: 0
+  enableIcon: 1
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &7649812528314171092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2195,41 +2209,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  buttonType: 1
-  webglMode: 0
-  basicFilled: {fileID: 0}
-  basicText: {fileID: 0}
-  basicOnlyIconFilled: {fileID: 7895180741848650392}
-  basicOnlyIconIcon: {fileID: 4579262349876864460}
-  basicWithIconFilled: {fileID: 0}
-  basicWithIconIcon: {fileID: 0}
-  basicWithIconText: {fileID: 0}
-  basicOutlineBorder: {fileID: 0}
-  basicOutlineFilled: {fileID: 0}
-  basicOutlineText: {fileID: 0}
-  basicOutlineTextHighligted: {fileID: 0}
-  basicOutlineOOBorder: {fileID: 0}
-  basicOutlineOOFilled: {fileID: 0}
-  basicOutlineOOIcon: {fileID: 0}
-  basicOutlineOOIconHighlighted: {fileID: 0}
-  basicOutlineWOBorder: {fileID: 0}
-  basicOutlineWOFilled: {fileID: 0}
-  basicOutlineWOIcon: {fileID: 0}
-  basicOutlineWOIconHighlighted: {fileID: 0}
-  basicOutlineWOText: {fileID: 0}
-  basicOutlineWOTextHighligted: {fileID: 0}
-  radialOOBackground: {fileID: 0}
-  radialOOIcon: {fileID: 0}
-  radialOutlineOOBorder: {fileID: 0}
-  radialOutlineOOFilled: {fileID: 0}
-  radialOutlineOOIcon: {fileID: 0}
-  radialOutlineOOIconHighlighted: {fileID: 0}
-  roundedBackground: {fileID: 0}
-  roundedText: {fileID: 0}
-  roundedOutlineBorder: {fileID: 0}
-  roundedOutlineFilled: {fileID: 0}
-  roundedOutlineText: {fileID: 0}
-  roundedOutlineTextHighligted: {fileID: 0}
+  outlineMode: 0
+  buttonManager: {fileID: 2333555350309722142}
+  normalBackground: {fileID: 7895180741848650392}
+  normalIcon: {fileID: 4579262349876864460}
 --- !u!1 &4517021961376973569
 GameObject:
   m_ObjectHideFlags: 0
@@ -2377,6 +2360,7 @@ GameObject:
   - component: {fileID: 2977771707063217150}
   - component: {fileID: 2637706937015081650}
   - component: {fileID: 5223905315902143374}
+  - component: {fileID: 9139184366195678657}
   m_Layer: 5
   m_Name: Pause
   m_TagString: Untagged
@@ -2396,7 +2380,7 @@ RectTransform:
   m_LocalScale: {x: 0.37, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1934791675691451336}
+  - {fileID: 9139184366195678662}
   - {fileID: 5607092623468000059}
   m_Father: {fileID: 8430945386506331931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2422,20 +2406,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 4969925902600259063}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a54a7257a6436d41b873f1053130384, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300002, guid: 80694812942b91b42bc4aad99071ba7e, type: 3}
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 105651154044925662}
+  normalImage: {fileID: 105651154044925662}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 7948130956262199146}
   useCustomContent: 0
@@ -2451,6 +2434,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 24
+  enableText: 0
+  enableIcon: 1
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &2977771707063217150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2538,41 +2528,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  buttonType: 1
-  webglMode: 0
-  basicFilled: {fileID: 0}
-  basicText: {fileID: 0}
-  basicOnlyIconFilled: {fileID: 2637706937015081650}
-  basicOnlyIconIcon: {fileID: 105651154044925662}
-  basicWithIconFilled: {fileID: 0}
-  basicWithIconIcon: {fileID: 0}
-  basicWithIconText: {fileID: 0}
-  basicOutlineBorder: {fileID: 0}
-  basicOutlineFilled: {fileID: 0}
-  basicOutlineText: {fileID: 0}
-  basicOutlineTextHighligted: {fileID: 0}
-  basicOutlineOOBorder: {fileID: 0}
-  basicOutlineOOFilled: {fileID: 0}
-  basicOutlineOOIcon: {fileID: 0}
-  basicOutlineOOIconHighlighted: {fileID: 0}
-  basicOutlineWOBorder: {fileID: 0}
-  basicOutlineWOFilled: {fileID: 0}
-  basicOutlineWOIcon: {fileID: 0}
-  basicOutlineWOIconHighlighted: {fileID: 0}
-  basicOutlineWOText: {fileID: 0}
-  basicOutlineWOTextHighligted: {fileID: 0}
-  radialOOBackground: {fileID: 0}
-  radialOOIcon: {fileID: 0}
-  radialOutlineOOBorder: {fileID: 0}
-  radialOutlineOOFilled: {fileID: 0}
-  radialOutlineOOIcon: {fileID: 0}
-  radialOutlineOOIconHighlighted: {fileID: 0}
-  roundedBackground: {fileID: 0}
-  roundedText: {fileID: 0}
-  roundedOutlineBorder: {fileID: 0}
-  roundedOutlineFilled: {fileID: 0}
-  roundedOutlineText: {fileID: 0}
-  roundedOutlineTextHighligted: {fileID: 0}
+  outlineMode: 0
+  buttonManager: {fileID: 1995957147975574551}
+  normalBackground: {fileID: 2637706937015081650}
+  normalIcon: {fileID: 105651154044925662}
 --- !u!1 &5002246998676634359
 GameObject:
   m_ObjectHideFlags: 0
@@ -2665,15 +2624,15 @@ RectTransform:
   m_GameObject: {fileID: 5269175472719605268}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.73, y: 0.8, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7109488924218711492}
+  m_Father: {fileID: 9139184366195678660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.03, y: 0.15000057}
-  m_SizeDelta: {x: 8.5, y: 24.14}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8985943256659470165
 CanvasRenderer:
@@ -3342,7 +3301,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -3833,6 +3792,7 @@ GameObject:
   - component: {fileID: 5799655394703289300}
   - component: {fileID: 7767660325044594030}
   - component: {fileID: 929149357414459832}
+  - component: {fileID: 9139184366195678658}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -3852,7 +3812,7 @@ RectTransform:
   m_LocalScale: {x: 0.37, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6853394560279575465}
+  - {fileID: 9139184366195678664}
   - {fileID: 2638944075411300342}
   m_Father: {fileID: 8430945386506331931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3878,20 +3838,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 8039923215173837477}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a54a7257a6436d41b873f1053130384, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 3466441824545876721}
+  normalImage: {fileID: 3466441824545876721}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 2777393762324927744}
   useCustomContent: 0
@@ -3907,6 +3866,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 24
+  enableText: 0
+  enableIcon: 1
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5799655394703289300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3994,41 +3960,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  buttonType: 1
-  webglMode: 0
-  basicFilled: {fileID: 0}
-  basicText: {fileID: 0}
-  basicOnlyIconFilled: {fileID: 7767660325044594030}
-  basicOnlyIconIcon: {fileID: 3466441824545876721}
-  basicWithIconFilled: {fileID: 0}
-  basicWithIconIcon: {fileID: 0}
-  basicWithIconText: {fileID: 0}
-  basicOutlineBorder: {fileID: 0}
-  basicOutlineFilled: {fileID: 0}
-  basicOutlineText: {fileID: 0}
-  basicOutlineTextHighligted: {fileID: 0}
-  basicOutlineOOBorder: {fileID: 0}
-  basicOutlineOOFilled: {fileID: 0}
-  basicOutlineOOIcon: {fileID: 0}
-  basicOutlineOOIconHighlighted: {fileID: 0}
-  basicOutlineWOBorder: {fileID: 0}
-  basicOutlineWOFilled: {fileID: 0}
-  basicOutlineWOIcon: {fileID: 0}
-  basicOutlineWOIconHighlighted: {fileID: 0}
-  basicOutlineWOText: {fileID: 0}
-  basicOutlineWOTextHighligted: {fileID: 0}
-  radialOOBackground: {fileID: 0}
-  radialOOIcon: {fileID: 0}
-  radialOutlineOOBorder: {fileID: 0}
-  radialOutlineOOFilled: {fileID: 0}
-  radialOutlineOOIcon: {fileID: 0}
-  radialOutlineOOIconHighlighted: {fileID: 0}
-  roundedBackground: {fileID: 0}
-  roundedText: {fileID: 0}
-  roundedOutlineBorder: {fileID: 0}
-  roundedOutlineFilled: {fileID: 0}
-  roundedOutlineText: {fileID: 0}
-  roundedOutlineTextHighligted: {fileID: 0}
+  outlineMode: 0
+  buttonManager: {fileID: 7774012697950349439}
+  normalBackground: {fileID: 7767660325044594030}
+  normalIcon: {fileID: 3466441824545876721}
 --- !u!1 &8398311067326876880
 GameObject:
   m_ObjectHideFlags: 0
@@ -4056,15 +3991,15 @@ RectTransform:
   m_GameObject: {fileID: 8398311067326876880}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.73, y: 0.8, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1892639342038842928}
+  m_Father: {fileID: 9139184366195678664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.03, y: 0.15000057}
-  m_SizeDelta: {x: 8.5, y: 24.14}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3446726479022890575
 CanvasRenderer:
@@ -4349,15 +4284,15 @@ RectTransform:
   m_GameObject: {fileID: 8702586373185063043}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.6, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6716964016905279882}
+  m_Father: {fileID: 9139184366195678662}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.84, y: 0.075000286}
-  m_SizeDelta: {x: 8.5, y: 23.989998}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7752013899271169313
 CanvasRenderer:
@@ -4591,22 +4526,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 9139184366195678655}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 8494083341645805644}
-  highlightedIcon: {fileID: 3048323125828131103}
+  normalImage: {fileID: 8494083341645805644}
+  highlightImage: {fileID: 3048323125828131103}
   normalText: {fileID: 2782204464662728065}
   highlightedText: {fileID: 2965690794978344141}
   soundSource: {fileID: 0}
@@ -4617,7 +4551,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -4626,6 +4560,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 2250704909818939723}
+  highlightCG: {fileID: 4089131478740782627}
 --- !u!114 &1660365822980096738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4671,7 +4613,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Michsky.UI.ModernUIPack.ModalWindowManager, ModernUIPack
+        m_TargetAssemblyTypeName: Michsky.MUIP.ModalWindowManager, ModernUIPack
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
@@ -4733,3 +4675,147 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9139184366195678656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4507050969482077026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9139184366195678657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969925902600259063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9139184366195678658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8039923215173837477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!1 &9139184366195678659
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9139184366195678660}
+  m_Layer: 5
+  m_Name: Icon Content
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9139184366195678660
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139184366195678659}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.73, y: 0.8, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4937104503565170860}
+  m_Father: {fileID: 7109488924218711492}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -0.03, y: 0.15000057}
+  m_SizeDelta: {x: 8.5, y: 24.14}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &9139184366195678661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9139184366195678662}
+  m_Layer: 5
+  m_Name: Icon Content
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9139184366195678662
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139184366195678661}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.6, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1934791675691451336}
+  m_Father: {fileID: 6716964016905279882}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0.84, y: 0.075000286}
+  m_SizeDelta: {x: 8.5, y: 23.989998}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &9139184366195678663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9139184366195678664}
+  m_Layer: 5
+  m_Name: Icon Content
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9139184366195678664
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139184366195678663}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.73, y: 0.8, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6853394560279575465}
+  m_Father: {fileID: 1892639342038842928}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -0.03, y: 0.15000057}
+  m_SizeDelta: {x: 8.5, y: 24.14}
+  m_Pivot: {x: 0.5, y: 0.5}

@@ -236,6 +236,7 @@ GameObject:
   - component: {fileID: 5310571123798271192}
   - component: {fileID: 5310571123798271195}
   - component: {fileID: 5310571123798271197}
+  - component: {fileID: 5310571123798271200}
   m_Layer: 5
   m_Name: TabButton
   m_TagString: TabButton
@@ -281,14 +282,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 5310571123798271199}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: Inner nodes
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
@@ -308,6 +309,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 18
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5310571123798271193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -443,3 +451,15 @@ MonoBehaviour:
   inactiveColor: {r: 203, g: 213, b: 224, a: 1}
   activeColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 0.45, g: 0.55, b: 0.72, a: 1}
+--- !u!114 &5310571123798271200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5310571123798271199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

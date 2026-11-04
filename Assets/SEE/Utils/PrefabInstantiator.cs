@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Michsky.MUIP;
+using System;
 using UnityEngine;
 
+/// <summary>
+/// Utilities used throughout SEE.
+/// </summary>
 namespace SEE.Utils
 {
     /// <summary>
@@ -20,10 +24,14 @@ namespace SEE.Utils
         /// if and only if <paramref name="instantiateInWorldSpace"/>.
         /// If the prefab cannot be instantiated, an exception is thrown.
         /// </summary>
+        /// <remarks>
+        /// Draggable UI windows without an assigned drag area use their containing canvas.
+        /// </remarks>
         /// <param name="prefabName">The path of the prefab relative to the Resources folder.</param>
         /// <param name="parent">The parent of the instantiate prefab; can be null.</param>
         /// <param name="instantiateInWorldSpace">Whether the prefab should be instantiated in world space.</param>
         /// <returns>The instantiated prefab; will never be null.</returns>
+        /// <exception cref="Exception">The prefab could not be loaded or instantiated.</exception>
         public static GameObject InstantiatePrefab(string prefabName, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             GameObject prefab = LoadPrefab(prefabName);
@@ -31,6 +39,19 @@ namespace SEE.Utils
             if (result == null)
             {
                 throw new Exception($"Prefab {prefabName} could not be instantiated.");
+            }
+
+            // WindowDragger's default lookup can select another canvas in scenes with multiple canvases.
+            foreach (WindowDragger dragger in result.GetComponentsInChildren<WindowDragger>(true))
+            {
+                if (dragger.dragArea == null)
+                {
+                    Canvas canvas = dragger.GetComponentInParent<Canvas>(true);
+                    if (canvas != null)
+                    {
+                        dragger.dragArea = (RectTransform)canvas.transform;
+                    }
+                }
             }
 
             if (CheckForMissingComponents)

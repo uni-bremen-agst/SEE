@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 293774443498411374}
   - component: {fileID: 5013839220337624685}
   - component: {fileID: 4628872312763025243}
+  - component: {fileID: 9158369246804821618}
   m_Layer: 5
   m_Name: Cancel
   m_TagString: Untagged
@@ -58,11 +59,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 36012286781541183}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: Cancel
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -78,12 +79,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 4560406004704757589}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 554244341070821028}
@@ -100,6 +100,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 22.5
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5013839220337624685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2037,6 +2044,7 @@ GameObject:
   - component: {fileID: 5394185019907151788}
   - component: {fileID: 5676332319776578763}
   - component: {fileID: 1036196786602531051}
+  - component: {fileID: 9158369246804821619}
   m_Layer: 5
   m_Name: DownBtn
   m_TagString: Untagged
@@ -2082,11 +2090,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4387779237598489068}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: ^
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -2102,12 +2110,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 3423897721683068653}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 3221779302869580227}
@@ -2124,6 +2131,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 14
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5676332319776578763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2348,6 +2362,7 @@ GameObject:
   - component: {fileID: 3613337479510435475}
   - component: {fileID: 5882613494583328030}
   - component: {fileID: 6055816318788294519}
+  - component: {fileID: 9158369246804821620}
   m_Layer: 5
   m_Name: Finish
   m_TagString: Untagged
@@ -2393,11 +2408,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5084512952368844514}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: Finish
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -2413,12 +2428,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 3299602311633477148}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 3558549229955090043}
@@ -2435,6 +2449,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 22.5
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5882613494583328030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2699,6 +2720,7 @@ GameObject:
   - component: {fileID: 4842201268505069435}
   - component: {fileID: 8730507423645313770}
   - component: {fileID: 796966303893975460}
+  - component: {fileID: 9158369246804821621}
   m_Layer: 5
   m_Name: UpBtn
   m_TagString: Untagged
@@ -2744,11 +2766,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5977823181421885640}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: ^
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -2764,12 +2786,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 7169899851546306418}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 7460299375245152873}
@@ -2786,6 +2807,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 14
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &8730507423645313770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3111,7 +3139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragArea: {fileID: 0}
   dragObject: {fileID: 4985421093549351610}
-  topOnClick: 1
+  topOnDrag: 1
 --- !u!114 &1378373156935747248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3510,6 +3538,7 @@ GameObject:
   - component: {fileID: 7750524079796414537}
   - component: {fileID: 3524828917477654520}
   - component: {fileID: 3529930071420354756}
+  - component: {fileID: 9158369246804821622}
   m_Layer: 5
   m_Name: DownBtn
   m_TagString: Untagged
@@ -3555,11 +3584,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6971349914758444038}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: ^
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -3575,12 +3604,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 4629798537507656251}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 257122685412829895}
@@ -3597,6 +3625,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 14
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &3524828917477654520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3896,6 +3931,7 @@ GameObject:
   - component: {fileID: 6728676569113146932}
   - component: {fileID: 1915859929309687026}
   - component: {fileID: 2891645697431501142}
+  - component: {fileID: 9158369246804821623}
   m_Layer: 5
   m_Name: UpBtn
   m_TagString: Untagged
@@ -3941,11 +3977,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7332140357985202713}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: ^
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -3961,12 +3997,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 1037910357912798527}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 8241839427313192325}
@@ -3983,6 +4018,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 14
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &1915859929309687026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4720,3 +4762,75 @@ MonoBehaviour:
   OnProportionalValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &9158369246804821618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36012286781541183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9158369246804821619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4387779237598489068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9158369246804821620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5084512952368844514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9158369246804821621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5977823181421885640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9158369246804821622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6971349914758444038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9158369246804821623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7332140357985202713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 4334658990492855594}
   - component: {fileID: 5068481639303119560}
   - component: {fileID: 8038396328379371769}
+  - component: {fileID: 8752012552862800143}
   m_Layer: 5
   m_Name: Trigger
   m_TagString: Untagged
@@ -133,15 +134,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 2661644877208027031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddd611441fc6f1f4c9f714fcd4dcbeb3, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 3286163911610860551, guid: 6dcca3599e352b94d9b4bd668c2f715e, type: 3}
   buttonText: BUTTON
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
@@ -154,7 +155,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -162,6 +163,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 22.5
+  enableText: 1
+  enableIcon: 1
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5068481639303119560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -573,3 +581,15 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &8752012552862800143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2661644877208027031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

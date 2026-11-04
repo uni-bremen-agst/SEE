@@ -2,18 +2,6 @@
 using HSVPicker;
 using Michsky.MUIP;
 using MoreLinq;
-using SEE.Graphs;
-using SEE.Game;
-using SEE.Game.City;
-using SEE.SceneManipulation;
-using SEE.Extensions;
-using SEE.GraphProviders;
-using SEE.Net.Actions.RuntimeConfig;
-using SEE.UI.Menu;
-using SEE.UI.Notification;
-using SEE.UI.PropertyDialog;
-using SEE.Utils;
-using SEE.Utils.Paths;
 using SimpleFileBrowser;
 using Sirenix.OdinInspector;
 using System;
@@ -26,8 +14,23 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.GraphProviders;
+using SEE.Graphs;
 using SEE.Graphs.Config;
+using SEE.Net.Actions.RuntimeConfig;
+using SEE.SceneManipulation;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
+using SEE.Utils;
+using SEE.Utils.Paths;
 
+/// <summary>
+/// Runtime configuration menus for code cities.
+/// </summary>
 namespace SEE.UI.RuntimeConfigMenu
 {
     /// <summary>
@@ -406,7 +409,7 @@ namespace SEE.UI.RuntimeConfigMenu
             GameObject button = PrefabInstantiator.InstantiatePrefab(buttonPrefab, configButtonList.transform, false);
             button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
             ButtonManager buttonManager = button.GetComponent<ButtonManager>();
-            buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
+            buttonManager.SetText(methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label);
 
             // add button listeners
             if (IsLoadMethod(methodInfo))
