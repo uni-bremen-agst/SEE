@@ -1,12 +1,15 @@
 ﻿using Michsky.MUIP;
+using UnityEngine;
+using UnityEngine.Events;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using UnityEngine;
-using UnityEngine.Events;
+using SEE.UI.Notification;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -74,6 +77,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Set the current selected node kind.
                 nodeKindSelector.defaultIndex = index;
+                nodeKindSelector.SetupSelector();
             }
         }
 

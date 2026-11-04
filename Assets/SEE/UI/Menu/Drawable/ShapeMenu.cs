@@ -1,11 +1,4 @@
 ﻿using Michsky.MUIP;
-using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
-using SEE.UI.Drawable;
-using SEE.UI.Notification;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +9,17 @@ using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
+using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
+using SEE.UI.Drawable;
+using SEE.UI.Notification;
+using SEE.Utils;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -642,6 +645,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             selector.defaultIndex = 0;
+            selector.SetupSelector();
         }
 
         /// <summary>

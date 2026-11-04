@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Michsky.MUIP;
+using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Michsky.MUIP;
-using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
+/// <summary>
+/// Tests for property dialog components.
+/// </summary>
 namespace SEE.UI.PropertyDialog
 {
     /// <summary>
@@ -16,6 +19,11 @@ namespace SEE.UI.PropertyDialog
     /// </summary>
     internal class TestPropertyDialog : TestUI
     {
+        /// <summary>
+        /// Checks entered text, selection changes, and the dialog confirmation callback.
+        /// </summary>
+        /// <returns>An enumerator that waits for dialog initialization and confirmation.</returns>
+        /// <exception cref="AssertionException">The dialog content or confirmation differs from the expected result.</exception>
         [UnityTest]
         public IEnumerator TestDialog()
         {
@@ -97,12 +105,57 @@ namespace SEE.UI.PropertyDialog
         }
 
         /// <summary>
+        /// Checks that dialog selections with one or two options initialize their indicators and values.
+        /// </summary>
+        /// <returns>An enumerator that waits for each dialog to initialize and close.</returns>
+        /// <exception cref="AssertionException">A selection has an incorrect value or indicator count.</exception>
+        [UnityTest]
+        public IEnumerator DialogSupportsShortSelections()
+        {
+            for (int optionCount = 1; optionCount <= 2; optionCount++)
+            {
+                GameObject container = new("Dialog with short selection");
+                SelectionProperty selection = container.AddComponent<SelectionProperty>();
+                selection.Name = "Short selection";
+                List<string> options = new() { "First" };
+                if (optionCount == 2)
+                {
+                    options.Add("Second");
+                }
+                selection.AddOptions(options);
+                selection.Value = options[optionCount - 1];
+
+                PropertyGroup group = container.AddComponent<PropertyGroup>();
+                group.Name = "Selection";
+                group.AddProperty(selection);
+                PropertyDialog dialog = container.AddComponent<PropertyDialog>();
+                dialog.Title = "Short selection dialog";
+                dialog.AddGroup(group);
+                dialog.DialogShouldBeShown = true;
+                yield return new WaitForSeconds(0.2f);
+
+                HorizontalSelector selector = selection.HorizontalSelector;
+                Assert.That(selector, Is.Not.Null);
+                Assert.That(selector.indicatorParent.childCount, Is.EqualTo(optionCount));
+                Assert.That(selection.Value, Is.EqualTo(options[optionCount - 1]));
+                selector.PreviousClick();
+                Assert.That(selection.Value, Is.EqualTo(options[0]));
+                selector.ForwardClick();
+                Assert.That(selection.Value, Is.EqualTo(options[optionCount - 1]));
+
+                dialog.DialogShouldBeShown = false;
+                UnityEngine.Object.Destroy(container);
+                yield return null;
+            }
+        }
+
+        /// <summary>
         /// Yields the <see cref="TMP_InputField"/> of <paramref name="field"/>.
         /// </summary>
-        /// <param name="field">game object from which to retrieve the component</param>
-        /// <returns>the retrieved component</returns>
-        /// <exception cref="Exception">thrown in case <paramref name="field"/> does not have
-        /// the requested component</exception>
+        /// <param name="field">Game object from which to retrieve the component.</param>
+        /// <returns>The retrieved component.</returns>
+        /// <exception cref="Exception">Thrown in case <paramref name="field"/> does not have
+        /// the requested component.</exception>
         private static TMP_InputField GetInputField(GameObject field)
         {
             if (field.TryGetComponent(out TMP_InputField inputField))
@@ -118,11 +171,11 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Yields the <see cref="HorizontalSelector"/> of <paramref name="field"/>.
         /// </summary>
-        /// <param name="field">game object from which to retrieve the component</param>
-        /// <returns>the retrieved component</returns>
-        /// <exception cref="Exception">thrown in case <paramref name="field"/> does not have
-        /// the requested component</exception>
-        static HorizontalSelector GetHorizontalSelector(GameObject field)
+        /// <param name="field">Game object from which to retrieve the component.</param>
+        /// <returns>The retrieved component.</returns>
+        /// <exception cref="Exception">Thrown in case <paramref name="field"/> does not have
+        /// the requested component.</exception>
+        private static HorizontalSelector GetHorizontalSelector(GameObject field)
         {
             if (field.TryGetComponent(out HorizontalSelector horizontalSelector))
             {

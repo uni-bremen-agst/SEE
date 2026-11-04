@@ -1,60 +1,81 @@
-﻿using System.Collections;
-using UnityEngine.TestTools;
-using UnityEditor.SceneManagement;
-using UnityEngine.SceneManagement;
+﻿using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using NUnit.Framework;
+using System.Collections;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
 using SEE.UserSettings;
 
+/// <summary>
+/// User interface components and their tests.
+/// </summary>
 namespace SEE.UI
 {
     /// <summary>
-    /// Abstract super class of all UI tests. It takes care of the setup
-    /// and tear down of all tests.
+    /// Sets up desktop input for UI tests running in Play Mode.
     /// </summary>
     internal abstract class TestUI
     {
         /// <summary>
-        /// Setup for a test.
-        /// The playmode will be entered.
-        /// The <see cref="UserSetting.InputType"/> will be <see cref="SEE.UserSettings.PlayerInputType.DesktopPlayer"/>.
-        ///
-        /// Note: Subclasses may have their own method tagged by UnitySetUp,
-        /// which will then be called after this method.
-        ///
+        /// The settings used by the current test.
         /// </summary>
-        /// <returns><see cref="EnterPlayMode"/></returns>
-        /// <remarks>Called before each test. See
-        /// https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-unitysetup-and-unityteardown.html
-        ///
-        /// Method must be public. Otherwise it will not be called by the test framework.
-        /// </remarks>
+        private UserSetting userSetting;
+
+        /// <summary>
+        /// The input type restored after a test using existing settings.
+        /// </summary>
+        private PlayerInputType previousInputType;
+
+        /// <summary>
+        /// The settings object created when the test scene has no settings.
+        /// </summary>
+        private GameObject createdSettings;
+
+        /// <summary>
+        /// The log-checking setting restored after the test.
+        /// </summary>
+        private bool previousIgnoreFailingMessages;
+
+        /// <summary>
+        /// Sets up desktop input in the Play Mode already entered by the test runner.
+        /// </summary>
+        /// <returns>An enumerator that waits one frame for UI initialization.</returns>
         [UnitySetUp]
         public IEnumerator SetUp()
         {
+            previousIgnoreFailingMessages = LogAssert.ignoreFailingMessages;
             LogAssert.ignoreFailingMessages = true;
-            UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
-            yield return new EnterPlayMode();
+            userSetting = Object.FindAnyObjectByType<UserSetting>();
+            if (userSetting == null)
+            {
+                createdSettings = new("UI test settings");
+                userSetting = createdSettings.AddComponent<UserSetting>();
+                userSetting.enabled = false;
+            }
+            previousInputType = userSetting.InputType;
+            userSetting.InputType = PlayerInputType.DesktopPlayer;
+            yield return null;
         }
 
         /// <summary>
-        /// Tear down after a test.
-        /// The playmode will be left.
-        ///
-        /// Note: Subclasses may have their own method tagged by UnityTearDown,
-        /// which will then be called before this method.
+        /// Restores settings and removes objects created by the test setup.
         /// </summary>
-        /// <returns><see cref="ExitPlayMode"/></returns>
-        /// <remarks>Called before each test. See
-        /// https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-unitysetup-and-unityteardown.html
-        ///
-        /// Method must be public. Otherwise it will not be called by the test framework.
-        /// </remarks>
+        /// <returns>An enumerator that waits one frame for object destruction.</returns>
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            yield return new ExitPlayMode();
+            if (createdSettings != null)
+            {
+                Object.Destroy(createdSettings);
+                createdSettings = null;
+            }
+            else if (userSetting != null)
+            {
+                userSetting.InputType = previousInputType;
+            }
+            yield return null;
+            LogAssert.ignoreFailingMessages = previousIgnoreFailingMessages;
         }
 
         /// <summary>
@@ -66,11 +87,11 @@ namespace SEE.UI
             /// <summary>
             /// Folder containing the test scene.
             /// </summary>
-            private const string SceneFolder = "Assets/Scenes/";
+            private const string sceneFolder = "Assets/Scenes/";
             /// <summary>
             /// Unity's file extension for scene files.
             /// </summary>
-            private const string SceneFileExtension = ".unity";
+            private const string sceneFileExtension = ".unity";
             /// <summary>
             /// The name of the scene given by the constructor.
             /// </summary>
@@ -79,31 +100,31 @@ namespace SEE.UI
             /// <summary>
             /// Makes sure that the given <paramref name="scene"/> is loaded before
             /// the test is run. The actual scene is loaded from the path
-            /// <see cref="SceneFolder"/> + <paramref name="scene"/> + <see cref="SceneFileExtension"/>.
+            /// <see cref="sceneFolder"/> + <paramref name="scene"/> + <see cref="sceneFileExtension"/>.
             ///
             /// Assumptions: <paramref name="scene"/> is contained in folder
-            /// <see cref="SceneFolder"/> and does not have the <see cref="SceneFileExtension"/>
+            /// <see cref="sceneFolder"/> and does not have the <see cref="sceneFileExtension"/>
             /// (that extension will be added automatically).
             /// </summary>
-            /// <param name="scene">name of the test scene to be loaded</param>
-            public LoadSceneAttribute(string scene = "Empty") => this.scene = SceneFolder + scene + SceneFileExtension;
+            /// <param name="scene">Name of the test scene to be loaded.</param>
+            public LoadSceneAttribute(string scene = "Empty") => this.scene = sceneFolder + scene + sceneFileExtension;
 
             /// <summary>
             /// Run before the <paramref name="test"/> to load the scene.
             /// </summary>
-            /// <param name="test">test to be run</param>
+            /// <param name="test">Test to be run.</param>
             /// <returns>An <see cref="AsyncOperation"/> determining whether the
-            /// scene was loaded</returns>
+            /// scene was loaded.</returns>
             IEnumerator IOuterUnityTestAction.BeforeTest(ITest test)
             {
                 yield return EditorSceneManager.LoadSceneAsyncInPlayMode(scene, new LoadSceneParameters(LoadSceneMode.Single));
             }
 
             /// <summary>
-            /// Run before the <paramref name="test"/>. Does not do anything.
+            /// Waits one frame after the <paramref name="test"/>.
             /// </summary>
-            /// <param name="test">test to be run</param>
-            /// <returns>alway <c>null</c></returns>
+            /// <param name="test">Test to be run.</param>
+            /// <returns>An enumerator that waits one frame.</returns>
             IEnumerator IOuterUnityTestAction.AfterTest(ITest test)
             {
                 yield return null;

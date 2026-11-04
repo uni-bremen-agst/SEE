@@ -1,11 +1,6 @@
-﻿using Michsky.MUIP;
-using SEE.Controls.ReversibleActions.Drawable;
-using Cysharp.Threading.Tasks;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
+﻿using Cysharp.Threading.Tasks;
+using Michsky.MUIP;
+using Random = UnityEngine.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +9,16 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
-using Random = UnityEngine.Random;
+using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -334,6 +337,7 @@ namespace SEE.UI.Menu.Drawable
                 AssignLineKind(GetLineKinds()[index]);
             });
             lineKindSelector.defaultIndex = 0;
+            lineKindSelector.SetupSelector();
         }
 
         /// <summary>
@@ -378,6 +382,7 @@ namespace SEE.UI.Menu.Drawable
 
             /// Sets the default selected item
             colorKindSelector.defaultIndex = 0;
+            colorKindSelector.SetupSelector();
         }
 
         /// <summary>
@@ -394,6 +399,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             segmentSelector.defaultIndex = 0;
+            segmentSelector.SetupSelector();
         }
 
         /// <summary>
@@ -410,6 +416,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             lineCapSelector.defaultIndex = 0;
+            lineCapSelector.SetupSelector();
         }
         #endregion
         #region IsOpen

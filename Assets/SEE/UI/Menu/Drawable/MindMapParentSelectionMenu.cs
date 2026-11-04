@@ -1,16 +1,19 @@
 ﻿using Michsky.MUIP;
-using SEE.Game;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Extensions;
-using SEE.Net.Actions.Drawable;
-using SEE.UI.Notification;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.Extensions;
+using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -97,6 +100,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             parentSelector.defaultIndex = 0;
+            parentSelector.SetupSelector();
 
             /// The parent selection can be completed through the Finish button.
             ButtonManager finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>();
@@ -210,6 +214,7 @@ namespace SEE.UI.Menu.Drawable
                     ChangeParent(addedNode, newConf, surface);
                 });
                 parentSelector.defaultIndex = index;
+                parentSelector.SetupSelector();
 
                 /// For the <paramref name="cutCopyMode"/>, provide a Finish Button.
                 /// Disable it for all others.
