@@ -8,7 +8,7 @@ using SEE.Controls.ReversibleActions.Tables;
 namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
-    /// Provides all available <see cref="AbstractActionStateType"/>s.
+    /// Provided all available <see cref="AbstractActionStateType"/>s.
     /// </summary>
     /// <remarks>These are used for <see cref="SEE.UI.PlayerMenu"/>.</remarks>
     public static class ActionStateTypes
@@ -22,7 +22,7 @@ namespace SEE.Controls.ReversibleActions
             = new();
 
         /// <summary>
-        /// Adds <paramref name="actionStateType"/> to the list of all action state
+        /// Added <paramref name="actionStateType"/> to the list of all action state
         /// types <see cref="AllRootTypes"/>.
         /// </summary>
         /// <param name="actionStateType">To be added.</param>
@@ -39,7 +39,7 @@ namespace SEE.Controls.ReversibleActions
         }
 
         /// <summary>
-        /// Returns the default <see cref="ActionStateType"/> at top level (root)
+        /// Returned the default <see cref="ActionStateType"/> at top level (root)
         /// of <see cref="AllRootTypes"/>, i.e. one that does not have a parent.
         /// This is the one that should be executed initially if the user has not
         /// made any menu selections yet.
@@ -76,6 +76,11 @@ namespace SEE.Controls.ReversibleActions
               new("Hide", "Hides nodes or edges",
                   Color.yellow.Darker(), Icons.EyeSlash,
                   HideAction.CreateReversibleAction);
+
+            Mark =
+              new("Mark", "Mark or unmark a node with a sphere",
+                  Color.yellow.Darker(), Icons.EmptyRadio,
+                  MarkAction.CreateReversibleAction);
 
             NewEdge =
               new("New Edge", "Draw a new edge between two nodes",
@@ -173,7 +178,7 @@ namespace SEE.Controls.ReversibleActions
             DrawFreehand =
                 new("Draw Freehand", "Draws a line on a drawable.",
                     Color.magenta.Darker(), Icons.Brush,
-            DrawFreehandAction.CreateReversibleAction,
+                    DrawFreehandAction.CreateReversibleAction,
                     parent: Drawable);
 
             DrawShapes =
@@ -310,6 +315,7 @@ namespace SEE.Controls.ReversibleActions
 
         public static readonly ActionStateType Move;
         public static readonly ActionStateType Hide;
+        public static readonly ActionStateType Mark;
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
