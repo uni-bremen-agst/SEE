@@ -15,6 +15,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal sealed class ExceptionFlowFiniteOrbitAdmission : IExceptionFlowSummaryTargetSink
     {
         private readonly ExceptionFlowSemanticEnvironment environment;
+        private readonly Action<ExceptionFlowProgressEvent>? progress;
         private readonly Dictionary<string, ISymbol> declarations = new(StringComparer.Ordinal);
         private readonly Queue<string> pendingDefinitions = new();
         private readonly Dictionary<string, List<Term>> templates = new(StringComparer.Ordinal);
@@ -35,8 +36,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private IEnumerable<Compilation>? metadataCallerModels;
 
         private ExceptionFlowFiniteOrbitAdmission(ExceptionFlowSemanticEnvironment environment)
+            : this(environment, null)
+        {
+        }
+
+        private ExceptionFlowFiniteOrbitAdmission(ExceptionFlowSemanticEnvironment environment, Action<ExceptionFlowProgressEvent>? progress)
         {
             this.environment = environment;
+            this.progress = progress;
             environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory);
         }
 
@@ -79,6 +86,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 templates.Add(id, []);
                 pendingDefinitions.Enqueue(id);
+                ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.DefinitionDiscovered, symbol: definition);
             }
             else if (!SymbolEqualityComparer.Default.Equals(declarations[id], definition))
             {
@@ -227,9 +235,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="environment">The existing validated semantic environment.</param>
         /// <returns>The sealed inventory and classified outcome.</returns>
         internal static ExceptionFlowFiniteOrbitAdmission Discover(
-            MemberDeclarationSyntax member, ExceptionFlowSemanticEnvironment environment, FactStore? facts = null)
+            MemberDeclarationSyntax member, ExceptionFlowSemanticEnvironment environment, FactStore? facts = null,
+            Action<ExceptionFlowProgressEvent>? progress = null)
         {
-            ExceptionFlowFiniteOrbitAdmission admission = new(environment);
+            ExceptionFlowFiniteOrbitAdmission admission = new(environment, progress);
             var world = facts?.Begin(environment);
             List<(ISymbol Definition, LocalFact Fact)> staged = [];
             List<(Compilation Compilation, ISymbol Definition)> stagedMetadataNoBody = [];
@@ -250,6 +259,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     admission.currentDefinition = body;
                     ISymbol definition = admission.declarations[body];
+                    ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.DefinitionStarted, symbol: definition);
                     admission.metadataCallerCompilation = null;
                     if (world != null)
                     {
@@ -292,9 +302,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         admission.recording = null;
                     }
                     admission.metadataCallerModels = null;
+                    ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.DefinitionProcessed, symbol: definition);
                 }
             }
             admission.currentDefinition = null;
+            ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.AdmissionSealing);
             admission.metadataCallerCompilation = null;
             Body[] bodies = admission.declarations.Select(pair => new Body(pair.Key,
                 ExceptionFlowInvocationSubstitution.Bindings(pair.Value).Select(binding => ExceptionFlowInvocationSubstitution.Binder(binding.Formal)).ToArray(),

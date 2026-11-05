@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Globalization;
 using XMLDocNormalizer.Cli;
+using XMLDocNormalizer.Cli.Output;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
@@ -36,6 +37,16 @@ namespace XMLDocNormalizer.Execution
         /// Thrown when an expected analysis report produced by a child process cannot be found.
         /// </exception>
         public static ExceptionAnalysisModeComparisonReportDto Run(ToolOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+            using RunProgress? progress = RunProgress.Create(options);
+            RunProgress? previous = ConsoleLogger.CurrentProgress;
+            ConsoleLogger.CurrentProgress = progress;
+            try { var result = RunCore(options); progress?.Finish(); return result; }
+            finally { ConsoleLogger.CurrentProgress = previous; }
+        }
+
+        private static ExceptionAnalysisModeComparisonReportDto RunCore(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
 
@@ -99,6 +110,7 @@ namespace XMLDocNormalizer.Execution
             };
 
             string comparisonOutputPath = ResolveComparisonOutputPath(options);
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Output);
             ExceptionAnalysisModeComparisonReportWriter.Write(comparisonOutputPath, comparisonReport);
 
             PrintComparisonSummary(comparisonReport, comparisonOutputPath);
@@ -159,10 +171,10 @@ namespace XMLDocNormalizer.Execution
             IReadOnlyList<ExceptionAnalysisMode> modes = GetComparisonModes();
             string modeOrderStrategy = GetModeOrderStrategy(comparisonRunCount);
 
-            Console.WriteLine("Project/solution detected. Running comparison with isolated child processes.");
-            Console.WriteLine($"Warmup runs per mode: {warmupRunCount}");
-            Console.WriteLine($"Measured runs per mode: {comparisonRunCount}");
-            Console.WriteLine($"Mode order strategy: {modeOrderStrategy}");
+            ConsoleLogger.Info("Project/solution detected. Running comparison with isolated child processes.");
+            ConsoleLogger.Info($"Warmup runs per mode: {warmupRunCount}");
+            ConsoleLogger.Info($"Measured runs per mode: {comparisonRunCount}");
+            ConsoleLogger.Info($"Mode order strategy: {modeOrderStrategy}");
 
             ExecuteWarmupRuns(
                 options,
@@ -183,7 +195,7 @@ namespace XMLDocNormalizer.Execution
                         runNumber,
                         comparisonRunCount);
 
-                    Console.WriteLine($"Running measured isolated mode: {mode} (run {runNumber}/{comparisonRunCount})");
+                    ConsoleLogger.Info($"Running measured isolated mode: {mode} (run {runNumber}/{comparisonRunCount})");
 
                     IsolatedModeExecutionResult result = ExecuteIsolatedModeRun(
                         options,
@@ -235,7 +247,7 @@ namespace XMLDocNormalizer.Execution
                         mode,
                         warmupRunNumber);
 
-                    Console.WriteLine($"Running warmup isolated mode: {mode} (warmup {warmupRunNumber}/{warmupRunCount})");
+                    ConsoleLogger.Info($"Running warmup isolated mode: {mode} (warmup {warmupRunNumber}/{warmupRunCount})");
 
                     ExecuteIsolatedModeRun(
                         options,
@@ -270,6 +282,8 @@ namespace XMLDocNormalizer.Execution
             string reportPath,
             int runNumber)
         {
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Isolated);
+            ConsoleLogger.CurrentProgress?.Activity($"{mode}, run {runNumber}");
             ProcessStartInfo startInfo = CreateModeProcessStartInfo(
                 options,
                 mode,
@@ -1258,26 +1272,26 @@ namespace XMLDocNormalizer.Execution
             ExceptionAnalysisModeComparisonReportDto report,
             string outputPath)
         {
-            Console.WriteLine();
-            Console.WriteLine("Exception analysis mode comparison");
-            Console.WriteLine("----------------------------------");
-            Console.WriteLine("Execution");
-            Console.WriteLine($"  Isolation:                {report.Timings.ExecutionIsolation}");
-            Console.WriteLine($"  Includes process startup: {report.Timings.IncludesProcessStartup}");
-            Console.WriteLine($"  Warmup runs per mode:     {report.Timings.WarmupRunCount}");
-            Console.WriteLine($"  Measured runs per mode:   {report.Timings.RunCount}");
-            Console.WriteLine($"  Mode order strategy:      {report.Timings.ModeOrderStrategy}");
-            Console.WriteLine($"  Timing basis:             Median of measured runs");
-            Console.WriteLine($"  Warmup handling:          Excluded from timing statistics");
+            ConsoleLogger.Info(string.Empty);
+            ConsoleLogger.Info("Exception analysis mode comparison");
+            ConsoleLogger.Info("----------------------------------");
+            ConsoleLogger.Info("Execution");
+            ConsoleLogger.Info($"  Isolation:                {report.Timings.ExecutionIsolation}");
+            ConsoleLogger.Info($"  Includes process startup: {report.Timings.IncludesProcessStartup}");
+            ConsoleLogger.Info($"  Warmup runs per mode:     {report.Timings.WarmupRunCount}");
+            ConsoleLogger.Info($"  Measured runs per mode:   {report.Timings.RunCount}");
+            ConsoleLogger.Info($"  Mode order strategy:      {report.Timings.ModeOrderStrategy}");
+            ConsoleLogger.Info($"  Timing basis:             Median of measured runs");
+            ConsoleLogger.Info($"  Warmup handling:          Excluded from timing statistics");
 
-            Console.WriteLine();
+            ConsoleLogger.Info(string.Empty);
             PrintFindingSummary(report.Modes);
 
-            Console.WriteLine();
+            ConsoleLogger.Info(string.Empty);
             PrintTimingSummary(report.Modes);
 
-            Console.WriteLine();
-            Console.WriteLine($"Comparison report written to: {outputPath}");
+            ConsoleLogger.Info(string.Empty);
+            ConsoleLogger.Info($"Comparison report written to: {outputPath}");
         }
 
         /// <summary>
@@ -1286,9 +1300,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="modeRuns">The compared mode runs.</param>
         private static void PrintFindingSummary(IReadOnlyList<ExceptionAnalysisModeRunDto> modeRuns)
         {
-            Console.WriteLine("Finding summary");
-            Console.WriteLine("---------------");
-            Console.WriteLine(
+            ConsoleLogger.Info("Finding summary");
+            ConsoleLogger.Info("---------------");
+            ConsoleLogger.Info(
                 $"{"Mode",-38} " +
                 $"{"Findings",8} " +
                 $"{"KLOC",8} " +
@@ -1300,7 +1314,7 @@ namespace XMLDocNormalizer.Execution
                 $"{"632",5} " +
                 $"{"Stable",8}");
 
-            Console.WriteLine(
+            ConsoleLogger.Info(
                 $"{new string('-', 38),-38} " +
                 $"{new string('-', 8),8} " +
                 $"{new string('-', 8),8} " +
@@ -1314,7 +1328,7 @@ namespace XMLDocNormalizer.Execution
 
             foreach (ExceptionAnalysisModeRunDto modeRun in modeRuns)
             {
-                Console.WriteLine(
+                ConsoleLogger.Info(
                     $"{modeRun.Mode,-38} " +
                     $"{modeRun.FindingCount,8} " +
                     $"{modeRun.FindingsPerKSloc,8:F2} " +
@@ -1334,9 +1348,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="modeRuns">The compared mode runs.</param>
         private static void PrintTimingSummary(IReadOnlyList<ExceptionAnalysisModeRunDto> modeRuns)
         {
-            Console.WriteLine("Timing summary");
-            Console.WriteLine("--------------");
-            Console.WriteLine(
+            ConsoleLogger.Info("Timing summary");
+            ConsoleLogger.Info("--------------");
+            ConsoleLogger.Info(
                 $"{"Mode",-38} " +
                 $"{"WallMed",8} " +
                 $"{"WallMean",9} " +
@@ -1347,7 +1361,7 @@ namespace XMLDocNormalizer.Execution
                 $"{"AnaMean",9} " +
                 $"{"AnaStd",8}");
 
-            Console.WriteLine(
+            ConsoleLogger.Info(
                 $"{new string('-', 38),-38} " +
                 $"{new string('-', 8),8} " +
                 $"{new string('-', 9),9} " +
@@ -1360,7 +1374,7 @@ namespace XMLDocNormalizer.Execution
 
             foreach (ExceptionAnalysisModeRunDto modeRun in modeRuns)
             {
-                Console.WriteLine(
+                ConsoleLogger.Info(
                     $"{modeRun.Mode,-38} " +
                     $"{FormatMilliseconds(modeRun.MedianWallClockDurationMs),8} " +
                     $"{FormatMilliseconds(modeRun.MeanWallClockDurationMs),9} " +
@@ -1372,12 +1386,12 @@ namespace XMLDocNormalizer.Execution
                     $"{FormatMilliseconds(modeRun.StandardDeviationReportedAnalysisDurationMs),8}");
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Legend:");
-            Console.WriteLine("  Wall* = wall-clock child process duration in milliseconds");
-            Console.WriteLine("  Ana*  = reported analysis duration in milliseconds");
-            Console.WriteLine("  Med   = median");
-            Console.WriteLine("  Std   = standard deviation");
+            ConsoleLogger.Info(string.Empty);
+            ConsoleLogger.Info("Legend:");
+            ConsoleLogger.Info("  Wall* = wall-clock child process duration in milliseconds");
+            ConsoleLogger.Info("  Ana*  = reported analysis duration in milliseconds");
+            ConsoleLogger.Info("  Med   = median");
+            ConsoleLogger.Info("  Std   = standard deviation");
         }
 
         /// <summary>

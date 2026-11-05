@@ -56,6 +56,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         private void BuildPendingSummaryNodes(
             ExceptionFlowSummaryGraph graph)
+            => BuildPendingSummaryNodesWithProgress(graph, null);
+
+        private static void ReportDiscoveredContexts(ExceptionFlowSummaryGraph graph, int before,
+            Action<ExceptionFlowProgressEvent>? progress)
+        {
+            if (progress is not null && graph.Count > before)
+                ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.ContextDiscovered, graph.Count - before);
+        }
+
+        private void BuildPendingSummaryNodesWithProgress(ExceptionFlowSummaryGraph graph,
+            Action<ExceptionFlowProgressEvent>? progress)
         {
             while (graph.DequeuePendingOrDefault()
                    is ExceptionFlowCallableKey key)
@@ -75,6 +86,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowSummaryFragment fragment =
                     new();
 
+                ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.ContextStarted, symbol: key.Symbol);
+
                 graph.BuildingKey = key;
                 graph.BuildingContext = callContext;
                 graph.BuildingCompilation = semanticContext.GetAnalysisScopes()
@@ -82,13 +95,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         Microsoft.CodeAnalysis.SymbolEqualityComparer.Default.Equals(compilation.Assembly, key.Symbol.ContainingAssembly)
                         || key.Symbol.DeclaringSyntaxReferences.Any(reference => compilation.ContainsSyntaxTree(reference.SyntaxTree)));
 
-                bool analyzedAnyBody =
-                    ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(
+                int registeredBefore = progress is null ? 0 : graph.Count;
+                bool analyzedAnyBody;
+                try
+                {
+                    analyzedAnyBody = ExceptionFlowAnalyzer.AnalyzeSummarySymbolDeclarations(
                         key.Symbol,
                         semanticContext,
                         graph,
                         fragment,
                         callContext);
+                }
+                finally { ReportDiscoveredContexts(graph, registeredBefore, progress); }
 
                 if (analyzedAnyBody)
                 {
@@ -97,6 +115,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 summary.Merge(
                     fragment);
+
+                ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.ContextProcessed, symbol: key.Symbol);
 
                 graph.BuildingKey = null;
                 graph.BuildingContext = null;

@@ -17,7 +17,11 @@ namespace XMLDocNormalizer.Execution.Analysis
 
     /// <summary>Main-local Current input; its existing sequential session and Roslyn objects never enter IPC.</summary>
     internal sealed record CurrentExceptionFlowAnalysisInput(
-        MemberDeclarationSyntax Member, ExceptionFlowSummaryAnalysisSession Session);
+        MemberDeclarationSyntax Member, ExceptionFlowSummaryAnalysisSession Session)
+    {
+        /// <summary>Native query-local diagnostic sink; never retained by the session or sent over IPC.</summary>
+        internal Action<ExceptionFlowProgressEvent>? Progress { get; init; }
+    }
 
     /// <summary>Main-local route request, not a process DTO; exactly one selected branch input is required.</summary>
     internal sealed record ExceptionFlowAnalysisRoutingRequest(

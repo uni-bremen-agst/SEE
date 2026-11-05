@@ -71,14 +71,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         internal ExceptionFlowAnalysisResult Analyze(
             MemberDeclarationSyntax member)
+            => AnalyzeWithProgress(member, null);
+
+        /// <summary>Observes only this query; the session retains no observer reference.</summary>
+        internal ExceptionFlowAnalysisResult AnalyzeWithProgress(
+            MemberDeclarationSyntax member, Action<ExceptionFlowProgressEvent>? progress)
         {
-            ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext, admissionFacts);
+            ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.Admission);
+            ExceptionFlowFiniteOrbitAdmission admission = ExceptionFlowFiniteOrbitAdmission.Discover(member, semanticContext, admissionFacts, progress);
             if (!admission.Outcome.Complete) return Outside(admission.Outcome, admission.DiagnoseGroundFacts(),
                 admission.DiagnoseBoundedLowerWitnesses());
             bool completed = false;
             try
             {
             graph.BeginProduction(admission.Seal, semanticContext);
+            ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.Graph);
+            int registeredBefore = progress is null ? 0 : graph.Count;
             if (!semanticContext.TryGetSemanticModel(
                     member.SyntaxTree,
                     out SemanticModel rootSemanticModel) ||
@@ -92,9 +100,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return Outside(WithReason(admission.Outcome, new("OwnerBindingFailure", "Admitted root could not be registered.")));
             }
 
-            BuildPendingSummaryNodes(
-                graph);
+            ReportDiscoveredContexts(graph, registeredBefore, progress);
+            BuildPendingSummaryNodesWithProgress(graph, progress);
 
+            ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.Evaluation, symbol: rootKey.Symbol);
             ExceptionFlowAnalysisResult result = evaluator.Evaluate(
                 graph,
                 rootKey,
@@ -153,6 +162,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 };
             }
             return result;
+        }
+    }
+
+    internal enum ExceptionFlowProgressKind
+    {
+        RootStarted, RootCompleted, RootFailed, Admission, AdmissionSealing,
+        DefinitionDiscovered, DefinitionStarted, DefinitionProcessed, Graph, ContextDiscovered, ContextStarted, ContextProcessed, Evaluation
+    }
+
+    /// <summary>Diagnostic notifications only; no profile, cache, path or protocol fields.</summary>
+    internal readonly record struct ExceptionFlowProgressEvent(ExceptionFlowProgressKind Kind, int Count = 1,
+        ISymbol? Symbol = null, MemberDeclarationSyntax? Member = null)
+    {
+        internal static void Send(Action<ExceptionFlowProgressEvent>? observer, ExceptionFlowProgressKind kind,
+            int count = 1, ISymbol? symbol = null, MemberDeclarationSyntax? member = null)
+        {
+            if (observer is null) return;
+            // A diagnostic consumer cannot turn an analyzer outcome into a technical failure.
+            try { observer(new(kind, count, symbol, member)); } catch (System.Exception) { }
         }
     }
 }

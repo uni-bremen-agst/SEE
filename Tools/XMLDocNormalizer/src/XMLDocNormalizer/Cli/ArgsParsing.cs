@@ -18,6 +18,7 @@ namespace XMLDocNormalizer.Cli
                 "--external-target",
                 "--format",
                 "--output",
+                "--progress",
                 "--exception-analysis-mode",
                 "--exception-analysis-comparison-runs",
                 "--exception-analysis-comparison-warmup-runs",
@@ -59,6 +60,18 @@ namespace XMLDocNormalizer.Cli
             bool cleanBackups = HasFlag(args, "--clean-backups");
             bool useTest = HasFlag(args, "--test");
             bool verbose = HasFlag(args, "--verbose") || HasFlag(args, "-v");
+            Output.ProgressMode progressMode = Output.ProgressMode.Auto;
+            if (HasFlag(args, "--progress"))
+            {
+                string? progressValue = GetOptionValue(args, "--progress");
+                if (args.Count(a => a.Equals("--progress", StringComparison.OrdinalIgnoreCase)) != 1
+                    || progressValue is null || !Enum.TryParse(progressValue, true, out progressMode)
+                    || !new[] { "auto", "on", "off" }.Contains(progressValue, StringComparer.OrdinalIgnoreCase))
+                {
+                    PrintUsage("Option --progress requires auto, on or off.");
+                    return false;
+                }
+            }
             bool fullAnalysis = HasFlag(args, "--full");
             bool includeGenerated = HasFlag(args, "--include-generated");
             bool includeTests = HasFlag(args, "--include-tests");
@@ -187,7 +200,8 @@ namespace XMLDocNormalizer.Cli
                 enableStatistics: enableStatistics,
                 statisticsOutputPath: statisticsOutputPath,
                 externalTarget: externalTarget,
-                externalTargetModeExplicit: externalTarget && HasFlag(args, "--exception-analysis-mode"));
+                externalTargetModeExplicit: externalTarget && HasFlag(args, "--exception-analysis-mode"),
+                progress: progressMode);
 
             return true;
         }
@@ -196,7 +210,7 @@ namespace XMLDocNormalizer.Cli
         {
             if (!HasFlag(args, "--check") || args.Count(arg => arg == "--external-target") != 1) { return false; }
             HashSet<string> flags = new(StringComparer.Ordinal) { "--check", "--verbose", "-v" };
-            HashSet<string> values = new(StringComparer.Ordinal) { "--external-target", "--format", "--output", "--exception-analysis-mode" };
+            HashSet<string> values = new(StringComparer.Ordinal) { "--external-target", "--format", "--output", "--exception-analysis-mode", "--progress" };
             HashSet<string> seen = new(StringComparer.Ordinal);
             for (int index = 0; index < args.Length; index++)
             {
@@ -660,6 +674,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --test                Use test mode (creates backups).");
             Console.WriteLine("  --clean-backups       Remove any backup files after run.");
             Console.WriteLine("  --verbose, -v         Enable verbose logging.");
+            Console.WriteLine("  --progress <mode>     Terminal progress on stderr: auto (default), on or off. Independent of --verbose.");
             Console.WriteLine("  --format <console|json|sarif>  Output format.");
             Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
             Console.WriteLine("  --exception-analysis-mode <mode>");

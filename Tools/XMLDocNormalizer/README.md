@@ -103,6 +103,41 @@ For a solution input:
 Generated files and test files are excluded by default. Use `--include-generated` and
 `--include-tests` to include them.
 
+## Terminal progress
+
+Use `--progress auto|on|off` independently of `--verbose`:
+
+```powershell
+dotnet run --project src/XMLDocNormalizer -- --check --progress on --exception-analysis-mode solution-transitive MySolution.sln
+```
+
+`auto` (the default) enables progress only when stdin, stdout and stderr are interactive,
+the terminal is suitable, and no CI environment is detected. `on` enables it explicitly;
+redirected stderr receives only phase starts and final summaries. `off` creates no display,
+timer or progress observer. Progress always uses stderr; existing console reports and
+JSON/SARIF report files retain their output contracts. No ANSI sequences or colors are required.
+
+The display follows actual loading, compilation preparation, documentation checks,
+exception-flow work, aggregation and output. Documentation and exception analysis remain
+interleaved per file in their existing execution order, with separate accumulated phase times.
+The documentation bar counts eligible files after their regular detectors finish, not detector
+invocations. Unavailable compilations or syntax trees leave those files unfinished.
+
+Exception analysis in all four modes reports roots started/completed. Transitive sessions also
+report dynamically discovered context nodes and processed context workitems. These are activity
+counts, not a fixed final total or a completion certificate. There is no context percentage or ETA.
+An active root still shows elapsed time and time since the last observed activity when its counts
+do not change. The display refresh is limited to twice per second; refreshes never advance counters.
+Direct mode does not construct summary contexts. Explicit `Incomplete` coverage remains separate
+from technical failure in the final status.
+
+`--verbose` alternates the compact row with the active detector/member and available admission
+work counters. It uses existing work notifications, not an additional analysis. Historical/external
+worker calls and isolated mode-comparison children expose a coarse process phase only; their wire
+protocol carries no new progress telemetry. SCC counts and a stable global root total are not
+computed just for display. Ctrl+C clears the active display without changing cancellation policy;
+forced process termination cannot guarantee cleanup.
+
 ## Check and fix modes
 
 ### `--check`

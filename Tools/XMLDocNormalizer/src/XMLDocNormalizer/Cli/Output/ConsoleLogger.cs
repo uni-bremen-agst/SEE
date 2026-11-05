@@ -10,19 +10,16 @@ namespace XMLDocNormalizer.Cli.Output
     /// </remarks>
     internal static class ConsoleLogger
     {
+        internal static readonly object SyncRoot = new();
+        internal static RunProgress? CurrentProgress { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether verbose messages and progress updates are enabled.
+        /// Gets or sets a value indicating whether verbose messages are enabled.
         /// </summary>
         /// <value>
-        /// True if verbose messages and progress updates are enabled; otherwise false.
+        /// True if verbose messages are enabled; otherwise false.
         /// </value>
         public static bool VerboseEnabled { get; set; }
 
-        /// <summary>
-        /// Tracks the length of the last progress message so the current console line
-        /// can be overwritten cleanly.
-        /// </summary>
-        private static int lastProgressLength = 0;
 
         /// <summary>
         /// Writes an informational message that is always shown.
@@ -30,8 +27,7 @@ namespace XMLDocNormalizer.Cli.Output
         /// <param name="message">The message to write.</param>
         public static void Info(string message)
         {
-            EndProgress();
-            Console.WriteLine(message);
+            WithProgressPaused(() => Console.WriteLine(message));
         }
 
         /// <summary>
@@ -72,30 +68,32 @@ namespace XMLDocNormalizer.Cli.Output
         /// </summary>
         /// <param name="message">The progress message to display.</param>
         /// <remarks>
-        /// Progress output is only shown in verbose mode and only when output is not redirected.
+        /// Updates the active run's stderr display; selection is independent of verbose logging.
         /// </remarks>
         public static void InfoProgress(string message)
         {
-            if (!VerboseEnabled || Console.IsOutputRedirected)
-            {
-                return;
-            }
-
-            int clearLength = Math.Max(lastProgressLength - message.Length, 0);
-            Console.Write("\r" + message + new string(' ', clearLength));
-            lastProgressLength = message.Length;
+            CurrentProgress?.Activity(message);
         }
 
         /// <summary>
-        /// Completes the current progress line by moving the cursor to the next line.
+        /// Clears the current progress line before other console output.
         /// </summary>
         public static void EndProgress()
         {
-            if (lastProgressLength > 0)
-            {
-                Console.WriteLine();
-                lastProgressLength = 0;
-            }
+            CurrentProgress?.ClearLine();
+        }
+
+        internal static void DrawProgress(TextWriter writer, string message, ref int lastLength)
+        {
+            int clearLength = Math.Max(lastLength - message.Length, 0);
+            writer.Write("\r" + message + new string(' ', clearLength));
+            lastLength = message.Length;
+        }
+
+        internal static void WithProgressPaused(Action output)
+        {
+            if (CurrentProgress is null) { output(); return; }
+            lock (SyncRoot) { EndProgress(); output(); }
         }
 
         /// <summary>
@@ -105,7 +103,11 @@ namespace XMLDocNormalizer.Cli.Output
         /// <param name="color">The color to use.</param>
         private static void WriteColoredLine(string message, ConsoleColor color)
         {
-            EndProgress();
+            WithProgressPaused(() => WriteColoredLineCore(message, color));
+        }
+
+        private static void WriteColoredLineCore(string message, ConsoleColor color)
+        {
 
             if (Console.IsOutputRedirected)
             {

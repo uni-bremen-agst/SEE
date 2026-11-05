@@ -18,6 +18,7 @@ namespace XMLDocNormalizer.Cli
     /// <param name="outputFormat">The output format for reporting findings.</param>
     /// <param name="outputPath">The output file path for machine-readable formats.</param>
     /// <param name="verbose">True to enable verbose logging.</param>
+    /// <param name="progress">Independent terminal progress policy.</param>
     /// <param name="fullAnalysis">True to analyze the entire solution when a .sln file is provided.</param>
     /// <param name="projectName">
     /// The optional project name to analyze when a solution file is provided.
@@ -65,8 +66,11 @@ namespace XMLDocNormalizer.Cli
         bool enableStatistics = false,
         string? statisticsOutputPath = null,
         bool externalTarget = false,
-        bool externalTargetModeExplicit = false)
+        bool externalTargetModeExplicit = false,
+        Output.ProgressMode progress = Output.ProgressMode.Auto)
     {
+        /// <summary>Gets the independent terminal progress policy.</summary>
+        public Output.ProgressMode Progress { get; } = progress;
         /// <summary>Gets whether TargetPath names an untrusted local external-target job.</summary>
         public bool ExternalTarget { get; } = externalTarget;
         /// <summary>Gets whether the legacy CLI mode must agree with the job's explicit mode.</summary>

@@ -173,7 +173,8 @@ namespace XMLDocNormalizer.Checks
             XmlDocOptions options,
             ExceptionFlowSummaryAnalysisSession?
                 summaryAnalysisSession,
-            AnalysisCoverage? coverage = null)
+            AnalysisCoverage? coverage = null,
+            Action<ExceptionFlowProgressEvent>? progress = null)
         {
             List<Finding> findings =
                 new();
@@ -233,6 +234,10 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
+                ExceptionFlowProgressEvent.Send(progress, ExceptionFlowProgressKind.RootStarted, member: member);
+                bool rootCompleted = false;
+                try
+                {
                 ExceptionFlowAnalysisResult directFlowResult =
                     ExceptionFlowLocalSourceAnalyzer
                         .AnalyzeDirectlyThrownExceptions(
@@ -240,14 +245,14 @@ namespace XMLDocNormalizer.Checks
                             exceptionFlowEnvironment);
 
                 ExceptionFlowAnalysisResult flowResult =
-                    AnalyzeConfiguredExceptionFlow(
+                    AnalyzeConfiguredExceptionFlowWithProgress(
                         member,
                         (CSharpCompilation)semanticModel.Compilation,
                         semanticContext,
                         exceptionFlowEnvironment,
                         options,
                         directFlowResult,
-                        summaryAnalysisSession);
+                        summaryAnalysisSession, progress);
 
                 if (coverage != null)
                 {
@@ -268,6 +273,7 @@ namespace XMLDocNormalizer.Checks
                         type => type.ToDisplayString(), options.ExceptionAnalysisMode, doc.HasInheritdoc(),
                         diagnostic?.HasEscapingUncertainty ?? true, flowResult.UncertainTargets,
                         diagnostic?.ExternalDocumentation ?? [], allowExactFindings: false);
+                    rootCompleted = true;
                     continue;
                 }
                 AddExceptionFindings<INamedTypeSymbol>(
@@ -280,6 +286,13 @@ namespace XMLDocNormalizer.Checks
                     options.ExceptionAnalysisMode, doc.HasInheritdoc(),
                     flowResult.HasUncertainPaths, flowResult.UncertainTargets,
                     flowResult.ExternalDocumentationEvidenceExceptions);
+                rootCompleted = true;
+                }
+                finally
+                {
+                    ExceptionFlowProgressEvent.Send(progress, rootCompleted
+                        ? ExceptionFlowProgressKind.RootCompleted : ExceptionFlowProgressKind.RootFailed, member: member);
+                }
             }
 
             return findings;
@@ -335,6 +348,14 @@ namespace XMLDocNormalizer.Checks
             XmlDocOptions options,
             ExceptionFlowAnalysisResult directFlowResult,
             ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession)
+            => AnalyzeConfiguredExceptionFlowWithProgress(member, compilation, semanticContext, exceptionFlowEnvironment,
+                options, directFlowResult, summaryAnalysisSession, null);
+
+        private static ExceptionFlowAnalysisResult AnalyzeConfiguredExceptionFlowWithProgress(
+            MemberDeclarationSyntax member, CSharpCompilation compilation, ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSemanticEnvironment exceptionFlowEnvironment, XmlDocOptions options,
+            ExceptionFlowAnalysisResult directFlowResult, ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession,
+            Action<ExceptionFlowProgressEvent>? progress)
         {
             if (!RequiresSummary(options.ExceptionAnalysisMode,
                 options.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
@@ -351,7 +372,7 @@ namespace XMLDocNormalizer.Checks
             ExceptionFlowAnalysisDispatchResult dispatched =
                 AnalyzeConfiguredExceptionFlowAsync(
                     new ExceptionFlowAnalysisDispatchRequest.CurrentCompilation(
-                        compilation, new(member, session)),
+                        compilation, new(member, session) { Progress = progress }),
                     analysisDispatch).GetAwaiter().GetResult();
 
             if (!dispatched.Succeeded || dispatched.Routing?.CurrentAnalysis == null)

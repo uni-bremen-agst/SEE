@@ -144,7 +144,8 @@ namespace XMLDocNormalizer.Execution
                 exceptionAnalysisComparisonRuns: baseOptions.ExceptionAnalysisComparisonRuns,
                 exceptionAnalysisComparisonWarmupRuns: baseOptions.ExceptionAnalysisComparisonWarmupRuns,
                 enableStatistics: false,
-                statisticsOutputPath: null);
+                statisticsOutputPath: null,
+                progress: baseOptions.Progress);
         }
 
         /// <summary>

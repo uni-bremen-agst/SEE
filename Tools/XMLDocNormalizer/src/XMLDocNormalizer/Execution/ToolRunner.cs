@@ -47,7 +47,22 @@ namespace XMLDocNormalizer.Execution
         /// </exception>
         public static RunResult Run(ToolOptions options)
         {
+            using RunProgress? progress = RunProgress.Create(options);
+            RunProgress? previous = ConsoleLogger.CurrentProgress;
+            ConsoleLogger.CurrentProgress = progress;
+            try
+            {
+                RunResult result = RunCore(options);
+                progress?.Finish(result.Coverage.Report());
+                return result;
+            }
+            finally { ConsoleLogger.CurrentProgress = previous; }
+        }
+
+        private static RunResult RunCore(ToolOptions options)
+        {
             ConsoleLogger.VerboseEnabled = options.Verbose;
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Loading);
             ConsoleLogger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
             if (options.ExternalTarget)
@@ -86,6 +101,7 @@ namespace XMLDocNormalizer.Execution
                 || options.XmlDocOptions.ExceptionAnalysisMode != ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
             { throw new ExternalTargetExecutionException("Only a check-only bounded external job is supported; new modes require job.analysisMode, not a legacy CLI mode override."); }
             Stopwatch stopwatch = Stopwatch.StartNew();
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.External);
             var analyzed = ExternalTargetExecution.AnalyzeAsync(options.TargetPath,
                 options.ExternalTargetModeExplicit ? options.XmlDocOptions.ExceptionAnalysisMode : null).GetAwaiter().GetResult();
             ConsoleLogger.Info("Bounded external target: selected-root exception findings only; not a full project check.");
@@ -95,7 +111,7 @@ namespace XMLDocNormalizer.Execution
             result.AccumulateFindings(analyzed.Findings);
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             foreach (var file in analyzed.Findings.GroupBy(finding => finding.FilePath))
-            { reporter.ReportFile(file.Key, file.ToArray()); }
+            { ReportFile(reporter, file.Key, file.ToArray()); }
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
@@ -129,10 +145,7 @@ namespace XMLDocNormalizer.Execution
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-            IProgress<ProjectLoadProgress> progress = new Progress<ProjectLoadProgress>(p =>
-            {
-                ConsoleLogger.InfoProgress($"[MSBuild] {p.Operation} - {p.FilePath}");
-            });
+            IProgress<ProjectLoadProgress>? progress = CreateLoadProgress();
 
             RunResult result = new();
             result.Coverage.Begin("Workspace", options.XmlDocOptions.ExceptionAnalysisMode);
@@ -149,6 +162,7 @@ namespace XMLDocNormalizer.Execution
             if (workspace.Diagnostics.Any(diagnostic => diagnostic.Kind == WorkspaceDiagnosticKind.Failure))
                 result.Coverage.Incomplete("WorkspaceLoadIncomplete");
 
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     projectsToAnalyze,
@@ -162,6 +176,8 @@ namespace XMLDocNormalizer.Execution
 
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
+            ConsoleLogger.CurrentProgress?.SetTotal(RunPhase.Documentation, projectsToAnalyze.Sum(p =>
+                p.Documents.Count(d => d.FilePath is { } path && !ToolFileFilter.ShouldExclude(path, options))));
             ConsoleLogger.InfoVerbose($"Processing {totalDocuments} document(s)...");
 
             int currentDocument = 0;
@@ -174,6 +190,7 @@ namespace XMLDocNormalizer.Execution
                 {
                     ConsoleLogger.Info($"Analyzing project: {project.Name}");
                 }
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
 
                 if (compilation == null)
@@ -188,7 +205,8 @@ namespace XMLDocNormalizer.Execution
                 foreach (Document document in project.Documents)
                 {
                     currentDocument++;
-                    ConsoleLogger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
+                    if (ConsoleLogger.CurrentProgress is null)
+                        ConsoleLogger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
                     if (filePath == null)
@@ -202,6 +220,7 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
+                    ConsoleLogger.CurrentProgress?.Begin(RunPhase.Documentation, filePath);
                     SyntaxTree? tree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
                     if (tree == null)
                     {
@@ -227,23 +246,29 @@ namespace XMLDocNormalizer.Execution
 
                     SemanticModel semanticModel = compilation.GetSemanticModel(tree);
 
+                    ConsoleLogger.CurrentProgress?.Detector(nameof(XmlDocBasicDetector));
                     List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, filePath, options.XmlDocOptions, namespaceAggregator));
 
                     // Common syntax detectors.
                     foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
                     {
+                        ConsoleLogger.CurrentProgress?.Detector(detector.Method.DeclaringType?.Name);
                         findings.AddRange(detector(tree, filePath));
                     }
 
+                    ConsoleLogger.CurrentProgress?.Detector(nameof(XmlDocValueDetector));
                     findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, filePath, options.XmlDocOptions));
 
                     // Common semantic detectors.
                     foreach (XmlDocDetectorCatalog.SemanticDetector detector in XmlDocDetectorCatalog.SemanticDetectors)
                     {
+                        ConsoleLogger.CurrentProgress?.Detector(detector.Method.DeclaringType?.Name);
                         findings.AddRange(detector(tree, filePath, semanticModel));
                     }
 
                     // Exception semantic detector requires project-closure context.
+                    ConsoleLogger.CurrentProgress?.DocumentCompleted();
+                    ConsoleLogger.CurrentProgress?.Begin(RunPhase.ExceptionFlow, filePath);
                     findings.AddRange(
                         XmlDocExceptionSemanticDetector.FindExceptionSmells(
                             tree,
@@ -252,10 +277,13 @@ namespace XMLDocNormalizer.Execution
                             semanticContext,
                             options.XmlDocOptions,
                             summaryAnalysisSession,
-                            result.Coverage));
+                            result.Coverage,
+                            ConsoleLogger.CurrentProgress?.FlowObserver));
 
+                    ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
                     result.AccumulateFindings(findings);
-                    reporter.ReportFile(filePath, findings);
+                    ConsoleLogger.CurrentProgress?.Findings(result.FindingCount);
+                    ReportFile(reporter, filePath, findings);
                 }
 
                 FlushNamespaceFindings(namespaceAggregator, result, reporter);
@@ -284,7 +312,7 @@ namespace XMLDocNormalizer.Execution
             string path,
             ToolOptions options,
             MSBuildWorkspace workspace,
-            IProgress<ProjectLoadProgress> progress)
+            IProgress<ProjectLoadProgress>? progress)
         {
             List<Project> projectsToAnalyze = new();
 
@@ -362,6 +390,15 @@ namespace XMLDocNormalizer.Execution
         /// </exception>
         internal static ExceptionComparisonExecutionResult RunComparison(ToolOptions options)
         {
+            using RunProgress? progress = RunProgress.Create(options);
+            RunProgress? previous = ConsoleLogger.CurrentProgress;
+            ConsoleLogger.CurrentProgress = progress;
+            try { var result = RunComparisonCore(options); progress?.Finish(); return result; }
+            finally { ConsoleLogger.CurrentProgress = previous; }
+        }
+
+        private static ExceptionComparisonExecutionResult RunComparisonCore(ToolOptions options)
+        {
             ConsoleLogger.VerboseEnabled = options.Verbose;
             ConsoleLogger.Info($"Running XMLDocNormalizer comparison with target: {options.TargetPath}");
 
@@ -404,13 +441,11 @@ namespace XMLDocNormalizer.Execution
             }
 
             ConsoleLogger.Info("Project/solution detected. Running comparison with semantic analysis.");
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Loading);
             Stopwatch totalStopwatch = Stopwatch.StartNew();
 
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-            IProgress<ProjectLoadProgress> progress = new Progress<ProjectLoadProgress>(p =>
-            {
-                ConsoleLogger.InfoProgress($"[MSBuild] {p.Operation} - {p.FilePath}");
-            });
+            IProgress<ProjectLoadProgress>? progress = CreateLoadProgress();
 
             List<Project> projectsToAnalyze = LoadProjectsToAnalyze(path, options, workspace, progress);
 
@@ -465,6 +500,9 @@ namespace XMLDocNormalizer.Execution
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
             int currentDocument = 0;
 
+            ConsoleLogger.CurrentProgress?.SetTotal(RunPhase.Documentation, projectsToAnalyze.Sum(p =>
+                p.Documents.Count(d => d.FilePath is { } path && !ToolFileFilter.ShouldExclude(path, options))));
+
             foreach (Project project in projectsToAnalyze)
             {
                 NamespaceDocumentationAggregator namespaceAggregator =
@@ -475,6 +513,7 @@ namespace XMLDocNormalizer.Execution
                     ConsoleLogger.Info($"Preparing baseline for project: {project.Name}");
                 }
 
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
                 if (compilation == null)
                 {
@@ -488,7 +527,8 @@ namespace XMLDocNormalizer.Execution
                 foreach (Document document in project.Documents)
                 {
                     currentDocument++;
-                    ConsoleLogger.InfoVerbose($"[baseline {currentDocument}/{totalDocuments}] {document.Name}");
+                    if (ConsoleLogger.CurrentProgress is null)
+                        ConsoleLogger.InfoVerbose($"[baseline {currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
                     if (filePath == null)
@@ -502,6 +542,7 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
+                    ConsoleLogger.CurrentProgress?.Begin(RunPhase.Documentation, filePath);
                     SyntaxTree? tree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
                     if (tree == null)
                     {
@@ -523,6 +564,8 @@ namespace XMLDocNormalizer.Execution
                             options,
                             namespaceAggregator);
 
+                    ConsoleLogger.CurrentProgress?.DocumentCompleted();
+                    ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
                     prepared.BaselineResult.AccumulateFindings(baselineFindings);
                     prepared.BaselineFindingsByFile[filePath] = baselineFindings;
 
@@ -633,6 +676,7 @@ namespace XMLDocNormalizer.Execution
             modeResult.Coverage.Begin("Workspace", mode);
             IFindingsReporter reporter = FindingsReporterFactory.Create(modeOptions);
 
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     prepared.Projects,
@@ -646,6 +690,7 @@ namespace XMLDocNormalizer.Execution
 
             foreach (PreparedSemanticDocument document in prepared.Documents)
             {
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.ExceptionFlow, document.FilePath);
                 List<Finding> combinedFindings = new();
 
                 if (prepared.BaselineFindingsByFile.TryGetValue(document.FilePath, out List<Finding>? baselineFindings))
@@ -661,7 +706,8 @@ namespace XMLDocNormalizer.Execution
                         semanticContext,
                         modeOptions.XmlDocOptions,
                         summaryAnalysisSession,
-                        modeResult.Coverage);
+                        modeResult.Coverage,
+                        ConsoleLogger.CurrentProgress?.FlowObserver);
 
                 if (exceptionFindings.Count > 0)
                 {
@@ -669,7 +715,7 @@ namespace XMLDocNormalizer.Execution
                     combinedFindings.AddRange(exceptionFindings);
                 }
 
-                reporter.ReportFile(document.FilePath, combinedFindings);
+                ReportFile(reporter, document.FilePath, combinedFindings);
             }
 
             stopwatch.Stop();
@@ -716,8 +762,9 @@ namespace XMLDocNormalizer.Execution
                 return null;
             }
 
-            return ExceptionFlowSummaryAnalysisSession.CreateSummaryAnalysisSession(
+            var session = ExceptionFlowSummaryAnalysisSession.CreateSummaryAnalysisSession(
                 new ExceptionFlowSemanticEnvironment(semanticContext));
+            return session;
         }
 
         /// <summary>
@@ -755,7 +802,8 @@ namespace XMLDocNormalizer.Execution
                 projectName: baseOptions.ProjectName,
                 includeGenerated: baseOptions.IncludeGenerated,
                 includeTests: baseOptions.IncludeTests,
-                compareExceptionAnalysisModes: false);
+                compareExceptionAnalysisModes: false,
+                progress: baseOptions.Progress);
         }
 
         /// <summary>
@@ -875,6 +923,9 @@ namespace XMLDocNormalizer.Execution
             NamespaceDocumentationAggregator namespaceAggregator =
                 new(options.XmlDocOptions.RequireDocumentationForNamespaces);
 
+            ConsoleLogger.CurrentProgress?.SetTotal(RunPhase.Documentation,
+                files.Count(file => !ToolFileFilter.ShouldExclude(file, options)));
+
             foreach (string file in files)
             {
                 if (ToolFileFilter.ShouldExclude(file, options))
@@ -882,6 +933,7 @@ namespace XMLDocNormalizer.Execution
                     continue;
                 }
 
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Documentation, file);
                 string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
 
@@ -901,17 +953,23 @@ namespace XMLDocNormalizer.Execution
                 IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
                 result.AccumulateTotals(fileTotals);
 
+                ConsoleLogger.CurrentProgress?.Detector(nameof(XmlDocBasicDetector));
                 List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions, namespaceAggregator));
 
                 foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
                 {
+                    ConsoleLogger.CurrentProgress?.Detector(detector.Method.DeclaringType?.Name);
                     findings.AddRange(detector(tree, file));
                 }
 
+                ConsoleLogger.CurrentProgress?.Detector(nameof(XmlDocValueDetector));
                 findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, file, options.XmlDocOptions));
 
+                ConsoleLogger.CurrentProgress?.DocumentCompleted();
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
                 result.AccumulateFindings(findings);
-                reporter.ReportFile(file, findings);
+                ConsoleLogger.CurrentProgress?.Findings(result.FindingCount);
+                ReportFile(reporter, file, findings);
             }
 
             FlushNamespaceFindings(namespaceAggregator, result, reporter);
@@ -947,9 +1005,14 @@ namespace XMLDocNormalizer.Execution
             result.Coverage.Begin("SyntaxOnly", options.XmlDocOptions.ExceptionAnalysisMode);
             result.Coverage.Unsupported("SemanticInputRequired");
 
+            ConsoleLogger.CurrentProgress?.SetTotal(RunPhase.Rewrite,
+                files.Count(file => !ToolFileFilter.ShouldExclude(file, options)));
             foreach (string originalFile in files)
             {
+                if (ToolFileFilter.ShouldExclude(originalFile, options)) continue;
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Rewrite, originalFile);
                 FixSingleFile(originalFile, options, result);
+                ConsoleLogger.CurrentProgress?.DocumentCompleted(RunPhase.Rewrite);
             }
 
             stopwatch.Stop();
@@ -1050,7 +1113,7 @@ namespace XMLDocNormalizer.Execution
             if (malformedFindings.Count > 0)
             {
                 result.AccumulateFindings(malformedFindings);
-                ConsoleReporter.PrintFindings(file, malformedFindings, options.Verbose);
+                ConsoleLogger.WithProgressPaused(() => ConsoleReporter.PrintFindings(file, malformedFindings, options.Verbose));
 
                 DeleteBackupOnAbort(backupPath);
                 return;
@@ -1147,7 +1210,7 @@ namespace XMLDocNormalizer.Execution
             {
                 List<Finding> groupFindings = group.ToList();
                 result.AccumulateFindings(groupFindings);
-                reporter.ReportFile(group.Key, groupFindings);
+                ReportFile(reporter, group.Key, groupFindings);
             }
         }
 
@@ -1163,6 +1226,12 @@ namespace XMLDocNormalizer.Execution
         /// </exception>
         private static void CompleteReporting(IFindingsReporter reporter, RunResult result)
         {
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Output);
+            ConsoleLogger.WithProgressPaused(() => CompleteReportingCore(reporter, result));
+        }
+
+        private static void CompleteReportingCore(IFindingsReporter reporter, RunResult result)
+        {
             if (reporter is IResultAwareFindingsReporter resultAware)
             {
                 resultAware.Complete(result);
@@ -1170,6 +1239,18 @@ namespace XMLDocNormalizer.Execution
             }
 
             reporter.Complete();
+        }
+
+        private static void ReportFile(IFindingsReporter reporter, string path, IReadOnlyList<Finding> findings)
+        {
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Output);
+            ConsoleLogger.WithProgressPaused(() => reporter.ReportFile(path, findings));
+        }
+
+        private static IProgress<ProjectLoadProgress>? CreateLoadProgress()
+        {
+            RunProgress? progress = ConsoleLogger.CurrentProgress;
+            return progress is null ? null : new InlineProgress<ProjectLoadProgress>(p => progress.Activity($"{p.Operation}: {Path.GetFileName(p.FilePath)}"));
         }
 
         /// <summary>

@@ -41,7 +41,9 @@ namespace XMLDocNormalizer.Execution.Analysis
                 try
                 {
                     // Same existing in-process entry as the detector, preserving caller-owned graph/model/cache lifetime.
-                    ExceptionFlowAnalysisResult native = request.Current.Session.Analyze(request.Current.Member);
+                    ExceptionFlowAnalysisResult native = request.Current.Progress is null
+                        ? request.Current.Session.Analyze(request.Current.Member)
+                        : request.Current.Session.AnalyzeWithProgress(request.Current.Member, request.Current.Progress);
                     return ExceptionFlowAnalysisRoutingResult.FromCurrent(native,
                         RoslynCanonicalExceptionFlowAdapter.CreateAnalysisResult(native));
                 }
