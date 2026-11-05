@@ -346,11 +346,13 @@ namespace SEE.Game.Drawable.Line
 
         /// <summary>
         /// Applies original, unshortened line positions to the given line.
-        /// This is required for lines with line caps because their renderer positions
-        /// may be visually shortened.
+        /// The original positions are retained when the visible geometry
+        /// differs from the logical geometry because of line caps.
         /// </summary>
         /// <param name="line">The line whose positions should be updated.</param>
-        /// <param name="positions">The original, unshortened line positions.</param>
+        /// <param name="positions">
+        /// The original, unshortened line positions.
+        /// </param>
         public static void ApplyOriginalLinePositions(
             GameObject line,
             Vector3[] positions)
@@ -368,7 +370,7 @@ namespace SEE.Game.Drawable.Line
                 line.GetComponent<LineAnchorValueHolder>();
 
             if (anchorHolder != null
-                && anchorHolder.UsesExplicitLoopCapGeometry)
+                && anchorHolder.OriginalRendererPositions != null)
             {
                 anchorHolder.OriginalRendererPositions =
                     new Vector3[positions.Length];
@@ -380,6 +382,7 @@ namespace SEE.Game.Drawable.Line
             }
 
             LineConf lineConf = LineConf.GetLine(line);
+
             if (lineConf == null)
             {
                 return;
@@ -405,14 +408,17 @@ namespace SEE.Game.Drawable.Line
         }
 
         /// <summary>
-        /// Applies the stored original anchors from the given line configuration
-        /// to the line object.
+        /// Applies the original anchor and end-cap preservation data
+        /// from the given line configuration to the line object.
+        /// Stored renderer positions are reset because they will be
+        /// reconstructed when the line caps are applied.
         /// </summary>
         /// <param name="line">
         /// The line object whose anchor holder should be updated.
         /// </param>
         /// <param name="lineConf">
-        /// The line configuration containing the stored original anchors.
+        /// The configuration containing the stored original anchors
+        /// and the end-cap preservation state.
         /// </param>
         internal static void ApplyStoredOriginalAnchors(
             GameObject line,
@@ -442,6 +448,9 @@ namespace SEE.Game.Drawable.Line
 
             anchorHolder.UsesExplicitLoopCapGeometry = false;
             anchorHolder.OriginalRendererPositions = null;
+
+            anchorHolder.UsePreviousSegmentForEndCap =
+                lineConf.UsePreviousSegmentForEndCap;
         }
 
         /// <summary>

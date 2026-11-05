@@ -32,6 +32,12 @@ namespace SEE.Game.Drawable.ValueHolders
         public bool UsesExplicitLoopCapGeometry;
 
         /// <summary>
+        /// Whether this open line retains the end cap of a split loop
+        /// and may use the preceding segment for its visual cap geometry.
+        /// </summary>
+        public bool UsePreviousSegmentForEndCap;
+
+        /// <summary>
         /// The original renderer positions before an explicit loop-cap geometry
         /// was created.
         /// </summary>

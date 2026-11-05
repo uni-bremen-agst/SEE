@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.Game.Drawable.Line
 {
@@ -595,17 +596,21 @@ namespace SEE.Game.Drawable.Line
 
         /// <summary>
         /// Redraws the line with the new sub positions.
+        /// Preserves the original end-cap geometry of a split loop
+        /// only for the resulting segment retaining that end cap.
         /// </summary>
-        /// <param name="surface">The drawable surface on which the line should be redrawn.</param>
+        /// <param name="surface">
+        /// The drawable surface on which the line should be redrawn.
+        /// </param>
         /// <param name="originLine">Configuration of the old line.</param>
-        /// <param name="positions">The new sub positions of the new line.</param>
+        /// <param name="positions">The positions of the new subline.</param>
         /// <param name="retainLoopStartCap">
         /// Whether the segment retains the original start cap of a loop.
         /// </param>
         /// <param name="retainLoopEndCap">
         /// Whether the segment retains the original end cap of a loop.
         /// </param>
-        /// <returns>Configuration of the new sub line.</returns>
+        /// <returns>Configuration of the new subline.</returns>
         private static LineConf ReDraw(
             GameObject surface,
             LineConf originLine,
@@ -614,13 +619,13 @@ namespace SEE.Game.Drawable.Line
             bool retainLoopEndCap = false)
         {
             LineConf lineToCreate = originLine.Clone();
+
             lineToCreate.ID = "";
             lineToCreate.RendererPositions = positions;
             lineToCreate.OriginalStartAnchor = positions[0];
             lineToCreate.OriginalEndAnchor = positions[^1];
 
-            // Every resulting segment is an open line, even if the
-            // original line was a loop.
+            // Every resulting segment is an open line.
             lineToCreate.Loop = false;
 
             AdjustLineCapsForSegment(
@@ -630,9 +635,6 @@ namespace SEE.Game.Drawable.Line
 
             if (originLine.Loop)
             {
-                // On a loop, both original caps can be anchored at
-                // the first logical point. Coordinate comparisons are
-                // therefore insufficient to determine cap ownership.
                 lineToCreate.LineCapStart =
                     retainLoopStartCap && originLine.LineCapStart != null
                         ? originLine.LineCapStart.Clone()
@@ -644,34 +646,59 @@ namespace SEE.Game.Drawable.Line
                         : LineCapConf.CreateNone();
             }
 
-            LineCapConf startCap = lineToCreate.LineCapStart != null
-                ? lineToCreate.LineCapStart.Clone()
-                : LineCapConf.CreateNone();
+            bool retainsOriginalEndCap =
+                lineToCreate.LineCapEnd != null
+                && lineToCreate.LineCapEnd.CapKind != LineCap.None;
 
-            LineCapConf endCap = lineToCreate.LineCapEnd != null
-                ? lineToCreate.LineCapEnd.Clone()
-                : LineCapConf.CreateNone();
+            lineToCreate.UsePreviousSegmentForEndCap =
+                retainsOriginalEndCap
+                && (originLine.Loop
+                    ? retainLoopEndCap
+                    : originLine.UsePreviousSegmentForEndCap
+                      && positions[^1].Equals(originLine.OriginalEndAnchor));
+
+            LineCapConf startCap =
+                lineToCreate.LineCapStart != null
+                    ? lineToCreate.LineCapStart.Clone()
+                    : LineCapConf.CreateNone();
+
+            LineCapConf endCap =
+                lineToCreate.LineCapEnd != null
+                    ? lineToCreate.LineCapEnd.Clone()
+                    : LineCapConf.CreateNone();
 
             lineToCreate.LineCapStart = LineCapConf.CreateNone();
             lineToCreate.LineCapEnd = LineCapConf.CreateNone();
 
-            GameObject newLine = GameLineDrawer.ReDrawLine(surface, lineToCreate);
+            GameObject newLine =
+                GameLineDrawer.ReDrawLine(surface, lineToCreate);
 
             GameLineGeometry.ChangePivot(newLine);
 
             LineConf pivotAdjustedLine = LineConf.GetLine(newLine);
-            GameLineGeometry.UpdateOriginalAnchors(newLine, pivotAdjustedLine.RendererPositions);
+
+            GameLineGeometry.UpdateOriginalAnchors(
+                newLine,
+                pivotAdjustedLine.RendererPositions);
+
             pivotAdjustedLine = LineConf.GetLine(newLine);
 
             pivotAdjustedLine.LineCapStart = startCap;
             pivotAdjustedLine.LineCapEnd = endCap;
 
-            GameLineCapApplicator.ApplyLineCaps(newLine, pivotAdjustedLine.LineCapStart,
-                pivotAdjustedLine.LineCapEnd, LineConf.GetFillOutColor(pivotAdjustedLine), true);
+            GameLineCapApplicator.ApplyLineCaps(
+                newLine,
+                pivotAdjustedLine.LineCapStart,
+                pivotAdjustedLine.LineCapEnd,
+                LineConf.GetFillOutColor(pivotAdjustedLine),
+                true);
 
             LineConf result = LineConf.GetLine(newLine);
 
-            new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), result).Execute();
+            new DrawNetAction(
+                surface.name,
+                GameFinder.GetDrawableSurfaceParentName(surface),
+                result).Execute();
 
             return result;
         }
