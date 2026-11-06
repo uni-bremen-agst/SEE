@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -230,6 +232,407 @@ namespace SEE.Game.Drawable.MindMap
                 node, MindMapNodeKind.Leaf, MindMapNodeKind.Theme);
 
             Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that renaming only an imported child preserves
+        /// its parent reference and updates all associated branch lines
+        /// and stored child references.
+        /// </summary>
+        [Test]
+        public void TestRenameMindMapWithOnlyChildCollision()
+        {
+            string parentName = "Theme-ParentA";
+            string childName = "Subtheme-ChildB";
+
+            CreateNode(childName, MindMapNodeKind.Subtheme);
+
+            MindMapNodeConf parent =
+                CreateImportedNode(parentName, MindMapNodeKind.Theme, "");
+
+            MindMapNodeConf child =
+                CreateImportedNode(
+                    childName,
+                    MindMapNodeKind.Subtheme,
+                    parentName);
+
+            string oldBranchName = child.BranchLineToParent;
+
+            GetStoredChildNames(parent).Add(childName, oldBranchName);
+
+            DrawableConfig config = new();
+            config.MindMapNodeConfigs.Add(parent);
+            config.MindMapNodeConfigs.Add(child);
+            config.LineConfigs.Add(new LineConf { ID = oldBranchName });
+
+            Assert.DoesNotThrow(
+                () => GameMindMap.RenameMindMap(config, attachedObjects));
+
+            Assert.That(parent.ID, Is.EqualTo(parentName));
+            Assert.That(child.ID, Is.Not.EqualTo(childName));
+            Assert.That(child.ID, Does.StartWith("Subtheme-"));
+            Assert.That(child.ParentNode, Is.EqualTo(parentName));
+
+            string expectedBranchName =
+                ValueHolder.MindMapBranchLine + "-"
+                + GameMindMap.GetIDofName(parent.ID) + "-"
+                + GameMindMap.GetIDofName(child.ID);
+
+            Assert.That(child.BranchLineToParent, Is.EqualTo(expectedBranchName));
+            Assert.That(child.BranchLineConf.ID, Is.EqualTo(expectedBranchName));
+            Assert.That(config.LineConfigs[0].ID, Is.EqualTo(expectedBranchName));
+
+            Dictionary<string, string> children = GetStoredChildNames(parent);
+
+            Assert.That(children.ContainsKey(childName), Is.False);
+            Assert.That(children.ContainsKey(child.ID), Is.True);
+            Assert.That(children[child.ID], Is.EqualTo(expectedBranchName));
+        }
+
+        /// <summary>
+        /// Verifies that a renamed parent is correctly referenced by an
+        /// unchanged child, even when the child occurs first in the
+        /// imported configuration.
+        /// </summary>
+        [Test]
+        public void TestRenameMindMapWithOnlyParentCollision()
+        {
+            string parentName = "Theme-ParentA";
+            string childName = "Subtheme-ChildB";
+
+            CreateNode(parentName, MindMapNodeKind.Theme);
+
+            MindMapNodeConf parent =
+                CreateImportedNode(parentName, MindMapNodeKind.Theme, "");
+
+            MindMapNodeConf child =
+                CreateImportedNode(
+                    childName,
+                    MindMapNodeKind.Subtheme,
+                    parentName);
+
+            string oldBranchName = child.BranchLineToParent;
+
+            GetStoredChildNames(parent).Add(childName, oldBranchName);
+
+            DrawableConfig config = new();
+
+            // Deliberately process the child before its parent.
+            config.MindMapNodeConfigs.Add(child);
+            config.MindMapNodeConfigs.Add(parent);
+            config.LineConfigs.Add(new LineConf { ID = oldBranchName });
+
+            Assert.DoesNotThrow(
+                () => GameMindMap.RenameMindMap(config, attachedObjects));
+
+            Assert.That(parent.ID, Is.Not.EqualTo(parentName));
+            Assert.That(parent.ID, Does.StartWith("Theme-"));
+
+            Assert.That(child.ID, Is.EqualTo(childName));
+            Assert.That(child.ParentNode, Is.EqualTo(parent.ID));
+
+            string expectedBranchName =
+                ValueHolder.MindMapBranchLine + "-"
+                + GameMindMap.GetIDofName(parent.ID) + "-"
+                + GameMindMap.GetIDofName(child.ID);
+
+            Assert.That(child.BranchLineToParent, Is.EqualTo(expectedBranchName));
+            Assert.That(child.BranchLineConf.ID, Is.EqualTo(expectedBranchName));
+            Assert.That(config.LineConfigs[0].ID, Is.EqualTo(expectedBranchName));
+
+            Assert.That(
+                GetStoredChildNames(parent)[childName],
+                Is.EqualTo(expectedBranchName));
+        }
+
+        /// <summary>
+        /// Verifies that renaming both an imported parent and its child
+        /// preserves their relationship and all associated branch names.
+        /// </summary>
+        [Test]
+        public void TestRenameMindMapWithParentAndChildCollision()
+        {
+            string parentName = "Theme-ParentA";
+            string childName = "Subtheme-ChildB";
+
+            CreateNode(parentName, MindMapNodeKind.Theme);
+            CreateNode(childName, MindMapNodeKind.Subtheme);
+
+            MindMapNodeConf parent =
+                CreateImportedNode(parentName, MindMapNodeKind.Theme, "");
+
+            MindMapNodeConf child =
+                CreateImportedNode(
+                    childName,
+                    MindMapNodeKind.Subtheme,
+                    parentName);
+
+            string oldBranchName = child.BranchLineToParent;
+
+            GetStoredChildNames(parent).Add(childName, oldBranchName);
+
+            DrawableConfig config = new();
+
+            config.MindMapNodeConfigs.Add(parent);
+            config.MindMapNodeConfigs.Add(child);
+            config.LineConfigs.Add(new LineConf { ID = oldBranchName });
+
+            Assert.DoesNotThrow(
+                () => GameMindMap.RenameMindMap(config, attachedObjects));
+
+            Assert.That(parent.ID, Is.Not.EqualTo(parentName));
+            Assert.That(child.ID, Is.Not.EqualTo(childName));
+            Assert.That(child.ParentNode, Is.EqualTo(parent.ID));
+
+            string expectedBranchName =
+                ValueHolder.MindMapBranchLine + "-"
+                + GameMindMap.GetIDofName(parent.ID) + "-"
+                + GameMindMap.GetIDofName(child.ID);
+
+            Assert.That(child.BranchLineToParent, Is.EqualTo(expectedBranchName));
+            Assert.That(child.BranchLineConf.ID, Is.EqualTo(expectedBranchName));
+            Assert.That(config.LineConfigs[0].ID, Is.EqualTo(expectedBranchName));
+
+            Assert.That(
+                parent.BorderConf.ID,
+                Is.EqualTo(ValueHolder.LinePrefix + "-"
+                           + GameMindMap.GetIDofName(parent.ID)));
+
+            Assert.That(
+                child.TextConf.ID,
+                Is.EqualTo(ValueHolder.TextPrefix + "-"
+                           + GameMindMap.GetIDofName(child.ID)));
+
+            Dictionary<string, string> children = GetStoredChildNames(parent);
+
+            Assert.That(children.ContainsKey(childName), Is.False);
+            Assert.That(children[child.ID], Is.EqualTo(expectedBranchName));
+        }
+
+        /// <summary>
+        /// Verifies that importing Mind Map nodes without collisions
+        /// preserves their names and existing parent-child references.
+        /// </summary>
+        [Test]
+        public void TestRenameMindMapWithoutCollisions()
+        {
+            string parentName = "Theme-ParentA";
+            string childName = "Subtheme-ChildB";
+
+            MindMapNodeConf parent =
+                CreateImportedNode(parentName, MindMapNodeKind.Theme, "");
+
+            MindMapNodeConf child =
+                CreateImportedNode(
+                    childName,
+                    MindMapNodeKind.Subtheme,
+                    parentName);
+
+            string branchName = child.BranchLineToParent;
+
+            GetStoredChildNames(parent).Add(childName, branchName);
+
+            DrawableConfig config = new();
+            config.MindMapNodeConfigs.Add(parent);
+            config.MindMapNodeConfigs.Add(child);
+            config.LineConfigs.Add(new LineConf { ID = branchName });
+
+            GameMindMap.RenameMindMap(config, attachedObjects);
+
+            Assert.That(parent.ID, Is.EqualTo(parentName));
+            Assert.That(child.ID, Is.EqualTo(childName));
+            Assert.That(child.ParentNode, Is.EqualTo(parentName));
+            Assert.That(child.BranchLineToParent, Is.EqualTo(branchName));
+            Assert.That(child.BranchLineConf.ID, Is.EqualTo(branchName));
+            Assert.That(config.LineConfigs[0].ID, Is.EqualTo(branchName));
+
+            Assert.That(
+                GetStoredChildNames(parent)[childName],
+                Is.EqualTo(branchName));
+        }
+
+        /// <summary>
+        /// Verifies that importing a mind map node renames the node and
+        /// its associated drawable objects when only the border or text
+        /// ID conflicts with an existing object.
+        /// </summary>
+        /// <param name="borderCollision">
+        /// True to introduce a border collision; false for a text collision.
+        /// </param>
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestRenameMindMapWithOnlyNestedObjectCollision(
+            bool borderCollision)
+        {
+            string originalName = "Theme-ParentA";
+
+            MindMapNodeConf node =
+                CreateImportedNode(originalName, MindMapNodeKind.Theme, "");
+
+            string conflictingName = borderCollision
+                ? node.BorderConf.ID
+                : node.TextConf.ID;
+
+            GameObject existingObject = new(conflictingName);
+            existingObject.transform.SetParent(attachedObjects.transform);
+
+            DrawableConfig config = new();
+            config.MindMapNodeConfigs.Add(node);
+
+            Assert.DoesNotThrow(
+                () => GameMindMap.RenameMindMap(config, attachedObjects));
+
+            Assert.That(node.ID, Is.Not.EqualTo(originalName));
+            Assert.That(node.ID, Does.StartWith("Theme-"));
+
+            string newID = GameMindMap.GetIDofName(node.ID);
+
+            Assert.That(
+                node.BorderConf.ID,
+                Is.EqualTo(ValueHolder.LinePrefix + "-" + newID));
+
+            Assert.That(
+                node.TextConf.ID,
+                Is.EqualTo(ValueHolder.TextPrefix + "-" + newID));
+
+            if (borderCollision)
+            {
+                Assert.That(node.BorderConf.ID, Is.Not.EqualTo(conflictingName));
+            }
+            else
+            {
+                Assert.That(node.TextConf.ID, Is.Not.EqualTo(conflictingName));
+            }
+
+            Assert.That(existingObject.name, Is.EqualTo(conflictingName));
+            Assert.That(
+                GameFinder.FindAttachedOrLocalDescendant(
+                    attachedObjects, conflictingName),
+                Is.SameAs(existingObject));
+        }
+
+        /// <summary>
+        /// Verifies that an imported branch line cannot overwrite an
+        /// existing branch line when neither node name conflicts.
+        /// </summary>
+        [Test]
+        public void TestRenameMindMapWithOnlyBranchLineCollision()
+        {
+            string parentName = "Theme-ParentA";
+            string childName = "Subtheme-ChildB";
+
+            MindMapNodeConf parent =
+                CreateImportedNode(parentName, MindMapNodeKind.Theme, "");
+
+            MindMapNodeConf child =
+                CreateImportedNode(
+                    childName,
+                    MindMapNodeKind.Subtheme,
+                    parentName);
+
+            string oldBranchName = child.BranchLineToParent;
+
+            GameObject existingBranch = new(oldBranchName);
+            existingBranch.transform.SetParent(attachedObjects.transform);
+
+            GetStoredChildNames(parent).Add(childName, oldBranchName);
+
+            DrawableConfig config = new();
+            config.MindMapNodeConfigs.Add(parent);
+            config.MindMapNodeConfigs.Add(child);
+            config.LineConfigs.Add(new LineConf { ID = oldBranchName });
+
+            Assert.DoesNotThrow(
+                () => GameMindMap.RenameMindMap(config, attachedObjects));
+
+            Assert.That(parent.ID, Is.EqualTo(parentName));
+            Assert.That(child.ID, Is.Not.EqualTo(childName));
+            Assert.That(child.ParentNode, Is.EqualTo(parentName));
+
+            string expectedBranchName =
+                ValueHolder.MindMapBranchLine + "-"
+                + GameMindMap.GetIDofName(parent.ID) + "-"
+                + GameMindMap.GetIDofName(child.ID);
+
+            Assert.That(expectedBranchName, Is.Not.EqualTo(oldBranchName));
+            Assert.That(child.BranchLineToParent, Is.EqualTo(expectedBranchName));
+            Assert.That(child.BranchLineConf.ID, Is.EqualTo(expectedBranchName));
+            Assert.That(config.LineConfigs[0].ID, Is.EqualTo(expectedBranchName));
+
+            Dictionary<string, string> children = GetStoredChildNames(parent);
+
+            Assert.That(children.ContainsKey(childName), Is.False);
+            Assert.That(children[child.ID], Is.EqualTo(expectedBranchName));
+
+            Assert.That(existingBranch.name, Is.EqualTo(oldBranchName));
+            Assert.That(
+                GameFinder.FindAttachedOrLocalDescendant(
+                    attachedObjects, oldBranchName),
+                Is.SameAs(existingBranch));
+        }
+
+        /// <summary>
+        /// Creates a minimal Mind Map node configuration for testing
+        /// imported names and parent-child references.
+        /// </summary>
+        /// <param name="name">The imported node name.</param>
+        /// <param name="nodeKind">The node kind.</param>
+        /// <param name="parentName">
+        /// The imported parent name, or an empty string for a root node.
+        /// </param>
+        /// <returns>The imported node configuration.</returns>
+        private static MindMapNodeConf CreateImportedNode(
+            string name,
+            MindMapNodeKind nodeKind,
+            string parentName)
+        {
+            string id = GameMindMap.GetIDofName(name);
+
+            string branchName = string.IsNullOrEmpty(parentName)
+                ? ""
+                : ValueHolder.MindMapBranchLine + "-"
+                  + GameMindMap.GetIDofName(parentName) + "-"
+                  + id;
+
+            return new MindMapNodeConf
+            {
+                ID = name,
+                NodeKind = nodeKind,
+                ParentNode = parentName,
+                BranchLineToParent = branchName,
+                BorderConf = new LineConf
+                {
+                    ID = ValueHolder.LinePrefix + id
+                },
+                TextConf = new TextConf
+                {
+                    ID = ValueHolder.TextPrefix + id
+                },
+                BranchLineConf = string.IsNullOrEmpty(parentName)
+                    ? null
+                    : new LineConf
+                    {
+                        ID = branchName
+                    }
+            };
+        }
+
+        /// <summary>
+        /// Retrieves the serialized child-to-branch name mapping of a
+        /// Mind Map node configuration for regression assertions.
+        /// </summary>
+        /// <param name="node">The imported node configuration.</param>
+        /// <returns>The stored child-name mapping.</returns>
+        private static Dictionary<string, string> GetStoredChildNames(
+            MindMapNodeConf node)
+        {
+            FieldInfo field = typeof(MindMapNodeConf).GetField(
+                "childrenNames",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(field, Is.Not.Null);
+
+            return (Dictionary<string, string>)field.GetValue(node);
         }
 
         /// <summary>

@@ -138,6 +138,43 @@ namespace SEE.Game.Drawable.Configurations
             };
         }
 
+        /// <summary>
+        /// Updates the stored child-node and branch-line names after
+        /// imported Mind Map configurations have been renamed.
+        /// Names without a replacement remain unchanged.
+        /// </summary>
+        /// <param name="nodeNames">
+        /// Maps original node names to their final names.
+        /// </param>
+        /// <param name="branchNames">
+        /// Maps original branch-line names to their final names.
+        /// </param>
+        internal void RenameChildReferences(
+            IReadOnlyDictionary<string, string> nodeNames,
+            IReadOnlyDictionary<string, string> branchNames)
+        {
+            Dictionary<string, string> renamedChildren = new();
+
+            foreach (KeyValuePair<string, string> child in childrenNames)
+            {
+                string childName =
+                    nodeNames.TryGetValue(
+                        child.Key, out string newChildName)
+                        ? newChildName
+                        : child.Key;
+
+                string branchName =
+                    branchNames.TryGetValue(
+                        child.Value, out string newBranchName)
+                        ? newBranchName
+                        : child.Value;
+
+                renamedChildren.Add(childName, branchName);
+            }
+
+            childrenNames = renamedChildren;
+        }
+
         #region Config I/O
 
         /// <summary>

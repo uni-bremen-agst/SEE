@@ -247,11 +247,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
             if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, configuration.ID) != null
                 && !configuration.ID.Contains(ValueHolder.MindMapBranchLine))
             {
-                string newName = prefix + "-" + RandomStrings.GetRandomString(8);
+                string newName = prefix + RandomStrings.GetRandomString(8);
 
                 while (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newName) != null)
                 {
-                    newName = prefix + "-" + RandomStrings.GetRandomString(8);
+                    newName = prefix + RandomStrings.GetRandomString(8);
                 }
 
                 configuration.ID = newName;
