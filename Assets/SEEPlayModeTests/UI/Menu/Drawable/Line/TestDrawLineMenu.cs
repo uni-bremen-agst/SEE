@@ -53,9 +53,9 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Verifies that reopening the drawing menu restores the primary color as the
-        /// color-picker target instead of retaining a previously selected secondary
-        /// color target.
+        /// Verifies that reopening the drawing menu restores the primary
+        /// color as the color-picker target after secondary-color editing
+        /// in a two-color mode.
         /// </summary>
         /// <returns>An enumerator used by the Unity test runner.</returns>
         [UnityTest]
@@ -65,6 +65,17 @@ namespace SEE.UI.Menu.Drawable.Line
             ValueHolder.CurrentSecondaryColor = Color.blue;
 
             yield return OpenDrawingMenu();
+
+            int gradientIndex =
+                GameLineAppearance.GetColorKinds(true).IndexOf(ColorKind.Gradient);
+
+            Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
+
+            controls.ColorKindSelector.selectorEvent.Invoke(gradientIndex);
+
+            yield return null;
+
+            Assert.That(ValueHolder.CurrentColorKind, Is.EqualTo(ColorKind.Gradient));
 
             controls.SecondaryColorButtonManager.clickEvent.Invoke();
 
@@ -190,8 +201,8 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Verifies that the primary and secondary color buttons select the
-        /// correct target for subsequent color-picker changes.
+        /// Verifies that the primary and secondary color buttons select
+        /// the correct color-picker target in Gradient mode.
         /// </summary>
         /// <returns>An enumerator used by the Unity test runner.</returns>
         [UnityTest]
@@ -202,8 +213,18 @@ namespace SEE.UI.Menu.Drawable.Line
 
             yield return OpenDrawingMenu();
 
-            Color firstPrimaryColor = Color.green;
+            int gradientIndex =
+                GameLineAppearance.GetColorKinds(true).IndexOf(ColorKind.Gradient);
 
+            Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
+
+            controls.ColorKindSelector.selectorEvent.Invoke(gradientIndex);
+
+            yield return null;
+
+            Assert.That(ValueHolder.CurrentColorKind, Is.EqualTo(ColorKind.Gradient));
+
+            Color firstPrimaryColor = Color.green;
             controls.ColorPicker.onValueChanged.Invoke(firstPrimaryColor);
 
             yield return null;
@@ -218,12 +239,12 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(
                 controls.PrimaryColorButtonManager.buttonVar.interactable,
                 Is.True);
+
             Assert.That(
                 controls.SecondaryColorButtonManager.buttonVar.interactable,
                 Is.False);
 
             Color newSecondaryColor = Color.yellow;
-
             controls.ColorPicker.onValueChanged.Invoke(newSecondaryColor);
 
             yield return null;
@@ -238,18 +259,57 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(
                 controls.PrimaryColorButtonManager.buttonVar.interactable,
                 Is.False);
+
             Assert.That(
                 controls.SecondaryColorButtonManager.buttonVar.interactable,
                 Is.True);
 
             Color secondPrimaryColor = Color.cyan;
-
             controls.ColorPicker.onValueChanged.Invoke(secondPrimaryColor);
 
             yield return null;
 
             Assert.That(ValueHolder.CurrentPrimaryColor, Is.EqualTo(secondPrimaryColor));
             Assert.That(ValueHolder.CurrentSecondaryColor, Is.EqualTo(newSecondaryColor));
+        }
+
+        /// <summary>
+        /// Verifies that selecting the secondary color in Monochrome mode
+        /// continues to edit the primary color instead.
+        /// </summary>
+        /// <returns>An enumerator used by the Unity test runner.</returns>
+        [UnityTest]
+        public IEnumerator TestMonochromeSecondarySelectionEditsPrimaryColor()
+        {
+            ValueHolder.CurrentPrimaryColor = Color.red;
+            ValueHolder.CurrentSecondaryColor = Color.blue;
+
+            yield return OpenDrawingMenu();
+
+            Assert.That(
+                ValueHolder.CurrentColorKind,
+                Is.EqualTo(ColorKind.Monochrome));
+
+            controls.SecondaryColorButtonManager.clickEvent.Invoke();
+
+            yield return null;
+
+            Color newPrimaryColor = Color.green;
+            controls.ColorPicker.onValueChanged.Invoke(newPrimaryColor);
+
+            yield return null;
+
+            Assert.That(
+                ValueHolder.CurrentPrimaryColor,
+                Is.EqualTo(newPrimaryColor));
+
+            Assert.That(
+                ValueHolder.CurrentSecondaryColor,
+                Is.EqualTo(Color.blue));
+
+            Assert.That(
+                controls.PrimaryColorButtonManager.buttonVar.interactable,
+                Is.False);
         }
 
         /// <summary>
