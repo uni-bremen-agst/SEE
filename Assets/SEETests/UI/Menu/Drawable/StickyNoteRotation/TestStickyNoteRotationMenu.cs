@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using UnityEngine;
 
@@ -105,6 +106,62 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             FindActiveButton("Back").clickEvent.Invoke();
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that repeated navigation from the x rotation menu
+        /// to the y rotation menu does not leave old hidden y menus
+        /// behind. Finishing must remove the remaining menu.
+        /// </summary>
+        [Test]
+        public void TestBackNextDoesNotAccumulateYRotationMenus()
+        {
+            StickyNoteRotationMenu.Enable(stickyNote, hitObject);
+
+            FindActiveButton("Next").clickEvent.Invoke();
+
+            RotationSliderController[] initialSliders =
+                Object.FindObjectsByType<RotationSliderController>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None);
+
+            Assert.That(initialSliders, Has.Length.EqualTo(1));
+
+            RotationSliderController previousSlider = initialSliders[0];
+
+            FindActiveButton("Back").clickEvent.Invoke();
+            FindActiveButton("Next").clickEvent.Invoke();
+
+            RotationSliderController[] reopenedSliders =
+                Object.FindObjectsByType<RotationSliderController>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None);
+
+            Assert.That(
+                previousSlider == null,
+                Is.True,
+                "The previous hidden y rotation menu must be destroyed.");
+
+            Assert.That(
+                reopenedSliders,
+                Has.Length.EqualTo(1),
+                "Only one y rotation menu may exist after reopening.");
+
+            Assert.That(StickyNoteRotationMenu.IsYActive(), Is.True);
+
+            FindActiveButton("Finish").clickEvent.Invoke();
+
+            Assert.That(StickyNoteRotationMenu.IsYActive(), Is.False);
+
+            RotationSliderController[] remainingSliders =
+                Object.FindObjectsByType<RotationSliderController>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None);
+
+            Assert.That(
+                remainingSliders,
+                Is.Empty,
+                "Finishing must destroy the y rotation menu.");
         }
 
         /// <summary>

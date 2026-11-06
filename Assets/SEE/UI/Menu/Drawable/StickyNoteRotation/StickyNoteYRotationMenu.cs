@@ -27,6 +27,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
         /// <summary>
         /// Enables the y rotation menu for the given sticky note.
+        /// An existing y rotation menu is destroyed before creating a
+        /// new instance to prevent hidden menus from accumulating.
         /// </summary>
         /// <param name="stickyNoteHolder">
         /// The sticky note holder that should be rotated.
@@ -50,22 +52,18 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             UnityAction backCall,
             UnityAction finishCall)
         {
-            yRotationMenu =
-                Menu.InstantiatePrefab(yRotationMenuPrefab);
+            Destroy();
+
+            yRotationMenu = Menu.InstantiatePrefab(yRotationMenuPrefab);
 
             RotationSliderController slider =
                 yRotationMenu.GetComponentInChildren<RotationSliderController>();
 
-            SetUpSlider(
-                slider,
-                stickyNoteHolder,
-                spawnMode);
+            SetUpSlider(slider, stickyNoteHolder, spawnMode);
 
-            GameObject surface =
-                GameFinder.GetDrawableSurface(stickyNoteHolder);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
 
-            string surfaceParentName =
-                GameFinder.GetDrawableSurfaceParentName(surface);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             SetUpReturnButton(returnCall);
 
