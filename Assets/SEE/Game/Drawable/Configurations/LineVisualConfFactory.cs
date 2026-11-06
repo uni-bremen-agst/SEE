@@ -1,5 +1,6 @@
-﻿using SEE.Extensions;
+﻿using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -34,7 +35,7 @@ namespace SEE.Game.Drawable.Configurations
         /// </remarks>
         public static void ApplyVisualProperties(GameObject source, LineRenderer renderer, ILineVisualConf target)
         {
-            GameObject fillout = GameDrawer.GetOwnFillOutObject(source);
+            GameObject fillout = GameLineFillOut.GetOwnFillOutObject(source);
             LineValueHolder lineValueHolder = source.GetComponent<LineValueHolder>();
 
             target.ColorKind = lineValueHolder.ColorKind;
@@ -61,18 +62,22 @@ namespace SEE.Game.Drawable.Configurations
         {
             switch (target.ColorKind)
             {
-                case GameDrawer.ColorKind.Monochrome:
-                    target.PrimaryColor = renderer.material.color;
+                case ColorKind.Monochrome:
+                    target.PrimaryColor = renderer.sharedMaterial.color;
                     target.SecondaryColor = Color.clear;
                     break;
-                case GameDrawer.ColorKind.Gradient:
+
+                case ColorKind.Gradient:
                     target.PrimaryColor = renderer.startColor;
                     target.SecondaryColor = renderer.endColor;
                     break;
-                case GameDrawer.ColorKind.TwoDashed:
-                    target.PrimaryColor = renderer.materials[0].color;
-                    target.SecondaryColor = renderer.materials[1].color;
+
+                case ColorKind.TwoDashed:
+                    Material[] materials = renderer.sharedMaterials;
+                    target.PrimaryColor = materials[0].color;
+                    target.SecondaryColor = materials[1].color;
                     break;
+
                 default:
                     target.PrimaryColor = Color.clear;
                     target.SecondaryColor = Color.clear;

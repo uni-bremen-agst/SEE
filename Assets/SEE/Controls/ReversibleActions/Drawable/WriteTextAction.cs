@@ -1,16 +1,15 @@
 ﻿using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+using SEE.Game.Drawable.Text;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.Text;
+using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -19,11 +18,6 @@ namespace SEE.Controls.ReversibleActions.Drawable
     /// </summary>
     public class WriteTextAction : DrawableAction
     {
-        /// <summary>
-        /// True if we are currently at the first start of this action.
-        /// </summary>
-        private static bool firstStart = true;
-
         /// <summary>
         /// The game object that holds the TextMeshPro component.
         /// </summary>
@@ -88,33 +82,6 @@ namespace SEE.Controls.ReversibleActions.Drawable
         }
 
         /// <summary>
-        /// Resets the action values.
-        /// </summary>
-        public static void Reset()
-        {
-            firstStart = true;
-        }
-
-        /// <summary>
-        /// Enables the text menu.
-        /// When it starts the first time, it will add necessary listeners.
-        /// </summary>
-        public override void Awake()
-        {
-            base.Awake();
-            if (firstStart)
-            {
-                UICanvas.Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-                TextMenu.EnableForWriting();
-                firstStart = false;
-            }
-            else
-            {
-                TextMenu.Enable(false);
-            }
-        }
-
-        /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.WriteText"/>.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
@@ -175,13 +142,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                     textObj = GameTexter.WriteText(Surface, textOut, position,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
-                        TextMenu.IsOutlineEnabled(),
+                        TextMenu.Instance.IsOutlineEnabled(),
                         ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
-                        holder.OrderInLayer, TextMenu.GetFontStyle());
+                        holder.OrderInLayer, TextMenu.Instance.GetFontStyle());
                     new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(Surface, TextConf.GetText(textObj));
-                    GameTexter.RefreshMeshCollider(textObj);
+                    GameTextGeometry.RefreshMeshCollider(textObj);
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
@@ -198,16 +165,6 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 progress = ProgressState.GettingPosition;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Stops the <see cref="WriteTextAction"/>.
-        /// Refreshes the mesh collider of the text.
-        /// It is necessary because the MeshRenderer needs some time to generate and deploy the mesh.
-        /// </summary>
-        public override void Stop()
-        {
-            TextMenu.Instance.Disable();
         }
 
         /// <summary>

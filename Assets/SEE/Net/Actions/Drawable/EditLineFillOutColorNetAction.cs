@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
+using SEE.Game.Drawable.Line;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -41,7 +41,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeFillOutColor(FindChild(LineName), Color);
+            GameLineFillOut.ChangeFillOutColor(FindChild(LineName), Color);
         }
     }
 }

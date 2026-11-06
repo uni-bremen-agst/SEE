@@ -1,14 +1,15 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
-using SEE.Extensions;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -157,7 +158,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
                     string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                    GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                    GameLineGeometry.MovePoint(selectedLine, Indices, oldPointPosition);
                     new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                         oldPointPosition).Execute();
                 }
@@ -168,8 +169,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
         /// <summary>
         /// Allows the user to select a line, and based on the mouse position
-        /// at the moment of the click, it searches for the nearest point on the line.
-        /// Additionally, the blink effect is activated to show which line has been chosen.
+        /// at the moment of the click, it searches for the nearest point(s).
+        /// Rendered indices are translated to original line indices before
+        /// the selected points are accessed or modified.
+        /// Additionally, the blink effect is activated to show which line
+        /// has been chosen.
         /// </summary>
         private void SelectLine()
         {
@@ -184,28 +188,44 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     selectedLine = hitObject.transform.parent.gameObject;
 
-                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                    bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+                    LineRenderer renderer =
+                        selectedLine.GetComponent<LineRenderer>();
+
+                    bool startCapSelected =
+                        hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
 
                     Indices = new List<int>
                     {
                         startCapSelected ? 0 : renderer.positionCount - 1
                     };
-
-                    Vector3[] originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine);
-                    oldPointPosition = originalPositions[Indices[0]];
                 }
                 else
                 {
                     selectedLine = hitObject;
-                    NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
-                        out List<Vector3> _, out List<int> matchedIndices);
+
+                    NearestPoints.GetNearestPoints(
+                        selectedLine,
+                        raycastHit.point,
+                        out List<Vector3> _,
+                        out List<int> matchedIndices);
 
                     Indices = matchedIndices;
-
-                    Vector3[] originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine);
-                    oldPointPosition = originalPositions[Indices[0]];
                 }
+
+                Indices = LinePositionHelper.ToLogicalIndices(
+                    selectedLine,
+                    Indices);
+
+                if (Indices.Count == 0)
+                {
+                    selectedLine = null;
+                    return;
+                }
+
+                Vector3[] originalPositions =
+                    LinePositionHelper.GetSafeOriginalPositions(selectedLine);
+
+                oldPointPosition = originalPositions[Indices[0]];
 
                 selectedLine.AddOrGetComponent<BlinkEffect>();
             }
@@ -229,7 +249,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     if (GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
                     {
                         newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
-                        GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                        GameLineGeometry.MovePoint(selectedLine, Indices, newPointPosition);
                         new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name,
                             Indices, newPointPosition).Execute();
                     }
@@ -246,7 +266,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 && selectedLine.GetComponent<BlinkEffect>() == null)
             {
                 progressState = ProgressState.Finish;
-                GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                GameLineGeometry.MovePoint(selectedLine, Indices, newPointPosition);
                 new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name, Indices,
                     newPointPosition).Execute();
             }
@@ -265,7 +285,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             {
                 GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                GameLineGeometry.MovePoint(selectedLine, Indices, oldPointPosition);
                 new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                     oldPointPosition).Execute();
             }
@@ -284,7 +304,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             if (memento.Line != null)
             {
-                GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.OldPointPosition);
+                GameLineGeometry.MovePoint(memento.Line, memento.Indices, memento.OldPointPosition);
                 new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.OldPointPosition).Execute();
             }
@@ -302,7 +322,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
             if (memento.Line != null)
             {
-                GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.NewPointPosition);
+                GameLineGeometry.MovePoint(memento.Line, memento.Indices, memento.NewPointPosition);
                 new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.NewPointPosition).Execute();
             }

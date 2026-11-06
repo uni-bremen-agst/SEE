@@ -1,16 +1,13 @@
-﻿using SEE.Game;
+using SEE.Controls.KeyActions;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Extensions;
-using SEE.UI;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -82,19 +79,19 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
-                if (((SEEInput.MouseUp(MouseButton.Left) || SEEInput.MouseUp(MouseButton.Right))
-                    && isInAction && !waitForHelperMenu)
+                if ((SEEInput.MouseUp(MouseButton.Left) || SEEInput.MouseUp(MouseButton.Right))
+                    && isInAction && !waitForHelperMenu
                     || finishChosingColor)
                 {
-                    if (!ColorPickerMenu.GetSwitchStatus())
+                    if (!ColorPickerMenu.Instance.GetSwitchStatus())
                     {
                         ValueHolder.CurrentPrimaryColor = pickedColor;
-                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
+                        ColorPickerMenu.Instance.AssignPrimaryColor(pickedColor);
                     }
                     else
                     {
                         pickForSecondColor = true;
-                        ColorPickerMenu.AssignSecondaryColor(pickedColor);
+                        ColorPickerMenu.Instance.AssignSecondaryColor(pickedColor);
                         ValueHolder.CurrentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
@@ -107,7 +104,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// of <see cref="ColorPickerMindMapMenu"/>.
             /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
             /// that the input can be immediately detected.
-            if (waitForHelperMenu && ColorPickerMindMapMenu.TryGetColor(out Color color))
+            if (waitForHelperMenu && ColorPickerMindMapMenu.Instance.TryGetColor(out Color color))
             {
                 pickedColor = color;
                 waitForHelperMenu = false;
@@ -118,7 +115,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// of <see cref="ColorPickerLineMenu"/>.
             /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
             /// that the input can be immediately detected.
-            if (waitForHelperMenu && ColorPickerLineMenu.TryGetColor(out Color color1))
+            if (waitForHelperMenu && ColorPickerLineMenu.Instance.TryGetColor(out Color color1))
             {
                 pickedColor = color1;
                 waitForHelperMenu = false;
@@ -139,6 +136,14 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
 
+                /// Lines and their nested line-cap objects require their own resolution,
+                /// because a cap can use visual properties that differ from the main line.
+                if (ColorPickerLineMenu.Instance.TryBeginSelection(hitObject, true))
+                {
+                    waitForHelperMenu = true;
+                    return;
+                }
+
                 /// Check for the case that a child object of a drawable type object was clicked.
                 if (!Tags.DrawableTypes.Contains(hitObject.tag)
                     && !hitObject.CompareTag(Tags.Drawable)
@@ -149,26 +154,20 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
                 switch (hitObject.tag)
                 {
-                    case Tags.Line:
-                        LineConf line = LineConf.GetLine(hitObject);
-                        pickedColor = line.PrimaryColor;
-                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
-                        {
-                            ColorPickerLineMenu.Enable(hitObject);
-                            waitForHelperMenu = true;
-                        }
-                        break;
                     case Tags.DText:
                         pickedColor = hitObject.GetComponent<TextMeshPro>().color;
                         break;
+
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
+
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hitObject, true);
+                        ColorPickerMindMapMenu.Instance.Enable(hitObject, true);
                         waitForHelperMenu = true;
                         break;
+
                     case Tags.Drawable:
                         DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
@@ -189,6 +188,14 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
 
+                /// Lines and their nested line-cap objects require their own resolution,
+                /// because a cap can use visual properties that differ from the main line.
+                if (ColorPickerLineMenu.Instance.TryBeginSelection(hitObject, false))
+                {
+                    waitForHelperMenu = true;
+                    return;
+                }
+
                 /// Check for the case that a child object of a drawable type object was clicked.
                 if (!Tags.DrawableTypes.Contains(hitObject.tag)
                     && !hitObject.CompareTag(Tags.Drawable)
@@ -199,30 +206,20 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
                 switch (hitObject.tag)
                 {
-                    case Tags.Line:
-                        LineConf line = LineConf.GetLine(hitObject);
-                        pickedColor = line.SecondaryColor;
-                        if (line.ColorKind == GameDrawer.ColorKind.Monochrome)
-                        {
-                            pickedColor = line.PrimaryColor;
-                        }
-                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
-                        {
-                            ColorPickerLineMenu.Enable(hitObject);
-                            waitForHelperMenu = true;
-                        }
-                        break;
                     case Tags.DText:
                         pickedColor = hitObject.GetComponent<TextMeshPro>().outlineColor;
                         break;
+
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
+
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hitObject, false);
+                        ColorPickerMindMapMenu.Instance.Enable(hitObject, false);
                         waitForHelperMenu = true;
                         break;
+
                     case Tags.Drawable:
                         DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
@@ -232,14 +229,8 @@ namespace SEE.Controls.ReversibleActions.Drawable
         }
 
         /// <summary>
-        /// At the beginning of this action, it saves the current color values
-        /// (<see cref="ValueHolder.CurrentPrimaryColor"/> and <see cref="ValueHolder.CurrentSecondaryColor"/>)
-        /// of the <see cref="ValueHolder"/>.
-        /// It also adds to the UICanvas a <see cref="ColorPickerMenuDisabler"/> component.
-        /// This is required to prevent a display error when displaying the color picker menu.
-        /// (When it is displayed, the switch status is initialized once.
-        ///     It is activated once and then returns to its original position.)
-        /// Then it enables the color picker menu.
+        /// Saves the current primary and secondary colors when this action starts.
+        /// These values are required to undo a completed color pick later.
         /// </summary>
         public override void Awake()
         {
@@ -247,31 +238,24 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            UICanvas.Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
         }
 
         /// <summary>
-        /// Enables the color picker menu on action start.
-        /// </summary>
-        public override void Start()
-        {
-            base.Start();
-            ColorPickerMenu.Instance.Enable();
-        }
-
-        /// <summary>
-        /// Disables the color picker menu on action stop.
+        /// Stops the current color-picking interaction and clears any transient helper
+        /// menu state belonging to this action instance.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            ColorPickerMenu.Instance.Disable();
-            ColorPickerMindMapMenu.Instance.Destroy();
-        }
 
-        ~ColorPickerAction()
-        {
-            ColorPickerMenu.Instance.Destroy();
+            ColorPickerMindMapMenu.Instance.Destroy();
+            ColorPickerLineMenu.Instance.Destroy();
+
+            isInAction = false;
+            waitForHelperMenu = false;
+            finishChosingColor = false;
+            pickForSecondColor = false;
+            pickedColor = Color.clear;
         }
 
         /// <summary>
@@ -326,9 +310,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             base.Undo();
             ValueHolder.CurrentPrimaryColor = memento.OldChosenPrimaryColor;
-            ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
+            ColorPickerMenu.Instance.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
             ValueHolder.CurrentSecondaryColor = memento.OldChosenSecondColor;
-            ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
+            ColorPickerMenu.Instance.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
         }
 
         /// <summary>
@@ -340,12 +324,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (!memento.PickForSecondColor)
             {
                 ValueHolder.CurrentPrimaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
+                ColorPickerMenu.Instance.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
             }
             else
             {
                 ValueHolder.CurrentSecondaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
+                ColorPickerMenu.Instance.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
             }
         }
 

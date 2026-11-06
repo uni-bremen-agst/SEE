@@ -1,7 +1,6 @@
 ﻿using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
+using SEE.Game.Drawable.Line;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -14,7 +13,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The new color kind for the line.
         /// </summary>
-        public GameDrawer.ColorKind ColorKind;
+        public ColorKind ColorKind;
 
         /// <summary>
         /// The line configuration.
@@ -29,7 +28,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="line">The configuration of the line that should be changed.</param>
         /// <param name="colorKind">The new color kind for the line.</param>
         public ChangeColorKindNetAction(string drawableID, string parentDrawableID, LineConf line,
-            GameDrawer.ColorKind colorKind)
+            ColorKind colorKind)
             : base(drawableID, parentDrawableID)
         {
             Line = line;
@@ -43,7 +42,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameDrawer.ChangeColorKind(FindChild(Line.ID), ColorKind, Line);
+            GameLineAppearance.ChangeColorKind(FindChild(Line.ID), ColorKind, Line);
         }
     }
 }

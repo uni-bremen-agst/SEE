@@ -144,5 +144,24 @@ namespace SEE.Game.Drawable
                     multiplyValue * -ValueHolder.DistanceToDrawable.z);
             }
         }
+
+        /// <summary>
+        /// Sets the order in layer of the given drawable object.
+        /// </summary>
+        /// <param name="obj">The drawable object whose order should be changed.</param>
+        /// <param name="newOrder">The new order in layer.</param>
+        public static void SetOrderInLayer(GameObject obj, int newOrder)
+        {
+            if (Tags.DrawableTypes.Contains(obj.tag))
+            {
+                int oldOrder = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+
+                LayerChangerStates state = newOrder > oldOrder
+                    ? LayerChangerStates.Increase
+                    : LayerChangerStates.Decrease;
+
+                ChangeOrderInLayer(obj, newOrder, state, false);
+            }
+        }
     }
 }

@@ -1,9 +1,10 @@
-﻿using SEE.Game.Drawable.ValueHolders;
-using SEE.Extensions;
+﻿using SEE.Extensions;
+using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Graphs.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Graphs.Config;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -31,7 +32,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The node kind of the node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind;
+        public MindMapNodeKind NodeKind;
 
         /// <summary>
         /// The configuration of the mind map border (line).
@@ -137,6 +138,43 @@ namespace SEE.Game.Drawable.Configurations
             };
         }
 
+        /// <summary>
+        /// Updates the stored child-node and branch-line names after
+        /// imported Mind Map configurations have been renamed.
+        /// Names without a replacement remain unchanged.
+        /// </summary>
+        /// <param name="nodeNames">
+        /// Maps original node names to their final names.
+        /// </param>
+        /// <param name="branchNames">
+        /// Maps original branch-line names to their final names.
+        /// </param>
+        internal void RenameChildReferences(
+            IReadOnlyDictionary<string, string> nodeNames,
+            IReadOnlyDictionary<string, string> branchNames)
+        {
+            Dictionary<string, string> renamedChildren = new();
+
+            foreach (KeyValuePair<string, string> child in childrenNames)
+            {
+                string childName =
+                    nodeNames.TryGetValue(
+                        child.Key, out string newChildName)
+                        ? newChildName
+                        : child.Key;
+
+                string branchName =
+                    branchNames.TryGetValue(
+                        child.Value, out string newBranchName)
+                        ? newBranchName
+                        : child.Value;
+
+                renamedChildren.Add(childName, branchName);
+            }
+
+            childrenNames = renamedChildren;
+        }
+
         #region Config I/O
 
         /// <summary>
@@ -240,13 +278,13 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore the node kind.
             if (attributes.TryGetValue(nodeKindLabel, out object kind)
-                && Enum.TryParse<GameMindMap.NodeKind>((string)kind, out GameMindMap.NodeKind result))
+                && Enum.TryParse<MindMapNodeKind>((string)kind, out MindMapNodeKind result))
             {
                 NodeKind = result;
             }
             else
             {
-                NodeKind = GameMindMap.NodeKind.Theme;
+                NodeKind = MindMapNodeKind.Theme;
                 errors = true;
             }
 

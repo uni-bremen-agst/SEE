@@ -98,5 +98,14 @@ namespace SEE.UI.PropertyDialog.Drawable
             filename = "";
             return false;
         }
+
+        /// <summary>
+        /// Closes the dialog and discards any input that has not yet been consumed.
+        /// </summary>
+        internal void CloseDialog()
+        {
+            GotInput = false;
+            Close();
+        }
     }
 }

@@ -3,6 +3,11 @@ using SEE.Utils;
 using SEE.Extensions;
 using SEE.Controls.ReversibleActions.HolisticMetrics;
 using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Controls.ReversibleActions.Drawable.CutCopyPaste;
+using SEE.Controls.ReversibleActions.Drawable.DrawShapes;
+using SEE.Controls.ReversibleActions.Drawable.Load;
+using SEE.Controls.ReversibleActions.Drawable.MoveRotate;
+using SEE.Controls.ReversibleActions.Drawable.StickyNote;
 using SEE.Controls.ReversibleActions.Tables;
 
 namespace SEE.Controls.ReversibleActions
