@@ -16,9 +16,9 @@ unrelated to the migration are recorded as observations. A failed manual
 test is not automatically classified as a migration regression; compare
 the previous version when the cause is unclear.
 
-**Execution state: Work in progress — snapshot exported on 05.11.2026.**
-The recorded case statuses are 19 Passed, 1 Failed, 0 Blocked, and 35 Not tested
-(20 of 55 cases have a recorded execution result). These totals summarize the
+**Execution state: Work in progress — snapshot exported on 07.11.2026.**
+The recorded case statuses are 32 Passed, 2 Failed, 0 Blocked, and 21 Not tested
+(34 of 55 cases have a recorded execution result). These totals summarize the
 entries below; they are not a new test run or final acceptance of the migration.
 Continue recording Actual result and Evidence / defects as testing progresses.
 
@@ -37,8 +37,7 @@ Continue recording Actual result and Evidence / defects as testing progresses.
 Each test case records the tester and platform used.
 Deviations from this environment must be documented in the test case,
 including a different commit, scene, keybinding, or required test harness.
-The global environment and the TC-01 metadata below follow the supplied
-example; other tester/date/platform fields are intentionally unassigned.
+Tester/date/platform fields remain unassigned for cases that have not been tested.
 
 ## Preparation and Menu Access
 
@@ -101,15 +100,15 @@ Use a separate filled copy for each tester/platform or comparison run.
 | Test case | Objective / UI | Status |
 | --- | --- | --- |
 | [TC-01](#tc-01) | Runtime ConfigMenu dropdown selection | Passed |
-| [TC-02](#tc-02) | Main menus, lists, and nested navigation | Not tested |
+| [TC-02](#tc-02) | Main menus, lists, and nested navigation | Passed |
 | [TC-03](#tc-03) | Property dialog validation, confirmation, and cancellation | Passed |
 | [TC-04](#tc-04) | Property-dialog file and directory input | Passed |
 | [TC-05](#tc-05) | In-game Settings navigation | Passed |
 | [TC-06](#tc-06) | Keybinding confirmation dialog | Passed |
-| [TC-07](#tc-07) | Notification appearance and dismissal | Not tested |
+| [TC-07](#tc-07) | Notification appearance and dismissal | Passed |
 | [TC-08](#tc-08) | Help entry controls and close icon | Failed |
 | [TC-09](#tc-09) | Hand-animation calibration instructions | Passed |
-| [TC-10](#tc-10) | Shared window frame behavior | Not tested |
+| [TC-10](#tc-10) | Shared window frame behavior | Passed |
 | [TC-11](#tc-11) | Tree View navigation, search, and scrolling | Passed |
 | [TC-12](#tc-12) | Property Window display and controls | Passed |
 | [TC-13](#tc-13) | Context-menu entries and submenus | Passed |
@@ -131,22 +130,22 @@ Use a separate filled copy for each tester/platform or comparison run.
 | [TC-29](#tc-29) | Shape settings and Shape/Config switch | Not tested |
 | [TC-30](#tc-30) | Text creation, style, and colors | Not tested |
 | [TC-31](#tc-31) | Image source selection | Not tested |
-| [TC-32](#tc-32) | Mind map creation menu | Not tested |
-| [TC-33](#tc-33) | Mind map parent selector | Not tested |
-| [TC-34](#tc-34) | Mind map node editing menu | Not tested |
-| [TC-35](#tc-35) | Mind map node-kind selector | Not tested |
-| [TC-36](#tc-36) | Line color-choice menu | Not tested |
-| [TC-37](#tc-37) | Mind map color-choice menu | Not tested |
+| [TC-32](#tc-32) | Mind map creation menu | Passed |
+| [TC-33](#tc-33) | Mind map parent selector | Failed |
+| [TC-34](#tc-34) | Mind map node editing menu | Passed |
+| [TC-35](#tc-35) | Mind map node-kind selector | Passed |
+| [TC-36](#tc-36) | Line color-choice menu | Passed  |
+| [TC-37](#tc-37) | Mind map color-choice menu | Passed (but bug exists) |
 | [TC-38](#tc-38) | Drawable Move/Rotate controls | Not tested |
 | [TC-39](#tc-39) | Drawable and Sticky Note scale menu | Not tested |
 | [TC-40](#tc-40) | Drawable cut/copy/paste menu | Not tested |
 | [TC-41](#tc-41) | Drawable save options | Not tested |
 | [TC-42](#tc-42) | Drawable load options | Not tested |
-| [TC-43](#tc-43) | Sticky Note operation selection | Not tested |
-| [TC-44](#tc-44) | Sticky Note fine movement | Not tested |
-| [TC-45](#tc-45) | Sticky Note edit controls | Not tested |
-| [TC-46](#tc-46) | Sticky Note X rotation | Not tested |
-| [TC-47](#tc-47) | Sticky Note Y rotation | Not tested |
+| [TC-43](#tc-43) | Sticky Note operation selection | Passed |
+| [TC-44](#tc-44) | Sticky Note fine movement | Passed |
+| [TC-45](#tc-45) | Sticky Note edit controls | Passed |
+| [TC-46](#tc-46) | Sticky Note X rotation | Passed |
+| [TC-47](#tc-47) | Sticky Note Y rotation | Passed |
 | [TC-48](#tc-48) | Drawable Manager search and controls | Not tested |
 | [TC-49](#tc-49) | Drawable Manager rows with and without descriptions | Not tested |
 | [TC-50](#tc-50) | Surface color menu | Not tested |
@@ -202,11 +201,11 @@ from confirmed migration regressions.
 
 ## TC-02 – Main menus, lists, and nested navigation
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -227,16 +226,9 @@ from confirmed migration regressions.
 | 4 | Scroll a long list and use its search field. | The list moves at a usable speed and search changes the displayed entries. |
 | 5 | Hover over and select one entry, then reopen the menu. | Hover feedback is visible; one selection activates one action, and the menu remains usable. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-03"></a>
 
@@ -399,11 +391,11 @@ Visible and working back button in Audio Settings:
 
 ## TC-07 – Notification appearance and dismissal
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -423,16 +415,9 @@ Visible and working back button in Audio Settings:
 | 4 | Start Host and trigger an information message, for example Metric Board → Save Board with no boards, then click its Save button. | The expected information notification appears. |
 | 5 | With no text input focused, press X. | Existing notifications are dismissed. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-08"></a>
 
@@ -516,12 +501,12 @@ MUIP 5:
 
 ## TC-10 – Shared window frame behavior
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
-
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
+-
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
 **Objective:** Verify dragging, resizing, closing, and switching windows.
@@ -540,16 +525,9 @@ MUIP 5:
 | 4 | Switch between open window tabs. | The corresponding content becomes active. |
 | 5 | Close Tree View and reopen it with Tab. | The window can be opened again and its header controls still work. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-11"></a>
 
@@ -1322,11 +1300,11 @@ from confirmed migration regressions.
 
 ## TC-32 – Mind map creation menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1346,26 +1324,19 @@ from confirmed migration regressions.
 | 4 | Select the Theme as parent and confirm. | The Subtheme is linked to the Theme. |
 | 5 | Repeat Space → Drawable → Mind Map → Leaf and complete placement/parent selection. | The Leaf is created with the selected parent. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-33"></a>
 
 ## TC-33 – Mind map parent selector
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Failed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1385,26 +1356,26 @@ from confirmed migration regressions.
 | 3 | Select a different valid Theme and confirm. | The Subtheme parent/connection changes to the selected node. |
 | 4 | Reopen Space → Drawable → Edit → the Subtheme → Parent, then use the return control. | The editing workflow is restored without an unintended parent change. |
 
-**Actual result:**
+**Actual result:** All functional steps worked as expected, including
+selecting and changing the parent. However, clicking Choose Parent
+triggered two MissingReferenceException errors for
+Michsky.MUIP.ButtonManager and UnityEngine.UI.Button.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+**Evidence / defects:** Both errors report access to destroyed button
+components during click processing. Parent selection remained usable.
 
-**Evidence / defects:**
+![TC-33: Exceptions when choosing a mind map parent](images/issue-701/tc-33-choose-parent-errors.png)
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
 
 <a id="tc-34"></a>
 
 ## TC-34 – Mind map node editing menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1425,27 +1396,20 @@ from confirmed migration regressions.
 | 4 | Press Space → Drawable → Edit → click the Theme without a parent connection. | The editing menu is shown for the Theme. |
 | 5 | Inspect and try BranchLine. | BranchLine remains disabled and does not open a non-existent connection editor. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-35"></a>
 
 ## TC-35 – Mind map node-kind selector
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
-
+- **Tester:** Noah Thiering
+- **Date:** 06.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
+-
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
 **Objective:** Verify node-kind changes and selector-arrow feedback.
@@ -1465,26 +1429,19 @@ from confirmed migration regressions.
 | 4 | Complete any required parent selection and inspect the node. | Its kind and connection are consistent with the chosen operation. |
 | 5 | Reopen Edit → the test node → NodeKind and use the return control. | The return path remains functional. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-36"></a>
 
 ## TC-36 – Line color-choice menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1507,8 +1464,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -1520,11 +1476,11 @@ from confirmed migration regressions.
 
 ## TC-37 – Mind map color-choice menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed (but bug exists)
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1547,14 +1503,14 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+The first two use cases work but the branch selection is not possible. This was also the case in the old build so its not caused by the MUIP update.
+
+Also there is a bug where picking a color, editing the mindmap subtheme and then picking color again breaks the whole UI. (Same bug also exists in the old build)
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+![TC-37: Mind map color-picker observation](images/issue-701/tc-37-mind-map-color-picker.png)
+
 
 <a id="tc-38"></a>
 
@@ -1758,11 +1714,11 @@ from confirmed migration regressions.
 
 ## TC-43 – Sticky Note operation selection
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1784,8 +1740,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -1797,11 +1752,11 @@ from confirmed migration regressions.
 
 ## TC-44 – Sticky Note fine movement
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1824,8 +1779,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -1837,11 +1791,11 @@ from confirmed migration regressions.
 
 ## TC-45 – Sticky Note edit controls
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1863,8 +1817,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -1876,11 +1829,11 @@ from confirmed migration regressions.
 
 ## TC-46 – Sticky Note X rotation
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1902,8 +1855,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -1915,11 +1867,11 @@ from confirmed migration regressions.
 
 ## TC-47 – Sticky Note Y rotation
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 06.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1941,8 +1893,7 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
@@ -2352,17 +2303,26 @@ every template has its own independently reachable menu.
 
 | Total | Passed | Failed | Blocked | Not tested |
 | --- | --- | --- | --- | --- |
-| 55 | 19 | 1 | 0 | 35 |
+| 55 | 32 | 2 | 0 | 21 |
+
+Excluding TC-54 and TC-55: 53 cases, 32 Passed, 2 Failed, 0 Blocked, and
+19 Not tested. TC-37 is counted as Passed according to its recorded status
+("Passed (but bug exists)").
+
+| Tester | Passed | Failed | Executed |
+| --- | --- | --- | --- |
+| Noah Thiering | 20 | 2 | 22 |
+| Tristan Mundt | 12 | 0 | 12 |
 
 **Tester / platform / date:** Noah Thiering (macOS 27.2) and Tristan Mundt
-(Windows 11); see the metadata of each executed case dated 05.11.2026.
+(Windows 11); see the metadata of each executed case dated 05.–06.11.2026.
 This is a combined progress snapshot, not evidence that every case was run on
 both platforms.
 
-**Overall result:** Work in progress. 20 of 55 cases have recorded execution
-results: 19 are marked Passed and 1 Failed. 35 remain Not tested. The Passed
+**Overall result:** Work in progress. 34 of 55 cases have recorded execution
+results: 32 are marked Passed and 2 Failed. 21 remain Not tested. The Passed
 count retains the testers' recorded classifications, including the observations
-in TC-05 and TC-12; those observations still need to be addressed in the final
+in TC-05, TC-12, and TC-37; those observations still need to be addressed in the final
 assessment. The manual test run is not complete.
 
 **Open defects / observations / blocked cases:**
@@ -2378,7 +2338,14 @@ assessment. The manual test run is not complete.
   subsequent ArgumentNullException errors remain unclassified. The recorded
   actual result refers to Tree View although this case targets Property Window;
   clarify the tested view before finalizing the report.
-- **TC-24 and the other 34 Not tested cases:** Complete the tests or record
+- **TC-33 — Failed:** Choosing a parent triggers MissingReferenceException
+  errors for ButtonManager and Button, although parent selection remains usable.
+  Whether these errors are migration regressions has not yet been established.
+- **TC-37 — recorded Passed with existing issues:** Branch color selection is
+  unavailable; picking a color again after editing a Subtheme can break the UI.
+  The tester reports both behaviors also occur before the upgrade. See the case
+  for evidence and reproduction details.
+- **TC-24 and the other 20 Not tested cases:** Complete the tests or record
   a concrete blocker if prerequisites prevent execution. No case is currently
   marked Blocked.
 
