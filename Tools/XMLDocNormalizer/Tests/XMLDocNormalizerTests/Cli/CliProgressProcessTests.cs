@@ -40,13 +40,28 @@ public sealed class CliProgressProcessTests
             Assert.Equal(ToolExitCodes.Findings, off.Code);
             Assert.Equal(off.Code, on.Code);
             Assert.Equal("", off.Error);
-            Assert.DoesNotContain("[Documentation]", on.Output);
-            Assert.Contains("[Load inputs]", on.Error);
-            Assert.Contains("[Prepare compilations]", on.Error);
-            Assert.Contains("[Documentation] finished; 1/1 files", on.Error);
+            Assert.DoesNotContain("Completed |", on.Output); Assert.DoesNotContain("Current |", on.Output);
+            Assert.Contains("Pending | [ ] Load inputs", on.Error);
+            Assert.Contains("Pending | [ ] Prepare compilations", on.Error);
+            Assert.Contains("Completed | [ok] Documentation; 1/1 files", on.Error);
             Assert.Contains("roots completed 1, started 1", on.Error);
-            Assert.Contains("contexts discovered " + contexts, on.Error);
-            Assert.Contains("context workitems processed " + contexts, on.Error);
+            if (mode == "direct")
+            {
+                Assert.DoesNotContain("contexts/workitems", on.Error);
+                Assert.DoesNotContain("contexts discovered 0", on.Error);
+            }
+            else
+            {
+                Assert.Contains("contexts discovered " + contexts, on.Error);
+                Assert.Contains("context workitems processed " + contexts, on.Error);
+            }
+            foreach (string phase in new[] { "Load inputs", "Prepare compilations", "Documentation", "Exception flow", "Finalize and report" })
+                Assert.Contains("Completed | [ok] " + phase, on.Error);
+            Assert.True(on.Error.IndexOf("Completed | [ok] Load inputs", StringComparison.Ordinal) < on.Error.IndexOf("Current | [>] Prepare compilations", StringComparison.Ordinal));
+            Assert.True(on.Error.IndexOf("Completed | [ok] Prepare compilations", StringComparison.Ordinal) < on.Error.IndexOf("Current | Documentation", StringComparison.Ordinal));
+            Assert.True(on.Error.IndexOf("Completed | [ok] Documentation", StringComparison.Ordinal) < on.Error.IndexOf("Completed | [ok] Exception flow", StringComparison.Ordinal));
+            Assert.True(on.Error.IndexOf("Completed | [ok] Exception flow", StringComparison.Ordinal) < on.Error.IndexOf("Current | [>] Finalize and report", StringComparison.Ordinal));
+            Assert.True(on.Error.IndexOf("Current | [>] Finalize and report", StringComparison.Ordinal) < on.Error.IndexOf("Completed | [ok] Finalize and report", StringComparison.Ordinal));
             Assert.DoesNotContain('%', on.Error);
             Assert.DoesNotContain('\u001b', on.Error);
             Assert.True(on.Error.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length <= 20);

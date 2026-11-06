@@ -53,7 +53,8 @@ namespace XMLDocNormalizer.Execution
             try
             {
                 RunResult result = RunCore(options);
-                progress?.Finish(result.Coverage.Report());
+                progress?.Finish(result.Coverage.Report(), finalFindings: result.FindingCount,
+                    finalErrors: result.ErrorCount, finalWarnings: result.WarningCount, finalHints: result.SuggestionCount);
                 return result;
             }
             finally { ConsoleLogger.CurrentProgress = previous; }
@@ -84,6 +85,7 @@ namespace XMLDocNormalizer.Execution
 
             ConsoleLogger.InfoVerbose("File or directory detected. Running without semantic analysis.");
             List<string> files = FileDiscovery.EnumerateCsFiles(options.TargetPath);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Loading);
 
             if (options.CheckOnly)
             {
@@ -107,14 +109,21 @@ namespace XMLDocNormalizer.Execution
             ConsoleLogger.Info("Bounded external target: selected-root exception findings only; not a full project check.");
             // No reporter or success result exists until the complete B21/B22 operation succeeds.
             RunResult result = new();
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Loading);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.External);
             result.UseCoverage(analyzed.Coverage!);
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
             result.AccumulateFindings(analyzed.Findings);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Aggregation);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
+            ConsoleLogger.CurrentProgress?.BeginFinalization();
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             foreach (var file in analyzed.Findings.GroupBy(finding => finding.FilePath))
             { ReportFile(reporter, file.Key, file.ToArray()); }
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Output);
             return result;
         }
 
@@ -158,27 +167,38 @@ namespace XMLDocNormalizer.Execution
                     : null;
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             List<Project> projectsToAnalyze = LoadProjectsToAnalyze(path, options, workspace, progress);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Loading);
 
             if (workspace.Diagnostics.Any(diagnostic => diagnostic.Kind == WorkspaceDiagnosticKind.Failure))
                 result.Coverage.Incomplete("WorkspaceLoadIncomplete");
 
             ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
+            bool preparationAvailable = true;
+            Action<string> preparationIssue = result.Coverage.Incomplete;
+            if (ConsoleLogger.CurrentProgress is not null) preparationIssue = reason =>
+            {
+                if (reason is "CompilationUnavailable" or "ProjectCoverageIncomplete") preparationAvailable = false;
+                result.Coverage.Incomplete(reason);
+            };
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     projectsToAnalyze,
                     options.XmlDocOptions.ExceptionAnalysisMode,
-                    result.Coverage.Incomplete);
+                    preparationIssue);
 
             ExceptionFlowSummaryAnalysisSession? summaryAnalysisSession =
                 CreateExceptionFlowSummaryAnalysisSession(
                     options.XmlDocOptions,
                     semanticContext);
 
+            if (preparationAvailable) ConsoleLogger.CurrentProgress?.Complete(RunPhase.Compilation);
+            else ConsoleLogger.CurrentProgress?.Interrupt(RunPhase.Compilation);
+
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
             ConsoleLogger.CurrentProgress?.SetTotal(RunPhase.Documentation, projectsToAnalyze.Sum(p =>
                 p.Documents.Count(d => d.FilePath is { } path && !ToolFileFilter.ShouldExclude(path, options))));
-            ConsoleLogger.InfoVerbose($"Processing {totalDocuments} document(s)...");
+            ConsoleLogger.InfoVerbose($"Discovered {totalDocuments} document(s) before eligibility filtering.");
 
             int currentDocument = 0;
             foreach (Project project in projectsToAnalyze)
@@ -192,7 +212,6 @@ namespace XMLDocNormalizer.Execution
                 }
                 ConsoleLogger.CurrentProgress?.Begin(RunPhase.Compilation);
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
-
                 if (compilation == null)
                 {
                     result.Coverage.Incomplete("CompilationUnavailable");
@@ -280,19 +299,26 @@ namespace XMLDocNormalizer.Execution
                             result.Coverage,
                             ConsoleLogger.CurrentProgress?.FlowObserver));
 
+                    ConsoleLogger.CurrentProgress?.CompleteExceptionFile();
                     ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
                     result.AccumulateFindings(findings);
                     ConsoleLogger.CurrentProgress?.Findings(result.FindingCount);
                     ReportFile(reporter, filePath, findings);
                 }
 
+                ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
                 FlushNamespaceFindings(namespaceAggregator, result, reporter);
             }
 
+            ConsoleLogger.CurrentProgress?.EndAnalysis();
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Aggregation);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
+            ConsoleLogger.CurrentProgress?.BeginFinalization();
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
             WriteStatisticsIfEnabled(options, statistics);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Output);
             ConsoleLogger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
@@ -393,6 +419,7 @@ namespace XMLDocNormalizer.Execution
             using RunProgress? progress = RunProgress.Create(options);
             RunProgress? previous = ConsoleLogger.CurrentProgress;
             ConsoleLogger.CurrentProgress = progress;
+            progress?.UseInlineReporting();
             try { var result = RunComparisonCore(options); progress?.Finish(); return result; }
             finally { ConsoleLogger.CurrentProgress = previous; }
         }
@@ -448,6 +475,7 @@ namespace XMLDocNormalizer.Execution
             IProgress<ProjectLoadProgress>? progress = CreateLoadProgress();
 
             List<Project> projectsToAnalyze = LoadProjectsToAnalyze(path, options, workspace, progress);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Loading);
 
             Stopwatch sharedStopwatch = Stopwatch.StartNew();
             PreparedSemanticComparisonInput prepared = PrepareSemanticComparisonInput(projectsToAnalyze, options);
@@ -470,6 +498,11 @@ namespace XMLDocNormalizer.Execution
                 comparisonResult.Modes.Add(modeExecution);
             }
 
+            ConsoleLogger.CurrentProgress?.EndAnalysis();
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Compilation);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Aggregation);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Output);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
             totalStopwatch.Stop();
             ConsoleLogger.Info($"\nComparison analysis finished in {totalStopwatch.ElapsedMilliseconds} ms.");
 
@@ -517,6 +550,7 @@ namespace XMLDocNormalizer.Execution
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
                 if (compilation == null)
                 {
+                    ConsoleLogger.CurrentProgress?.Interrupt(RunPhase.Compilation);
                     ConsoleLogger.Warn($"Compilation for project {project.Name} is null. Skipping this project.");
                     prepared.BaselineResult.Coverage.Incomplete("CompilationUnavailable");
                     continue;
@@ -600,6 +634,7 @@ namespace XMLDocNormalizer.Execution
                 }
             }
 
+            ConsoleLogger.CurrentProgress?.EndAnalysis(exceptionFlow: false);
             return prepared;
         }
 
@@ -688,6 +723,7 @@ namespace XMLDocNormalizer.Execution
                     modeOptions.XmlDocOptions,
                     semanticContext);
 
+            if (mode == Enum.GetValues<ExceptionAnalysisMode>()[^1]) ConsoleLogger.CurrentProgress?.Complete(RunPhase.Compilation);
             foreach (PreparedSemanticDocument document in prepared.Documents)
             {
                 ConsoleLogger.CurrentProgress?.Begin(RunPhase.ExceptionFlow, document.FilePath);
@@ -972,12 +1008,18 @@ namespace XMLDocNormalizer.Execution
                 ReportFile(reporter, file, findings);
             }
 
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
             FlushNamespaceFindings(namespaceAggregator, result, reporter);
 
+            ConsoleLogger.CurrentProgress?.EndAnalysis(exceptionFlow: false);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Aggregation);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
+            ConsoleLogger.CurrentProgress?.BeginFinalization();
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
             WriteStatisticsIfEnabled(options, statistics);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Output);
 
             return result;
         }
@@ -1014,6 +1056,8 @@ namespace XMLDocNormalizer.Execution
                 FixSingleFile(originalFile, options, result);
                 ConsoleLogger.CurrentProgress?.DocumentCompleted(RunPhase.Rewrite);
             }
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Rewrite);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
 
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;

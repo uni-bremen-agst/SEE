@@ -69,7 +69,7 @@ public sealed class CliProgressTests
     public void RegularDetectorCallsDoNotAdvanceTheFileCounter()
     {
         TimeSpan now = TimeSpan.Zero; var writer = new StringWriter();
-        using var progress = new RunProgress(writer, true, false, () => now, () => 300, false);
+        using var progress = new RunProgress(writer, true, false, () => now, () => 300, false, terminal: new ProgressTestTerminal(writer, 300));
         progress.SetTotal(RunPhase.Documentation, 2);
         progress.Begin(RunPhase.Documentation, "First.cs");
         for (int n = 0; n < 20; n++) { now += TimeSpan.FromSeconds(1); progress.Detector("Param"); }
@@ -78,7 +78,7 @@ public sealed class CliProgressTests
         Assert.Contains("50% 1/2 files", writer.ToString());
         Assert.DoesNotContain("100%", writer.ToString());
         progress.Finish(failed: true);
-        Assert.Contains("failed/interrupted", writer.ToString());
+        Assert.Contains("Execution failed", writer.ToString());
         Assert.Contains("1/2 files", writer.ToString());
     }
 
@@ -86,19 +86,19 @@ public sealed class CliProgressTests
     public void RefreshOnlyChangesTimeAndActivityAge()
     {
         TimeSpan now = TimeSpan.Zero; var writer = new StringWriter();
-        using var progress = new RunProgress(writer, true, false, () => now, () => 400, false);
+        using var progress = new RunProgress(writer, true, false, () => now, () => 400, false, terminal: new ProgressTestTerminal(writer, 400));
         progress.Begin(RunPhase.ExceptionFlow);
         progress.Observe(new(ExceptionFlowProgressKind.RootStarted));
         progress.Observe(new(ExceptionFlowProgressKind.ContextDiscovered, 7));
         now = TimeSpan.FromSeconds(12); progress.Refresh();
         Assert.Contains("00:12", writer.ToString());
-        Assert.Contains("activity 12s ago", writer.ToString());
+        Assert.Contains("Last activity: 12s ago", writer.ToString());
         Assert.DoesNotContain("%", writer.ToString());
         progress.Finish();
         string text = writer.ToString();
-        Assert.Contains("roots completed 0, started 1", text);
-        Assert.Contains("contexts discovered 7", text);
-        Assert.Contains("context workitems processed 0", text);
+        Assert.Contains("Roots     : 0 completed / 1 started", text);
+        Assert.Contains("Contexts  : 7 discovered", text);
+        Assert.Contains("Workitems : 0 processed", text);
         Assert.DoesNotContain("ETA", text);
         int length = text.Length; progress.Refresh(); Assert.Equal(length, writer.ToString().Length);
     }
@@ -112,8 +112,8 @@ public sealed class CliProgressTests
         progress.Begin(RunPhase.Documentation); progress.DocumentCompleted();
         now = TimeSpan.FromSeconds(3); progress.Begin(RunPhase.ExceptionFlow);
         now = TimeSpan.FromSeconds(13); progress.Begin(RunPhase.Documentation); progress.DocumentCompleted();
-        now = TimeSpan.FromSeconds(15); progress.Finish();
-        Assert.Contains("[Documentation] finished; 2/2 files; 00:05", writer.ToString());
+        progress.Complete(RunPhase.ExceptionFlow); now = TimeSpan.FromSeconds(15); progress.Finish();
+        Assert.Contains("Completed | [ok] Documentation; 2/2 files; 00:03", writer.ToString());
         Assert.Contains("processed 0; 00:10", writer.ToString());
     }
 
@@ -121,14 +121,14 @@ public sealed class CliProgressTests
     public void VerboseMemberTracksProcessingRatherThanDiscoveredTargets()
     {
         TimeSpan now = TimeSpan.Zero; var writer = new StringWriter(); var fixture = FlowFixture();
-        using var progress = new RunProgress(writer, true, true, () => now, () => 300, false);
+        using var progress = new RunProgress(writer, true, true, () => now, () => 300, false, terminal: new ProgressTestTerminal(writer, 300));
         progress.Begin(RunPhase.ExceptionFlow);
         var type = fixture.Compilation.GetTypeByMetadataName("Entry")!;
         progress.Observe(new(ExceptionFlowProgressKind.ContextStarted, Symbol: type.GetMembers("Run").Single()));
         progress.Observe(new(ExceptionFlowProgressKind.ContextDiscovered, Symbol: type.GetMembers("B").Single()));
         now = TimeSpan.FromSeconds(2); progress.Refresh(); progress.Finish();
-        Assert.Contains("member Entry.Run()", writer.ToString());
-        Assert.DoesNotContain("member Entry.B()", writer.ToString());
+        Assert.Contains("Member: Entry.Run()", writer.ToString());
+        Assert.DoesNotContain("Member: Entry.B()", writer.ToString());
     }
 
     [Fact]
@@ -147,20 +147,23 @@ public sealed class CliProgressTests
     public void NarrowTerminalAndResizeNeverWrapALine(int narrow)
     {
         TimeSpan now = TimeSpan.Zero; int width = 120; var writer = new StringWriter();
-        using var progress = new RunProgress(writer, true, true, () => now, () => width, false);
+        var terminal = new ProgressTestTerminal(writer, width);
+        using var progress = new RunProgress(writer, true, true, () => now, () => width, false, terminal: terminal);
         progress.Begin(RunPhase.Documentation, new string('a', 150) + ".cs");
-        writer.GetStringBuilder().Clear(); width = narrow; now = TimeSpan.FromSeconds(1); progress.Refresh();
-        Assert.All(writer.ToString().Split('\r'), line => Assert.True(line.Length <= narrow - 1));
+        writer.GetStringBuilder().Clear(); terminal.Writes.Clear(); width = terminal.Width = narrow; now = TimeSpan.FromSeconds(1); progress.Refresh();
+        Assert.All(terminal.Writes, line => Assert.True(line.Text.TrimEnd().Length <= narrow - 1));
+        int written = terminal.Writes.Count; now += TimeSpan.FromSeconds(1); progress.Refresh();
+        if (narrow < 32) { Assert.Contains("Live display unavailable", writer.ToString()); Assert.Equal(written, terminal.Writes.Count); }
     }
 
     [Fact]
     public void VerboseShowsTheActualDetectorAndNonInteractiveOutputIsBounded()
     {
         TimeSpan now = TimeSpan.Zero; var writer = new StringWriter();
-        using (var progress = new RunProgress(writer, true, true, () => now, () => 180, false))
+        using (var progress = new RunProgress(writer, true, true, () => now, () => 180, false, terminal: new ProgressTestTerminal(writer, 180)))
         {
             progress.Begin(RunPhase.Documentation, "One.cs"); now = TimeSpan.FromSeconds(2); progress.Detector("Param");
-            Assert.Contains("detector Param", writer.ToString()); progress.Finish();
+            Assert.Contains("Current: Documentation check - Param", writer.ToString()); progress.Finish();
         }
         writer.GetStringBuilder().Clear();
         using (var progress = new RunProgress(writer, false, true, () => now, startTimer: false))
@@ -172,9 +175,9 @@ public sealed class CliProgressTests
             }
             progress.Finish(new("Succeeded", "Incomplete", "Test", "SolutionTransitive", ["TargetCoverageIncomplete"]));
         }
-        Assert.True(writer.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries).Length <= 5);
+        Assert.True(writer.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries).Length <= 20);
         Assert.Contains("1000/1000 files", writer.ToString());
-        Assert.Contains("analysis Incomplete", writer.ToString());
+        Assert.DoesNotContain("Coverage", writer.ToString()); Assert.DoesNotContain("analysis Incomplete", writer.ToString());
         Assert.DoesNotContain('\r', writer.ToString().Replace("\r\n", "\n", StringComparison.Ordinal));
     }
 
@@ -249,11 +252,11 @@ public sealed class CliProgressTests
     {
         using var fixture = new Files();
         var invalid = Capture(() => Assert.Throws<ArgumentException>(() => ToolRunner.Run(Options(Path.Combine(fixture.Root, "missing"), "none", OutputFormat.Json, ProgressMode.On))));
-        Assert.Contains("failed/interrupted", invalid.Error);
-        Assert.Contains("[Run] Failed", invalid.Error);
+        Assert.Contains("Stopped | [!!] Load inputs", invalid.Error);
+        Assert.Contains("[!!] Execution failed", invalid.Error);
         var output = Capture(() => Assert.ThrowsAny<Exception>(() => ToolRunner.Run(Options(fixture.Root, fixture.Root, OutputFormat.Json, ProgressMode.On))));
-        Assert.Contains("[Write output] failed/interrupted", output.Error);
-        Assert.Contains("[Run] Failed", output.Error);
+        Assert.Contains("Stopped | [!!] Finalize and report", output.Error);
+        Assert.Contains("[!!] Execution failed", output.Error);
         Assert.Null(ConsoleLogger.CurrentProgress);
     }
 

@@ -76,7 +76,7 @@ namespace XMLDocNormalizer.Cli.Output
         }
 
         /// <summary>
-        /// Clears the current progress line before other console output.
+        /// Leaves the completed progress region visible and the cursor below it.
         /// </summary>
         public static void EndProgress()
         {
@@ -93,7 +93,7 @@ namespace XMLDocNormalizer.Cli.Output
         internal static void WithProgressPaused(Action output)
         {
             if (CurrentProgress is null) { output(); return; }
-            lock (SyncRoot) { EndProgress(); output(); }
+            lock (SyncRoot) { CurrentProgress.WithOutput(output); }
         }
 
         /// <summary>

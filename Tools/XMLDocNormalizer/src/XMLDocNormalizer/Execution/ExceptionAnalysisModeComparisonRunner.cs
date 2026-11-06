@@ -39,7 +39,7 @@ namespace XMLDocNormalizer.Execution
         public static ExceptionAnalysisModeComparisonReportDto Run(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
-            using RunProgress? progress = RunProgress.Create(options);
+            using RunProgress? progress = RunProgress.Create(options, isolatedComparison: true);
             RunProgress? previous = ConsoleLogger.CurrentProgress;
             ConsoleLogger.CurrentProgress = progress;
             try { var result = RunCore(options); progress?.Finish(); return result; }
@@ -59,6 +59,10 @@ namespace XMLDocNormalizer.Execution
                     comparisonRunCount,
                     warmupRunCount);
 
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Isolated);
+            ConsoleLogger.CurrentProgress?.CompleteAnalysis();
+            ConsoleLogger.CurrentProgress?.BeginFinalization();
+            ConsoleLogger.CurrentProgress?.Begin(RunPhase.Aggregation);
             List<ModeExecutionAggregate> modeAggregates =
                 CreateModeExecutionAggregates(modeExecutions);
 
@@ -109,9 +113,11 @@ namespace XMLDocNormalizer.Execution
                 Modes = modeRuns
             };
 
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Aggregation);
             string comparisonOutputPath = ResolveComparisonOutputPath(options);
             ConsoleLogger.CurrentProgress?.Begin(RunPhase.Output);
             ExceptionAnalysisModeComparisonReportWriter.Write(comparisonOutputPath, comparisonReport);
+            ConsoleLogger.CurrentProgress?.Complete(RunPhase.Output);
 
             PrintComparisonSummary(comparisonReport, comparisonOutputPath);
 

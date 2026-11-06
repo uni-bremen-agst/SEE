@@ -117,25 +117,70 @@ redirected stderr receives only phase starts and final summaries. `off` creates 
 timer or progress observer. Progress always uses stderr; existing console reports and
 JSON/SARIF report files retain their output contracts. No ANSI sequences or colors are required.
 
-The display follows actual loading, compilation preparation, documentation checks,
-exception-flow work, aggregation and output. Documentation and exception analysis remain
-interleaved per file in their existing execution order, with separate accumulated phase times.
-The documentation bar counts eligible files after their regular detectors finish, not detector
+On a verified Windows console, the compact display groups work into Completed, Current work,
+and Pending. Exactly one blank line separates adjacent visible areas. Uppercase headings use
+green, the existing orange/gold activity color, and muted gray respectively; analysis details
+retain their uniform two-space indentation and neutral color. The gold Current work heading
+is separate from the single highlighted activity. Empty areas disappear. Completed entries turn green at their proved scope boundary,
+move exactly once, and retain final times and counters. Current work has at most one orange/gold
+activity and neutral file/root/context counters. Pending entries are gray and have no invented
+elapsed times or percentages. Documentation and exception flow remain interleaved; both share
+Analyze while unfinished, and a completed part disappears from Current work immediately.
+
+The Current line uses available detector or root/member data with an honest general fallback.
+`--verbose` adds available admission counters only inside the unfinished analysis. No transient
+member, detector or activity snapshots remain after completion. Findings, warnings, hints, coverage,
+SLOC and statistics belong exclusively to the existing reporters; the dashboard does not repeat
+those results. Its successful final view contains completed work, frozen times/counters and total
+time in the header. Actual failures are red, interrupted work is identified without false green.
+
+Only changed rows are updated. Normal refreshes neither change states/counters nor move entries.
+Real scope transitions may change area membership and height; the existing incremental region
+clears removed rows and shortened tails. Actual console messages appear above a reanchored
+region, while empty/file-only reporting does not disturb it. Native Windows stderr cell APIs are
+used without unverified ANSI assumptions or an external renderer library. Status markers also
+work without color. The native orange/gold fallback is DarkYellow (palette index 6), whose shade
+depends on the user's palette. Background/global attributes and `NO_COLOR` remain respected.
+Redirects, CI and unsuitable terminals receive bounded categorized text transitions on stderr.
+
+Below 80 columns the initial layout uses shorter labels. Below 40 columns, with insufficient
+height, when a wide layout no longer fits or after buffer reflow, quiet text transitions take over.
+Non-ASCII characters in the live region appear as `?` for predictable cell widths; ordinary
+messages and report files retain Unicode. The display never treats findings as an execution error.
+
+Compilation preparation ends at the existing eager project-context/session preparation boundary.
+Missing compilations leave preparation interrupted. Later cached accesses and demand-driven
+supporting work stay inside Analyze without reopening completed preparation. Intermediate
+aggregation and per-file reporting also remain in Analyze. Final reporting starts only at the
+explicit end of all required analysis scopes. Paths without a separable final report omit that step.
+The real finalization transition is painted immediately. If its visible interval is shorter than
+1,000 ms, a working interactive display retains that frame briefly before the green end view.
+This presentation pause happens after reporting work is complete and its elapsed time is frozen;
+a subsecond finalization still correctly shows `00:00`. Time already visible is credited, actual
+finalization of at least one second adds no wait, and the presentation pause is excluded from
+the displayed total time. Redirects, CI, disabled progress and text fallback add no pause.
+Ordinary counter/time refreshes retain their 500 ms throttle.
+The in-process mode comparison keeps its actual later preparation pending/ongoing until its real
+boundary. `Finish()` interrupts unfinished work; it never invents a successful scope completion.
+The documentation bar explicitly labels eligible files and counts them after their regular detectors finish, not detector
 invocations. Unavailable compilations or syntax trees leave those files unfinished.
+Verbose loading messages can mention all discovered documents; that candidate count is not
+the filtered eligible-file denominator used by the bar.
 
 Exception analysis in all four modes reports roots started/completed. Transitive sessions also
 report dynamically discovered context nodes and processed context workitems. These are activity
 counts, not a fixed final total or a completion certificate. There is no context percentage or ETA.
 An active root still shows elapsed time and time since the last observed activity when its counts
 do not change. The display refresh is limited to twice per second; refreshes never advance counters.
-Direct mode does not construct summary contexts. Explicit `Incomplete` coverage remains separate
+Direct mode omits context/workitem rows entirely.
+Explicit `Incomplete` coverage remains separate
 from technical failure in the final status.
 
-`--verbose` alternates the compact row with the active detector/member and available admission
+`--verbose` adds stable rows for the active detector/member and available admission
 work counters. It uses existing work notifications, not an additional analysis. Historical/external
 worker calls and isolated mode-comparison children expose a coarse process phase only; their wire
 protocol carries no new progress telemetry. SCC counts and a stable global root total are not
-computed just for display. Ctrl+C clears the active display without changing cancellation policy;
+computed just for display. Ctrl+C leaves an interrupted final display without changing cancellation policy;
 forced process termination cannot guarantee cleanup.
 
 ## Check and fix modes
