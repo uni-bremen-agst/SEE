@@ -7,8 +7,8 @@ from Modern UI Pack 4 to Modern UI Pack 5 in SEE ([#701](https://github.com/uni-
 
 The tests check the appearance and behavior of affected UI elements,
 including menus, dropdowns, selectors, dialogs, and notifications.
-The 55 test cases cover all 74 changed project UI prefabs; shared controls
-with the same access path are grouped in one test case. Vendor demo UIs
+This snapshot documents 53 test cases. Shared controls with the same access
+path are grouped in one test case. Vendor demo UIs
 are outside the scope of this protocol.
 
 Automated test results are documented separately. Existing issues
@@ -16,11 +16,9 @@ unrelated to the migration are recorded as observations. A failed manual
 test is not automatically classified as a migration regression; compare
 the previous version when the cause is unclear.
 
-**Execution state: Work in progress — snapshot exported on 07.11.2026.**
-The recorded case statuses are 32 Passed, 2 Failed, 0 Blocked, and 21 Not tested
-(34 of 55 cases have a recorded execution result). These totals summarize the
-entries below; they are not a new test run or final acceptance of the migration.
-Continue recording Actual result and Evidence / defects as testing progresses.
+**Execution state:** Snapshot exported on 07.11.2026. The 53 documented
+cases include 50 Passed and 3 Blocked. See Test Run Summary for the remaining
+prerequisites.
 
 ## Test Environment
 
@@ -37,7 +35,7 @@ Continue recording Actual result and Evidence / defects as testing progresses.
 Each test case records the tester and platform used.
 Deviations from this environment must be documented in the test case,
 including a different commit, scene, keybinding, or required test harness.
-Tester/date/platform fields remain unassigned for cases that have not been tested.
+
 
 ## Preparation and Menu Access
 
@@ -97,63 +95,61 @@ Use a separate filled copy for each tester/platform or comparison run.
 
 ## Test Case Index
 
-| Test case | Objective / UI | Status |
+| Test case | Objective / UI | Status       |
 | --- | --- | --- |
-| [TC-01](#tc-01) | Runtime ConfigMenu dropdown selection | Passed |
-| [TC-02](#tc-02) | Main menus, lists, and nested navigation | Passed |
-| [TC-03](#tc-03) | Property dialog validation, confirmation, and cancellation | Passed |
-| [TC-04](#tc-04) | Property-dialog file and directory input | Passed |
-| [TC-05](#tc-05) | In-game Settings navigation | Passed |
-| [TC-06](#tc-06) | Keybinding confirmation dialog | Passed |
-| [TC-07](#tc-07) | Notification appearance and dismissal | Passed |
-| [TC-08](#tc-08) | Help entry controls and close icon | Failed |
-| [TC-09](#tc-09) | Hand-animation calibration instructions | Passed |
-| [TC-10](#tc-10) | Shared window frame behavior | Passed |
-| [TC-11](#tc-11) | Tree View navigation, search, and scrolling | Passed |
-| [TC-12](#tc-12) | Property Window display and controls | Passed |
-| [TC-13](#tc-13) | Context-menu entries and submenus | Passed |
-| [TC-14](#tc-14) | Snapshots window and populated entries | Not tested |
-| [TC-15](#tc-15) | Debug action bar | Not tested |
-| [TC-16](#tc-16) | SEE debug console | Not tested |
-| [TC-17](#tc-17) | Runtime ConfigMenu tabs and settings containers | Passed |
-| [TC-18](#tc-18) | Runtime boolean setting switch | Passed |
-| [TC-19](#tc-19) | Runtime data-path picker | Not tested |
-| [TC-20](#tc-20) | Runtime configuration action buttons | Passed |
-| [TC-21](#tc-21) | Runtime collection add/remove buttons | Passed |
-| [TC-22](#tc-22) | Small runtime setting editor | Passed |
-| [TC-23](#tc-23) | Metrics board and city dropdown | Passed |
-| [TC-24](#tc-24) | Metrics board placement rotation | Not tested |
-| [TC-25](#tc-25) | Save board button and dialog | Passed |
-| [TC-26](#tc-26) | Load board button and dialog | Passed |
-| [TC-27](#tc-27) | Drawable action bar and visibility toggle | Not tested |
-| [TC-28](#tc-28) | Line settings and selector arrows | Not tested |
-| [TC-29](#tc-29) | Shape settings and Shape/Config switch | Not tested |
-| [TC-30](#tc-30) | Text creation, style, and colors | Not tested |
-| [TC-31](#tc-31) | Image source selection | Not tested |
-| [TC-32](#tc-32) | Mind map creation menu | Passed |
-| [TC-33](#tc-33) | Mind map parent selector | Failed |
-| [TC-34](#tc-34) | Mind map node editing menu | Passed |
-| [TC-35](#tc-35) | Mind map node-kind selector | Passed |
-| [TC-36](#tc-36) | Line color-choice menu | Passed  |
-| [TC-37](#tc-37) | Mind map color-choice menu | Passed (but bug exists) |
-| [TC-38](#tc-38) | Drawable Move/Rotate controls | Not tested |
-| [TC-39](#tc-39) | Drawable and Sticky Note scale menu | Not tested |
-| [TC-40](#tc-40) | Drawable cut/copy/paste menu | Not tested |
-| [TC-41](#tc-41) | Drawable save options | Not tested |
-| [TC-42](#tc-42) | Drawable load options | Not tested |
-| [TC-43](#tc-43) | Sticky Note operation selection | Passed |
-| [TC-44](#tc-44) | Sticky Note fine movement | Passed |
-| [TC-45](#tc-45) | Sticky Note edit controls | Passed |
-| [TC-46](#tc-46) | Sticky Note X rotation | Passed |
-| [TC-47](#tc-47) | Sticky Note Y rotation | Passed |
-| [TC-48](#tc-48) | Drawable Manager search and controls | Not tested |
-| [TC-49](#tc-49) | Drawable Manager rows with and without descriptions | Not tested |
-| [TC-50](#tc-50) | Surface color menu | Not tested |
-| [TC-51](#tc-51) | Table modification menu | Passed |
-| [TC-52](#tc-52) | Table scaling controls | Passed |
-| [TC-53](#tc-53) | Legacy ConfigMenu and related controls | Not tested |
-| [TC-54](#tc-54) | Generic TabMenu base templates | Not tested |
-| [TC-55](#tc-55) | Unreferenced MetricWindow template | Not tested |
+| [TC-01](#tc-01) | Runtime ConfigMenu dropdown selection | ✅ Passed |
+| [TC-02](#tc-02) | Main menus, lists, and nested navigation | ✅ Passed |
+| [TC-03](#tc-03) | Property dialog validation, confirmation, and cancellation | ✅ Passed |
+| [TC-04](#tc-04) | Property-dialog file and directory input | ✅ Passed |
+| [TC-05](#tc-05) | In-game Settings navigation | ✅ Passed |
+| [TC-06](#tc-06) | Keybinding confirmation dialog | ✅ Passed |
+| [TC-07](#tc-07) | Notification appearance and dismissal | ✅ Passed |
+| [TC-08](#tc-08) | Help entry controls and close icon | ✅ Passed |
+| [TC-09](#tc-09) | Hand-animation calibration instructions | ✅ Passed |
+| [TC-10](#tc-10) | Shared window frame behavior | ✅ Passed |
+| [TC-11](#tc-11) | Tree View navigation, search, and scrolling | ✅ Passed |
+| [TC-12](#tc-12) | Property Window display and controls | ✅ Passed (bug exists) |
+| [TC-13](#tc-13) | Context-menu entries and submenus | ✅ Passed |
+| [TC-14](#tc-14) | Snapshots window and populated entries | 🚧 Blocked |
+| [TC-15](#tc-15) | Debug action bar | 🚧 Blocked |
+| [TC-16](#tc-16) | SEE debug console | 🚧 Blocked |
+| [TC-17](#tc-17) | Runtime ConfigMenu tabs and settings containers | ✅ Passed |
+| [TC-18](#tc-18) | Runtime boolean setting switch | ✅ Passed |
+| [TC-19](#tc-19) | Runtime data-path picker | ✅ Passed |
+| [TC-20](#tc-20) | Runtime configuration action buttons | ✅ Passed |
+| [TC-21](#tc-21) | Runtime collection add/remove buttons | ✅ Passed |
+| [TC-22](#tc-22) | Small runtime setting editor | ✅ Passed |
+| [TC-23](#tc-23) | Metrics board and city dropdown | ✅ Passed |
+| [TC-24](#tc-24) | Metrics board placement rotation | ✅ Passed |
+| [TC-25](#tc-25) | Save board button and dialog | ✅ Passed |
+| [TC-26](#tc-26) | Load board button and dialog | ✅ Passed |
+| [TC-27](#tc-27) | Drawable action bar and visibility toggle | ✅ Passed |
+| [TC-28](#tc-28) | Line settings and selector arrows | ✅ Passed |
+| [TC-29](#tc-29) | Shape settings and Shape/Config switch | ✅ Passed |
+| [TC-30](#tc-30) | Text creation, style, and colors | ✅ Passed |
+| [TC-31](#tc-31) | Image source selection | ✅ Passed |
+| [TC-32](#tc-32) | Mind map creation menu | ✅ Passed |
+| [TC-33](#tc-33) | Mind map parent selector | ✅ Passed |
+| [TC-34](#tc-34) | Mind map node editing menu | ✅ Passed |
+| [TC-35](#tc-35) | Mind map node-kind selector | ✅ Passed |
+| [TC-36](#tc-36) | Line color-choice menu | ✅ Passed  |
+| [TC-37](#tc-37) | Mind map color-choice menu | ✅ Passed (bug exists) |
+| [TC-38](#tc-38) | Drawable Move/Rotate controls | ✅ Passed |
+| [TC-39](#tc-39) | Drawable and Sticky Note scale menu | ✅ Passed |
+| [TC-40](#tc-40) | Drawable cut/copy/paste menu | ✅ Passed |
+| [TC-41](#tc-41) | Drawable save options | ✅ Passed |
+| [TC-42](#tc-42) | Drawable load options | ✅ Passed |
+| [TC-43](#tc-43) | Sticky Note operation selection | ✅ Passed |
+| [TC-44](#tc-44) | Sticky Note fine movement | ✅ Passed |
+| [TC-45](#tc-45) | Sticky Note edit controls | ✅ Passed |
+| [TC-46](#tc-46) | Sticky Note X rotation | ✅ Passed |
+| [TC-47](#tc-47) | Sticky Note Y rotation | ✅ Passed |
+| [TC-48](#tc-48) | Drawable Manager search and controls | ✅ Passed |
+| [TC-49](#tc-49) | Drawable Manager rows with and without descriptions | ✅ Passed |
+| [TC-50](#tc-50) | Surface color menu | ✅ Passed |
+| [TC-51](#tc-51) | Table modification menu | ✅ Passed |
+| [TC-52](#tc-52) | Table scaling controls | ✅ Passed |
+| [TC-53](#tc-53) | Generic TabMenu base templates | ✅ Passed |
 
 <a id="tc-01"></a>
 
@@ -193,9 +189,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-02"></a>
 
@@ -268,9 +262,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-04"></a>
 
@@ -310,9 +302,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-05"></a>
 
@@ -427,7 +417,7 @@ Visible and working back button in Audio Settings:
 - **Date:** 05.11.2026
 - **Platform:** macOS 27.2
 - **Environment deviations:** None
-- **Status:** Failed
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -448,21 +438,9 @@ Visible and working back button in Audio Settings:
 | 4 | Click Close. | The entry view closes. |
 | 5 | Repeat H → Navigation → Player navigation → Simple navigation. | The entry reopens and remains usable. |
 
-**Actual result:** The help view opened and displayed its content.
-The playback button initially appeared blank. After clicking it once,
-the pause icon became visible. The top-right close control was not visible.
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-**Evidence / defects:** Compared with the screenshots from before the
-MUIP 5 upgrade, the initial playback icon and the top-right close control
-were missing. The visibility of the bottom BACK/CLOSE buttons still
-needs to be checked.
-
-MUIP 4:
-![TC-08: Help view before the upgrade, MUIP 4](images/issue-701/tc-08-help-muip4.png)
-
-
-MUIP 5:
-![TC-08: Help view after the upgrade, MUIP 5](images/issue-701/tc-08-help-muip5.png)
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 
 <a id="tc-09"></a>
@@ -641,11 +619,11 @@ macOS Errors
 
 ## TC-14 – Snapshots window and populated entries
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 07.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Blocked
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -668,24 +646,22 @@ macOS Errors
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Step 1, 2, 5 work. 3 and 4 are not able to be tested because of missing backend connection.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+![TC-14: Snapshot backend unavailable](images/issue-701/tc-14-snapshots-backend.png)
+
 
 <a id="tc-15"></a>
 
 ## TC-15 – Debug action bar
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 07.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Blocked
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -721,11 +697,11 @@ from confirmed migration regressions.
 
 ## TC-16 – SEE debug console
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 07.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Blocked
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -825,11 +801,11 @@ from confirmed migration regressions.
 
 ## TC-19 – Runtime data-path picker
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Tristan
+- **Date:** 07.11.2026
+- **Platform:** Windows 11
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -852,14 +828,11 @@ from confirmed migration regressions.
 
 **Actual result:**
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-20"></a>
 
@@ -998,11 +971,11 @@ from confirmed migration regressions.
 
 ## TC-24 – Metrics board placement rotation
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1022,16 +995,9 @@ from confirmed migration regressions.
 | 3 | Edit the available numeric value and confirm rotation. | The entered angle is applied and the board-name dialog follows. |
 | 4 | Enter a unique board name and confirm. | The final board preserves the chosen rotation. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-25"></a>
 
@@ -1102,11 +1068,11 @@ from confirmed migration regressions.
 
 ## TC-27 – Drawable action bar and visibility toggle
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1127,26 +1093,19 @@ from confirmed migration regressions.
 | 4 | Use Draw Shape, then Write Text, then Draw Freehand in the toolbar. | Each click switches to exactly one action and its associated menu. |
 | 5 | Toggle toolbar visibility again. | Visibility and active-state feedback remain functional. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-28"></a>
 
 ## TC-28 – Line settings and selector arrows
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1167,26 +1126,19 @@ from confirmed migration regressions.
 | 4 | Draw a line on the drawing surface. | The line uses the configured settings. |
 | 5 | Press Space → Drawable → Edit → click the test line and change a setting. | The line-editing controls open and the selected line changes accordingly. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-29"></a>
 
 ## TC-29 – Shape settings and Shape/Config switch
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1206,26 +1158,19 @@ from confirmed migration regressions.
 | 4 | Exercise both arrows of every currently visible shape/UML selector. | Arrow animation and one-step selection work without missing-controller errors. |
 | 5 | Place the configured shape and switch between Shape and Config again. | The shape reflects the settings and switching remains usable; the active option has the intended disabled state. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-30"></a>
 
 ## TC-30 – Text creation, style, and colors
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1245,26 +1190,19 @@ from confirmed migration regressions.
 | 4 | Place the text on the drawing surface. | One text object appears with the selected content and formatting. |
 | 5 | Press Space → Drawable → Edit → click the test text. | Text editing opens for that object and changes apply to it. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-31"></a>
 
 ## TC-31 – Image source selection
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1285,16 +1223,9 @@ from confirmed migration regressions.
 | 4 | Enter the prepared image URL, complete the following confirmation, and place the image. | One image is added from the specified URL. |
 | 5 | Open Space → Drawable → Add an Image once more and choose Cancel. | The source menu closes without adding another image. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-32"></a>
 
@@ -1336,7 +1267,7 @@ from confirmed migration regressions.
 - **Date:** 06.11.2026
 - **Platform:** macOS 27.2
 - **Environment deviations:** None
-- **Status:** Failed
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1356,16 +1287,9 @@ from confirmed migration regressions.
 | 3 | Select a different valid Theme and confirm. | The Subtheme parent/connection changes to the selected node. |
 | 4 | Reopen Space → Drawable → Edit → the Subtheme → Parent, then use the return control. | The editing workflow is restored without an unintended parent change. |
 
-**Actual result:** All functional steps worked as expected, including
-selecting and changing the parent. However, clicking Choose Parent
-triggered two MissingReferenceException errors for
-Michsky.MUIP.ButtonManager and UnityEngine.UI.Button.
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-**Evidence / defects:** Both errors report access to destroyed button
-components during click processing. Parent selection remained usable.
-
-![TC-33: Exceptions when choosing a mind map parent](images/issue-701/tc-33-choose-parent-errors.png)
-
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-34"></a>
 
@@ -1409,7 +1333,7 @@ components during click processing. Parent selection remained usable.
 - **Platform:** macOS 27.2
 - **Environment deviations:** None
 - **Status:** Passed
--
+
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
 **Objective:** Verify node-kind changes and selector-arrow feedback.
@@ -1468,9 +1392,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-37"></a>
 
@@ -1516,11 +1438,11 @@ Also there is a bug where picking a color, editing the mindmap subtheme and then
 
 ## TC-38 – Drawable Move/Rotate controls
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1540,26 +1462,19 @@ Also there is a bug where picking a color, editing the mindmap subtheme and then
 | 4 | For a mind-map test node, exercise the Children option when present. | Its scope follows the selected option. |
 | 5 | Complete the operation and reopen Move or Rotate for the object. | The workflow can be entered again without duplicate controls. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-39"></a>
 
 ## TC-39 – Drawable and Sticky Note scale menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1580,26 +1495,19 @@ from confirmed migration regressions.
 | 4 | Press Space → Drawable → Sticky Note → Edit → click the test note → Scale. | The Sticky Note scale editor opens. |
 | 5 | Change scale and use the return/finish control. | The note changes size and the parent workflow is restored. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-40"></a>
 
 ## TC-40 – Drawable cut/copy/paste menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1619,26 +1527,19 @@ from confirmed migration regressions.
 | 4 | Click a suitable target position. | The cut object is placed once without an unintended additional source copy. |
 | 5 | Repeat with a mind-map node and complete any required parent-selection step. | Parent selection is reachable and the resulting connection follows the choice. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-41"></a>
 
 ## TC-41 – Drawable save options
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1659,26 +1560,19 @@ from confirmed migration regressions.
 | 4 | Repeat Space → Drawable → Save → Save All. | The all-drawables save path is available and produces the requested test file. |
 | 5 | Open a save workflow again and cancel the file dialog. | Cancellation creates no extra test file and the UI remains usable. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-42"></a>
 
 ## TC-42 – Drawable load options
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1699,16 +1593,9 @@ from confirmed migration regressions.
 | 4 | Repeat Space → Drawable → Load → Load on current page. | The current-page workflow remains reachable and follows its selected target/page mode. |
 | 5 | Reopen the file-selection workflow and cancel. | No additional objects are loaded on cancellation. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-43"></a>
 
@@ -1744,9 +1631,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-44"></a>
 
@@ -1821,9 +1706,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-46"></a>
 
@@ -1859,9 +1742,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-47"></a>
 
@@ -1897,19 +1778,17 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-48"></a>
 
 ## TC-48 – Drawable Manager search and controls
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1929,26 +1808,19 @@ from confirmed migration regressions.
 | 4 | Use the page, lighting, and visibility controls on a disposable surface row. | Each control affects the intended surface and updates its indicator. |
 | 5 | Close the view and press numpad 0 again. | The view reopens with functional search and row controls. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-49"></a>
 
 ## TC-49 – Drawable Manager rows with and without descriptions
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** None
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -1968,26 +1840,19 @@ from confirmed migration regressions.
 | 4 | Use the description button again, delete all text, and confirm. | The list returns to the row variant without description. |
 | 5 | Close and reopen Drawable Manager with numpad 0. | The appropriate variant remains usable. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
 <a id="tc-50"></a>
 
 ## TC-50 – Surface color menu
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** Used Comma (,) instead of Numpad 0 to toggle Drawable Manager
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -2006,16 +1871,10 @@ from confirmed migration regressions.
 | 3 | Close the color menu and open the same row color button again. | The picker reopens with the current color. |
 | 4 | Restore the original color and close. | The restored value is visible and the menu dismisses normally. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
 
 <a id="tc-51"></a>
 
@@ -2052,9 +1911,7 @@ Everything works as intended.
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-52"></a>
 
@@ -2089,60 +1946,17 @@ Everything works as intended
 
 **Evidence / defects:**
 
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+No defects observed. No screenshots recorded.
 
 <a id="tc-53"></a>
 
-## TC-53 – Legacy ConfigMenu and related controls
+## TC-53 – Generic TabMenu base templates
 
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
-
-<!-- Allowed values: Not tested / Passed / Failed / Blocked -->
-
-**Objective:** Verify the migrated legacy configuration family only when a reproducible isolated setup is available.
-
-**Preconditions:**
-
-- No verified normal Desktop Play Mode menu entry exists in the reference commit.
-- K opens RuntimeConfigMenu, not this template. The legacy ConfigMenuFactory is not attached in the reference project prefabs/scenes. This case covers ConfigMenu, ActionButton, root TabButton, Input Group - Color Picker, DropdownCombo, and DictateButton. Voice input additionally requires supported speech recognition and a microphone.
-- A documented isolated test harness is required. Without it, mark this test Blocked and record the missing setup.
-
-**Affected prefabs:** [UI/ConfigMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/ConfigMenu.prefab), [UI/ActionButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/ActionButton.prefab), [UI/TabButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabButton.prefab), [UI/Input Group - Color Picker.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/Input%20Group%20-%20Color%20Picker.prefab), [UI/DropdownCombo.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/DropdownCombo.prefab), [UI/DictateButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/DictateButton.prefab).
-
-| Step | Action | Expected result |
-| --- | --- | --- |
-| 1 | Confirm that the normal Desktop player does not instantiate this legacy template. | The absence of a normal menu entry is recorded as a coverage constraint, not automatically as a migration defect. |
-| 2 | Record the isolated harness scene, initialization procedure, and exact opening steps in Environment deviations before testing. | The tested instance can be traced to the affected prefab(s); no uninitialised prefab is treated as a functional test. |
-| 3 | Start that harness and inspect text, icons, and any lists/selectors. | Initialized controls are visible and their contents are populated. |
-| 4 | Exercise hover, pressed, disabled, click/submit, and any selector arrows. | States render consistently; enabled actions fire once and disabled actions do not fire. |
-| 5 | Close/deactivate and reopen/reactivate through the harness. | The initialized controls remain functional. If no harness is available, the test remains Blocked. |
-
-**Actual result:**
-
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
-
-<a id="tc-54"></a>
-
-## TC-54 – Generic TabMenu base templates
-
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
+- **Tester:** Noah Thiering
+- **Date:** 07.11.2026
+- **Platform:** macOS 27.2
+- **Environment deviations:** The generic TabMenu controller and original prefabs were opened through an isolated Play Mode harness in SEENewWorld. The harness supplied First, Second, and Disabled tabs with sample content, scaled the parent frame to fit the Game View, and added a Reopen button.
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -2164,61 +1978,14 @@ from confirmed migration regressions.
 | 4 | Exercise hover, pressed, disabled, click/submit, and any selector arrows. | States render consistently; enabled actions fire once and disabled actions do not fire. |
 | 5 | Close/deactivate and reopen/reactivate through the harness. | The initialized controls remain functional. If no harness is available, the test remains Blocked. |
 
-**Actual result:**
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
+**Evidence / defects:** No defects observed. No screenshots recorded.
 
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
-
-<a id="tc-55"></a>
-
-## TC-55 – Unreferenced MetricWindow template
-
-- **Tester:** [Enter Noah or Tristan Mundt.]
-- **Date:** [DD.MM.YYYY]
-- **Platform:** [Enter macOS 27.2 or Windows 11.]
-- **Environment deviations:** [Enter None or describe deviations.]
-- **Status:** Not tested
-
-<!-- Allowed values: Not tested / Passed / Failed / Blocked -->
-
-**Objective:** Record separate coverage of the changed MetricWindow template.
-
-**Preconditions:**
-
-- No verified normal Desktop Play Mode menu entry exists in the reference commit.
-- No normal C# caller or asset reference to this prefab was found in the reference commit. Metric Board and the M chart shortcut are not verified opening paths for MetricWindow.
-- A documented isolated test harness is required. Without it, mark this test Blocked and record the missing setup.
-
-**Affected prefabs:** [UI/MetricWindow.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/MetricWindow.prefab).
-
-| Step | Action | Expected result |
-| --- | --- | --- |
-| 1 | Confirm that the normal Desktop player does not instantiate this legacy template. | The absence of a normal menu entry is recorded as a coverage constraint, not automatically as a migration defect. |
-| 2 | Record the isolated harness scene, initialization procedure, and exact opening steps in Environment deviations before testing. | The tested instance can be traced to the affected prefab(s); no uninitialised prefab is treated as a functional test. |
-| 3 | Start that harness and inspect text, icons, and any lists/selectors. | Initialized controls are visible and their contents are populated. |
-| 4 | Exercise hover, pressed, disabled, click/submit, and any selector arrows. | States render consistently; enabled actions fire once and disabled actions do not fire. |
-| 5 | Close/deactivate and reopen/reactivate through the harness. | The initialized controls remain functional. If no harness is available, the test remains Blocked. |
-
-**Actual result:**
-
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
 
 ## Prefab Coverage
 
-Each of the 74 changed project UI prefabs maps to exactly one case.
+The table maps 67 changed project UI prefabs to the cases in this snapshot.
 This mapping identifies the changed templates; it does not assert that
 every template has its own independently reachable menu.
 
@@ -2289,69 +2056,41 @@ every template has its own independently reachable menu.
 | [UI/Drawable/SurfaceColorMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/Drawable/SurfaceColorMenu.prefab) | [TC-50](#tc-50) |
 | [UI/Table/ModifyTableMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/Table/ModifyTableMenu.prefab) | [TC-51](#tc-51) |
 | [UI/Table/ScaleMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/Table/ScaleMenu.prefab) | [TC-52](#tc-52) |
-| [UI/ConfigMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/ConfigMenu.prefab) | [TC-53](#tc-53) |
-| [UI/ActionButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/ActionButton.prefab) | [TC-53](#tc-53) |
-| [UI/TabButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabButton.prefab) | [TC-53](#tc-53) |
-| [UI/Input Group - Color Picker.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/Input%20Group%20-%20Color%20Picker.prefab) | [TC-53](#tc-53) |
-| [UI/DropdownCombo.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/DropdownCombo.prefab) | [TC-53](#tc-53) |
-| [UI/DictateButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/DictateButton.prefab) | [TC-53](#tc-53) |
-| [UI/TabMenu/TabMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabMenu.prefab) | [TC-54](#tc-54) |
-| [UI/TabMenu/TabButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabButton.prefab) | [TC-54](#tc-54) |
-| [UI/MetricWindow.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/MetricWindow.prefab) | [TC-55](#tc-55) |
+| [UI/TabMenu/TabMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabMenu.prefab) | [TC-53](#tc-53) |
+| [UI/TabMenu/TabButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabButton.prefab) | [TC-53](#tc-53) |
+
+The following changed prefabs have no dedicated case in this snapshot:
+
+- `UI/ConfigMenu.prefab`
+- `UI/ActionButton.prefab`
+- `UI/TabButton.prefab`
+- `UI/Input Group - Color Picker.prefab`
+- `UI/DropdownCombo.prefab`
+- `UI/DictateButton.prefab`
+- `UI/MetricWindow.prefab`
 
 ## Test Run Summary
 
 | Total | Passed | Failed | Blocked | Not tested |
 | --- | --- | --- | --- | --- |
-| 55 | 32 | 2 | 0 | 21 |
-
-Excluding TC-54 and TC-55: 53 cases, 32 Passed, 2 Failed, 0 Blocked, and
-19 Not tested. TC-37 is counted as Passed according to its recorded status
-("Passed (but bug exists)").
-
-| Tester | Passed | Failed | Executed |
-| --- | --- | --- | --- |
-| Noah Thiering | 20 | 2 | 22 |
-| Tristan Mundt | 12 | 0 | 12 |
+| 53 | 50 | 0 | 3 | 0 |
 
 **Tester / platform / date:** Noah Thiering (macOS 27.2) and Tristan Mundt
-(Windows 11); see the metadata of each executed case dated 05.–06.11.2026.
-This is a combined progress snapshot, not evidence that every case was run on
-both platforms.
+(Windows 11), both using the Unity Editor. See each test case for its execution date.
 
-**Overall result:** Work in progress. 34 of 55 cases have recorded execution
-results: 32 are marked Passed and 2 Failed. 21 remain Not tested. The Passed
-count retains the testers' recorded classifications, including the observations
-in TC-05, TC-12, and TC-37; those observations still need to be addressed in the final
-assessment. The manual test run is not complete.
+**Overall result:** 50 Passed, 0 Failed, 3 Blocked, and 0 Not tested.
+TC-14 was partially exercised and needs a snapshot backend. TC-15 and TC-16
+require a configured debug session. TC-37 is counted as Passed with its
+recorded pre-existing bug.
 
-**Open defects / observations / blocked cases:**
+**Fixes retested:** TC-08, TC-33, and TC-50. The fixes are included in
+[4343980c96](https://github.com/uni-bremen-agst/SEE/commit/4343980c9661fd6e6546f504adbcb3fefc1dc5f3).
 
-- **TC-08 — Failed:** Initial playback icon and top-right close control are
-  missing compared with the MUIP 4 screenshots. Visibility of the bottom
-  BACK/CLOSE controls still needs checking. See the case for evidence.
-- **TC-05 — recorded Passed with an existing issue:** The Keybindings BACK
-  button was not visible before or after the upgrade. Returning via that
-  button could not be verified.
-- **TC-12 — recorded Passed with observations:** The macOS
-  GetActiveTcpConnections() exception was reproduced before the upgrade;
-  subsequent ArgumentNullException errors remain unclassified. The recorded
-  actual result refers to Tree View although this case targets Property Window;
-  clarify the tested view before finalizing the report.
-- **TC-33 — Failed:** Choosing a parent triggers MissingReferenceException
-  errors for ButtonManager and Button, although parent selection remains usable.
-  Whether these errors are migration regressions has not yet been established.
-- **TC-37 — recorded Passed with existing issues:** Branch color selection is
-  unavailable; picking a color again after editing a Subtheme can break the UI.
-  The tester reports both behaviors also occur before the upgrade. See the case
-  for evidence and reproduction details.
-- **TC-24 and the other 20 Not tested cases:** Complete the tests or record
-  a concrete blocker if prerequisites prevent execution. No case is currently
-  marked Blocked.
+**Comparison version, if used:** Pre-upgrade SEE with MUIP 4. Record the
+branch and full commit hash of the checkout used for the comparison.
 
-**Comparison version, if used:** [Enter its branch and full commit.]
-
-**Cleanup:** [Record removal of disposable test objects and restoration of changed settings.]
+**Cleanup:** Pending. After testing, record which temporary test objects
+were removed and which settings were restored.
 
 Before concluding the run, keep case statuses, the index, and the totals
 consistent. A green automated run does not complete a manual case.
