@@ -61,10 +61,7 @@ namespace SEE.UI.Menu.Drawable
                 /// Initialize the button for canceling the menu.
                 ButtonManager cancelBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Cancel")
                             .GetComponent<ButtonManager>();
-                cancelBtn.onClick.AddListener(() =>
-                {
-                    Disable();
-                });
+                cancelBtn.onClick.AddListener(Destroy);
             }
         }
     }
