@@ -2409,7 +2409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300002, guid: 80694812942b91b42bc4aad99071ba7e, type: 3}
+  buttonIcon: {fileID: 21300000, guid: 7832486d350096542aefd38da1c44ec5, type: 3}
   onClick:
     m_PersistentCalls:
       m_Calls: []
@@ -4322,7 +4322,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300002, guid: 80694812942b91b42bc4aad99071ba7e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7832486d350096542aefd38da1c44ec5, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

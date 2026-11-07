@@ -115,6 +115,11 @@ namespace SEE.UI.HelpSystem
         private GameObject helpSystemSpace;
 
         /// <summary>
+        /// The panel displaying the current help entry.
+        /// </summary>
+        private Panel entryPanel;
+
+        /// <summary>
         /// A instance of tmp which displays the current progress of the video such as "1s / 35 s".
         /// </summary>
         private TextMeshProUGUI progress;
@@ -319,21 +324,39 @@ namespace SEE.UI.HelpSystem
 
             helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
 
-            Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, panelsCanvas);
-            PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
+            entryPanel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, panelsCanvas);
+            PanelTab tab = entryPanel.GetTab((RectTransform)helpSystemEntry.transform);
             tab.Label = "";
             GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"),
                                                           helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform, false);
             HelpSystemBuilder.Headline = headline;
             headline.GetComponent<TextMeshProUGUI>().text = title;
 
-            PanelNotificationCenter.OnTabClosed += panelTab =>
+            PanelNotificationCenter.OnPanelClosed += OnPanelClosed;
+            PanelNotificationCenter.OnTabClosed += OnTabClosed;
+        }
+
+        private void OnPanelClosed(Panel panel)
+        {
+            if (panel == entryPanel)
             {
-                if (panelTab.Panel == panel)
-                {
-                    Close();
-                }
-            };
+                Close();
+            }
+        }
+
+        private void OnTabClosed(PanelTab tab) => OnPanelClosed(tab.Panel);
+
+        private void UnsubscribeFromPanelEvents()
+        {
+            PanelNotificationCenter.OnPanelClosed -= OnPanelClosed;
+            PanelNotificationCenter.OnTabClosed -= OnTabClosed;
+            entryPanel = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            UnsubscribeFromPanelEvents();
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -345,6 +368,7 @@ namespace SEE.UI.HelpSystem
             videoPlayer?.Stop();
             IsPlaying = false;
             PersonalAssistantBrain.Instance?.Stop();
+            UnsubscribeFromPanelEvents();
             Destroyer.Destroy(helpSystemSpace);
             EntryShown = false;
         }
@@ -417,6 +441,7 @@ namespace SEE.UI.HelpSystem
             PersonalAssistantBrain.Instance?.Stop();
             videoPlayer?.Stop();
             EntryShown = false;
+            UnsubscribeFromPanelEvents();
             Destroyer.Destroy(helpSystemSpace);
         }
 
