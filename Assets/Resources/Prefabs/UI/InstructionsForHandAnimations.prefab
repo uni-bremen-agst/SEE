@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1149,7 +1149,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1575,22 +1575,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 9139184366195678655}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: Close
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 8494083341645805644}
-  highlightedIcon: {fileID: 3048323125828131103}
+  normalImage: {fileID: 8494083341645805644}
+  highlightImage: {fileID: 3048323125828131103}
   normalText: {fileID: 2782204464662728065}
   highlightedText: {fileID: 2965690794978344141}
   soundSource: {fileID: 0}
@@ -1601,7 +1600,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -1610,6 +1609,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 2250704909818939723}
+  highlightCG: {fileID: 4089131478740782627}
 --- !u!114 &1660365822980096738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1655,7 +1662,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Michsky.UI.ModernUIPack.ModalWindowManager, ModernUIPack
+        m_TargetAssemblyTypeName: Michsky.MUIP.ModalWindowManager, ModernUIPack
         m_MethodName: 
         m_Mode: 1
         m_Arguments:

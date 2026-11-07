@@ -361,6 +361,7 @@ GameObject:
   - component: {fileID: 7734883416778855734}
   - component: {fileID: 4547095341203468177}
   - component: {fileID: 6439533209827356462}
+  - component: {fileID: 9066124595810444875}
   m_Layer: 5
   m_Name: Group
   m_TagString: Untagged
@@ -480,19 +481,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1874176378163580936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF5FD"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 8146306459036859299}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 6395484848576167605}
@@ -509,6 +509,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 36
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &6439533209827356462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,6 +550,7 @@ GameObject:
   - component: {fileID: 8280760184951877564}
   - component: {fileID: 8663104550250191}
   - component: {fileID: 2180345664057754735}
+  - component: {fileID: 9066124595810444876}
   m_Layer: 5
   m_Name: Sort
   m_TagString: Untagged
@@ -662,19 +670,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1959865772248175663}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF0DC"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 4794745068905858350}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 9041207098413024880}
@@ -691,6 +698,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 36
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &2180345664057754735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -800,6 +814,7 @@ GameObject:
   - component: {fileID: 8017296535842955226}
   - component: {fileID: 1208407751294909222}
   - component: {fileID: 8156587985265908029}
+  - component: {fileID: 9066124595810444877}
   m_Layer: 5
   m_Name: Filter
   m_TagString: Untagged
@@ -919,19 +934,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2441149418491542768}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF0B0"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 3525724078483443591}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 6040598831507082404}
@@ -948,6 +962,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 36
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &8156587985265908029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2658,13 +2679,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
-  images:
-  - {fileID: 6980893328556673925}
-  - {fileID: 2789169427069279165}
-  texts:
-  - {fileID: 842318586328925508}
-  - {fileID: 4624945097066885423}
+  mainText: {fileID: 6807727362598245007}
+  placeholderText: {fileID: 4618368004867492041}
+  backgroundImage: {fileID: 6424740765246731478}
+  filledImage: {fileID: 7726245115218372043}
 --- !u!114 &9004278678232372259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2921,3 +2939,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &9066124595810444875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874176378163580936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9066124595810444876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959865772248175663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9066124595810444877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2441149418491542768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

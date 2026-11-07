@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Operator;
 using SEE.Extensions;
 using SEE.Utils;
@@ -205,7 +205,11 @@ namespace SEE.UI.Notification
                 manager.icon = Icon;
                 manager.timer = Timer;
                 manager.enableTimer = Timer >= 1f && TimerEnabled;
-                manager.destroyAfterPlaying = DestroyAfterPlaying;
+                manager.closeBehaviour = DestroyAfterPlaying
+                    ? NotificationManager.CloseBehaviour.Destroy
+                    : NotificationManager.CloseBehaviour.Disable;
+                manager.startBehaviour = NotificationManager.StartBehaviour.None;
+                manager.UpdateUI();
                 manager.OpenNotification();
 
                 // Close the notification when clicking on it

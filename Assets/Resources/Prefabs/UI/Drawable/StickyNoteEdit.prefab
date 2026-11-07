@@ -104,20 +104,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -223,6 +226,7 @@ GameObject:
   - component: {fileID: 5775550866809515455}
   - component: {fileID: 6996865662727473056}
   - component: {fileID: 2934472420271643427}
+  - component: {fileID: 8979516641594127389}
   m_Layer: 5
   m_Name: Rotation
   m_TagString: Untagged
@@ -268,11 +272,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 197361998822810784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Rotation
-  clickEvent:
+  iconScale: 1
+  textSize: 22.5
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 8624005466499485261}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 5759154950029800101}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -288,21 +342,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 8624005466499485261}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 5759154950029800101}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -310,6 +360,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6996865662727473056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +436,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &8979516641594127389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197361998822810784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &312999452519353652
 GameObject:
   m_ObjectHideFlags: 0
@@ -538,7 +602,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -553,7 +617,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -568,7 +632,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -962,7 +1026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -977,7 +1041,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -992,7 +1056,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1161,7 +1225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1176,7 +1240,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1191,7 +1255,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1510,7 +1574,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1525,7 +1589,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1540,7 +1604,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -1568,6 +1632,7 @@ GameObject:
   - component: {fileID: 5481024169116163571}
   - component: {fileID: 6663358976792765852}
   - component: {fileID: 4535021693699911768}
+  - component: {fileID: 4677926636872092064}
   m_Layer: 5
   m_Name: Scale
   m_TagString: Untagged
@@ -1613,11 +1678,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 3124972185393081059}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonIcon: {fileID: 0}
   buttonText: Scale
-  clickEvent:
+  iconScale: 1
+  textSize: 22.5
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 0}
+  highlightCG: {fileID: 0}
+  disabledCG: {fileID: 0}
+  normalText: {fileID: 5820661860101238722}
+  highlightedText: {fileID: 0}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 0}
+  highlightImage: {fileID: 0}
+  disabledImage: {fileID: 0}
+  soundSource: {fileID: 0}
+  rippleParent: {fileID: 8177083453765435340}
+  isInteractable: 1
+  enableIcon: 0
+  enableText: 1
+  useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 1
+  enableButtonSounds: 0
+  useHoverSound: 1
+  useClickSound: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 1
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 0
+  onClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1633,21 +1748,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  hoverEvent:
+  onDoubleClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalText: {fileID: 5820661860101238722}
-  soundSource: {fileID: 0}
-  rippleParent: {fileID: 8177083453765435340}
-  useCustomContent: 0
-  enableButtonSounds: 0
-  useHoverSound: 1
-  useClickSound: 1
-  useRipple: 1
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -1655,6 +1766,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6663358976792765852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1729,6 +1842,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 12
+--- !u!114 &4677926636872092064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3124972185393081059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3515251956834153970
 GameObject:
   m_ObjectHideFlags: 0
@@ -2112,7 +2237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2127,7 +2252,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2142,7 +2267,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2335,11 +2460,15 @@ MonoBehaviour:
   valueText: {fileID: 0}
   popupValueText: {fileID: 0}
   enableSaving: 0
+  invokeOnAwake: 1
   sliderTag: Tag Text
   usePercent: 0
   showValue: 0
   showPopupValue: 0
   useRoundValue: 0
+  decimalFormat: 1
+  minValue: 0
+  maxValue: 0
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2414,7 +2543,8 @@ MonoBehaviour:
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
   hasLabel: 0
   hasPopupLabel: 0
-  webglMode: 0
+  overrideColors: 0
+  overrideFonts: 0
   background: {fileID: 7795028268114714434}
   bar: {fileID: 8831813579964120867}
   handle: {fileID: 576728487480397996}
@@ -2557,7 +2687,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 8602504243433751648}
   tmpText: {fileID: 2539263698338595922}
-  onValueChanged:
+  OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &4787292759030161687
@@ -2714,7 +2844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2729,7 +2859,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2744,7 +2874,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -2943,20 +3073,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -3217,7 +3350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3232,7 +3365,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3247,7 +3380,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3512,7 +3645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3527,7 +3660,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3542,7 +3675,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -3662,20 +3795,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -3861,8 +3997,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55380a2c17ece834c96a5c7bfa74d470, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  picker: {fileID: 4208082801611223313}
-  presets:
+  Picker: {fileID: 4208082801611223313}
+  Presets:
   - {fileID: 4787292759030161687}
   - {fileID: 5772527126950090290}
   - {fileID: 8770835581750528570}
@@ -3874,7 +4010,7 @@ MonoBehaviour:
   - {fileID: 1405172562197840847}
   - {fileID: 6041799788213479943}
   - {fileID: 3733451458124179675}
-  createPresetImage: {fileID: 2748651376757226132}
+  CreatePresetImage: {fileID: 2748651376757226132}
 --- !u!1 &6554167151935933229
 GameObject:
   m_ObjectHideFlags: 0
@@ -3938,7 +4074,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragArea: {fileID: 0}
   dragObject: {fileID: 4985421093549351610}
-  topOnClick: 1
+  topOnDrag: 1
 --- !u!114 &1378373156935747248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4069,20 +4205,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 5
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4165,6 +4304,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a058d8729a0602458c4c9045eeddbf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
   OnEvents:
     m_PersistentCalls:
       m_Calls: []
@@ -4240,14 +4382,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
+  overrideColors: 0
   border: {fileID: 2242554374507488152}
   background: {fileID: 8054596600368672236}
   handleOn: {fileID: 6223807128465232334}
   handleOff: {fileID: 3489345372355531976}
 --- !u!95 &195965755555483052
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4261,6 +4403,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -4450,7 +4593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -4465,7 +4608,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -4480,7 +4623,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -4657,20 +4800,23 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4931,7 +5077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -4946,7 +5092,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -4961,7 +5107,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -5486,7 +5632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLeft:
+  OnLeft:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -5501,7 +5647,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onRight:
+  OnRight:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -5516,7 +5662,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onMiddle:
+  OnMiddle:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 108424295478628767}
@@ -5635,20 +5781,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -6421,6 +6570,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 326370227258344758, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 473728276618931899, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -6512,6 +6666,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 2042142435846476716, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 2356398483926951466, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -6689,6 +6848,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 5337678097716369149, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 5349439747052562945, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -6721,6 +6885,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 5349439747052562945, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 5493264123930492142, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -6752,6 +6921,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 5493264123930492142, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -6785,6 +6959,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294704125
       objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 6902966852220138908, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -6815,6 +6994,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7008529064164788781, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 7199539176213212952, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -6844,6 +7028,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7547463640195977829, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 7781454041237124995, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
@@ -6958,6 +7147,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 7954934987403382009, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 8363915173054809253, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -7020,6 +7214,11 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 8727449310617686932, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 8731585516226021777, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}
       propertyPath: m_fontAsset
@@ -7072,6 +7271,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839826584184242325, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

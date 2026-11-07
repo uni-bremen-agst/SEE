@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 
 namespace SEE.UI.Menu.Drawable
@@ -59,9 +59,9 @@ namespace SEE.UI.Menu.Drawable
                 Instance.Instantiate(imageSourceMenuPrefab);
 
                 /// Initialize the button for loading the image from local disk.
-                ButtonManagerBasic local = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Local")
-                    .GetComponent<ButtonManagerBasic>();
-                local.clickEvent.AddListener(() =>
+                ButtonManager local = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Local")
+                    .GetComponent<ButtonManager>();
+                local.onClick.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Local;
@@ -69,9 +69,9 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for loading the image from the web.
-                ButtonManagerBasic web = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Web")
-                    .GetComponent<ButtonManagerBasic>();
-                web.clickEvent.AddListener(() =>
+                ButtonManager web = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Web")
+                    .GetComponent<ButtonManager>();
+                web.onClick.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Web;
@@ -79,9 +79,9 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Cancel")
-                    .GetComponent<ButtonManagerBasic>();
-                cancelBtn.clickEvent.AddListener(() =>
+                ButtonManager cancelBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Cancel")
+                    .GetComponent<ButtonManager>();
+                cancelBtn.onClick.AddListener(() =>
                 {
                     Instance.Destroy();
                 });

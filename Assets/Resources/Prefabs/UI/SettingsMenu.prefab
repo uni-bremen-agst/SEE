@@ -125,7 +125,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1072,7 +1072,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1231,22 +1231,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 734233849434055746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 306444233716195459}
-  highlightedIcon: {fileID: 3383915508923864478}
+  normalImage: {fileID: 306444233716195459}
+  highlightImage: {fileID: 3383915508923864478}
   normalText: {fileID: 4086461163020422402}
   highlightedText: {fileID: 2029155728401579643}
   soundSource: {fileID: 0}
@@ -1257,7 +1256,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -1266,6 +1265,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 4306939565916115853}
+  highlightCG: {fileID: 7701998857040436205}
 --- !u!114 &7605516605702412491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3725,22 +3732,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1604869771859199426}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 6200174065914596918}
-  highlightedIcon: {fileID: 1396602613672111592}
+  normalImage: {fileID: 6200174065914596918}
+  highlightImage: {fileID: 1396602613672111592}
   normalText: {fileID: 4861977541959613347}
   highlightedText: {fileID: 6926758198507063992}
   soundSource: {fileID: 0}
@@ -3751,7 +3757,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -3760,6 +3766,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 1212090250372667877}
+  highlightCG: {fileID: 5592372094524547854}
 --- !u!114 &2747597950858075776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4550,22 +4564,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2285682105058048593}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 5585363029729845856}
-  highlightedIcon: {fileID: 3227086794430301432}
+  normalImage: {fileID: 5585363029729845856}
+  highlightImage: {fileID: 3227086794430301432}
   normalText: {fileID: 8356483684106075110}
   highlightedText: {fileID: 465447799148284979}
   soundSource: {fileID: 0}
@@ -4576,7 +4589,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -4585,6 +4598,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 8281799070121644259}
+  highlightCG: {fileID: 1013877302657370298}
 --- !u!114 &1695790205982230169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5733,7 +5754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -5952,22 +5973,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 3099582204769183037}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: de29f948a075aad439ab0f831dd4cc3c, type: 3}
   buttonText: Disconnect
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 1808714875842574010}
-  highlightedIcon: {fileID: 7091276563606035871}
+  normalImage: {fileID: 1808714875842574010}
+  highlightImage: {fileID: 7091276563606035871}
   normalText: {fileID: 8394140998946510087}
   highlightedText: {fileID: 8643619852219450986}
   soundSource: {fileID: 0}
@@ -5978,7 +5998,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -5987,6 +6007,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 683986302579164020}
+  highlightCG: {fileID: 8767451893769206073}
 --- !u!114 &8224808631336842921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6649,22 +6677,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 3227318192121793077}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 4682651516685760541}
-  highlightedIcon: {fileID: 4852912351400314610}
+  normalImage: {fileID: 4682651516685760541}
+  highlightImage: {fileID: 4852912351400314610}
   normalText: {fileID: 6929435877004131009}
   highlightedText: {fileID: 1766452664318364835}
   soundSource: {fileID: 0}
@@ -6675,7 +6702,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -6684,6 +6711,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 1866748231963139384}
+  highlightCG: {fileID: 4124937534461152578}
 --- !u!114 &4202029791220868005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8525,7 +8560,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -8949,22 +8984,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4203783638187949228}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 4995195842956688066}
-  highlightedIcon: {fileID: 754737357244946592}
+  normalImage: {fileID: 4995195842956688066}
+  highlightImage: {fileID: 754737357244946592}
   normalText: {fileID: 3008179638484153971}
   highlightedText: {fileID: 7839099982642199428}
   soundSource: {fileID: 0}
@@ -8975,7 +9009,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -8984,6 +9018,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 5389575212455909218}
+  highlightCG: {fileID: 9035960374650347819}
 --- !u!114 &2872589559362748655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9590,7 +9632,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -10033,7 +10075,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -10691,22 +10733,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4999438253497493336}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 3073053775019153663}
-  highlightedIcon: {fileID: 1752452628558740202}
+  normalImage: {fileID: 3073053775019153663}
+  highlightImage: {fileID: 1752452628558740202}
   normalText: {fileID: 3365636249884172271}
   highlightedText: {fileID: 977649819810126112}
   soundSource: {fileID: 0}
@@ -10717,7 +10758,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -10726,6 +10767,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 159534584481471490}
+  highlightCG: {fileID: 2989831172202544390}
 --- !u!114 &1711487260262416315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10893,22 +10942,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5002127753976156452}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: EXIT
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 7308649611650773043}
-  highlightedIcon: {fileID: 2917899805914302829}
+  normalImage: {fileID: 7308649611650773043}
+  highlightImage: {fileID: 2917899805914302829}
   normalText: {fileID: 4745491074467349557}
   highlightedText: {fileID: 4914899836949337946}
   soundSource: {fileID: 0}
@@ -10919,7 +10967,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -10928,6 +10976,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 1635038738515334085}
+  highlightCG: {fileID: 1561685732880272137}
 --- !u!114 &2852856034182527792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11245,22 +11301,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5160742139184889060}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 680d795de97417144bc422017b616f81, type: 3}
   buttonText: Share Settings
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 9117674075741422681}
-  highlightedIcon: {fileID: 8455883025310341738}
+  normalImage: {fileID: 9117674075741422681}
+  highlightImage: {fileID: 8455883025310341738}
   normalText: {fileID: 8013313308038877773}
   highlightedText: {fileID: 3889646637954007358}
   soundSource: {fileID: 0}
@@ -11271,7 +11326,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -11280,6 +11335,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 5372550694081385455}
+  highlightCG: {fileID: 7151060591701345018}
 --- !u!114 &4903448047310238914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12196,7 +12259,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -12709,22 +12772,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5585268853876512996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 494471732899002182}
-  highlightedIcon: {fileID: 7685255670629808328}
+  normalImage: {fileID: 494471732899002182}
+  highlightImage: {fileID: 7685255670629808328}
   normalText: {fileID: 7523072356975062934}
   highlightedText: {fileID: 4662764878185909490}
   soundSource: {fileID: 0}
@@ -12735,7 +12797,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -12744,6 +12806,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 7191896365429056995}
+  highlightCG: {fileID: 7268489560811564213}
 --- !u!114 &5511030744532409329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13134,7 +13204,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -15900,7 +15970,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -16071,7 +16141,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -16490,7 +16560,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -17337,7 +17407,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -18113,22 +18183,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 7984513414059441907}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 98bd4c9b1471720489f5411c44702ab1, type: 3}
   buttonText: BACK
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 8072922867996897370}
-  highlightedIcon: {fileID: 1797074348467444365}
+  normalImage: {fileID: 8072922867996897370}
+  highlightImage: {fileID: 1797074348467444365}
   normalText: {fileID: 5359539557125439508}
   highlightedText: {fileID: 2438669957845135147}
   soundSource: {fileID: 0}
@@ -18139,7 +18208,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -18148,6 +18217,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 3793471230809818133}
+  highlightCG: {fileID: 8113594116271880225}
 --- !u!114 &3850155430815551051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21705,22 +21782,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 9112515727579468973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 8314887797146833051}
-  highlightedIcon: {fileID: 7776250209996011366}
+  normalImage: {fileID: 8314887797146833051}
+  highlightImage: {fileID: 7776250209996011366}
   normalText: {fileID: 3190311859599454666}
   highlightedText: {fileID: 704414103621914081}
   soundSource: {fileID: 0}
@@ -21731,7 +21807,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -21740,6 +21816,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 2093379533648852288}
+  highlightCG: {fileID: 7443473110973114961}
 --- !u!114 &1661428575412309432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21907,22 +21991,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 9163765373752201631}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 74f5ca41efc4bd0468c0ca5b29dfb51a, type: 3}
   buttonText: Connect
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 534693565986927113}
-  highlightedIcon: {fileID: 6498456277906698266}
+  normalImage: {fileID: 534693565986927113}
+  highlightImage: {fileID: 6498456277906698266}
   normalText: {fileID: 5855651808148461240}
   highlightedText: {fileID: 2593950227612850023}
   soundSource: {fileID: 0}
@@ -21933,7 +22016,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -21942,6 +22025,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 7721897300111604662}
+  highlightCG: {fileID: 2916827822785232755}
 --- !u!114 &4268902808477128896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22097,22 +22188,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 9189649225815589162}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 3176353950069640914}
-  highlightedIcon: {fileID: 6897470303962405103}
+  normalImage: {fileID: 3176353950069640914}
+  highlightImage: {fileID: 6897470303962405103}
   normalText: {fileID: 2225563183561664471}
   highlightedText: {fileID: 2842669191482774105}
   soundSource: {fileID: 0}
@@ -22123,7 +22213,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -22132,6 +22222,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 6191002258735428854}
+  highlightCG: {fileID: 174248510776335919}
 --- !u!114 &5215825831692863230
 MonoBehaviour:
   m_ObjectHideFlags: 0

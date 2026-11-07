@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Game.City;
 using SEE.Net.Util;
@@ -45,7 +45,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <summary>
         /// The refresh button, to reload the snapshots from the server.
         /// </summary>
-        private ButtonManagerBasic refreshButton;
+        private ButtonManager refreshButton;
 
         /// <summary>
         /// Is called when the component is mounted and initializes it.
@@ -65,14 +65,14 @@ namespace SEE.UI.Window.SnapshotsWindow
 
             Transform root = PrefabInstantiator.InstantiatePrefab(snapshotWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = root.Find(snapshotListPath).gameObject;
-            refreshButton = root.Find(refreshButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
-            refreshButton.clickEvent.AddListener(() => RebuildAsync().Forget());
+            refreshButton = root.Find(refreshButtonPath).gameObject.MustGetComponent<ButtonManager>();
+            refreshButton.onClick.AddListener(() => RebuildAsync().Forget());
             foreach (Transform child in items.transform)
             {
                 Destroyer.Destroy(child.gameObject);
             }
 
-            refreshButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
+            refreshButton.onHover.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
 
             RebuildAsync().Forget();
         }

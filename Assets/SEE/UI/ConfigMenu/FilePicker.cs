@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.UserSettings;
 using SEE.Utils.Paths;
 using SimpleFileBrowser;
@@ -51,7 +51,7 @@ namespace SEE.UI.ConfigMenu
         private CustomDropdown dropdown;
         private TMP_InputField customInput;
         private TextMeshProUGUI labelText;
-        private ButtonManagerBasic pickerButton;
+        private ButtonManager pickerButton;
 
         /// <summary>
         /// The DataPath instance this file picker manipulates.
@@ -74,25 +74,23 @@ namespace SEE.UI.ConfigMenu
             MustGetComponentInChild("DropdownCombo/SelectableInput/Button", out pickerButton);
             MustGetComponentInChild("Label", out labelText);
 
-            dropdown.dropdownItems.Clear();
+            dropdown.items.Clear();
             foreach (string kind in ConfigMenu.EnumToStr<DataPath.RootKind>())
             {
-                dropdown.CreateNewItemFast(kind, null);
+                dropdown.items.Add(new() { itemName = kind });
             }
             dropdown.selectedItemIndex =
-                dropdown.dropdownItems.FindIndex(
+                dropdown.items.FindIndex(
                     item => item.itemName == DataPathInstance.Root.ToString());
             dropdown.SetupDropdown();
-            dropdown.dropdownEvent.AddListener(index =>
+            dropdown.onValueChanged.AddListener(index =>
             {
-                String selectedItem = dropdown.dropdownItems[index].itemName;
+                String selectedItem = dropdown.items[index].itemName;
                 DataPathInstance.Root = ItemToRootKind(selectedItem);
                 UpdateInput();
             });
-            dropdown.isListItem = true;
-            dropdown.listParent = FindCanvas(gameObject);
 
-            pickerButton.clickEvent.AddListener(() =>
+            pickerButton.onClick.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
@@ -150,7 +148,7 @@ namespace SEE.UI.ConfigMenu
         private void UpdateDropdownAndInput()
         {
             dropdown.selectedItemIndex =
-                dropdown.dropdownItems.FindIndex(
+                dropdown.items.FindIndex(
                     item => item.itemName == DataPathInstance.Root.ToString());
             dropdown.SetupDropdown();
             UpdateInput();

@@ -1,12 +1,15 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
+using UnityEngine;
+using UnityEngine.Events;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using UnityEngine;
-using UnityEngine.Events;
+using SEE.UI.Notification;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -54,8 +57,8 @@ namespace SEE.UI.Menu.Drawable
                 Instance.Instantiate(nodeKindSelectionMenuPrefab);
 
                 /// Adds the return call to the return button, to return to the parent menu.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
 
                 /// Initialize the node kind selector.
                 nodeKindSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Selection").GetComponent<HorizontalSelector>();
@@ -74,6 +77,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Set the current selected node kind.
                 nodeKindSelector.defaultIndex = index;
+                nodeKindSelector.SetupSelector();
             }
         }
 
@@ -91,7 +95,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf boarderConf = newConf.BorderConf;
             LineConf parentBranchLineConf = newConf.BranchLineConf;
 
-            nodeKindSelector.selectorEvent.AddListener(index =>
+            nodeKindSelector.onValueChanged.AddListener(index =>
             {
                 /// Gets the new and the old node kind.
                 GameMindMap.NodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];

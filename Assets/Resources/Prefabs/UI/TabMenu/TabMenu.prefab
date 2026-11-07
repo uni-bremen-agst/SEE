@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -558,22 +558,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2013536413586489746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CLOSE
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 1385500399483052193}
-  highlightedIcon: {fileID: 7376091477316294268}
+  normalImage: {fileID: 1385500399483052193}
+  highlightImage: {fileID: 7376091477316294268}
   normalText: {fileID: 8321458124105580687}
   highlightedText: {fileID: 425287105785420312}
   soundSource: {fileID: 0}
@@ -584,7 +583,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -593,6 +592,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 5157235402243397614}
+  highlightCG: {fileID: 7779824699395965319}
 --- !u!114 &5578592442726008526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,19 +643,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4139855650557551505}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2355048607340794802}
-        m_TargetAssemblyTypeName: Michsky.UI.ModernUIPack.ModalWindowManager, ModernUIPack
-        m_MethodName: CloseWindow
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!95 &3933235246894348331
 Animator:
   serializedVersion: 5
@@ -756,7 +751,7 @@ MonoBehaviour:
   windowIcon: {fileID: 7532082840377106743}
   windowTitle: {fileID: 6858195498952399003}
   windowDescription: {fileID: 6598862683781582154}
-  confirmButton: {fileID: 5578592442726008526}
+  confirmButton: {fileID: 4939812956084923905}
   cancelButton: {fileID: 0}
   mwAnimator: {fileID: 5782401636765229652}
   icon: {fileID: 0}
@@ -768,8 +763,7 @@ MonoBehaviour:
   onCancel:
     m_PersistentCalls:
       m_Calls: []
-  sharpAnimations: 0
-  useCustomValues: 0
+  useCustomContent: 0
   isOn: 0
 --- !u!95 &5782401636765229652
 Animator:
@@ -1882,7 +1876,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

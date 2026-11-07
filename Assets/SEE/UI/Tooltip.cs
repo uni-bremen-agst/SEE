@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
@@ -290,7 +290,7 @@ namespace SEE.UI
             tooltipGameObject = PrefabInstantiator.InstantiatePrefab(tooltipPrefab, Canvas.transform, false);
             if (tooltipGameObject.TryGetComponentOrLog(out tooltipManager))
             {
-                tooltipManager.allowUpdating = true;
+                tooltipManager.allowUpdate = true;
                 // Move tooltip to front of layer hierarchy
                 tooltipManager.gameObject.transform.SetAsLastSibling();
                 if (tooltipManager.tooltipObject.transform.Find("Anchor/Content").gameObject.TryGetComponentOrLog(out canvasGroup))

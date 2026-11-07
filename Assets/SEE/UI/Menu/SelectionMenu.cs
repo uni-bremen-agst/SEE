@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Extensions;
 using TMPro;
 using UnityEngine;
@@ -74,7 +74,7 @@ namespace SEE.UI.Menu
         private void ActivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);
-            if (button.TryGetComponentOrLog(out ButtonManagerBasic manager))
+            if (button.TryGetComponentOrLog(out ButtonManager manager))
             {
                 manager.buttonText = $"[{entry.Title}]";
                 manager.normalText.fontStyle = FontStyles.UpperCase;
@@ -90,7 +90,7 @@ namespace SEE.UI.Menu
         private void DeactivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);
-            if (button.TryGetComponentOrLog(out ButtonManagerBasic manager))
+            if (button.TryGetComponentOrLog(out ButtonManager manager))
             {
                 manager.buttonText = entry.Title;
                 manager.normalText.fontStyle = FontStyles.Normal;

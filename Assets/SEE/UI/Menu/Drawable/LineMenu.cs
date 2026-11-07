@@ -1,11 +1,6 @@
-﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.ReversibleActions.Drawable;
-using Cysharp.Threading.Tasks;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
+﻿using Cysharp.Threading.Tasks;
+using Michsky.MUIP;
+using Random = UnityEngine.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +9,16 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
-using Random = UnityEngine.Random;
+using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -127,12 +130,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Button manager for chosing the primary color.
         /// </summary>
-        private static readonly ButtonManagerBasic primaryColorBMB;
+        private static readonly ButtonManager primaryColorBMB;
 
         /// <summary>
         /// Button manager for chosing the secondary color.
         /// </summary>
-        private static readonly ButtonManagerBasic secondaryColorBMB;
+        private static readonly ButtonManager secondaryColorBMB;
 
         /// <summary>
         /// The HSVPicker ColorPicker component of the line menu.
@@ -142,12 +145,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Button manager for chosing the color-kind area.
         /// </summary>
-        private static readonly ButtonManagerBasic colorKindBMB;
+        private static readonly ButtonManager colorKindBMB;
 
         /// <summary>
         /// Button manager for chosing the fill-out area.
         /// </summary>
-        private static readonly ButtonManagerBasic fillOutBMB;
+        private static readonly ButtonManager fillOutBMB;
 
         /// <summary>
         /// The switch manager for the fill-out status.
@@ -270,22 +273,18 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initialize the remaining GUI elements.
             loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
-            primaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
-            secondaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManager>();
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.Interactable(false);
+            secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManager>();
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             tilingSlider = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
-            colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
-            colorKindBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
-            fillOutBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManager>();
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.Interactable(false);
+            fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManager>();
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
             fillOutManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
             Instance.Disable();
@@ -311,7 +310,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             /// Register the handler for switching the line kind.
-            lineKindSelector.selectorEvent.AddListener(index =>
+            lineKindSelector.onValueChanged.AddListener(index =>
             {
                 if (GetLineKinds()[index] == LineKind.Dashed)
                 {
@@ -338,6 +337,7 @@ namespace SEE.UI.Menu.Drawable
                 AssignLineKind(GetLineKinds()[index]);
             });
             lineKindSelector.defaultIndex = 0;
+            lineKindSelector.SetupSelector();
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             /// Register the handler for switching the color kind.
-            colorKindSelector.selectorEvent.AddListener(index =>
+            colorKindSelector.onValueChanged.AddListener(index =>
             {
                 bool isDashed = selectedLineKind != LineKind.Solid;
                 ColorKind newColorKind = GetColorKinds(true)[index];
@@ -382,6 +382,7 @@ namespace SEE.UI.Menu.Drawable
 
             /// Sets the default selected item
             colorKindSelector.defaultIndex = 0;
+            colorKindSelector.SetupSelector();
         }
 
         /// <summary>
@@ -398,6 +399,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             segmentSelector.defaultIndex = 0;
+            segmentSelector.SetupSelector();
         }
 
         /// <summary>
@@ -414,6 +416,7 @@ namespace SEE.UI.Menu.Drawable
             }
 
             lineCapSelector.defaultIndex = 0;
+            lineCapSelector.SetupSelector();
         }
         #endregion
         #region IsOpen
@@ -588,7 +591,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the old action of the selector
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             /// Creates the new action for changing the line kind on the selector.
@@ -607,7 +610,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Add the action to the selector.
-            lineKindSelector.selectorEvent.AddListener(lineKindAction);
+            lineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -628,7 +631,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the old action of the selector
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
             }
 
             /// Creates the new action for changing the color kind on the selector.
@@ -645,7 +648,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the action to the selector.
-            colorKindSelector.selectorEvent.AddListener(colorKindAction);
+            colorKindSelector.onValueChanged.AddListener(colorKindAction);
         }
 
         /// <summary>
@@ -656,16 +659,16 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpPrimaryColorButtonForDrawing()
         {
             /// Removes old handler.
-            primaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
             /// Adds the mutually exclusive mode.
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Adds the new handler for saving in global value.
-            primaryColorBMB.clickEvent.AddListener(() =>
+            primaryColorBMB.onClick.AddListener(() =>
             {
                 AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
             });
             /// Makes the button not clickable.
-            primaryColorBMB.buttonVar.interactable = false;
+            primaryColorBMB.Interactable(false);
         }
 
         /// <summary>
@@ -676,17 +679,17 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpSecondaryColorButtonForDrawing()
         {
             /// Removes old handler.
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             /// Adds the mutually exclusive mode.
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Adds the new handler for saving in global value.
-            secondaryColorBMB.clickEvent.AddListener(() =>
+            secondaryColorBMB.onClick.AddListener(() =>
             {
                 ValueHolder.CurrentSecondaryColor = EnsureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
                 AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
             });
             /// Makes the button not clickable.
-            secondaryColorBMB.buttonVar.interactable = true;
+            secondaryColorBMB.Interactable(true);
         }
         /// <summary>
         /// Sets up the outline thickness slider for drawing mode.
@@ -709,14 +712,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void SetUpColorKindTypeButtonForDrawing()
         {
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            colorKindBMB.clickEvent.AddListener(() =>
+            colorKindBMB.onClick.RemoveAllListeners();
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.onClick.AddListener(() =>
             {
                 DisableFillOut();
                 EnableColorKind();
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
-                if (!primaryColorBMB.buttonVar.interactable)
+                if (!primaryColorBMB.isInteractable)
                 {
                     AssignColorArea(color => { ValueHolder.CurrentPrimaryColor = color; }, ValueHolder.CurrentPrimaryColor);
                 }
@@ -726,7 +729,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
                 }
             });
-            colorKindBMB.buttonVar.interactable = false;
+            colorKindBMB.Interactable(false);
         }
 
         /// <summary>
@@ -734,9 +737,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void SetUpFillOutTypeButtonForDrawing()
         {
-            fillOutBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            fillOutBMB.clickEvent.AddListener(() =>
+            fillOutBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.onClick.AddListener(() =>
             {
                 DisableColorKind();
                 EnableFillOut();
@@ -747,7 +750,7 @@ namespace SEE.UI.Menu.Drawable
                 }
                 AssignColorArea(color => { ValueHolder.CurrentTertiaryColor = color; }, ValueHolder.CurrentTertiaryColor);
             });
-            fillOutBMB.buttonVar.interactable = true;
+            fillOutBMB.Interactable(true);
         }
 
         /// <summary>
@@ -906,9 +909,9 @@ namespace SEE.UI.Menu.Drawable
             if (returnCall != null)
             {
                 EnableReturn();
-                ButtonManagerBasic returnBtn = GameFinder.FindAttachedOrLocalDescendant(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
-                returnBtn.clickEvent.RemoveAllListeners();
-                returnBtn.clickEvent.AddListener(returnCall);
+                ButtonManager returnBtn = GameFinder.FindAttachedOrLocalDescendant(gameObject, "ReturnBtn").GetComponent<ButtonManager>();
+                returnBtn.onClick.RemoveAllListeners();
+                returnBtn.onClick.AddListener(returnCall);
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
@@ -954,7 +957,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the current line kind action of the line kind selector.
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             /// Creates a new line kind selector action
@@ -1014,7 +1017,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the line kind selector action.
-            lineKindSelector.selectorEvent.AddListener(lineKindAction);
+            lineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -1038,7 +1041,7 @@ namespace SEE.UI.Menu.Drawable
             /// Removes the current color-kind action of the color-kind selector.
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
             }
 
             /// Creates a new color-kind selector action
@@ -1090,7 +1093,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the color-kind selector action.
-            colorKindSelector.selectorEvent.AddListener(colorKindAction);
+            colorKindSelector.onValueChanged.AddListener(colorKindAction);
         }
 
         /// <summary>
@@ -1114,7 +1117,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
             }
             segmentAction = index =>
             {
@@ -1138,7 +1141,7 @@ namespace SEE.UI.Menu.Drawable
                 RefreshEditingUIForCurrentSegment(selectedLine, lineHolder, surface, surfaceParentName);
                 ResetColorTypeSelectionToDefault();
             };
-            segmentSelector.selectorEvent.AddListener(segmentAction);
+            segmentSelector.onValueChanged.AddListener(segmentAction);
         }
 
         /// <summary>
@@ -1180,7 +1183,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
             }
             lineCapAction = index =>
             {
@@ -1257,7 +1260,7 @@ namespace SEE.UI.Menu.Drawable
                     RecalculateMenuHeightDelayedAsync().Forget();
                 }
             };
-            lineCapSelector.selectorEvent.AddListener(lineCapAction);
+            lineCapSelector.onValueChanged.AddListener(lineCapAction);
         }
 
         /// <summary>
@@ -1389,11 +1392,11 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler
-            primaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
             /// Add mutually exclusive mode.
-            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            primaryColorBMB.clickEvent.AddListener(() =>
+            primaryColorBMB.onClick.AddListener(() =>
             {
                 if (segment == Segment.Main)
                 {
@@ -1421,7 +1424,7 @@ namespace SEE.UI.Menu.Drawable
 
             });
             /// Makes the button unclickable.
-            primaryColorBMB.buttonVar.interactable = false;
+            primaryColorBMB.Interactable(false);
         }
 
         /// <summary>
@@ -1437,12 +1440,12 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler.
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             /// Add mutually exclusive mode.
-            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.onClick.AddListener(MutuallyExclusiveColorButtons);
 
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            secondaryColorBMB.clickEvent.AddListener(() =>
+            secondaryColorBMB.onClick.AddListener(() =>
             {
                 if (segment == Segment.Main)
                 {
@@ -1473,7 +1476,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             });
             /// Makes the button unclickable.
-            secondaryColorBMB.buttonVar.interactable = true;
+            secondaryColorBMB.Interactable(true);
         }
 
         /// <summary>
@@ -1671,17 +1674,17 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpColorKindTypeButtonForEditing(GameObject selectedLine,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.onClick.RemoveAllListeners();
+            colorKindBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
-            colorKindBMB.clickEvent.AddListener(() =>
+            colorKindBMB.onClick.AddListener(() =>
             {
                 DisableFillOut();
                 EnableColorKind();
 
                 if (segment == Segment.Main)
                 {
-                    if (!primaryColorBMB.buttonVar.interactable)
+                    if (!primaryColorBMB.isInteractable)
                     {
                         AssignColorArea(color =>
                         {
@@ -1723,7 +1726,7 @@ namespace SEE.UI.Menu.Drawable
                         return;
                     }
 
-                    if (!primaryColorBMB.buttonVar.interactable)
+                    if (!primaryColorBMB.isInteractable)
                     {
                         AssignColorArea(color =>
                         {
@@ -1749,7 +1752,7 @@ namespace SEE.UI.Menu.Drawable
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
             });
 
-            colorKindBMB.buttonVar.interactable = false;
+            colorKindBMB.Interactable(false);
         }
 
         /// <summary>
@@ -1762,10 +1765,10 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpFillOutTypeButtonForEditing(GameObject selectedLine, LineConf lineHolder,
             GameObject surface, string surfaceParentName)
         {
-            fillOutBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
-            fillOutBMB.clickEvent.AddListener(() =>
+            fillOutBMB.onClick.AddListener(() =>
             {
                 DisableColorKind();
                 EnableFillOut();
@@ -1817,7 +1820,7 @@ namespace SEE.UI.Menu.Drawable
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
             });
 
-            fillOutBMB.buttonVar.interactable = true;
+            fillOutBMB.Interactable(true);
         }
 
         /// <summary>
@@ -1929,7 +1932,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="clearFillOutAction">Action to clear the value.</param>
         public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
-            if (Instance.IsInEditMode() && !fillOutBMB.buttonVar.interactable)
+            if (Instance.IsInEditMode() && !fillOutBMB.isInteractable)
             {
                 if (fillOut != null && setFillOutAction != null)
                 {
@@ -2218,25 +2221,25 @@ namespace SEE.UI.Menu.Drawable
 
             if (lineKindAction != null)
             {
-                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindSelector.onValueChanged.RemoveListener(lineKindAction);
                 lineKindAction = null;
             }
 
             if (colorKindAction != null)
             {
-                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindSelector.onValueChanged.RemoveListener(colorKindAction);
                 colorKindAction = null;
             }
 
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
                 segmentAction = null;
             }
 
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
                 lineCapAction = null;
             }
 
@@ -2249,16 +2252,16 @@ namespace SEE.UI.Menu.Drawable
                 gameObject.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
                 tilingAction = null;
             }
-            primaryColorBMB.clickEvent.RemoveAllListeners();
-            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.onClick.RemoveAllListeners();
+            secondaryColorBMB.onClick.RemoveAllListeners();
             gameObject.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
             gameObject.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
             fillOutManager.OffEvents.RemoveAllListeners();
             fillOutManager.OnEvents.RemoveAllListeners();
-            colorKindBMB.clickEvent.RemoveAllListeners();
-            fillOutBMB.clickEvent.RemoveAllListeners();
+            colorKindBMB.onClick.RemoveAllListeners();
+            fillOutBMB.onClick.RemoveAllListeners();
 
             if (colorAction != null)
             {
@@ -2379,8 +2382,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void MutuallyExclusiveColorButtons()
         {
-            primaryColorBMB.buttonVar.interactable = !primaryColorBMB.buttonVar.IsInteractable();
-            secondaryColorBMB.buttonVar.interactable = !secondaryColorBMB.buttonVar.IsInteractable();
+            primaryColorBMB.Interactable(!primaryColorBMB.isInteractable);
+            secondaryColorBMB.Interactable(!secondaryColorBMB.isInteractable);
         }
 
 
@@ -2390,8 +2393,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void MutuallyExclusiveColorTypeButtons()
         {
-            colorKindBMB.buttonVar.interactable = !colorKindBMB.buttonVar.IsInteractable();
-            fillOutBMB.buttonVar.interactable = !fillOutBMB.buttonVar.IsInteractable();
+            colorKindBMB.Interactable(!colorKindBMB.isInteractable);
+            fillOutBMB.Interactable(!fillOutBMB.isInteractable);
         }
 
         /// <summary>
@@ -2402,8 +2405,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void ResetColorTypeSelectionToDefault()
         {
-            colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB.buttonVar.interactable = true;
+            colorKindBMB.Interactable(false);
+            fillOutBMB.Interactable(true);
         }
         #endregion
 

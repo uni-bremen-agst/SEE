@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,14 +135,12 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            dropdown.dropdownEvent.AddListener(selectedIndex =>
+            dropdown.onValueChanged.AddListener(selectedIndex =>
             {
-                string selectedItem = dropdown.dropdownItems[selectedIndex].itemName;
+                string selectedItem = dropdown.items[selectedIndex].itemName;
                 OnValueChange(Value);
                 FigureOutInputMode(selectedItem);
             });
-            dropdown.isListItem = true;
-            dropdown.listParent = FindCanvas(gameObject);
             labelText.text = Label;
 
             dictaphone.OnDictationFinished += text => customInput.text = text;
@@ -153,14 +151,15 @@ namespace SEE.UI.ConfigMenu
             if (valuesUpdates.Count > 0)
             {
                 List<string> newValues = valuesUpdates.Dequeue();
-                dropdown.dropdownItems.Clear();
+                dropdown.items.Clear();
+                // Add items directly because CreateNewItem() can reset the selected index.
                 if (Mode == ComboSelectMode.Combo)
                 {
-                    dropdown.CreateNewItemFast(customInputText, null);
+                    dropdown.items.Add(new() { itemName = customInputText });
                 }
                 foreach (string s in newValues)
                 {
-                    dropdown.CreateNewItemFast(s, null);
+                    dropdown.items.Add(new() { itemName = s });
                 }
 
                 dropdown.SetupDropdown();
@@ -176,7 +175,7 @@ namespace SEE.UI.ConfigMenu
         private void SetToCustomMode(string customValue)
         {
             dropdown.selectedItemIndex =
-                dropdown.dropdownItems.FindIndex(item => item.itemName == customInputText);
+                dropdown.items.FindIndex(item => item.itemName == customInputText);
             dropdown.SetupDropdown();
             customInput.gameObject.SetActive(true);
             dictaphone.gameObject.SetActive(true);
@@ -197,7 +196,7 @@ namespace SEE.UI.ConfigMenu
         private void FigureOutInputMode(string value)
         {
             // If the new value is already part of the items in the list, we simply select its index.
-            int index = dropdown.dropdownItems.FindIndex(item => item.itemName == value);
+            int index = dropdown.items.FindIndex(item => item.itemName == value);
             if (index >= 0 && value != customInputText)
             {
                 SetToFixedMode(index);
@@ -211,7 +210,7 @@ namespace SEE.UI.ConfigMenu
 
         private string FigureOutValue()
         {
-            string item = dropdown.dropdownItems[dropdown.selectedItemIndex].itemName;
+            string item = dropdown.items[dropdown.selectedItemIndex].itemName;
             if (item == customInputText)
             {
                 return customInput.text;

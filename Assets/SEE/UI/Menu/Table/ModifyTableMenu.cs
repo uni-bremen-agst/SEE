@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
@@ -50,30 +50,30 @@ namespace SEE.UI.Menu.Table
             menuInstance = PrefabInstantiator.InstantiatePrefab(tableMenuPrefab,
                                 UICanvas.Canvas.transform, false);
 
-            ButtonManagerBasic move = menuInstance.FindDescendant("Move")
-                .GetComponent<ButtonManagerBasic>();
-            move.clickEvent.AddListener(() =>
+            ButtonManager move = menuInstance.FindDescendant("Move")
+                .GetComponent<ButtonManager>();
+            move.onClick.AddListener(() =>
             {
                 ConfirmOperation(ModifyOperation.Move);
             });
 
-            ButtonManagerBasic scale = menuInstance.FindDescendant("Scale")
-                .GetComponent<ButtonManagerBasic>();
-            scale.clickEvent.AddListener(() =>
+            ButtonManager scale = menuInstance.FindDescendant("Scale")
+                .GetComponent<ButtonManager>();
+            scale.onClick.AddListener(() =>
             {
                 ConfirmOperation(ModifyOperation.Scale);
             });
 
-            ButtonManagerBasic delete = menuInstance.FindDescendant("Delete")
-                .GetComponent<ButtonManagerBasic>();
-            delete.clickEvent.AddListener(() =>
+            ButtonManager delete = menuInstance.FindDescendant("Delete")
+                .GetComponent<ButtonManager>();
+            delete.onClick.AddListener(() =>
             {
                 ConfirmOperation(ModifyOperation.Delete);
             });
 
-            ButtonManagerBasic cancel = menuInstance.FindDescendant("CancelDragger")
-                .GetComponent<ButtonManagerBasic>();
-            cancel.clickEvent.AddListener(() =>
+            ButtonManager cancel = menuInstance.FindDescendant("CancelDragger")
+                .GetComponent<ButtonManager>();
+            cancel.onClick.AddListener(() =>
             {
                 ConfirmOperation(ModifyOperation.Cancel);
             });
