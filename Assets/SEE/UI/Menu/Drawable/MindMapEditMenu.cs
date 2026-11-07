@@ -116,9 +116,9 @@ namespace SEE.Game.UI.Menu.Drawable
                     .GetComponent<ButtonManager>();
             changeParent.onClick.AddListener(() =>
             {
-                /// At this point, immediately is required because Destroyer.Destroy() does not
-                /// delete quickly enough in case a theme node has been selected.
-                GameObject.DestroyImmediate(Instance.gameObject);
+                // Hide the menu immediately, but let the button finish processing its click.
+                Instance.Disable();
+                Destroyer.Destroy(Instance.gameObject);
                 MindMapParentSelectionMenu.EnableForEditing(attached, node, conf, callback);
             });
         }
