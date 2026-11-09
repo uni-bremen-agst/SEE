@@ -336,6 +336,10 @@ namespace SEE.UI.HelpSystem
             PanelNotificationCenter.OnTabClosed += OnTabClosed;
         }
 
+        /// <summary>
+        /// Closes the help entry when its containing panel closes.
+        /// </summary>
+        /// <param name="panel">The panel that closed.</param>
         private void OnPanelClosed(Panel panel)
         {
             if (panel == entryPanel)
@@ -344,8 +348,15 @@ namespace SEE.UI.HelpSystem
             }
         }
 
+        /// <summary>
+        /// Handles the closed tab through its containing panel.
+        /// </summary>
+        /// <param name="tab">The tab that closed.</param>
         private void OnTabClosed(PanelTab tab) => OnPanelClosed(tab.Panel);
 
+        /// <summary>
+        /// Removes panel event subscriptions and clears the entry's panel reference.
+        /// </summary>
         private void UnsubscribeFromPanelEvents()
         {
             PanelNotificationCenter.OnPanelClosed -= OnPanelClosed;
@@ -353,6 +364,9 @@ namespace SEE.UI.HelpSystem
             entryPanel = null;
         }
 
+        /// <summary>
+        /// Removes panel event subscriptions before running the base destruction handler.
+        /// </summary>
         protected override void OnDestroy()
         {
             UnsubscribeFromPanelEvents();

@@ -108,7 +108,7 @@ Use a separate filled copy for each tester/platform or comparison run.
 | [TC-09](#tc-09) | Hand-animation calibration instructions | ✅ Passed |
 | [TC-10](#tc-10) | Shared window frame behavior | ✅ Passed |
 | [TC-11](#tc-11) | Tree View navigation, search, and scrolling | ✅ Passed |
-| [TC-12](#tc-12) | Property Window display and controls | ✅ Passed (bug exists) |
+| [TC-12](#tc-12) | Property Window display and controls | ✅ Passed |
 | [TC-13](#tc-13) | Context-menu entries and submenus | ✅ Passed |
 | [TC-14](#tc-14) | Snapshots window and populated entries | 🚧 Blocked |
 | [TC-15](#tc-15) | Debug action bar | 🚧 Blocked |
@@ -133,7 +133,7 @@ Use a separate filled copy for each tester/platform or comparison run.
 | [TC-34](#tc-34) | Mind map node editing menu | ✅ Passed |
 | [TC-35](#tc-35) | Mind map node-kind selector | ✅ Passed |
 | [TC-36](#tc-36) | Line color-choice menu | ✅ Passed  |
-| [TC-37](#tc-37) | Mind map color-choice menu | ✅ Passed (bug exists) |
+| [TC-37](#tc-37) | Mind map color-choice menu | ✅ Passed |
 | [TC-38](#tc-38) | Drawable Move/Rotate controls | ✅ Passed |
 | [TC-39](#tc-39) | Drawable and Sticky Note scale menu | ✅ Passed |
 | [TC-40](#tc-40) | Drawable cut/copy/paste menu | ✅ Passed |
@@ -569,18 +569,20 @@ Visible and working back button in Audio Settings:
 | 5 | Open Inspect → Properties for a different node. | The corresponding properties are displayed for the new target. |
 | 6 | Close and reopen the Property Window through the same context-menu path. | The view and its controls initialise correctly again. |
 
-**Actual result:** All Tree View test steps produced the expected results.
-Opening the view on macOS also triggered a NotImplementedException,
-followed by repeated ArgumentNullException errors. These did not prevent
-completion of the test steps.
+**Actual result:** All Property Window test steps produced the expected
+results. During the original macOS run, opening the window triggered a
+`NotImplementedException`, followed by repeated `ArgumentNullException`
+errors. These did not prevent completion of the test steps.
 
-**Evidence / defects:** The GetActiveTcpConnections() exception was
-previously reproduced on master before the MUIP 5 upgrade on macOS.
-The subsequent ArgumentNullException errors have not yet been classified.
-Tristan reported no corresponding errors on Windows.
+**Evidence / defects:** The `GetActiveTcpConnections()` exception was also
+reproduced on `master` before the MUIP 5 upgrade. Commit
+[27ea1219ff](https://github.com/uni-bremen-agst/SEE/commit/27ea1219fffcae8727dd105024112589b26add05)
+fixes the JavaScript debug adapter's port selection on macOS by avoiding
+that unsupported API. No macOS retest is recorded to confirm whether the
+subsequent `ArgumentNullException` errors also stopped. Tristan reported
+no corresponding errors on Windows.
 
-macOS Errors
-![TC-12: Exceptions observed on macOS](images/issue-701/tc-12-macos-errors.png)
+![TC-12: Exceptions observed before the fix on macOS](images/issue-701/tc-12-macos-errors.png)
 
 
 <a id="tc-13"></a>
@@ -682,16 +684,10 @@ Step 1, 2, 5 work. 3 and 4 are not able to be tested because of missing backend 
 | 4 | Use Console and Variables in the debug action bar. | The respective SEE windows open. |
 | 5 | Inspect Reverse/StepBack/Restart visibility and use Stop. | Only supported optional actions are available; Stop ends the session without a stuck UI. |
 
-**Actual result:**
+**Actual result:** The run lacked a configured debug session, which is
+required to open and exercise the action bar.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** Action bar behavior remains unverified.
 
 <a id="tc-16"></a>
 
@@ -722,16 +718,10 @@ from confirmed migration regressions.
 | 4 | Submit a supported test expression once. | The adapter processes one submission and displays the corresponding result. |
 | 5 | Use Clear, close the window, then reopen it through Console in the action bar. | Clear affects the intended message list; the window can be reopened and used again. |
 
-**Actual result:**
+**Actual result:** The run lacked the debug session required by TC-15 to
+open the SEE Console and produce test output.
 
-Fill in after performing the test. Include the selected city, setting,
-source object, or test file where this is relevant.
-
-**Evidence / defects:**
-
-Link to screenshots or describe deviations and how to reproduce them.
-Record missing prerequisites for Blocked cases. Distinguish known issues
-from confirmed migration regressions.
+**Evidence / defects:** Console behavior remains unverified.
 
 <a id="tc-17"></a>
 
@@ -1402,11 +1392,13 @@ No defects observed. No screenshots recorded.
 - **Date:** 06.11.2026
 - **Platform:** Windows 11
 - **Environment deviations:** None
-- **Status:** Passed (but bug exists)
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
-**Objective:** Verify component color sampling and the disabled missing-branch action.
+**Objective:** Verify Border and Text color sampling and the disabled
+missing-branch action after the MUIP upgrade. Record existing color-picker
+defects separately.
 
 **Preconditions:**
 
@@ -1418,18 +1410,19 @@ No defects observed. No screenshots recorded.
 | Step | Action | Expected result |
 | --- | --- | --- |
 | 1 | Press Space → Drawable → Color Picker → left-click the connected Subtheme. | The Border/Text/BranchLine color menu opens. |
-| 2 | Choose Border; repeat the full path and choose Text, then BranchLine. | Each choice samples the corresponding component color. |
+| 2 | Choose Border, then repeat the full path and choose Text. | Each choice samples the corresponding component color. |
 | 3 | Repeat the path using right-click on the source node. | The secondary-color sampling path remains usable. |
 | 4 | Open Space → Drawable → Color Picker → click the Theme without a branch. | The helper menu opens with BranchLine disabled. |
 | 5 | Try the disabled BranchLine action, then choose an available component. | The disabled action does nothing; the available choice remains functional. |
 
-**Actual result:**
+**Actual result:** Border and Text color sampling worked in the recorded run.
 
-The first two use cases work but the branch selection is not possible. This was also the case in the old build so its not caused by the MUIP update.
+**Evidence / defects:** The tester also observed two existing defects in
+both the pre-upgrade and upgraded builds:
 
-Also there is a bug where picking a color, editing the mindmap subtheme and then picking color again breaks the whole UI. (Same bug also exists in the old build)
-
-**Evidence / defects:**
+- BranchLine color sampling was unavailable on a connected Subtheme.
+- Sampling a color, editing the Subtheme, and sampling again left the UI
+  unresponsive.
 
 ![TC-37: Mind map color-picker observation](images/issue-701/tc-37-mind-map-color-picker.png)
 
@@ -2080,8 +2073,8 @@ The following changed prefabs have no dedicated case in this snapshot:
 
 **Overall result:** 50 Passed, 0 Failed, 3 Blocked, and 0 Not tested.
 TC-14 was partially exercised and needs a snapshot backend. TC-15 and TC-16
-require a configured debug session. TC-37 is counted as Passed with its
-recorded pre-existing bug.
+require a configured debug session. TC-37 records the pre-existing
+color-picker defects separately from the migration result.
 
 **Fixes retested:** TC-08, TC-33, and TC-50. The fixes are included in
 [4343980c96](https://github.com/uni-bremen-agst/SEE/commit/4343980c9661fd6e6546f504adbcb3fefc1dc5f3).

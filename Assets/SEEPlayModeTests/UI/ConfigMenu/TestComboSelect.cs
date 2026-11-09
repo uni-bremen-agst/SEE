@@ -41,7 +41,7 @@ namespace SEE.UI.ConfigMenu
         }
 
         /// <summary>
-        /// Checks that shrinking or clearing options does not leave an invalid index.
+        /// Checks that shrinking or clearing options keeps the selected value readable.
         /// </summary>
         /// <returns>An enumerator that waits for queued value updates.</returns>
         /// <exception cref="AssertionException">An option rebuild leaves an invalid index or value.</exception>
@@ -66,6 +66,7 @@ namespace SEE.UI.ConfigMenu
             yield return null;
             Assert.That(dropdown.items, Is.Empty);
             Assert.That(dropdown.selectedText.text, Is.Empty);
+            Assert.That(combo.Value, Is.Empty);
             combo.Values = new[] { "Recovered" };
             combo.Value = "Recovered";
             yield return null;

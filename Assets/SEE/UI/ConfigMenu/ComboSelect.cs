@@ -117,7 +117,7 @@ namespace SEE.UI.ConfigMenu
         }
 
         /// <summary>
-        /// The value (currently selected option) of this input.
+        /// The selected value, or an empty string when no option is selected.
         /// </summary>
         public string Value
         {
@@ -210,7 +210,13 @@ namespace SEE.UI.ConfigMenu
 
         private string FigureOutValue()
         {
-            string item = dropdown.items[dropdown.selectedItemIndex].itemName;
+            int index = dropdown.selectedItemIndex;
+            if (index < 0 || index >= dropdown.items.Count)
+            {
+                return string.Empty;
+            }
+
+            string item = dropdown.items[index].itemName;
             if (item == customInputText)
             {
                 return customInput.text;

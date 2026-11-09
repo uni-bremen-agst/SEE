@@ -124,6 +124,11 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #endregion
 
         #region Utilities
+        /// <summary>
+        /// Selects an available TCP port for the JavaScript debug adapter.
+        /// </summary>
+        /// <returns>The selected port number.</returns>
+        /// <exception cref="SocketException">The macOS loopback socket could not be opened or bound.</exception>
         private static int GetAdapterPort()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))

@@ -42,7 +42,6 @@ namespace SEE.UI.Menu
         /// </summary>
         private PlayerInputType previousInputType;
 
-
         /// <summary>
         /// Creates a test canvas and temporarily selects desktop input using the authoritative settings.
         /// </summary>
