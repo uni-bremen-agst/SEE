@@ -337,11 +337,7 @@ No defects observed. No screenshots recorded.
 
 **Evidence / defects:** Existing issue: BACK button not visible in Keybindings. Reproduced in the previous version; not introduced by the MUIP upgrade. Returning via the button could not be verified.
 
-No back button visible at the bottom:
-![TC-05: Keybindings without a visible BACK button](images/issue-701/tc-05-keybindings-missing-back.png)
-
-Visible and working back button in Audio Settings:
-![TC-05: Audio Settings with a visible BACK button](images/issue-701/tc-05-audio-settings-back-button.png)
+[Screenshots of the missing BACK button in Keybindings and the working BACK button in Audio Settings](https://github.com/uni-bremen-agst/SEE/pull/1033#issuecomment-6745613492).
 
 
 <a id="tc-06"></a>
@@ -582,7 +578,7 @@ fixes the JavaScript debug adapter's port selection on macOS by avoiding
 that unsupported API. Neither exception recurred in the macOS retest.
 Tristan reported no corresponding errors on Windows.
 
-![TC-12: Exceptions observed before the fix on macOS](images/issue-701/tc-12-macos-errors.png)
+[Screenshot of the macOS exceptions before the fix](https://github.com/uni-bremen-agst/SEE/pull/1033#issuecomment-6745613492).
 
 
 <a id="tc-13"></a>
@@ -653,7 +649,7 @@ a snapshot require a configured snapshot backend with a disposable test snapshot
 
 **Evidence / defects:**
 
-![TC-14: Snapshot backend unavailable](images/issue-701/tc-14-snapshots-backend.png)
+[Screenshot of the unavailable snapshot backend](https://github.com/uni-bremen-agst/SEE/pull/1033#issuecomment-6745613492).
 
 
 <a id="tc-15"></a>
@@ -1428,7 +1424,7 @@ both the pre-upgrade and upgraded builds:
 - Sampling a color, editing the Subtheme, and sampling again left the UI
   unresponsive.
 
-![TC-37: Mind map color-picker observation](images/issue-701/tc-37-mind-map-color-picker.png)
+[Screenshot of the mind map color-picker observation](https://github.com/uni-bremen-agst/SEE/pull/1033#issuecomment-6745613492).
 
 
 <a id="tc-38"></a>
