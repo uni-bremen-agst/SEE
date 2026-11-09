@@ -16,9 +16,9 @@ unrelated to the migration are recorded as observations. A failed manual
 test is not automatically classified as a migration regression; compare
 the previous version when the cause is unclear.
 
-**Execution state:** Snapshot exported on 07.11.2026. The 53 documented
-cases include 50 Passed and 3 Blocked. See Test Run Summary for the remaining
-prerequisites.
+**Execution state:** Snapshot updated on 09.11.2026. The 53 documented
+cases include 52 Passed and 1 Blocked. See Test Run Summary for the remaining
+prerequisite.
 
 ## Test Environment
 
@@ -111,8 +111,8 @@ Use a separate filled copy for each tester/platform or comparison run.
 | [TC-12](#tc-12) | Property Window display and controls | ✅ Passed |
 | [TC-13](#tc-13) | Context-menu entries and submenus | ✅ Passed |
 | [TC-14](#tc-14) | Snapshots window and populated entries | 🚧 Blocked |
-| [TC-15](#tc-15) | Debug action bar | 🚧 Blocked |
-| [TC-16](#tc-16) | SEE debug console | 🚧 Blocked |
+| [TC-15](#tc-15) | Debug action bar | ✅ Passed |
+| [TC-16](#tc-16) | SEE debug console | ✅ Passed |
 | [TC-17](#tc-17) | Runtime ConfigMenu tabs and settings containers | ✅ Passed |
 | [TC-18](#tc-18) | Runtime boolean setting switch | ✅ Passed |
 | [TC-19](#tc-19) | Runtime data-path picker | ✅ Passed |
@@ -570,7 +570,8 @@ Visible and working back button in Audio Settings:
 | 6 | Close and reopen the Property Window through the same context-menu path. | The view and its controls initialise correctly again. |
 
 **Actual result:** All Property Window test steps produced the expected
-results. During the original macOS run, opening the window triggered a
+results. The macOS retest on 09.11.2026 completed without errors. During
+the original macOS run, opening the window triggered a
 `NotImplementedException`, followed by repeated `ArgumentNullException`
 errors. These did not prevent completion of the test steps.
 
@@ -578,9 +579,8 @@ errors. These did not prevent completion of the test steps.
 reproduced on `master` before the MUIP 5 upgrade. Commit
 [27ea1219ff](https://github.com/uni-bremen-agst/SEE/commit/27ea1219fffcae8727dd105024112589b26add05)
 fixes the JavaScript debug adapter's port selection on macOS by avoiding
-that unsupported API. No macOS retest is recorded to confirm whether the
-subsequent `ArgumentNullException` errors also stopped. Tristan reported
-no corresponding errors on Windows.
+that unsupported API. Neither exception recurred in the macOS retest.
+Tristan reported no corresponding errors on Windows.
 
 ![TC-12: Exceptions observed before the fix on macOS](images/issue-701/tc-12-macos-errors.png)
 
@@ -646,9 +646,10 @@ no corresponding errors on Windows.
 | 4 | Use an available action on a disposable test snapshot; record its label in Actual result. | The selected action affects the intended snapshot once. |
 | 5 | Close the window and press F7 again. | The window reopens and refresh remains usable. |
 
-**Actual result:**
-
-Step 1, 2, 5 work. 3 and 4 are not able to be tested because of missing backend connection.
+**Actual result:** F7 opened and reopened the window, and the Refresh button
+responded. The backend request stopped because the session had no server ID.
+Loading and refreshing a populated list, scrolling its entries, and downloading
+a snapshot require a configured snapshot backend with a disposable test snapshot.
 
 **Evidence / defects:**
 
@@ -659,11 +660,10 @@ Step 1, 2, 5 work. 3 and 4 are not able to be tested because of missing backend 
 
 ## TC-15 – Debug action bar
 
-- **Tester:** Tristan
-- **Date:** 07.11.2026
-- **Platform:** Windows 11
-- **Environment deviations:** None
-- **Status:** Blocked
+- **Tester:** Noah Thiering
+- **Date:** 09.11.2026
+- **Platform:** macOS 27.2
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -684,20 +684,23 @@ Step 1, 2, 5 work. 3 and 4 are not able to be tested because of missing backend 
 | 4 | Use Console and Variables in the debug action bar. | The respective SEE windows open. |
 | 5 | Inspect Reverse/StepBack/Restart visibility and use Stop. | Only supported optional actions are available; Stop ends the session without a stuck UI. |
 
-**Actual result:** The run lacked a configured debug session, which is
-required to open and exercise the action bar.
+**Actual result:** The tested debug action bar controls worked as expected.
 
-**Evidence / defects:** Action bar behavior remains unverified.
+**Evidence / defects:** The source window stayed on `Loading code window text...`
+after a `NullReferenceException`. SEE then logged line-range errors when it
+tried to highlight source lines after stepping. The source loading code and
+the Pause handler, which returns early while the program is running, were
+already present before the MUIP upgrade.
 
 <a id="tc-16"></a>
 
 ## TC-16 – SEE debug console
 
-- **Tester:** Tristan
-- **Date:** 07.11.2026
-- **Platform:** Windows 11
+- **Tester:** Noah Thiering
+- **Date:** 09.11.2026
+- **Platform:** macOS 27.2
 - **Environment deviations:** None
-- **Status:** Blocked
+- **Status:** Passed
 
 <!-- Allowed values: Not tested / Passed / Failed / Blocked -->
 
@@ -705,7 +708,8 @@ required to open and exercise the action bar.
 
 **Preconditions:**
 
-- A debug session is running using the configuration steps in the debug-action-bar case.
+- A debug session is running, started through the configuration steps in the
+  debug-action-bar case or through a local Play Mode fixture.
 - The test program produces output and supports any expression used for input testing.
 
 **Affected prefabs:** [UI/ConsoleWindow/ConsoleWindow.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/ConsoleWindow/ConsoleWindow.prefab).
@@ -718,10 +722,10 @@ required to open and exercise the action bar.
 | 4 | Submit a supported test expression once. | The adapter processes one submission and displays the corresponding result. |
 | 5 | Use Clear, close the window, then reopen it through Console in the action bar. | Clear affects the intended message list; the window can be reopened and used again. |
 
-**Actual result:** The run lacked the debug session required by TC-15 to
-open the SEE Console and produce test output.
+**Actual result:** All test steps produced the expected results. No deviations were observed.
 
-**Evidence / defects:** Console behavior remains unverified.
+**Evidence / defects:** No defects observed. No screenshots recorded.
+
 
 <a id="tc-17"></a>
 
@@ -2052,29 +2056,41 @@ every template has its own independently reachable menu.
 | [UI/TabMenu/TabMenu.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabMenu.prefab) | [TC-53](#tc-53) |
 | [UI/TabMenu/TabButton.prefab](https://github.com/uni-bremen-agst/SEE/blob/19fc3a3694ed41c28e19930eebbec13ded2a909c/Assets/Resources/Prefabs/UI/TabMenu/TabButton.prefab) | [TC-53](#tc-53) |
 
-The following changed prefabs have no dedicated case in this snapshot:
+The following changed prefabs have no dedicated manual case.
 
-- `UI/ConfigMenu.prefab`
-- `UI/ActionButton.prefab`
-- `UI/TabButton.prefab`
-- `UI/Input Group - Color Picker.prefab`
-- `UI/DropdownCombo.prefab`
-- `UI/DictateButton.prefab`
-- `UI/MetricWindow.prefab`
+| Prefab | Automated coverage | Remaining gap |
+| --- | --- | --- |
+| `UI/ConfigMenu.prefab` | [TestUIResources](../../Assets/SEEPlayModeTests/UI/TestUIResources.cs) checks both selector arrows, their animations, and selection callbacks. | The complete legacy menu and applying its settings. |
+| `UI/ActionButton.prefab` | [TestButtonColorTransition](../../Assets/SEEPlayModeTests/UI/TestButtonColorTransition.cs) checks the shared button's text, pointer states, and click. | The action's integration into a complete legacy menu. |
+| `UI/TabButton.prefab` | [TestButtonColorTransition](../../Assets/SEEPlayModeTests/UI/TestButtonColorTransition.cs) checks assigned captions in both tab states. | Tab switching in the complete legacy configuration menu. |
+| `UI/Input Group - Color Picker.prefab` | [TestButtonColorTransition](../../Assets/SEEPlayModeTests/UI/TestButtonColorTransition.cs) checks navigation on the picker trigger. | Opening the picker and applying a color in the legacy configuration menu. |
+| `UI/DropdownCombo.prefab` | [TestComboSelect](../../Assets/SEEPlayModeTests/UI/ConfigMenu/TestComboSelect.cs) exercises the nested prefab through the dropdown input group. | A full legacy menu run with the dropdown and its related controls. |
+| `UI/DictateButton.prefab` | [TestButtonColorTransition](../../Assets/SEEPlayModeTests/UI/TestButtonColorTransition.cs) checks button navigation. | Microphone input and speech-to-text behavior. |
+| `UI/MetricWindow.prefab` | No direct automated coverage. | Opening, populating, and interacting with this window. |
 
 ## Test Run Summary
 
 | Total | Passed | Failed | Blocked | Not tested |
 | --- | --- | --- | --- | --- |
-| 53 | 50 | 0 | 3 | 0 |
+| 53 | 52 | 0 | 1 | 0 |
 
 **Tester / platform / date:** Noah Thiering (macOS 27.2) and Tristan Mundt
 (Windows 11), both using the Unity Editor. See each test case for its execution date.
 
-**Overall result:** 50 Passed, 0 Failed, 3 Blocked, and 0 Not tested.
-TC-14 was partially exercised and needs a snapshot backend. TC-15 and TC-16
-require a configured debug session. TC-37 records the pre-existing
-color-picker defects separately from the migration result.
+**Overall result:** 52 Passed, 0 Failed, 1 Blocked, and 0 Not tested.
+TC-14 was partially exercised and needs a snapshot backend. TC-15 and TC-37
+record pre-existing defects separately from the migration result.
+
+Local Play Mode checks confirmed that the ShapeSwitch's MUIP `ButtonManager`
+restores its own interactable state on the next frame after a direct write
+to `Button.interactable`. The affected callers set the state through the
+manager. A confirmation dialog also stopped at the bounds of its own canvas
+in a test with two differently sized canvases.
+
+A local network probe shut down and restarted the host with `Empty` as the
+networked scene and verified scene unload and network manager cleanup. The
+run with `SEENewWorld` logged duplicate-spawn and despawn RPC errors. The
+existing network test still uses the full world, whose cleanup remains open.
 
 **Fixes retested:** TC-08, TC-33, and TC-50. The fixes are included in
 [4343980c96](https://github.com/uni-bremen-agst/SEE/commit/4343980c9661fd6e6546f504adbcb3fefc1dc5f3).
@@ -2082,8 +2098,8 @@ color-picker defects separately from the migration result.
 **Comparison version, if used:** Pre-upgrade SEE with MUIP 4. Record the
 branch and full commit hash of the checkout used for the comparison.
 
-**Cleanup:** Pending. After testing, record which temporary test objects
-were removed and which settings were restored.
+**Cleanup:** Removed the temporary debug test launchers and their Unity metadata
+from the project after the TC-15 and TC-16 retests.
 
 Before concluding the run, keep case statuses, the index, and the totals
 consistent. A green automated run does not complete a manual case.
