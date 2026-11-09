@@ -76,8 +76,6 @@ namespace SEE.UI.PropertyDialog
         [UnityTest]
         public IEnumerator TestDialog()
         {
-            LogAssert.ignoreFailingMessages = true;
-
             // Set up the dialog.
             GameObject gameObject = new("Dialog");
             dialogOwners.Add(gameObject);

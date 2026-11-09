@@ -44,13 +44,16 @@ namespace SEE.UI.RuntimeConfigMenu
         [UnityTest]
         public IEnumerator DisabledMethodButtonsIgnorePointerClicks()
         {
-            root = new("Runtime button test", typeof(Canvas));
+            EventSystem events = CreateRaycastCanvas("Runtime button test");
             GameObject owner = new("Inactive menu");
             owner.transform.SetParent(root.transform);
             owner.SetActive(false);
             RuntimeTabMenu menu = owner.AddComponent<RuntimeTabMenu>();
             GameObject instance = Object.Instantiate(
                 Resources.Load<GameObject>("Prefabs/UI/RuntimeConfigMenu/RuntimeConfigButton"), root.transform, false);
+            RectTransform rectangle = (RectTransform)instance.transform;
+            rectangle.anchorMin = rectangle.anchorMax = new Vector2(0.5f, 0.5f);
+            rectangle.anchoredPosition = Vector2.zero;
             ButtonManager manager = instance.GetComponent<ButtonManager>();
             int clicks = 0;
             manager.onClick.AddListener(() => clicks++);
@@ -58,14 +61,13 @@ namespace SEE.UI.RuntimeConfigMenu
                 BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(update, Is.Not.Null);
             yield return ((UniTask)update.Invoke(menu, new object[] { instance, false })).ToCoroutine();
-            PointerEventData pointer = new(EventSystem.current) { button = PointerEventData.InputButton.Left };
-            ExecuteEvents.Execute(instance, pointer, ExecuteEvents.pointerClickHandler);
+            Click(rectangle, instance, events);
             Assert.That(clicks, Is.Zero);
             Assert.That(manager.isInteractable, Is.False);
             Assert.That(instance.GetComponent<Button>().interactable, Is.False);
 
             yield return ((UniTask)update.Invoke(menu, new object[] { instance, true })).ToCoroutine();
-            ExecuteEvents.Execute(instance, pointer, ExecuteEvents.pointerClickHandler);
+            Click(rectangle, instance, events);
             Assert.That(clicks, Is.EqualTo(1));
             Assert.That(manager.isInteractable, Is.True);
             Assert.That(instance.GetComponent<Button>().interactable, Is.True);
@@ -80,15 +82,7 @@ namespace SEE.UI.RuntimeConfigMenu
         [UnityTest]
         public IEnumerator RuntimeDropdownOpensSelectsAndReopensThroughInputEvents()
         {
-            root = new("Runtime dropdown test", typeof(Canvas), typeof(UnityEngine.UI.GraphicRaycaster));
-            root.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            EventSystem events = EventSystem.current;
-            if (events == null)
-            {
-                GameObject eventObject = new("Dropdown events", typeof(EventSystem));
-                eventObject.transform.SetParent(root.transform);
-                events = eventObject.GetComponent<EventSystem>();
-            }
+            EventSystem events = CreateRaycastCanvas("Runtime dropdown test");
 
             // Resolve the factory's resource rather than testing a different dropdown prefab.
             FieldInfo prefabField = typeof(RuntimeTabMenu).GetField("dropDownPrefab",
@@ -146,6 +140,24 @@ namespace SEE.UI.RuntimeConfigMenu
             yield return WaitForAnimation(dropdown);
             Assert.That(dropdown.listCG.alpha, Is.EqualTo(0f).Within(0.01f));
             Assert.That(changes, Is.EqualTo(1), "Opening and closing must not notify another selection.");
+        }
+
+        /// <summary>
+        /// Creates the test canvas and an event system if the scene has none.
+        /// </summary>
+        /// <param name="name">The name of the test canvas.</param>
+        /// <returns>The event system used for the test clicks.</returns>
+        private EventSystem CreateRaycastCanvas(string name)
+        {
+            root = new(name, typeof(Canvas), typeof(GraphicRaycaster));
+            root.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            if (EventSystem.current != null)
+            {
+                return EventSystem.current;
+            }
+            GameObject eventObject = new("Runtime menu test events", typeof(EventSystem));
+            eventObject.transform.SetParent(root.transform, false);
+            return eventObject.GetComponent<EventSystem>();
         }
 
         /// <summary>

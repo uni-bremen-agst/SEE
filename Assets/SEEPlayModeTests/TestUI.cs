@@ -33,19 +33,12 @@ namespace SEE.UI
         private GameObject createdSettings;
 
         /// <summary>
-        /// The log-checking setting restored after the test.
-        /// </summary>
-        private bool previousIgnoreFailingMessages;
-
-        /// <summary>
         /// Sets up desktop input in the Play Mode already entered by the test runner.
         /// </summary>
         /// <returns>An enumerator that waits one frame for UI initialization.</returns>
         [UnitySetUp]
         public IEnumerator SetUp()
         {
-            previousIgnoreFailingMessages = LogAssert.ignoreFailingMessages;
-            LogAssert.ignoreFailingMessages = true;
             userSetting = Object.FindAnyObjectByType<UserSetting>();
             if (userSetting == null)
             {
@@ -75,7 +68,6 @@ namespace SEE.UI
                 userSetting.InputType = previousInputType;
             }
             yield return null;
-            LogAssert.ignoreFailingMessages = previousIgnoreFailingMessages;
         }
 
         /// <summary>
