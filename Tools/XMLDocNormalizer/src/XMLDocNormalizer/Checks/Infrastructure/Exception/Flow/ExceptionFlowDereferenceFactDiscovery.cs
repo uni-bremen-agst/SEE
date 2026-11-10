@@ -1,5 +1,6 @@
 using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowStableMemberFacts;
 using static XMLDocNormalizer.Checks.Infrastructure.Exception.Flow.ExceptionFlowSymbolUsageFacts;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -450,6 +451,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         private sealed class SuccessfulDereferenceCachePartition
         {
+            /// <summary>Bounds receiver keys retained by one live semantic model.</summary>
+            private const int MaximumStablePropertyEntries = 256;
+
+            /// <summary>Bounds symbol references retained by one cached result.</summary>
+            private const int MaximumStablePropertiesPerEntry = 64;
+
+            /// <summary>Shares an immutable empty result without model or symbol references.</summary>
+            private static readonly IReadOnlyCollection<IPropertySymbol> NoStableProperties =
+                ImmutableArray<IPropertySymbol>.Empty;
+
             /// <summary>
             /// Synchronizes cache access without holding the lock while an
             /// uncached Roslyn computation is performed.
@@ -464,6 +475,56 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 SuccessfulDereferenceCacheKey,
                 ExceptionFlowValueFacts> entries =
                     new(SuccessfulDereferenceCacheKeyComparer.Instance);
+
+            /// <summary>Stores immutable property sets by exact receiver syntax identity.</summary>
+            private readonly Dictionary<ExpressionSyntax, IReadOnlyCollection<IPropertySymbol>>
+                stablePropertySets = new(ReferenceEqualityComparer.Instance);
+
+            /// <summary>Finds an exact receiver query in this semantic-model partition.</summary>
+            /// <param name="expression">The original receiver syntax object.</param>
+            /// <param name="properties">The stored immutable result, or an empty value on a miss.</param>
+            /// <returns>Whether the query has a cached result, including a negative result.</returns>
+            public bool TryGetStableProperties(ExpressionSyntax expression, out IReadOnlyCollection<IPropertySymbol> properties)
+            {
+                lock (gate)
+                {
+                    if (stablePropertySets.TryGetValue(expression, out IReadOnlyCollection<IPropertySymbol>? cached))
+                    {
+                        properties = cached;
+                        return true;
+                    }
+                }
+
+                properties = NoStableProperties;
+                return false;
+            }
+
+            /// <summary>Publishes a bounded immutable snapshot after computation outside the lock.</summary>
+            /// <param name="expression">The original receiver syntax object.</param>
+            /// <param name="properties">The independently computed property set.</param>
+            /// <returns>The published snapshot, or the unshared original result when a bound is reached.</returns>
+            public IReadOnlyCollection<IPropertySymbol> StoreStableProperties(ExpressionSyntax expression, IReadOnlyCollection<IPropertySymbol> properties)
+            {
+                lock (gate)
+                {
+                    if (stablePropertySets.TryGetValue(expression, out IReadOnlyCollection<IPropertySymbol>? cached))
+                    {
+                        return cached;
+                    }
+
+                    if (stablePropertySets.Count >= MaximumStablePropertyEntries
+                        || properties.Count > MaximumStablePropertiesPerEntry)
+                    {
+                        return properties;
+                    }
+
+                    IReadOnlyCollection<IPropertySymbol> snapshot = properties.Count == 0
+                        ? NoStableProperties
+                        : properties.ToImmutableArray();
+                    stablePropertySets.Add(expression, snapshot);
+                    return snapshot;
+                }
+            }
 
             /// <summary>
             /// Attempts to get a previously computed immutable fact value.
@@ -752,6 +813,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         internal static IReadOnlyCollection<IPropertySymbol>
             GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
+                ExpressionSyntax receiverExpression,
+                SemanticModel semanticModel)
+        {
+            SuccessfulDereferenceCachePartition cache = successfulDereferenceCaches.GetValue(
+                semanticModel, static _ => new SuccessfulDereferenceCachePartition());
+            if (cache.TryGetStableProperties(receiverExpression, out IReadOnlyCollection<IPropertySymbol> cached))
+            {
+                return cached;
+            }
+
+            IReadOnlyCollection<IPropertySymbol> properties =
+                ComputeStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(receiverExpression, semanticModel);
+            return cache.StoreStableProperties(receiverExpression, properties);
+        }
+
+        /// <summary>Computes receiver-sensitive property proofs without consulting memoized results.</summary>
+        /// <param name="receiverExpression">The exact receiver expression and control-flow position.</param>
+        /// <param name="semanticModel">The immutable semantic model that owns the query.</param>
+        /// <returns>The original property set using Roslyn symbol equality and traversal order.</returns>
+        private static IReadOnlyCollection<IPropertySymbol>
+            ComputeStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
                 ExpressionSyntax receiverExpression,
                 SemanticModel semanticModel)
         {
