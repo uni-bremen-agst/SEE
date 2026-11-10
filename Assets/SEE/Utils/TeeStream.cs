@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SEE.Utils
 {
@@ -51,6 +53,29 @@ namespace SEE.Utils
         {
             primaryStream.Flush();
             secondaryStream.Flush();
+        }
+
+        public override async Task FlushAsync(CancellationToken cancellationToken)
+        {
+            await primaryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+            await secondaryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count,
+                                                 CancellationToken cancellationToken)
+        {
+            int bytesRead = await primaryStream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            await secondaryStream.WriteAsync(buffer, offset, bytesRead, cancellationToken).ConfigureAwait(false);
+            await secondaryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+            return bytesRead;
+        }
+
+        public override async Task WriteAsync(byte[] buffer, int offset, int count,
+                                              CancellationToken cancellationToken)
+        {
+            await primaryStream.WriteAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            await secondaryStream.WriteAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            await secondaryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public override int Read(byte[] buffer, int offset, int count)

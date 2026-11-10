@@ -583,7 +583,8 @@ namespace SEE.Tools.LSP
                 node.SourceName = symbol.Name;
                 node.Filename = Path.GetFileName(path);
                 node.Directory = Path.GetDirectoryName(path);
-                Assert.AreEqual(path, node.Path());
+                // Node.Path() joins with '/', while Windows file paths may use '\\'.
+                Assert.AreEqual(Path.GetFullPath(path), Path.GetFullPath(node.Path()));
                 node.Type = symbol.Kind.ToNodeKind().ToString();
                 node.SourceRange = LSPRange.FromLspRange(symbol.Range);
                 node.SourceLine = symbol.SelectionRange.Start.Line + 1;

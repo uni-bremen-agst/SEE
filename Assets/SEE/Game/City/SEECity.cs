@@ -381,6 +381,10 @@ namespace SEE.Game.City
                     ShowNotification.Error("Data failure", $"Graph provider failed with: {ex.Message}\n", log: false);
                     throw;
                 }
+                finally
+                {
+                    IsPipelineRunning = false;
+                }
             }
             else
             {

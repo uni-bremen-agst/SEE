@@ -117,7 +117,7 @@ namespace SEE.GraphProviders
         /// </summary>
         [Tooltip("If true, the communication between the language server and SEE will be logged."), RuntimeTab(GraphProviderFoldoutGroup)]
         [InfoBox("@\"Logfiles can be found in \" + System.IO.Path.GetTempPath() + "
-                 + "\" under inputLogLsp.txt and outputLogLsp.txt\"", InfoMessageType.Info, nameof(LogLSP))]
+                 + "\" under inputLogLsp-<session>.txt and outputLogLsp-<session>.txt\"", InfoMessageType.Info, nameof(LogLSP))]
         public bool LogLSP;
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace SEE.GraphProviders
         [Tooltip("The maximum time to wait for the language server to respond."
              + " Responses after the timeout will not be considered."), RuntimeTab(GraphProviderFoldoutGroup)]
         [InfoBox("No timeout will be applied.", InfoMessageType.Info, "@" + nameof(Timeout) + " == 0")]
-        [Range(0, 10), Unit(Units.Second)]
+        [Range(0, 120), Unit(Units.Second)]
         public double Timeout = 2;
 
         /// <summary>
@@ -238,12 +238,9 @@ namespace SEE.GraphProviders
             if (city.gameObject.TryGetComponent(out LSPHandler oldHandler))
             {
                 // We need to shut down the old handler before we can create a new one.
-                if (!Application.isPlaying)
+                using (LoadingSpinner.ShowIndeterminate("Shutting down old LSP handler..."))
                 {
-                    using (LoadingSpinner.ShowIndeterminate("Shutting down old LSP handler..."))
-                    {
-                        await oldHandler.ShutdownAsync(token);
-                    }
+                    await oldHandler.ShutdownAsync(token);
                 }
                 Destroyer.Destroy(oldHandler);
             }
@@ -300,14 +297,17 @@ namespace SEE.GraphProviders
                 await UniTask.SwitchToMainThread();
             }
 
-            // We shut down the LSP server for now. If it is needed again, it can still be restarted.
+            // Reuse the initialized server for navigation instead of starting it again when code opens.
             if (Application.isPlaying)
             {
-                handler.enabled = false;
+                if (!UseInCodeWindows)
+                {
+                    handler.enabled = false;
+                }
             }
             else
             {
-                handler.ShutdownAsync().Forget();
+                await handler.ShutdownAsync();
             }
             return graph;
         }
