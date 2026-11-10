@@ -43,6 +43,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
 
+            return GetOneBasedSourcePositionValueFactsForResolvedSymbol(
+                unwrappedExpression, semanticModel, callContext, inspectedValueSources, symbolInfo);
+        }
+
+        /// <summary>
+        /// Evaluates source-position facts using the binding already obtained
+        /// for the same unwrapped expression in the same semantic model.
+        /// </summary>
+        /// <param name="expression">The expression whose binding was resolved.</param>
+        /// <param name="semanticModel">The exact model used for that binding.</param>
+        /// <param name="callContext">The current callable value facts.</param>
+        /// <param name="inspectedValueSources">The current recursive value-source guard.</param>
+        /// <param name="symbolInfo">The binding of the unwrapped expression in the supplied model.</param>
+        /// <returns>The source-position facts, computed afresh for the current flow and guard.</returns>
+        internal static ExceptionFlowValueFacts GetOneBasedSourcePositionValueFactsForResolvedSymbol(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext,
+            HashSet<ISymbol> inspectedValueSources,
+            SymbolInfo symbolInfo)
+        {
+            ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
+
             if (symbolInfo.Symbol is ILocalSymbol localSymbol)
             {
                 if (!inspectedValueSources.Add(localSymbol))

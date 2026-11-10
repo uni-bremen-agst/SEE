@@ -116,12 +116,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return (trueFacts & falseFacts).Normalize();
             }
 
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
+
             ExceptionFlowValueFacts sourcePositionFacts =
-                ExceptionFlowSourcePositionValueFactsProvider.GetOneBasedSourcePositionValueFacts(
+                ExceptionFlowSourcePositionValueFactsProvider.GetOneBasedSourcePositionValueFactsForResolvedSymbol(
                     unwrappedExpression,
                     semanticModel,
                     callContext,
-                    inspectedImmutableMembers);
+                    inspectedImmutableMembers,
+                    symbolInfo);
 
             ExceptionFlowValueFacts enumValueFacts =
                 GetDefinedEnumValueFacts(
@@ -208,10 +211,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 facts |= ExceptionFlowValueFacts.NonNull;
             }
-
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(
-                    unwrappedExpression);
 
             switch (symbolInfo.Symbol)
             {
