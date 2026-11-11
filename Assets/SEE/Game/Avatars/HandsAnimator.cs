@@ -515,7 +515,7 @@ namespace SEE.Game.Avatars
                         ik.solver.leftHandEffector.position = Vector3.Lerp(
                                         ik.solver.leftHandEffector.position,
                                         newHandPosition,
-                                        0.1f);
+                                        Time.deltaTime * 30f);
                     }
                     // If a gesture was recognized - move the hand slower.
                     else
@@ -523,7 +523,7 @@ namespace SEE.Game.Avatars
                         ik.solver.leftHandEffector.position = Vector3.Lerp(
                                             ik.solver.leftHandEffector.position,
                                             newHandPosition,
-                                            0.05f);
+                                            Time.deltaTime * 15f);
                     }
 
                     // Interval where palm should be facing the camera.
@@ -640,7 +640,7 @@ namespace SEE.Game.Avatars
                         ik.solver.rightHandEffector.position = Vector3.Lerp(
                                             ik.solver.rightHandEffector.position,
                                             newHandPosition,
-                                            0.1f);
+                                            Time.deltaTime * 30f);
                     }
                     // If a gesture was recognized - move the hand slower.
                     else
@@ -648,7 +648,7 @@ namespace SEE.Game.Avatars
                         ik.solver.rightHandEffector.position = Vector3.Lerp(
                                                 ik.solver.rightHandEffector.position,
                                                 newHandPosition,
-                                                0.05f);
+                                                Time.deltaTime * 15f);
                     }
 
                     // Interval where palm should be facing the camera.
