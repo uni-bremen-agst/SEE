@@ -1,5 +1,6 @@
 using Michsky.MUIP;
 using NUnit.Framework;
+using SEE.Utils;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,9 +22,14 @@ namespace SEE.UI
     internal class TestUIResources
     {
         /// <summary>
-        /// Owns every UI object created by a test.
+        /// Owns the UI under test.
         /// </summary>
         private GameObject root;
+
+        /// <summary>
+        /// An independent canvas used to test drag area assignment.
+        /// </summary>
+        private GameObject additionalCanvas;
 
         /// <summary>
         /// The event system used for simulated pointer events.
@@ -55,7 +61,34 @@ namespace SEE.UI
         public IEnumerator TearDown()
         {
             Object.Destroy(root);
+            Object.Destroy(additionalCanvas);
+            additionalCanvas = null;
             yield return null;
+        }
+
+        /// <summary>
+        /// Verifies that a draggable dialog uses its own canvas when another canvas is active.
+        /// </summary>
+        /// <returns>An enumerator that waits for the dragger's Start method.</returns>
+        [UnityTest]
+        public IEnumerator WindowDraggerUsesParentCanvasWhenMultipleCanvasesExist()
+        {
+            additionalCanvas = new("Additional UI canvas", typeof(Canvas));
+            additionalCanvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+
+            GameObject dialog = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/ConfirmDialog",
+                                                                    root.transform, false);
+            WindowDragger dragger = dialog.GetComponentInChildren<WindowDragger>();
+            RectTransform expectedDragArea = root.GetComponent<RectTransform>();
+            Assert.That(dragger, Is.Not.Null);
+            Assert.That(dragger.isActiveAndEnabled, Is.True);
+
+            // Check before Start so a lucky result from its scene-wide canvas search cannot hide a regression.
+            Assert.That(dragger.dragArea == expectedDragArea, Is.True,
+                        "Instantiation must assign the parent canvas as the drag area.");
+            yield return null;
+            Assert.That(dragger.dragArea == expectedDragArea, Is.True,
+                        "The dragger must still use the parent canvas after Start.");
         }
 
         /// <summary>
