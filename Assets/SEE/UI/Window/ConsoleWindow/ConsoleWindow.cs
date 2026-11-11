@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.KeyActions;
 using SEE.Extensions;
 using SEE.UI.PopupMenus;
@@ -100,17 +100,17 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// The button to open the search options.
         /// </summary>
-        private ButtonManagerBasic searchOptionsButton;
+        private ButtonManager searchOptionsButton;
 
         /// <summary>
         /// The button to open the filter options.
         /// </summary>
-        private ButtonManagerBasic filterButton;
+        private ButtonManager filterButton;
 
         /// <summary>
         /// The button to clear all messages.
         /// </summary>
-        private ButtonManagerBasic clearButton;
+        private ButtonManager clearButton;
 
         /// <summary>
         /// The input field.
@@ -304,14 +304,14 @@ namespace SEE.UI.Window.ConsoleWindow
 
             popupMenu = gameObject.AddComponent<PopupMenu>();
 
-            searchOptionsButton = root.Find("Search/SearchOptions").gameObject.MustGetComponent<ButtonManagerBasic>();
-            searchOptionsButton.clickEvent.AddListener(() => ShowSearchOptionsPopup());
+            searchOptionsButton = root.Find("Search/SearchOptions").gameObject.MustGetComponent<ButtonManager>();
+            searchOptionsButton.onClick.AddListener(() => ShowSearchOptionsPopup());
 
-            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            filterButton.clickEvent.AddListener(() => ShowFilterPopup());
+            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManager>();
+            filterButton.onClick.AddListener(() => ShowFilterPopup());
 
-            clearButton = root.Find("Search/Clear").gameObject.MustGetComponent<ButtonManagerBasic>();
-            clearButton.clickEvent.AddListener(ClearMessages);
+            clearButton = root.Find("Search/Clear").gameObject.MustGetComponent<ButtonManager>();
+            clearButton.onClick.AddListener(ClearMessages);
 
             inputField = root.Find("InputField").gameObject.MustGetComponent<TMP_InputField>();
             inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);

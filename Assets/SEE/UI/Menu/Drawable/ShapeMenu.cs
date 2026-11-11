@@ -1,11 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
-using SEE.UI.Drawable;
-using SEE.UI.Notification;
-using SEE.Utils;
+﻿using Michsky.MUIP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +9,17 @@ using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
+using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
+using SEE.UI.Drawable;
+using SEE.UI.Notification;
+using SEE.Utils;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -53,7 +56,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the open shape menu button manager.
         /// </summary>
-        private static ButtonManagerBasic shapeBMB;
+        private static ButtonManager shapeBMB;
         /// <summary>
         /// The instance for the open config menu (line menu) button.
         /// </summary>
@@ -61,7 +64,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the open config menu button manager.
         /// </summary>
-        private static ButtonManagerBasic configBMB;
+        private static ButtonManager configBMB;
         /// <summary>
         /// The selector for the UML shapes.
         /// </summary>
@@ -185,7 +188,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the information button. It can open or close the information box.
         /// </summary>
-        private static ButtonManagerBasic infoBMB;
+        private static ButtonManager infoBMB;
         /// <summary>
         /// The instance for the layer for the image.
         /// </summary>
@@ -201,7 +204,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance of the finish button.
         /// </summary>
-        private static ButtonManagerBasic finishBMB;
+        private static ButtonManager finishBMB;
         /// <summary>
         /// The instance for the part undo button.
         /// </summary>
@@ -209,7 +212,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The manager of the part undo button.
         /// </summary>
-        private static ButtonManagerBasic partUndoBMB;
+        private static ButtonManager partUndoBMB;
         /// <summary>
         /// The instance for the layer for the switch.
         /// </summary>
@@ -225,7 +228,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the dragger info button.
         /// </summary>
-        private static ButtonManagerBasic draggerInfoBMB;
+        private static ButtonManager draggerInfoBMB;
         #endregion
 
         /// The following block are the value holders for the chosen values:
@@ -465,15 +468,15 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initialize the button for calling the shape menu.
             shapeBtn = drawableSwitch.GetComponentsInChildren<Button>()[0];
-            shapeBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[0];
-            shapeBMB.clickEvent.AddListener(ShapeOnClick);
+            shapeBMB = drawableSwitch.GetComponentsInChildren<ButtonManager>()[0];
+            shapeBMB.onClick.AddListener(ShapeOnClick);
 
             /// Initialize the button for calling the config menu.
             configBtn = drawableSwitch.GetComponentsInChildren<Button>()[1];
-            configBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[1];
-            configBMB.clickEvent.AddListener(ConfigOnClick);
+            configBMB = drawableSwitch.GetComponentsInChildren<ButtonManager>()[1];
+            configBMB.onClick.AddListener(ConfigOnClick);
             shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
+            shapeBMB.Interactable(false);
         }
 
         /// <summary>
@@ -565,9 +568,9 @@ namespace SEE.UI.Menu.Drawable
 
             // Info
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
-            infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
+            infoBMB = objInfo.GetComponentInChildren<ButtonManager>();
             infoVisibility = false;
-            infoBMB.clickEvent.AddListener(ToggleInfo);
+            infoBMB.onClick.AddListener(ToggleInfo);
 
             objImage = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
@@ -577,17 +580,17 @@ namespace SEE.UI.Menu.Drawable
             loopManager = objLoop.GetComponentInChildren<SwitchManager>();
 
             objFinish = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "FinishBtn");
-            finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
+            finishBMB = objFinish.GetComponent<ButtonManager>();
 
             objPartUndo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "PartUndoBtn");
-            partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
+            partUndoBMB = objPartUndo.GetComponent<ButtonManager>();
             objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
 
             // Dragger info
             draggerInfoObj = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "DraggerInfo");
-            draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
-            draggerInfoBMB.clickEvent.AddListener(() =>
+            draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManager>();
+            draggerInfoBMB.onClick.AddListener(() =>
             {
                 if (selectedShape == Shape.Line)
                 {
@@ -636,12 +639,13 @@ namespace SEE.UI.Menu.Drawable
                 selector.CreateNewItem(value.ToString());
             }
 
-            selector.selectorEvent.AddListener(index =>
+            selector.onValueChanged.AddListener(index =>
             {
                 onSelected(values[index]);
             });
 
             selector.defaultIndex = 0;
+            selector.SetupSelector();
         }
 
         /// <summary>
@@ -754,8 +758,8 @@ namespace SEE.UI.Menu.Drawable
         public static void ActivatePartUndo(UnityAction action)
         {
             objPartUndo.SetActive(true);
-            partUndoBMB.clickEvent.RemoveAllListeners();
-            partUndoBMB.clickEvent.AddListener(action);
+            partUndoBMB.onClick.RemoveAllListeners();
+            partUndoBMB.onClick.AddListener(action);
         }
 
         /// <summary>
@@ -1167,8 +1171,8 @@ namespace SEE.UI.Menu.Drawable
         private static void ConfigOnClick()
         {
             configBtn.interactable = false;
-            configBMB.enabled = false;
-            shapeBMB.enabled = true;
+            configBMB.Interactable(false);
+            shapeBMB.Interactable(true);
             shapeBtn.interactable = true;
             if (DrawShapesAction.currentShape == null)
             {
@@ -1209,9 +1213,9 @@ namespace SEE.UI.Menu.Drawable
         private static void ShapeOnClick()
         {
             shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
+            shapeBMB.Interactable(false);
             configBtn.interactable = true;
-            configBMB.enabled = true;
+            configBMB.Interactable(true);
             LineMenu.Instance.Disable();
             BindShapeMenu();
             shapeMenu.SetActive(true);
@@ -1223,8 +1227,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="action">The action that should be assigned.</param>
         public static void AssignFinishButton(UnityAction action)
         {
-            finishBMB.clickEvent.RemoveAllListeners();
-            finishBMB.clickEvent.AddListener(action);
+            finishBMB.onClick.RemoveAllListeners();
+            finishBMB.onClick.AddListener(action);
         }
 
         /// <summary>

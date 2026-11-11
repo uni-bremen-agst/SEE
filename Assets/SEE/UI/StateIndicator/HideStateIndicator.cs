@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.ReversibleActions;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 
 namespace SEE.UI.StateIndicator
 {
@@ -112,7 +112,7 @@ namespace SEE.UI.StateIndicator
             GameObject icon = doneButton.transform.Find("Icon").gameObject;
 
             doneButton.name = ButtonNameDone;
-            if (!doneButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+            if (!doneButton.TryGetComponentOrLog(out ButtonManager buttonManager) ||
                 !doneButton.TryGetComponentOrLog(out Image buttonImage) ||
                 !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
                 !icon.TryGetComponentOrLog(out Image iconImage) ||
@@ -131,7 +131,7 @@ namespace SEE.UI.StateIndicator
             iconImage.color = ButtonColorBack.IdealTextColor();
             buttonManager.buttonText = ButtonNameDone;
 
-            buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeDone));
+            buttonManager.onClick.AddListener(() => SetSelectionType(SelectionTypeDone));
             pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionDone));
             pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
@@ -147,7 +147,7 @@ namespace SEE.UI.StateIndicator
             GameObject icon = backButton.transform.Find("Icon").gameObject;
 
             backButton.name = ButtonNameBack;
-            if (!backButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+            if (!backButton.TryGetComponentOrLog(out ButtonManager buttonManager) ||
                 !backButton.TryGetComponentOrLog(out Image buttonImage) ||
                 !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
                 !icon.TryGetComponentOrLog(out Image iconImage) ||
@@ -166,7 +166,7 @@ namespace SEE.UI.StateIndicator
             iconImage.color = ButtonColorBack.IdealTextColor();
             buttonManager.buttonText = ButtonNameBack;
 
-            buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeBack));
+            buttonManager.onClick.AddListener(() => SetSelectionType(SelectionTypeBack));
             pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionBack));
             pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }

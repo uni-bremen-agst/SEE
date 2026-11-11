@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Net.Util;
 using SEE.UI.Notification;
@@ -45,7 +45,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <summary>
         /// Button to download the snapshot.
         /// </summary>
-        private ButtonManagerBasic downloadButton;
+        private ButtonManager downloadButton;
 
         /// <summary>
         /// Event which is called when a snapshot was downloaded.
@@ -80,9 +80,9 @@ namespace SEE.UI.Window.SnapshotsWindow
             item = PrefabInstantiator.InstantiatePrefab(snapshotWindowItemPrefab, transform, false);
             item.name = GetDisplayName;
 
-            downloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
-            downloadButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
-            downloadButton.clickEvent.AddListener(() => OnClickDownloadAsync().Forget());
+            downloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManager>();
+            downloadButton.onHover.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
+            downloadButton.onClick.AddListener(() => OnClickDownloadAsync().Forget());
 
             TextMeshProUGUI textMesh = item.transform.Find(textPath).gameObject.MustGetComponent<TextMeshProUGUI>();
             textMesh.text = GetDisplayName;

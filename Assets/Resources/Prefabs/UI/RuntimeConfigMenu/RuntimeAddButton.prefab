@@ -546,22 +546,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 7481182053943031186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: dcfd43422257fbc4b816c648667814b2, type: 3}
   buttonText: 
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 8005626101495190689}
-  highlightedIcon: {fileID: 1909209434670195324}
+  normalImage: {fileID: 8005626101495190689}
+  highlightImage: {fileID: 1909209434670195324}
   normalText: {fileID: 1105697278195414159}
   highlightedText: {fileID: 8774445413295648280}
   soundSource: {fileID: 0}
@@ -572,7 +571,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 1
@@ -581,6 +580,14 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 20.0
+  enableText: 1
+  enableIcon: 1
+  isInteractable: 1
+  normalCG: {fileID: 4301453890461066222}
+  highlightCG: {fileID: 1717145360849220999}
 --- !u!114 &3551334076091921102
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
@@ -136,17 +136,17 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The negative/"cancel" button of the dialog.
         /// </summary>
-        private ButtonManagerBasic NoButton { get; set; }
+        private ButtonManager NoButton { get; set; }
 
         /// <summary>
         /// The positive/"confirm" button of the dialog.
         /// </summary>
-        private ButtonManagerBasic YesButton { get; set; }
+        private ButtonManager YesButton { get; set; }
 
         /// <summary>
         /// The button for closing the dialog without making an explicit choice.
         /// </summary>
-        private ButtonManagerBasic CloseButton { get; set; }
+        private ButtonManager CloseButton { get; set; }
 
         /// <summary>
         /// The image component of the <see cref="YesButton"/> controlling its color.
@@ -208,19 +208,19 @@ namespace SEE.UI.Menu
         {
             Dialog = PrefabInstantiator.InstantiatePrefab(dialogMenuPrefab, Canvas.transform, false);
             CanvasGroup = Dialog.MustGetComponent<CanvasGroup>();
-            NoButton = Dialog.transform.Find("Content/Buttons/Cancel").gameObject.MustGetComponent<ButtonManagerBasic>();
+            NoButton = Dialog.transform.Find("Content/Buttons/Cancel").gameObject.MustGetComponent<ButtonManager>();
             NoIcon = NoButton.transform.Find("Texts/Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
-            YesButton = Dialog.transform.Find("Content/Buttons/Confirm").gameObject.MustGetComponent<ButtonManagerBasic>();
+            YesButton = Dialog.transform.Find("Content/Buttons/Confirm").gameObject.MustGetComponent<ButtonManager>();
             YesIcon = YesButton.transform.Find("Texts/Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             YesButtonImage = YesButton.gameObject.MustGetComponent<Image>();
             NoButtonImage = NoButton.gameObject.MustGetComponent<Image>();
             Title = Dialog.transform.Find("Dragger/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             Description = Dialog.transform.Find("Content/Description").gameObject.MustGetComponent<TextMeshProUGUI>();
-            CloseButton = Dialog.transform.Find("Dragger/CancelDragger").gameObject.MustGetComponent<ButtonManagerBasic>();
+            CloseButton = Dialog.transform.Find("Dragger/CancelDragger").gameObject.MustGetComponent<ButtonManager>();
 
-            YesButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Confirmed));
-            NoButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Declined));
-            CloseButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Closed));
+            YesButton.onClick.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Confirmed));
+            NoButton.onClick.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Declined));
+            CloseButton.onClick.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Closed));
             OnChoiceMade.AddListener(_ => CloseMenu());
         }
 

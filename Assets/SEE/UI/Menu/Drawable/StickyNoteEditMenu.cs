@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Extensions;
@@ -141,8 +141,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Rotation(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic rotation = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
-            rotation.clickEvent.AddListener(() =>
+            ButtonManager rotation = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Rotation").GetComponent<ButtonManager>();
+            rotation.onClick.AddListener(() =>
             {
                 Instance.Disable();
                 StickyNoteRotationMenu.Enable(stickyNote.GetRootParent(), null, callback);
@@ -157,8 +157,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Scale(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic scale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Scale").GetComponent<ButtonManagerBasic>();
-            scale.clickEvent.AddListener(() =>
+            ButtonManager scale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Scale").GetComponent<ButtonManager>();
+            scale.onClick.AddListener(() =>
             {
                 Instance.Disable();
                 ScaleMenu.Enable(stickyNote, true, callback);

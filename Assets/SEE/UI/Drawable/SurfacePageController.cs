@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
@@ -20,17 +20,17 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Button for increasing the currently selected page.
         /// </summary>
-        private ButtonManagerBasic forward;
+        private ButtonManager forward;
 
         /// <summary>
         /// Button for decreasing the currently selected page.
         /// </summary>
-        private ButtonManagerBasic backward;
+        private ButtonManager backward;
 
         /// <summary>
         /// Button for opening a <see cref="PopupMenu"/> to select a page.
         /// </summary>
-        private ButtonManagerBasic display;
+        private ButtonManager display;
 
         /// <summary>
         /// Text for displaying the currently selected page.
@@ -52,9 +52,9 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void Awake()
         {
-            forward = transform.Find("ForwardButton").GetComponent<ButtonManagerBasic>();
-            backward = transform.Find("BackButton").GetComponent<ButtonManagerBasic>();
-            display = transform.Find("CurrentButton").GetComponent<ButtonManagerBasic>();
+            forward = transform.Find("ForwardButton").GetComponent<ButtonManager>();
+            backward = transform.Find("BackButton").GetComponent<ButtonManager>();
+            display = transform.Find("CurrentButton").GetComponent<ButtonManager>();
             displayMesh = transform.Find("CurrentButton").GetComponentInChildren<TextMeshProUGUI>();
             popupMenu = gameObject.AddComponent<PopupMenu>();
             holder = GameFinder.GetDrawableSurface(gameObject).GetComponent<DrawableHolder>();
@@ -62,7 +62,7 @@ namespace SEE.UI.Drawable
             displayMesh.text = holder.CurrentPage.ToString();
 
             /// Register handler for the back button.
-            backward.clickEvent.AddListener(() =>
+            backward.onClick.AddListener(() =>
             {
                 int page;
                 if (holder.CurrentPage > 0)
@@ -78,7 +78,7 @@ namespace SEE.UI.Drawable
             });
 
             /// Register handler for the forward button.
-            forward.clickEvent.AddListener(() =>
+            forward.onClick.AddListener(() =>
             {
                 int page;
                 if (holder.CurrentPage < holder.MaxPageSize-1)
@@ -94,7 +94,7 @@ namespace SEE.UI.Drawable
             });
 
             /// Register handler for the middle button (popup menu button)
-            display.clickEvent.AddListener(PopupMenu);
+            display.onClick.AddListener(PopupMenu);
         }
 
         /// <summary>

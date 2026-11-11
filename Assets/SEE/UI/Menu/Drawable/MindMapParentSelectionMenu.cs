@@ -1,16 +1,19 @@
-﻿using Michsky.UI.ModernUIPack;
-using SEE.Game;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Extensions;
-using SEE.Net.Actions.Drawable;
-using SEE.UI.Notification;
+﻿using Michsky.MUIP;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.Extensions;
+using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 
+/// <summary>
+/// Menus for editing drawable objects.
+/// </summary>
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
@@ -91,16 +94,17 @@ namespace SEE.UI.Menu.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Adds a handler to the parent selector so that the selected node is set as the chosen node.
-            parentSelector.selectorEvent.AddListener(index =>
+            parentSelector.onValueChanged.AddListener(index =>
             {
                 chosenObject = nodes[index];
             });
 
             parentSelector.defaultIndex = 0;
+            parentSelector.SetupSelector();
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
-            finish.clickEvent.AddListener(() =>
+            ButtonManager finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>();
+            finish.onClick.AddListener(() =>
             {
                 gotSelection = true;
 
@@ -132,8 +136,8 @@ namespace SEE.UI.Menu.Drawable
                 if (returnCall != null)
                 {
                     /// Adds the return call back to the return button.
-                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                        .clickEvent.AddListener(returnCall);
+                    GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>()
+                        .onClick.AddListener(returnCall);
                 }
                 else
                 {
@@ -204,12 +208,13 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Adds the handler for changing the parent to the parent selector.
-                parentSelector.selectorEvent.AddListener(index =>
+                parentSelector.onValueChanged.AddListener(index =>
                 {
                     chosenObject = nodes[index];
                     ChangeParent(addedNode, newConf, surface);
                 });
                 parentSelector.defaultIndex = index;
+                parentSelector.SetupSelector();
 
                 /// For the <paramref name="cutCopyMode"/>, provide a Finish Button.
                 /// Disable it for all others.
@@ -220,8 +225,8 @@ namespace SEE.UI.Menu.Drawable
                 }
                 else
                 {
-                    ButtonManagerBasic finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
-                    finish.clickEvent.AddListener(() =>
+                    ButtonManager finish = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>();
+                    finish.onClick.AddListener(() =>
                     {
                         gotSelection = true;
                     });

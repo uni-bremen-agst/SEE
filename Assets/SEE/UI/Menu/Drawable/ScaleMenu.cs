@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
@@ -179,8 +179,8 @@ namespace SEE.UI.Menu.Drawable
             if (stickyNoteMode)
             {
                 doneObject.SetActive(true);
-                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.RemoveAllListeners();
-                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+                doneObject.GetComponent<ButtonManager>().onClick.RemoveAllListeners();
+                doneObject.GetComponent<ButtonManager>().onClick.AddListener(() =>
                 {
                     Instance.Destroy();
                     isFinish = true;
@@ -202,8 +202,8 @@ namespace SEE.UI.Menu.Drawable
             if (returnCall != null)
             {
                 Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {

@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Utils;
@@ -146,7 +146,7 @@ namespace SEE.UI.ConfigMenu
             SetupCity(CurrentlyEditing);
 
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out cityLoadButton);
-            cityLoadButton.clickEvent.AddListener(() =>
+            cityLoadButton.onClick.AddListener(() =>
             {
                 city.LoadDataAsync().Forget();
                 actions.SetActive(true);
@@ -176,13 +176,13 @@ namespace SEE.UI.ConfigMenu
         private void SetupInstanceSwitch()
         {
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CitySwitch", out editingInstanceSelector);
-            editingInstanceSelector.itemList.Clear();
+            editingInstanceSelector.items.Clear();
             EditableInstances.ForEach(instance => editingInstanceSelector.CreateNewItem(instance.DisplayValue));
             editingInstanceSelector.defaultIndex = EditableInstances.IndexOf(CurrentlyEditing);
             editingInstanceSelector.SetupSelector();
-            editingInstanceSelector.selectorEvent.AddListener(index =>
+            editingInstanceSelector.onValueChanged.AddListener(index =>
             {
-                string displayValue = editingInstanceSelector.itemList[index].itemTitle;
+                string displayValue = editingInstanceSelector.items[index].itemTitle;
                 EditableInstance newInstance = EditableInstances.Find(instance => instance.DisplayValue == displayValue);
                 OnInstanceChangeRequest.Invoke(newInstance);
             });
@@ -216,9 +216,9 @@ namespace SEE.UI.ConfigMenu
         private void CreateActionButton(string buttonText, UnityAction onClick)
         {
             GameObject deleteGraphButtonGo = Instantiate(actionButtonPrefab, actions.transform, false);
-            ButtonManagerBasic deleteGraphButton = deleteGraphButtonGo.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager deleteGraphButton = deleteGraphButtonGo.MustGetComponent<ButtonManager>();
             deleteGraphButton.buttonText = buttonText;
-            deleteGraphButton.clickEvent.AddListener(onClick);
+            deleteGraphButton.onClick.AddListener(onClick);
         }
 
         private void SetupPages()

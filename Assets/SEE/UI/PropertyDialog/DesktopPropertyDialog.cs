@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.UserSettings;
 using SEE.Utils;
@@ -75,6 +75,7 @@ namespace SEE.UI.PropertyDialog
                     modal.icon = Icon;
                 }
                 modal.descriptionText = Description;
+                modal.UpdateUI();
 
                 Transform contentChild = dialog.transform.Find(contentChildName);
                 foreach (PropertyGroup group in groups)
@@ -91,6 +92,11 @@ namespace SEE.UI.PropertyDialog
                 {
                     modal.onConfirm.AddListener(() => DialogShouldBeShown = false);
                     modal.onCancel.AddListener(() => DialogShouldBeShown = false);
+                }
+                else
+                {
+                    modal.onConfirm.RemoveListener(modal.CloseWindow);
+                    modal.onCancel.RemoveListener(modal.CloseWindow);
                 }
 
                 EnableOnClick(modal.confirmButton, allowClosing);
@@ -184,7 +190,7 @@ namespace SEE.UI.PropertyDialog
         /// <param name="button">The button for which to register/unregister <see cref="CloseDesktop"/>.</param>
         /// <param name="add">If true, <see cref="CloseDesktop"/> is registered on onClick,
         /// otherwise unregistered.</param>
-        private void EnableOnClick(Button button, bool add)
+        private void EnableOnClick(ButtonManager button, bool add)
         {
             if (add)
             {

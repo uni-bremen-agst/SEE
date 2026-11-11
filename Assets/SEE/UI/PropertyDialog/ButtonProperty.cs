@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.ReversibleActions;
 using SEE.Extensions;
 using SEE.Utils;
@@ -88,7 +88,7 @@ namespace SEE.UI.PropertyDialog
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
 
-                if (!button.TryGetComponentOrLog(out ButtonManagerBasic buttonManager)
+                if (!button.TryGetComponentOrLog(out ButtonManager buttonManager)
                      || !button.TryGetComponentOrLog(out Image buttonImage)
                      || !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro)
                      || !icon.TryGetComponentOrLog(out TextMeshProUGUI iconText)
@@ -104,7 +104,7 @@ namespace SEE.UI.PropertyDialog
                 iconText.text = Icon.ToString();
 
                 buttonManager.buttonText = Name;
-                buttonManager.clickEvent.AddListener(Clicked);
+                buttonManager.onClick.AddListener(Clicked);
                 pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
                 pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }

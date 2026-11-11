@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Tables;
 using SEE.Extensions;
 using SEE.Net.Actions.Table;
@@ -96,13 +96,13 @@ namespace SEE.UI.Menu.Table
         /// </summary>
         private void DialogActionButtons()
         {
-            ButtonManagerBasic finish = menuInstance.FindDescendant("Finish").GetComponent<ButtonManagerBasic>();
-            finish.clickEvent.AddListener(() =>
+            ButtonManager finish = menuInstance.FindDescendant("Finish").GetComponent<ButtonManager>();
+            finish.onClick.AddListener(() =>
             {
                 isFinished = true;
             });
-            ButtonManagerBasic cancel = menuInstance.FindDescendant("Cancel").GetComponent<ButtonManagerBasic>();
-            cancel.clickEvent.AddListener(() =>
+            ButtonManager cancel = menuInstance.FindDescendant("Cancel").GetComponent<ButtonManager>();
+            cancel.onClick.AddListener(() =>
             {
                 wasCanceled = true;
             });

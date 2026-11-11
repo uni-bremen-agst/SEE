@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.Utils;
 using System;
@@ -207,13 +207,13 @@ namespace SEE.UI.PopupMenus
         private void AddAction(PopupMenuAction action, GameObject actionItem = null)
         {
             actionItem ??= PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", actionList, false);
-            ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager button = actionItem.MustGetComponent<ButtonManager>();
             button.buttonText = action.Name;
 
             PriorityHolder priorityHolder = actionItem.AddComponent<PriorityHolder>();
             priorityHolder.Priority = action.Priority;
 
-            button.clickEvent.AddListener(OnClick);
+            button.onClick.AddListener(OnClick);
             if (action.IconGlyph != default)
             {
                 actionItem.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>().text = action.IconGlyph.ToString();

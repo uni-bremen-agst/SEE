@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Michsky.MUIP;
+using System;
 using System.Collections.Generic;
-using Michsky.UI.ModernUIPack;
-using SEE.Utils;
 using UnityEngine;
+using SEE.Utils;
 
+/// <summary>
+/// Components for editing properties in dialogs.
+/// </summary>
 namespace SEE.UI.PropertyDialog
 {
     /// <summary>
@@ -65,12 +68,19 @@ namespace SEE.UI.PropertyDialog
 
             #region Local Methods
 
+            /// <summary>
+            /// Populates the selector and initializes its first option.
+            /// </summary>
+            /// <param name="horizontalSelector">The selector to initialize.</param>
+            /// <param name="options">The selection options.</param>
             static void SetOptions(HorizontalSelector horizontalSelector, IList<string> options)
             {
                 foreach (string option in options)
                 {
                     horizontalSelector.CreateNewItem(option);
                 }
+                horizontalSelector.defaultIndex = 0;
+                horizontalSelector.SetupSelector();
             }
 
             void SetupTooltip(GameObject field)

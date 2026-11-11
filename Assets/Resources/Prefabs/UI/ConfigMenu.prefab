@@ -568,16 +568,16 @@ MonoBehaviour:
   labelHelper: {fileID: 6681774491840764446}
   indicatorParent: {fileID: 280492145764112342}
   indicatorObject: {fileID: 1323806087491500, guid: d761d163a9f3c244a97cdaa6e14fafc1, type: 3}
-  saveValue: 0
-  selectorTag: Tag Text
+  saveSelected: 0
+  saveKey: Tag Text
   enableIndicators: 1
   invokeAtStart: 0
   invertAnimation: 0
   loopSelection: 1
   defaultIndex: 2
   index: 0
-  itemList: []
-  selectorEvent:
+  items: []
+  onValueChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &8218051341783757732
@@ -1404,10 +1404,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: Load
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
@@ -1428,6 +1428,15 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 1
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 22.5
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 1
+  isInteractable: 1
+  normalCG: {fileID: 6299520938764807246}
+  highlightCG: {fileID: 6299520937279465967}
 --- !u!114 &6299520937276338312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1504,40 +1513,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  buttonType: 3
-  basicFilled: {fileID: 0}
-  basicText: {fileID: 0}
-  basicOnlyIconFilled: {fileID: 0}
-  basicOnlyIconIcon: {fileID: 0}
-  basicWithIconFilled: {fileID: 0}
-  basicWithIconIcon: {fileID: 0}
-  basicWithIconText: {fileID: 0}
-  basicOutlineBorder: {fileID: 6299520938194417644}
-  basicOutlineFilled: {fileID: 6299520938715867521}
-  basicOutlineText: {fileID: 6299520937289255401}
-  basicOutlineTextHighligted: {fileID: 6299520938188579177}
-  basicOutlineOOBorder: {fileID: 0}
-  basicOutlineOOFilled: {fileID: 0}
-  basicOutlineOOIcon: {fileID: 0}
-  basicOutlineOOIconHighlighted: {fileID: 0}
-  basicOutlineWOBorder: {fileID: 0}
-  basicOutlineWOFilled: {fileID: 0}
-  basicOutlineWOIcon: {fileID: 0}
-  basicOutlineWOIconHighlighted: {fileID: 0}
-  basicOutlineWOText: {fileID: 0}
-  basicOutlineWOTextHighligted: {fileID: 0}
-  radialOOBackground: {fileID: 0}
-  radialOOIcon: {fileID: 0}
-  radialOutlineOOBorder: {fileID: 0}
-  radialOutlineOOFilled: {fileID: 0}
-  radialOutlineOOIcon: {fileID: 0}
-  radialOutlineOOIconHighlighted: {fileID: 0}
-  roundedBackground: {fileID: 0}
-  roundedText: {fileID: 0}
-  roundedOutlineBorder: {fileID: 0}
-  roundedOutlineFilled: {fileID: 0}
-  roundedOutlineText: {fileID: 0}
-  roundedOutlineTextHighligted: {fileID: 0}
+  outlineMode: 1
+  buttonManager: {fileID: 6299520937276338313}
+  normalBackground: {fileID: 6299520938194417644}
+  highlightedBackground: {fileID: 6299520938715867521}
+  normalText: {fileID: 6299520937289255401}
+  highlightedText: {fileID: 6299520938188579177}
 --- !u!114 &6299520937276338325
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@
 
 using System;
 using System.Collections.Generic;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using TMPro;
 using UnityEngine;
 

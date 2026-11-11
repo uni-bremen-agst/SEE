@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Extensions;
 using SEE.UI.PopupMenus;
 using SEE.UI.Window.DrawableManagerWindow;
@@ -25,17 +25,17 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private readonly ButtonManagerBasic filterButton;
+        private readonly ButtonManager filterButton;
 
         /// <summary>
         /// The button that opens the sort menu.
         /// </summary>
-        private readonly ButtonManagerBasic sortButton;
+        private readonly ButtonManager sortButton;
 
         /// <summary>
         /// The button that opens the group menu.
         /// </summary>
-        private readonly ButtonManagerBasic groupButton;
+        private readonly ButtonManager groupButton;
 
         /// <summary>
         /// The rebuild event.
@@ -67,8 +67,8 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
         public PropertyWindowContextMenu(PopupMenu contextMenu,
-            UnityEvent rebuild, ButtonManagerBasic filterButton,
-            ButtonManagerBasic sortButton, ButtonManagerBasic groupButton)
+            UnityEvent rebuild, ButtonManager filterButton,
+            ButtonManager sortButton, ButtonManager groupButton)
         {
             this.contextMenu = contextMenu;
             this.rebuild = rebuild;
@@ -83,16 +83,16 @@ namespace SEE.UI.Window.PropertyWindow
             ResetSort();
             GroupByName = true;
 
-            this.filterButton.clickEvent.AddListener(ShowFilterMenu);
-            this.filterButton.clickEvent.AddListener(() => {
+            this.filterButton.onClick.AddListener(ShowFilterMenu);
+            this.filterButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            this.sortButton.clickEvent.AddListener(ShowSortMenu);
-            this.sortButton.clickEvent.AddListener(() => {
+            this.sortButton.onClick.AddListener(ShowSortMenu);
+            this.sortButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
-            this.groupButton.clickEvent.AddListener(() => {
+            this.groupButton.onClick.AddListener(ShowGroupMenu);
+            this.groupButton.onClick.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
         }

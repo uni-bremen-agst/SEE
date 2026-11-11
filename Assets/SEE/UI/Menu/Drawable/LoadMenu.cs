@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine.Events;
@@ -33,18 +33,18 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance for the regular load drawable button.
         /// </summary>
-        private static ButtonManagerBasic loadButton;
+        private static ButtonManager loadButton;
 
         /// <summary>
         /// The instance for the specific load drawables button.
         /// </summary>
-        private static ButtonManagerBasic loadSpecificButton;
+        private static ButtonManager loadSpecificButton;
 
         /// <summary>
         /// The instance for the button that loads drawable content onto the current page
         /// of the selected drawable surface.
         /// </summary>
-        private static ButtonManagerBasic loadSpecificCurrentPageButton;
+        private static ButtonManager loadSpecificCurrentPageButton;
 
         /// <summary>
         /// Creates the load menu.
@@ -60,20 +60,20 @@ namespace SEE.UI.Menu.Drawable
             Instance = new LoadMenu();
             Instance.Instantiate(loadMenuPrefab);
             loadButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Load")
-                .GetComponent<ButtonManagerBasic>();
+                .GetComponent<ButtonManager>();
             loadSpecificButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LoadSpecific")
-                .GetComponent<ButtonManagerBasic>();
+                .GetComponent<ButtonManager>();
             loadSpecificCurrentPageButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LoadSpecificCurrentPage")
-                .GetComponent<ButtonManagerBasic>();
+                .GetComponent<ButtonManager>();
 
             /// Adds a handler for the <paramref name="loadButtonCall"/>.
-            loadButton.clickEvent.AddListener(loadButtonCall);
+            loadButton.onClick.AddListener(loadButtonCall);
 
             /// Adds a handler for the <paramref name="loadSpecificButtonCall"/>.
-            loadSpecificButton.clickEvent.AddListener(loadSpecificButtonCall);
+            loadSpecificButton.onClick.AddListener(loadSpecificButtonCall);
 
             /// Adds a handler for the load on specific current page button.
-            loadSpecificCurrentPageButton.clickEvent.AddListener(loadSpecificCurrentPageButtonCall);
+            loadSpecificCurrentPageButton.onClick.AddListener(loadSpecificCurrentPageButtonCall);
         }
     }
 }

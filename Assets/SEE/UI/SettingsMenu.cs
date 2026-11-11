@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Audio;
 using SEE.Controls.KeyActions;
 using SEE.Game;
@@ -312,12 +312,12 @@ namespace SEE.UI
                 .GetComponentInChildren<TMP_InputField>();
 
             // Buttons and important GameObjects of the LiveKit settings page.
-            ButtonManagerWithIcon share = settingsMenuGameObject.FindDescendant("Share")
-                .MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager share = settingsMenuGameObject.FindDescendant("Share")
+                .MustGetComponent<ButtonManager>();
             GameObject connectGO = settingsMenuGameObject.FindDescendant("Connect");
-            ButtonManagerWithIcon connect = connectGO.MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager connect = connectGO.MustGetComponent<ButtonManager>();
             GameObject disconnectGO = settingsMenuGameObject.FindDescendant("Disconnect");
-            ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
+            ButtonManager disconnect = disconnectGO.MustGetComponent<ButtonManager>();
             disconnectGO.SetActive(false);
 
             if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitManager liveKitVideoManager))
@@ -348,19 +348,19 @@ namespace SEE.UI
                     UserSetting.Instance.Save();
                 });
 
-                share.clickEvent.AddListener(() =>
+                share.onClick.AddListener(() =>
                 {
                     new LiveKitSettingsNetAction(UserSetting.Instance.Video.LiveKitUrl,
                                                  UserSetting.Instance.Video.TokenUrl,
                                                  UserSetting.Instance.Video.RoomName).Execute();
                 });
 
-                connect.clickEvent.AddListener(() =>
+                connect.onClick.AddListener(() =>
                 {
                     StartCoroutine(ConnectRoutine());
                 });
 
-                disconnect.clickEvent.AddListener(() =>
+                disconnect.onClick.AddListener(() =>
                 {
                     liveKitVideoManager.Disconnect();
                     disconnectGO.SetActive(false);

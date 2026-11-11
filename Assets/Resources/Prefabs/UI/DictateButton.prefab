@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9179822574375697228}
   - component: {fileID: 9198049589183556094}
   - component: {fileID: 7783995227472328117}
+  - component: {fileID: 9198049589183556095}
   m_Layer: 5
   m_Name: DictateButton
   m_TagString: Untagged
@@ -59,19 +60,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3797590431724552235}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a54a7257a6436d41b873f1053130384, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonIcon: {fileID: 21300000, guid: 66bf9157a68771e4a82bdfe968f08212, type: 3}
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  normalIcon: {fileID: 7597349028753587917}
+  normalImage: {fileID: 7597349028753587917}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 9097854882561332462}
   useCustomContent: 0
@@ -86,6 +87,15 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 24
+  enableText: 0
+  enableIcon: 1
+  animationSolution: 0
+  useUINavigation: 1
+  navigationMode: 3
+  isInteractable: 1
 --- !u!114 &9179822574375697228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,3 +354,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &9198049589183556095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3797590431724552235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

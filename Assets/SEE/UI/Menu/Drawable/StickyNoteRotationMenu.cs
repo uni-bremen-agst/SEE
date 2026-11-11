@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
@@ -72,7 +72,7 @@ namespace SEE.UI.Menu.Drawable
             HangingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
 
             /// Initialize the next button, it opens the menu for the Y-rotation.
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Next").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Next").GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 xRotationMenu.SetActive(false);
                 EnableYRotation(stickyNoteHolder, hitObject != null, returnCall);
@@ -93,8 +93,8 @@ namespace SEE.UI.Menu.Drawable
         private static void LayingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Laying").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     if (hitObject != null)
                     {
@@ -120,7 +120,7 @@ namespace SEE.UI.Menu.Drawable
         private static void HangingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Hanging").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Hanging").GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GameStickyNoteManager.SetRotateX(stickyNoteHolder, 0);
                 if (hitObject == null)
@@ -139,8 +139,8 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "ReturnBtn").GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {
@@ -170,8 +170,8 @@ namespace SEE.UI.Menu.Drawable
             TwoHundredSeventy(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
 
             /// Initialize the back button, it returns to the xRotation menu.
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Back").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Back").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
             {
                 yRotationMenu.SetActive(false);
                 xRotationMenu.SetActive(true);
@@ -179,8 +179,8 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initalize the finish button. It closes the rotation menus.
             /// And set <see cref="isFinished"/> to true.
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Finish").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Finish").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
             {
                 Destroyer.Destroy(xRotationMenu);
                 Destroyer.Destroy(yRotationMenu);
@@ -200,8 +200,8 @@ namespace SEE.UI.Menu.Drawable
         private static void Zero(GameObject stickyNoteHolder, RotationSliderController slider,
             bool spawnMode, GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "0").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "0").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
             {
                 slider.AssignValue(0);
                 GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0);
@@ -225,8 +225,8 @@ namespace SEE.UI.Menu.Drawable
         private static void Ninety(GameObject stickyNoteHolder, RotationSliderController slider,
             bool spawnMode, GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "90").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "90").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     slider.AssignValue(90);
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90);
@@ -250,8 +250,8 @@ namespace SEE.UI.Menu.Drawable
         private static void OneHundredEighty(GameObject stickyNoteHolder, RotationSliderController slider,
             bool spawnMode, GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "180").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "180").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     slider.AssignValue(180);
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180);
@@ -275,8 +275,8 @@ namespace SEE.UI.Menu.Drawable
         private static void TwoHundredSeventy(GameObject stickyNoteHolder, RotationSliderController slider,
             bool spawnMode, GameObject surface, string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "270").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "270").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     slider.AssignValue(270);
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270);
@@ -297,8 +297,8 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "ReturnBtn").GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {

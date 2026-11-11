@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.UI.Notification;
 using System.Globalization;
 using TMPro;
@@ -22,12 +22,12 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Is the button up of this component.
         /// </summary>
-        private ButtonManagerBasic upBtn;
+        private ButtonManager upBtn;
 
         /// <summary>
         /// Is the button down of this component.
         /// </summary>
-        private ButtonManagerBasic downBtn;
+        private ButtonManager downBtn;
 
         /// <summary>
         /// Is the current value of the input field.
@@ -74,16 +74,16 @@ namespace SEE.UI.Drawable
         {
             inputField = GetComponentInChildren<TMP_InputField>();
             GameObject up = transform.Find("UpDown").Find("UpBtn").gameObject;
-            upBtn = up.GetComponent<ButtonManagerBasic>();
+            upBtn = up.GetComponent<ButtonManager>();
 
             GameObject down = transform.Find("UpDown").Find("DownBtn").gameObject;
-            downBtn = down.GetComponent<ButtonManagerBasic>();
+            downBtn = down.GetComponent<ButtonManager>();
             /// Adds the handler for the normal left click.
-            upBtn.clickEvent.AddListener(ClickUp);
+            upBtn.onClick.AddListener(ClickUp);
             /// Adds the component for the option that the button can be holded (right click).
             up.AddComponent<ButtonHeld>().SetAction(ClickUp);
             /// Adds the handler for the normal left click.
-            downBtn.clickEvent.AddListener(ClickDown);
+            downBtn.onClick.AddListener(ClickDown);
             /// Adds the component for the option that the button can be holded (right click).
             down.AddComponent<ButtonHeld>().SetAction(ClickDown);
             /// Adds a hover tool tip to the buttons.

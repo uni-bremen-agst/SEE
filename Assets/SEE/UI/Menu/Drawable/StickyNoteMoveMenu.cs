@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
@@ -59,8 +59,8 @@ namespace SEE.UI.Menu.Drawable
             speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
 
             /// Register the finish button. It destroys the move menu and set the finish attribut.
-            GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
             {
                 Destroyer.Destroy(Instance.gameObject);
                 isFinish = true;
@@ -134,8 +134,8 @@ namespace SEE.UI.Menu.Drawable
             #endregion
 
             /// Register an information button for explaining the individual movement buttons.
-            GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Info").GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+            GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Info").GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
             {
                 ShowNotification.Info("Movement Buttons",
                     "Up-Button moves on Y-axis positiv." +
