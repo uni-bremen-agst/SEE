@@ -22,6 +22,12 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
+        /// The acceptable overlap of two nodes. If the actual overlap is beyond
+        /// this threshold, an exception will be thrown.
+        /// </summary>
+        private const float acceptableOverlap = 0.01f;
+
+        /// <summary>
         /// A reference to the layout calculated in the previous frame or state.
         /// This is strictly required for the "incremental" aspect of the layout, as the algorithm
         /// uses the positions from this old layout to try and keep nodes as close to their previous
@@ -545,7 +551,7 @@ namespace SEE.Layout.NodeLayouts
                             float distX = bCenterX - aCenterX;
                             float distY = bCenterY - aCenterY;
 
-                            if (distX == 0f && distY == 0f) { distX = 0.01f; }
+                            if (distX == 0f && distY == 0f) { distX = acceptableOverlap; }
 
                             float minX = (a.Width / 2f) + (b.Width / 2f);
                             float minY = (a.Height / 2f) + (b.Height / 2f);
@@ -614,13 +620,13 @@ namespace SEE.Layout.NodeLayouts
             // We can still trim the parent to fit,
             // But if it's significant, we throw an exception.
             float overlapFrac = ComputeMaxOverlapFractionFromPNodes(nodes);
-            if (overlapFrac < 0.01f)
+            if (overlapFrac < acceptableOverlap)
             {
                 TrimParentToFit(parent, nodes);
             }
             else
             {
-                throw new Exception($"Report error: {overlapFrac}");
+                throw new Exception($"Inacceptable overlap: {overlapFrac} >= {acceptableOverlap}");
             }
         }
 
