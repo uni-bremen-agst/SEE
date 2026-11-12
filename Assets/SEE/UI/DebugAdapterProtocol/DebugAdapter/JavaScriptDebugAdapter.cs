@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
@@ -27,7 +29,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "js-debug", "src");
         public override string AdapterFileName { get; set; } = "node";
 
-        public override string AdapterArguments { get; set; } = $"dapDebugServer.js {GetAvailablePort()}";
+        public override string AdapterArguments { get; set; } = $"dapDebugServer.js {GetAdapterPort()}";
         #endregion
 
         #region Launch Configuration
@@ -122,6 +124,24 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #endregion
 
         #region Utilities
+        /// <summary>
+        /// Selects an available TCP port for the JavaScript debug adapter.
+        /// </summary>
+        /// <returns>The selected port number.</returns>
+        /// <exception cref="SocketException">The macOS loopback socket could not be opened or bound.</exception>
+        private static int GetAdapterPort()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return GetAvailablePort();
+            }
+
+            // Unity's macOS runtime cannot enumerate TCP connections.
+            using Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            return ((IPEndPoint)socket.LocalEndPoint).Port;
+        }
+
         /// <summary>
         /// Returns the first available port.
         ///

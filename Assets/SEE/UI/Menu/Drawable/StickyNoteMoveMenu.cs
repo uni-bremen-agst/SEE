@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
@@ -84,11 +84,11 @@ namespace SEE.UI.Menu.Drawable
             speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
 
             /// Register the finish button.
-            ButtonManagerBasic finishButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManager finishButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Finish").GetComponent<ButtonManager>();
 
-            finishButton.clickEvent.RemoveAllListeners();
-            finishButton.clickEvent.AddListener(() =>
+            finishButton.onClick.RemoveAllListeners();
+            finishButton.onClick.AddListener(() =>
             {
                 Destroyer.Destroy(gameObject);
                 isFinish = true;
@@ -146,11 +146,11 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void SetUpInfoButton()
         {
-            ButtonManagerBasic infoButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Info").GetComponent<ButtonManagerBasic>();
+            ButtonManager infoButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Info").GetComponent<ButtonManager>();
 
-            infoButton.clickEvent.RemoveAllListeners();
-            infoButton.clickEvent.AddListener(() =>
+            infoButton.onClick.RemoveAllListeners();
+            infoButton.onClick.AddListener(() =>
             {
                 ShowNotification.Info("Movement Buttons",
                     "Up-Button moves on Y-axis positiv."

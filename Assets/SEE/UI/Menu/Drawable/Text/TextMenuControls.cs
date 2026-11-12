@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;
@@ -26,7 +26,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the bold font-style button.
         /// </summary>
-        internal ButtonManagerBasic BoldButtonManager { get; }
+        internal ButtonManager BoldButtonManager { get; }
 
         /// <summary>
         /// The italic font-style button.
@@ -36,7 +36,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the italic font-style button.
         /// </summary>
-        internal ButtonManagerBasic ItalicButtonManager { get; }
+        internal ButtonManager ItalicButtonManager { get; }
 
         /// <summary>
         /// The underline font-style button.
@@ -46,7 +46,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the underline font-style button.
         /// </summary>
-        internal ButtonManagerBasic UnderlineButtonManager { get; }
+        internal ButtonManager UnderlineButtonManager { get; }
 
         /// <summary>
         /// The strikethrough font-style button.
@@ -56,7 +56,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the strikethrough font-style button.
         /// </summary>
-        internal ButtonManagerBasic StrikethroughButtonManager { get; }
+        internal ButtonManager StrikethroughButtonManager { get; }
 
         /// <summary>
         /// The lower-case font-style button.
@@ -66,7 +66,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the lower-case font-style button.
         /// </summary>
-        internal ButtonManagerBasic LowerCaseButtonManager { get; }
+        internal ButtonManager LowerCaseButtonManager { get; }
 
         /// <summary>
         /// The upper-case font-style button.
@@ -76,7 +76,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the upper-case font-style button.
         /// </summary>
-        internal ButtonManagerBasic UpperCaseButtonManager { get; }
+        internal ButtonManager UpperCaseButtonManager { get; }
 
         /// <summary>
         /// The small-caps font-style button.
@@ -86,7 +86,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the small-caps font-style button.
         /// </summary>
-        internal ButtonManagerBasic SmallCapsButtonManager { get; }
+        internal ButtonManager SmallCapsButtonManager { get; }
 
         /// <summary>
         /// The font-color button.
@@ -96,7 +96,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the font-color button.
         /// </summary>
-        internal ButtonManagerBasic FontColorButtonManager { get; }
+        internal ButtonManager FontColorButtonManager { get; }
 
         /// <summary>
         /// The outline-color button.
@@ -106,7 +106,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the outline-color button.
         /// </summary>
-        internal ButtonManagerBasic OutlineColorButtonManager { get; }
+        internal ButtonManager OutlineColorButtonManager { get; }
 
         /// <summary>
         /// The HSV color picker.
@@ -146,7 +146,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the edit-text button.
         /// </summary>
-        internal ButtonManagerBasic EditTextButtonManager { get; }
+        internal ButtonManager EditTextButtonManager { get; }
 
         /// <summary>
         /// The object containing the order-in-layer control.
@@ -171,7 +171,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <summary>
         /// The button manager of the return button.
         /// </summary>
-        internal ButtonManagerBasic ReturnButtonManager { get; }
+        internal ButtonManager ReturnButtonManager { get; }
 
         /// <summary>
         /// Resolves all UI references belonging to the text menu.
@@ -186,14 +186,14 @@ namespace SEE.UI.Menu.Drawable.Text
                     menuObject,
                     "Bold");
             BoldButton = bold.GetComponent<Button>();
-            BoldButtonManager = bold.GetComponent<ButtonManagerBasic>();
+            BoldButtonManager = bold.GetComponent<ButtonManager>();
 
             GameObject italic =
                 GameFinder.FindAttachedOrLocalDescendant(
                     menuObject,
                     "Italic");
             ItalicButton = italic.GetComponent<Button>();
-            ItalicButtonManager = italic.GetComponent<ButtonManagerBasic>();
+            ItalicButtonManager = italic.GetComponent<ButtonManager>();
 
             GameObject underline =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -201,7 +201,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "Underline");
             UnderlineButton = underline.GetComponent<Button>();
             UnderlineButtonManager =
-                underline.GetComponent<ButtonManagerBasic>();
+                underline.GetComponent<ButtonManager>();
 
             GameObject strikethrough =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -210,7 +210,7 @@ namespace SEE.UI.Menu.Drawable.Text
             StrikethroughButton =
                 strikethrough.GetComponent<Button>();
             StrikethroughButtonManager =
-                strikethrough.GetComponent<ButtonManagerBasic>();
+                strikethrough.GetComponent<ButtonManager>();
 
             GameObject lowerCase =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -218,7 +218,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "LowerCase");
             LowerCaseButton = lowerCase.GetComponent<Button>();
             LowerCaseButtonManager =
-                lowerCase.GetComponent<ButtonManagerBasic>();
+                lowerCase.GetComponent<ButtonManager>();
 
             GameObject upperCase =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -226,7 +226,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "UpperCase");
             UpperCaseButton = upperCase.GetComponent<Button>();
             UpperCaseButtonManager =
-                upperCase.GetComponent<ButtonManagerBasic>();
+                upperCase.GetComponent<ButtonManager>();
 
             GameObject smallCaps =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -234,7 +234,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "SmallCaps");
             SmallCapsButton = smallCaps.GetComponent<Button>();
             SmallCapsButtonManager =
-                smallCaps.GetComponent<ButtonManagerBasic>();
+                smallCaps.GetComponent<ButtonManager>();
 
             GameObject fontColor =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -242,7 +242,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "FontColorBtn");
             FontColorButton = fontColor.GetComponent<Button>();
             FontColorButtonManager =
-                fontColor.GetComponent<ButtonManagerBasic>();
+                fontColor.GetComponent<ButtonManager>();
 
             GameObject outlineColor =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -250,7 +250,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "OutlineColorBtn");
             OutlineColorButton = outlineColor.GetComponent<Button>();
             OutlineColorButtonManager =
-                outlineColor.GetComponent<ButtonManagerBasic>();
+                outlineColor.GetComponent<ButtonManager>();
 
             ColorPicker =
                 menuObject.GetComponentInChildren<HSVPicker.ColorPicker>();
@@ -283,7 +283,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     "EditText");
             EditTextButtonManager =
                 EditTextObject
-                    .GetComponentInChildren<ButtonManagerBasic>();
+                    .GetComponentInChildren<ButtonManager>();
 
             OrderInLayerObject =
                 GameFinder.FindAttachedOrLocalDescendant(
@@ -298,7 +298,7 @@ namespace SEE.UI.Menu.Drawable.Text
             ReturnButtonObject =
                 menuObject.transform.Find("ReturnBtn").gameObject;
             ReturnButtonManager =
-                ReturnButtonObject.GetComponent<ButtonManagerBasic>();
+                ReturnButtonObject.GetComponent<ButtonManager>();
         }
     }
 }

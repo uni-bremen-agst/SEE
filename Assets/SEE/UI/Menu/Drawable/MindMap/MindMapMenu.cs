@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
 
@@ -59,8 +59,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
             base.Enable();
 
             /// Initialize the button for spawn a theme.
-            ButtonManagerBasic theme = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Theme").GetComponent<ButtonManagerBasic>();
-            theme.clickEvent.AddListener(() =>
+            ButtonManager theme = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Theme").GetComponent<ButtonManager>();
+            theme.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Theme;
@@ -68,8 +68,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
             });
 
             /// Initialize the button for spawn a subtheme.
-            ButtonManagerBasic subtheme = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Subtheme").GetComponent<ButtonManagerBasic>();
-            subtheme.clickEvent.AddListener(() =>
+            ButtonManager subtheme = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Subtheme").GetComponent<ButtonManager>();
+            subtheme.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Subtheme;
@@ -77,8 +77,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
             });
 
             /// Initialize the button for spawn a leaf.
-            ButtonManagerBasic leaf = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Leaf").GetComponent<ButtonManagerBasic>();
-            leaf.clickEvent.AddListener(() =>
+            ButtonManager leaf = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Leaf").GetComponent<ButtonManager>();
+            leaf.onClick.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Leaf;

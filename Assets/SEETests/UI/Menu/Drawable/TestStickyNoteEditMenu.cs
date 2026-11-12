@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
@@ -74,8 +74,8 @@ namespace SEE.UI.Menu.Drawable
         {
             StickyNoteEditMenu.Instance.Enable(stickyNote, CreateConfiguration(true));
 
-            ButtonManagerBasic scaleButton = FindButton("Scale");
-            scaleButton.clickEvent.Invoke();
+            ButtonManager scaleButton = FindButton("Scale");
+            scaleButton.onClick.Invoke();
 
             Assert.That(scaleButton.gameObject.activeInHierarchy, Is.False);
             Assert.That(ScaleMenu.Instance.IsOpen(), Is.True);
@@ -119,9 +119,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The name of the button.</param>
         /// <returns>The matching button.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == name)
                 {

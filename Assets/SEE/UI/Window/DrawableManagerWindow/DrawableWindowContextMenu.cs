@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.UI.PopupMenus;
 using System;
 using System.Collections.Generic;
@@ -32,17 +32,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private readonly ButtonManagerBasic filterButton;
+        private readonly ButtonManager filterButton;
 
         /// <summary>
         /// The button that opens the sort menu.
         /// </summary>
-        private readonly ButtonManagerBasic sortButton;
+        private readonly ButtonManager sortButton;
 
         /// <summary>
         /// The button that opens the group menu.
         /// </summary>
-        private readonly ButtonManagerBasic groupButton;
+        private readonly ButtonManager groupButton;
 
         /// <summary>
         /// The drawable surface filter.
@@ -68,8 +68,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
         public DrawableWindowContextMenu(PopupMenu contextMenu,
-                                     UnityEvent<List<GameObject>> rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
-                                     ButtonManagerBasic groupButton)
+                                     UnityEvent<List<GameObject>> rebuild, ButtonManager filterButton, ButtonManager sortButton,
+                                     ButtonManager groupButton)
         {
             this.contextMenu = contextMenu;
             this.rebuild = rebuild;
@@ -83,9 +83,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
             ResetFilter();
             ResetSort();
             ResetGrouping();
-            this.filterButton.clickEvent.AddListener(ShowFilterMenu);
-            this.sortButton.clickEvent.AddListener(ShowSortMenu);
-            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
+            this.filterButton.onClick.AddListener(ShowFilterMenu);
+            this.sortButton.onClick.AddListener(ShowSortMenu);
+            this.groupButton.onClick.AddListener(ShowGroupMenu);
         }
         #region Filter menu
         /// <summary>

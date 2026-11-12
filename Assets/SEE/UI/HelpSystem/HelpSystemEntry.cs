@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Crosstales.RTVoice;
 using DynamicPanels;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Avatars;
 using SEE.Extensions;
 using SEE.Utils;
@@ -87,17 +87,17 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The pause or rather the pause/play button which pauses or plays the video, respectively.
         /// </summary>
-        private ButtonManagerBasicIcon pauseButton;
+        private ButtonManager pauseButton;
 
         /// <summary>
         /// The forward-button, which skips a specific time of the video forwards.
         /// </summary>
-        private ButtonManagerBasicIcon forwardButton;
+        private ButtonManager forwardButton;
 
         /// <summary>
         /// The forward-button, which skips a specific time of the video backwards.
         /// </summary>
-        private ButtonManagerBasicIcon backwardButton;
+        private ButtonManager backwardButton;
 
         /// <summary>
         /// The helpSystemEntry GameObject.
@@ -113,6 +113,11 @@ namespace SEE.UI.HelpSystem
         /// It will be a child of <see cref="PlatformDependentComponent.Canvas"/>.
         /// </summary>
         private GameObject helpSystemSpace;
+
+        /// <summary>
+        /// The panel displaying the current help entry.
+        /// </summary>
+        private Panel entryPanel;
 
         /// <summary>
         /// A instance of tmp which displays the current progress of the video such as "1s / 35 s".
@@ -291,12 +296,12 @@ namespace SEE.UI.HelpSystem
             text.fontSize = 18;
 
             {
-                helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-                manager.clickEvent.AddListener(Back);
+                helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManager manager);
+                manager.onClick.AddListener(Back);
             }
             {
-                helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-                manager.clickEvent.AddListener(Close);
+                helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManager manager);
+                manager.onClick.AddListener(Close);
             }
             videoPlayer = GetVideoPlayer();
 
@@ -307,33 +312,65 @@ namespace SEE.UI.HelpSystem
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
-            pauseButton.clickEvent.AddListener(TogglePlaying);
+            pauseButton.onClick.AddListener(TogglePlaying);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Forward")
                            .gameObject.TryGetComponentOrLog(out forwardButton);
-            forwardButton.clickEvent.AddListener(Forward);
+            forwardButton.onClick.AddListener(Forward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Back")
                            .gameObject.TryGetComponentOrLog(out backwardButton);
-            backwardButton.clickEvent.AddListener(Backward);
+            backwardButton.onClick.AddListener(Backward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
 
-            Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, panelsCanvas);
-            PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
+            entryPanel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, panelsCanvas);
+            PanelTab tab = entryPanel.GetTab((RectTransform)helpSystemEntry.transform);
             tab.Label = "";
             GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"),
                                                           helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform, false);
             HelpSystemBuilder.Headline = headline;
             headline.GetComponent<TextMeshProUGUI>().text = title;
 
-            PanelNotificationCenter.OnTabClosed += panelTab =>
+            PanelNotificationCenter.OnPanelClosed += OnPanelClosed;
+            PanelNotificationCenter.OnTabClosed += OnTabClosed;
+        }
+
+        /// <summary>
+        /// Closes the help entry when its containing panel closes.
+        /// </summary>
+        /// <param name="panel">The panel that closed.</param>
+        private void OnPanelClosed(Panel panel)
+        {
+            if (panel == entryPanel)
             {
-                if (panelTab.Panel == panel)
-                {
-                    Close();
-                }
-            };
+                Close();
+            }
+        }
+
+        /// <summary>
+        /// Handles the closed tab through its containing panel.
+        /// </summary>
+        /// <param name="tab">The tab that closed.</param>
+        private void OnTabClosed(PanelTab tab) => OnPanelClosed(tab.Panel);
+
+        /// <summary>
+        /// Removes panel event subscriptions and clears the entry's panel reference.
+        /// </summary>
+        private void UnsubscribeFromPanelEvents()
+        {
+            PanelNotificationCenter.OnPanelClosed -= OnPanelClosed;
+            PanelNotificationCenter.OnTabClosed -= OnTabClosed;
+            entryPanel = null;
+        }
+
+        /// <summary>
+        /// Removes panel event subscriptions before running the base destruction handler.
+        /// </summary>
+        protected override void OnDestroy()
+        {
+            UnsubscribeFromPanelEvents();
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -345,6 +382,7 @@ namespace SEE.UI.HelpSystem
             videoPlayer?.Stop();
             IsPlaying = false;
             PersonalAssistantBrain.Instance?.Stop();
+            UnsubscribeFromPanelEvents();
             Destroyer.Destroy(helpSystemSpace);
             EntryShown = false;
         }
@@ -417,6 +455,7 @@ namespace SEE.UI.HelpSystem
             PersonalAssistantBrain.Instance?.Stop();
             videoPlayer?.Stop();
             EntryShown = false;
+            UnsubscribeFromPanelEvents();
             Destroyer.Destroy(helpSystemSpace);
         }
 

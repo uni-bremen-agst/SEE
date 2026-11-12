@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
@@ -193,8 +193,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     yRotationMenu,
                     buttonName)
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     slider.AssignValue(degree);
 
@@ -270,8 +270,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     yRotationMenu,
                     "Back")
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(backCall);
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(backCall);
         }
 
         /// <summary>
@@ -285,8 +285,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     yRotationMenu,
                     "Finish")
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(finishCall);
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(finishCall);
         }
 
         /// <summary>
@@ -306,8 +306,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             if (returnCall != null)
             {
                 returnButton
-                    .GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                    .GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.Game.Drawable;

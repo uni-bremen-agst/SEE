@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.UI.Drawable;
@@ -141,10 +141,10 @@ namespace SEE.UI.Menu.Drawable
         {
             ScaleMenu.Instance.Enable(selectedObject, true);
 
-            ButtonManagerBasic doneButton = FindButton("Done");
+            ButtonManager doneButton = FindButton("Done");
             Assert.That(doneButton.gameObject.activeSelf, Is.True);
 
-            doneButton.clickEvent.Invoke();
+            doneButton.onClick.Invoke();
 
             Assert.That(ScaleMenu.Instance.TryGetFinish(out bool firstFinish), Is.True);
             Assert.That(firstFinish, Is.True);
@@ -164,10 +164,10 @@ namespace SEE.UI.Menu.Drawable
 
             ScaleMenu.Instance.Enable(selectedObject, returnCall: returnCall);
 
-            ButtonManagerBasic returnButton = FindButton("ReturnBtn");
+            ButtonManager returnButton = FindButton("ReturnBtn");
             Assert.That(returnButton.gameObject.activeSelf, Is.True);
 
-            returnButton.clickEvent.Invoke();
+            returnButton.onClick.Invoke();
 
             Assert.That(callbackInvoked, Is.True);
         }
@@ -197,9 +197,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The name of the button.</param>
         /// <returns>The matching button manager.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == name)

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable.Configurations;
@@ -89,10 +89,10 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindNodeKindSelector();
 
-            Assert.That(selector.itemList.Count, Is.EqualTo(3));
-            Assert.That(selector.itemList[0].itemTitle, Is.EqualTo(MindMapNodeKind.Theme.ToString()));
-            Assert.That(selector.itemList[1].itemTitle, Is.EqualTo(MindMapNodeKind.Subtheme.ToString()));
-            Assert.That(selector.itemList[2].itemTitle, Is.EqualTo(MindMapNodeKind.Leaf.ToString()));
+            Assert.That(selector.items.Count, Is.EqualTo(3));
+            Assert.That(selector.items[0].itemTitle, Is.EqualTo(MindMapNodeKind.Theme.ToString()));
+            Assert.That(selector.items[1].itemTitle, Is.EqualTo(MindMapNodeKind.Subtheme.ToString()));
+            Assert.That(selector.items[2].itemTitle, Is.EqualTo(MindMapNodeKind.Leaf.ToString()));
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 configuration,
                 () => callbackInvoked = true);
 
-            ButtonManagerBasic returnButton = FindReturnButton();
-            returnButton.clickEvent.Invoke();
+            ButtonManager returnButton = FindReturnButton();
+            returnButton.onClick.Invoke();
 
             Assert.That(callbackInvoked, Is.True);
         }
@@ -186,7 +186,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             int index = GameMindMap.GetNodeKinds().IndexOf(newNodeKind);
 
             selector.index = index;
-            selector.selectorEvent.Invoke(index);
+            selector.onValueChanged.Invoke(index);
 
             Assert.That(nodeValueHolder.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
             Assert.That(configuration.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
@@ -240,7 +240,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                     .IndexOf(MindMapNodeKind.Subtheme);
 
             selector.index = subthemeIndex;
-            selector.selectorEvent.Invoke(subthemeIndex);
+            selector.onValueChanged.Invoke(subthemeIndex);
 
             Assert.That(
                 MindMapParentSelectionMenu.Instance.IsOpen(),
@@ -251,7 +251,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                     .IndexOf(MindMapNodeKind.Leaf);
 
             selector.index = leafIndex;
-            selector.selectorEvent.Invoke(leafIndex);
+            selector.onValueChanged.Invoke(leafIndex);
 
             Assert.That(
                 selector.index,
@@ -295,9 +295,9 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// Finds the return button manager of the currently instantiated menu.
         /// </summary>
         /// <returns>The return button manager.</returns>
-        private static ButtonManagerBasic FindReturnButton()
+        private static ButtonManager FindReturnButton()
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == "ReturnBtn")

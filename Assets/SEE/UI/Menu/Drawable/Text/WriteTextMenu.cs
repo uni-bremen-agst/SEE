@@ -1,7 +1,5 @@
 ﻿using SEE.Game.Drawable;
-using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Drawable;
-using SEE.UI.Menu.Drawable;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -76,7 +74,7 @@ namespace SEE.UI.Menu.Drawable.Text
 
             controls.ReturnButtonObject.SetActive(false);
 
-            controls.FontColorButtonManager.clickEvent.AddListener(() =>
+            controls.FontColorButtonManager.onClick.AddListener(() =>
             {
                 textStyleMenu.AssignColorArea(
                     color => ValueHolder.CurrentPrimaryColor = color,
@@ -108,7 +106,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         private void SetUpOutlineColorButton()
         {
-            controls.OutlineColorButtonManager.clickEvent.AddListener(() =>
+            controls.OutlineColorButtonManager.onClick.AddListener(() =>
             {
                 if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {

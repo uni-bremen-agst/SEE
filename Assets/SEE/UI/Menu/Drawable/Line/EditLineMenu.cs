@@ -299,8 +299,8 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.ReturnButtonObject.SetActive(true);
 
-            controls.ReturnButtonManager.clickEvent.RemoveAllListeners();
-            controls.ReturnButtonManager.clickEvent.AddListener(returnCall);
+            controls.ReturnButtonManager.onClick.RemoveAllListeners();
+            controls.ReturnButtonManager.onClick.AddListener(returnCall);
 
             controls.LayerSlider.interactable = false;
         }

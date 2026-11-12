@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.ReversibleActions.HolisticMetrics;
 using SEE.Graphs;
 using SEE.Game.City;
@@ -87,17 +87,37 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private void Awake()
         {
+            Canvas canvas = GetComponent<Canvas>();
+            if (canvas.worldCamera == null)
+            {
+                canvas.worldCamera = MainCamera.Camera;
+            }
+
             houseIcon = Resources.Load<Sprite>(houseIconPath);
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetsPath);
             metricTypes = Metric.GetTypes();
 
-            citySelection.dropdownEvent.AddListener(Redraw);
-            citySelection.dropdownEvent.AddListener(CitySelectionChanged);
+            citySelection.onValueChanged.AddListener(Redraw);
+            citySelection.onValueChanged.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
 
             graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
         }
 
+        /// <summary>
+        /// Keeps the dropdown state consistent with MUIP hiding its list on re-enable.
+        /// </summary>
+        private void OnDisable()
+        {
+            if (citySelection != null)
+            {
+                citySelection.isOn = false;
+                if (citySelection.triggerObject != null)
+                {
+                    citySelection.triggerObject.SetActive(false);
+                }
+            }
+        }
         /// <summary>
         /// Returns the title of this manager's metrics board.
         /// </summary>
@@ -237,7 +257,7 @@ namespace SEE.Game.HolisticMetrics
         {
             cities = FindObjectsOfType<SEECity>().Where(c => c?.LoadedGraph != null).ToArray();
             string oldSelection = citySelection.selectedText.text;
-            citySelection.dropdownItems.Clear();
+            citySelection.items.Clear();
             foreach (SEECity city in cities)
             {
                 citySelection.CreateNewItem(city.name, houseIcon);
@@ -247,8 +267,8 @@ namespace SEE.Game.HolisticMetrics
             // might change as soon as the player first clicks the dropdown to expand it.
             if (cities.Any(city => city.name.Equals(oldSelection)))
             {
-                citySelection.selectedItemIndex = citySelection.dropdownItems.IndexOf(
-                    citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
+                citySelection.selectedItemIndex = citySelection.items.IndexOf(
+                    citySelection.items.Find(item => item.itemName.Equals(oldSelection)));
             }
 
             citySelection.SetupDropdown();
@@ -354,7 +374,7 @@ namespace SEE.Game.HolisticMetrics
             // requester
             OnCitySelectionClick();
 
-            int indexInDropdown = citySelection.dropdownItems
+            int indexInDropdown = citySelection.items
                 .FindIndex(city => city.itemName.Equals(cityName));
             if (indexInDropdown == -1)  // The return value if it was not found
             {

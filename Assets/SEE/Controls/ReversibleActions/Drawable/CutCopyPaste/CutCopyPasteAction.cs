@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -239,16 +239,16 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         private void SetupButtons(GameObject menu)
         {
             Transform content = menu.transform.Find("Content");
-            ButtonManagerBasic cut = content.Find("Cut").GetComponent<ButtonManagerBasic>();
-            ButtonManagerBasic copy = content.Find("Copy").GetComponent<ButtonManagerBasic>();
+            ButtonManager cut = content.Find("Cut").GetComponent<ButtonManager>();
+            ButtonManager copy = content.Find("Copy").GetComponent<ButtonManager>();
 
-            cut.clickEvent.AddListener(() =>
+            cut.onClick.AddListener(() =>
             {
                 state = CutCopy.Cut;
                 ShowNotification.Info("Select position", "Choose a suitable position for pasting the cut object.", 2);
             });
 
-            copy.clickEvent.AddListener(() =>
+            copy.onClick.AddListener(() =>
             {
                 state = CutCopy.Copy;
                 ShowNotification.Info("Select position", "Choose a suitable position for pasting the copied object.", 2);

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.StickyNote;
@@ -152,11 +152,11 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="returnCall">The callback used to return to this edit menu.</param>
         private void InitializeRotation(GameObject stickyNote, UnityAction returnCall)
         {
-            ButtonManagerBasic rotationButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
+            ButtonManager rotationButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Rotation").GetComponent<ButtonManager>();
 
-            rotationButton.clickEvent.RemoveAllListeners();
-            rotationButton.clickEvent.AddListener(() =>
+            rotationButton.onClick.RemoveAllListeners();
+            rotationButton.onClick.AddListener(() =>
             {
                 Disable();
                 StickyNoteRotationMenu.Enable(stickyNote.GetRootParent(), null, returnCall);
@@ -171,11 +171,11 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="returnCall">The callback used to return to this edit menu.</param>
         private void InitializeScale(GameObject stickyNote, UnityAction returnCall)
         {
-            ButtonManagerBasic scaleButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Scale").GetComponent<ButtonManagerBasic>();
+            ButtonManager scaleButton = GameFinder.FindAttachedOrLocalDescendant(
+                gameObject, "Scale").GetComponent<ButtonManager>();
 
-            scaleButton.clickEvent.RemoveAllListeners();
-            scaleButton.clickEvent.AddListener(() =>
+            scaleButton.onClick.RemoveAllListeners();
+            scaleButton.onClick.AddListener(() =>
             {
                 Disable();
                 ScaleMenu.Instance.Enable(stickyNote, true, returnCall);

@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
@@ -144,6 +144,7 @@ namespace SEE.UI.Menu.Drawable.Line
             }
 
             segmentSelector.defaultIndex = 0;
+            segmentSelector.SetupSelector();
 
             foreach (LineCap lineCap in GetEditableLineCaps())
             {
@@ -151,6 +152,7 @@ namespace SEE.UI.Menu.Drawable.Line
             }
 
             lineCapSelector.defaultIndex = 0;
+            lineCapSelector.SetupSelector();
         }
 
         /// <summary>
@@ -371,7 +373,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
             }
 
             segmentAction = index =>
@@ -380,7 +382,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 action?.Invoke();
             };
 
-            segmentSelector.selectorEvent.AddListener(segmentAction);
+            segmentSelector.onValueChanged.AddListener(segmentAction);
         }
 
         /// <summary>
@@ -391,7 +393,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
             }
 
             lineCapAction = index =>
@@ -399,7 +401,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 action?.Invoke(GetEditableLineCaps()[index]);
             };
 
-            lineCapSelector.selectorEvent.AddListener(lineCapAction);
+            lineCapSelector.onValueChanged.AddListener(lineCapAction);
         }
 
         /// <summary>
@@ -409,13 +411,13 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (segmentAction != null)
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentSelector.onValueChanged.RemoveListener(segmentAction);
                 segmentAction = null;
             }
 
             if (lineCapAction != null)
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapSelector.onValueChanged.RemoveListener(lineCapAction);
                 lineCapAction = null;
             }
 

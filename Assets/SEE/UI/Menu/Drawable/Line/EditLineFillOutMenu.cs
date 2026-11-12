@@ -120,9 +120,9 @@ namespace SEE.UI.Menu.Drawable.Line
             string surfaceParentName,
             Action hideColorControls)
         {
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
+            controls.FillOutButtonManager.onClick.RemoveAllListeners();
 
-            controls.FillOutButtonManager.clickEvent.AddListener(() =>
+            controls.FillOutButtonManager.onClick.AddListener(() =>
             {
                 SelectFillOutType();
 
@@ -190,7 +190,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     true);
             });
 
-            controls.FillOutButtonManager.buttonVar.interactable = true;
+            controls.FillOutButtonManager.Interactable(true);
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             clearFillOutColorAction = clearFillOutAction;
 
-            if (controls.FillOutButtonManager.buttonVar.interactable)
+            if (controls.FillOutButtonManager.isInteractable)
             {
                 return;
             }
@@ -437,7 +437,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.FillOutManager.OffEvents.RemoveAllListeners();
             controls.FillOutManager.OnEvents.RemoveAllListeners();
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
+            controls.FillOutButtonManager.onClick.RemoveAllListeners();
 
             clearFillOutColorAction = null;
         }
@@ -447,8 +447,8 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SelectFillOutType()
         {
-            controls.ColorKindButtonManager.buttonVar.interactable = true;
-            controls.FillOutButtonManager.buttonVar.interactable = false;
+            controls.ColorKindButtonManager.Interactable(true);
+            controls.FillOutButtonManager.Interactable(false);
         }
 
         /// <summary>

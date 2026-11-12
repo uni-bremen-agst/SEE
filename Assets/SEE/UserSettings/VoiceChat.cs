@@ -12,6 +12,7 @@ namespace SEE.UserSettings
     {
         None = 0,       // no voice chat
         Dissonance = 1, // Dissonance voice chat
+        LiveKit = 2,    // LiveKit voice chat
     }
 
     [Serializable]
@@ -29,6 +30,9 @@ namespace SEE.UserSettings
                     EnableDissonance(true);
                     break;
                 case VoiceChatSystems.None:
+                    EnableDissonance(false);
+                    break;
+                case VoiceChatSystems.LiveKit:
                     EnableDissonance(false);
                     break;
                 default:
@@ -50,6 +54,9 @@ namespace SEE.UserSettings
                     break;
                 case VoiceChatSystems.Dissonance:
                     // nothing to be done
+                    break;
+                case VoiceChatSystems.LiveKit:
+                    // Nothing to do here
                     break;
                 default:
                     throw new NotImplementedException($"Unhanded voice chat option {voiceChatSystem}.");

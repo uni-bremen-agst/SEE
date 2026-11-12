@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ namespace SEE.UI.Menu.Drawable
         {
             ImageSourceMenu.Instance.Enable();
 
-            FindButton("Local").clickEvent.Invoke();
+            FindButton("Local").onClick.Invoke();
 
             Assert.That(
                 ImageSourceMenu.Instance.TryGetSource(
@@ -45,7 +45,7 @@ namespace SEE.UI.Menu.Drawable
         {
             ImageSourceMenu.Instance.Enable();
 
-            FindButton("Web").clickEvent.Invoke();
+            FindButton("Web").onClick.Invoke();
 
             Assert.That(
                 ImageSourceMenu.Instance.TryGetSource(
@@ -62,7 +62,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestSourceCanOnlyBeConsumedOnce()
         {
             ImageSourceMenu.Instance.Enable();
-            FindButton("Local").clickEvent.Invoke();
+            FindButton("Local").onClick.Invoke();
 
             Assert.That(
                 ImageSourceMenu.Instance.TryGetSource(out _),
@@ -83,7 +83,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestDestroyDiscardsPendingSource()
         {
             ImageSourceMenu.Instance.Enable();
-            FindButton("Web").clickEvent.Invoke();
+            FindButton("Web").onClick.Invoke();
 
             ImageSourceMenu.Instance.Destroy();
 
@@ -103,7 +103,7 @@ namespace SEE.UI.Menu.Drawable
         {
             ImageSourceMenu.Instance.Enable();
 
-            FindButton("Cancel").clickEvent.Invoke();
+            FindButton("Cancel").onClick.Invoke();
 
             Assert.That(
                 ImageSourceMenu.Instance.TryGetSource(
@@ -120,7 +120,7 @@ namespace SEE.UI.Menu.Drawable
         public void TestReopeningStartsWithoutPreviousSelection()
         {
             ImageSourceMenu.Instance.Enable();
-            FindButton("Local").clickEvent.Invoke();
+            FindButton("Local").onClick.Invoke();
 
             ImageSourceMenu.Instance.Destroy();
             ImageSourceMenu.Instance.Enable();
@@ -138,10 +138,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The button name.</param>
         /// <returns>The matching button manager.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate
-                     in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate
+                     in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
             {

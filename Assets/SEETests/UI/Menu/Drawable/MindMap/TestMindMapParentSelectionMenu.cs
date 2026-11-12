@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -104,7 +104,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == leaf.name), Is.False);
+            Assert.That(selector.items.Exists(item => item.itemTitle == leaf.name), Is.False);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == addedNode.name), Is.False);
+            Assert.That(selector.items.Exists(item => item.itemTitle == addedNode.name), Is.False);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == firstParent.name), Is.False);
+            Assert.That(selector.items.Exists(item => item.itemTitle == firstParent.name), Is.False);
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == firstParent.name), Is.False);
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == secondParent.name), Is.True);
+            Assert.That(selector.items.Exists(item => item.itemTitle == firstParent.name), Is.False);
+            Assert.That(selector.items.Exists(item => item.itemTitle == secondParent.name), Is.True);
         }
 
         /// <summary>
@@ -177,8 +177,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             HorizontalSelector selector = FindParentSelector();
 
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == descendant.name), Is.False);
-            Assert.That(selector.itemList.Exists(item => item.itemTitle == firstParent.name), Is.True);
+            Assert.That(selector.items.Exists(item => item.itemTitle == descendant.name), Is.False);
+            Assert.That(selector.items.Exists(item => item.itemTitle == firstParent.name), Is.True);
         }
 
         /// <summary>
@@ -195,8 +195,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             Assert.That(MindMapParentSelectionMenu.GetChosenParent(), Is.SameAs(secondParent));
 
-            ButtonManagerBasic finish = FindFinishButton();
-            finish.clickEvent.Invoke();
+            ButtonManager finish = FindFinishButton();
+            finish.onClick.Invoke();
 
             bool hasParent = MindMapParentSelectionMenu.TryGetParent(out GameObject parent);
 
@@ -212,8 +212,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             MindMapParentSelectionMenu.Enable(attachedObjects, addedNode);
 
-            ButtonManagerBasic finish = FindFinishButton();
-            finish.clickEvent.Invoke();
+            ButtonManager finish = FindFinishButton();
+            finish.onClick.Invoke();
 
             bool firstResult = MindMapParentSelectionMenu.TryGetParent(out GameObject firstResultParent);
             bool secondResult = MindMapParentSelectionMenu.TryGetParent(out GameObject secondResultParent);
@@ -235,7 +235,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             MindMapParentSelectionMenu.EnableForEditing(
                 attachedObjects, addedNode, configuration, () => { });
 
-            ButtonManagerBasic finish = FindFinishButton();
+            ButtonManager finish = FindFinishButton();
 
             Assert.That(finish.gameObject.activeSelf, Is.False);
         }
@@ -252,11 +252,11 @@ namespace SEE.UI.Menu.Drawable.MindMap
             MindMapParentSelectionMenu.EnableForEditing(
                 attachedObjects, addedNode, configuration, () => { }, true);
 
-            ButtonManagerBasic finish = FindFinishButton();
+            ButtonManager finish = FindFinishButton();
 
             Assert.That(finish.gameObject.activeSelf, Is.True);
 
-            finish.clickEvent.Invoke();
+            finish.onClick.Invoke();
 
             bool hasParent = MindMapParentSelectionMenu.TryGetParent(out GameObject parent);
 
@@ -286,7 +286,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             Assert.That(confirmedParent, Is.Null);
 
             /// Only Finish confirms the selected candidate.
-            FindFinishButton().clickEvent.Invoke();
+            FindFinishButton().onClick.Invoke();
 
             Assert.That(confirmedParent, Is.SameAs(secondParent));
 
@@ -318,9 +318,9 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// Finds the finish button manager of the currently instantiated parent selection menu.
         /// </summary>
         /// <returns>The finish button manager.</returns>
-        private static ButtonManagerBasic FindFinishButton()
+        private static ButtonManager FindFinishButton()
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == "Finish")
@@ -341,7 +341,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         private static void SelectItem(HorizontalSelector selector, int index)
         {
             selector.index = index;
-            selector.selectorEvent.Invoke(index);
+            selector.onValueChanged.Invoke(index);
         }
 
         /// <summary>

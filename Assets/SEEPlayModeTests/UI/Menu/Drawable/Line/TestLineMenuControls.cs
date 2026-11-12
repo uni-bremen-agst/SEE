@@ -4,6 +4,7 @@ using SEE.Utils;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -134,22 +135,22 @@ namespace SEE.UI.Menu.Drawable.Line
 
             Assert.That(controls.PrimaryColorButtonManager, Is.Not.Null);
             Assert.That(
-                controls.PrimaryColorButtonManager.buttonVar,
+                controls.PrimaryColorButtonManager.GetComponent<Button>(),
                 Is.Not.Null);
 
             Assert.That(controls.SecondaryColorButtonManager, Is.Not.Null);
             Assert.That(
-                controls.SecondaryColorButtonManager.buttonVar,
+                controls.SecondaryColorButtonManager.GetComponent<Button>(),
                 Is.Not.Null);
 
             Assert.That(controls.ColorKindButtonManager, Is.Not.Null);
             Assert.That(
-                controls.ColorKindButtonManager.buttonVar,
+                controls.ColorKindButtonManager.GetComponent<Button>(),
                 Is.Not.Null);
 
             Assert.That(controls.FillOutButtonManager, Is.Not.Null);
             Assert.That(
-                controls.FillOutButtonManager.buttonVar,
+                controls.FillOutButtonManager.GetComponent<Button>(),
                 Is.Not.Null);
 
             Assert.That(controls.FillOutObject, Is.Not.Null);

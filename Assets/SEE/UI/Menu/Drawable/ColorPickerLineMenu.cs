@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -310,11 +310,11 @@ namespace SEE.UI.Menu.Drawable
         private void ConfigureButton(string name, string label, Color color, bool enabled, UnityAction action)
         {
             GameObject buttonObject = GameFinder.FindAttachedOrLocalDescendant(gameObject, name);
-            ButtonManagerBasic manager = buttonObject.GetComponent<ButtonManagerBasic>();
+            ButtonManager manager = buttonObject.GetComponent<ButtonManager>();
             Button button = buttonObject.GetComponent<Button>();
             TextMeshProUGUI text = buttonObject.GetComponentInChildren<TextMeshProUGUI>();
 
-            manager.clickEvent.RemoveAllListeners();
+            manager.onClick.RemoveAllListeners();
             manager.buttonText = label;
             manager.enabled = enabled;
             button.interactable = enabled;
@@ -329,7 +329,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (enabled && action != null)
             {
-                manager.clickEvent.AddListener(action);
+                manager.onClick.AddListener(action);
             }
         }
 

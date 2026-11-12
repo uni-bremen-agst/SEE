@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using System.Linq;

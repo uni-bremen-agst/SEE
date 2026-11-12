@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine.Events;
@@ -48,21 +48,21 @@ namespace SEE.UI.Menu.Drawable
         {
             Instantiate(loadMenuPrefab);
 
-            ButtonManagerBasic loadButton =
+            ButtonManager loadButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Load")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            ButtonManagerBasic loadSpecificButton =
+            ButtonManager loadSpecificButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecific")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            ButtonManagerBasic loadSpecificCurrentPageButton =
+            ButtonManager loadSpecificCurrentPageButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecificCurrentPage")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            loadButton.clickEvent.AddListener(loadButtonCall);
-            loadSpecificButton.clickEvent.AddListener(loadSpecificButtonCall);
-            loadSpecificCurrentPageButton.clickEvent.AddListener(
+            loadButton.onClick.AddListener(loadButtonCall);
+            loadSpecificButton.onClick.AddListener(loadSpecificButtonCall);
+            loadSpecificCurrentPageButton.onClick.AddListener(
                 loadSpecificCurrentPageButtonCall);
         }
     }

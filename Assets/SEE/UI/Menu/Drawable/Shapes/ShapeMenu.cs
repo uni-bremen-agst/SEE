@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
@@ -393,7 +393,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
             infoVisibility = false;
 
-            controls.InfoButtonManager.clickEvent.AddListener(ToggleInfo);
+            controls.InfoButtonManager.onClick.AddListener(ToggleInfo);
 
             controls.PartUndoObject
                 .AddComponent<UIHoverTooltip>()
@@ -401,7 +401,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
             controls.PartUndoObject.SetActive(false);
 
-            controls.DraggerInfoButtonManager.clickEvent.AddListener(() =>
+            controls.DraggerInfoButtonManager.onClick.AddListener(() =>
             {
                 if (state.SelectedShape == Shape.Line)
                 {
@@ -443,12 +443,13 @@ namespace SEE.UI.Menu.Drawable.Shapes
                 selector.CreateNewItem(value.ToString());
             }
 
-            selector.selectorEvent.AddListener(index =>
+            selector.onValueChanged.AddListener(index =>
             {
                 onSelected(values[index]);
             });
 
             selector.defaultIndex = 0;
+            selector.SetupSelector();
         }
 
         /// <summary>
@@ -512,8 +513,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
         public static void ActivatePartUndo(UnityAction action)
         {
             controls.PartUndoObject.SetActive(true);
-            controls.PartUndoButtonManager.clickEvent.RemoveAllListeners();
-            controls.PartUndoButtonManager.clickEvent.AddListener(action);
+            controls.PartUndoButtonManager.onClick.RemoveAllListeners();
+            controls.PartUndoButtonManager.onClick.AddListener(action);
         }
 
         /// <summary>
@@ -631,11 +632,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
         public static void AssignFinishButton(UnityAction action)
         {
             controls.FinishButtonManager
-                .clickEvent
+                .onClick
                 .RemoveAllListeners();
 
             controls.FinishButtonManager
-                .clickEvent
+                .onClick
                 .AddListener(action);
         }
         #endregion

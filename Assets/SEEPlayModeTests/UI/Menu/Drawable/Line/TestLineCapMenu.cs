@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -363,7 +363,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SelectSegment(int index)
         {
             segmentSelector.index = index;
-            segmentSelector.selectorEvent.Invoke(index);
+            segmentSelector.onValueChanged.Invoke(index);
         }
 
         /// <summary>

@@ -1,19 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using HSVPicker;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using MoreLinq;
-using SEE.Graphs;
-using SEE.Game;
-using SEE.Game.City;
-using SEE.SceneManipulation;
-using SEE.Extensions;
-using SEE.GraphProviders;
-using SEE.Net.Actions.RuntimeConfig;
-using SEE.UI.Menu;
-using SEE.UI.Notification;
-using SEE.UI.PropertyDialog;
-using SEE.Utils;
-using SEE.Utils.Paths;
 using SimpleFileBrowser;
 using Sirenix.OdinInspector;
 using System;
@@ -26,8 +14,23 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.GraphProviders;
+using SEE.Graphs;
 using SEE.Graphs.Config;
+using SEE.Net.Actions.RuntimeConfig;
+using SEE.SceneManipulation;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
+using SEE.Utils;
+using SEE.Utils.Paths;
 
+/// <summary>
+/// Runtime configuration menus for code cities.
+/// </summary>
 namespace SEE.UI.RuntimeConfigMenu
 {
     /// <summary>
@@ -343,12 +346,12 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupCitySwitcher()
         {
             // init the list
-            citySwitcher.itemList.Clear();
+            citySwitcher.items.Clear();
             citySwitcher.defaultIndex = CityIndex;
             RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
             citySwitcher.SetupSelector();
 
-            citySwitcher.selectorEvent.AddListener(index =>
+            citySwitcher.onValueChanged.AddListener(index =>
             {
                 OnSwitchCity?.Invoke(index);
                 citySwitcher.index = CityIndex;
@@ -361,12 +364,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void UpdateCitySwitcher()
         {
-            citySwitcher.itemList.Clear();
+            citySwitcher.items.Clear();
             citySwitcher.defaultIndex = CityIndex;
             RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
-            citySwitcher.selectorEvent.RemoveAllListeners();
+            citySwitcher.onValueChanged.RemoveAllListeners();
             citySwitcher.SetupSelector();
-            citySwitcher.selectorEvent.AddListener(index =>
+            citySwitcher.onValueChanged.AddListener(index =>
             {
                 OnSwitchCity?.Invoke(index);
                 citySwitcher.index = CityIndex;
@@ -405,23 +408,23 @@ namespace SEE.UI.RuntimeConfigMenu
             // creates the button
             GameObject button = PrefabInstantiator.InstantiatePrefab(buttonPrefab, configButtonList.transform, false);
             button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
-            ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
-            buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
+            ButtonManager buttonManager = button.GetComponent<ButtonManager>();
+            buttonManager.SetText(methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label);
 
             // add button listeners
             if (IsLoadMethod(methodInfo))
             {
-                buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
+                buttonManager.onClick.AddListener(() => ExecuteLoadAsync().Forget());
             }
             else
             {
-                buttonManager.clickEvent.AddListener(() =>
+                buttonManager.onClick.AddListener(() =>
                 {
                     // calls the method and updates the menu
                     methodInfo.Invoke(city, null);
                     OnUpdateMenuValues?.Invoke();
                 });
-                buttonManager.clickEvent.AddListener(() =>
+                buttonManager.onClick.AddListener(() =>
                 {
                     UpdateCityMethodNetAction netAction = new()
                     {
@@ -430,8 +433,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     };
                     netAction.Execute();
                 });
-                buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
-                buttonManager.clickEvent.AddListener(() => RestorePreviousScrollPosition());
+                buttonManager.onClick.AddListener(() => CheckControlConditionsWithDelay());
+                buttonManager.onClick.AddListener(() => RestorePreviousScrollPosition());
             }
 
             // add network listener
@@ -1026,6 +1029,11 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     continue;
                 }
+                if (comp is ButtonManager buttonManager)
+                {
+                    buttonManager.Interactable(interactable);
+                    continue;
+                }
                 Type type = comp.GetType();
 
                 // Check property
@@ -1161,8 +1169,8 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
                 removeBtnTransform.gameObject.SetActive(true);
-                ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
-                removeBtn.clickEvent.AddListener(() =>
+                ButtonManager removeBtn = removeBtnTransform.GetComponent<ButtonManager>();
+                removeBtn.onClick.AddListener(() =>
                 {
                     RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
                 });
@@ -1177,8 +1185,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="dict">The dictionary.</param>
         private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
         {
-            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
-            addBtn.clickEvent.AddListener(() =>
+            ButtonManager addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManager>();
+            addBtn.onClick.AddListener(() =>
             {
                 Type keyType = GetType(true);
                 if (keyType != typeof(string))
@@ -1824,15 +1832,13 @@ namespace SEE.UI.RuntimeConfigMenu
             getWidgetName ??= () => dropDownGameObject.FullName();
 
             // dropdown settings
-            dropdown.isListItem = true;
-            dropdown.listParent = !recursive ? Menu.transform : Canvas.transform;
             dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
-            valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
+            valueArray.ForEach(s => dropdown.items.Add(new() { itemName = s }));
             dropdown.SetupDropdown();
 
             // add listeners
-            dropdown.dropdownEvent.AddListener(setter);
-            dropdown.dropdownEvent.AddListener(changedValue =>
+            dropdown.onValueChanged.AddListener(setter);
+            dropdown.onValueChanged.AddListener(changedValue =>
             {
                 UpdateCityAttributeNetAction<int> action = new()
                 {
@@ -1843,8 +1849,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 action.Execute();
             });
 
-            dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
-            dropdown.dropdownEvent.AddListener(_ => CheckControlConditions());
+            dropdown.onValueChanged.AddListener(_ => CheckImmediateRedraw());
+            dropdown.onValueChanged.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 
@@ -2119,19 +2125,19 @@ namespace SEE.UI.RuntimeConfigMenu
             GameObject addButton =
                 PrefabInstantiator.InstantiatePrefab(addElementButtonPrefab, buttonContainer.transform);
             addButton.name = "AddElementButton";
-            ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
+            ButtonManager addButtonManager = addButton.GetComponent<ButtonManager>();
 
             GameObject removeButton =
                 PrefabInstantiator.InstantiatePrefab(removeElementButtonPrefab, buttonContainer.transform);
             removeButton.name = "RemoveElementButton";
-            ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
+            ButtonManager removeButtonManager = removeButton.GetComponent<ButtonManager>();
 
             // list settings
             UpdateListChildren(list, parent);
             buttonContainer.transform.SetAsLastSibling();
 
             // AddButton listener adding a new instance at the end of the list
-            addButtonManager.clickEvent.AddListener(() =>
+            addButtonManager.onClick.AddListener(() =>
             {
                 list.Add(newT());
                 UpdateListChildren(list, parent);
@@ -2145,7 +2151,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             // RemoveButton listener removing the last element in the list
-            removeButtonManager.clickEvent.AddListener(() =>
+            removeButtonManager.onClick.AddListener(() =>
             {
                 if (list.Count == 0)
                 {

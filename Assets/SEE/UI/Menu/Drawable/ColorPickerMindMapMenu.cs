@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
@@ -103,8 +103,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfBorderButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic border = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Border").GetComponent<ButtonManagerBasic>();
-            border.clickEvent.AddListener(() =>
+            ButtonManager border = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Border").GetComponent<ButtonManager>();
+            border.onClick.AddListener(() =>
             {
                 chosenColor = GetLineColor(conf.BorderConf, primaryColor);
                 gotColor = true;
@@ -120,8 +120,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfTextButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic text = GameFinder.FindAttachedOrLocalDescendant(gameObject, "NodeText").GetComponent<ButtonManagerBasic>();
-            text.clickEvent.AddListener(() =>
+            ButtonManager text = GameFinder.FindAttachedOrLocalDescendant(gameObject, "NodeText").GetComponent<ButtonManager>();
+            text.onClick.AddListener(() =>
             {
                 chosenColor = primaryColor ? conf.TextConf.FontColor : conf.TextConf.OutlineColor;
                 gotColor = true;
@@ -141,8 +141,8 @@ namespace SEE.UI.Menu.Drawable
             /// Checks if the node has a parent. If not, this area will be disabled.
             if (conf.BranchLineToParent != "")
             {
-                ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
-                branchButton.clickEvent.AddListener(() =>
+                ButtonManager branchButton = branchLineButtonArea.GetComponent<ButtonManager>();
+                branchButton.onClick.AddListener(() =>
                 {
                     chosenColor = GetLineColor(conf.BranchLineConf, primaryColor);
                     gotColor = true;
@@ -152,7 +152,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If the node has no parent, there is consequently no branch line to the parent.
                 /// Therefore, in this case, the button will be disabled.
-                branchLineButtonArea.GetComponent<ButtonManagerBasic>().enabled = false;
+                branchLineButtonArea.GetComponent<ButtonManager>().Interactable(false);
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
         }

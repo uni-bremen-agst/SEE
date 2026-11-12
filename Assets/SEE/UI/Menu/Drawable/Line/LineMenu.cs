@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
 using SEE.UI.Drawable;
@@ -146,18 +146,18 @@ namespace SEE.UI.Menu.Drawable.Line
             /// Initializes and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
-            Instance.controls.PrimaryColorButtonManager.clickEvent.AddListener(
+            Instance.controls.PrimaryColorButtonManager.onClick.AddListener(
                 Instance.MutuallyExclusiveColorButtons);
-            Instance.controls.PrimaryColorButtonManager.buttonVar.interactable = false;
+            Instance.controls.PrimaryColorButtonManager.Interactable(false);
 
-            Instance.controls.SecondaryColorButtonManager.clickEvent.AddListener(
+            Instance.controls.SecondaryColorButtonManager.onClick.AddListener(
                 Instance.MutuallyExclusiveColorButtons);
 
-            Instance.controls.ColorKindButtonManager.clickEvent.AddListener(
+            Instance.controls.ColorKindButtonManager.onClick.AddListener(
                 Instance.MutuallyExclusiveColorTypeButtons);
-            Instance.controls.ColorKindButtonManager.buttonVar.interactable = false;
+            Instance.controls.ColorKindButtonManager.Interactable(false);
 
-            Instance.controls.FillOutButtonManager.clickEvent.AddListener(
+            Instance.controls.FillOutButtonManager.onClick.AddListener(
                 Instance.MutuallyExclusiveColorTypeButtons);
 
             Instance.mode = Mode.None;
@@ -177,7 +177,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 selector.CreateNewItem(kind.ToString());
             }
 
-            selector.selectorEvent.AddListener(index =>
+            selector.onValueChanged.AddListener(index =>
             {
                 if (GameLineAppearance.GetLineKinds()[index] == LineKind.Dashed)
                 {
@@ -203,6 +203,7 @@ namespace SEE.UI.Menu.Drawable.Line
             });
 
             selector.defaultIndex = 0;
+            selector.SetupSelector();
         }
 
         /// <summary>
@@ -217,7 +218,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 selector.CreateNewItem(kind.ToString());
             }
 
-            selector.selectorEvent.AddListener(index =>
+            selector.onValueChanged.AddListener(index =>
             {
                 bool isDashed = selectedLineKind != LineKind.Solid;
                 ColorKind newColorKind = GameLineAppearance.GetColorKinds(true)[index];
@@ -241,6 +242,7 @@ namespace SEE.UI.Menu.Drawable.Line
             });
 
             selector.defaultIndex = 0;
+            selector.SetupSelector();
         }
         #endregion
         #region IsOpen
@@ -625,11 +627,11 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorButtons()
         {
-            controls.PrimaryColorButtonManager.buttonVar.interactable =
-                !controls.PrimaryColorButtonManager.buttonVar.IsInteractable();
+            controls.PrimaryColorButtonManager.Interactable(
+                !controls.PrimaryColorButtonManager.isInteractable);
 
-            controls.SecondaryColorButtonManager.buttonVar.interactable =
-                !controls.SecondaryColorButtonManager.buttonVar.IsInteractable();
+            controls.SecondaryColorButtonManager.Interactable(
+                !controls.SecondaryColorButtonManager.isInteractable);
         }
 
         /// <summary>
@@ -638,11 +640,11 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorTypeButtons()
         {
-            controls.ColorKindButtonManager.buttonVar.interactable =
-                !controls.ColorKindButtonManager.buttonVar.IsInteractable();
+            controls.ColorKindButtonManager.Interactable(
+                !controls.ColorKindButtonManager.isInteractable);
 
-            controls.FillOutButtonManager.buttonVar.interactable =
-                !controls.FillOutButtonManager.buttonVar.IsInteractable();
+            controls.FillOutButtonManager.Interactable(
+                !controls.FillOutButtonManager.isInteractable);
         }
         #endregion
 

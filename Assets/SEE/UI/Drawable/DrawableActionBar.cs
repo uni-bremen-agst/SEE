@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.ReversibleActions;
 using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game;
@@ -99,8 +99,8 @@ namespace SEE.UI.Drawable
         private void InitToggler()
         {
             GameObject toggle = GameFinder.FindAttachedOrLocalDescendant(togglerInstance, "Toggle");
-            ButtonManagerBasic toggleBMB = toggle.GetComponent<ButtonManagerBasic>();
-            toggleBMB.clickEvent.AddListener(() =>
+            ButtonManager toggleBMB = toggle.GetComponent<ButtonManager>();
+            toggleBMB.onClick.AddListener(() =>
             {
                 if (!toggles)
                 {
@@ -130,7 +130,7 @@ namespace SEE.UI.Drawable
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             GameObject drawFreehand = GameFinder.FindAttachedOrLocalDescendant(barInstance, "DrawFreehand");
             drawFreehand.AddComponent<UIHoverTooltip>().SetMessage("Draw Freehand");
-            drawFreehand.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            drawFreehand.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawFreehand);
                 menu.UpdateActiveEntry();
@@ -138,7 +138,7 @@ namespace SEE.UI.Drawable
 
             GameObject drawShape = GameFinder.FindAttachedOrLocalDescendant(barInstance, "DrawShape");
             drawShape.AddComponent<UIHoverTooltip>().SetMessage("Draw Shape");
-            drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            drawShape.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawShapes);
                 menu.UpdateActiveEntry();
@@ -146,7 +146,7 @@ namespace SEE.UI.Drawable
 
             GameObject writeText = GameFinder.FindAttachedOrLocalDescendant(barInstance, "WriteText");
             writeText.AddComponent<UIHoverTooltip>().SetMessage("Write Text");
-            writeText.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            writeText.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.WriteText);
                 menu.UpdateActiveEntry();
@@ -154,7 +154,7 @@ namespace SEE.UI.Drawable
 
             GameObject addImage = GameFinder.FindAttachedOrLocalDescendant(barInstance, "AddImage");
             addImage.AddComponent<UIHoverTooltip>().SetMessage("Add An Image");
-            addImage.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            addImage.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.AddImage);
                 menu.UpdateActiveEntry();
@@ -162,7 +162,7 @@ namespace SEE.UI.Drawable
 
             GameObject mindMap = GameFinder.FindAttachedOrLocalDescendant(barInstance, "MindMap");
             mindMap.AddComponent<UIHoverTooltip>().SetMessage("Create Mind Map");
-            mindMap.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            mindMap.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MindMap);
                 menu.UpdateActiveEntry();
@@ -170,7 +170,7 @@ namespace SEE.UI.Drawable
 
             GameObject colorPicker = GameFinder.FindAttachedOrLocalDescendant(barInstance, "ColorPicker");
             colorPicker.AddComponent<UIHoverTooltip>().SetMessage("Color Picker");
-            colorPicker.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            colorPicker.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.ColorPicker);
                 menu.UpdateActiveEntry();
@@ -178,7 +178,7 @@ namespace SEE.UI.Drawable
 
             GameObject edit = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Edit");
             edit.AddComponent<UIHoverTooltip>().SetMessage("Edit");
-            edit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            edit.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Edit);
                 menu.UpdateActiveEntry();
@@ -186,7 +186,7 @@ namespace SEE.UI.Drawable
 
             GameObject moveRotator = GameFinder.FindAttachedOrLocalDescendant(barInstance, "MoveRotator");
             moveRotator.AddComponent<UIHoverTooltip>().SetMessage("Move Or Rotate");
-            moveRotator.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            moveRotator.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MoveRotator);
                 menu.UpdateActiveEntry();
@@ -194,7 +194,7 @@ namespace SEE.UI.Drawable
 
             GameObject scale = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Scale");
             scale.AddComponent<UIHoverTooltip>().SetMessage("Scale");
-            scale.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            scale.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Scale);
                 menu.UpdateActiveEntry();
@@ -202,7 +202,7 @@ namespace SEE.UI.Drawable
 
             GameObject layerChanger = GameFinder.FindAttachedOrLocalDescendant(barInstance, "LayerChanger");
             layerChanger.AddComponent<UIHoverTooltip>().SetMessage("Change The Sorting Layer.");
-            layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            layerChanger.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
                 menu.UpdateActiveEntry();
@@ -210,7 +210,7 @@ namespace SEE.UI.Drawable
 
             GameObject cutCopyPaste = GameFinder.FindAttachedOrLocalDescendant(barInstance, "CutCopyPaste");
             cutCopyPaste.AddComponent<UIHoverTooltip>().SetMessage("Cut, Copy, Paste");
-            cutCopyPaste.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            cutCopyPaste.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.CutCopyPaste);
                 menu.UpdateActiveEntry();
@@ -218,7 +218,7 @@ namespace SEE.UI.Drawable
 
             GameObject movePoint = GameFinder.FindAttachedOrLocalDescendant(barInstance, "MovePoint");
             movePoint.AddComponent<UIHoverTooltip>().SetMessage("Move a Point");
-            movePoint.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            movePoint.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MovePoint);
                 menu.UpdateActiveEntry();
@@ -226,7 +226,7 @@ namespace SEE.UI.Drawable
 
             GameObject lineSplit = GameFinder.FindAttachedOrLocalDescendant(barInstance, "LineSplit");
             lineSplit.AddComponent<UIHoverTooltip>().SetMessage("Line Split");
-            lineSplit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            lineSplit.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineSplit);
                 menu.UpdateActiveEntry();
@@ -234,7 +234,7 @@ namespace SEE.UI.Drawable
 
             GameObject save = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Save");
             save.AddComponent<UIHoverTooltip>().SetMessage("Save");
-            save.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            save.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Save);
                 menu.UpdateActiveEntry();
@@ -242,7 +242,7 @@ namespace SEE.UI.Drawable
 
             GameObject load = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Load");
             load.AddComponent<UIHoverTooltip>().SetMessage("Load");
-            load.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            load.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Load);
                 menu.UpdateActiveEntry();
@@ -250,7 +250,7 @@ namespace SEE.UI.Drawable
 
             GameObject linePointErase = GameFinder.FindAttachedOrLocalDescendant(barInstance, "LinePointErase");
             linePointErase.AddComponent<UIHoverTooltip>().SetMessage("Line Point Erase");
-            linePointErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            linePointErase.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LinePointErase);
                 menu.UpdateActiveEntry();
@@ -258,7 +258,7 @@ namespace SEE.UI.Drawable
 
             GameObject lineConnectionErase = GameFinder.FindAttachedOrLocalDescendant(barInstance, "LineConnectionErase");
             lineConnectionErase.AddComponent<UIHoverTooltip>().SetMessage("Line Connection Erase");
-            lineConnectionErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            lineConnectionErase.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineConnectionErase);
                 menu.UpdateActiveEntry();
@@ -266,7 +266,7 @@ namespace SEE.UI.Drawable
 
             GameObject erase = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Erase");
             erase.AddComponent<UIHoverTooltip>().SetMessage("Erase");
-            erase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            erase.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Erase);
                 menu.UpdateActiveEntry();
@@ -274,7 +274,7 @@ namespace SEE.UI.Drawable
 
             GameObject cleaner = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Clear");
             cleaner.AddComponent<UIHoverTooltip>().SetMessage("Clear");
-            cleaner.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            cleaner.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Clear);
                 menu.UpdateActiveEntry();
@@ -282,7 +282,7 @@ namespace SEE.UI.Drawable
 
             GameObject stickyNote = GameFinder.FindAttachedOrLocalDescendant(barInstance, "StickyNote");
             stickyNote.AddComponent<UIHoverTooltip>().SetMessage("Sticky Note");
-            stickyNote.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            stickyNote.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.StickyNote);
                 menu.UpdateActiveEntry();
@@ -290,7 +290,7 @@ namespace SEE.UI.Drawable
 
             GameObject manager = GameFinder.FindAttachedOrLocalDescendant(barInstance, "Manager");
             manager.AddComponent<UIHoverTooltip>().SetMessage("Drawable Surface Manager");
-            manager.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            manager.GetComponent<ButtonManager>().onClick.AddListener(() =>
             {
                 LocalPlayer.Instance.GetComponentInChildren<ShowDrawableManager>().Toggle();
             }

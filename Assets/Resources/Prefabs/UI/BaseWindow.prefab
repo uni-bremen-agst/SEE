@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 3234119393681621959}
   - component: {fileID: 1896868295312918780}
   - component: {fileID: 7574915619905740904}
+  - component: {fileID: 9165615014469686546}
   m_Layer: 5
   m_Name: LaunchConfigButton
   m_TagString: Untagged
@@ -222,19 +223,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 827323873744743279}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF135"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 337716356843864605}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 6861539207992936200}
@@ -251,6 +251,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 50
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &7574915619905740904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,6 +738,7 @@ GameObject:
   - component: {fileID: 4817834187763508169}
   - component: {fileID: 2071728101195948408}
   - component: {fileID: 1065186037043223758}
+  - component: {fileID: 9165615014469686547}
   m_Layer: 5
   m_Name: RunButton
   m_TagString: Untagged
@@ -850,19 +858,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 3902494223798037918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF04B"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 23821745296567609}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 3229100235764461913}
@@ -879,6 +886,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 50
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &1065186037043223758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -905,6 +919,7 @@ GameObject:
   - component: {fileID: 4855234656506648199}
   - component: {fileID: 3231865460557730369}
   - component: {fileID: 3160538397828206015}
+  - component: {fileID: 9165615014469686548}
   m_Layer: 5
   m_Name: IDEButton
   m_TagString: Untagged
@@ -1024,19 +1039,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 4406374932750852001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF044"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 5776645084074061690}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 8825136254822643659}
@@ -1053,6 +1067,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 50
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &3160538397828206015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1079,6 +1100,7 @@ GameObject:
   - component: {fileID: 5421570892701183412}
   - component: {fileID: 5721575760286308168}
   - component: {fileID: 6491357672771426578}
+  - component: {fileID: 9165615014469686549}
   m_Layer: 5
   m_Name: ShareButton
   m_TagString: Untagged
@@ -1198,19 +1220,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 4828754170683687782}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF1E0"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 8737252819247059228}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 42488130501405176}
@@ -1227,6 +1248,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 50
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &6491357672771426578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1391,6 +1419,7 @@ GameObject:
   - component: {fileID: 6141444049811484579}
   - component: {fileID: 8681837824454532490}
   - component: {fileID: 5912617384673330217}
+  - component: {fileID: 9165615014469686550}
   m_Layer: 5
   m_Name: DebugAdapterConfigButton
   m_TagString: Untagged
@@ -1510,19 +1539,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 5175672963081718960}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF188"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 9094629550335831883}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 1833647092193919001}
@@ -1539,6 +1567,13 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 50
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &5912617384673330217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2675,3 +2710,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &9165615014469686546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827323873744743279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9165615014469686547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3902494223798037918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9165615014469686548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4406374932750852001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9165615014469686549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4828754170683687782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &9165615014469686550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5175672963081718960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

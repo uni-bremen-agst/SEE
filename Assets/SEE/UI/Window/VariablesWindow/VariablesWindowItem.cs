@@ -4,7 +4,7 @@ using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
 using SEE.Extensions;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using System.Linq;
 using System;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;

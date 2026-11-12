@@ -1,7 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
-using SEE.Utils;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.UI.Menu.Drawable
@@ -49,21 +47,21 @@ namespace SEE.UI.Menu.Drawable
         {
             Instantiate(saveMenuPrefab);
 
-            ButtonManagerBasic saveButton =
+            ButtonManager saveButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Save")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            ButtonManagerBasic saveCurrentPageButton =
+            ButtonManager saveCurrentPageButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveCurrentPage")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            ButtonManagerBasic saveAllButton =
+            ButtonManager saveAllButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveAll")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            saveButton.clickEvent.AddListener(saveButtonCall);
-            saveCurrentPageButton.clickEvent.AddListener(saveCurrentPageButtonCall);
-            saveAllButton.clickEvent.AddListener(saveAllButtonCall);
+            saveButton.onClick.AddListener(saveButtonCall);
+            saveCurrentPageButton.onClick.AddListener(saveCurrentPageButtonCall);
+            saveAllButton.onClick.AddListener(saveAllButtonCall);
         }
     }
 }

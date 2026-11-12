@@ -64,23 +64,35 @@ MonoBehaviour:
   windowIcon: {fileID: 3039354244786937687}
   windowTitle: {fileID: 2748644864285449064}
   windowDescription: {fileID: 7080315148683464953}
-  confirmButton: {fileID: 5368202669162988336}
-  cancelButton: {fileID: 6534152023922108797}
+  confirmButton: {fileID: 549087675577322830}
+  cancelButton: {fileID: 8235139044224297879}
   mwAnimator: {fileID: 3398194618946736344}
   icon: {fileID: 21300000, guid: ce4f0f0804dfd3b4a84ad79898a71fe9, type: 3}
   titleText: Dialog
   descriptionText: 'Content here. You can re-align the text.
 
     You can use 2 lines.'
+  onOpen:
+    m_PersistentCalls:
+      m_Calls: []
+  onClose:
+    m_PersistentCalls:
+      m_Calls: []
   onConfirm:
     m_PersistentCalls:
       m_Calls: []
   onCancel:
     m_PersistentCalls:
       m_Calls: []
-  sharpAnimations: 0
-  useCustomValues: 0
+  useCustomContent: 0
   isOn: 0
+  closeOnCancel: 1
+  closeOnConfirm: 1
+  showCancelButton: 1
+  showConfirmButton: 1
+  startBehaviour: 1
+  closeBehaviour: 1
+  onEnableBehaviour: 0
 --- !u!225 &5593780657732337941
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -416,6 +428,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -567,6 +580,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -725,7 +739,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 76abe28924c3a9345adaa9cc63c803d3, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -995,7 +1009,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 76abe28924c3a9345adaa9cc63c803d3, type: 3}
+  m_Sprite: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1281,34 +1295,74 @@ MonoBehaviour:
   m_GameObject: {fileID: 2796228965903149328}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  buttonIcon: {fileID: 21300000, guid: 1c1bef4b40e990c42aed6432ebd324ef, type: 3}
   buttonText: OK
-  clickEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  hoverEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 3934257090524944318}
-  highlightedIcon: {fileID: 4137363720400012742}
+  iconScale: 1
+  textSize: 20
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 8591966764822442628}
+  highlightCG: {fileID: 2063193334739514885}
+  disabledCG: {fileID: 0}
   normalText: {fileID: 297136405917743596}
   highlightedText: {fileID: 4005844012695724820}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 3934257090524944318}
+  highlightImage: {fileID: 4137363720400012742}
+  disabledImage: {fileID: 0}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 0}
-  animationSolution: 1
-  fadingMultiplier: 8
+  isInteractable: 1
+  enableIcon: 1
+  enableText: 1
   useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 0
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 0
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 1
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onDoubleClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 0}
   speed: 1
   maxSize: 4
@@ -1316,6 +1370,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &5368202669162988336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1597,7 +1653,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
   background: {fileID: 934302884277831457}
   bar: {fileID: 389929272076970896}
 --- !u!1 &3362835508981072506
@@ -1880,34 +1935,74 @@ MonoBehaviour:
   m_GameObject: {fileID: 3878583803478588464}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1b9ec3e5bcdc64d87d311ffc627a77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonIcon: {fileID: 21300000, guid: 76abe28924c3a9345adaa9cc63c803d3, type: 3}
+  buttonIcon: {fileID: 21300002, guid: 88dca061d041a2a4596563e6a38f66c8, type: 3}
   buttonText: CANCEL
-  clickEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  hoverEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
-  normalIcon: {fileID: 4985743958720533845}
-  highlightedIcon: {fileID: 6305360826244545898}
+  iconScale: 1
+  textSize: 20
+  autoFitContent: 0
+  padding:
+    left: 20
+    right: 20
+    top: 5
+    bottom: 5
+  spacing: 15
+  disabledLayout: {fileID: 0}
+  normalLayout: {fileID: 0}
+  highlightedLayout: {fileID: 0}
+  mainLayout: {fileID: 0}
+  mainFitter: {fileID: 0}
+  targetFitter: {fileID: 0}
+  targetRect: {fileID: 0}
+  normalCG: {fileID: 8404511436203155729}
+  highlightCG: {fileID: 8684107952545365800}
+  disabledCG: {fileID: 0}
   normalText: {fileID: 3865115975312172169}
   highlightedText: {fileID: 2229820463969045781}
+  disabledText: {fileID: 0}
+  normalImage: {fileID: 4985743958720533845}
+  highlightImage: {fileID: 6305360826244545898}
+  disabledImage: {fileID: 0}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 0}
-  animationSolution: 1
-  fadingMultiplier: 8
+  isInteractable: 1
+  enableIcon: 1
+  enableText: 1
   useCustomContent: 0
+  useCustomTextSize: 1
+  checkForDoubleClick: 0
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  useUINavigation: 0
+  navigationMode: 3
+  selectOnUp: {fileID: 0}
+  selectOnDown: {fileID: 0}
+  selectOnLeft: {fileID: 0}
+  selectOnRight: {fileID: 0}
+  wrapAround: 0
+  useRipple: 0
+  doubleClickPeriod: 0.25
+  fadingMultiplier: 8
+  animationSolution: 1
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onDoubleClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeave:
+    m_PersistentCalls:
+      m_Calls: []
   rippleUpdateMode: 1
+  targetCanvas: {fileID: 0}
   rippleShape: {fileID: 0}
   speed: 1
   maxSize: 4
@@ -1915,6 +2010,8 @@ MonoBehaviour:
   transitionColor: {r: 1, g: 1, b: 1, a: 1}
   renderOnTop: 0
   centered: 0
+  isPreset: 0
+  latestTabIndex: 0
 --- !u!114 &6534152023922108797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2115,6 +2212,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2255,6 +2353,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2515,6 +2614,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2613,7 +2713,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1c1bef4b40e990c42aed6432ebd324ef, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -2977,7 +3077,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5d08ed2465c5c104c9c915959d69b527, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1c1bef4b40e990c42aed6432ebd324ef, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -3480,6 +3580,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

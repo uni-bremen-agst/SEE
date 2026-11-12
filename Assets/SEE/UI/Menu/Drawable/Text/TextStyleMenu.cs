@@ -162,13 +162,14 @@ namespace SEE.UI.Menu.Drawable.Text
                 Color.gray;
 
             controls.FontColorButton.interactable = false;
+            controls.FontColorButtonManager.Interactable(false);
 
             controls.FontColorButtonManager
-                .clickEvent
+                .onClick
                 .AddListener(ToggleColorButtons);
 
             controls.OutlineColorButtonManager
-                .clickEvent
+                .onClick
                 .AddListener(ToggleColorButtons);
 
             controls.OutlineObject.SetActive(false);
@@ -180,25 +181,25 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         private void InitializeFontStyleButtons()
         {
-            controls.BoldButtonManager.clickEvent.AddListener(
+            controls.BoldButtonManager.onClick.AddListener(
                 () => Press(Bold));
 
-            controls.ItalicButtonManager.clickEvent.AddListener(
+            controls.ItalicButtonManager.onClick.AddListener(
                 () => Press(Italic));
 
-            controls.UnderlineButtonManager.clickEvent.AddListener(
+            controls.UnderlineButtonManager.onClick.AddListener(
                 () => Press(Underline));
 
-            controls.StrikethroughButtonManager.clickEvent.AddListener(
+            controls.StrikethroughButtonManager.onClick.AddListener(
                 () => Press(Strikethrough));
 
-            controls.LowerCaseButtonManager.clickEvent.AddListener(
+            controls.LowerCaseButtonManager.onClick.AddListener(
                 () => Press(LowerCase));
 
-            controls.UpperCaseButtonManager.clickEvent.AddListener(
+            controls.UpperCaseButtonManager.onClick.AddListener(
                 () => Press(UpperCase));
 
-            controls.SmallCapsButtonManager.clickEvent.AddListener(
+            controls.SmallCapsButtonManager.onClick.AddListener(
                 () => Press(SmallCaps));
         }
 
@@ -210,12 +211,12 @@ namespace SEE.UI.Menu.Drawable.Text
         {
             ResetStyles();
 
-            controls.FontColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.FontColorButtonManager.clickEvent.AddListener(
+            controls.FontColorButtonManager.onClick.RemoveAllListeners();
+            controls.FontColorButtonManager.onClick.AddListener(
                 ToggleColorButtons);
 
-            controls.OutlineColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.OutlineColorButtonManager.clickEvent.AddListener(
+            controls.OutlineColorButtonManager.onClick.RemoveAllListeners();
+            controls.OutlineColorButtonManager.onClick.AddListener(
                 ToggleColorButtons);
 
             controls.ThicknessSlider.onValueChanged.RemoveAllListeners();
@@ -245,8 +246,14 @@ namespace SEE.UI.Menu.Drawable.Text
             controls.FontColorButton.interactable =
                 !controls.FontColorButton.IsInteractable();
 
+            controls.FontColorButtonManager.Interactable(
+                controls.FontColorButton.interactable);
+
             controls.OutlineColorButton.interactable =
                 !controls.OutlineColorButton.IsInteractable();
+
+            controls.OutlineColorButtonManager.Interactable(
+                controls.OutlineColorButton.interactable);
 
             bool outlineColorSelected =
                 !controls.OutlineColorButton.interactable;

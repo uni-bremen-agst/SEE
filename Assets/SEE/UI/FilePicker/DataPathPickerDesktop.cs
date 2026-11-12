@@ -1,7 +1,6 @@
 ﻿using System;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.KeyActions;
-using SEE.Extensions;
 using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -63,7 +62,7 @@ namespace SEE.UI.FilePicker
         /// <summary>
         ///     The picker button.
         /// </summary>
-        protected ButtonManagerBasic PickerButton { get; private set; }
+        protected ButtonManager PickerButton { get; private set; }
 
         /// <summary>
         ///     The label.
@@ -82,7 +81,7 @@ namespace SEE.UI.FilePicker
             Dropdown = Menu.transform.Find(DropdownPath).GetComponent<CustomDropdown>();
             CustomInput = Menu.transform.Find(CustomInputPath).GetComponent<TMP_InputField>();
             LabelText = Menu.transform.Find(LabelPath).GetComponent<TextMeshProUGUI>();
-            PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManagerBasic>();
+            PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManager>();
 
             TMP_InputField inputField = Menu.transform.Find("DropdownCombo/SelectableInput/Input")
                                             .GetComponent<TMP_InputField>();
@@ -90,23 +89,21 @@ namespace SEE.UI.FilePicker
             LabelText.text = Label;
 
             // setup dropdown
-            Dropdown.isListItem = true;
-            Dropdown.listParent = Canvas.transform;
-            Dropdown.dropdownItems.Clear();
+            Dropdown.items.Clear();
             foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
             {
-                Dropdown.CreateNewItemFast(kind.ToString(), null);
+                Dropdown.items.Add(new() { itemName = kind.ToString() });
             }
-            Dropdown.dropdownEvent.AddListener(index =>
+            Dropdown.onValueChanged.AddListener(index =>
             {
-                string selectedItem = Dropdown.dropdownItems[index].itemName;
+                string selectedItem = Dropdown.items[index].itemName;
                 Enum.TryParse(selectedItem, out DataPathInstance.Root);
                 UpdateInput();
                 OnChangedDropdown?.Invoke();
             });
 
             // opens a file picker with the picker button
-            PickerButton.clickEvent.AddListener(() =>
+            PickerButton.onClick.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
@@ -198,7 +195,7 @@ namespace SEE.UI.FilePicker
         private void UpdateDropdown()
         {
             Dropdown.selectedItemIndex =
-                Dropdown.dropdownItems.FindIndex(item => item.itemName == DataPathInstance.Root.ToString());
+                Dropdown.items.FindIndex(item => item.itemName == DataPathInstance.Root.ToString());
             Dropdown.SetupDropdown();
         }
 
@@ -227,7 +224,7 @@ namespace SEE.UI.FilePicker
 
         public void SyncDropdown(int newValue)
         {
-            string selectedItem = Dropdown.dropdownItems[newValue].itemName;
+            string selectedItem = Dropdown.items[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
             UpdateDropdown();
             UpdateInput();

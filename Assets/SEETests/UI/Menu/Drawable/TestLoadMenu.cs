@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -35,9 +35,9 @@ namespace SEE.UI.Menu.Drawable
                 () => loadSpecificCalled = true,
                 () => loadCurrentPageCalled = true);
 
-            FindButton("Load").clickEvent.Invoke();
-            FindButton("LoadSpecific").clickEvent.Invoke();
-            FindButton("LoadSpecificCurrentPage").clickEvent.Invoke();
+            FindButton("Load").onClick.Invoke();
+            FindButton("LoadSpecific").onClick.Invoke();
+            FindButton("LoadSpecificCurrentPage").onClick.Invoke();
 
             Assert.That(loadCalled, Is.True);
             Assert.That(loadSpecificCalled, Is.True);
@@ -49,10 +49,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The button name.</param>
         /// <returns>The matching button manager.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate
-                     in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate
+                     in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
             {

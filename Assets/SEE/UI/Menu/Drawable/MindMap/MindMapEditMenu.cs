@@ -1,10 +1,10 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
+using SEE.Extensions;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
@@ -153,10 +153,10 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// </summary>
         /// <param name="name">The name of the requested button.</param>
         /// <returns>The requested button manager.</returns>
-        private static ButtonManagerBasic GetButton(string name)
+        private static ButtonManager GetButton(string name)
         {
             return GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, name)
-                .GetComponent<ButtonManagerBasic>();
+                .GetComponent<ButtonManager>();
         }
 
         /// <summary>
@@ -170,8 +170,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeParent = GetButton("Parent");
-            changeParent.clickEvent.AddListener(() =>
+            ButtonManager changeParent = GetButton("Parent");
+            changeParent.onClick.AddListener(() =>
             {
                 /// At this point, immediately is required because Destroyer.Destroy() does not
                 /// delete quickly enough in case a theme node has been selected.
@@ -189,8 +189,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeNodeKind(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeNodeKind = GetButton("NodeKind");
-            changeNodeKind.clickEvent.AddListener(() =>
+            ButtonManager changeNodeKind = GetButton("NodeKind");
+            changeNodeKind.onClick.AddListener(() =>
             {
                 Destroyer.Destroy(Instance.gameObject);
                 MindMapChangeNodeKindMenu.Enable(node, conf, callback);
@@ -206,8 +206,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeBorder(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeBorder = GetButton("Border");
-            changeBorder.clickEvent.AddListener(() =>
+            ButtonManager changeBorder = GetButton("Border");
+            changeBorder.onClick.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
                 LineMenu.Instance.EnableForEditing(node.FindDescendantWithTag(Tags.Line), conf.BorderConf, callback);
@@ -223,8 +223,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="callback">The callback used to return to the edit menu.</param>
         private static void InitializeChangeText(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeText = GetButton("NodeText");
-            changeText.clickEvent.AddListener(() =>
+            ButtonManager changeText = GetButton("NodeText");
+            changeText.onClick.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
                 TextMenu.Instance.EnableForEditing(node.FindDescendantWithTag(Tags.DText), conf.TextConf, callback);
@@ -244,8 +244,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             if (conf.BranchLineToParent != "")
             {
-                ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
-                branchButton.clickEvent.AddListener(() =>
+                ButtonManager branchButton = branchLineButtonArea.GetComponent<ButtonManager>();
+                branchButton.onClick.AddListener(() =>
                 {
                     Instance.gameObject.SetActive(false);
                     GameObject branchLine = GameFinder.FindAttachedOrLocalDescendant(attached, conf.BranchLineToParent);
@@ -255,7 +255,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             else
             {
                 /// If no parent branch line exists for this node, deactivate the button.
-                branchLineButtonArea.GetComponent<ButtonManagerBasic>().enabled = false;
+                branchLineButtonArea.GetComponent<ButtonManager>().Interactable(false);
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
         }

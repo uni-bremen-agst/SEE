@@ -109,7 +109,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             if (lineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                controls.LineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             lineKindAction = index =>
@@ -171,7 +171,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
             };
 
-            controls.LineKindSelector.selectorEvent.AddListener(lineKindAction);
+            controls.LineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -341,7 +341,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (lineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                controls.LineKindSelector.onValueChanged.RemoveListener(lineKindAction);
                 lineKindAction = null;
             }
 

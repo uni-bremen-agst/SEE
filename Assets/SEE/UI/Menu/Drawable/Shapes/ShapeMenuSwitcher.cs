@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using SEE.Game.Drawable.Configurations;
@@ -36,11 +36,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         internal void Initialize()
         {
-            controls.ShapeButtonManager.clickEvent.AddListener(OpenShapeMenu);
-            controls.ConfigButtonManager.clickEvent.AddListener(OpenLineMenu);
+            controls.ShapeButtonManager.onClick.AddListener(OpenShapeMenu);
+            controls.ConfigButtonManager.onClick.AddListener(OpenLineMenu);
 
             controls.ShapeButton.interactable = false;
-            controls.ShapeButtonManager.enabled = false;
+            controls.ShapeButtonManager.Interactable(false);
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace SEE.UI.Menu.Drawable.Shapes
         internal void OpenLineMenu()
         {
             controls.ConfigButton.interactable = false;
-            controls.ConfigButtonManager.enabled = false;
+            controls.ConfigButtonManager.Interactable(false);
 
-            controls.ShapeButtonManager.enabled = true;
+            controls.ShapeButtonManager.Interactable(true);
             controls.ShapeButton.interactable = true;
 
             GameObject currentPreviewShape = ShapeMenu.GetCurrentPreviewShape();
@@ -147,10 +147,10 @@ namespace SEE.UI.Menu.Drawable.Shapes
         private void OpenShapeMenu()
         {
             controls.ShapeButton.interactable = false;
-            controls.ShapeButtonManager.enabled = false;
+            controls.ShapeButtonManager.Interactable(false);
 
             controls.ConfigButton.interactable = true;
-            controls.ConfigButtonManager.enabled = true;
+            controls.ConfigButtonManager.Interactable(true);
 
             LineMenu.Instance.Disable();
 

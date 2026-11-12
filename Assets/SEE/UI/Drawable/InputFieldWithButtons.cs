@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.UI.Notification;
 using System.Globalization;
 using TMPro;
@@ -22,12 +22,12 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Is the button up of this component.
         /// </summary>
-        private ButtonManagerBasic upBtn;
+        private ButtonManager upBtn;
 
         /// <summary>
         /// Is the button down of this component.
         /// </summary>
-        private ButtonManagerBasic downBtn;
+        private ButtonManager downBtn;
 
         /// <summary>
         /// Is the current value of the input field.
@@ -123,28 +123,28 @@ namespace SEE.UI.Drawable
                     $"{nameof(InputFieldWithButtons)} requires a child named 'DownBtn'.");
             }
 
-            upBtn = up.GetComponent<ButtonManagerBasic>();
+            upBtn = up.GetComponent<ButtonManager>();
             if (upBtn == null)
             {
                 throw new MissingComponentException(
-                    $"The 'UpBtn' object requires a {nameof(ButtonManagerBasic)}.");
+                    $"The 'UpBtn' object requires a {nameof(ButtonManager)}.");
             }
 
-            downBtn = down.GetComponent<ButtonManagerBasic>();
+            downBtn = down.GetComponent<ButtonManager>();
             if (downBtn == null)
             {
                 throw new MissingComponentException(
-                    $"The 'DownBtn' object requires a {nameof(ButtonManagerBasic)}.");
+                    $"The 'DownBtn' object requires a {nameof(ButtonManager)}.");
             }
 
             /// Adds the handler for the normal left click.
-            upBtn.clickEvent.AddListener(ClickUp);
+            upBtn.onClick.AddListener(ClickUp);
 
             /// Adds the component for the option that the button can be held.
             up.gameObject.AddComponent<ButtonHeld>().SetAction(ClickUp);
 
             /// Adds the handler for the normal left click.
-            downBtn.clickEvent.AddListener(ClickDown);
+            downBtn.onClick.AddListener(ClickDown);
 
             /// Adds the component for the option that the button can be held.
             down.gameObject.AddComponent<ButtonHeld>().SetAction(ClickDown);

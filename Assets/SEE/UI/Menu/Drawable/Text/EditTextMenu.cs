@@ -208,8 +208,8 @@ namespace SEE.UI.Menu.Drawable.Text
             }
 
             controls.ReturnButtonObject.SetActive(true);
-            controls.ReturnButtonManager.clickEvent.RemoveAllListeners();
-            controls.ReturnButtonManager.clickEvent.AddListener(returnCall);
+            controls.ReturnButtonManager.onClick.RemoveAllListeners();
+            controls.ReturnButtonManager.onClick.AddListener(returnCall);
 
             /// When text editing is opened from a parent menu, the text must keep
             /// the order in layer controlled by its parent drawable object.
@@ -239,7 +239,7 @@ namespace SEE.UI.Menu.Drawable.Text
             GameObject surface,
             string surfaceParentName)
         {
-            controls.FontColorButtonManager.clickEvent.AddListener(() =>
+            controls.FontColorButtonManager.onClick.AddListener(() =>
             {
                 textStyleMenu.AssignColorArea(
                     color =>
@@ -282,7 +282,7 @@ namespace SEE.UI.Menu.Drawable.Text
             GameObject surface,
             string surfaceParentName)
         {
-            controls.OutlineColorButtonManager.clickEvent.AddListener(() =>
+            controls.OutlineColorButtonManager.onClick.AddListener(() =>
             {
                 if (textHolder.OutlineColor == Color.clear)
                 {
@@ -394,9 +394,9 @@ namespace SEE.UI.Menu.Drawable.Text
             GameObject surface,
             string surfaceParentName)
         {
-            controls.EditTextButtonManager.clickEvent.RemoveAllListeners();
+            controls.EditTextButtonManager.onClick.RemoveAllListeners();
 
-            controls.EditTextButtonManager.clickEvent.AddListener(() =>
+            controls.EditTextButtonManager.onClick.AddListener(() =>
             {
                 WriteEditTextDialog writeTextDialog = new();
                 writeTextDialog.SetStringInit(textHolder.Text);

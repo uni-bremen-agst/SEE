@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Controls.KeyActions;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -151,14 +151,14 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
         {
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab, UICanvas.Canvas.transform, false);
 
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManager>().onClick
                 .AddListener(() =>
                 {
                     selectedOperation = Operation.Move;
                     DestroySwitchMenu();
                 });
 
-            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManager>().onClick
                 .AddListener(() =>
                 {
                     selectedOperation = Operation.Rotate;

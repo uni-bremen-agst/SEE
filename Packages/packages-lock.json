@@ -48,14 +48,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.25",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.26",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "c28f1b725d26c4b59f5c6606a0c0e91aa52c50a8"
+      "hash": "db8488330a97bc1b7c2c93541b832eb877d30f9f"
     },
     "com.soupday.cc3_unity_tools": {
       "version": "https://github.com/soupday/cc_unity_tools_URP.git",
@@ -207,7 +207,7 @@
     },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.2.1",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -533,8 +533,10 @@
       "version": "https://github.com/livekit/client-sdk-unity.git",
       "depth": 0,
       "source": "git",
-      "dependencies": {},
-      "hash": "d568fdbd68fbb71428b61c3af79f5cac8fff86a0"
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "356bf5dfe079fd981cd514271b32d6cfe5d5516f"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",

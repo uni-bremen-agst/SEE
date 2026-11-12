@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -70,8 +70,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
             if (returnCall != null)
             {
-                returnButton.GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                returnButton.GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {
@@ -177,19 +177,20 @@ namespace SEE.UI.Menu.Drawable.MindMap
             PopulateParentSelector(parentSelector, nodes);
 
             /// Adds a handler to the parent selector so that the selected node is set as the chosen node.
-            parentSelector.selectorEvent.AddListener(index =>
+            parentSelector.onValueChanged.AddListener(index =>
             {
                 chosenObject = nodes[index];
             });
 
             parentSelector.defaultIndex = 0;
+            parentSelector.SetupSelector();
 
             /// Initialize the chosen parent with the currently displayed selector item.
             chosenObject = nodes[0];
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GetFinishButton().GetComponent<ButtonManagerBasic>();
-            finish.clickEvent.AddListener(() =>
+            ButtonManager finish = GetFinishButton().GetComponent<ButtonManager>();
+            finish.onClick.AddListener(() =>
             {
                 /// Ensure that the chosen parent corresponds to the currently displayed
                 /// selector item, even if no selector event was raised.
@@ -272,13 +273,14 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 }
 
                 /// Apply regular parent changes immediately when the selector changes.
-                parentSelector.selectorEvent.AddListener(selectedIndex =>
+                parentSelector.onValueChanged.AddListener(selectedIndex =>
                 {
                     chosenObject = nodes[selectedIndex];
                     ChangeParent(addedNode, newConf, surface);
                 });
 
                 parentSelector.defaultIndex = index;
+                parentSelector.SetupSelector();
 
                 /// CutCopyPaste confirms its selection through Finish.
                 /// Regular editing applies changes immediately and therefore hides Finish.
@@ -290,7 +292,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 }
                 else
                 {
-                    finish.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+                    finish.GetComponent<ButtonManager>().onClick.AddListener(() =>
                     {
                         gotSelection = true;
                     });
@@ -345,14 +347,15 @@ namespace SEE.UI.Menu.Drawable.MindMap
             chosenObject = nodes[0];
 
             /// Changing the selector only changes the pending selection.
-            parentSelector.selectorEvent.AddListener(index =>
+            parentSelector.onValueChanged.AddListener(index =>
             {
                 chosenObject = nodes[index];
             });
+            parentSelector.SetupSelector();
 
             /// Only Finish turns the displayed candidate into a confirmed selection.
-            ButtonManagerBasic finish = GetFinishButton().GetComponent<ButtonManagerBasic>();
-            finish.clickEvent.AddListener(() =>
+            ButtonManager finish = GetFinishButton().GetComponent<ButtonManager>();
+            finish.onClick.AddListener(() =>
             {
                 chosenObject = nodes[parentSelector.index];
                 confirmCall?.Invoke(chosenObject);

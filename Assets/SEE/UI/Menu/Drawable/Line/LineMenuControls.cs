@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;
@@ -87,22 +87,22 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <summary>
         /// The button manager for selecting the primary color.
         /// </summary>
-        internal ButtonManagerBasic PrimaryColorButtonManager { get; }
+        internal ButtonManager PrimaryColorButtonManager { get; }
 
         /// <summary>
         /// The button manager for selecting the secondary color.
         /// </summary>
-        internal ButtonManagerBasic SecondaryColorButtonManager { get; }
+        internal ButtonManager SecondaryColorButtonManager { get; }
 
         /// <summary>
         /// The button manager for selecting the color-kind area.
         /// </summary>
-        internal ButtonManagerBasic ColorKindButtonManager { get; }
+        internal ButtonManager ColorKindButtonManager { get; }
 
         /// <summary>
         /// The button manager for selecting the fill-out area.
         /// </summary>
-        internal ButtonManagerBasic FillOutButtonManager { get; }
+        internal ButtonManager FillOutButtonManager { get; }
 
         /// <summary>
         /// The game object containing the fill-out controls.
@@ -142,7 +142,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <summary>
         /// The button manager of the return button.
         /// </summary>
-        internal ButtonManagerBasic ReturnButtonManager { get; }
+        internal ButtonManager ReturnButtonManager { get; }
 
         /// <summary>
         /// The window dragger of the line menu.
@@ -195,30 +195,22 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject primaryColorButton =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "PrimaryColorBtn");
             PrimaryColorButtonManager =
-                primaryColorButton.GetComponent<ButtonManagerBasic>();
-            PrimaryColorButtonManager.buttonVar =
-                primaryColorButton.GetComponent<Button>();
+                primaryColorButton.GetComponent<ButtonManager>();
 
             GameObject secondaryColorButton =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SecondaryColorBtn");
             SecondaryColorButtonManager =
-                secondaryColorButton.GetComponent<ButtonManagerBasic>();
-            SecondaryColorButtonManager.buttonVar =
-                secondaryColorButton.GetComponent<Button>();
+                secondaryColorButton.GetComponent<ButtonManager>();
 
             GameObject colorKindButton =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorKindBtn");
             ColorKindButtonManager =
-                colorKindButton.GetComponent<ButtonManagerBasic>();
-            ColorKindButtonManager.buttonVar =
-                colorKindButton.GetComponent<Button>();
+                colorKindButton.GetComponent<ButtonManager>();
 
             GameObject fillOutButton =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOutBtn");
             FillOutButtonManager =
-                fillOutButton.GetComponent<ButtonManagerBasic>();
-            FillOutButtonManager.buttonVar =
-                fillOutButton.GetComponent<Button>();
+                fillOutButton.GetComponent<ButtonManager>();
 
             FillOutObject =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOut");
@@ -239,7 +231,7 @@ namespace SEE.UI.Menu.Drawable.Line
             ReturnButtonObject =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ReturnBtn");
             ReturnButtonManager =
-                ReturnButtonObject.GetComponent<ButtonManagerBasic>();
+                ReturnButtonObject.GetComponent<ButtonManager>();
 
             GameObject dragger =
                 GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Dragger");

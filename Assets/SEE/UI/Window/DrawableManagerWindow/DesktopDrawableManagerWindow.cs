@@ -1,6 +1,6 @@
 ﻿using DG.Tweening;
 using HighlightPlus;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -72,17 +72,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private ButtonManagerBasic filterButton;
+        private ButtonManager filterButton;
 
         /// <summary>
         /// The button that opens the sorting menu.
         /// </summary>
-        private ButtonManagerBasic sortButton;
+        private ButtonManager sortButton;
 
         /// <summary>
         /// The button that opens the grouping menu.
         /// </summary>
-        private ButtonManagerBasic groupButton;
+        private ButtonManager groupButton;
 
         protected override void StartDesktop()
         {
@@ -97,9 +97,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             searchField.onValueChanged.AddListener(SearchFor);
 
-            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
-            groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManager>();
+            sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManager>();
+            groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManager>();
             PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             UnityEvent<List<GameObject>> rebuild = new();
             rebuild.AddListener(list => { Rebuild(list); });
@@ -317,11 +317,11 @@ namespace SEE.UI.Window.DrawableManagerWindow
             TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             iconMesh.text = GameFinder.IsWhiteboard(surface) ? Icons.Whiteboard.ToString() : Icons.StickyNote.ToString();
 
-            ButtonManagerBasic descriptionBtn = foreground.Find("DescriptionBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager descriptionBtn = foreground.Find("DescriptionBtn").gameObject.MustGetComponent<ButtonManager>();
             TextMeshProUGUI descriptionBtnMesh = foreground.Find("DescriptionBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             TextMeshProUGUI descriptionMesh = foreground.Find("Description").gameObject.MustGetComponent<TextMeshProUGUI>();
             descriptionMesh.text = config.Description;
-            descriptionBtn.clickEvent.AddListener(() =>
+            descriptionBtn.onClick.AddListener(() =>
             {
                 WriteEditTextDialog writeTextDialog = new();
                 writeTextDialog.SetStringInit(descriptionMesh.text);
@@ -335,11 +335,11 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 writeTextDialog.Open(stringAction);
             });
 
-            ButtonManagerBasic colorBtn = foreground.Find("ColorBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager colorBtn = foreground.Find("ColorBtn").gameObject.MustGetComponent<ButtonManager>();
             Image colorImage = foreground.Find("ColorBtn").gameObject.GetComponent<Image>();
             TextMeshProUGUI colorMesh = foreground.Find("ColorBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             colorMesh.color = config.Color;
-            colorBtn.clickEvent.AddListener(() =>
+            colorBtn.onClick.AddListener(() =>
             {
                 if (!SurfaceColorMenu.Instance.IsOpen())
                 {
@@ -351,7 +351,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 }
             });
 
-            ButtonManagerBasic pageBtn = foreground.Find("PageBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager pageBtn = foreground.Find("PageBtn").gameObject.MustGetComponent<ButtonManager>();
             TextMeshProUGUI pageBtnMesh = foreground.Find("PageBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             pageBtn.buttonText = config.CurrentPage.ToString();
             pageBtnMesh.text = config.CurrentPage.ToString();
@@ -359,11 +359,11 @@ namespace SEE.UI.Window.DrawableManagerWindow
             pageClickController.OnLeft.AddListener(() => contextMenu.ShowSelectionAddPageMenu(surface, pageBtn.transform.position));
             pageClickController.OnRight.AddListener(() => contextMenu.ShowRemovePageMenu(surface, pageBtn.transform.position));
 
-            ButtonManagerBasic lightingBtn = foreground.Find("LightingBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager lightingBtn = foreground.Find("LightingBtn").gameObject.MustGetComponent<ButtonManager>();
             Image lightingImage = foreground.Find("LightingBtn").gameObject.GetComponent<Image>();
             TextMeshProUGUI lightMesh = foreground.Find("LightingBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             lightMesh.color = GetLightColor(config.Lighting);
-            lightingBtn.clickEvent.AddListener(() =>
+            lightingBtn.onClick.AddListener(() =>
             {
                 bool light = !GameFinder.GetDrawableSurfaceParent(surface).GetComponentInChildren<Light>().enabled;
                 GameDrawableManager.ChangeLighting(surface, light);
@@ -377,12 +377,12 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 }
             });
 
-            ButtonManagerBasic visibilityBtn = foreground.Find("VisibilityBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManager visibilityBtn = foreground.Find("VisibilityBtn").gameObject.MustGetComponent<ButtonManager>();
             Image visibilityImage = foreground.Find("VisibilityBtn").gameObject.GetComponent<Image>();
             TextMeshProUGUI visibilityMesh = foreground.Find("VisibilityBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             visibilityBtn.buttonText = GetVisibilityText(config.Visibility);
             visibilityMesh.color = GetVisibilityColor(config.Visibility);
-            visibilityBtn.clickEvent.AddListener(() =>
+            visibilityBtn.onClick.AddListener(() =>
             {
                 bool visibility = !surface.GetRootParent().activeInHierarchy;
                 GameDrawableManager.ChangeVisibility(surface, visibility);

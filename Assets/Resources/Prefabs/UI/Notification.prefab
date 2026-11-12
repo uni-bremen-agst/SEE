@@ -480,7 +480,7 @@ MonoBehaviour:
   enableTimer: 0
   timer: 2
   useCustomContent: 0
-  useStacking: 1
+  useStacking: 0
   destroyAfterPlaying: 0
   notificationStyle: 2
 --- !u!225 &795374008530660810

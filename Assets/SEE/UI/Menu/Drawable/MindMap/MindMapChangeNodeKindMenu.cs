@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Editing;
@@ -57,10 +57,10 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
                 /// Adds the return callback to the return button.
                 /// A Subtheme or Leaf must have a confirmed parent before leaving this menu.
-                ButtonManagerBasic returnButton = GameFinder.FindAttachedOrLocalDescendant(
-                    Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
+                ButtonManager returnButton = GameFinder.FindAttachedOrLocalDescendant(
+                    Instance.gameObject, "ReturnBtn").GetComponent<ButtonManager>();
 
-                returnButton.clickEvent.AddListener(() =>
+                returnButton.onClick.AddListener(() =>
                 {
                     MMNodeValueHolder nodeValueHolder = addedNode.GetComponent<MMNodeValueHolder>();
 
@@ -92,6 +92,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
 
                 /// Set the current selected node kind.
                 nodeKindSelector.defaultIndex = index;
+                nodeKindSelector.SetupSelector();
             }
         }
 
@@ -111,7 +112,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             LineConf borderConf = newConf.BorderConf;
             LineConf parentBranchLineConf = newConf.BranchLineConf;
 
-            nodeKindSelector.selectorEvent.AddListener(index =>
+            nodeKindSelector.onValueChanged.AddListener(index =>
             {
                 MindMapNodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];
                 MindMapNodeKind oldNodeKind = newConf.NodeKind;

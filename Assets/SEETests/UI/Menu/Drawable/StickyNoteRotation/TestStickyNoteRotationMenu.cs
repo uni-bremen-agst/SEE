@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -83,7 +83,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             StickyNoteRotationMenu.Enable(stickyNote, hitObject);
 
-            FindActiveButton(buttonName).clickEvent.Invoke();
+            FindActiveButton(buttonName).onClick.Invoke();
 
             AssertAngle(stickyNote.transform.localEulerAngles.x, expectedDegree);
         }
@@ -99,11 +99,11 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.False);
 
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.True);
 
-            FindActiveButton("Back").clickEvent.Invoke();
+            FindActiveButton("Back").onClick.Invoke();
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.False);
         }
@@ -118,7 +118,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         {
             StickyNoteRotationMenu.Enable(stickyNote, hitObject);
 
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
             RotationSliderController[] initialSliders =
                 Object.FindObjectsByType<RotationSliderController>(
@@ -129,8 +129,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             RotationSliderController previousSlider = initialSliders[0];
 
-            FindActiveButton("Back").clickEvent.Invoke();
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Back").onClick.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
             RotationSliderController[] reopenedSliders =
                 Object.FindObjectsByType<RotationSliderController>(
@@ -149,7 +149,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.True);
 
-            FindActiveButton("Finish").clickEvent.Invoke();
+            FindActiveButton("Finish").onClick.Invoke();
 
             Assert.That(StickyNoteRotationMenu.IsYActive(), Is.False);
 
@@ -179,9 +179,9 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             stickyNote.transform.localEulerAngles = new Vector3(0.0f, 13.0f, 0.0f);
 
             StickyNoteRotationMenu.Enable(stickyNote, hitObject);
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
-            FindActiveButton(buttonName).clickEvent.Invoke();
+            FindActiveButton(buttonName).onClick.Invoke();
 
             AssertAngle(stickyNote.transform.localEulerAngles.y, expectedDegree);
         }
@@ -194,7 +194,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         public void TestAssignValueToYSliderChangesRotation()
         {
             StickyNoteRotationMenu.Enable(stickyNote, hitObject);
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
             StickyNoteRotationMenu.AssignValueToYSlider(123.4f);
 
@@ -211,7 +211,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             StickyNoteRotationMenu.Enable(stickyNote, hitObject, () => callbackInvoked = true);
 
-            FindActiveButton("ReturnBtn").clickEvent.Invoke();
+            FindActiveButton("ReturnBtn").onClick.Invoke();
 
             Assert.That(callbackInvoked, Is.True);
         }
@@ -226,9 +226,9 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             bool callbackInvoked = false;
 
             StickyNoteRotationMenu.Enable(stickyNote, hitObject, () => callbackInvoked = true);
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
-            FindActiveButton("ReturnBtn").clickEvent.Invoke();
+            FindActiveButton("ReturnBtn").onClick.Invoke();
 
             Assert.That(callbackInvoked, Is.True);
         }
@@ -241,9 +241,9 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         public void TestFinishCanOnlyBeConsumedOnce()
         {
             StickyNoteRotationMenu.Enable(stickyNote, hitObject);
-            FindActiveButton("Next").clickEvent.Invoke();
+            FindActiveButton("Next").onClick.Invoke();
 
-            FindActiveButton("Finish").clickEvent.Invoke();
+            FindActiveButton("Finish").onClick.Invoke();
 
             Assert.That(StickyNoteRotationMenu.TryGetFinish(out bool finish), Is.True);
             Assert.That(finish, Is.True);
@@ -258,9 +258,9 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </summary>
         /// <param name="name">The name of the requested button.</param>
         /// <returns>The active button manager.</returns>
-        private static ButtonManagerBasic FindActiveButton(string name)
+        private static ButtonManager FindActiveButton(string name)
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == name && candidate.gameObject.activeInHierarchy)

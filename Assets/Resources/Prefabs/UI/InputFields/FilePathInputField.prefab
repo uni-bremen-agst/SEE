@@ -580,13 +580,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
-  images:
-  - {fileID: 8077329024551970421}
-  - {fileID: 8077329023663384115}
-  texts:
-  - {fileID: 8077329023320129079}
-  - {fileID: 8077329024008539462}
+  mainText: {fileID: 8077329023320129077}
+  placeholderText: {fileID: 8077329024008539460}
+  backgroundImage: {fileID: 8077329024551970419}
+  filledImage: {fileID: 8077329023663384113}
 --- !u!114 &278820234878124279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -944,6 +941,7 @@ GameObject:
   - component: {fileID: 53702569879243412}
   - component: {fileID: 2161329322746325604}
   - component: {fileID: 3096115446278773368}
+  - component: {fileID: 9196498759740983802}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -989,19 +987,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 8433249691215561210}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d218e07e7315e243acdfcc700d01eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: "\uF142"
-  clickEvent:
+  onClick:
     m_PersistentCalls:
       m_Calls: []
-  hoverEvent:
+  onHover:
     m_PersistentCalls:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
-  buttonVar: {fileID: 0}
   normalText: {fileID: 8175830036434502609}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 2610730137352248389}
@@ -1018,6 +1015,13 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
+  autoFitContent: 0
+  useCustomTextSize: 1
+  textSize: 26
+  enableText: 1
+  enableIcon: 0
+  animationSolution: 0
+  isInteractable: 1
 --- !u!114 &2161329322746325604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1227,3 +1231,15 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &9196498759740983802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8433249691215561210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a652232d3791450f96f7b713a7468bf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

@@ -121,13 +121,13 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (lineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                controls.LineKindSelector.onValueChanged.RemoveListener(lineKindAction);
                 lineKindAction = null;
             }
 
             if (colorKindAction != null)
             {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                controls.ColorKindSelector.onValueChanged.RemoveListener(colorKindAction);
                 colorKindAction = null;
             }
 
@@ -176,7 +176,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             if (lineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                controls.LineKindSelector.onValueChanged.RemoveListener(lineKindAction);
             }
 
             lineKindAction = index =>
@@ -191,7 +191,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
             };
 
-            controls.LineKindSelector.selectorEvent.AddListener(lineKindAction);
+            controls.LineKindSelector.onValueChanged.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             if (colorKindAction != null)
             {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                controls.ColorKindSelector.onValueChanged.RemoveListener(colorKindAction);
             }
 
             colorKindAction = index =>
@@ -225,7 +225,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
             };
 
-            controls.ColorKindSelector.selectorEvent.AddListener(colorKindAction);
+            controls.ColorKindSelector.onValueChanged.AddListener(colorKindAction);
         }
 
         /// <summary>
@@ -233,10 +233,10 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetUpPrimaryColorButton()
         {
-            controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(SelectPrimaryColor);
+            controls.PrimaryColorButtonManager.onClick.RemoveAllListeners();
+            controls.PrimaryColorButtonManager.onClick.AddListener(SelectPrimaryColor);
 
-            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
+            controls.PrimaryColorButtonManager.Interactable(false);
         }
 
         /// <summary>
@@ -244,10 +244,10 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetUpSecondaryColorButton()
         {
-            controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(SelectSecondaryColor);
+            controls.SecondaryColorButtonManager.onClick.RemoveAllListeners();
+            controls.SecondaryColorButtonManager.onClick.AddListener(SelectSecondaryColor);
 
-            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
+            controls.SecondaryColorButtonManager.Interactable(true);
         }
 
         /// <summary>
@@ -269,18 +269,18 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetUpColorKindTypeButton()
         {
-            controls.ColorKindButtonManager.clickEvent.RemoveAllListeners();
-            controls.ColorKindButtonManager.clickEvent.AddListener(
+            controls.ColorKindButtonManager.onClick.RemoveAllListeners();
+            controls.ColorKindButtonManager.onClick.AddListener(
                 MutuallyExclusiveColorTypeButtons);
 
-            controls.ColorKindButtonManager.clickEvent.AddListener(() =>
+            controls.ColorKindButtonManager.onClick.AddListener(() =>
             {
                 HideFillOut();
                 ShowColorKind();
                 MenuHelper.CalculateHeight(lineMenu, true);
 
                 if (ValueHolder.CurrentColorKind == ColorKind.Monochrome
-                    || !controls.PrimaryColorButtonManager.buttonVar.interactable)
+                    || !controls.PrimaryColorButtonManager.isInteractable)
                 {
                     SelectPrimaryColor();
                 }
@@ -290,7 +290,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
             });
 
-            controls.ColorKindButtonManager.buttonVar.interactable = false;
+            controls.ColorKindButtonManager.Interactable(false);
         }
 
         /// <summary>
@@ -298,11 +298,11 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetUpFillOutTypeButton()
         {
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
-            controls.FillOutButtonManager.clickEvent.AddListener(
+            controls.FillOutButtonManager.onClick.RemoveAllListeners();
+            controls.FillOutButtonManager.onClick.AddListener(
                 MutuallyExclusiveColorTypeButtons);
 
-            controls.FillOutButtonManager.clickEvent.AddListener(() =>
+            controls.FillOutButtonManager.onClick.AddListener(() =>
             {
                 HideColorKind();
                 ShowFillOut();
@@ -319,7 +319,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     ValueHolder.CurrentTertiaryColor);
             });
 
-            controls.FillOutButtonManager.buttonVar.interactable = true;
+            controls.FillOutButtonManager.Interactable(true);
         }
 
         /// <summary>
@@ -399,8 +399,8 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetPrimaryColorButtonState()
         {
-            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
-            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
+            controls.PrimaryColorButtonManager.Interactable(false);
+            controls.SecondaryColorButtonManager.Interactable(true);
         }
 
         /// <summary>
@@ -408,8 +408,8 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void SetSecondaryColorButtonState()
         {
-            controls.PrimaryColorButtonManager.buttonVar.interactable = true;
-            controls.SecondaryColorButtonManager.buttonVar.interactable = false;
+            controls.PrimaryColorButtonManager.Interactable(true);
+            controls.SecondaryColorButtonManager.Interactable(false);
         }
 
         /// <summary>
@@ -417,11 +417,11 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorTypeButtons()
         {
-            controls.ColorKindButtonManager.buttonVar.interactable =
-                !controls.ColorKindButtonManager.buttonVar.IsInteractable();
+            controls.ColorKindButtonManager.Interactable(
+                !controls.ColorKindButtonManager.isInteractable);
 
-            controls.FillOutButtonManager.buttonVar.interactable =
-                !controls.FillOutButtonManager.buttonVar.IsInteractable();
+            controls.FillOutButtonManager.Interactable(
+                !controls.FillOutButtonManager.isInteractable);
         }
 
         /// <summary>

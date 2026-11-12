@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Line;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace SEE.UI.Menu.Drawable.Line
 {
@@ -71,13 +72,13 @@ namespace SEE.UI.Menu.Drawable.Line
 
             Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
 
-            controls.ColorKindSelector.selectorEvent.Invoke(gradientIndex);
+            controls.ColorKindSelector.onValueChanged.Invoke(gradientIndex);
 
             yield return null;
 
             Assert.That(ValueHolder.CurrentColorKind, Is.EqualTo(ColorKind.Gradient));
 
-            controls.SecondaryColorButtonManager.clickEvent.Invoke();
+            controls.SecondaryColorButtonManager.onClick.Invoke();
 
             yield return null;
 
@@ -152,20 +153,20 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(solidIndex, Is.GreaterThanOrEqualTo(0));
             Assert.That(twoDashedIndex, Is.GreaterThanOrEqualTo(0));
 
-            controls.LineKindSelector.selectorEvent.Invoke(dashedIndex);
+            controls.LineKindSelector.onValueChanged.Invoke(dashedIndex);
 
             yield return null;
 
             Assert.That(ValueHolder.CurrentLineKind, Is.EqualTo(LineKind.Dashed));
             Assert.That(controls.TilingObject.activeInHierarchy, Is.True);
 
-            controls.ColorKindSelector.selectorEvent.Invoke(twoDashedIndex);
+            controls.ColorKindSelector.onValueChanged.Invoke(twoDashedIndex);
 
             yield return null;
 
             Assert.That(ValueHolder.CurrentColorKind, Is.EqualTo(ColorKind.TwoDashed));
 
-            controls.LineKindSelector.selectorEvent.Invoke(solidIndex);
+            controls.LineKindSelector.onValueChanged.Invoke(solidIndex);
 
             yield return null;
 
@@ -191,7 +192,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
 
-            controls.ColorKindSelector.selectorEvent.Invoke(gradientIndex);
+            controls.ColorKindSelector.onValueChanged.Invoke(gradientIndex);
 
             yield return null;
 
@@ -218,7 +219,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             Assert.That(gradientIndex, Is.GreaterThanOrEqualTo(0));
 
-            controls.ColorKindSelector.selectorEvent.Invoke(gradientIndex);
+            controls.ColorKindSelector.onValueChanged.Invoke(gradientIndex);
 
             yield return null;
 
@@ -232,16 +233,16 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(ValueHolder.CurrentPrimaryColor, Is.EqualTo(firstPrimaryColor));
             Assert.That(ValueHolder.CurrentSecondaryColor, Is.EqualTo(Color.blue));
 
-            controls.SecondaryColorButtonManager.clickEvent.Invoke();
+            controls.SecondaryColorButtonManager.onClick.Invoke();
 
             yield return null;
 
             Assert.That(
-                controls.PrimaryColorButtonManager.buttonVar.interactable,
+                controls.PrimaryColorButtonManager.GetComponent<Button>().interactable,
                 Is.True);
 
             Assert.That(
-                controls.SecondaryColorButtonManager.buttonVar.interactable,
+                controls.SecondaryColorButtonManager.GetComponent<Button>().interactable,
                 Is.False);
 
             Color newSecondaryColor = Color.yellow;
@@ -252,16 +253,16 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(ValueHolder.CurrentPrimaryColor, Is.EqualTo(firstPrimaryColor));
             Assert.That(ValueHolder.CurrentSecondaryColor, Is.EqualTo(newSecondaryColor));
 
-            controls.PrimaryColorButtonManager.clickEvent.Invoke();
+            controls.PrimaryColorButtonManager.onClick.Invoke();
 
             yield return null;
 
             Assert.That(
-                controls.PrimaryColorButtonManager.buttonVar.interactable,
+                controls.PrimaryColorButtonManager.GetComponent<Button>().interactable,
                 Is.False);
 
             Assert.That(
-                controls.SecondaryColorButtonManager.buttonVar.interactable,
+                controls.SecondaryColorButtonManager.GetComponent<Button>().interactable,
                 Is.True);
 
             Color secondPrimaryColor = Color.cyan;
@@ -290,7 +291,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 ValueHolder.CurrentColorKind,
                 Is.EqualTo(ColorKind.Monochrome));
 
-            controls.SecondaryColorButtonManager.clickEvent.Invoke();
+            controls.SecondaryColorButtonManager.onClick.Invoke();
 
             yield return null;
 
@@ -308,7 +309,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 Is.EqualTo(Color.blue));
 
             Assert.That(
-                controls.PrimaryColorButtonManager.buttonVar.interactable,
+                controls.PrimaryColorButtonManager.GetComponent<Button>().interactable,
                 Is.False);
         }
 
@@ -327,7 +328,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             yield return OpenDrawingMenu();
 
-            controls.FillOutButtonManager.clickEvent.Invoke();
+            controls.FillOutButtonManager.onClick.Invoke();
 
             yield return null;
 

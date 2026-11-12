@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -95,7 +95,7 @@ namespace SEE.UI.Menu.Drawable
             Assert.That(FindButton("Secondary").enabled, Is.False);
             Assert.That(FindButton("Secondary").GetComponent<Button>().interactable, Is.False);
 
-            FindButton("FillOut").clickEvent.Invoke();
+            FindButton("FillOut").onClick.Invoke();
 
             Assert.That(ColorPickerLineMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.FillOutColor));
@@ -127,7 +127,7 @@ namespace SEE.UI.Menu.Drawable
 
             ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
 
-            ButtonManagerBasic endCap = FindButton("FillOut");
+            ButtonManager endCap = FindButton("FillOut");
 
             Assert.That(endCap.enabled, Is.False);
             Assert.That(endCap.GetComponent<Button>().interactable, Is.False);
@@ -142,7 +142,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf configuration = CreateConfigurationWithCaps();
 
             ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
-            FindButton("Secondary").clickEvent.Invoke();
+            FindButton("Secondary").onClick.Invoke();
 
             Assert.That(ColorPickerLineMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.LineCapStart.PrimaryColor));
@@ -158,7 +158,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf configuration = CreateConfigurationWithCaps();
 
             ColorPickerLineMenu.Instance.BeginSelection(configuration, false);
-            FindButton("Secondary").clickEvent.Invoke();
+            FindButton("Secondary").onClick.Invoke();
 
             Assert.That(ColorPickerLineMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.LineCapStart.SecondaryColor));
@@ -177,13 +177,13 @@ namespace SEE.UI.Menu.Drawable
             ColorPickerLineMenu.Instance.BeginSelection(configuration, true);
 
             /// The "Secondary" prefab button represents Start Cap in the first step.
-            FindButton("Secondary").clickEvent.Invoke();
+            FindButton("Secondary").onClick.Invoke();
 
             Assert.That(FindButton("Primary").buttonText, Is.EqualTo("Primary"));
             Assert.That(FindButton("Secondary").buttonText, Is.EqualTo("Secondary"));
             Assert.That(FindButton("FillOut").buttonText, Is.EqualTo("Fill Out"));
 
-            FindButton("FillOut").clickEvent.Invoke();
+            FindButton("FillOut").onClick.Invoke();
 
             Assert.That(ColorPickerLineMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.LineCapStart.FillOutColor));
@@ -379,9 +379,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The original prefab name of the button.</param>
         /// <returns>The matching button manager.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == name)

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -80,8 +80,8 @@ namespace SEE.UI.Menu.Drawable
         {
             StickyNoteMoveMenu.Instance.Enable(stickyNoteHolder, true);
 
-            ButtonManagerBasic finishButton = FindFinishButton();
-            finishButton.clickEvent.Invoke();
+            ButtonManager finishButton = FindFinishButton();
+            finishButton.onClick.Invoke();
 
             Assert.That(StickyNoteMoveMenu.Instance.TryGetFinish(out bool firstFinish), Is.True);
             Assert.That(firstFinish, Is.True);
@@ -112,9 +112,9 @@ namespace SEE.UI.Menu.Drawable
         /// Finds the finish button of the sticky note move menu.
         /// </summary>
         /// <returns>The finish button.</returns>
-        private static ButtonManagerBasic FindFinishButton()
+        private static ButtonManager FindFinishButton()
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == "Finish")
                 {

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;
@@ -37,7 +37,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for opening the shape menu.
         /// </summary>
-        internal ButtonManagerBasic ShapeButtonManager { get; }
+        internal ButtonManager ShapeButtonManager { get; }
 
         /// <summary>
         /// The button for opening the line configuration menu.
@@ -47,7 +47,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for opening the line configuration menu.
         /// </summary>
-        internal ButtonManagerBasic ConfigButtonManager { get; }
+        internal ButtonManager ConfigButtonManager { get; }
 
         /// <summary>
         /// The selector for choosing the general shape type.
@@ -182,7 +182,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for toggling the information image.
         /// </summary>
-        internal ButtonManagerBasic InfoButtonManager { get; }
+        internal ButtonManager InfoButtonManager { get; }
 
         /// <summary>
         /// The object containing the information image.
@@ -232,7 +232,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for finishing line drawing.
         /// </summary>
-        internal ButtonManagerBasic FinishButtonManager { get; }
+        internal ButtonManager FinishButtonManager { get; }
 
         /// <summary>
         /// The object containing the partial undo button.
@@ -242,7 +242,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for partial undo.
         /// </summary>
-        internal ButtonManagerBasic PartUndoButtonManager { get; }
+        internal ButtonManager PartUndoButtonManager { get; }
 
         /// <summary>
         /// The object containing the drawing control information button.
@@ -252,7 +252,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <summary>
         /// The button manager for the drawing control information button.
         /// </summary>
-        internal ButtonManagerBasic DraggerInfoButtonManager { get; }
+        internal ButtonManager DraggerInfoButtonManager { get; }
 
         /// <summary>
         /// The window dragger belonging to the shape menu.
@@ -275,8 +275,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
             MenuObject = menuObject;
 
             Button[] switchButtons = switchObject.GetComponentsInChildren<Button>();
-            ButtonManagerBasic[] switchButtonManagers =
-                switchObject.GetComponentsInChildren<ButtonManagerBasic>();
+            ButtonManager[] switchButtonManagers =
+                switchObject.GetComponentsInChildren<ButtonManager>();
 
             ShapeButton = switchButtons[0];
             ShapeButtonManager = switchButtonManagers[0];
@@ -351,7 +351,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
             InfoObject =
                 GameFinder.FindAttachedOrLocalDescendant(menuObject, "InfoPlaceHolder");
             InfoButtonManager =
-                InfoObject.GetComponentInChildren<ButtonManagerBasic>();
+                InfoObject.GetComponentInChildren<ButtonManager>();
 
             ImageObject =
                 GameFinder.FindAttachedOrLocalDescendant(menuObject, "Image");
@@ -375,17 +375,17 @@ namespace SEE.UI.Menu.Drawable.Shapes
             FinishObject =
                 GameFinder.FindAttachedOrLocalDescendant(menuObject, "FinishBtn");
             FinishButtonManager =
-                FinishObject.GetComponent<ButtonManagerBasic>();
+                FinishObject.GetComponent<ButtonManager>();
 
             PartUndoObject =
                 GameFinder.FindAttachedOrLocalDescendant(BoolValueObject, "PartUndoBtn");
             PartUndoButtonManager =
-                PartUndoObject.GetComponent<ButtonManagerBasic>();
+                PartUndoObject.GetComponent<ButtonManager>();
 
             DraggerInfoObject =
                 GameFinder.FindAttachedOrLocalDescendant(menuObject, "DraggerInfo");
             DraggerInfoButtonManager =
-                DraggerInfoObject.GetComponent<ButtonManagerBasic>();
+                DraggerInfoObject.GetComponent<ButtonManager>();
 
             GameObject dragger =
                 GameFinder.FindAttachedOrLocalDescendant(menuObject, "Dragger");

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 
 namespace SEE.UI.Menu.Drawable
@@ -64,29 +64,29 @@ namespace SEE.UI.Menu.Drawable
 
             Instantiate(imageSourceMenuPrefab);
 
-            ButtonManagerBasic local =
+            ButtonManager local =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Local")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            local.clickEvent.AddListener(() =>
+            local.onClick.AddListener(() =>
             {
                 SelectSource(Source.Local);
             });
 
-            ButtonManagerBasic web =
+            ButtonManager web =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Web")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            web.clickEvent.AddListener(() =>
+            web.onClick.AddListener(() =>
             {
                 SelectSource(Source.Web);
             });
 
-            ButtonManagerBasic cancelButton =
+            ButtonManager cancelButton =
                 GameFinder.FindAttachedOrLocalDescendant(gameObject, "Cancel")
-                    .GetComponent<ButtonManagerBasic>();
+                    .GetComponent<ButtonManager>();
 
-            cancelButton.clickEvent.AddListener(Destroy);
+            cancelButton.onClick.AddListener(Destroy);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -28,19 +28,19 @@ namespace SEE.UI.Menu.Drawable
                 () => saveCurrentPageCalled = true,
                 () => saveAllCalled = true);
 
-            FindButton("Save").clickEvent.Invoke();
-            FindButton("SaveCurrentPage").clickEvent.Invoke();
-            FindButton("SaveAll").clickEvent.Invoke();
+            FindButton("Save").onClick.Invoke();
+            FindButton("SaveCurrentPage").onClick.Invoke();
+            FindButton("SaveAll").onClick.Invoke();
 
             Assert.That(saveCalled, Is.True);
             Assert.That(saveCurrentPageCalled, Is.True);
             Assert.That(saveAllCalled, Is.True);
         }
 
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate
-                     in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate
+                     in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
             {

@@ -199,7 +199,7 @@ MonoBehaviour:
   enableSwitchSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  switchAnimator: {fileID: 0}
+  switchAnimator: {fileID: 9008899218307786698}
   switchButton: {fileID: 0}
   soundSource: {fileID: 0}
   hoverSound: {fileID: 0}

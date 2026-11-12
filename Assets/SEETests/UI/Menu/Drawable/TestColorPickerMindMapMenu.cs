@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.Line;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -32,7 +32,7 @@ namespace SEE.UI.Menu.Drawable
             MindMapNodeConf configuration = CreateConfiguration();
             ColorPickerMindMapMenu.Instance.Enable(configuration, true);
 
-            FindButton("Border").clickEvent.Invoke();
+            FindButton("Border").onClick.Invoke();
 
             Assert.That(ColorPickerMindMapMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.BorderConf.PrimaryColor));
@@ -47,7 +47,7 @@ namespace SEE.UI.Menu.Drawable
             MindMapNodeConf configuration = CreateConfiguration();
             ColorPickerMindMapMenu.Instance.Enable(configuration, false);
 
-            FindButton("Border").clickEvent.Invoke();
+            FindButton("Border").onClick.Invoke();
 
             Assert.That(ColorPickerMindMapMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.BorderConf.SecondaryColor));
@@ -63,7 +63,7 @@ namespace SEE.UI.Menu.Drawable
             configuration.BorderConf.ColorKind = ColorKind.Monochrome;
 
             ColorPickerMindMapMenu.Instance.Enable(configuration, false);
-            FindButton("Border").clickEvent.Invoke();
+            FindButton("Border").onClick.Invoke();
 
             Assert.That(ColorPickerMindMapMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.BorderConf.PrimaryColor));
@@ -78,7 +78,7 @@ namespace SEE.UI.Menu.Drawable
             MindMapNodeConf configuration = CreateConfiguration();
             ColorPickerMindMapMenu.Instance.Enable(configuration, false);
 
-            FindButton("NodeText").clickEvent.Invoke();
+            FindButton("NodeText").onClick.Invoke();
 
             Assert.That(ColorPickerMindMapMenu.Instance.TryGetColor(out Color color), Is.True);
             Assert.That(color, Is.EqualTo(configuration.TextConf.OutlineColor));
@@ -95,7 +95,7 @@ namespace SEE.UI.Menu.Drawable
 
             ColorPickerMindMapMenu.Instance.Enable(configuration, true);
 
-            ButtonManagerBasic branchButton = FindButton("BranchLine");
+            ButtonManager branchButton = FindButton("BranchLine");
             Assert.That(branchButton.enabled, Is.False);
             Assert.That(branchButton.GetComponent<Button>().interactable, Is.False);
         }
@@ -109,7 +109,7 @@ namespace SEE.UI.Menu.Drawable
             MindMapNodeConf configuration = CreateConfiguration();
             ColorPickerMindMapMenu.Instance.Enable(configuration, true);
 
-            FindButton("Border").clickEvent.Invoke();
+            FindButton("Border").onClick.Invoke();
             ColorPickerMindMapMenu.Instance.Destroy();
 
             Assert.That(ColorPickerMindMapMenu.Instance.TryGetColor(out Color color), Is.False);
@@ -150,9 +150,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="name">The name of the button.</param>
         /// <returns>The matching button manager.</returns>
-        private static ButtonManagerBasic FindButton(string name)
+        private static ButtonManager FindButton(string name)
         {
-            foreach (ButtonManagerBasic candidate in Object.FindObjectsByType<ButtonManagerBasic>(
+            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (candidate.gameObject.name == name)

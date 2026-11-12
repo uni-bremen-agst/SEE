@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
@@ -186,9 +186,9 @@ namespace SEE.UI.Menu.Drawable
             {
                 doneObject.SetActive(true);
 
-                ButtonManagerBasic doneButton = doneObject.GetComponent<ButtonManagerBasic>();
-                doneButton.clickEvent.RemoveAllListeners();
-                doneButton.clickEvent.AddListener(() =>
+                ButtonManager doneButton = doneObject.GetComponent<ButtonManager>();
+                doneButton.onClick.RemoveAllListeners();
+                doneButton.onClick.AddListener(() =>
                 {
                     Destroy();
                     isFinish = true;
@@ -213,9 +213,9 @@ namespace SEE.UI.Menu.Drawable
             {
                 returnButtonObject.SetActive(true);
 
-                ButtonManagerBasic returnButton = returnButtonObject.GetComponent<ButtonManagerBasic>();
-                returnButton.clickEvent.RemoveAllListeners();
-                returnButton.clickEvent.AddListener(returnCall);
+                ButtonManager returnButton = returnButtonObject.GetComponent<ButtonManager>();
+                returnButton.onClick.RemoveAllListeners();
+                returnButton.onClick.AddListener(returnCall);
             }
             else
             {

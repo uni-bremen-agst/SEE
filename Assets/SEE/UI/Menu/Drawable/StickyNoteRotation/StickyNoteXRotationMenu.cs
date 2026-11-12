@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
@@ -131,8 +131,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     xRotationMenu,
                     "Laying")
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     if (hitObject != null)
                     {
@@ -181,8 +181,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     xRotationMenu,
                     "Hanging")
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(() =>
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(() =>
                 {
                     GameStickyNoteTransform.SetRotateX(
                         stickyNoteHolder,
@@ -209,8 +209,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameFinder.FindAttachedOrLocalDescendant(
                     xRotationMenu,
                     "Next")
-                .GetComponent<ButtonManagerBasic>()
-                .clickEvent.AddListener(nextCall);
+                .GetComponent<ButtonManager>()
+                .onClick.AddListener(nextCall);
         }
 
         /// <summary>
@@ -230,8 +230,8 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             if (returnCall != null)
             {
                 returnButton
-                    .GetComponent<ButtonManagerBasic>()
-                    .clickEvent.AddListener(returnCall);
+                    .GetComponent<ButtonManager>()
+                    .onClick.AddListener(returnCall);
             }
             else
             {
