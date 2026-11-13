@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using Mediapipe;
 using Mediapipe.Tasks.Vision.Core;
 using Mediapipe.Tasks.Vision.FaceLandmarker;
 using Mediapipe.Unity.Experimental;
