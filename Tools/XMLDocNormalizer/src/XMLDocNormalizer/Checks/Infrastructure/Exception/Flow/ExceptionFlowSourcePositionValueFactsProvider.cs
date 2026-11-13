@@ -236,7 +236,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if (unwrappedExpression is not MemberAccessExpressionSyntax positionAccess
-                || semanticModel.GetSymbolInfo(positionAccess).Symbol is not IPropertySymbol positionProperty
+                || symbolInfo.Symbol is not IPropertySymbol positionProperty
                 || positionProperty.Name != "StartLinePosition"
                 || !HasMetadataIdentity(
                     positionProperty.ContainingType,
@@ -309,7 +309,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if (unwrappedExpression is not InvocationExpressionSyntax invocation
-                || semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol selectedMethod)
+                || symbolInfo.Symbol is not IMethodSymbol selectedMethod)
             {
                 return false;
             }
@@ -423,7 +423,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             };
 
             if (argumentList == null
-                || semanticModel.GetSymbolInfo(unwrappedExpression).Symbol is not IMethodSymbol constructor
+                || symbolInfo.Symbol is not IMethodSymbol constructor
                 || constructor.MethodKind != MethodKind.Constructor
                 || !HasMetadataIdentity(
                     constructor.ContainingType,
