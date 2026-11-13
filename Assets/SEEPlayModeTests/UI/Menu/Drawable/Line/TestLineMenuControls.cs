@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿
+using NUnit.Framework;
 using SEE.Game.Drawable;
 using SEE.Utils;
 using System.Collections;
@@ -9,14 +10,9 @@ using UnityEngine.UI;
 namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
-    /// Play-mode integration tests for <see cref="LineMenuControls"/>.
+    /// PlayMode integration tests for <see cref="LineMenuControls"/>.
     /// </summary>
-    /// <remarks>
-    /// These tests are currently blocked by issue #983 because the play-mode
-    /// test environment does not provide the SEE scene objects required by
-    /// drawable menus.
-    /// </remarks>
-    [Ignore("Blocked by #983: required SEE UI scene objects are unavailable in play-mode tests.")]
+    [TestFixture]
     internal class TestLineMenuControls : TestUI
     {
         /// <summary>
@@ -31,21 +27,29 @@ namespace SEE.UI.Menu.Drawable.Line
         private GameObject lineMenuObject;
 
         /// <summary>
-        /// Instantiates the real line-menu prefab before every test.
+        /// Ensures that a UI canvas exists and instantiates the real
+        /// line-menu prefab before each test.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for UI initialization.
+        /// </returns>
         [UnitySetUp]
         public IEnumerator SetUpLineMenu()
         {
+            EnsureUICanvas();
+
             lineMenuObject = Menu.InstantiatePrefab(LineMenuPrefab);
 
             yield return null;
         }
 
         /// <summary>
-        /// Destroys the instantiated line-menu prefab after every test.
+        /// Destroys the instantiated line-menu prefab.
+        /// The shared test base cleans up an owned UI canvas.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for deferred object destruction.
+        /// </returns>
         [UnityTearDown]
         public IEnumerator TearDownLineMenu()
         {
@@ -59,9 +63,11 @@ namespace SEE.UI.Menu.Drawable.Line
 
         /// <summary>
         /// Verifies that every hierarchy object required by
-        /// <see cref="LineMenuControls"/> still exists in the real prefab.
+        /// <see cref="LineMenuControls"/> exists in the real prefab.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator used by the Unity test runner.
+        /// </returns>
         [UnityTest]
         public IEnumerator TestRequiredPrefabObjectsExist()
         {
@@ -103,10 +109,12 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Verifies that all shared controls can be resolved from the real
-        /// line-menu prefab.
+        /// Verifies that all shared controls can be resolved from
+        /// the real line-menu prefab.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator used by the Unity test runner.
+        /// </returns>
         [UnityTest]
         public IEnumerator TestSharedControlsCanBeResolved()
         {

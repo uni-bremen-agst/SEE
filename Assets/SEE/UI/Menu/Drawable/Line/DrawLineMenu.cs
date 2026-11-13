@@ -96,6 +96,10 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         internal void Enable()
         {
+            // Restore the drawing-specific tiling before registering
+            // the listener that updates the stored drawing configuration.
+            controls.TilingSlider.AssignValue(ValueHolder.CurrentTiling);
+
             controls.TilingSlider.onValueChanged.AddListener(
                 tilingAction = tiling =>
                 {

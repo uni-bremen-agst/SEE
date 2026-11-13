@@ -14,12 +14,7 @@ namespace SEE.UI.Menu.Drawable.Line
     /// The tests use the real line-menu prefab and verify that its controls
     /// update the drawing configuration as expected.
     /// </summary>
-    /// <remarks>
-    /// These tests are currently blocked by issue #983 because the play-mode
-    /// test environment does not provide the SEE scene objects required by
-    /// drawable menus.
-    /// </remarks>
-    [Ignore("Blocked by #983: required SEE UI scene objects are unavailable in play-mode tests.")]
+    [TestFixture]
     internal class TestDrawLineMenu : TestUI
     {
         /// <summary>
@@ -28,12 +23,17 @@ namespace SEE.UI.Menu.Drawable.Line
         private LineMenuControls controls;
 
         /// <summary>
-        /// Prepares the line menu for every test.
+        /// Ensures that a UI canvas exists, resets the drawing values,
+        /// and prepares the shared line menu for the next test.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for UI initialization.
+        /// </returns>
         [UnitySetUp]
         public IEnumerator SetUpLineMenu()
         {
+            EnsureUICanvas();
+
             ResetDrawingValues();
 
             LineMenu.Instance.Disable();
@@ -42,13 +42,23 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Disables the line menu after every test.
+        /// Disables the shared line menu and preserves its singleton
+        /// object before the test base destroys an owned UI canvas.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for deferred cleanup.
+        /// </returns>
         [UnityTearDown]
         public IEnumerator TearDownLineMenu()
         {
             LineMenu.Instance.Disable();
+
+            if (OwnsUICanvas && LineMenu.Instance.GameObject != null)
+            {
+                /// The singleton must survive the temporary canvas
+                /// so that subsequent tests can reuse it.
+                LineMenu.Instance.GameObject.transform.SetParent(null);
+            }
 
             yield return null;
         }
@@ -387,7 +397,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
         /// <summary>
         /// Verifies that reopening the drawing menu restores its selectors,
-        /// switches, and visibility from the current drawing values.
+        /// switches, tiling slider, and visibility from the current drawing values.
         /// </summary>
         /// <returns>An enumerator used by the Unity test runner.</returns>
         [UnityTest]
@@ -410,6 +420,7 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(controls.LineKindSelector.index, Is.EqualTo(dashedIndex));
             Assert.That(controls.ColorKindSelector.index, Is.EqualTo(gradientIndex));
             Assert.That(controls.TilingObject.activeInHierarchy, Is.True);
+            Assert.That(controls.TilingSlider.GetValue(), Is.EqualTo(3.5f).Within(0.0001f));
             Assert.That(controls.FillOutManager.isOn, Is.True);
 
             LineMenu.Instance.Disable();
@@ -419,11 +430,17 @@ namespace SEE.UI.Menu.Drawable.Line
             Assert.That(LineMenu.Instance.IsOpen(), Is.False);
             Assert.That(LineMenu.Instance.IsInDrawingMode(), Is.False);
 
+            /// Simulate the shared slider having been changed by another
+            /// menu mode while preserving the drawing configuration.
+            controls.TilingSlider.AssignValue(6.0f);
+            ValueHolder.CurrentTiling = 3.5f;
+
             yield return OpenDrawingMenu();
 
             Assert.That(controls.LineKindSelector.index, Is.EqualTo(dashedIndex));
             Assert.That(controls.ColorKindSelector.index, Is.EqualTo(gradientIndex));
             Assert.That(controls.TilingObject.activeInHierarchy, Is.True);
+            Assert.That(controls.TilingSlider.GetValue(), Is.EqualTo(3.5f).Within(0.0001f));
             Assert.That(controls.FillOutManager.isOn, Is.True);
 
             Assert.That(ValueHolder.CurrentLineKind, Is.EqualTo(LineKind.Dashed));

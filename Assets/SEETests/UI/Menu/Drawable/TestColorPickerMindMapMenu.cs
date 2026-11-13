@@ -1,8 +1,7 @@
-﻿using SEE.Game.Drawable.Line;
-using Michsky.MUIP;
+﻿using Michsky.MUIP;
 using NUnit.Framework;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -85,7 +84,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Verifies that the branch-line button is disabled for a node without a parent.
+        /// Verifies that the branch-line button is visibly disabled
+        /// and does not receive pointer interactions when the node
+        /// has no parent.
         /// </summary>
         [Test]
         public void TestBranchLineButtonIsDisabledWithoutParent()
@@ -96,8 +97,16 @@ namespace SEE.UI.Menu.Drawable
             ColorPickerMindMapMenu.Instance.Enable(configuration, true);
 
             ButtonManager branchButton = FindButton("BranchLine");
+
             Assert.That(branchButton.enabled, Is.False);
             Assert.That(branchButton.GetComponent<Button>().interactable, Is.False);
+
+            CanvasGroup canvasGroup = branchButton.GetComponent<CanvasGroup>();
+
+            Assert.That(canvasGroup, Is.Not.Null);
+            Assert.That(canvasGroup.alpha, Is.LessThan(1.0f));
+            Assert.That(canvasGroup.interactable, Is.False);
+            Assert.That(canvasGroup.blocksRaycasts, Is.False);
         }
 
         /// <summary>

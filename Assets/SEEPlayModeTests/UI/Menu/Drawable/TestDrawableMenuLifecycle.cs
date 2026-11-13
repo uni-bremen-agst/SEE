@@ -16,21 +16,36 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// Play-mode integration tests for <see cref="DrawableMenuLifecycle"/>.
     /// </summary>
-    /// <remarks>
-    /// These tests are currently blocked by issue #983 because the play-mode
-    /// test environment does not provide the SEE scene objects required by
-    /// drawable menus.
-    /// </remarks>
-    [Ignore("Blocked by #983: required SEE UI scene objects are unavailable in play-mode tests.")]
+    [TestFixture]
     internal class TestDrawableMenuLifecycle : TestUI
     {
         /// <summary>
-        /// Disables all tool-session menus before every test.
+        /// Ensures that the UI canvas exists, restores the parents of
+        /// persistent menu objects, and closes all tool-session menus
+        /// before each test.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for UI initialization.
+        /// </returns>
         [UnitySetUp]
         public IEnumerator SetUpMenus()
         {
+            EnsureUICanvas();
+
+            Transform canvasTransform = UICanvas.Canvas.transform;
+            ShapeMenuControls shapeControls = GetShapeControls();
+
+            /// Restore persistent menu objects to the current canvas.
+            /// These objects may have survived a previous test canvas.
+            shapeControls.SwitchObject.transform.SetParent(
+                canvasTransform, false);
+
+            shapeControls.MenuObject.transform.SetParent(
+                canvasTransform, false);
+
+            GetTextMenuObject().transform.SetParent(
+                canvasTransform, false);
+
             LineMenu.Instance.Disable();
             ShapeMenu.Disable();
             TextMenu.Instance.Disable();
@@ -39,15 +54,34 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Disables all tool-session menus after every test.
+        /// Closes all tool-session menus and preserves persistent
+        /// menu objects before the shared test base destroys a
+        /// temporary UI canvas.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for menu cleanup.
+        /// </returns>
         [UnityTearDown]
         public IEnumerator TearDownMenus()
         {
             ShapeMenu.Disable();
             TextMenu.Instance.Disable();
             LineMenu.Instance.Disable();
+
+            ColorPickerMindMapMenu.Instance.Destroy();
+            ColorPickerLineMenu.Instance.Destroy();
+
+            if (OwnsUICanvas)
+            {
+                ShapeMenuControls shapeControls = GetShapeControls();
+
+                shapeControls.MenuObject.transform.SetParent(null);
+                shapeControls.SwitchObject.transform.SetParent(null);
+
+                GetTextMenuObject().transform.SetParent(null);
+
+                LineMenu.Instance.GameObject.transform.SetParent(null);
+            }
 
             yield return null;
         }
@@ -213,11 +247,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Verifies that stopping a color-picker action discards a pending line helper
-        /// even when no action-state transition occurs.
+        /// Verifies that stopping a color-picker action discards a pending
+        /// line helper menu even when no action-state transition occurs.
+        /// The selection state is cleared immediately, while the menu
+        /// object is destroyed after the current Unity frame.
         /// </summary>
-        [Test]
-        public void TestStoppingColorPickerDestroysLineHelperMenu()
+        /// <returns>
+        /// An enumerator that waits for deferred menu destruction.
+        /// </returns>
+        [UnityTest]
+        public IEnumerator TestStoppingColorPickerDestroysLineHelperMenu()
         {
             LineConf configuration = new LineConf
             {
@@ -239,11 +278,16 @@ namespace SEE.UI.Menu.Drawable
 
             action.Stop();
 
-            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.False);
+            /// The pending color selection must be invalidated immediately.
             Assert.That(
                 ColorPickerLineMenu.Instance.TryGetColor(out Color color),
                 Is.False);
             Assert.That(color, Is.EqualTo(Color.clear));
+
+            /// Unity destroys game objects at the end of the frame.
+            yield return null;
+
+            Assert.That(ColorPickerLineMenu.Instance.IsOpen(), Is.False);
         }
 
         /// <summary>
@@ -278,13 +322,43 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The shape-menu switch object.</returns>
         private static GameObject GetShapeSwitch()
         {
+            return GetShapeControls().SwitchObject;
+        }
+
+        /// <summary>
+        /// Gets the controls owned by the static shape menu.
+        /// </summary>
+        /// <returns>The shape-menu controls.</returns>
+        private static ShapeMenuControls GetShapeControls()
+        {
             FieldInfo field = typeof(ShapeMenu).GetField(
-                "drawableSwitch",
+                "controls",
                 BindingFlags.NonPublic | BindingFlags.Static);
 
             Assert.That(field, Is.Not.Null);
 
-            GameObject result = field.GetValue(null) as GameObject;
+            ShapeMenuControls controls =
+                field.GetValue(null) as ShapeMenuControls;
+
+            Assert.That(controls, Is.Not.Null);
+
+            return controls;
+        }
+
+        /// <summary>
+        /// Gets the persistent game object of the text-menu singleton.
+        /// </summary>
+        /// <returns>The text-menu game object.</returns>
+        private static GameObject GetTextMenuObject()
+        {
+            FieldInfo field = typeof(Menu).GetField(
+                "gameObject",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(field, Is.Not.Null);
+
+            GameObject result =
+                field.GetValue(TextMenu.Instance) as GameObject;
 
             Assert.That(result, Is.Not.Null);
 

@@ -1,4 +1,5 @@
 ﻿using Michsky.MUIP;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.Line;
 using SEE.UI.Drawable;
@@ -371,6 +372,18 @@ namespace SEE.UI.Menu.Drawable.Line
                     });
 
                 drawLineMenu.Enable();
+
+                /// The stored drawing line kind may differ from the line kind
+                /// selected before the menu was reopened. Synchronize the
+                /// tiling control with the restored drawing configuration.
+                if (ValueHolder.CurrentLineKind == LineKind.Dashed)
+                {
+                    EnableTilingFromLineMenu();
+                }
+                else
+                {
+                    DisableTilingFromLineMenu();
+                }
 
                 mode = Mode.Drawing;
             }

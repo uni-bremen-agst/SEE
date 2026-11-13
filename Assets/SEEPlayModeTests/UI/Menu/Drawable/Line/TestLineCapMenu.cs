@@ -14,12 +14,7 @@ namespace SEE.UI.Menu.Drawable.Line
     /// <summary>
     /// Play-mode integration tests for <see cref="LineCapMenu"/>.
     /// </summary>
-    /// <remarks>
-    /// These tests are currently blocked by issue #983 because the play-mode
-    /// test environment does not provide the SEE scene objects required by
-    /// drawable menus.
-    /// </remarks>
-    [Ignore("Blocked by #983: required SEE UI scene objects are unavailable in play-mode tests.")]
+    [TestFixture]
     internal class TestLineCapMenu : TestUI
     {
         /// <summary>
@@ -79,13 +74,18 @@ namespace SEE.UI.Menu.Drawable.Line
         private GameObject lineCapSelection;
 
         /// <summary>
-        /// Instantiates the real prefab and initializes a fresh
+        /// Ensures that a UI canvas exists, instantiates the real
+        /// line-menu prefab, and initializes a fresh
         /// <see cref="LineCapMenu"/>.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for UI initialization.
+        /// </returns>
         [UnitySetUp]
         public IEnumerator SetUpLineCapMenu()
         {
+            EnsureUICanvas();
+
             lineMenuObject = Menu.InstantiatePrefab(LineMenuPrefab);
 
             lineCapMenu = new LineCapMenu(
@@ -119,9 +119,12 @@ namespace SEE.UI.Menu.Drawable.Line
         }
 
         /// <summary>
-        /// Removes listeners and destroys the test prefab.
+        /// Removes registered listeners and destroys the test prefab.
+        /// The shared test base cleans up an owned UI canvas.
         /// </summary>
-        /// <returns>An enumerator used by the Unity test runner.</returns>
+        /// <returns>
+        /// An enumerator that waits for deferred object destruction.
+        /// </returns>
         [UnityTearDown]
         public IEnumerator TearDownLineCapMenu()
         {

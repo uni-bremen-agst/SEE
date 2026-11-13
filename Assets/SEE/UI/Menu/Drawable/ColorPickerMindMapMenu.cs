@@ -130,18 +130,21 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Initializes the button used to obtain the branch-line color.
-        /// If the node has no parent branch line, the button is disabled.
+        /// If the node has no parent branch line, the button is visually
+        /// disabled and cannot receive pointer interactions.
         /// </summary>
         /// <param name="conf">The configuration of the selected node.</param>
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfBranchLine(MindMapNodeConf conf, bool primaryColor)
         {
-            GameObject branchLineButtonArea = GameFinder.FindAttachedOrLocalDescendant(gameObject, "BranchLine");
+            GameObject branchLineButtonArea =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "BranchLine");
 
-            /// Checks if the node has a parent. If not, this area will be disabled.
+            ButtonManager branchButton =
+                branchLineButtonArea.GetComponent<ButtonManager>();
+
             if (conf.BranchLineToParent != "")
             {
-                ButtonManager branchButton = branchLineButtonArea.GetComponent<ButtonManager>();
                 branchButton.onClick.AddListener(() =>
                 {
                     chosenColor = GetLineColor(conf.BranchLineConf, primaryColor);
@@ -150,10 +153,25 @@ namespace SEE.UI.Menu.Drawable
             }
             else
             {
-                /// If the node has no parent, there is consequently no branch line to the parent.
-                /// Therefore, in this case, the button will be disabled.
-                branchLineButtonArea.GetComponent<ButtonManager>().Interactable(false);
+                /// Disable both button components without invoking the
+                /// Modern UI Pack animation, which requires an unassigned
+                /// disabledCG reference in this prefab.
+                branchButton.enabled = false;
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
+
+                /// Keep the unavailable option visible but prevent pointer
+                /// interactions and animations on the entire button hierarchy.
+                CanvasGroup canvasGroup =
+                    branchLineButtonArea.GetComponent<CanvasGroup>();
+
+                if (canvasGroup == null)
+                {
+                    canvasGroup = branchLineButtonArea.AddComponent<CanvasGroup>();
+                }
+
+                canvasGroup.alpha = 0.5f;
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
             }
         }
 

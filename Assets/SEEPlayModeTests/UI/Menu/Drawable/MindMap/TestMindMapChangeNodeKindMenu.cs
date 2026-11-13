@@ -1,22 +1,31 @@
-﻿using Michsky.MUIP;
+﻿
+using Michsky.MUIP;
 using NUnit.Framework;
 using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Game.Drawable.ValueHolders;
-using UnityEngine;
+using System.Collections;
 using System.Reflection;
 using TMPro;
-using SEE.Game.Drawable.MindMap;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.UI.Menu.Drawable.MindMap
 {
     /// <summary>
-    /// Tests the node kind selection behavior of
+    /// PlayMode tests for the node kind selection behavior of
     /// <see cref="MindMapChangeNodeKindMenu"/>.
     /// </summary>
     [TestFixture]
-    public class TestMindMapChangeNodeKindMenu : DrawableMenuTestBase
+    internal class TestMindMapChangeNodeKindMenu : TestUI
     {
+        /// <summary>
+        /// The UI canvas used by the Drawable menus.
+        /// </summary>
+        private GameObject uiCanvasObject;
+
         /// <summary>
         /// The root object of the test Drawable hierarchy.
         /// </summary>
@@ -38,11 +47,19 @@ namespace SEE.UI.Menu.Drawable.MindMap
         private GameObject node;
 
         /// <summary>
-        /// Creates the Drawable hierarchy required by each test.
+        /// Creates the UI canvas and Drawable hierarchy required by each test.
         /// </summary>
-        [SetUp]
-        public void SetUp()
+        /// <returns>
+        /// An enumerator that waits for the Unity lifecycle to initialize.
+        /// </returns>
+        [UnitySetUp]
+        public IEnumerator SetUpMindMapChangeNodeKindMenu()
         {
+            uiCanvasObject = new GameObject(
+                "UI Canvas",
+                typeof(RectTransform),
+                typeof(Canvas));
+
             root = new GameObject("DrawableRoot");
 
             surface = new GameObject("Surface");
@@ -56,26 +73,43 @@ namespace SEE.UI.Menu.Drawable.MindMap
             node = new GameObject("Node");
             node.tag = Tags.MindMapNode;
             node.transform.SetParent(attachedObjects.transform);
-            node.AddComponent<MMNodeValueHolder>();
+
+            MMNodeValueHolder nodeValueHolder =
+                node.AddComponent<MMNodeValueHolder>();
+
+            nodeValueHolder.NodeKind = MindMapNodeKind.Theme;
+
+            yield return null;
         }
 
         /// <summary>
-        /// Destroys the menu and test hierarchy.
+        /// Destroys the menus, UI canvas, and test hierarchy after each test.
         /// </summary>
-        [TearDown]
-        public void TearDown()
+        /// <returns>
+        /// An enumerator that waits for deferred object destruction.
+        /// </returns>
+        [UnityTearDown]
+        public IEnumerator TearDownMindMapChangeNodeKindMenu()
         {
             MindMapChangeNodeKindMenu.Instance.Destroy();
             MindMapParentSelectionMenu.Instance.Destroy();
 
             if (root != null)
             {
-                Object.DestroyImmediate(root);
+                Object.Destroy(root);
             }
+
+            if (uiCanvasObject != null)
+            {
+                Object.Destroy(uiCanvasObject);
+            }
+
+            yield return null;
         }
 
         /// <summary>
-        /// Verifies that the node kind selector contains all available Mind Map node kinds.
+        /// Verifies that the node kind selector contains all available
+        /// Mind Map node kinds.
         /// </summary>
         [Test]
         public void TestSelectorContainsAllNodeKinds()
@@ -85,18 +119,26 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 NodeKind = MindMapNodeKind.Theme
             };
 
-            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+            MindMapChangeNodeKindMenu.Enable(
+                node, configuration, () => { });
 
             HorizontalSelector selector = FindNodeKindSelector();
 
             Assert.That(selector.items.Count, Is.EqualTo(3));
-            Assert.That(selector.items[0].itemTitle, Is.EqualTo(MindMapNodeKind.Theme.ToString()));
-            Assert.That(selector.items[1].itemTitle, Is.EqualTo(MindMapNodeKind.Subtheme.ToString()));
-            Assert.That(selector.items[2].itemTitle, Is.EqualTo(MindMapNodeKind.Leaf.ToString()));
+            Assert.That(
+                selector.items[0].itemTitle,
+                Is.EqualTo(MindMapNodeKind.Theme.ToString()));
+            Assert.That(
+                selector.items[1].itemTitle,
+                Is.EqualTo(MindMapNodeKind.Subtheme.ToString()));
+            Assert.That(
+                selector.items[2].itemTitle,
+                Is.EqualTo(MindMapNodeKind.Leaf.ToString()));
         }
 
         /// <summary>
-        /// Verifies that the selector uses the configured node kind as its default item.
+        /// Verifies that the selector uses the configured node kind
+        /// as its default item.
         /// </summary>
         [Test]
         public void TestConfiguredNodeKindIsUsedAsDefault()
@@ -106,7 +148,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 NodeKind = MindMapNodeKind.Subtheme
             };
 
-            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+            MindMapChangeNodeKindMenu.Enable(
+                node, configuration, () => { });
 
             HorizontalSelector selector = FindNodeKindSelector();
 
@@ -114,8 +157,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
-        /// Verifies that the currently selected selector index is returned as the
-        /// corresponding Mind Map node kind.
+        /// Verifies that the selected selector index is returned as
+        /// the corresponding Mind Map node kind.
         /// </summary>
         [Test]
         public void TestGetSelectedNodeKindUsesCurrentSelectorIndex()
@@ -125,7 +168,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 NodeKind = MindMapNodeKind.Theme
             };
 
-            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+            MindMapChangeNodeKindMenu.Enable(
+                node, configuration, () => { });
 
             HorizontalSelector selector = FindNodeKindSelector();
             selector.index = 2;
@@ -136,7 +180,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
-        /// Verifies that pressing the return button invokes the provided callback.
+        /// Verifies that pressing the return button invokes the provided
+        /// callback when the selected node is a valid root Theme.
         /// </summary>
         [Test]
         public void TestReturnButtonInvokesCallback()
@@ -147,6 +192,16 @@ namespace SEE.UI.Menu.Drawable.MindMap
             {
                 NodeKind = MindMapNodeKind.Theme
             };
+
+            MMNodeValueHolder valueHolder =
+                node.GetComponent<MMNodeValueHolder>();
+
+            Assert.That(valueHolder, Is.Not.Null);
+
+            /// In Play Mode, Awake determines the node kind from its name.
+            /// Explicitly configure the test node as the root Theme
+            /// required by this scenario.
+            valueHolder.NodeKind = MindMapNodeKind.Theme;
 
             MindMapChangeNodeKindMenu.Enable(
                 node,
@@ -160,17 +215,20 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
-        /// Verifies that changing a Theme to a node kind that requires a parent does not
-        /// modify the node until a valid parent has been explicitly confirmed.
+        /// Verifies that changing a Theme to a node kind requiring
+        /// a parent does not modify the node before confirmation.
         /// </summary>
-        /// <param name="newNodeKind">The node kind that requires a parent.</param>
+        /// <param name="newNodeKind">
+        /// The node kind that requires a parent.
+        /// </param>
         [TestCase(MindMapNodeKind.Subtheme)]
         [TestCase(MindMapNodeKind.Leaf)]
         public void TestParentRequiredNodeKindChangeRemainsPendingUntilConfirmation(
             MindMapNodeKind newNodeKind)
         {
-            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
-            InitializeValueHolder(nodeValueHolder);
+            MMNodeValueHolder nodeValueHolder =
+                node.GetComponent<MMNodeValueHolder>();
+
             nodeValueHolder.NodeKind = MindMapNodeKind.Theme;
 
             CreateParentCandidate();
@@ -180,7 +238,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 NodeKind = MindMapNodeKind.Theme
             };
 
-            MindMapChangeNodeKindMenu.Enable(node, configuration, () => { });
+            MindMapChangeNodeKindMenu.Enable(
+                node, configuration, () => { });
 
             HorizontalSelector selector = FindNodeKindSelector();
             int index = GameMindMap.GetNodeKinds().IndexOf(newNodeKind);
@@ -188,22 +247,31 @@ namespace SEE.UI.Menu.Drawable.MindMap
             selector.index = index;
             selector.onValueChanged.Invoke(index);
 
-            Assert.That(nodeValueHolder.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
-            Assert.That(configuration.NodeKind, Is.EqualTo(MindMapNodeKind.Theme));
+            Assert.That(
+                nodeValueHolder.NodeKind,
+                Is.EqualTo(MindMapNodeKind.Theme));
+
+            Assert.That(
+                configuration.NodeKind,
+                Is.EqualTo(MindMapNodeKind.Theme));
+
             Assert.That(nodeValueHolder.GetParent(), Is.Null);
         }
 
         /// <summary>
-        /// Verifies that rejecting a node-kind change also cancels a pending
-        /// parent selection from a previously selected node kind.
+        /// Verifies that rejecting a node kind change also cancels
+        /// a pending parent selection from a previous node kind.
         /// </summary>
-        [Test]
-        public void TestRejectedNodeKindChangeCancelsPendingParentSelection()
+        /// <returns>
+        /// An enumerator that waits for the pending parent menu
+        /// to be destroyed.
+        /// </returns>
+        [UnityTest]
+        public IEnumerator TestRejectedNodeKindChangeCancelsPendingParentSelection()
         {
             MMNodeValueHolder nodeValueHolder =
                 node.GetComponent<MMNodeValueHolder>();
 
-            InitializeValueHolder(nodeValueHolder);
             nodeValueHolder.NodeKind = MindMapNodeKind.Theme;
 
             CreateParentCandidate();
@@ -215,7 +283,6 @@ namespace SEE.UI.Menu.Drawable.MindMap
             MMNodeValueHolder childValueHolder =
                 child.AddComponent<MMNodeValueHolder>();
 
-            InitializeValueHolder(childValueHolder);
             childValueHolder.NodeKind = MindMapNodeKind.Leaf;
 
             GameObject branchLine = new GameObject("BranchLine");
@@ -253,6 +320,8 @@ namespace SEE.UI.Menu.Drawable.MindMap
             selector.index = leafIndex;
             selector.onValueChanged.Invoke(leafIndex);
 
+            yield return null;
+
             Assert.That(
                 selector.index,
                 Is.EqualTo(
@@ -273,45 +342,75 @@ namespace SEE.UI.Menu.Drawable.MindMap
         }
 
         /// <summary>
-        /// Finds the node kind selector of the currently instantiated menu.
+        /// Finds the node-kind selector belonging to the currently
+        /// instantiated Mind Map node-kind menu.
         /// </summary>
-        /// <returns>The node kind selector.</returns>
+        /// <returns>The node-kind selector.</returns>
         private static HorizontalSelector FindNodeKindSelector()
         {
-            foreach (HorizontalSelector candidate in Object.FindObjectsByType<HorizontalSelector>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
-            {
-                if (candidate.gameObject.name == "Selection")
-                {
-                    return candidate;
-                }
-            }
+            GameObject selectorObject =
+                GameFinder.FindAttachedOrLocalDescendant(
+                    GetNodeKindMenuObject(),
+                    "Selection");
 
-            Assert.Fail("Could not find the Mind Map node kind selector.");
-            return null;
+            Assert.That(selectorObject, Is.Not.Null);
+
+            HorizontalSelector result =
+                selectorObject.GetComponent<HorizontalSelector>();
+
+            Assert.That(result, Is.Not.Null);
+
+            return result;
         }
 
         /// <summary>
-        /// Finds the return button manager of the currently instantiated menu.
+        /// Retrieves the game object owned by the current node-kind menu
+        /// instance so test controls are not confused with controls
+        /// belonging to other open or inactive menus.
+        /// </summary>
+        /// <returns>The current node-kind menu game object.</returns>
+        private static GameObject GetNodeKindMenuObject()
+        {
+            FieldInfo field = typeof(Menu).GetField(
+                "gameObject",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(field, Is.Not.Null);
+
+            GameObject result =
+                field.GetValue(MindMapChangeNodeKindMenu.Instance)
+                    as GameObject;
+
+            Assert.That(result, Is.Not.Null);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Finds the return button belonging to the currently instantiated
+        /// Mind Map node-kind menu.
         /// </summary>
         /// <returns>The return button manager.</returns>
         private static ButtonManager FindReturnButton()
         {
-            foreach (ButtonManager candidate in Object.FindObjectsByType<ButtonManager>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
-            {
-                if (candidate.gameObject.name == "ReturnBtn")
-                {
-                    return candidate;
-                }
-            }
+            GameObject buttonObject =
+                GameFinder.FindAttachedOrLocalDescendant(
+                    GetNodeKindMenuObject(),
+                    "ReturnBtn");
 
-            Assert.Fail("Could not find the return button of the Mind Map node kind menu.");
-            return null;
+            Assert.That(buttonObject, Is.Not.Null);
+
+            ButtonManager result =
+                buttonObject.GetComponent<ButtonManager>();
+
+            Assert.That(result, Is.Not.Null);
+
+            return result;
         }
 
         /// <summary>
-        /// Creates a valid Theme that can be selected as the parent of the node under test.
+        /// Creates a valid Theme that can be selected as the parent
+        /// of the node under test.
         /// </summary>
         /// <returns>The created parent candidate.</returns>
         private GameObject CreateParentCandidate()
@@ -320,29 +419,15 @@ namespace SEE.UI.Menu.Drawable.MindMap
             parent.tag = Tags.MindMapNode;
             parent.transform.SetParent(attachedObjects.transform);
 
-            MMNodeValueHolder valueHolder = parent.AddComponent<MMNodeValueHolder>();
-            InitializeValueHolder(valueHolder);
+            MMNodeValueHolder valueHolder =
+                parent.AddComponent<MMNodeValueHolder>();
+
             valueHolder.NodeKind = MindMapNodeKind.Theme;
 
             TextMeshPro text = parent.AddComponent<TextMeshPro>();
             text.text = parent.name;
 
             return parent;
-        }
-
-        /// <summary>
-        /// Invokes the Unity initialization of the given Mind Map node value holder.
-        /// EditMode tests do not execute the regular MonoBehaviour lifecycle reliably
-        /// for this component.
-        /// </summary>
-        /// <param name="valueHolder">The value holder that should be initialized.</param>
-        private static void InitializeValueHolder(MMNodeValueHolder valueHolder)
-        {
-            MethodInfo awake = typeof(MMNodeValueHolder).GetMethod(
-                "Awake", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(awake, Is.Not.Null, "Could not find MMNodeValueHolder.Awake().");
-            awake.Invoke(valueHolder, null);
         }
     }
 }
