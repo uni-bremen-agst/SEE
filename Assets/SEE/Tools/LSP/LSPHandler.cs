@@ -249,6 +249,19 @@ namespace SEE.Tools.LSP
             }
         };
 
+        /// <summary>
+        /// Explicit executable path retained when restarting the server for code windows.
+        /// </summary>
+        private string configuredExecutablePath;
+
+        // Owned resources must also be released after a partially completed startup.
+        private Stream inputLog = Stream.Null;
+        private Stream outputLog = Stream.Null;
+        private CancellationTokenSource startupCancellation;
+
+        // The importer and several code windows can share the same open document.
+        private readonly Dictionary<DocumentUri, int> documentUsers = new();
+
         private void OnEnable()
         {
             if (Server != null)
@@ -259,6 +272,7 @@ namespace SEE.Tools.LSP
 
         private void OnDisable()
         {
+            startupCancellation?.Cancel();
             ShutdownAsync().Forget();
         }
 
@@ -272,6 +286,10 @@ namespace SEE.Tools.LSP
                 throw new InvalidOperationException("LSP server must be set before initializing the handler.\n");
             }
             await semaphore.WaitAsync(token);
+            if (!string.IsNullOrEmpty(executablePath))
+            {
+                configuredExecutablePath = executablePath;
+            }
             if (IsReady)
             {
                 semaphore.Release();
@@ -284,11 +302,14 @@ namespace SEE.Tools.LSP
             IDisposable spinner = LoadingSpinner.ShowIndeterminate("Starting language server...");
             try
             {
-                ProcessStartInfo startInfo = new(fileName: executablePath ?? Server.ServerExecutable,
+                startupCancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
+                token = startupCancellation.Token;
+                ProcessStartInfo startInfo = new(fileName: configuredExecutablePath ?? Server.ServerExecutable,
                                                  arguments: Server.Parameters)
                 {
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
                     WorkingDirectory = ProjectPath
                 };
@@ -307,15 +328,23 @@ namespace SEE.Tools.LSP
                                                         + $"See {Server.WebsiteURL} for setup instructions.\n");
                 }
 
-                Stream outputLog = Stream.Null;
-                Stream inputLog = Stream.Null;
+                Debug.Log($"LSP starting: PID {lspProcess.Id}, executable '{startInfo.FileName}', "
+                          + $"arguments '{startInfo.Arguments}', working directory '{ProjectPath}'.\n");
+                lspProcess.ErrorDataReceived += (_, args) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(args.Data))
+                    {
+                        Debug.LogWarning($"LSP stderr: {args.Data}\n");
+                    }
+                };
+                lspProcess.BeginErrorReadLine();
+
                 if (LogLSP)
                 {
                     string tempDir = Path.GetTempPath();
-                    string outputPath = Path.Combine(tempDir, "outputLogLsp.txt");
-                    string inputPath = Path.Combine(tempDir, "inputLogLsp.txt");
-                    FileIO.DeleteIfExists(outputPath);
-                    FileIO.DeleteIfExists(inputPath);
+                    string session = Guid.NewGuid().ToString("N");
+                    string outputPath = Path.Combine(tempDir, $"outputLogLsp-{session}.txt");
+                    string inputPath = Path.Combine(tempDir, $"inputLogLsp-{session}.txt");
                     outputLog = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                     inputLog = new FileStream(inputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                 }
@@ -346,7 +375,11 @@ namespace SEE.Tools.LSP
                                                           .OnShowMessage(ShowMessage)
                                                           .OnWorkDoneProgressCreate(HandleInitialWorkDoneProgress));
                 // Starting the server might take a little while.
-                await AsyncUtils.RunWithTimeoutAsync(t => Client.Initialize(t).AsUniTask(), TimeoutSpan * 4,
+                await AsyncUtils.RunWithTimeoutAsync(async t =>
+                {
+                    using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(token, t);
+                    await Client.Initialize(linked.Token).AsUniTask();
+                }, TimeoutSpan * 4,
                                                      throwOnTimeout: true);
                 do
                 {
@@ -355,7 +388,7 @@ namespace SEE.Tools.LSP
                     // and then wait until the progress is done. As soon as there are 500ms without
                     // any progress, we assume the initial work is done.
                     bool doneInTimeout = await AsyncUtils.RunWithTimeoutAsync(t => UniTask.WaitUntil(() => initialWork.Count == 0,
-                                                                                                     cancellationToken: t),
+                                                                                                     cancellationToken: t).AttachExternalCancellation(token),
                                                                               // We allow more time for the initial work to be done.
                                                                               TimeoutSpan * 4, throwOnTimeout: false);
                     await UniTask.Delay(TimeSpan.FromMilliseconds(500), cancellationToken: token);
@@ -366,8 +399,15 @@ namespace SEE.Tools.LSP
                 } while (initialWork.Count > 0);
                 IsReady = true;
             }
+            catch
+            {
+                ReleaseServerResources();
+                throw;
+            }
             finally
             {
+                startupCancellation?.Dispose();
+                startupCancellation = null;
                 semaphore.Release();
                 spinner.Dispose();
             }
@@ -466,17 +506,24 @@ namespace SEE.Tools.LSP
         /// <param name="path">The path to the document.</param>
         public void OpenDocument(string path)
         {
+            DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
+            if (documentUsers.TryGetValue(uri, out int users))
+            {
+                documentUsers[uri] = users + 1;
+                return;
+            }
             DidOpenTextDocumentParams parameters = new()
             {
                 TextDocument = new TextDocumentItem
                 {
-                    Uri = DocumentUri.File(path),
+                    Uri = uri,
                     LanguageId = Server.LanguageIdFor(Path.GetExtension(path).TrimStart('.')),
                     Version = 1,
                     Text = File.ReadAllText(path)
                 }
             };
             Client.DidOpenTextDocument(parameters);
+            documentUsers[uri] = 1;
         }
 
         /// <summary>
@@ -486,11 +533,22 @@ namespace SEE.Tools.LSP
         /// <param name="path">The path to the document.</param>
         public void CloseDocument(string path)
         {
+            DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
+            if (!documentUsers.TryGetValue(uri, out int users))
+            {
+                return;
+            }
+            if (users > 1)
+            {
+                documentUsers[uri] = users - 1;
+                return;
+            }
             DidCloseTextDocumentParams parameters = new()
             {
-                TextDocument = new TextDocumentIdentifier(path)
+                TextDocument = new TextDocumentIdentifier(uri)
             };
             Client.DidCloseTextDocument(parameters);
+            documentUsers.Remove(uri);
         }
 
         /// <summary>
@@ -771,19 +829,16 @@ namespace SEE.Tools.LSP
         /// </summary>
         public async UniTask ShutdownAsync(CancellationToken token = default)
         {
+            startupCancellation?.Cancel();
             await semaphore.WaitAsync(token);
-            if (!IsReady)
-            {
-                // LSP server is not running.
-                return;
-            }
-
-            IDisposable spinner = LoadingSpinner.ShowIndeterminate("Shutting down language server...");
             try
             {
-                if (Client != null)
+                if (IsReady && Client != null)
                 {
-                    await AsyncUtils.RunWithTimeoutAsync(_ => Client.Shutdown().AsUniTask(), TimeoutSpan, throwOnTimeout: false);
+                    // Shutdown must remain bounded even when request timeouts are disabled.
+                    TimeSpan shutdownTimeout = TimeoutSpan > TimeSpan.Zero ? TimeoutSpan : TimeSpan.FromSeconds(5);
+                    await AsyncUtils.RunWithTimeoutAsync(_ => Client.Shutdown().AsUniTask(), shutdownTimeout, throwOnTimeout: false);
+                    Client.SendExit();
                 }
             }
             catch (InvalidParametersException)
@@ -793,12 +848,53 @@ namespace SEE.Tools.LSP
             }
             finally
             {
-                // In case Client.SendExit() fails, we release the semaphore and resources first to avoid a deadlock.
-                IsReady = false;
-                semaphore.Release();
-                spinner.Dispose();
+                try
+                {
+                    ReleaseServerResources();
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }
+        }
 
-                Client?.SendExit();
+        /// <summary>
+        /// Releases this handler's client, process and logs, including after failed initialization.
+        /// Must be called while holding the lifecycle semaphore.
+        /// </summary>
+        private void ReleaseServerResources()
+        {
+            IsReady = false;
+            documentUsers.Clear();
+            try
+            {
+                Client?.Dispose();
+            }
+            finally
+            {
+                Client = null;
+                try
+                {
+                    if (lspProcess != null && !lspProcess.HasExited)
+                    {
+                        lspProcess.Kill();
+                    }
+                }
+                finally
+                {
+                    lspProcess?.Dispose();
+                    lspProcess = null;
+                    try
+                    {
+                        inputLog.Dispose();
+                    }
+                    finally
+                    {
+                        outputLog.Dispose();
+                        inputLog = outputLog = Stream.Null;
+                    }
+                }
             }
         }
     }

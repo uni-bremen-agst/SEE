@@ -63,6 +63,10 @@ namespace SEE.Scanner.LSP
         /// <returns>A stream of tokens created from the semantic tokens.</returns>
         private static IEnumerable<LSPToken> FromSemanticTokens(SemanticTokens tokens, SemanticTokensLegend legend, LSPLanguage language, string fileContents)
         {
+            // Render each source line break once, including Windows CRLF line endings.
+            // LSP positions are line-relative, so this preserves their character offsets.
+            fileContents = fileContents.Replace("\r\n", "\n").Replace('\r', '\n');
+
             IList<SemanticTokenModifier> modifierLegend = legend.TokenModifiers.ToList();
             IList<SemanticTokenType> typeLegend = legend.TokenTypes.ToList();
 

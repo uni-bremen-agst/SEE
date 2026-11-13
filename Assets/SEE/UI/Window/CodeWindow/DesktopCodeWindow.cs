@@ -192,7 +192,10 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             int character = word.firstCharacterIndex;
                             (int line, int column) = GetSourcePosition(character);
-                            contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
+                            if (column > 0)
+                            {
+                                contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
+                            }
                         }
                         return;
                     }
@@ -310,7 +313,10 @@ namespace SEE.UI.Window.CodeWindow
             void GoToDefinition(TMP_WordInfo word)
             {
                 (int line, int column) = GetSourcePosition(word.firstCharacterIndex);
-                contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
+                if (column > 0)
+                {
+                    contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
+                }
             }
         }
 
@@ -404,8 +410,34 @@ namespace SEE.UI.Window.CodeWindow
         /// <returns>The line and column of the source code position of the given <paramref name="characterIndex"/>.</returns>
         private (int line, int column) GetSourcePosition(int characterIndex)
         {
-            int line = textMesh.textInfo.characterInfo[characterIndex].lineNumber;
-            int column = characterIndex - CodeWindowOffsets[line] - neededPadding;
+            if (characterIndex < 0 || characterIndex >= textMesh.textInfo.characterCount)
+            {
+                return (0, 0);
+            }
+            // TMP's index points into the rich-text string actually rendered. Neither
+            // visual line numbers nor accumulated token lengths reliably identify source positions.
+            int rawIndex = textMesh.textInfo.characterInfo[characterIndex].index;
+            string renderedText = textMesh.text;
+            int line = 0;
+            int newlineIndex = -1;
+            for (int i = 0; i < rawIndex; i++)
+            {
+                if (renderedText[i] == '\n')
+                {
+                    line++;
+                    newlineIndex = i;
+                }
+            }
+            if (line >= CodeWindowOffsets.Count)
+            {
+                return (0, 0);
+            }
+            int firstCharacter = characterIndex;
+            while (firstCharacter > 0 && textMesh.textInfo.characterInfo[firstCharacter - 1].index > newlineIndex)
+            {
+                firstCharacter--;
+            }
+            int column = characterIndex - firstCharacter - neededPadding;
             return (line + 1, column);
         }
 
