@@ -642,27 +642,84 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
             // A finite monotone lattice over the closed source types present in
             // the finite input, not a depth/iteration bound or a generic solver.
-            bool changed;
-            do
+            string[] bodyOrder = declarations.Keys.ToArray();
+            SortedSet<int> pending = new();
+            SortedSet<int> nextRound = new();
+            bool[] inspected = new bool[bodyOrder.Length];
+            Dictionary<string, HashSet<int>> callers = new(StringComparer.Ordinal);
+            for (int index = 0; index < bodyOrder.Length; index++)
             {
-                changed = false;
-                foreach (string body in declarations.Keys)
+                if (Eligible(bodyOrder[index]))
                 {
-                    if (!Eligible(body)) continue;
-                    foreach (var edge in diagnosticDefinitions[body].Fragment.CallEdges)
+                    pending.Add(index);
+                }
+            }
+            while (pending.Count != 0)
+            {
+                int index = pending.Min;
+                pending.Remove(index);
+                string body = bodyOrder[index];
+                bool changed = false;
+                foreach (ExceptionFlowSummaryCallEdge edge in diagnosticDefinitions[body].Fragment.CallEdges)
+                {
+                    string target = BodyId(edge.Target.Symbol);
+                    // Unregistered readers are already pending in the first sweep.
+                    // Later sweeps need only readers whose inputs have changed.
+                    if (!inspected[index])
                     {
-                        string target = BodyId(edge.Target.Symbol);
-                        if (!unknown.ContainsKey(target)) { if (!unknown[body]) { unknown[body] = true; changed = true; } continue; }
-                        if (unknown[target] && !unknown[body]) { unknown[body] = true; changed = true; }
-                        foreach (var pair in known[target])
-                            if (!edge.CaughtExceptionTypes.Any(caught => ExactGroundCatch(pair.Value, caught))
-                                && known[body].TryAdd(pair.Key, pair.Value)) changed = true;
-                        foreach (var pair in external[target])
-                            if (!edge.CaughtExceptionTypes.Any(caught => ExactGroundCatch(pair.Value, caught))
-                                && external[body].TryAdd(pair.Key, pair.Value)) changed = true;
+                        if (!callers.TryGetValue(target, out HashSet<int>? readers))
+                        {
+                            readers = new();
+                            callers.Add(target, readers);
+                        }
+                        readers.Add(index);
+                    }
+                    if (!unknown.ContainsKey(target))
+                    {
+                        if (!unknown[body])
+                        {
+                            unknown[body] = true;
+                            changed = true;
+                        }
+                        continue;
+                    }
+                    if (unknown[target] && !unknown[body])
+                    {
+                        unknown[body] = true;
+                        changed = true;
+                    }
+                    foreach (KeyValuePair<string, INamedTypeSymbol> pair in known[target])
+                    {
+                        if (!edge.CaughtExceptionTypes.Any(caught => ExactGroundCatch(pair.Value, caught))
+                            && known[body].TryAdd(pair.Key, pair.Value))
+                        {
+                            changed = true;
+                        }
+                    }
+                    foreach (KeyValuePair<string, INamedTypeSymbol> pair in external[target])
+                    {
+                        if (!edge.CaughtExceptionTypes.Any(caught => ExactGroundCatch(pair.Value, caught))
+                            && external[body].TryAdd(pair.Key, pair.Value))
+                        {
+                            changed = true;
+                        }
                     }
                 }
-            } while (changed);
+                inspected[index] = true;
+                if (changed && callers.TryGetValue(body, out HashSet<int>? dependents))
+                {
+                    foreach (int caller in dependents)
+                    {
+                        // Preserve the original sweep order and first winning symbol
+                        // representative, including self/recursive edges in the next round.
+                        (caller > index ? pending : nextRound).Add(caller);
+                    }
+                }
+                if (pending.Count == 0)
+                {
+                    (pending, nextRound) = (nextRound, pending);
+                }
+            }
             // A previously admitted body projection is not an independent
             // witness across an uncovered initialization boundary (C3D F4).
             // Keep the original local facts; do not invent wrapper sources.
