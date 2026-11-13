@@ -2,6 +2,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
@@ -20,8 +21,17 @@ namespace SEE.Controls.ReversibleActions.Drawable
     public class LineSplitAction : LineAction
     {
         /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineSplit"/>.
-        /// Specifically: Allows the user to split a line. One action run allows to split the line one time.
+        /// Stores the original local split position so that the visual
+        /// split marker can be displayed again when the action is redone.
+        /// </summary>
+        private Vector3? splitMarkerPosition;
+
+
+        /// <summary>
+        /// This method manages the player's interaction with the mode
+        /// <see cref="ActionStateType.LineSplit"/>.
+        /// Specifically: Allows the user to split a line.
+        /// One action run allows to split the line one time.
         /// </summary>
         /// <returns>Whether this action is finished.</returns>
         public override bool Update()
@@ -43,28 +53,45 @@ namespace SEE.Controls.ReversibleActions.Drawable
                         isActive = true;
                         LineConf originLine = LineConf.GetLine(hitObject);
                         List<LineConf> lines = new();
-                        NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
-                            out List<Vector3> positionsList, out List<int> matchedIndices);
+                        NearestPoints.GetNearestPoints(
+                            hitObject,
+                            raycastHit.point,
+                            out List<Vector3> positionsList,
+                            out List<int> matchedIndices);
 
-                        List<Vector3> originalPositions = LinePositionHelper.GetSafeOriginalPositions(hitObject).ToList();
+                        matchedIndices = LinePositionHelper.ToLogicalIndices(
+                            hitObject,
+                            matchedIndices);
+
+                        List<Vector3> originalPositions =
+                            LinePositionHelper.GetSafeOriginalPositions(hitObject).ToList();
 
                         GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
                             matchedIndices, originalPositions, lines, false);
 
-                        /// Showes a notification if the split was successfully.
-                        if (lines.Count > 1)
+                        /// Shows a notification if the split was successful.
+                        if (lines.Count > 1 || (originLine.Loop && lines.Count == 1))
                         {
-                            ShowNotification.Info("Line split",
-                                "The original line was successfully split in " + lines.Count + " lines");
-                            /// Marks the split position for a specific time.
-                            MarkSplitPosition(hitObject, originalPositions[matchedIndices[0]]);
+                            string description = lines.Count > 1
+                                ? $"The original line was successfully split into {lines.Count} lines."
+                                : "The closed line was opened at the selected point.";
+
+                            ShowNotification.Info("Line split", description);
+
+                            Vector3 markerPosition =
+                                originalPositions[matchedIndices[0]];
+
+                            splitMarkerPosition = markerPosition;
+                            MarkSplitPosition(hitObject, markerPosition);
                         }
+
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                             memento.OriginalLine.ID).Execute();
                         Destroyer.Destroy(hitObject);
                     }
                 }
+
                 /// This block completes the action.
                 if (SEEInput.MouseUp(MouseButton.Left) && isActive)
                 {
@@ -87,7 +114,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// Calculates the pivot point for the marker.
             Vector3 position = hitObject.transform.TransformPoint(splitPos);
             GameObject surface = GameFinder.GetDrawableSurface(hitObject);
-            position = GameDrawer.GetConvertedPosition(surface, position);
+            position = GameLineGeometry.GetConvertedPosition(surface, position);
 
             /// Calculates the negativ color for the marker.
             Color color = GetColor(hitObject);
@@ -97,12 +124,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
                 ValueHolder.LineSplitMarkerRadius, ValueHolder.LineSplitMarkerVertices);
             /// Creates the marker polygon.
-            GameObject point = GameDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
-                GameDrawer.ColorKind.Monochrome,
+            GameObject point = GameLineDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
+                ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
-                false, GameDrawer.LineKind.Solid, 1f, increaseCurrentOrder: false);
+                false, LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
-            GameDrawer.SetPivotShape(point, position);
+            GameLineGeometry.SetPivotShape(point, position);
             /// Adds the point on all clients.
             new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), LineConf.GetLine(point)).Execute();
             /// Adds a blink effect.
@@ -116,9 +143,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
         /// <summary>
         /// Delivers the color for the complementary color calculation.
-        /// For <see cref="GameDrawer.ColorKind.Monochrome"/>, it is the normal line color.
-        /// For <see cref="GameDrawer.ColorKind.Gradient"/>, it is a mix of the start and the end color.
-        /// For <see cref="GameDrawer.ColorKind.TwoDashed"/>, it is a mix of the two material colors.
+        /// For <see cref="ColorKind.Monochrome"/>, it is the normal line color.
+        /// For <see cref="ColorKind.Gradient"/>, it is a mix of the start and the end color.
+        /// For <see cref="ColorKind.TwoDashed"/>, it is a mix of the two material colors.
         /// </summary>
         /// <param name="line">The split line.</param>
         /// <returns>The color for the complementary color calculation.</returns>
@@ -129,13 +156,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             switch (holder.ColorKind)
             {
-                case GameDrawer.ColorKind.Monochrome:
+                case ColorKind.Monochrome:
                     color = line.GetColor();
                     break;
-                case GameDrawer.ColorKind.Gradient:
+                case ColorKind.Gradient:
                     color = (renderer.startColor + renderer.endColor) / 2;
                     break;
-                case GameDrawer.ColorKind.TwoDashed:
+                case ColorKind.TwoDashed:
                     color = (renderer.materials[0].color + renderer.materials[1].color) / 2;
                     break;
             }
@@ -149,7 +176,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             base.Undo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameDrawer.ReDrawLine(surface, memento.OriginalLine);
+            GameLineDrawer.ReDrawLine(surface, memento.OriginalLine);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine).Execute();
 
             foreach (LineConf line in memento.Lines)
@@ -157,6 +184,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 GameObject lineObj = GameFinder.FindAttachedOrLocalDescendant(surface, line.ID);
                 new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.ID).Execute();
                 Destroyer.Destroy(lineObj);
+            }
+
+            if (splitMarkerPosition.HasValue)
+            {
+                ShowNotification.Info("Line split undone",
+                    "The original line has been restored.");
             }
         }
 
@@ -168,13 +201,28 @@ namespace SEE.Controls.ReversibleActions.Drawable
             base.Redo();
             GameObject surface = memento.Surface.GetDrawableSurface();
             GameObject originObj = GameFinder.FindAttachedOrLocalDescendant(surface, memento.OriginalLine.ID);
+
+            if (splitMarkerPosition.HasValue && originObj != null)
+            {
+                MarkSplitPosition(originObj, splitMarkerPosition.Value);
+            }
+
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.ID).Execute();
             Destroyer.Destroy(originObj);
 
             foreach (LineConf line in memento.Lines)
             {
-                GameDrawer.ReDrawLine(surface, line);
+                GameLineDrawer.ReDrawLine(surface, line);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, line).Execute();
+            }
+
+            if (splitMarkerPosition.HasValue)
+            {
+                string description = memento.Lines.Count > 1
+                    ? $"Restored {memento.Lines.Count} line segments."
+                    : "The closed line was opened again.";
+
+                ShowNotification.Info("Line split redone", description);
             }
         }
 

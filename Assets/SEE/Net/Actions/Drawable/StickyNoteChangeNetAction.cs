@@ -1,6 +1,5 @@
-﻿using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using UnityEngine;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.StickyNote;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -25,7 +24,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (DrawableConf != null && Surface != null)
             {
-                GameStickyNoteManager.Change(Surface, DrawableConf);
+                GameStickyNoteEdit.Change(Surface, DrawableConf);
             }
             else
             {

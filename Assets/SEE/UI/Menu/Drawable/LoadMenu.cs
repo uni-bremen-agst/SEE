@@ -31,49 +31,39 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The instance for the regular load drawable button.
+        /// Creates the load menu and registers the required button handlers.
         /// </summary>
-        private static ButtonManager loadButton;
-
-        /// <summary>
-        /// The instance for the specific load drawables button.
-        /// </summary>
-        private static ButtonManager loadSpecificButton;
-
-        /// <summary>
-        /// The instance for the button that loads drawable content onto the current page
-        /// of the selected drawable surface.
-        /// </summary>
-        private static ButtonManager loadSpecificCurrentPageButton;
-
-        /// <summary>
-        /// Creates the load menu.
-        /// </summary>
-        /// <param name="loadButtonCall">The action that should be executed when the load button is pressed.</param>
-        /// <param name="loadSpecificButtonCall">The action that should be executed when the load specific button is pressed.</param>
-        /// <param name="loadSpecificCurrentPageButtonCall">The action that should be executed when loading onto the current page is pressed.</param>
-        public static void Enable(UnityAction loadButtonCall,
-                                  UnityAction loadSpecificButtonCall,
-                                  UnityAction loadSpecificCurrentPageButtonCall)
+        /// <param name="loadButtonCall">
+        /// The action that should be executed when the load button is pressed.
+        /// </param>
+        /// <param name="loadSpecificButtonCall">
+        /// The action that should be executed when the load-specific button is pressed.
+        /// </param>
+        /// <param name="loadSpecificCurrentPageButtonCall">
+        /// The action that should be executed when loading onto the current page is pressed.
+        /// </param>
+        public void Enable(UnityAction loadButtonCall,
+                           UnityAction loadSpecificButtonCall,
+                           UnityAction loadSpecificCurrentPageButtonCall)
         {
-            /// Instantiate the menu.
-            Instance = new LoadMenu();
-            Instance.Instantiate(loadMenuPrefab);
-            loadButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Load")
-                .GetComponent<ButtonManager>();
-            loadSpecificButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LoadSpecific")
-                .GetComponent<ButtonManager>();
-            loadSpecificCurrentPageButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LoadSpecificCurrentPage")
-                .GetComponent<ButtonManager>();
+            Instantiate(loadMenuPrefab);
 
-            /// Adds a handler for the <paramref name="loadButtonCall"/>.
+            ButtonManager loadButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Load")
+                    .GetComponent<ButtonManager>();
+
+            ButtonManager loadSpecificButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecific")
+                    .GetComponent<ButtonManager>();
+
+            ButtonManager loadSpecificCurrentPageButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecificCurrentPage")
+                    .GetComponent<ButtonManager>();
+
             loadButton.onClick.AddListener(loadButtonCall);
-
-            /// Adds a handler for the <paramref name="loadSpecificButtonCall"/>.
             loadSpecificButton.onClick.AddListener(loadSpecificButtonCall);
-
-            /// Adds a handler for the load on specific current page button.
-            loadSpecificCurrentPageButton.onClick.AddListener(loadSpecificCurrentPageButtonCall);
+            loadSpecificCurrentPageButton.onClick.AddListener(
+                loadSpecificCurrentPageButtonCall);
         }
     }
 }

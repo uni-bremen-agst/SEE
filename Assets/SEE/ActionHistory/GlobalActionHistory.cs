@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.ReversibleActions;
+using System;
 using static SEE.ReversibleActionHistory.ActionHistory;
 
 namespace SEE.ReversibleActionHistory
@@ -13,6 +14,16 @@ namespace SEE.ReversibleActionHistory
         /// The history of actions.
         /// </summary>
         private static readonly ActionHistory history = new();
+
+        /// <summary>
+        /// Is raised when the <see cref="ActionStateType"/> of the currently executing action changes.
+        /// The first argument is the previous action state type and the second argument is the new one.
+        /// </summary>
+        public static event Action<ActionStateType, ActionStateType> ActionStateChanged
+        {
+            add => history.ActionStateChanged += value;
+            remove => history.ActionStateChanged -= value;
+        }
 
         /// <summary>
         /// Executes the currently active action (if there is any).

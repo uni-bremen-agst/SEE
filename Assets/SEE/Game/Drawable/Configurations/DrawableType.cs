@@ -1,4 +1,8 @@
-﻿using SEE.Graphs.Config;
+﻿using SEE.Game.Drawable.Editing;
+using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.MindMap;
+using SEE.Game.Drawable.Text;
+using SEE.Graphs.Config;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
 using System;
@@ -62,9 +66,8 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Edits the object to the given drawable type configuration.
-        /// It calls the corresponding <see cref="GameEdit"/> - change method of the respective
-        /// drawable type.
+        /// Edits the object according to the given drawable type configuration.
+        /// It delegates the change to the editor responsible for the respective drawable type.
         /// </summary>
         /// <param name="objectToEdit">The object to be edited.</param>
         /// <param name="type">The drawable type configuration that should be applied.</param>
@@ -75,19 +78,19 @@ namespace SEE.Game.Drawable.Configurations
             switch(type)
             {
                 case LineConf line:
-                    GameEdit.ChangeLine(objectToEdit, line);
+                    GameLineEdit.ChangeLine(objectToEdit, line);
                     new EditLineNetAction(surface.name, surfaceParentName, LineConf.GetLineWithoutRenderPos(objectToEdit)).Execute();
                     break;
                 case TextConf text:
-                    GameEdit.ChangeText(objectToEdit, text);
+                    GameTextEdit.ChangeText(objectToEdit, text);
                     new EditTextNetAction(surface.name, surfaceParentName, text).Execute();
                     break;
                 case ImageConf image:
-                    GameEdit.ChangeImage(objectToEdit, image);
+                    GameImageEdit.ChangeImage(objectToEdit, image);
                     new EditImageNetAction(surface.name, surfaceParentName, image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    GameEdit.ChangeMindMapNode(objectToEdit, node);
+                    GameMindMapEdit.ChangeMindMapNode(objectToEdit, node);
                     new EditMMNodeNetAction(surface.name, surfaceParentName, node).Execute();
                     break;
                 default:
@@ -206,7 +209,7 @@ namespace SEE.Game.Drawable.Configurations
             switch (type)
             {
                 case LineConf line:
-                    createdObject = GameDrawer.ReDrawLine(surface, line);
+                    createdObject = GameLineDrawer.ReDrawLine(surface, line);
                     EnsureValidity(type, createdObject);
                     new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         line).Execute();

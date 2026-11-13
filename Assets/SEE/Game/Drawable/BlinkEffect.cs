@@ -109,6 +109,7 @@ namespace SEE.Game.Drawable
         public void Deactivate()
         {
             loopOn = false;
+            StopAllCoroutines();
             if (renderer != null)
             {
                 renderer.enabled = true;
@@ -140,9 +141,14 @@ namespace SEE.Game.Drawable
         /// <param name="obj">The object which blink effect should be deactivated.</param>
         public static void Deactivate(GameObject obj)
         {
-            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            if (obj == null)
             {
-                obj.GetComponent<BlinkEffect>().Deactivate();
+                return;
+            }
+
+            foreach (BlinkEffect effect in obj.GetComponents<BlinkEffect>())
+            {
+                effect.Deactivate();
             }
         }
 

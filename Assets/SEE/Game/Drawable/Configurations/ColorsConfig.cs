@@ -1,5 +1,5 @@
 ﻿using SEE.Graphs.Config;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.Line;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;

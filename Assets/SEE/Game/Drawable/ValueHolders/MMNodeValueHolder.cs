@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Game.Drawable.MindMap;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.ValueHolders
@@ -11,7 +12,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// Property for the node kind of the mind map node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind { get; set; }
+        public MindMapNodeKind NodeKind { get; set; }
 
         /// <summary>
         /// The layer of the mind map node.
@@ -27,7 +28,7 @@ namespace SEE.Game.Drawable.ValueHolders
             get { return layer; }
             set
             {
-                if (NodeKind == GameMindMap.NodeKind.Theme)
+                if (NodeKind == MindMapNodeKind.Theme)
                 {
                     layer = 0;
                 }
@@ -64,15 +65,15 @@ namespace SEE.Game.Drawable.ValueHolders
             children = new Dictionary<GameObject, GameObject>();
             if (gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix))
             {
-                NodeKind = GameMindMap.NodeKind.Theme;
+                NodeKind = MindMapNodeKind.Theme;
             }
             else if (gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix))
             {
-                NodeKind = GameMindMap.NodeKind.Subtheme;
+                NodeKind = MindMapNodeKind.Subtheme;
             }
             else
             {
-                NodeKind = GameMindMap.NodeKind.Leaf;
+                NodeKind = MindMapNodeKind.Leaf;
             }
             layer = 0;
         }
@@ -84,7 +85,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <param name="parent">The parent node.</param>
         public void SetParent(GameObject parent, GameObject branchLine)
         {
-            if (NodeKind == GameMindMap.NodeKind.Theme)
+            if (NodeKind == MindMapNodeKind.Theme)
             {
                 if (this.parent != null)
                 {
