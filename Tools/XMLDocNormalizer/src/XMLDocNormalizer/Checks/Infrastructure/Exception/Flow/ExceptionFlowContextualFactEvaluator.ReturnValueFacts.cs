@@ -98,18 +98,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 bool hasReturnFacts =
                     false;
 
+                // Every return was collected from this one declaration's syntax tree.
+                SemanticModel? returnSemanticModel =
+                    ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
+                        semanticModel,
+                        returnExpressions[0].SyntaxTree);
+
+                if (returnSemanticModel == null)
+                {
+                    return false;
+                }
+
                 foreach (ExpressionSyntax returnExpression in returnExpressions)
                 {
-                    SemanticModel? returnSemanticModel =
-                        ExceptionFlowSemanticScope.GetSemanticModelForSyntaxTree(
-                            semanticModel,
-                            returnExpression.SyntaxTree);
-
-                    if (returnSemanticModel == null)
-                    {
-                        return false;
-                    }
-
                     ExceptionFlowValueFacts returnFacts =
                         GetSourceReturnExpressionValueFacts(
                             returnExpression,
