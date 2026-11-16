@@ -463,21 +463,39 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     ? ExceptionFlowPathStepKind.InterfaceMethodCall
                     : ExceptionFlowPathStepKind.VirtualMethodCall;
 
+            ExceptionFlowCallContext? callSiteContext = null;
             foreach (SummaryInvocationTargetPlan target in plan.Targets)
             {
-                ExceptionFlowCallContext targetContext = plan.IsRuntimeDispatch
-                    ? CreateDispatchCallContext(
+                ExceptionFlowCallContext targetContext;
+                if (plan.IsRuntimeDispatch && plan.CallerContext.Key.Length == 0)
+                {
+                    // Empty caller facts have no mutable member sets to expose.
+                    callSiteContext ??= ExceptionFlowContextualFactEvaluator.CreateCallContext(
                         plan.SelectedMethod,
-                        target.RequestedTarget,
                         plan.Invocation.ArgumentList.Arguments,
                         plan.SemanticModel,
-                        plan.CallerContext)
-                    : CreateInvocationCallContext(
-                        plan.Invocation,
+                        plan.CallerContext);
+                    targetContext = CreateDispatchTargetContext(
                         plan.SelectedMethod,
                         target.RequestedTarget,
-                        plan.SemanticModel,
-                        plan.CallerContext);
+                        callSiteContext);
+                }
+                else
+                {
+                    targetContext = plan.IsRuntimeDispatch
+                        ? CreateDispatchCallContext(
+                            plan.SelectedMethod,
+                            target.RequestedTarget,
+                            plan.Invocation.ArgumentList.Arguments,
+                            plan.SemanticModel,
+                            plan.CallerContext)
+                        : CreateInvocationCallContext(
+                            plan.Invocation,
+                            plan.SelectedMethod,
+                            target.RequestedTarget,
+                            plan.SemanticModel,
+                            plan.CallerContext);
+                }
                 ExceptionFlowCallableKey targetKey =
                     target.SupportingSourceScope != null
                         ? ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
@@ -588,16 +606,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         : ExceptionFlowPathStepKind
                             .VirtualMethodCall;
 
+            ExceptionFlowCallContext? callSiteContext = null;
             foreach (IMethodSymbol runtimeTarget
                      in runtimeTargets)
             {
-                ExceptionFlowCallContext targetContext =
-                    CreateDispatchCallContext(
+                ExceptionFlowCallContext targetContext;
+                if (callerContext.Key.Length == 0)
+                {
+                    // Keep the first evaluation at its original position in the loop.
+                    callSiteContext ??= ExceptionFlowContextualFactEvaluator.CreateCallContext(
+                        methodSymbol,
+                        invocation.ArgumentList.Arguments,
+                        semanticModel,
+                        callerContext);
+                    targetContext = CreateDispatchTargetContext(
+                        methodSymbol,
+                        runtimeTarget,
+                        callSiteContext);
+                }
+                else
+                {
+                    targetContext = CreateDispatchCallContext(
                         methodSymbol,
                         runtimeTarget,
                         invocation.ArgumentList.Arguments,
                         semanticModel,
                         callerContext);
+                }
 
                 ExceptionFlowCallableKey targetKey = ExceptionFlowSummaryTargetRegistrar.RegisterMethodTarget(
                     runtimeTarget, targetContext, semanticContext, graph);
