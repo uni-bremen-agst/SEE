@@ -104,6 +104,64 @@ namespace SEE.Gizmos
         }
 
         /// <summary>
+        /// Verifies that removing a hovered edge after the hover threshold has
+        /// been reached clears both hover tracking collections and the cursor focus.
+        /// </summary>
+        /// <returns>An enumerator waiting for initialization and the hover threshold.</returns>
+        [UnityTest]
+        [LoadScene]
+        public IEnumerator RemovedEdgeAfterThresholdCleansHoverState()
+        {
+            EnsureCamera();
+            SEECity city = CreateCity("City A");
+            yield return null;
+
+            Graph graph = new("TestGraphEdgeThreshold");
+            AssignGraph(city, graph);
+
+            Node source = new() { ID = "SourceThreshold" };
+            Node target = new() { ID = "TargetThreshold" };
+            graph.AddNode(source);
+            graph.AddNode(target);
+
+            Edge edge = graph.AddEdge(source, target, "Dependency");
+
+            GameObject gameObject = new(edge.ID)
+            {
+                tag = Tags.Edge
+            };
+
+            createdObjects.Add(gameObject);
+            gameObject.transform.SetParent(city.transform, false);
+
+            EdgeRef edgeRef = gameObject.AddComponent<EdgeRef>();
+            edgeRef.Value = edge;
+
+            InteractableGraphElement interactable =
+                gameObject.AddComponent<InteractableGraphElement>();
+
+            CityCursor cursor = city.GetComponent<CityCursor>();
+
+            interactable.SetHoverFlags((uint)HoverFlag.World, false);
+
+            Assert.That(cursor.Cursor.GetFocusses(),
+                        Does.Contain(interactable));
+
+            // Wait until the hover threshold has actually been reached.
+            yield return new WaitForSecondsRealtime(0.7f);
+
+            AssertThresholdReached(cursor, interactable);
+
+            graph.RemoveEdge(edge);
+            Assert.That(edge.ItsGraph, Is.Null);
+
+            interactable.SetHoverFlags(0, false);
+
+            Assert.That(cursor.Cursor.GetFocusses(), Is.Empty);
+            AssertNoTracking(cursor);
+        }
+
+        /// <summary>
         /// Verifies that removing a hovered edge clears the cursor and hover tracking
         /// state without reporting an invalid graph as an error.
         /// Also verifies that the removed edge is ignored by subsequent hover events.
@@ -163,6 +221,47 @@ namespace SEE.Gizmos
             interactable.SetHoverFlags(0, false);
 
             yield return new WaitForSecondsRealtime(0.6f);
+
+            Assert.That(cursor.Cursor.GetFocusses(), Is.Empty);
+            AssertNoTracking(cursor);
+        }
+
+        /// <summary>
+        /// Verifies that removing a hovered node after the hover threshold has
+        /// been reached clears both hover tracking collections and the cursor focus.
+        /// </summary>
+        /// <returns>An enumerator waiting for initialization and the hover threshold.</returns>
+        [UnityTest]
+        [LoadScene]
+        public IEnumerator RemovedNodeAfterThresholdCleansHoverState()
+        {
+            EnsureCamera();
+            SEECity city = CreateCity("City A");
+            yield return null;
+
+            Graph graph = new("TestGraphNodeThreshold");
+            AssignGraph(city, graph);
+
+            Node node = new() { ID = "TestNodeThreshold" };
+            graph.AddNode(node);
+
+            InteractableGraphElement interactable = CreateNode(city, node);
+            CityCursor cursor = city.GetComponent<CityCursor>();
+
+            interactable.SetHoverFlags((uint)HoverFlag.World, false);
+
+            Assert.That(cursor.Cursor.GetFocusses(),
+                        Does.Contain(interactable));
+
+            // Wait until the hover threshold has actually been reached.
+            yield return new WaitForSecondsRealtime(0.7f);
+
+            AssertThresholdReached(cursor, interactable);
+
+            graph.RemoveNode(node);
+            Assert.That(node.ItsGraph, Is.Null);
+
+            interactable.SetHoverFlags(0, false);
 
             Assert.That(cursor.Cursor.GetFocusses(), Is.Empty);
             AssertNoTracking(cursor);
@@ -296,6 +395,27 @@ namespace SEE.Gizmos
 
             cameraObject.AddComponent<Camera>();
             createdObjects.Add(cameraObject);
+        }
+
+        /// <summary>
+        /// Verifies that the given interactable has reached the hover threshold
+        /// tracked by the city cursor.
+        /// </summary>
+        /// <param name="cursor">The cursor whose threshold state is inspected.</param>
+        /// <param name="interactable">The interactable expected to have reached the threshold.</param>
+        private static void AssertThresholdReached(CityCursor cursor,
+                                                   InteractableGraphElement interactable)
+        {
+            FieldInfo thresholdField = typeof(CityCursor).GetField(
+                "hoverThresholdReached",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(thresholdField, Is.Not.Null);
+
+            HashSet<InteractableObject> thresholdReached =
+                (HashSet<InteractableObject>)thresholdField.GetValue(cursor);
+
+            Assert.That(thresholdReached, Does.Contain(interactable));
         }
 
         /// <summary>
