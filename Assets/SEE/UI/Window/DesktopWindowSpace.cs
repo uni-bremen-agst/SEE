@@ -11,7 +11,9 @@ using CollectionExtensions = SEE.Utils.CollectionExtensions;
 namespace SEE.UI.Window
 {
     /// <summary>
-    /// This part of the class contains the Desktop UI for a space.
+    /// Implements the desktop and VR presentation of a <see cref="WindowSpace"/>.
+    /// Manages DynamicPanels panels and tabs, synchronizes their contents with
+    /// the registered windows, and handles panel lifecycle events.
     /// </summary>
     public partial class WindowSpace
     {
@@ -31,6 +33,11 @@ namespace SEE.UI.Window
         /// </summary>
         private bool panelEventsRegistered;
 
+        /// <summary>
+        /// Initializes the desktop window space by finding an existing
+        /// window-space GameObject or instantiating its prefab.
+        /// Ensures that the window space is active.
+        /// </summary>
         protected override void StartDesktop()
         {
             // Add space game object if it doesn't exist yet
@@ -43,6 +50,11 @@ namespace SEE.UI.Window
             space.SetActive(true);
         }
 
+        /// <summary>
+        /// Configures the shared UI canvas for VR interaction,
+        /// attaches it to the XR tablet, and initializes the
+        /// window-space GameObject using the desktop setup.
+        /// </summary>
         protected override void StartVR()
         {
             Canvas.MustGetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
@@ -363,6 +375,10 @@ namespace SEE.UI.Window
             }
         }
 
+        /// <summary>
+        /// Synchronizes windows and panels in VR using the same
+        /// lifecycle management as the desktop implementation.
+        /// </summary>
         protected override void UpdateVR()
         {
             UpdateDesktop();

@@ -8,9 +8,11 @@ using UnityEngine.Serialization;
 namespace SEE.UI.Window
 {
     /// <summary>
-    /// An ordered collection of active windows.
-    /// The user will be able to choose which of the currently active windows will be shown.
-    /// This component is responsible for arranging, displaying, and hiding the windows.
+    /// Manages an ordered collection of windows and their active selection.
+    /// Windows are registered and removed through the public API, while
+    /// their visual representation is synchronized during subsequent updates.
+    /// The platform-specific implementation arranges the windows and
+    /// manages their visibility and interaction.
     /// </summary>
     public partial class WindowSpace : PlatformDependentComponent
     {
@@ -32,7 +34,9 @@ namespace SEE.UI.Window
         public string WindowSpaceName = "WindowSpace";
 
         /// <summary>
-        /// This event will be invoked whenever a new window is added to the space.
+        /// Invoked immediately after a window is registered with this
+        /// window space. Its visual representation may not yet exist,
+        /// because window initialization is processed during updates.
         /// </summary>
         public UnityEvent<BaseWindow> OnWindowAdded = new();
 
@@ -107,7 +111,9 @@ namespace SEE.UI.Window
         private BaseWindow currentActiveWindow;
 
         /// <summary>
-        /// The nominal active window. Changes will be applied on every frame using <see cref="Update"/>.
+        /// Gets or sets the nominally active window.
+        /// Changes to this property are synchronized with the corresponding
+        /// visual tab during a subsequent update.
         /// </summary>
         public BaseWindow ActiveWindow { get; set; }
 
@@ -121,15 +127,29 @@ namespace SEE.UI.Window
         #region Value Object
 
         /// <summary>
-        /// Re-creates a <see cref="WindowSpace"/> from the given <paramref name="valueObject"/> and attaches
-        /// it to the given GameObject <paramref name="attachTo"/>.
+        /// Re-creates a <see cref="WindowSpace"/> from the given
+        /// <paramref name="valueObject"/> and attaches it to
+        /// <paramref name="attachTo"/>.
         /// </summary>
-        /// <param name="valueObject">The value object from which the space should be constructed.</param>
-        /// <param name="attachTo">The game object to which the new space should be attached.</param>
-        /// <param name="attachWindows">Whether the <see cref="WindowValues"/> in the space should
-        /// be attached to <see cref="attachTo"/> as well, instead of the GameObject that might be defined
-        /// in them.</param>
-        /// <returns>The newly re-created <see cref="WindowSpace"/>.</returns>
+        /// <param name="valueObject">
+        /// The serialized window-space values to restore.
+        /// </param>
+        /// <param name="attachTo">
+        /// The GameObject to which the new window space is attached.
+        /// </param>
+        /// <param name="attachWindows">
+        /// Whether all restored windows should also be attached to
+        /// <paramref name="attachTo"/> instead of their individually
+        /// specified GameObjects.
+        /// </param>
+        /// <returns>The restored window space.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="attachTo"/> is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if a required window cannot be restored or no
+        /// restored window matches the serialized active window.
+        /// </exception>
         public static WindowSpace FromValueObject(WindowSpaceValues valueObject, GameObject attachTo,
                                                   bool attachWindows = false)
         {
@@ -145,9 +165,16 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Generates and returns a <see cref="WindowSpaceValues"/> struct for this space.
+        /// Creates a serializable representation of this window space,
+        /// including its registered windows and active window.
         /// </summary>
-        /// <returns>The newly created <see cref="WindowSpaceValues"/>, matching this class.</returns>
+        /// <returns>
+        /// The serialized values representing the current window space.
+        /// </returns>
+        /// <remarks>
+        /// A non-null <see cref="ActiveWindow"/> is required because
+        /// the active window is included in the serialized representation.
+        /// </remarks>
         public WindowSpaceValues ToValueObject()
         {
             return new WindowSpaceValues(Windows, ActiveWindow);
