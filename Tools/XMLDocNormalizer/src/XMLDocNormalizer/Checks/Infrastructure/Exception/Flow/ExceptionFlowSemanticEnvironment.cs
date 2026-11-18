@@ -31,16 +31,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="consumer">The admission's own cumulative assembly set, never retained.</param>
         /// <param name="enumerate">The existing ordered key projection, supplied by admission and never retained.</param>
+        /// <param name="consumerState">Optional root-owned validity receipt; never retained by this environment.</param>
         internal void IncludeAssemblyInventory(HashSet<string> consumer,
-            Func<ExceptionFlowSemanticEnvironment, IEnumerable<string>> enumerate)
+            Func<ExceptionFlowSemanticEnvironment, IEnumerable<string>> enumerate, AssemblyInventoryConsumer? consumerState = null)
         {
-            var view = GetAnalysisScopes();
+            IReadOnlyList<ExceptionFlowSemanticScope> view = GetAnalysisScopes();
             if (ReferenceEquals(assemblyInventoryView, view) && assemblyInventory != null)
             {
-                consumer.UnionWith(assemblyInventory);
+                string[] inventory = assemblyInventory;
+                if (consumerState?.IsCurrent(consumer, inventory) == true)
+                {
+                    return;
+                }
+                consumerState?.Invalidate();
+                consumer.UnionWith(inventory);
+                consumerState?.Capture(consumer, inventory);
                 return;
             }
 
+            consumerState?.Invalidate();
             assemblyInventoryView = null;
             assemblyInventory = null;
             HashSet<string> keys = new(StringComparer.Ordinal);
@@ -54,6 +63,58 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             string[] completed = keys.ToArray();
             assemblyInventory = completed;
             assemblyInventoryView = view;
+        }
+
+        /// <summary>Root-local exact contents of a completed union, not a collection mutation counter.</summary>
+        internal sealed class AssemblyInventoryConsumer
+        {
+            private HashSet<string>? consumer;
+            private string[]? inventory;
+            private string[]? members;
+
+            internal bool IsCurrent(HashSet<string> current, string[] required)
+            {
+                if (!ReferenceEquals(consumer, current) || !ReferenceEquals(inventory, required)
+                    || members == null || members.Length != current.Count
+                    || current.EnsureCapacity(0) > 3L * required.Length + 3)
+                {
+                    return false;
+                }
+                int index = 0;
+                foreach (string member in current)
+                {
+                    // Strings are immutable. An exact reference/order match
+                    // proves the required contents without hashing any key.
+                    if (!ReferenceEquals(members[index++], member))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            internal void Invalidate()
+            {
+                consumer = null;
+                inventory = null;
+                members = null;
+            }
+
+            internal void Capture(HashSet<string> current, string[] required)
+            {
+                // Custom comparers can have observable or throwing reads.
+                // Empty arrays need not have a unique materialization identity.
+                // Keep memory/comparison work bounded by the required inventory;
+                // cumulative consumers with extra entries retain the old path.
+                if (!ReferenceEquals(current.Comparer, StringComparer.Ordinal) || required.Length == 0
+                    || current.Count != required.Length || current.EnsureCapacity(0) > 3L * required.Length + 3)
+                {
+                    return;
+                }
+                members = current.ToArray();
+                consumer = current;
+                inventory = required;
+            }
         }
 
         /// <summary>

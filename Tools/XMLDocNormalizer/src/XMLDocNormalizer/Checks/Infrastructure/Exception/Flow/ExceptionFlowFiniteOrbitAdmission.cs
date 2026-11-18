@@ -26,6 +26,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private readonly List<Reason> reasons = [];
         private readonly HashSet<string> staticInitializationGaps = new(StringComparer.Ordinal);
         private readonly HashSet<string> knownAssemblies = new(StringComparer.Ordinal);
+        private readonly ExceptionFlowSemanticEnvironment.AssemblyInventoryConsumer assemblyConsumer = new();
         private readonly Dictionary<string, (ExceptionFlowSummaryFragment Fragment, bool HasBody)> diagnosticDefinitions = new(StringComparer.Ordinal);
         private string? currentDefinition;
         private Certificate? certificate;
@@ -44,7 +45,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             this.environment = environment;
             this.progress = progress;
-            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory);
+            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory, assemblyConsumer);
         }
 
         /// <summary>Gets the sealed classified outcome and its complete finite witness.</summary>
@@ -79,7 +80,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         private string AddDefinition(ISymbol symbol)
         {
-            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory);
+            environment.IncludeAssemblyInventory(knownAssemblies, AssemblyInventory, assemblyConsumer);
             ISymbol definition = symbol.OriginalDefinition;
             string id = BodyId(definition);
             if (declarations.TryAdd(id, definition))
