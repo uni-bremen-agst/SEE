@@ -175,6 +175,12 @@ namespace SEE.Controls.Players
             }
         }
 
+        /// <summary>
+        /// Initializes the window space manager and its user interface.
+        /// Ensures that only one manager is active, creates the local player's
+        /// window space, forwards active-window changes, and initializes the
+        /// window selection menu and state indicator.
+        /// </summary>
         private void Start()
         {
             WindowSpaceManager[] windowSpaceManagers = FindObjectsByType<WindowSpaceManager>(FindObjectsSortMode.None);
@@ -207,6 +213,10 @@ namespace SEE.Controls.Players
             SetUpWindowSelectionMenu();
         }
 
+        /// <summary>
+        /// Checks whether the window selection menu input was triggered
+        /// and toggles the menu's visibility accordingly.
+        /// </summary>
         private void Update()
         {
             if (SEEInput.ShowWindowMenu())
