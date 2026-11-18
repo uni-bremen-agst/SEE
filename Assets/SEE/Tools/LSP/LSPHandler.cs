@@ -254,12 +254,39 @@ namespace SEE.Tools.LSP
         /// </summary>
         private string configuredExecutablePath;
 
-        // Owned resources must also be released after a partially completed startup.
+        /// <summary>
+        /// Log stream receiving a copy of everything this client sends to the language server
+        /// (i.e., what is written to the server's standard input). If <see cref="LogLSP"/> is true,
+        /// this is a file named inputLogLsp-<session></session>.txt in the temporary directory;
+        /// otherwise it is <see cref="Stream.Null"/>.
+        /// </summary>
+        /// <remarks>Owned resources must also be released after a partially completed startup.</remarks>
         private Stream inputLog = Stream.Null;
+
+        /// <summary>
+        /// Log stream receiving a copy of everything the language server sends to this client
+        /// (i.e., what is read from the server's standard output). If <see cref="LogLSP"/> is true,
+        /// this is a file named outputLogLsp-<session></session>.txt in the temporary directory;
+        /// otherwise it is <see cref="Stream.Null"/>.
+        /// </summary>
+        /// <remarks>Owned resources must also be released after a partially completed startup.</remarks>
         private Stream outputLog = Stream.Null;
+
+        /// <summary>
+        /// Cancels a startup that is still in progress. It is created by <see cref="InitializeAsync"/>,
+        /// linked to the token passed to that method, and disposed and reset to null when the startup
+        /// completes or fails. <see cref="ShutdownAsync"/> and <see cref="OnDisable"/> cancel it so that
+        /// a pending startup does not block the shutdown. It is null while no startup is in progress.
+        /// </summary>
         private CancellationTokenSource startupCancellation;
 
-        // The importer and several code windows can share the same open document.
+        /// <summary>
+        /// Reference count of the documents currently open in the language server, keyed by their URI.
+        /// The importer and several code windows can share the same open document, so
+        /// <see cref="OpenDocument"/> sends <c>textDocument/didOpen</c> only for the first user and
+        /// <see cref="CloseDocument"/> sends <c>textDocument/didClose</c> only when the last user closes it.
+        /// It is cleared when the server resources are released.
+        /// </summary>
         private readonly Dictionary<DocumentUri, int> documentUsers = new();
 
         private void OnEnable()
