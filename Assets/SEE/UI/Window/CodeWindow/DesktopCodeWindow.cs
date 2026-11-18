@@ -414,28 +414,20 @@ namespace SEE.UI.Window.CodeWindow
             {
                 return (0, 0);
             }
-            // TMP's index points into the rich-text string actually rendered. Neither
-            // visual line numbers nor accumulated token lengths reliably identify source positions.
-            int rawIndex = textMesh.textInfo.characterInfo[characterIndex].index;
-            string renderedText = textMesh.text;
+            // Count rendered source line breaks, not visual wrapping or characters inside rich-text tags.
             int line = 0;
-            int newlineIndex = -1;
-            for (int i = 0; i < rawIndex; i++)
+            int firstCharacter = 0;
+            for (int i = 0; i < characterIndex; i++)
             {
-                if (renderedText[i] == '\n')
+                if (textMesh.textInfo.characterInfo[i].character == '\n')
                 {
                     line++;
-                    newlineIndex = i;
+                    firstCharacter = i + 1;
                 }
             }
             if (line >= CodeWindowOffsets.Count)
             {
                 return (0, 0);
-            }
-            int firstCharacter = characterIndex;
-            while (firstCharacter > 0 && textMesh.textInfo.characterInfo[firstCharacter - 1].index > newlineIndex)
-            {
-                firstCharacter--;
             }
             int column = characterIndex - firstCharacter - neededPadding;
             return (line + 1, column);
