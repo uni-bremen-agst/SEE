@@ -109,7 +109,7 @@ namespace SEE.UI.Window.CodeWindow
                            .Aggregate(0, (i, token) => i + token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             neededPadding = Mathf.FloorToInt(Mathf.Log10(assumedLines)) + 1;
-            text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
+            StringBuilder builder = new($"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ");
 
             CodeWindowOffsets.Clear();
              // The first line starts at the beginning of the text after the line number.
@@ -130,7 +130,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 if (token.TokenType == TokenType.Newline)
                 {
-                    AppendNewline(ref lineNumber, ref text, token);
+                    AppendNewline(ref lineNumber, token);
                 }
                 else if (token.TokenType != TokenType.EOF) // Skip EOF token completely.
                 {
@@ -142,6 +142,7 @@ namespace SEE.UI.Window.CodeWindow
             EndIssueSegment();
 
             // Lines are equal to number of newlines, including the initial newline.
+            text = builder.ToString();
             lines = text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
             text = text.TrimStart('\n'); // Remove leading newline.
 
@@ -175,13 +176,13 @@ namespace SEE.UI.Window.CodeWindow
 
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
             // Note that newlines MUST be added in this method, not anywhere else, else issue highlighting will break!
-            void AppendNewline(ref int theLineNumber, ref string text, SEEToken token)
+            void AppendNewline(ref int theLineNumber, SEEToken token)
             {
                 // Close an issue marking here if necessary
                 EndIssueSegment();
 
                 // First, of course, the newline.
-                text += "\n";
+                builder.Append("\n");
                 // At this point, we need to remember the offset of this new line.
                 Assert.AreEqual(CodeWindowOffsets.Count, theLineNumber-1);
                 // + 1 for the newline
@@ -190,7 +191,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Add whitespace next to line number, so it's consistent.
                 int padding = neededPadding - (Mathf.FloorToInt(Mathf.Log10(theLineNumber)) + 1);
                 // Line number will be typeset in grey to distinguish it from the rest.
-                text += $"<color=#CCCCCC>{string.Join(string.Empty, Enumerable.Repeat(' ', padding))}{theLineNumber}</color> ";
+                builder.Append($"<color=#CCCCCC>{string.Join(string.Empty, Enumerable.Repeat(' ', padding))}{theLineNumber}</color> ");
                 characterOffset += neededPadding + 1;
 
                 if (issues?.ContainsKey(theLineNumber) ?? false)
@@ -217,7 +218,7 @@ namespace SEE.UI.Window.CodeWindow
                     // Any entry after the first is on a separate line.
                     if (!firstRun)
                     {
-                        AppendNewline(ref lineNumber, ref text, token);
+                        AppendNewline(ref lineNumber, token);
                     }
 
                     // Mark any potential issue
@@ -256,7 +257,7 @@ namespace SEE.UI.Window.CodeWindow
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
                         string replaced = ExpandTabs(line, token.Language.TabWidth);
-                        text += replaced;
+                        builder.Append(replaced);
                         characterOffset += replaced.Length;
                     }
                     else
@@ -265,23 +266,23 @@ namespace SEE.UI.Window.CodeWindow
                                                  .Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
                         foreach (string textTag in tags)
                         {
-                            text += $"<{textTag}>";
+                            builder.Append($"<{textTag}>");
                         }
                         if (currentlyMarking is not { HasColorTags: true })
                         {
-                            text += $"<color=#{token.TokenType.Color}>";
+                            builder.Append($"<color=#{token.TokenType.Color}>");
                         }
                         string replaced = line.Replace("</noparse>", @"<\noparse>");
-                        text += $"<noparse>{replaced}</noparse>";
+                        builder.Append($"<noparse>{replaced}</noparse>");
                         characterOffset += replaced.Length;
                         if (currentlyMarking is not { HasColorTags: true })
                         {
-                            text += "</color>";
+                            builder.Append("</color>");
                         }
                         tags.Reverse();
                         foreach (string textTag in tags)
                         {
-                            text += $"</{textTag}>";
+                            builder.Append($"</{textTag}>");
                         }
                     }
 
@@ -296,7 +297,7 @@ namespace SEE.UI.Window.CodeWindow
                 IncreaseLinkCounter();
                 issueDictionary[linkCounter] = issueTokens[token].ToHashSet();
                 currentlyMarking = issueTokens[token].First();
-                text += $"<link=\"{linkCounter.ToString()}\">{currentlyMarking.OpeningRichTags}";
+                builder.Append($"<link=\"{linkCounter.ToString()}\">{currentlyMarking.OpeningRichTags}");
             }
 
             // Ends marking the current issue segment, if there is any.
@@ -304,7 +305,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 if (currentlyMarking != null)
                 {
-                    text += $"{currentlyMarking.ClosingRichTags}</link>";
+                    builder.Append($"{currentlyMarking.ClosingRichTags}</link>");
                 }
                 currentlyMarking = null;
             }
@@ -389,23 +390,24 @@ namespace SEE.UI.Window.CodeWindow
 
             neededPadding = $"{text.Length}".Length;
             ExpandedTabs.Clear();
-            this.text = "";
+            StringBuilder builder = new();
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent.
-                this.text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
+                builder.Append(string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length)));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                this.text += $"<color=#CCCCCC>{i + 1}</color> ";
+                builder.Append($"<color=#CCCCCC>{i + 1}</color> ");
                 if (asIs)
                 {
-                    this.text += text[i] + "\n";
+                    builder.Append(text[i] + "\n");
                 }
                 else
                 {
-                    this.text += $"<noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                    builder.Append($"<noparse>{text[i].Replace("noparse", "")}</noparse>\n");
                 }
             }
 
+            this.text = builder.ToString();
             lines = text.Length;
         }
 
