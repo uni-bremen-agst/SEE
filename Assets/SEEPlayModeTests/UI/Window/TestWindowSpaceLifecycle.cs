@@ -1312,5 +1312,282 @@ namespace SEE.UI.Window
             Assert.That(closedContent == null, Is.True,
                         "The closed window's UI GameObject was not destroyed.");
         }
+
+
+        /// <summary>
+        /// Verifies that destroying multiple tab contents in the same frame
+        /// does not cause DynamicPanels to activate another destroyed tab.
+        /// The entire panel must be cleaned up without an exception.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that waits for window initialization, destruction,
+        /// and subsequent panel cleanup.
+        /// </returns>
+        [UnityTest]
+        [LoadScene]
+        public IEnumerator DestroyingMultipleTabContentsInOneFrameDoesNotThrow()
+        {
+            windowOwner = new GameObject("Multiple destroyed tab contents test");
+
+            WindowSpace windowSpace =
+                windowOwner.AddComponent<WindowSpace>();
+
+            WindowSpaceTestWindow firstWindow =
+                windowOwner.AddComponent<WindowSpaceTestWindow>();
+            firstWindow.Title = "First destroyed tab";
+
+            WindowSpaceTestWindow secondWindow =
+                windowOwner.AddComponent<WindowSpaceTestWindow>();
+            secondWindow.Title = "Second destroyed tab";
+
+            windowSpace.AddWindow(firstWindow);
+            windowSpace.AddWindow(secondWindow);
+            windowSpace.ActiveWindow = secondWindow;
+
+            Panel sharedPanel = null;
+            PanelTab secondTab = null;
+
+            for (int frame = 0;
+                 frame < MaximumInitializationFrames && sharedPanel == null;
+                 frame++)
+            {
+                if (firstWindow.Window != null
+                    && secondWindow.Window != null)
+                {
+                    foreach (Panel candidate in Object.FindObjectsByType<Panel>(
+                                 FindObjectsInactive.Include,
+                                 FindObjectsSortMode.None))
+                    {
+                        if (candidate == null)
+                        {
+                            continue;
+                        }
+
+                        PanelTab firstTab = candidate.GetTab(
+                            (RectTransform)firstWindow.Window.transform);
+
+                        PanelTab candidateSecondTab = candidate.GetTab(
+                            (RectTransform)secondWindow.Window.transform);
+
+                        if (firstTab != null && candidateSecondTab != null)
+                        {
+                            sharedPanel = candidate;
+                            secondTab = candidateSecondTab;
+                            break;
+                        }
+                    }
+                }
+
+                if (sharedPanel == null)
+                {
+                    yield return null;
+                }
+            }
+
+            Assert.That(sharedPanel, Is.Not.Null,
+                        "Both windows were not initialized in the same panel.");
+
+            Assert.That(sharedPanel.NumberOfTabs, Is.EqualTo(2));
+
+            int secondIndex = sharedPanel.GetTabIndex(secondTab);
+
+            Assert.That(secondIndex, Is.GreaterThanOrEqualTo(0));
+
+            sharedPanel.ActiveTab = secondIndex;
+            windowSpace.ActiveWindow = secondWindow;
+
+            yield return null;
+
+            Assert.That(sharedPanel.ActiveTab,
+                        Is.EqualTo(sharedPanel.GetTabIndex(secondTab)),
+                        "The second tab is not active before destruction.");
+
+            GameObject firstContent = firstWindow.Window;
+            GameObject secondContent = secondWindow.Window;
+
+            Assert.That(firstContent, Is.Not.Null);
+            Assert.That(secondContent, Is.Not.Null);
+
+            // Both UI contents disappear in the same frame.
+            Destroyer.Destroy(firstContent);
+            Destroyer.Destroy(secondContent);
+
+            yield return null;
+            yield return null;
+            yield return null;
+
+            Assert.That(windowSpace != null, Is.True,
+                        "WindowSpace was unexpectedly destroyed.");
+
+            Assert.That(windowSpace.Windows.Count, Is.Zero,
+                        "Destroyed windows are still registered.");
+
+            Assert.That(sharedPanel == null, Is.True,
+                        "The panel containing destroyed tabs was not removed.");
+        }
+
+
+        /// <summary>
+        /// Verifies that closing the final window notifies synchronization
+        /// listeners with a serializable empty window space.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that waits for window initialization,
+        /// closing, and synchronization notification.
+        /// </returns>
+        [UnityTest]
+        [LoadScene]
+        public IEnumerator ClosingLastWindowCanSynchronizeEmptyWindowSpace()
+        {
+            windowOwner = new GameObject("Empty window space synchronization test");
+
+            WindowSpace windowSpace =
+                windowOwner.AddComponent<WindowSpace>();
+
+            WindowSpaceTestWindow firstWindow =
+                windowOwner.AddComponent<WindowSpaceTestWindow>();
+            firstWindow.Title = "Last synchronized window";
+
+            windowSpace.AddWindow(firstWindow);
+            windowSpace.ActiveWindow = firstWindow;
+
+            Panel firstPanel = null;
+
+            for (int frame = 0;
+                 frame < MaximumInitializationFrames && firstPanel == null;
+                 frame++)
+            {
+                if (firstWindow.Window != null)
+                {
+                    foreach (Panel candidate in Object.FindObjectsByType<Panel>(
+                                 FindObjectsInactive.Include,
+                                 FindObjectsSortMode.None))
+                    {
+                        if (candidate != null
+                            && candidate.GetTab(
+                                (RectTransform)firstWindow.Window.transform)
+                               != null)
+                        {
+                            firstPanel = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if (firstPanel == null)
+                {
+                    yield return null;
+                }
+            }
+
+            Assert.That(firstPanel, Is.Not.Null,
+                        "The initial window panel was not created.");
+
+            int synchronizationNotifications = 0;
+            bool emptyStateSerialized = false;
+
+            windowSpace.OnActiveWindowChanged.AddListener(() =>
+            {
+                if (windowSpace.ActiveWindow != null)
+                {
+                    return;
+                }
+
+                synchronizationNotifications++;
+
+                // This is the serialization operation also performed
+                // by SyncWindowSpaceAction.UpdateSpace().
+                WindowSpace.WindowSpaceValues values =
+                    windowSpace.ToValueObject();
+
+                emptyStateSerialized =
+                    values.Windows != null && values.Windows.Count == 0;
+            });
+
+            Assert.That(windowSpace.CloseWindow(firstWindow), Is.True,
+                        "The final window could not be closed.");
+
+            yield return null;
+            yield return null;
+            yield return null;
+
+            Assert.That(windowSpace.Windows.Count, Is.Zero,
+                        "The closed window is still registered.");
+
+            Assert.That(windowSpace.ActiveWindow == null, Is.True,
+                        "The active window was not cleared.");
+
+            Assert.That(synchronizationNotifications,
+                        Is.GreaterThanOrEqualTo(1),
+                        "No synchronization notification was raised.");
+
+            Assert.That(emptyStateSerialized, Is.True,
+                        "The empty window space could not be serialized.");
+        }
+
+        /// <summary>
+        /// Verifies that an empty window space survives Unity serialization
+        /// and can be restored without an active window.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that waits for initialization of the restored space.
+        /// </returns>
+        [UnityTest]
+        [LoadScene]
+        public IEnumerator EmptyWindowSpaceCanBeSerializedAndRestored()
+        {
+            windowOwner = new GameObject("Empty window space serialization test");
+
+            WindowSpace originalSpace =
+                windowOwner.AddComponent<WindowSpace>();
+            originalSpace.WindowSpaceName = "Empty window space source";
+
+            WindowSpace.WindowSpaceValues originalValues =
+                originalSpace.ToValueObject();
+
+            Assert.That(originalValues.HasActiveWindow, Is.False,
+                        "An empty space must not have an active window.");
+
+            Assert.That(originalValues.Windows, Is.Empty,
+                        "An empty space must not contain window values.");
+
+            // Exercise Unity serialization rather than passing only the
+            // original in-memory value object.
+            string serializedValues = JsonUtility.ToJson(originalValues);
+
+            WindowSpace.WindowSpaceValues receivedValues =
+                JsonUtility.FromJson<WindowSpace.WindowSpaceValues>(
+                    serializedValues);
+
+            Assert.That(receivedValues.HasActiveWindow, Is.False,
+                        "The empty active-window state was not preserved.");
+
+            Assert.That(receivedValues.Windows, Is.Not.Null,
+                        "The received window list is missing.");
+
+            Assert.That(receivedValues.Windows, Is.Empty,
+                        "The received space unexpectedly contains windows.");
+
+            GameObject receivingOwner =
+                new GameObject("Empty window space receiver");
+
+            receivingOwner.transform.SetParent(windowOwner.transform, false);
+
+            WindowSpace restoredSpace =
+                WindowSpace.FromValueObject(receivedValues, receivingOwner);
+
+            restoredSpace.WindowSpaceName = "Empty window space receiver UI";
+
+            Assert.That(restoredSpace.Windows, Is.Empty,
+                        "The restored space unexpectedly contains windows.");
+
+            Assert.That(restoredSpace.ActiveWindow, Is.Null,
+                        "The restored space unexpectedly has an active window.");
+
+            yield return null;
+
+            Assert.That(restoredSpace, Is.Not.Null,
+                        "The restored WindowSpace was destroyed.");
+        }
     }
 }
