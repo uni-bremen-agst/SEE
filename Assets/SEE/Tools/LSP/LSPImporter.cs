@@ -10,7 +10,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Graphs;
 using SEE.Graphs.Utils;
-using SEE.Tools;
 using SEE.Utils;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
@@ -267,46 +266,51 @@ namespace SEE.Tools.LSP
             {
                 string path = relevantDocuments[documentCount];
                 Handler.OpenDocument(path);
-                Node dirNode = AddOrGetDirectoryNode(Path.GetDirectoryName(path), graph);
-                Node symbolParent = dirNode;
-                if (IncludeNodeTypes.HasFlag(NodeKind.File))
+                try
                 {
-                    Node fileNode = new()
+                    Node dirNode = AddOrGetDirectoryNode(Path.GetDirectoryName(path), graph);
+                    Node symbolParent = dirNode;
+                    if (IncludeNodeTypes.HasFlag(NodeKind.File))
                     {
-                        ID = Path.GetRelativePath(Handler.ProjectPath, path)
-                    };
-                    fileNode.SourceName = fileNode.Filename = Path.GetFileName(path);
-                    fileNode.Directory = Path.GetDirectoryName(path);
-                    fileNode.Type = NodeKind.File.ToString();
-                    SetFileLOC(fileNode);
-                    graph.AddNode(fileNode);
-                    fileNode.Reparent(dirNode);
-                    symbolParent = fileNode;
-                    if (supportsPullDiagnostics)
-                    {
-                        IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
-                        if (diagnostics != null)
+                        Node fileNode = new()
                         {
-                            HandleDiagnostics(diagnostics, path);
+                            ID = Path.GetRelativePath(Handler.ProjectPath, path)
+                        };
+                        fileNode.SourceName = fileNode.Filename = Path.GetFileName(path);
+                        fileNode.Directory = Path.GetDirectoryName(path);
+                        fileNode.Type = NodeKind.File.ToString();
+                        SetFileLOC(fileNode);
+                        graph.AddNode(fileNode);
+                        fileNode.Reparent(dirNode);
+                        symbolParent = fileNode;
+                        if (supportsPullDiagnostics)
+                        {
+                            IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
+                            if (diagnostics != null)
+                            {
+                                HandleDiagnostics(diagnostics, path);
+                            }
                         }
                     }
-                }
 
-                IUniTaskAsyncEnumerable<SymbolInformationOrDocumentSymbol> symbols = Handler.DocumentSymbols(path);
-                await foreach (SymbolInformationOrDocumentSymbol symbol in symbols)
-                {
-                    if (symbol.IsDocumentSymbolInformation)
+                    IUniTaskAsyncEnumerable<SymbolInformationOrDocumentSymbol> symbols = Handler.DocumentSymbols(path);
+                    await foreach (SymbolInformationOrDocumentSymbol symbol in symbols)
                     {
-                        Logging.Logger.LogError("This language server emits SymbolInformation, which is deprecated and not "
-                                       + "supported by SEE. Please choose a language server that is capable of "
-                                       + "returning hierarchic DocumentSymbols.\n");
-                        return;
+                        if (symbol.IsDocumentSymbolInformation)
+                        {
+                            Logging.Logger.LogError("This language server emits SymbolInformation, which is deprecated and not "
+                                           + "supported by SEE. Please choose a language server that is capable of "
+                                           + "returning hierarchic DocumentSymbols.\n");
+                            return;
+                        }
+
+                        await AddSymbolNodeAsync(symbol.DocumentSymbol, path, graph, symbolParent, token);
                     }
-
-                    await AddSymbolNodeAsync(symbol.DocumentSymbol, path, graph, symbolParent, token);
                 }
-
-                Handler.CloseDocument(path);
+                finally
+                {
+                    Handler.CloseDocument(path);
+                }
                 // ~20% of the progress is made by loading the documents and its symbols.
                 changePercentage?.Invoke((1 - edgeProgressFactor) * documentCount / relevantDocuments.Count);
             }
@@ -338,43 +342,50 @@ namespace SEE.Tools.LSP
             foreach ((string path, List<Node> nodes) in relevantNodesByPath)
             {
                 Handler.OpenDocument(path);
-                foreach (Node node in nodes)
+                try
                 {
-                    token.ThrowIfCancellationRequested();
+                    foreach (Node node in nodes)
+                    {
+                        token.ThrowIfCancellationRequested();
 
-                    // Depending on capabilities and settings, we connect the nodes with edges.
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Definition, LSP.Definition, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Declaration) && Handler.ServerCapabilities.DeclarationProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Declaration, LSP.Declaration, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.TypeDefinition) && Handler.ServerCapabilities.TypeDefinitionProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.TypeDefinition, LSP.OfType, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Implementation) && Handler.ServerCapabilities.ImplementationProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Implementation, LSP.ImplementationOf, node, graph, reverseDirection: true, token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
-                    {
-                        await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
-                    {
-                        await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
-                    }
+                        // Depending on capabilities and settings, we connect the nodes with edges.
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Definition, LSP.Definition, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Declaration) && Handler.ServerCapabilities.DeclarationProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Declaration, LSP.Declaration, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.TypeDefinition) && Handler.ServerCapabilities.TypeDefinitionProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.TypeDefinition, LSP.OfType, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Implementation) && Handler.ServerCapabilities.ImplementationProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Implementation, LSP.ImplementationOf, node, graph, reverseDirection: true, token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
+                        {
+                            await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
+                        {
+                            await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
+                        }
 
-                    // The remaining 80% of the progress is made by connecting the nodes.
-                    // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
-                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
+                        // The remaining 80% of the progress is made by connecting the nodes.
+                        // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
+                        changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
+                    }
+                }
+                finally
+                {
+                    Handler.CloseDocument(path);
                 }
             }
             Logging.Logger.LogInfo($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
