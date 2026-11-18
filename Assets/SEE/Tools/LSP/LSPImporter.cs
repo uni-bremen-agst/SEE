@@ -830,7 +830,8 @@ namespace SEE.Tools.LSP
         /// </summary>
         /// <param name="path">The path of the file in which to search for nodes.</param>
         /// <param name="range">The range in the file at which to search for nodes.</param>
-        /// <returns>The nodes that are located at the given range in the file.</returns>
+        /// <returns>The nodes that are located at the given range in the file. If none
+        /// can be found, the result will be empty.</returns>
         /// <seealso cref="KDIntervalTree{T}"/>
         private IEnumerable<Node> FindNodesByLocation(string path, Range range)
         {
