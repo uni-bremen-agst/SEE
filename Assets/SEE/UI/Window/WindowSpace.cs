@@ -125,7 +125,6 @@ namespace SEE.UI.Window
         public UnityEvent OnActiveWindowChanged = new();
 
         #region Value Object
-
         /// <summary>
         /// Re-creates a <see cref="WindowSpace"/> from the given
         /// <paramref name="valueObject"/> and attaches it to
@@ -147,8 +146,8 @@ namespace SEE.UI.Window
         /// Thrown if <paramref name="attachTo"/> is null.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown if a required window cannot be restored or no
-        /// restored window matches the serialized active window.
+        /// Thrown if a required window cannot be restored or the serialized
+        /// active window cannot be found among the restored windows.
         /// </exception>
         public static WindowSpace FromValueObject(WindowSpaceValues valueObject, GameObject attachTo,
                                                   bool attachWindows = false)
@@ -159,22 +158,38 @@ namespace SEE.UI.Window
             }
 
             WindowSpace space = attachTo.AddComponent<WindowSpace>();
-            space.windows.AddRange(valueObject.Windows.Select(x => BaseWindow.FromValueObject<BaseWindow>(x, attachWindows ? attachTo : null)));
-            space.ActiveWindow = space.windows.First(x => valueObject.ActiveWindow.Title == x.Title);
+
+            space.windows.AddRange(valueObject.Windows.Select(
+                x => BaseWindow.FromValueObject<BaseWindow>(
+                    x, attachWindows ? attachTo : null)));
+
+            if (valueObject.HasActiveWindow)
+            {
+                if (valueObject.ActiveWindow == null)
+                {
+                    throw new InvalidOperationException(
+                        "The serialized window space has no active window values.");
+                }
+
+                space.ActiveWindow = space.windows.First(
+                    window => window.Title == valueObject.ActiveWindow.Title);
+            }
+            else
+            {
+                space.ActiveWindow = null;
+            }
+
             return space;
         }
 
         /// <summary>
         /// Creates a serializable representation of this window space,
-        /// including its registered windows and active window.
+        /// including its registered windows and optional active window.
         /// </summary>
         /// <returns>
         /// The serialized values representing the current window space.
+        /// An empty window space is represented without an active window.
         /// </returns>
-        /// <remarks>
-        /// A non-null <see cref="ActiveWindow"/> is required because
-        /// the active window is included in the serialized representation.
-        /// </remarks>
         public WindowSpaceValues ToValueObject()
         {
             return new WindowSpaceValues(Windows, ActiveWindow);
@@ -188,7 +203,15 @@ namespace SEE.UI.Window
         public struct WindowSpaceValues
         {
             /// <summary>
+            /// Whether this window space contains an active window.
+            /// An empty window space has no active window.
+            /// </summary>
+            [field: SerializeField]
+            public bool HasActiveWindow { get; private set; }
+
+            /// <summary>
             /// Generated value object of the active window in this space.
+            /// Only valid if <see cref="HasActiveWindow"/> is true.
             /// </summary>
             [field: SerializeField]
             public WindowValues ActiveWindow { get; private set; }
@@ -200,15 +223,21 @@ namespace SEE.UI.Window
             public List<WindowValues> Windows { get; private set; }
 
             /// <summary>
-            /// Creates a new <see cref="WindowSpaceValues"/> object from the given parameters.
-            /// Note that this will create a <see cref="WindowSpaceValues"/> object for each window in the space.
+            /// Creates a new <see cref="WindowSpaceValues"/> object from the
+            /// given parameters.
+            /// Creates a value object for every window in the space.
             /// </summary>
-            /// <param name="windows">List of windows in the space.</param>
-            /// <param name="activeWindow">Currently active window in the space.</param>
+            /// <param name="windows">
+            /// The windows belonging to this space.
+            /// </param>
+            /// <param name="activeWindow">
+            /// The currently active window, or null if no window is active.
+            /// </param>
             internal WindowSpaceValues(IEnumerable<BaseWindow> windows, BaseWindow activeWindow)
             {
-                ActiveWindow = activeWindow.ToValueObject();
-                Windows = windows.Select(x => x.ToValueObject()).ToList();
+                HasActiveWindow = activeWindow != null;
+                ActiveWindow = HasActiveWindow ? activeWindow.ToValueObject() : null;
+                Windows = windows.Select(window => window.ToValueObject()).ToList();
             }
         }
 

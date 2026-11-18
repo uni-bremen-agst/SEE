@@ -69,6 +69,57 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
+        /// Removes tabs with destroyed content from the given panel.
+        /// Inactive invalid tabs are removed before the active tab to prevent
+        /// DynamicPanels from activating another tab whose content has already
+        /// been destroyed.
+        /// </summary>
+        /// <param name="panel">The panel whose invalid tabs shall be removed.</param>
+        private static void RemoveDestroyedTabs(Panel panel)
+        {
+            if (panel == null)
+            {
+                return;
+            }
+
+            // Remove invalid inactive tabs first. Removing an inactive tab
+            // does not require DynamicPanels to activate another tab.
+            for (int index = panel.NumberOfTabs - 1; index >= 0; index--)
+            {
+                if (index == panel.ActiveTab)
+                {
+                    continue;
+                }
+
+                PanelTab tab = panel[index];
+
+                if (tab != null && tab.Content == null)
+                {
+                    panel.RemoveTab(index);
+                }
+            }
+
+            if (panel == null || panel.NumberOfTabs == 0)
+            {
+                return;
+            }
+
+            // Removing the active tab may cause DynamicPanels to activate
+            // another tab. All remaining inactive tabs now have valid content.
+            int activeIndex = panel.ActiveTab;
+
+            if (activeIndex >= 0 && activeIndex < panel.NumberOfTabs)
+            {
+                PanelTab activeTab = panel[activeIndex];
+
+                if (activeTab != null && activeTab.Content == null)
+                {
+                    panel.RemoveTab(activeIndex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Activates the tab corresponding to <see cref="ActiveWindow"/>.
         /// Removes tabs whose content has already been destroyed before
         /// activating another tab, because removing such tabs may change
@@ -93,7 +144,6 @@ namespace SEE.UI.Window
                 {
                     Debug.LogError("Neither active window, nor previous active window is "
                                    + "part of available windows. This component will now self-destruct.");
-
                     Destroyer.Destroy(this);
                     throw new InvalidOperationException();
                 }
@@ -115,19 +165,9 @@ namespace SEE.UI.Window
                 return;
             }
 
-            // DynamicPanels may remove a tab during ActiveTab's setter
-            // when its content has already been destroyed. This changes
-            // the tab indices and may cause an ArgumentOutOfRangeException.
-            // Remove such tabs before activating the requested window.
-            for (int i = panel.NumberOfTabs - 1; i >= 0; i--)
-            {
-                PanelTab existingTab = panel[i];
-
-                if (existingTab != null && existingTab.Content == null)
-                {
-                    panel.RemoveTab(i);
-                }
-            }
+            // Remove invalid inactive tabs before the active tab.
+            // This prevents DynamicPanels from selecting destroyed content.
+            RemoveDestroyedTabs(panel);
 
             if (panel == null || tab == null || tab.Content == null)
             {
@@ -180,6 +220,7 @@ namespace SEE.UI.Window
                          .Select(panel => (panel, panel.GetTab(windowTransform)))
                          .SingleOrDefault(entry => entry.Item2 != null);
         }
+
         /// <summary>
         /// Synchronizes the active windows with their DynamicPanels tabs.
         /// Removes obsolete window associations and tabs with destroyed
@@ -268,15 +309,7 @@ namespace SEE.UI.Window
             foreach (Panel panel in panels.Keys
                          .Where(panel => panel != null).ToList())
             {
-                for (int index = panel.NumberOfTabs - 1; index >= 0; index--)
-                {
-                    PanelTab tab = panel[index];
-
-                    if (tab != null && tab.Content == null)
-                    {
-                        panel.RemoveTab(index);
-                    }
-                }
+                RemoveDestroyedTabs(panel);
             }
 
             // Select another valid window if the active one disappeared.
