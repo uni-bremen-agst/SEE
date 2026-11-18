@@ -55,6 +55,17 @@ namespace SEE.UI.Window.CodeWindow
         private List<int> CodeWindowOffsets { get; } = new();
 
         /// <summary>
+        /// For each line (0-based index), the tabs of the source text that were expanded to spaces
+        /// when rendering the line, in ascending order. Each entry consists of the 0-based rendered column
+        /// at which the expansion starts (relative to the start of the source text, i.e., after the line
+        /// number) and the number of spaces the tab was expanded to.
+        ///
+        /// This is needed to map a rendered column back to the column in the source file
+        /// (see <see cref="ToSourceColumn"/>). Filled by <see cref="EnterFromTokens"/> only.
+        /// </summary>
+        private List<List<(int column, int width)>> ExpandedTabs { get; } = new();
+
+        /// <summary>
         /// The graph associated with the code city this code window is in.
         /// </summary>
         private Graph AssociatedGraph;
@@ -102,6 +113,8 @@ namespace SEE.UI.Window.CodeWindow
             CodeWindowOffsets.Clear();
              // The first line starts at the beginning of the text after the line number.
             CodeWindowOffsets.Add(0);
+            ExpandedTabs.Clear();
+            ExpandedTabs.Add(new List<(int column, int width)>());
 
              // Line number we'll write down next
             int lineNumber = 2;
@@ -133,6 +146,32 @@ namespace SEE.UI.Window.CodeWindow
 
             # region Local Functions
 
+            // Returns the given whitespace with each tab replaced by tabWidth spaces and records each
+            // expansion in ExpandedTabs, so that rendered columns can be mapped back to source columns.
+            string ExpandTabs(string whitespace, int tabWidth)
+            {
+                if (!whitespace.Contains('\t'))
+                {
+                    return whitespace;
+                }
+                // Rendered column (0-based, after the line number) at which the whitespace starts.
+                int column = characterOffset - CodeWindowOffsets[^1] - (neededPadding + 1);
+                string result = string.Empty;
+                foreach (char c in whitespace)
+                {
+                    if (c == '\t')
+                    {
+                        ExpandedTabs[^1].Add((column + result.Length, tabWidth));
+                        result += new string(' ', tabWidth);
+                    }
+                    else
+                    {
+                        result += c;
+                    }
+                }
+                return result;
+            }
+
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
             // Note that newlines MUST be added in this method, not anywhere else, else issue highlighting will break!
             void AppendNewline(ref int theLineNumber, ref string text, SEEToken token)
@@ -146,6 +185,7 @@ namespace SEE.UI.Window.CodeWindow
                 Assert.AreEqual(CodeWindowOffsets.Count, theLineNumber-1);
                 // + 1 for the newline
                 CodeWindowOffsets.Add(++characterOffset);
+                ExpandedTabs.Add(new List<(int column, int width)>());
                 // Add whitespace next to line number, so it's consistent.
                 int padding = neededPadding - (Mathf.FloorToInt(Mathf.Log10(theLineNumber)) + 1);
                 // Line number will be typeset in grey to distinguish it from the rest.
@@ -214,7 +254,7 @@ namespace SEE.UI.Window.CodeWindow
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                        string replaced = line.Replace("\t", new string(' ', token.Language.TabWidth));
+                        string replaced = ExpandTabs(line, token.Language.TabWidth);
                         text += replaced;
                         characterOffset += replaced.Length;
                     }
@@ -347,6 +387,7 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             neededPadding = $"{text.Length}".Length;
+            ExpandedTabs.Clear();
             this.text = "";
             for (int i = 0; i < text.Length; i++)
             {
