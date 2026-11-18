@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using SEE.Graphs;
 using SEE.Game;
@@ -156,20 +157,20 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 // Rendered column (0-based, after the line number) at which the whitespace starts.
                 int column = characterOffset - CodeWindowOffsets[^1] - (neededPadding + 1);
-                string result = string.Empty;
+                StringBuilder result = new(whitespace.Length + tabWidth);
                 foreach (char c in whitespace)
                 {
                     if (c == '\t')
                     {
                         ExpandedTabs[^1].Add((column + result.Length, tabWidth));
-                        result += new string(' ', tabWidth);
+                        result.Append(' ', tabWidth);
                     }
                     else
                     {
-                        result += c;
+                        result.Append(c);
                     }
                 }
-                return result;
+                return result.ToString();
             }
 
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
