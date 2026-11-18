@@ -310,7 +310,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             admission.metadataCallerCompilation = null;
             Body[] bodies = admission.declarations.Select(pair => new Body(pair.Key,
                 ExceptionFlowInvocationSubstitution.Bindings(pair.Value).Select(binding => ExceptionFlowInvocationSubstitution.Binder(binding.Formal)).ToArray(),
-                admission.templates[pair.Key].DistinctBy(term => term.Key).OrderBy(term => term.Key, StringComparer.Ordinal).ToArray())).ToArray();
+                admission.templates[pair.Key].Select(term => (Term: term, Key: term.Key))
+                    .DistinctBy(template => template.Key).OrderBy(template => template.Key, StringComparer.Ordinal)
+                    .Select(template => template.Term).ToArray())).ToArray();
             string scope = environment.GetScopeDigest(ScopeDigest);
             foreach (var owners in environment.GetAnalysisScopes().GroupBy(item => AssemblyKey(item.Compilation.Assembly), StringComparer.Ordinal))
                 if (owners.Select(item => item.Compilation).Distinct(ReferenceEqualityComparer.Instance).Count() != 1)
