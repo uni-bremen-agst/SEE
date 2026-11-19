@@ -18,17 +18,18 @@ using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity.Experimental;
-using Mediapipe.Tasks.Vision.HandLandmarker;
 using RootMotion.FinalIK;
+using SEE.Controls.KeyActions;
 using SEE.Extensions;
+using SEE.UI;
 using SEE.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Stopwatch = System.Diagnostics.Stopwatch;
-using SEE.UI;
-using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {
@@ -61,9 +62,14 @@ namespace SEE.Game.Avatars
         private readonly Stopwatch stopwatch = new();
 
         /// <summary>
-        /// TextureFrame object to hold a copy of the webcam texture on the CPU.
+        /// TextureFrame object to hold a current copy of the webcam texture on the CPU used for the animations.
         /// </summary>
-        private TextureFrame textureFrame;
+        private TextureFrame currentTextureFrame;
+
+        /// <summary>
+        /// TextureFrame object to temporarily hold the new copy of the webcam texture on the CPU.
+        /// </summary>
+        private TextureFrame nextTextureFrame;
 
         /// <summary>
         /// Solver from MediaPipe that is used to detect pose.
@@ -205,6 +211,11 @@ namespace SEE.Game.Avatars
         private bool areNewHandLandmarks = false;
 
         /// <summary>
+        /// Indicates whether an asynchronous GPU readback of the webcam texture is currently in progress.
+        /// </summary>
+        private bool isWebcamTextureReedbackPending = false;
+
+        /// <summary>
         /// Tracks the number of frames in which no pose landmarks are detected by MediaPipe.
         /// </summary>
         private int poseLandmarksLostFrames = 0;
@@ -305,10 +316,12 @@ namespace SEE.Game.Avatars
                     // If the avatar's hands are already in the starting position and ready for animation.
                     if (HandsAnimator.BringHandsToStartPositions())
                     {
-                        // Needed to flip the image since MediaPipe and Unity handle pixel data differently.
-                        textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
-                        Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
+                        if (!isWebcamTextureReedbackPending && webCamTexture.didUpdateThisFrame)
+                        {
+                            StartCoroutine(ReadWebcamTexture());
+                        }
 
+                        Mediapipe.Image poseLandmarkerImage = currentTextureFrame.BuildCPUImage();
                         poseLandmarker.DetectAsync(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
                         // Create a stable copy of the MediaPipe result data at one specific moment in time.
@@ -391,7 +404,7 @@ namespace SEE.Game.Avatars
                             // Changing positions of the hands.
                             HandsAnimator.SolveHandsPositions(snapshotResultPoseLandmarker, samplingTimesPoseLandmarkerSnapshot);
 
-                            Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
+                            Mediapipe.Image imageForGestureRecognizer = currentTextureFrame.BuildCPUImage();
                             gestureRecognizer.RecognizeAsync(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
                             // Create a stable copy of the MediaPipe result data at one specific moment in time.
@@ -469,6 +482,33 @@ namespace SEE.Game.Avatars
                     ik.solver.rightArmChain.bendConstraint.weight = 0f;
                 }
             }
+        }
+
+        /// <summary>
+        /// Asynchronously reads the current webcam image into <c>nextTextureFrame<c>.
+        /// If the reedback succeeds, swaps <c>nextTextureFrame<c> and <c>currentTextureFrame<c> so that
+        /// newly captured image will be used for animations.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerator"/> that can be used with
+        /// <see cref="MonoBehaviour.StartCoroutine(IEnumerator)"/> to execute the GPU reedback asynchronously.</returns>
+        private IEnumerator ReadWebcamTexture()
+        {
+            isWebcamTextureReedbackPending = true;
+
+            // Needed to flip the image since MediaPipe and Unity handle pixel data differently.
+            AsyncGPUReadbackRequest req = nextTextureFrame.ReadTextureAsync(webCamTexture, flipHorizontally: true, flipVertically: false);
+
+            yield return new WaitUntil(() => req.done);
+
+            if (req.hasError)
+            {
+                Debug.LogError($"Failed to read texture from the image source\n");
+                isWebcamTextureReedbackPending = false;
+                yield break;
+            }
+
+            (nextTextureFrame, currentTextureFrame) = (currentTextureFrame, nextTextureFrame);
+            isWebcamTextureReedbackPending = false;
         }
 
         /// <summary>
@@ -552,7 +592,8 @@ namespace SEE.Game.Avatars
 
                 // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
                 stopwatch.Start();
-                textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+                currentTextureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+                nextTextureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
                 isMediaPipeInitialized = true;
             }
         }
