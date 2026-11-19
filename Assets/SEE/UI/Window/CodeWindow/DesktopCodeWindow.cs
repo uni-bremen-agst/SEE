@@ -8,6 +8,7 @@ using SEE.IDE;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using SEE.UI.DebugAdapterProtocol;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
 using SEE.Controls.Players;
+using SEE.Controls.KeyActions;
 using SEE.Net.Actions.GraphElement;
 
 namespace SEE.UI.Window.CodeWindow
@@ -182,7 +184,7 @@ namespace SEE.UI.Window.CodeWindow
             if (WindowSpaceManager.WindowSpaceOfLocalPlayer.ActiveWindow == this)
             {
                 // Right-click opens menu with LSP actions.
-                if (Input.GetMouseButtonDown(1))
+                if (KeyBindings.IsMouseButtonDown(1))
                 {
                     if (lspHandler != null)
                     {
@@ -192,7 +194,7 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             int character = word.firstCharacterIndex;
                             (int line, int column) = GetSourcePosition(character);
-                            contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
+                            contextMenu.Show(line - 1, column - 1, SEEInput.MousePosition, word.GetWord());
                         }
                         return;
                     }
@@ -201,7 +203,7 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     // Show issue info by leveraging links we created earlier.
                     // Passing camera as null causes the screen space rather than world space camera to be used.
-                    int link = TMP_TextUtilities.FindIntersectingLink(textMesh, Input.mousePosition, null);
+                    int link = TMP_TextUtilities.FindIntersectingLink(textMesh, SEEInput.MousePosition, null);
                     if (link != -1)
                     {
                         TriggerIssueHoverAsync(link).Forget();
@@ -232,7 +234,7 @@ namespace SEE.UI.Window.CodeWindow
                         //          We would need to implement context-dependent key bindings first.
                         //       b) We need to differentiate between "key is in a pressed state", "key was pressed",
                         //          and "key was released", which goes beyond the general interface of SEEInput.
-                        if (Input.GetKey(KeyCode.LeftControl))
+                        if (KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
                         {
                             UnderlineHoveredWord(hoveredWord.Value);
                         }
@@ -240,22 +242,22 @@ namespace SEE.UI.Window.CodeWindow
 
                     lastHoveredWord = hoveredWord;
                 }
-                else if (Input.GetKeyUp(KeyCode.LeftControl) && lastHoveredWord != null)
+                else if (KeyBindings.IsKeyUp(InputKey.LeftCtrl) && lastHoveredWord != null)
                 {
                     RemoveUnderline(lastHoveredWord.Value);
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftControl) && lastHoveredWord != null)
+                else if (KeyBindings.IsKeyDown(InputKey.LeftCtrl) && lastHoveredWord != null)
                 {
                     UnderlineHoveredWord(lastHoveredWord.Value);
                 }
 
-                if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftControl) && lastHoveredWord != null)
+                if (KeyBindings.IsMouseButtonPressed(0) && KeyBindings.IsKeyPressed(InputKey.LeftCtrl) && lastHoveredWord != null)
                 {
                     RemoveUnderline(lastHoveredWord.Value);
                     GoToDefinition(lastHoveredWord.Value);
                 }
 
-                if (Input.GetKey(KeyCode.LeftControl) && Input.mouseScrollDelta.y is float delta and not 0)
+                if (KeyBindings.IsKeyPressed(InputKey.LeftCtrl) && SEEInput.MouseScrollDelta is float delta and not 0)
                 {
                     // Change font size by scrolled amount.
                     FontSize = Mathf.Clamp(FontSize + delta, 5, 72);
@@ -271,7 +273,7 @@ namespace SEE.UI.Window.CodeWindow
 
             TMP_WordInfo? DetectHoveredWord()
             {
-                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
+                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, SEEInput.MousePosition, null);
                 return index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
             }
 

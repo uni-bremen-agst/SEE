@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions
 {
@@ -177,7 +178,7 @@ namespace SEE.Controls.ReversibleActions
             }
             else
             {
-                if (Input.GetMouseButtonDown(0)
+                if (KeyBindings.IsMouseButtonDown(0)
                     && Raycasting.RaycastGraphElement(
                         out RaycastHit raycastHit,
                         out GraphElementRef _) != HitGraphElement.None)

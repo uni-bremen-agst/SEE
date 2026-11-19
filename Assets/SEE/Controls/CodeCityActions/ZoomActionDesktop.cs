@@ -28,7 +28,7 @@ namespace SEE.Controls.CodeCityActions
             // Whether the user presses a keyboard shortcut to zoom into the city.
             bool zoomInto = SEEInput.ZoomInto();
             // Alternatively, the user can select the mouse wheel for zooming.
-            float zoomStepsDelta = Input.mouseScrollDelta.y;
+            float zoomStepsDelta = SEEInput.MouseScrollDelta;
             // We need to round to the "next" full integer, otherwise not all scrolling will be counted.
             int zoomSteps = zoomStepsDelta < 0 ? Mathf.FloorToInt(zoomStepsDelta) : Mathf.CeilToInt(zoomStepsDelta);
             // Whether zooming per mouse wheel was requested.

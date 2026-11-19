@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.Game.Drawable;
@@ -12,6 +12,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 
 namespace SEE.Controls.ReversibleActions.Drawable
@@ -398,7 +399,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 SwitchManager speedUp = MoveMenu.GetSpeedUpManager();
                 SwitchManager moveByMouse = MoveMenu.GetMoveByMouseManager();
                 /// For switching the speed.
-                if (Input.GetKeyDown(KeyCode.LeftControl))
+                if (KeyBindings.IsKeyDown(InputKey.LeftCtrl))
                 {
                     speedUp.isOn = !speedUp.isOn;
                     speedUp.UpdateUI();
@@ -553,21 +554,21 @@ namespace SEE.Controls.ReversibleActions.Drawable
             float degree = 0;
 
             /// Rotates forward with normal speed.
-            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.Rotate;
                 rotate = true;
             }
             /// Rotates forward with fast speed.
-            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.RotateFast;
                 rotate = true;
             }
             /// Rotates back with normal speed.
-            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.Rotate;
@@ -575,7 +576,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             }
             /// Rotates back with fast speed.
-            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.RotateFast;
@@ -685,7 +686,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         }
 
         /// <summary>
-        /// Returns the pressed KeyCode of the arrow keys.
+        /// Returns the direction indicated by the current movement action.
         /// </summary>
         /// <returns>The pressed arrow key.</returns>
         private ValueHolder.MoveDirection GetDirection()

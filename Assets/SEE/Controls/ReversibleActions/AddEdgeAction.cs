@@ -164,7 +164,7 @@ namespace SEE.Controls.ReversibleActions
             else
             {
                 if (HoveredObject != null
-                    && Input.GetMouseButtonDown(0)
+                    && KeyBindings.IsMouseButtonDown(0)
                     && !Raycasting.IsMouseOverGUI()
                     && HoveredObject.HasNodeRef())
                 {

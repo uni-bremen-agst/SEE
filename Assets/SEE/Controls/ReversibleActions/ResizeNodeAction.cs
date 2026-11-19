@@ -11,6 +11,7 @@ using Plane = UnityEngine.Plane;
 using SEE.Factories;
 using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions
 {
@@ -414,7 +415,7 @@ namespace SEE.Controls.ReversibleActions
             private void Update()
             {
                 bool newClick = false;
-                if (Input.GetMouseButton(0))
+                if (KeyBindings.IsMouseButtonPressed(0))
                 {
                     newClick = !clicked;
                     clicked = true;

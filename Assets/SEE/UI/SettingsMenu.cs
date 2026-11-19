@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,16 +165,6 @@ namespace SEE.UI
             if (bindingToRebind != null)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
-                // the next button that gets pressed will be the new keyBind.
-                if (Input.anyKeyDown)
-                {
-                    KeyCode newKey = Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>()
-                                         .FirstOrDefault(key => Input.GetKeyDown(key) && KeyBindings.AssignableKeyCode(key));
-                    if (newKey != KeyCode.None)
-                    {
-                        ReassignKeyAsync(bindingToRebind, newKey).Forget();
-                    }
-                }
             }
             if (SEEInput.ToggleSettings())
             {
@@ -210,25 +200,26 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Reassigns the binding of the given <paramref name="descriptor"/> to the new key <paramref name="newKey"/>
+        /// Reassigns the binding of the given <paramref name="descriptor"/> to the new Input System control path
         /// after confirming the action with the user.
         /// </summary>
         /// <param name="descriptor">The key binding to reassign.</param>
-        /// <param name="newKey">The new key code to assign to the key binding.</param>
-        private async UniTaskVoid ReassignKeyAsync(KeyActionDescriptor descriptor, KeyCode newKey)
+        /// <param name="bindingPath">The Input System control path to assign.</param>
+        private async UniTaskVoid ReassignKeyAsync(KeyActionDescriptor descriptor, string bindingPath)
         {
             bindingToRebind = null;
             SEEInput.KeyboardShortcutsEnabled = true;
             bindingNotification.Close();
-            string question = $"Do you really want to reassign action \"{descriptor.Name}\" to key {newKey}?";
+            string displayName = KeyBindings.BindingDisplayName(bindingPath);
+            string question = $"Do you really want to reassign action \"{descriptor.Name}\" to key {displayName}?";
             if (!await ConfirmDialog.ConfirmAsync(new(question, Title: "Change Key?")))
             {
                 return;
             }
             try
             {
-                KeyBindings.SetBindingForKey(descriptor, newKey);
-                shortNameOfBindingToLabel[descriptor.Name].text = newKey.ToString();
+                KeyBindings.SetBindingForPath(descriptor, bindingPath);
+                shortNameOfBindingToLabel[descriptor.Name].text = displayName;
             }
             catch (KeyMap.KeyBindingsExistsException ex)
             {
@@ -241,8 +232,18 @@ namespace SEE.UI
         /// </summary>
         private void StartRebindFor(KeyActionDescriptor binding)
         {
-            bindingNotification = ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
+            KeyBindings.CancelInteractiveRebind();
             bindingToRebind = binding;
+            SEEInput.KeyboardShortcutsEnabled = false;
+            bindingNotification = ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
+            KeyBindings.StartInteractiveRebind(binding,
+                path => ReassignKeyAsync(binding, path).Forget(),
+                () =>
+                {
+                    bindingToRebind = null;
+                    SEEInput.KeyboardShortcutsEnabled = true;
+                    bindingNotification.Close();
+                });
         }
 
         /// <summary>
@@ -577,7 +578,7 @@ namespace SEE.UI
                         .Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
 
                     // The name of the key code bound.
-                    key.text = descriptor.KeyCode.ToString();
+                    key.text = KeyBindings.BindingDisplayName(descriptor.BindingPath);
                     shortNameOfBindingToLabel[descriptor.Name] = key;
 
                     // add the actionlistener to be able to change the key code of a binding.

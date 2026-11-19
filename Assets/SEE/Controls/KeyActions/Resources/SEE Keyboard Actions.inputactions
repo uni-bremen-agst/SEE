@@ -1,0 +1,1496 @@
+﻿{
+    "name":  "SEE Keyboard Actions",
+    "maps":  [
+                 {
+                     "name":  "SEE",
+                     "id":  "090158cf-acc1-4856-8903-26fe96916bdd",
+                     "actions":  [
+                                     {
+                                         "name":  "Help",
+                                         "type":  "Button",
+                                         "id":  "dc7cb217-f6cc-4da8-bd90-94f718e13c55",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleMenu",
+                                         "type":  "Button",
+                                         "id":  "c1cb3045-c020-4f40-a137-3ab0a04ebe2e",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleSettings",
+                                         "type":  "Button",
+                                         "id":  "d294b470-e18c-4dff-9321-08f89912aaa3",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ConfigMenu",
+                                         "type":  "Button",
+                                         "id":  "8b9651fb-cd18-4cab-b696-d5ad5125e618",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleBrowser",
+                                         "type":  "Button",
+                                         "id":  "2918f05e-b4cb-4bf3-ac51-41cfbb212de3",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleMirror",
+                                         "type":  "Button",
+                                         "id":  "2cdf1d39-31b1-4e5e-b479-e624664b429e",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Undo",
+                                         "type":  "Button",
+                                         "id":  "86218983-a3be-4adc-b124-b05149ae225b",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Redo",
+                                         "type":  "Button",
+                                         "id":  "2a753692-0156-4052-a40c-34a979298b7d",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "CloseNotifications",
+                                         "type":  "Button",
+                                         "id":  "303fb542-c5f7-4488-bcff-3965934183ee",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleFaceCam",
+                                         "type":  "Button",
+                                         "id":  "a8f58259-6eb6-4cca-b8d1-1d9ca2d201ba",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleFaceCamPosition",
+                                         "type":  "Button",
+                                         "id":  "53b2840a-7cee-472a-a9c4-c80055d37acd",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleVoiceControl",
+                                         "type":  "Button",
+                                         "id":  "abfb1a9c-1a67-4c7b-ae78-12bc517d3541",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "OpenSnapshotWindow",
+                                         "type":  "Button",
+                                         "id":  "875a2b4f-2b2f-40e1-9fc3-ee79422df2ea",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "BoostCameraSpeed",
+                                         "type":  "Button",
+                                         "id":  "243eb30a-f333-410a-bc46-5895857ccf5e",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveForward",
+                                         "type":  "Button",
+                                         "id":  "46ab59c6-9262-4673-8dc4-6df47b5a1ac6",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveBackward",
+                                         "type":  "Button",
+                                         "id":  "b60f669d-e697-40d6-847a-2fb721651b55",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveRight",
+                                         "type":  "Button",
+                                         "id":  "42b42488-e6dd-419c-8afd-f03576b2de94",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveLeft",
+                                         "type":  "Button",
+                                         "id":  "4f65186c-4f52-4bc6-a1d3-b556b05217a5",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveUp",
+                                         "type":  "Button",
+                                         "id":  "7ee9d897-77c4-4216-9abd-da48d5762f0c",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveDown",
+                                         "type":  "Button",
+                                         "id":  "143da51e-8e79-4ddc-86b2-fe4537e13323",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleCharts",
+                                         "type":  "Button",
+                                         "id":  "2af4f121-fe05-482b-a413-6be5a799aac7",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleMetricHoveringSelection",
+                                         "type":  "Button",
+                                         "id":  "b767ffd2-9c6e-417c-a0d1-b83f850c67f7",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleHolisticMetricsMenu",
+                                         "type":  "Button",
+                                         "id":  "87f26c86-d8ce-4e89-86ff-827205a24183",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "TreeView",
+                                         "type":  "Button",
+                                         "id":  "e6ba9144-45ae-4b59-baf8-3fbfdeba6ab4",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleEdges",
+                                         "type":  "Button",
+                                         "id":  "e644d05e-db25-43f8-93f3-469dbeeaf755",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Unselect",
+                                         "type":  "Button",
+                                         "id":  "1b4d6260-b2b5-4101-8f26-46f7d019f6a2",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Cancel",
+                                         "type":  "Button",
+                                         "id":  "9105abeb-b894-4fd6-ac42-a66e57a6e3d1",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Reset",
+                                         "type":  "Button",
+                                         "id":  "69b1d629-3455-4f07-bd7e-2f2a675f6492",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ZoomInto",
+                                         "type":  "Button",
+                                         "id":  "4fe055cf-012d-443d-bedc-c927f1d446dc",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Snap",
+                                         "type":  "Button",
+                                         "id":  "548cb9b6-aa8d-4b2a-81bf-681be43c87cb",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DragHovered",
+                                         "type":  "Button",
+                                         "id":  "05de467d-5769-4988-8985-ae18b40459c5",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleCameraLock",
+                                         "type":  "Button",
+                                         "id":  "512f7495-9b05-4884-8d08-3aa25039a912",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Pointing",
+                                         "type":  "Button",
+                                         "id":  "be97fdc1-bc82-4be0-903a-ca1d36451bad",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "HandAnimations",
+                                         "type":  "Button",
+                                         "id":  "868babd5-dda7-464e-93d8-d8234c2c8701",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "SetMarker",
+                                         "type":  "Button",
+                                         "id":  "923f3a1a-ddd2-445a-8fac-7170603a7d94",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DeleteMarker",
+                                         "type":  "Button",
+                                         "id":  "c1cb899d-815c-4905-a550-6a61ebdda82d",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleEvolutionCanvases",
+                                         "type":  "Button",
+                                         "id":  "2e795740-0f4e-4cd7-b5e5-39a07fcdde7d",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Previous",
+                                         "type":  "Button",
+                                         "id":  "e5bb36a7-73c0-4bc6-85ac-3a83b4c7e707",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "Next",
+                                         "type":  "Button",
+                                         "id":  "767f026b-8aa8-4ee7-848c-57bcf0e98251",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleAutoPlay",
+                                         "type":  "Button",
+                                         "id":  "f117fc5e-843b-4595-b53a-fd09e34e5a95",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "IncreaseAnimationSpeed",
+                                         "type":  "Button",
+                                         "id":  "9b4eee24-6d14-41c8-b99f-be6c34847ea9",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DecreaseAnimationSpeed",
+                                         "type":  "Button",
+                                         "id":  "7a437590-787a-4a8a-af58-6cd1842ee9ce",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleExecutionOrder",
+                                         "type":  "Button",
+                                         "id":  "5285c53a-9762-4967-afac-b3509f2283c0",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ExecuteToBreakpoint",
+                                         "type":  "Button",
+                                         "id":  "d017bfac-495e-4fa9-a1fb-b84ca82164ad",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "FirstStatement",
+                                         "type":  "Button",
+                                         "id":  "94be5489-3258-4c87-925d-4c2a4ac55424",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ShowWindowMenu",
+                                         "type":  "Button",
+                                         "id":  "3ae9ba32-c232-48bf-9adc-f651fe3d1f3c",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleTextChat",
+                                         "type":  "Button",
+                                         "id":  "7db58207-47ec-4afd-8762-6c2fedeb2099",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleVoiceChat",
+                                         "type":  "Button",
+                                         "id":  "f6a890e0-74d0-4f72-a43d-d29a39a780e9",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PartUndo",
+                                         "type":  "Button",
+                                         "id":  "f2ea0638-3e42-479a-b2ed-d437583ac6d5",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectUp",
+                                         "type":  "Button",
+                                         "id":  "8252686f-79ef-4aa0-984a-65b4ee3853ff",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectDown",
+                                         "type":  "Button",
+                                         "id":  "930c01bf-72ad-43f8-a7dd-faac0e2b3dd8",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectLeft",
+                                         "type":  "Button",
+                                         "id":  "85266d1a-c9eb-4d35-8de8-d975daca0003",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectRight",
+                                         "type":  "Button",
+                                         "id":  "5bf406a5-e0df-4af8-b119-760350ab59bb",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectForward",
+                                         "type":  "Button",
+                                         "id":  "e3d2e90d-4eb4-44f9-b1f7-da870745abe6",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "MoveObjectBackward",
+                                         "type":  "Button",
+                                         "id":  "25337117-a047-4376-879e-f0dbd243e9d6",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DrawableManagerView",
+                                         "type":  "Button",
+                                         "id":  "c28d88dc-5f47-4b0c-a73c-094c8fa9a653",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "SavePathPosition",
+                                         "type":  "Button",
+                                         "id":  "2491e70f-c7e7-4dd4-a68b-c793399ba56d",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "TogglePathPlaying",
+                                         "type":  "Button",
+                                         "id":  "b2c2705c-b676-40c1-8530-a9df373c4ba9",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "ToggleEchoFace",
+                                         "type":  "Button",
+                                         "id":  "d07eb3e5-f921-4c7f-9c11-4b2df86ed25b",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DirectLeftControl",
+                                         "type":  "Button",
+                                         "id":  "8dfc4149-f9f6-4005-b6a6-eff57b95a779",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DirectRightControl",
+                                         "type":  "Button",
+                                         "id":  "36094843-6b96-49b6-ad61-17a74719f573",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DirectLeftShift",
+                                         "type":  "Button",
+                                         "id":  "b0b75cdb-8d35-47eb-b4d1-c6be34118f0a",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DirectRightShift",
+                                         "type":  "Button",
+                                         "id":  "d17c838d-e360-4b48-9a19-8866e9bd3870",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "DirectEscape",
+                                         "type":  "Button",
+                                         "id":  "2d8a5fab-7d6f-408f-a325-b1ad113e4663",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit0",
+                                         "type":  "Button",
+                                         "id":  "ce210ff7-8436-4507-bb49-d7c1af8ca348",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit1",
+                                         "type":  "Button",
+                                         "id":  "adf2c4d3-ae80-4d96-8fa2-fefb3cd6a563",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit2",
+                                         "type":  "Button",
+                                         "id":  "9760eb16-3eac-467f-a0bf-9735e3517462",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit3",
+                                         "type":  "Button",
+                                         "id":  "f1594965-6336-4a61-abce-9113ba3da1af",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit4",
+                                         "type":  "Button",
+                                         "id":  "17cc2c64-addc-42aa-8f7b-3729abb61509",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit5",
+                                         "type":  "Button",
+                                         "id":  "07a09e7b-c7ff-4ecf-93c3-aebf6b82a99a",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit6",
+                                         "type":  "Button",
+                                         "id":  "bfc37ed9-049f-4ad8-9e7d-b0abda8b793d",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit7",
+                                         "type":  "Button",
+                                         "id":  "a3745030-9b76-43e2-a27d-327bc0aeff23",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit8",
+                                         "type":  "Button",
+                                         "id":  "99eaa6b2-4fc3-449e-aea8-376ed8746e39",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     },
+                                     {
+                                         "name":  "PlayerMenuDigit9",
+                                         "type":  "Button",
+                                         "id":  "a208dfdb-1687-4d0a-b0a6-5b6f3d3f5c7b",
+                                         "expectedControlType":  "Button",
+                                         "processors":  "",
+                                         "interactions":  "",
+                                         "initialStateCheck":  false
+                                     }
+                                 ],
+                     "bindings":  [
+                                      {
+                                          "name":  "",
+                                          "id":  "19d63cd3-ed22-481e-bf2d-7a9f60288131",
+                                          "path":  "\u003cKeyboard\u003e/h",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Help",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "419c13ce-ab2c-4e5d-8b45-8883e92e8493",
+                                          "path":  "\u003cKeyboard\u003e/space",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleMenu",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "a08b0478-242b-49ac-809f-a0e031eedfa0",
+                                          "path":  "\u003cKeyboard\u003e/pause",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleSettings",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "f93b4a56-c41d-4d86-8af7-59370e2eda41",
+                                          "path":  "\u003cKeyboard\u003e/k",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ConfigMenu",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "acdcc221-dc49-42e0-9414-6ef6dd5057a7",
+                                          "path":  "\u003cKeyboard\u003e/f4",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleBrowser",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "f82805d4-9f9c-420e-a5c1-f91bf10255d9",
+                                          "path":  "\u003cKeyboard\u003e/f8",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleMirror",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "5d3777e6-d05d-4d82-809c-d881942d90e3",
+                                          "path":  "\u003cKeyboard\u003e/z",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Undo",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "7fcddc32-2ead-4d99-ac0d-e862c4b88b69",
+                                          "path":  "\u003cKeyboard\u003e/y",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Redo",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2a8e2987-1ff2-440f-8e2a-deaeea57446b",
+                                          "path":  "\u003cKeyboard\u003e/x",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "CloseNotifications",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "efe7e0c0-eb79-41fa-84ca-82e37d923086",
+                                          "path":  "\u003cKeyboard\u003e/i",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleFaceCam",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "7bc9b135-771d-4381-8bf1-3f5061948cc9",
+                                          "path":  "\u003cKeyboard\u003e/f3",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleFaceCamPosition",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "f3ac02e4-0be5-4f1d-964a-21ae7b30a014",
+                                          "path":  "\u003cKeyboard\u003e/period",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleVoiceControl",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "dd1e4be3-944d-4d33-8375-a8978a5d8c3a",
+                                          "path":  "\u003cKeyboard\u003e/f7",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "OpenSnapshotWindow",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "ee55212a-4926-40cf-a34f-8ebfd6ddd822",
+                                          "path":  "\u003cKeyboard\u003e/leftShift",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "BoostCameraSpeed",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "8e3bdab4-e148-49e2-ba0a-9d62bd8256b5",
+                                          "path":  "\u003cKeyboard\u003e/w",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveForward",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "4708ecea-3fa4-439b-943c-79221ba2f3ac",
+                                          "path":  "\u003cKeyboard\u003e/s",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveBackward",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "3b9d9f2b-8b0e-4534-bed9-c23f9c5fa4e2",
+                                          "path":  "\u003cKeyboard\u003e/d",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveRight",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2deaa2ee-129c-4a2c-84c6-eeecb2ed5862",
+                                          "path":  "\u003cKeyboard\u003e/a",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveLeft",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "bc575c18-35dc-4ee7-8c49-508f71ffdec7",
+                                          "path":  "\u003cKeyboard\u003e/q",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveUp",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "98f06426-085f-4a62-b81a-f16f9b045e52",
+                                          "path":  "\u003cKeyboard\u003e/e",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveDown",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "c64da8f7-3456-4265-953c-1da9aec993c9",
+                                          "path":  "\u003cKeyboard\u003e/m",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleCharts",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "6896bc3c-15d4-4516-b1ab-c41c9c4d1c04",
+                                          "path":  "\u003cKeyboard\u003e/n",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleMetricHoveringSelection",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "c8591890-0b56-4066-b387-12ec11a186c2",
+                                          "path":  "\u003cKeyboard\u003e/c",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleHolisticMetricsMenu",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "65c33e0b-875c-4d13-acb9-0061abefa36f",
+                                          "path":  "\u003cKeyboard\u003e/tab",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "TreeView",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "20696416-da08-4aa4-944f-205a738e38aa",
+                                          "path":  "\u003cKeyboard\u003e/v",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleEdges",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "fa26b71a-abfe-49ab-9a8c-75654ac28c3f",
+                                          "path":  "\u003cKeyboard\u003e/u",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Unselect",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "e94fdde6-4f13-434e-a428-dcb1bfbb666c",
+                                          "path":  "\u003cKeyboard\u003e/escape",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Cancel",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "d058d835-dbbc-44cc-887d-0c853509c2d0",
+                                          "path":  "\u003cKeyboard\u003e/r",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Reset",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "48138261-0b1c-44fd-a03a-c28e0eac859f",
+                                          "path":  "\u003cKeyboard\u003e/g",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ZoomInto",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2a8c73e2-ffe9-4094-8fc3-fd18a0a19aaa",
+                                          "path":  "\u003cKeyboard\u003e/leftAlt",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Snap",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "164a97fd-56db-4c10-9db0-a16d3a7ffda7",
+                                          "path":  "\u003cKeyboard\u003e/leftCtrl",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DragHovered",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "6305557b-06ca-4666-98ae-069967eece62",
+                                          "path":  "\u003cKeyboard\u003e/l",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleCameraLock",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2ab41bab-631c-4aa2-8c74-bb64a69e902f",
+                                          "path":  "\u003cKeyboard\u003e/p",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Pointing",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "f4cd4e16-6c8c-46b6-b4ac-a23605310261",
+                                          "path":  "\u003cKeyboard\u003e/f6",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "HandAnimations",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "799d0733-1596-4109-84aa-dd322037e679",
+                                          "path":  "\u003cKeyboard\u003e/insert",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "SetMarker",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "0a647876-b5ca-409f-8383-8874379a477a",
+                                          "path":  "\u003cKeyboard\u003e/delete",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DeleteMarker",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "0405beef-8800-4473-b7e2-aa731166c9be",
+                                          "path":  "\u003cKeyboard\u003e/t",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleEvolutionCanvases",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "3ec0ab81-4784-40a1-b2f1-395ccb205378",
+                                          "path":  "\u003cKeyboard\u003e/leftArrow",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Previous",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "fe505a38-d8b4-4b12-ae6c-a7e6fe80325d",
+                                          "path":  "\u003cKeyboard\u003e/rightArrow",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "Next",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "3d56135d-bac1-41f5-92ba-19a574528717",
+                                          "path":  "\u003cKeyboard\u003e/f9",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleAutoPlay",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "262cfc60-2518-435b-9b33-e8eb8f19e501",
+                                          "path":  "\u003cKeyboard\u003e/upArrow",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "IncreaseAnimationSpeed",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "cf148758-6495-44ae-999c-1566ed6b3104",
+                                          "path":  "\u003cKeyboard\u003e/downArrow",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DecreaseAnimationSpeed",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "3c3e4b06-19ed-42b9-97c6-f567d4634558",
+                                          "path":  "\u003cKeyboard\u003e/o",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleExecutionOrder",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "24c939ca-5dbe-44e6-b03b-01a5b3c0b842",
+                                          "path":  "\u003cKeyboard\u003e/b",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ExecuteToBreakpoint",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "97fc32e1-a143-4bf1-ad2b-8e79dd127332",
+                                          "path":  "\u003cKeyboard\u003e/home",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "FirstStatement",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "a1e4db39-42e5-46c1-8047-89daa2c3c449",
+                                          "path":  "\u003cKeyboard\u003e/f1",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ShowWindowMenu",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "7ba87429-9d8f-44cd-81aa-b387a5336b1d",
+                                          "path":  "\u003cKeyboard\u003e/f2",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleTextChat",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "8bbd3c2b-3412-4891-a583-a11caeac7998",
+                                          "path":  "\u003cKeyboard\u003e/f5",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleVoiceChat",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "dc45ae52-c6f2-4e49-b95b-6b89ab6d2e33",
+                                          "path":  "\u003cKeyboard\u003e/capsLock",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PartUndo",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "80bb37c6-87c4-43f6-8145-66f536c35e70",
+                                          "path":  "\u003cKeyboard\u003e/numpad8",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectUp",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2ebb49c8-9dc8-4b97-82b0-92b339fc6482",
+                                          "path":  "\u003cKeyboard\u003e/numpad2",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectDown",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "0e8bd10e-e9fb-4bef-b364-08fa99104261",
+                                          "path":  "\u003cKeyboard\u003e/numpad4",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectLeft",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "6a9caa6a-9548-401b-b64a-458b15122783",
+                                          "path":  "\u003cKeyboard\u003e/numpad6",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectRight",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "da644699-88dd-4553-a7c0-64f030bd2bbc",
+                                          "path":  "\u003cKeyboard\u003e/numpad9",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectForward",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "352428ee-d8dc-4432-b5b5-89adf1539c5b",
+                                          "path":  "\u003cKeyboard\u003e/numpad3",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "MoveObjectBackward",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "c98402b0-f21a-4d80-975e-2c29cd44bc33",
+                                          "path":  "\u003cKeyboard\u003e/numpad0",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DrawableManagerView",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "ebd30541-e056-43e6-b0b1-dc92e5f332d0",
+                                          "path":  "\u003cKeyboard\u003e/f11",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "SavePathPosition",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "0cd6139b-f2f4-4c58-87f6-7d689b852331",
+                                          "path":  "\u003cKeyboard\u003e/f12",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "TogglePathPlaying",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "ab9f943f-1ba1-47ed-a63d-8165c6e57868",
+                                          "path":  "\u003cKeyboard\u003e/f",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "ToggleEchoFace",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "13d888cd-4c79-414a-abc6-50c412f6dbfa",
+                                          "path":  "\u003cKeyboard\u003e/leftCtrl",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DirectLeftControl",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "0fe5a614-028c-4a83-9d29-c011a4a26aad",
+                                          "path":  "\u003cKeyboard\u003e/rightCtrl",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DirectRightControl",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "e3f43864-3dac-494a-bc47-67e1bffa7cf2",
+                                          "path":  "\u003cKeyboard\u003e/leftShift",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DirectLeftShift",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "f8ceb615-016e-4bc7-92f4-9f6f90b40b4a",
+                                          "path":  "\u003cKeyboard\u003e/rightShift",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DirectRightShift",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "6fa97256-d00c-43e2-bd01-9fec34d06fc4",
+                                          "path":  "\u003cKeyboard\u003e/escape",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "DirectEscape",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "2a8f8ae6-89da-4e3e-826f-5a9bfe66f985",
+                                          "path":  "\u003cKeyboard\u003e/0",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit0",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "52210190-3bdc-4318-ad4f-48edec71c6d5",
+                                          "path":  "\u003cKeyboard\u003e/1",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit1",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "682fd7d9-a3a2-474b-aea0-0a14c51edc31",
+                                          "path":  "\u003cKeyboard\u003e/2",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit2",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "21ae3c42-8fdb-461d-861a-d9a57693318b",
+                                          "path":  "\u003cKeyboard\u003e/3",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit3",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "73d04ef2-715a-4695-bfbd-261d1b417835",
+                                          "path":  "\u003cKeyboard\u003e/4",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit4",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "29bf2d18-17fd-4d24-9d45-8f77ad82573d",
+                                          "path":  "\u003cKeyboard\u003e/5",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit5",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "6ad06c35-9e68-45cb-92d8-92ae2eb8c16a",
+                                          "path":  "\u003cKeyboard\u003e/6",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit6",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "56298a60-9d34-43f8-b486-dc3943e34642",
+                                          "path":  "\u003cKeyboard\u003e/7",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit7",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "5e54eba2-feeb-4f61-bbf4-a2dc7ed1990c",
+                                          "path":  "\u003cKeyboard\u003e/8",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit8",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      },
+                                      {
+                                          "name":  "",
+                                          "id":  "5bcc4304-cdc5-49e2-8d21-cc3e15f91df6",
+                                          "path":  "\u003cKeyboard\u003e/9",
+                                          "interactions":  "",
+                                          "processors":  "",
+                                          "groups":  "",
+                                          "action":  "PlayerMenuDigit9",
+                                          "isComposite":  false,
+                                          "isPartOfComposite":  false
+                                      }
+                                  ]
+                 }
+             ],
+    "controlSchemes":  [
+
+                       ]
+}

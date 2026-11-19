@@ -1,4 +1,4 @@
-﻿using SEE.Game.Drawable;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Extensions;
@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using SEE.Controls.KeyActions;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
@@ -248,7 +249,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 AddLineShapePoint();
 
                 /// With left shift key can the loop option of the shape menu be toggled.
-                if (Input.GetKeyDown(KeyCode.LeftShift))
+                if (KeyBindings.IsKeyDown(InputKey.LeftShift))
                 {
                     ShapeMenu.GetLoopManager().isOn = !ShapeMenu.GetLoopManager().isOn;
                     ShapeMenu.GetLoopManager().UpdateUI();
@@ -258,7 +259,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
                 if (SEEInput.MouseUp(MouseButton.Left)
-                    && Input.GetKey(KeyCode.LeftControl)
+                    && KeyBindings.IsKeyPressed(InputKey.LeftCtrl)
                     && drawing
                     && positions.Length > 0
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
@@ -623,7 +624,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             if (SEEInput.MouseDown(MouseButton.Middle)
                 && shapePreviewFix
-                && Input.GetKey(KeyCode.LeftControl)
+                && KeyBindings.IsKeyPressed(InputKey.LeftCtrl)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
             {
                 shapePreviewFix = false;
@@ -641,7 +642,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             if (Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && SEEInput.MouseDown(MouseButton.Middle)
-                && !Input.GetKey(KeyCode.LeftControl)
+                && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
             {
                 shapePreviewFix = true;
@@ -832,7 +833,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// </summary>
         private void AddLineShapePoint()
         {
-            if (SEEInput.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift)
+            if (SEEInput.LeftMouseDown() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl) && !KeyBindings.IsKeyPressed(InputKey.LeftShift)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))

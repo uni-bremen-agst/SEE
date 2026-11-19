@@ -127,7 +127,7 @@ namespace SEE.Controls.Players
                 cameraState.FreeMode = true;
             }
 
-            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            lastAxis = SEEInput.MousePosition;
         }
 
         /// <summary>
@@ -358,13 +358,11 @@ namespace SEE.Controls.Players
                     wasRotating = true;
                 }
 
-                float x = -(lastAxis.x - Input.mousePosition.x) * 0.1f;
-                float y = -(lastAxis.y - Input.mousePosition.y) * 0.1f;
+                float x = -(lastAxis.x - SEEInput.MousePosition.x) * 0.1f;
+                float y = -(lastAxis.y - SEEInput.MousePosition.y) * 0.1f;
 
                 // These were the original statements which, however, do not work in
                 // a remote-desktop session (RDP).
-                // float x = Input.GetAxis("Mouse X");
-                // float y = Input.GetAxis("Mouse Y");
 
                 cameraState.Yaw += x;
                 cameraState.Pitch -= y;
@@ -378,8 +376,8 @@ namespace SEE.Controls.Players
                 TracingHelperService.Instance?.TrackRotation(rotationStartYaw, cameraState.Yaw);
             }
 
-            lastAxis.x = Input.mousePosition.x;
-            lastAxis.y = Input.mousePosition.y;
+            lastAxis.x = SEEInput.MousePosition.x;
+            lastAxis.y = SEEInput.MousePosition.y;
         }
     }
 }

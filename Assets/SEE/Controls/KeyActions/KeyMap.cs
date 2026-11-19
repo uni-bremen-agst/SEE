@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine.InputSystem;
 using UnityEngine;
 
 namespace SEE.Controls.KeyActions
@@ -46,67 +47,12 @@ namespace SEE.Controls.KeyActions
         }
 
         /// <summary>
-        /// Gets the <paramref name="keyCode"/> of the <see cref="KeyActionDescriptor"/> bound
-        /// to the specified <paramref name="keyAction"/>.
-        /// </summary>
-        /// <param name="keyAction">The <see cref="KeyAction"/> whose <paramref name="keyCode"/> is requested.</param>
-        /// <param name="keyCode">The resulting <see cref="KeyCode"/> of the descriptor bound
-        /// to <paramref name="keyAction"/>; defined only if this method returns true.</param>
-        /// <returns>True if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
-        /// otherwise, false.</returns>
-        internal bool TryGetValue(KeyAction keyAction, out KeyCode keyCode)
-        {
-            if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
-            {
-                keyCode = descriptor.KeyCode;
-                return true;
-            }
-            else
-            {
-                keyCode = KeyCode.None;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Returns the <see cref="KeyAction"/> in <see cref="keyBindings"/> that is
-        /// triggered by the given <paramref name="keyCode"/>. If a binding is found,
-        /// the <see cref="KeyAction"/> bound to the <paramref name="keyCode"/> is
-        /// returned in <paramref name="boundKeyAction"/> and true is returned.
-        /// Otherwise false is returned and <paramref name="boundKeyAction"/>
-        /// is undefined.
-        /// </summary>
-        /// <param name="keyCode">A <see cref="KeyCode"/> for which a binding
-        /// is to be searched.</param>
-        /// <param name="boundKeyAction">The <see cref="KeyAction"/> bound
-        /// to <paramref name="keyCode"/> if one exists; otherwise undefined.</param>
-        /// <returns>True if and only if there is a <see cref="KeyAction"/>
-        /// triggered by <paramref name="keyCode"/>.</returns>
-        internal bool TryGetKeyAction(KeyCode keyCode, out KeyAction boundKeyAction)
-        {
-            KeyValuePair<KeyAction, KeyActionDescriptor> keyValuePair = keyBindings.FirstOrDefault(kv => kv.Value.KeyCode == keyCode);
-            // Note: We cannot simply use 'return keyValuePair.Key == default' because KeyAction is an enum and the
-            // default of an enum is a valid value.
-            if (keyValuePair.Equals(default(KeyValuePair<KeyAction, KeyActionDescriptor>)))
-            {
-                boundKeyAction = default;
-                return false;
-            }
-            else
-            {
-                boundKeyAction = keyValuePair.Key;
-                return true;
-            }
-        }
-
-        /// <summary>
         /// Binds <paramref name="keyActionDescriptor"/> to <paramref name="keyAction"/>.
         /// </summary>
         /// <param name="keyAction">Where to bind.</param>
         /// <param name="keyActionDescriptor">What to be bound.</param>
         /// <exception cref="System.ArgumentException">If there is already another action
-        /// <paramref name="keyAction"/> is bound to or if the key code of <paramref name="keyActionDescriptor"/>
-        /// is already in use.
+        /// <paramref name="keyAction"/> is bound to or if the control path is already in use.
         /// </exception>
         internal void Bind(KeyAction keyAction, KeyActionDescriptor keyActionDescriptor)
         {
@@ -114,9 +60,12 @@ namespace SEE.Controls.KeyActions
             {
                 throw new ArgumentException($"Key action {keyAction} is already bound to {descriptor.Name}.\n");
             }
-            else if (TryGetKeyAction(keyActionDescriptor.KeyCode, out KeyAction boundKeyAction))
+            else if (!string.IsNullOrEmpty(keyActionDescriptor.BindingPath)
+                     && keyBindings.Any(kv => string.Equals(kv.Value.BindingPath,
+                                                           keyActionDescriptor.BindingPath,
+                                                           StringComparison.OrdinalIgnoreCase)))
             {
-                throw new ArgumentException($"Key code {keyActionDescriptor.KeyCode} is already bound to key action {boundKeyAction}.\n");
+                throw new ArgumentException($"Control path {keyActionDescriptor.BindingPath} is already bound.\n");
             }
             else
             {
@@ -124,23 +73,18 @@ namespace SEE.Controls.KeyActions
             }
         }
 
-        /// <summary>
-        /// Rebinds <paramref name="descriptor"/> to another <paramref name="keyCode"/>.
-        /// </summary>
-        /// <param name="descriptor">The binding that should be triggered by <paramref name="keyCode"/>.</param>
-        /// <param name="keyCode">The key code that should trigger the action represented by <paramref name="descriptor"/>.</param>
-        /// <exception cref="Exception">Thrown if <paramref name="keyCode"/> is already bound to an action.</exception>
-        internal void ResetKeyCode(KeyActionDescriptor descriptor, KeyCode keyCode)
+        /// <summary>Rebinds a descriptor while retaining the Input System path directly.</summary>
+        internal void ResetBinding(KeyActionDescriptor descriptor, string bindingPath)
         {
-            if (TryGetKeyAction(keyCode, out KeyAction action))
+            KeyValuePair<KeyAction, KeyActionDescriptor> existingPathBinding = keyBindings.FirstOrDefault(kv =>
+                !ReferenceEquals(kv.Value, descriptor)
+                && string.Equals(kv.Value.BindingPath, bindingPath, StringComparison.OrdinalIgnoreCase));
+            if (existingPathBinding.Value != null)
             {
-                throw new KeyBindingsExistsException($"Cannot register key {keyCode} for {descriptor.Name}."
-                                                     + $" Key {keyCode} is already bound to {action}.\n");
+                throw new KeyBindingsExistsException($"Cannot register control path {bindingPath} for {descriptor.Name}."
+                    + $" It is already bound to {existingPathBinding.Key}.\n");
             }
-            else
-            {
-                descriptor.KeyCode = keyCode;
-            }
+            descriptor.BindingPath = bindingPath;
         }
 
         /// <summary>
@@ -151,25 +95,14 @@ namespace SEE.Controls.KeyActions
 
         #region Persistence
 
-        /// <summary>
-        /// Defines the settings for the JSON serialization.
-        /// These settings ensure that enums are handled as strings rather than their numeric values,
-        /// so that the JSON file is more human readable.
-        /// </summary>
-        private static readonly JsonSerializerSettings jsonSettings = new()
-        {
-            Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() }
-        };
-
-        /// <summary>
-        /// Defines the content of the JSON file.
-        /// </summary>
         private class KeyData
         {
             /// <summary>
             /// The key code triggering an action.
             /// </summary>
-            public KeyCode KeyCode { get; set; }
+            public string KeyCode { get; set; }
+            /// <summary>Input System control path, when saved by the new input binding format.</summary>
+            public string BindingPath { get; set; }
             /// <summary>
             /// The descriptive <see cref="KeyActionDescriptor.Name"/> of the action shown to the user.
             /// </summary>
@@ -182,73 +115,83 @@ namespace SEE.Controls.KeyActions
         }
 
         /// <summary>
-        /// Saves the keybindings to the JSON file as a list of key-value pairs <see cref="KeyData"/>
-        /// where the key is <see cref="KeyActionDescriptor.KeyCode"/> and its value is
-        /// <see cref="KeyActionDescriptor.Name"/>.
-        /// </summary>
-        /// <remarks>Should be called whenever <see cref="keyBindings"/> is updated</remarks>
-        internal void Save(string keyBindingsPath)
-        {
-            IList<KeyData> keyList = new List<KeyData>();
-            keyList.AddRange(keyBindings.Select(binding => new KeyData
-            {
-                KeyCode = binding.Value.KeyCode,
-                ActionName = binding.Value.Name
-            }));
-            File.WriteAllText(keyBindingsPath, JsonConvert.SerializeObject(keyList, Formatting.Indented, jsonSettings));
-        }
-
-        /// <summary>
         /// Loads the <see cref="keyBindings"/> from <see cref="keyBindingsPath"/>
         /// if this file path exists. Otherwise nothing is done.
         ///
-        /// If there is a key code in the file, but not in <see cref="keyBindings"/>,
-        /// it will be ignored silently.
+        /// Entries with unknown actions, invalid key names, or invalid keyboard paths are skipped with a warning.
         ///
         /// It is not a problem if there is a key code in <see cref="keyBindings"/>
         /// but not in the file. We do not expect the file to be complete.
         ///
-        /// If, however, the merge of the key codes in the file into <see cref="keyBindings"/>
-        /// would create a situation in which the same key code is bound to multiple
+        /// If the imported paths would create a situation in which the same control path is bound to multiple
         /// actions, we will log an error, but otherwise do not finalize the merge;
         /// that is, <see cref="keyBindings"/> will be the same as before the call
         /// of this method.
         /// </summary>
         /// <exception cref="Exception">Thrown if there exists at least one
-        /// duplicate key code in the file.</exception>
+        /// duplicate control path in the file.</exception>
         internal void Load(string keyBindingsPath)
         {
             // If the file exists, we can read from it, otherwise we don't do anything.
             if (File.Exists(keyBindingsPath))
             {
                 // We are using a copy of keyBindings to finalize the merge only when
-                // there are no duplicate key codes. We are testing for duplicated
-                // key codes at the end only because two key code could have been
-                // swapped, which would be perfectly okay. Testing each individually
+                // there are no duplicate control paths. We are testing for duplicates
+                // after applying every imported value because two bindings may have
+                // been swapped, which is okay. Testing each individually
                 // would appear as an error erroneously.
                 IDictionary<KeyAction, KeyActionDescriptor> newKeyBindings
-                    = new Dictionary<KeyAction, KeyActionDescriptor>(keyBindings);
+                    = keyBindings.ToDictionary(pair => pair.Key, pair =>
+                    {
+                        KeyActionDescriptor original = pair.Value;
+                        return new KeyActionDescriptor(original.Name, original.Description, original.Category)
+                        {
+                            BindingPath = original.BindingPath
+                        };
+                    });
 
-                foreach (KeyData keyData in (IList<KeyData>)JsonConvert.DeserializeObject<List<KeyData>>
-                                                                         (File.ReadAllText(keyBindingsPath)))
+                List<KeyData> importedBindings = JsonConvert.DeserializeObject<List<KeyData>>(File.ReadAllText(keyBindingsPath));
+                if (importedBindings == null)
                 {
-                    // If the key code is in file, but not in keyBindings, we will ignore it.
-                    if (TryGetKeyActionDescriptorByName(newKeyBindings, keyData.ActionName,
-                                                        out KeyActionDescriptor keyActionDescriptor))
-                    {
-                        keyActionDescriptor.KeyCode = keyData.KeyCode;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Loaded key binding {keyData} with {keyActionDescriptor} "
-                            + "that is not contained in key bindings. Will be ignored.\n");
-                    }
+                    throw new InvalidDataException($"Settings in {keyBindingsPath} do not contain a binding list.");
                 }
 
-                // the keyCodes in newKeyBindings must be unique; merge should be all at once or not at all
-                if (HasDuplicateKeyCodes(newKeyBindings))
+                foreach (KeyData keyData in importedBindings)
                 {
-                    throw new("There is at least one key code bound to more than one action.\n"
+                    if (keyData == null || string.IsNullOrWhiteSpace(keyData.ActionName))
+                    {
+                        Debug.LogWarning("Ignoring an incomplete entry in the legacy key bindings.");
+                        continue;
+                    }
+                    if (!TryGetKeyActionDescriptorByName(newKeyBindings, keyData.ActionName,
+                                                         out KeyActionDescriptor keyActionDescriptor))
+                    {
+                        Debug.LogWarning($"Ignoring legacy key binding for unknown action '{keyData.ActionName}'.");
+                        continue;
+                    }
+
+                    string bindingPath = keyData.BindingPath;
+                    if (string.IsNullOrEmpty(bindingPath))
+                    {
+                        if (!KeyBindings.TryKeyboardPathFor(keyData.KeyCode, out bindingPath))
+                        {
+                            Debug.LogWarning($"Ignoring invalid legacy key '{keyData.KeyCode}' for action '{keyData.ActionName}'.");
+                            continue;
+                        }
+                    }
+                    else if (!IsValidKeyboardBindingPath(bindingPath))
+                    {
+                        Debug.LogWarning($"Ignoring invalid control path '{bindingPath}' for action '{keyData.ActionName}'.");
+                        continue;
+                    }
+
+                    keyActionDescriptor.BindingPath = bindingPath;
+                }
+
+                // Control paths in newKeyBindings must be unique; merge is all at once or not at all.
+                if (HasDuplicateBindingPaths(newKeyBindings))
+                {
+                    throw new("There is at least one control path bound to more than one action.\n"
                         + $"Settings in {keyBindingsPath} will be ignored.\n");
                 }
                 else
@@ -258,6 +201,22 @@ namespace SEE.Controls.KeyActions
             }
         }
 
+        /// <summary>Checks that an imported path is a syntactically valid keyboard control path.</summary>
+        private static bool IsValidKeyboardBindingPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            try
+            {
+                return InputControlPath.Parse(path).Count() > 1;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+        }
         /// <summary>
         /// Returns the <see cref="KeyActionDescriptor"/> in <paramref name="keyBindings"/> that
         /// has the given <paramref name="actionName"/> (<see cref="KeyActionDescriptor.Name"/>).
@@ -300,13 +259,13 @@ namespace SEE.Controls.KeyActions
         }
 
         /// <summary>
-        /// Returns true if and only if there are duplicate key codes in <paramref name="keyBindings"/>.
+        /// Returns true if and only if there are duplicate control paths in <paramref name="keyBindings"/>.
         /// </summary>
         /// <param name="keyBindings">The key bindings to be checked for consistency.</param>
-        /// <returns>True if there are duplicate key codes in <paramref name="keyBindings"/>.</returns>
-        private static bool HasDuplicateKeyCodes(IDictionary<KeyAction, KeyActionDescriptor> keyBindings)
+        /// <returns>True if there are duplicate control paths in <paramref name="keyBindings"/>.</returns>
+        private static bool HasDuplicateBindingPaths(IDictionary<KeyAction, KeyActionDescriptor> keyBindings)
         {
-            return ContainsDuplicates(keyBindings.Select(kv => kv.Value.KeyCode));
+            return ContainsDuplicates(keyBindings.Select(kv => kv.Value.BindingPath?.ToLowerInvariant()));
         }
 
         /// <summary>

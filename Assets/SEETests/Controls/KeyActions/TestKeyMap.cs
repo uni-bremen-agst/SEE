@@ -18,7 +18,7 @@ namespace SEE.Controls.KeyActions
         public void TestBind()
         {
             KeyMap map = new();
-            KeyActionDescriptor expected = new("Help", "Provides help", KeyActionCategory.General, KeyCode.H);
+            KeyActionDescriptor expected = NewDescriptor("Help", "<Keyboard>/h");
             map.Bind(KeyAction.Help, expected);
 
             Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor actual), Is.True,
@@ -36,7 +36,7 @@ namespace SEE.Controls.KeyActions
         private void AreEqual(KeyActionDescriptor expected, KeyActionDescriptor actual)
         {
             Assert.That(actual.Name, Is.EqualTo(expected.Name), "Name");
-            Assert.That(actual.KeyCode, Is.EqualTo(expected.KeyCode), "KeyCode");
+            Assert.That(actual.BindingPath, Is.EqualTo(expected.BindingPath), "BindingPath");
             Assert.That(actual.Category, Is.EqualTo(expected.Category), "Category");
             Assert.That(actual.Description, Is.EqualTo(expected.Description), "Description");
         }
@@ -51,8 +51,7 @@ namespace SEE.Controls.KeyActions
             try
             {
                 KeyMap map = new();
-                map.Save(filename);
-
+                File.WriteAllText(filename, "[]");
                 map.Load(filename);
             }
             finally
@@ -74,17 +73,15 @@ namespace SEE.Controls.KeyActions
                 KeyMap savedMap = new();
                 const string keyActionName = "Help";
                 const KeyAction keyAction = KeyAction.Help;
-                savedMap.Bind(keyAction, NewDescriptor(keyActionName, KeyCode.H));
-                savedMap.Save(filename);
+                savedMap.Bind(keyAction, NewDescriptor(keyActionName, "<Keyboard>/h"));
+                File.WriteAllText(filename, "[{\"KeyCode\":\"H\",\"ActionName\":\"Help\"}]");
 
                 // Read the previously saved binding again.
                 KeyMap loadedMap = new();
                 // Note: Loading will ignore every action whose name does not exist yet.
                 // Hence, we need to add a binding for keyAction. We will use a
-                // different KeyCode, however, so that we can check whether everything
-                // was loaded correctly. The binding file stores only the name of the
-                // action and the associated KeyCode.
-                loadedMap.Bind(keyAction, NewDescriptor(keyActionName, KeyCode.X));
+                // different path, so we can check that the saved path is imported.
+                loadedMap.Bind(keyAction, NewDescriptor(keyActionName, "<Keyboard>/x"));
                 loadedMap.Load(filename);
 
                 AreEqual(savedMap, loadedMap);
@@ -95,9 +92,12 @@ namespace SEE.Controls.KeyActions
             }
         }
 
-        private static KeyActionDescriptor NewDescriptor(string keyActionName, KeyCode keyCode)
+        private static KeyActionDescriptor NewDescriptor(string keyActionName, string bindingPath)
         {
-            return new(keyActionName, "Provides help", KeyActionCategory.General, keyCode);
+            return new KeyActionDescriptor(keyActionName, "Provides help", KeyActionCategory.General)
+            {
+                BindingPath = bindingPath
+            };
         }
 
         /// <summary>
@@ -119,24 +119,24 @@ namespace SEE.Controls.KeyActions
                 // is contained in both savedMap and loadedMap, yet with different keys
                 const string help = "Help";
                 const KeyAction helpAction = KeyAction.Help;
-                savedMap.Bind(helpAction, NewDescriptor(help, KeyCode.H));
+                savedMap.Bind(helpAction, NewDescriptor(help, "<Keyboard>/h"));
 
                 // is contained only in savedMap => should be ignored
                 const string snap = "Snap";
                 const KeyAction snapAction = KeyAction.Snap;
-                savedMap.Bind(snapAction, NewDescriptor(snap, KeyCode.S));
-
-                savedMap.Save(filename);
+                savedMap.Bind(snapAction, NewDescriptor(snap, "<Keyboard>/s"));
+                File.WriteAllText(filename,
+                    "[{\"KeyCode\":\"H\",\"ActionName\":\"Help\"},{\"KeyCode\":\"S\",\"ActionName\":\"Snap\"}]");
 
                 KeyMap loadedMap = new();
                 // help action should be loaded; if we wouldn't add it before loading, it would be ignored;
-                // yet, we are using a different key code
-                loadedMap.Bind(helpAction, NewDescriptor(help, KeyCode.X));
+                // yet, we are using a different path.
+                loadedMap.Bind(helpAction, NewDescriptor(help, "<Keyboard>/x"));
 
                 // is contained only in loadedMap => must contained to exist unchanged
                 const string menu = "Menu";
                 const KeyAction menuAction = KeyAction.ToggleMenu;
-                KeyActionDescriptor menuDescriptor = NewDescriptor(menu, KeyCode.Y);
+                KeyActionDescriptor menuDescriptor = NewDescriptor(menu, "<Keyboard>/y");
                 loadedMap.Bind(menuAction, menuDescriptor);
 
                 loadedMap.Load(filename);
@@ -149,11 +149,11 @@ namespace SEE.Controls.KeyActions
                 }
 
                 {
-                    // helpAction is in both bindings, but its key code was changed
+                    // helpAction is in both bindings, but its path was changed
                     Assert.That(loadedMap.TryGetKeyActionDescriptorByName(help, out KeyActionDescriptor actual),
                                 Is.True, $"There is no binding named {help}.");
-                    // help was saved with KeyCode.H
-                    Assert.That(actual.KeyCode, Is.EqualTo(KeyCode.H));
+                    // help was saved with <Keyboard>/h
+                    Assert.That(actual.BindingPath, Is.EqualTo("<Keyboard>/h"));
                 }
 
                 {
@@ -187,8 +187,8 @@ namespace SEE.Controls.KeyActions
                 File.WriteAllText(filename, content);
 
                 KeyMap loadedMap = new();
-                loadedMap.Bind(KeyAction.Help, NewDescriptor("Help", KeyCode.X));
-                loadedMap.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", KeyCode.Y));
+                loadedMap.Bind(KeyAction.Help, NewDescriptor("Help", "<Keyboard>/x"));
+                loadedMap.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", "<Keyboard>/y"));
                 Assert.That(() => loadedMap.Load(filename), Throws.TypeOf<Exception>());
             }
             finally
@@ -205,8 +205,8 @@ namespace SEE.Controls.KeyActions
         public void TestInconsistency()
         {
             KeyMap map = new();
-            map.Bind(KeyAction.Help, NewDescriptor("Help", KeyCode.X));
-            Assert.That(() => map.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", KeyCode.X)),
+            map.Bind(KeyAction.Help, NewDescriptor("Help", "<Keyboard>/x"));
+            Assert.That(() => map.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", "<Keyboard>/x")),
                         Throws.TypeOf<ArgumentException>());
         }
 

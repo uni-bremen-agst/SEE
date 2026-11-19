@@ -1,4 +1,4 @@
-﻿using SEE.Controls.ReversibleActions;
+using SEE.Controls.ReversibleActions;
 using SEE.Controls.Players;
 using SEE.Tools.OpenTelemetry;
 using SEE.UserSettings;
@@ -6,6 +6,8 @@ using SEE.Utils;
 using SEE.XR;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using InputKey = UnityEngine.InputSystem.Key;
 
 namespace SEE.Controls.KeyActions
 {
@@ -14,6 +16,18 @@ namespace SEE.Controls.KeyActions
     /// </summary>
     public static class SEEInput
     {
+        /// <summary>
+        /// Current mouse cursor position from the Input System, or zero when no mouse is connected.
+        /// </summary>
+        public static Vector3 MousePosition => Mouse.current != null
+            ? Mouse.current.position.ReadValue()
+            : Vector3.zero;
+
+        /// <summary>
+        /// Current vertical mouse wheel delta from the Input System.
+        /// </summary>
+        public static float MouseScrollDelta => KeyBindings.MouseScrollDeltaY;
+
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
         /// If false, we will not listen to keyboard inputs for any of the logical
@@ -165,7 +179,8 @@ namespace SEE.Controls.KeyActions
         /// was pressed.</returns>
         public static bool DigitKeyPressed(int digit)
         {
-            bool result = KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.Alpha1 + digit);
+            int keyDigit = (digit + 1) % 10;
+            bool result = KeyboardShortcutsEnabled && KeyBindings.IsPlayerMenuDigitDown(keyDigit);
 
             if (result)
             {
@@ -195,7 +210,7 @@ namespace SEE.Controls.KeyActions
 
 #if UNITY_EDITOR == false
     // Ctrl keys are not available when running the game in the editor
-    if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+    if (KeyBindings.IsKeyPressed(InputKey.LeftCtrl) || KeyBindings.IsKeyPressed(InputKey.RightCtrl))
     {
 #endif
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Undo);
@@ -235,7 +250,7 @@ namespace SEE.Controls.KeyActions
 
 #if UNITY_EDITOR == false
     // Ctrl keys are not available when running the game in the editor
-    if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+    if (KeyBindings.IsKeyPressed(InputKey.LeftCtrl) || KeyBindings.IsKeyPressed(InputKey.RightCtrl))
     {
 #endif
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Redo);
@@ -415,7 +430,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user starts the mouse interaction to open the context menu.</returns>
         internal static bool OpenContextMenuStart()
         {
-            return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+            return KeyBindings.IsMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         /// <summary>
@@ -424,7 +439,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user ends the mouse interaction to open the context menu.</returns>
         internal static bool OpenContextMenuEnd()
         {
-            return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+            return KeyBindings.IsMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion
@@ -562,7 +577,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user requests this action.</returns>
         internal static bool Drag()
         {
-            return Input.GetMouseButton(middleMouseButton);
+            return KeyBindings.IsMouseButtonPressed(middleMouseButton);
         }
 
         #endregion
@@ -661,8 +676,8 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user requests this action.</returns>
         public static bool RotateCamera()
         {
-            return Input.GetMouseButton(rightMouseButton)
-                   || Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(leftMouseButton);
+            return KeyBindings.IsMouseButtonPressed(rightMouseButton)
+                   || KeyBindings.IsKeyPressed(InputKey.LeftCtrl) && KeyBindings.IsMouseButtonPressed(leftMouseButton);
         }
 
         /// <summary>
@@ -951,7 +966,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user selects a game object and <see cref="SelectionEnabled"/>.</returns>
         public static bool Select()
         {
-            return SelectionEnabled && Input.GetMouseButtonDown(leftMouseButton) && !Raycasting.IsMouseOverGUI();
+            return SelectionEnabled && KeyBindings.IsMouseButtonDown(leftMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion
@@ -965,7 +980,7 @@ namespace SEE.Controls.KeyActions
         public static bool MoveObject()
         {
             return LeftMouseInteraction()
-                && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                && (KeyBindings.IsKeyPressed(InputKey.LeftShift) || KeyBindings.IsKeyPressed(InputKey.RightShift))
                 && !Raycasting.IsMouseOverGUI();
         }
 
@@ -980,7 +995,7 @@ namespace SEE.Controls.KeyActions
         public static bool MoveObjectInitiated()
         {
             return LeftMouseDown()
-                && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                && (KeyBindings.IsKeyPressed(InputKey.LeftShift) || KeyBindings.IsKeyPressed(InputKey.RightShift))
                 && !Raycasting.IsMouseOverGUI();
         }
         #endregion Movement of a node
@@ -996,7 +1011,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user uses the left mouse button.</returns>
         public static bool LeftMouseInteraction()
         {
-            return Input.GetMouseButton(leftMouseButton);
+            return KeyBindings.IsMouseButtonPressed(leftMouseButton);
         }
 
         /// <summary>
@@ -1010,7 +1025,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user uses left mouse down.</returns>
         public static bool LeftMouseDown()
         {
-            return Input.GetMouseButtonDown(leftMouseButton);
+            return KeyBindings.IsMouseButtonDown(leftMouseButton);
         }
 
         /// <summary>
@@ -1019,7 +1034,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user uses the left mouse button.</returns>
         public static bool RightMouseInteraction()
         {
-            return Input.GetMouseButton(rightMouseButton);
+            return KeyBindings.IsMouseButtonPressed(rightMouseButton);
         }
 
         /// <summary>
@@ -1029,7 +1044,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user releases the selected mouse button.</returns>
         public static bool MouseUp(MouseButton state)
         {
-            return Input.GetMouseButtonUp((int)state);
+            return KeyBindings.IsMouseButtonUp((int)state);
         }
 
         /// <summary>
@@ -1039,7 +1054,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user holds the selected mouse button.</returns>
         public static bool MouseHold(MouseButton state)
         {
-            return Input.GetMouseButton((int)state);
+            return KeyBindings.IsMouseButtonPressed((int)state);
         }
 
         /// <summary>
@@ -1049,7 +1064,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user press the selected mouse button.</returns>
         public static bool MouseDown(MouseButton state)
         {
-            return Input.GetMouseButtonDown((int)state);
+            return KeyBindings.IsMouseButtonDown((int)state);
         }
 
         /// <summary>
@@ -1058,7 +1073,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user scrolls down.</returns>
         public static bool ScrollDown()
         {
-            return Input.mouseScrollDelta.y <= -0.1;
+            return KeyBindings.MouseScrollDeltaY <= -0.1f;
         }
 
         /// <summary>
@@ -1067,7 +1082,7 @@ namespace SEE.Controls.KeyActions
         /// <returns>True if the user scrolls up.</returns>
         public static bool ScrollUp()
         {
-            return Input.mouseScrollDelta.y >= 0.1;
+            return KeyBindings.MouseScrollDeltaY >= 0.1f;
         }
 
         #endregion

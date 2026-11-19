@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Graphs;
 using SEE.Extensions;
 using UnityEngine;
@@ -459,7 +460,7 @@ namespace SEE.Utils
             }
             else
             {
-                screenPoint = Input.mousePosition;
+                screenPoint = SEEInput.MousePosition;
             }
 
             return mainCamera != null

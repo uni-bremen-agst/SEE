@@ -3,6 +3,7 @@ using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.Extensions;
+using SEE.Controls.KeyActions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -325,9 +326,9 @@ namespace SEE.UI
             }
 
             // If the mouse has moved, we should hide the tooltip.
-            if (lastMousePosition != Input.mousePosition)
+            if (lastMousePosition != SEEInput.MousePosition)
             {
-                lastMousePosition = Input.mousePosition;
+                lastMousePosition = SEEInput.MousePosition;
                 if (oneTimeText != null && lastDisplayedText == oneTimeText)
                 {
                     // This was a one-time tooltip, so we should hide it again now if it was displayed already.

@@ -86,7 +86,7 @@ namespace SEE.UI
                     startObject = o;
                     if (UserSetting.IsDesktop)
                     {
-                        startMousePosition = Input.mousePosition;
+                        startMousePosition = SEEInput.MousePosition;
                     }
                     multiselection = false;
                     if (XRSEEActions.TooltipToggle)
@@ -118,11 +118,11 @@ namespace SEE.UI
                         return;
                     }
                     if (UserSetting.IsVR
-                        || hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
+                        || hitObject == startObject && (SEEInput.MousePosition - startMousePosition).magnitude < 1)
                     {
                         if (UserSetting.IsDesktop)
                         {
-                            position = Input.mousePosition;
+                            position = SEEInput.MousePosition;
                         }
                         else
                         {
@@ -145,7 +145,7 @@ namespace SEE.UI
                     {
                         if (UserSetting.IsDesktop)
                         {
-                            position = Input.mousePosition;
+                            position = SEEInput.MousePosition;
                         }
                         else
                         {

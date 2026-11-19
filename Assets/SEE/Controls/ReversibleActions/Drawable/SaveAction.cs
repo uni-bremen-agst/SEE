@@ -1,4 +1,4 @@
-﻿using HighlightPlus;
+using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -13,6 +13,7 @@ using SEE.Utils;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using UnityEngine.Events;
 using SEE.Controls.KeyActions;
 
@@ -246,7 +247,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// </summary>
         private void Cancel()
         {
-            if (selectedSurfaces.Count > 0 && Input.GetKeyDown(KeyCode.Escape)
+            if (selectedSurfaces.Count > 0 && KeyBindings.IsKeyDown(InputKey.Escape)
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 ShowNotification.Info("Unselect drawables", "The marked drawables was unselected.");

@@ -94,7 +94,7 @@ namespace SEE.Controls.ReversibleActions
             {
                 case ProgressState.NoNodeSelected:
                     // FIXME: Needs adaptation for VR where no mouse is available.
-                    if (Input.GetMouseButtonDown(0)
+                    if (KeyBindings.IsMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
                         // the hit object is the node to be edited

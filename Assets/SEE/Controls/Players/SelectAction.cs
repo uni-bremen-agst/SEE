@@ -2,6 +2,7 @@ using System.Linq;
 using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using SEE.Audio;
 using SEE.XR;
 using SEE.UserSettings;
@@ -47,7 +48,7 @@ namespace SEE.Controls.Players
                 {
                     obj = interactableObject;
                 }
-                if (Input.GetKey(KeyCode.LeftControl)
+                if (KeyBindings.IsKeyPressed(InputKey.LeftCtrl)
                     || UserSetting.IsVR && XRSEEActions.SelectedFlag)
                 {
                     if (obj != null)

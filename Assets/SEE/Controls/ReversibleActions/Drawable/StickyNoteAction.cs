@@ -1,4 +1,4 @@
-﻿using HighlightPlus;
+using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -9,6 +9,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.Drawable
@@ -186,7 +187,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 switch (selectedAction)
                 {
                     case Operation.None:
-                        if (Input.GetMouseButtonDown(0))
+                        if (KeyBindings.IsMouseButtonDown(0))
                         {
                             ShowNotification.Info("Select an operation",
                                 "First you need to select an operation from the menu.");
@@ -369,7 +370,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
 
             /// Finish the sticky note selection and starts the moving.
-            if (inProgress && !mouseWasReleased && Input.GetMouseButtonUp(0))
+            if (inProgress && !mouseWasReleased && KeyBindings.IsMouseButtonUp(0))
             {
                 mouseWasReleased = true;
             }
@@ -790,24 +791,24 @@ namespace SEE.Controls.ReversibleActions.Drawable
             bool interaction = false;
             value = 0;
 
-            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 value = state == WheelInteractionType.Rotate? ValueHolder.Rotate : ValueHolder.ScaleUp;
                 interaction = true;
             }
-            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 value = state == WheelInteractionType.Rotate ? ValueHolder.RotateFast : ValueHolder.ScaleUpFast;
                 interaction = true;
             }
 
-            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.Rotate : ValueHolder.ScaleDown;
                 interaction = true;
 
             }
-            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.RotateFast : ValueHolder.ScaleDownFast;
                 interaction = true;
@@ -858,7 +859,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// <returns>Whether this action is finished.</returns>
         private bool Delete()
         {
-            if (Input.GetMouseButtonDown(0)
+            if (KeyBindings.IsMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
                 GameFinder.HasDrawableSurface(raycastHit.collider.gameObject) ||

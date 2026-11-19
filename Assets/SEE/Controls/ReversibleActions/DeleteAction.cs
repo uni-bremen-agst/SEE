@@ -14,6 +14,7 @@ using SEE.Utils;
 using SEE.XR;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls.KeyActions;
 using System.Text;
 using UnityEngine;
 using SEE.GraphElementRefs;
@@ -222,7 +223,7 @@ namespace SEE.Controls.ReversibleActions
         /// </summary>
         private void HandleInputSelection()
         {
-            if (UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
+            if (UserSetting.IsDesktop && KeyBindings.IsMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted

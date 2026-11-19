@@ -79,7 +79,7 @@ namespace SEE.Controls.ReversibleActions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
+                    if (UserSetting.IsDesktop && KeyBindings.IsMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
                         && ger.gameObject.TryGetComponent(out InteractableObject io)
                         && io.IsInteractable(raycastHit.point))

@@ -3,6 +3,7 @@ using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
@@ -39,7 +40,7 @@ namespace SEE.Controls.ReversibleActions.HolisticMetrics
         /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
-            if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
+            if (KeyBindings.IsMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 WidgetsManager widgetsManager = raycastHit.transform.GetComponent<WidgetsManager>();
                 if (widgetsManager == null)

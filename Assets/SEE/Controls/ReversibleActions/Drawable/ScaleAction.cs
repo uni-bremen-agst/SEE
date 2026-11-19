@@ -1,4 +1,4 @@
-﻿using SEE.Controls.KeyActions;
+using SEE.Controls.KeyActions;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -10,6 +10,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using InputKey = UnityEngine.InputSystem.Key;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -263,25 +264,25 @@ namespace SEE.Controls.ReversibleActions.Drawable
             float scaleFactor = 0f;
             bool isScaled = false;
             /// Scale up with normal speed.
-            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 scaleFactor = ValueHolder.ScaleUp;
                 isScaled = true;
             }
             /// Scale up with faster speed.
-            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 scaleFactor = ValueHolder.ScaleUpFast;
                 isScaled = true;
             }
             /// Scale down with normal speed.
-            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 scaleFactor = ValueHolder.ScaleDown;
                 isScaled = true;
             }
             /// Scale down with faster speed.
-            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && KeyBindings.IsKeyPressed(InputKey.LeftCtrl))
             {
                 scaleFactor = ValueHolder.ScaleDownFast;
                 isScaled = true;
