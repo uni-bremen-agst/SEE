@@ -87,12 +87,10 @@ namespace SEE.Game.Avatars
         private Vector3 headPosition = Vector3.one;
 
         /// <summary>
-        /// Starting values ​​of positions and rotations of the hands before bringing them to the predefined start position.
+        /// Starting values ​​of rotations of the hands before bringing them to the predefined start position.
         /// </summary>
         /// <remarks>By start position it is meant that the avatar's hands are in front of the avatar,
         /// bent at the elbows and the palms are facing forward.</remarks>
-        private Vector3 leftHandStartPos = Vector3.zero;
-        private Vector3 rightHandStartPos = Vector3.zero;
         private Quaternion startLeftHandRotation;
         private Quaternion startRightHandRotation;
 
