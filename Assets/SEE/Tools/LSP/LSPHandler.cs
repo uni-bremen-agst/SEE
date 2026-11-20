@@ -289,6 +289,14 @@ namespace SEE.Tools.LSP
         /// </summary>
         private readonly Dictionary<DocumentUri, int> documentUsers = new();
 
+        /// <summary>
+        /// Serializes all updates of <see cref="documentUsers"/> together with the corresponding
+        /// <c>textDocument/didOpen</c> and <c>textDocument/didClose</c> notifications.
+        /// </summary>
+        /// <remarks>Needed because the importer may resume on a thread-pool thread while code windows
+        /// open and close documents on Unity's main thread.</remarks>
+        private readonly object documentUsersLock = new();
+
         private void OnEnable()
         {
             if (Server != null)
@@ -534,23 +542,26 @@ namespace SEE.Tools.LSP
         public void OpenDocument(string path)
         {
             DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
-            if (documentUsers.TryGetValue(uri, out int users))
+            lock (documentUsersLock)
             {
-                documentUsers[uri] = users + 1;
-                return;
-            }
-            DidOpenTextDocumentParams parameters = new()
-            {
-                TextDocument = new TextDocumentItem
+                if (documentUsers.TryGetValue(uri, out int users))
                 {
-                    Uri = uri,
-                    LanguageId = Server.LanguageIdFor(Path.GetExtension(path).TrimStart('.')),
-                    Version = 1,
-                    Text = File.ReadAllText(path)
+                    documentUsers[uri] = users + 1;
+                    return;
                 }
-            };
-            Client.DidOpenTextDocument(parameters);
-            documentUsers[uri] = 1;
+                DidOpenTextDocumentParams parameters = new()
+                {
+                    TextDocument = new TextDocumentItem
+                    {
+                        Uri = uri,
+                        LanguageId = Server.LanguageIdFor(Path.GetExtension(path).TrimStart('.')),
+                        Version = 1,
+                        Text = File.ReadAllText(path)
+                    }
+                };
+                Client.DidOpenTextDocument(parameters);
+                documentUsers[uri] = 1;
+            }
         }
 
         /// <summary>
@@ -561,21 +572,24 @@ namespace SEE.Tools.LSP
         public void CloseDocument(string path)
         {
             DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
-            if (!documentUsers.TryGetValue(uri, out int users))
+            lock (documentUsersLock)
             {
-                return;
+                if (!documentUsers.TryGetValue(uri, out int users))
+                {
+                    return;
+                }
+                if (users > 1)
+                {
+                    documentUsers[uri] = users - 1;
+                    return;
+                }
+                DidCloseTextDocumentParams parameters = new()
+                {
+                    TextDocument = new TextDocumentIdentifier(uri)
+                };
+                Client.DidCloseTextDocument(parameters);
+                documentUsers.Remove(uri);
             }
-            if (users > 1)
-            {
-                documentUsers[uri] = users - 1;
-                return;
-            }
-            DidCloseTextDocumentParams parameters = new()
-            {
-                TextDocument = new TextDocumentIdentifier(uri)
-            };
-            Client.DidCloseTextDocument(parameters);
-            documentUsers.Remove(uri);
         }
 
         /// <summary>
@@ -893,7 +907,10 @@ namespace SEE.Tools.LSP
         private void ReleaseServerResources()
         {
             IsReady = false;
-            documentUsers.Clear();
+            lock (documentUsersLock)
+            {
+                documentUsers.Clear();
+            }
             try
             {
                 Client?.Dispose();
