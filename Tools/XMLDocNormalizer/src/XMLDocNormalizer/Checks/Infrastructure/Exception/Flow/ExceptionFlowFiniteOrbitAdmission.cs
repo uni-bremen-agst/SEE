@@ -105,8 +105,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             string target = AddDefinition(symbol);
             ISymbol invocation = context.InvocationSymbol ?? symbol;
             if (currentDefinition == null) throw new InvalidOperationException("No discovery body frame.");
-            if (BodyId(invocation) != target)
+            if (!ReferenceEquals(invocation.OriginalDefinition, symbol.OriginalDefinition)
+                && BodyId(invocation) != target)
+            {
                 reasons.Add(new("OwnerBindingFailure", "Source/metadata declaration mismatch: " + BodyId(invocation) + " -> " + target));
+            }
             Term[] assignments = ExceptionFlowInvocationSubstitution.Bindings(invocation)
                 .Select(pair => ToTerm(pair.Actual)).ToArray();
             string transition = Transition(currentDefinition, target, invocation);
