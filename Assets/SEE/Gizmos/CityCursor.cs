@@ -127,34 +127,35 @@ namespace SEE.Gizmos
         }
 
         /// <summary>
-        /// Removes <paramref name="interactableObject"/> from the <see cref="Cursor"/> focus when
-        /// it belongs to <see cref="city"/>.
-        /// Called whenever an <see cref="InteractableObject"/> is unselected.
+        /// Removes <paramref name="interactableObject"/> from the <see cref="Cursor"/> focus
+        /// when it was previously tracked by this city.
+        /// Also cleans up hover state if the graph element has already been removed.
         /// </summary>
-        /// <param name="interactableObject">The unselected object.</param>
+        /// <param name="interactableObject">The object that is no longer hovered.</param>
+        /// <param name="_">Whether the hover event was initiated locally.</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
-            if (AnyHoverIsDoable(interactableObject)
-                && interactableObject is InteractableGraphElement graphElement)
+            if (interactableObject is InteractableGraphElement graphElement
+                && hoverStartTimes.TryGetValue(interactableObject, out float startTime))
             {
-                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
-                if (selectedGraph != null && selectedGraph == city.LoadedGraph)
+                Cursor.RemoveFocus(interactableObject);
+
+                // Only record telemetry while the element still belongs to this city.
+                if (graphElement.GraphElemRef != null
+                    && graphElement.GraphElemRef.Elem != null
+                    && graphElement.GraphElemRef.Elem.ItsGraph != null
+                    && graphElement.GraphElemRef.Elem.ItsGraph == city.LoadedGraph
+                    && hoverThresholdReached.Contains(interactableObject))
                 {
-                    Cursor.RemoveFocus(interactableObject);
-
-                    if (hoverStartTimes.TryGetValue(interactableObject, out float startTime)
-                        && hoverThresholdReached.Contains(interactableObject))
-                    {
-                        float duration = Time.time - startTime;
-                        TracingHelperService.Instance?.TrackHoverDuration(
-                            interactableObject.gameObject,
-                            duration,
-                            hoverThreshold);
-                    }
-
-                    hoverStartTimes.Remove(interactableObject);
-                    hoverThresholdReached.Remove(interactableObject);
+                    float duration = Time.time - startTime;
+                    TracingHelperService.Instance?.TrackHoverDuration(
+                        interactableObject.gameObject,
+                        duration,
+                        hoverThreshold);
                 }
+
+                hoverStartTimes.Remove(interactableObject);
+                hoverThresholdReached.Remove(interactableObject);
             }
         }
 
@@ -182,12 +183,11 @@ namespace SEE.Gizmos
                 }
                 if (graphElement.GraphElemRef.Elem == null)
                 {
-                    //Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem.ItsGraph == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(Graph)}.\n");
+                    // A removed graph element may still receive hover events.
                     return false;
                 }
             }
