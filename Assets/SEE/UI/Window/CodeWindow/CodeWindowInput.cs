@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using SEE.Graphs;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.UI.Notification;
@@ -297,7 +296,7 @@ namespace SEE.UI.Window.CodeWindow
                 IncreaseLinkCounter();
                 issueDictionary[linkCounter] = issueTokens[token].ToHashSet();
                 currentlyMarking = issueTokens[token].First();
-                builder.Append($"<link=\"{linkCounter.ToString()}\">{currentlyMarking.OpeningRichTags}");
+                builder.Append($"<link=\"{linkCounter}\">{currentlyMarking.OpeningRichTags}");
             }
 
             // Ends marking the current issue segment, if there is any.
