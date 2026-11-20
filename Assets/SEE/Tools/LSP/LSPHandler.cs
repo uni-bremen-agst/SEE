@@ -298,11 +298,13 @@ namespace SEE.Tools.LSP
         private readonly object documentUsersLock = new();
 
         /// <summary>
-        /// The text and version last sent to the language server for each document in <see cref="documentUsers"/>.
-        /// Used to send <c>textDocument/didChange</c> when a document that is already open is opened again
-        /// after its file has been changed on disk. Guarded by <see cref="documentUsersLock"/>.
+        /// The text sent to the language server for each document in <see cref="documentUsers"/>.
+        /// All users of an open document share this snapshot, even if the file has been changed on disk
+        /// in the meantime, so that the text and positions of all code windows showing the document stay
+        /// consistent with the server. The file is read again only when the document is opened anew after
+        /// its last user has closed it. Guarded by <see cref="documentUsersLock"/>.
         /// </summary>
-        private readonly Dictionary<DocumentUri, (string text, int version)> documentContents = new();
+        private readonly Dictionary<DocumentUri, string> documentContents = new();
 
         private void OnEnable()
         {
@@ -546,39 +548,23 @@ namespace SEE.Tools.LSP
         /// Note that the document needs to be closed manually after it is no longer needed.
         /// </summary>
         /// <param name="path">The path to the document.</param>
-        /// <returns>The contents of the document as known to the language server after this call.
-        /// Callers that need the document's text should use these contents instead of reading the file
-        /// again, as the file may have been changed in the meantime.</returns>
+        /// <returns>The contents of the document as known to the language server. If the document is
+        /// already open, this is the snapshot sent when it was first opened, even if the file has been
+        /// changed on disk since then. Callers that need the document's text should use these contents
+        /// instead of reading the file, so that their positions match those of the server.</returns>
         public string OpenDocument(string path)
         {
             DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
             lock (documentUsersLock)
             {
-                string text = File.ReadAllText(path);
                 if (documentUsers.TryGetValue(uri, out int users))
                 {
+                    // Share the snapshot of the existing users (see documentContents) instead of
+                    // updating the server's document, which would invalidate their positions.
                     documentUsers[uri] = users + 1;
-                    // The file may have been changed on disk since the document was opened. The new user
-                    // reads the file from disk, so the server must work on the same contents.
-                    (string sentText, int version) = documentContents[uri];
-                    if (text != sentText)
-                    {
-                        version++;
-                        Client.DidChangeTextDocument(new DidChangeTextDocumentParams
-                        {
-                            TextDocument = new OptionalVersionedTextDocumentIdentifier
-                            {
-                                Uri = uri,
-                                Version = version
-                            },
-                            // A change event without a range replaces the whole document.
-                            ContentChanges = new Container<TextDocumentContentChangeEvent>(
-                                new TextDocumentContentChangeEvent { Text = text })
-                        });
-                        documentContents[uri] = (text, version);
-                    }
-                    return text;
+                    return documentContents[uri];
                 }
+                string text = File.ReadAllText(path);
                 DidOpenTextDocumentParams parameters = new()
                 {
                     TextDocument = new TextDocumentItem
@@ -591,7 +577,7 @@ namespace SEE.Tools.LSP
                 };
                 Client.DidOpenTextDocument(parameters);
                 documentUsers[uri] = 1;
-                documentContents[uri] = (text, 1);
+                documentContents[uri] = text;
                 return text;
             }
         }
