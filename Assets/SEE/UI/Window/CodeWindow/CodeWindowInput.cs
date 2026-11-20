@@ -443,7 +443,7 @@ namespace SEE.UI.Window.CodeWindow
                     // (inferred from the file extension) must be supported by the server.
                     lspHandler = null;
                     if (go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
-                        && lspHandler.ServerCapabilities.SemanticTokensProvider != null
+                        && lspHandler.ServerCapabilities?.SemanticTokensProvider != null
                         && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
                     {
                         lspHandler.enabled = true;
@@ -452,6 +452,8 @@ namespace SEE.UI.Window.CodeWindow
                     }
                     else
                     {
+                        // TryGetComponent may have set lspHandler although LSP is not used for this window.
+                        lspHandler = null;
                         tokens = await AntlrToken.FromFileAsync(filename);
                     }
                 }

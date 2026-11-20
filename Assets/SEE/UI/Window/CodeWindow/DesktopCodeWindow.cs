@@ -184,7 +184,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Right-click opens menu with LSP actions.
                 if (Input.GetMouseButtonDown(1))
                 {
-                    if (lspHandler != null)
+                    if (LspAvailable)
                     {
                         // We use the word detection instead of the character detection because the latter
                         // needs the cursor to be precisely over a character, while the former works more broadly.
@@ -194,6 +194,7 @@ namespace SEE.UI.Window.CodeWindow
                             (int line, int column) = GetSourcePosition(character);
                             if (column > 0)
                             {
+                                contextMenu ??= ContextMenuHandler.FromCodeWindow(this);
                                 contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
                             }
                         }
@@ -216,7 +217,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Detect hovering over words (only while the code window is not being scrolled).
                 if (scrollingTo == 0 && !lastHoveredWord.Equals(hoveredWord))
                 {
-                    if (lspHandler != null)
+                    if (LspAvailable)
                     {
                         TriggerLspHoverAsync(hoveredWord).Forget();
                     }
@@ -312,9 +313,14 @@ namespace SEE.UI.Window.CodeWindow
 
             void GoToDefinition(TMP_WordInfo word)
             {
+                if (!LspAvailable)
+                {
+                    return;
+                }
                 (int line, int column) = GetSourcePosition(word.firstCharacterIndex);
                 if (column > 0)
                 {
+                    contextMenu ??= ContextMenuHandler.FromCodeWindow(this);
                     contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
                 }
             }
@@ -385,6 +391,13 @@ namespace SEE.UI.Window.CodeWindow
                 excessLines = Mathf.CeilToInt(rect.rect.height / textMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }
         }
+
+        /// <summary>
+        /// True if this code window uses the language server and the server is currently running,
+        /// i.e., LSP-based navigation and hover information are available. The server may have
+        /// been shut down after this window was opened, in which case its client is gone.
+        /// </summary>
+        private bool LspAvailable => lspHandler != null && lspHandler.ServerCapabilities != null;
 
         /// <summary>
         /// Removes listeners.
