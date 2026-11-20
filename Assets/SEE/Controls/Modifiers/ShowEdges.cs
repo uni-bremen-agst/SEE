@@ -364,6 +364,9 @@ namespace SEE.Controls.Modifiers
                     edgeToggleToken?.Cancel();
                     edgeToggleToken = new CancellationTokenSource();
                 }
+                // SelectionOn sets isSelected before calling this method, so a node that is
+                // selected without having been hovered first has no token yet.
+                edgeToggleToken ??= new CancellationTokenSource();
                 EdgeLayoutAttributes layout = CodeCity.EdgeLayoutSettings;
                 List<List<Edge>> edges = RelevantEdges(node,
                                                        followSource: layout.AnimateTransitiveSourceEdges,
