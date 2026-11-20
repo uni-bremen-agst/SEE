@@ -297,6 +297,13 @@ namespace SEE.Tools.LSP
         /// open and close documents on Unity's main thread.</remarks>
         private readonly object documentUsersLock = new();
 
+        /// <summary>
+        /// The text and version last sent to the language server for each document in <see cref="documentUsers"/>.
+        /// Used to send <c>textDocument/didChange</c> when a document that is already open is opened again
+        /// after its file has been changed on disk. Guarded by <see cref="documentUsersLock"/>.
+        /// </summary>
+        private readonly Dictionary<DocumentUri, (string text, int version)> documentContents = new();
+
         private void OnEnable()
         {
             if (Server != null)
@@ -544,9 +551,29 @@ namespace SEE.Tools.LSP
             DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
             lock (documentUsersLock)
             {
+                string text = File.ReadAllText(path);
                 if (documentUsers.TryGetValue(uri, out int users))
                 {
                     documentUsers[uri] = users + 1;
+                    // The file may have been changed on disk since the document was opened. The new user
+                    // reads the file from disk, so the server must work on the same contents.
+                    (string sentText, int version) = documentContents[uri];
+                    if (text != sentText)
+                    {
+                        version++;
+                        Client.DidChangeTextDocument(new DidChangeTextDocumentParams
+                        {
+                            TextDocument = new OptionalVersionedTextDocumentIdentifier
+                            {
+                                Uri = uri,
+                                Version = version
+                            },
+                            // A change event without a range replaces the whole document.
+                            ContentChanges = new Container<TextDocumentContentChangeEvent>(
+                                new TextDocumentContentChangeEvent { Text = text })
+                        });
+                        documentContents[uri] = (text, version);
+                    }
                     return;
                 }
                 DidOpenTextDocumentParams parameters = new()
@@ -556,11 +583,12 @@ namespace SEE.Tools.LSP
                         Uri = uri,
                         LanguageId = Server.LanguageIdFor(Path.GetExtension(path).TrimStart('.')),
                         Version = 1,
-                        Text = File.ReadAllText(path)
+                        Text = text
                     }
                 };
                 Client.DidOpenTextDocument(parameters);
                 documentUsers[uri] = 1;
+                documentContents[uri] = (text, 1);
             }
         }
 
@@ -589,6 +617,7 @@ namespace SEE.Tools.LSP
                 };
                 Client.DidCloseTextDocument(parameters);
                 documentUsers.Remove(uri);
+                documentContents.Remove(uri);
             }
         }
 
@@ -910,6 +939,7 @@ namespace SEE.Tools.LSP
             lock (documentUsersLock)
             {
                 documentUsers.Clear();
+                documentContents.Clear();
             }
             try
             {
