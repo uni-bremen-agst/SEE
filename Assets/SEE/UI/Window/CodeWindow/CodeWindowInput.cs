@@ -447,8 +447,9 @@ namespace SEE.UI.Window.CodeWindow
                         && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
                     {
                         lspHandler.enabled = true;
-                        lspHandler.OpenDocument(filename);
-                        tokens = await LSPToken.FromFileAsync(filename, lspHandler, language);
+                        // Use the contents known to the server, so that text and semantic tokens are consistent.
+                        string contents = lspHandler.OpenDocument(filename);
+                        tokens = await LSPToken.FromFileAsync(filename, lspHandler, language, contents);
                     }
                     else
                     {

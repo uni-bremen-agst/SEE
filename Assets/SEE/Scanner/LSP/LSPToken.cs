@@ -26,13 +26,17 @@ namespace SEE.Scanner.LSP
         /// <param name="filePath">Path to the source code file which shall be read and parsed.</param>
         /// <param name="handler">The LSP handler used to retrieve the semantic tokens.</param>
         /// <param name="language">The language of the file.</param>
+        /// <param name="fileContents">The contents of the file as sent to the language server
+        /// (see <see cref="LSPHandler.OpenDocument"/>). If null, the file is read from disk; this may
+        /// be inconsistent with the semantic tokens if the file has changed since it was opened.</param>
         /// <returns>A stream of tokens created from the source code file.</returns>
-        public static async UniTask<IEnumerable<LSPToken>> FromFileAsync(string filePath, LSPHandler handler, LSPLanguage language)
+        public static async UniTask<IEnumerable<LSPToken>> FromFileAsync(string filePath, LSPHandler handler, LSPLanguage language,
+                                                                          string fileContents = null)
         {
             const int delayMs = 100;
             const int maxTries = 30;
 
-            string fileContents = await System.IO.File.ReadAllTextAsync(filePath);
+            fileContents ??= await System.IO.File.ReadAllTextAsync(filePath);
             // We may need to wait for the server to process the file, so we just retry for a bit
             // (with the above constants, at most 3 seconds) until we get the tokens.
             SemanticTokens tokens;

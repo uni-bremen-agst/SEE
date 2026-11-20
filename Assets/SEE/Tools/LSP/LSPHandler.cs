@@ -546,7 +546,10 @@ namespace SEE.Tools.LSP
         /// Note that the document needs to be closed manually after it is no longer needed.
         /// </summary>
         /// <param name="path">The path to the document.</param>
-        public void OpenDocument(string path)
+        /// <returns>The contents of the document as known to the language server after this call.
+        /// Callers that need the document's text should use these contents instead of reading the file
+        /// again, as the file may have been changed in the meantime.</returns>
+        public string OpenDocument(string path)
         {
             DocumentUri uri = DocumentUri.File(Path.GetFullPath(path));
             lock (documentUsersLock)
@@ -574,7 +577,7 @@ namespace SEE.Tools.LSP
                         });
                         documentContents[uri] = (text, version);
                     }
-                    return;
+                    return text;
                 }
                 DidOpenTextDocumentParams parameters = new()
                 {
@@ -589,6 +592,7 @@ namespace SEE.Tools.LSP
                 Client.DidOpenTextDocument(parameters);
                 documentUsers[uri] = 1;
                 documentContents[uri] = (text, 1);
+                return text;
             }
         }
 
