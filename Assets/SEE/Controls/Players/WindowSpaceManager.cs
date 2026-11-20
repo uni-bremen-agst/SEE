@@ -99,13 +99,28 @@ namespace SEE.Controls.Players
             return Instance.gameObject;
         }
 
-        /// Updates the space of the player specified by <paramref name="playerName"/> using the values
-        /// from <paramref name="valueObject"/>.
+        /// <summary>
+        /// Updates the window space of the specified player using the received
+        /// serialized values. Supports window spaces without an active window.
         /// </summary>
-        /// <param name="playerName">The name of the player whose space shall be updated.</param>
-        /// <param name="valueObject">The value object which represents the new space of the player.</param>
+        /// <param name="playerName">
+        /// The name of the player whose window space shall be updated.
+        /// </param>
+        /// <param name="valueObject">
+        /// The serialized window-space values received from the network.
+        /// </param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if an active window is indicated but its serialized
+        /// values are missing or the corresponding window cannot be found.
+        /// </exception>
         public void UpdateSpaceFromValueObject(string playerName, WindowSpace.WindowSpaceValues valueObject)
         {
+            if (valueObject.HasActiveWindow && valueObject.ActiveWindow == null)
+            {
+                throw new InvalidOperationException(
+                    "The received window space has no active window values.");
+            }
+
             if (!windowSpaces.ContainsKey(playerName))
             {
                 windowSpaces[playerName] = WindowSpace.FromValueObject(valueObject, gameObject);
@@ -145,14 +160,27 @@ namespace SEE.Controls.Players
                 // Close windows which are no longer open
                 closedWindows.ForEach(x => windowSpaces[playerName].CloseWindow(x));
 
-                // Set active window if it changed
-                if (windowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)
+                // Set the active window, including an explicitly empty state.
+                if (!valueObject.HasActiveWindow)
                 {
-                    windowSpaces[playerName].ActiveWindow = windowSpaces[playerName].Windows.First(x => x.Title == valueObject.ActiveWindow.Title);
+                    windowSpaces[playerName].ActiveWindow = null;
+                }
+                else if (windowSpaces[playerName].ActiveWindow == null
+                         || windowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)
+                {
+                    windowSpaces[playerName].ActiveWindow =
+                        windowSpaces[playerName].Windows.First(
+                            x => x.Title == valueObject.ActiveWindow.Title);
                 }
             }
         }
 
+        /// <summary>
+        /// Initializes the window space manager and its user interface.
+        /// Ensures that only one manager is active, creates the local player's
+        /// window space, forwards active-window changes, and initializes the
+        /// window selection menu and state indicator.
+        /// </summary>
         private void Start()
         {
             WindowSpaceManager[] windowSpaceManagers = FindObjectsByType<WindowSpaceManager>(FindObjectsSortMode.None);
@@ -185,6 +213,10 @@ namespace SEE.Controls.Players
             SetUpWindowSelectionMenu();
         }
 
+        /// <summary>
+        /// Checks whether the window selection menu input was triggered
+        /// and toggles the menu's visibility accordingly.
+        /// </summary>
         private void Update()
         {
             if (SEEInput.ShowWindowMenu())
