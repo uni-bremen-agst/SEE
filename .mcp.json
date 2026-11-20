@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "see": {
+      "command": "python",
+      "args": ["Tools/SeeMcp/see_mcp_server.py"]
+    }
+  }
+}

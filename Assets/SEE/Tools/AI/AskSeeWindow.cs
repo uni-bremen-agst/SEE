@@ -1,0 +1,1012 @@
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using SEE.Controls.KeyActions;
+using SEE.Utils;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+namespace SEE.Tools.AI
+{
+    /// <summary>
+    /// The "Ask SEE" box: press <see cref="OpenKey"/> (J) in SEE, type a question about the
+    /// code and press Enter. The question goes to Claude Code, which runs in the background
+    /// (headless, <c>claude -p</c>) in the repository folder with the <c>see</c> MCP server
+    /// from <c>.mcp.json</c>. Claude searches the code and calls the SEE tools, so the
+    /// buildings light up while it works; its answer then appears in the box.
+    ///
+    /// Claude may only read code (Read, Grep, Glob) and use the SEE tools; it cannot edit
+    /// files or run commands. Follow-up questions continue the same conversation until
+    /// "New conversation" is pressed.
+    ///
+    /// Requires the Claude Code command-line tool, signed in once with <c>claude</c> → <c>/login</c>.
+    /// Only compiled into the Editor and development builds, like <see cref="AgentCommandServer"/>.
+    /// </summary>
+    public class AskSeeWindow : MonoBehaviour
+    {
+        #region Settings
+
+        /// <summary>
+        /// Key that opens the box (without Ctrl, Alt or Shift). J is the only letter SEE does not
+        /// bind (F became "Toggle EchoFace"); with Ctrl, Alt or Shift, J triggers the debug keys of
+        /// <see cref="AgentCityEffects"/>.
+        /// </summary>
+        public KeyCode OpenKey = KeyCode.J;
+
+        /// <summary>
+        /// The Claude Code executable: "claude" (searched on PATH and in the usual install
+        /// folders) or a full path.
+        /// </summary>
+        public string ClaudeExecutable = "claude";
+
+        /// <summary>Model passed to Claude Code; empty uses Claude Code's default.</summary>
+        public string Model = "";
+
+        /// <summary>A question is stopped after this many seconds.</summary>
+        public int TimeoutSeconds = 240;
+
+        /// <summary>Font size of the box.</summary>
+        public int FontSize = 15;
+
+        #endregion
+
+        /// <summary>The single instance, created automatically when the game starts.</summary>
+        public static AskSeeWindow Instance { get; private set; }
+
+        /// <summary>Extra instructions for Claude, on top of those of the see MCP server.</summary>
+        private const string systemPrompt =
+            "You are answering a question typed into SEE, a 3D code city in Unity. The user is "
+            + "looking at the city, not at your tool calls. Find the answer in the source code with "
+            + "Read, Grep and Glob, then show it in the city with the see tools: find_symbol, then "
+            + "focus (or show_path, show_neighbors or highlight when that fits better). The city may "
+            + "be built from an older version of the code; if no building matches, say so and focus "
+            + "the closest match. For a path, give show_path the start and the end and report the "
+            + "path it returns; never invent a dependency or a step. Match the length of your reply to the question: for 'where is' "
+            + "questions, at most four short sentences that name the file and line; for 'how', "
+            + "'why' or 'explain' questions, explain clearly in up to about fifteen sentences or a "
+            + "short list (lines starting with '- '), citing files and lines. Use plain text: no "
+            + "Markdown headings, bold, tables or code blocks, because the reply is shown as plain text.";
+
+        /// <summary>Name of the question text field, for keyboard focus.</summary>
+        private const string fieldName = "AskSeeQuestion";
+
+        /// <summary>Whether the box is shown.</summary>
+        private bool open;
+
+        /// <summary>Frame in which the box was opened; that frame's key press is not typed into the field.</summary>
+        private int openedFrame = -1;
+
+        /// <summary>The question being typed.</summary>
+        private string question = "";
+
+        /// <summary>One question of the conversation, what Claude did for it, and its answer.</summary>
+        private class Exchange
+        {
+            /// <summary>The question as typed.</summary>
+            internal string Question;
+
+            /// <summary>What Claude did, one line per step.</summary>
+            internal readonly List<string> Steps = new();
+
+            /// <summary>Claude's answer or an error message; empty while waiting.</summary>
+            internal string Answer = "";
+
+            /// <summary>Whether <see cref="Answer"/> is an error message.</summary>
+            internal bool IsError;
+        }
+
+        /// <summary>The current conversation, oldest question first.</summary>
+        private readonly List<Exchange> conversation = new();
+
+        /// <summary>The newest exchange, or null if nothing was asked yet.</summary>
+        private Exchange Current => conversation.Count > 0 ? conversation[^1] : null;
+
+        /// <summary>One-line status under the buttons.</summary>
+        private string status = "Ask anything about the code.";
+
+        /// <summary>Whether the box is shown in its large size.</summary>
+        private bool large;
+
+        /// <summary>Whether the question field should get the keyboard focus at the next repaint.</summary>
+        private bool focusQuestion;
+
+        /// <summary>Claude Code's session, for follow-up questions; null starts a new conversation.</summary>
+        private string sessionId;
+
+        /// <summary>The running Claude Code process, or null.</summary>
+        private Process process;
+
+        /// <summary>Whether the running process has sent its final result.</summary>
+        private bool gotResult;
+
+        /// <summary>When the running question was sent (realtime seconds).</summary>
+        private float startedAt;
+
+        /// <summary>Lines from Claude Code's standard output, filled by a background thread.</summary>
+        private readonly ConcurrentQueue<string> outputLines = new();
+
+        /// <summary>Lines from Claude Code's standard error, filled by a background thread.</summary>
+        private readonly ConcurrentQueue<string> errorLines = new();
+
+        /// <summary>The last few lines of standard error, shown if Claude Code fails.</summary>
+        private readonly List<string> recentErrors = new();
+
+        /// <summary>Position and size of the box.</summary>
+        private Rect windowRect = new(20, 20, 620, 200);
+
+        /// <summary>Scroll position of the answer area.</summary>
+        private Vector2 scroll;
+
+        /// <summary>Styles, created on first use inside OnGUI.</summary>
+        private GUIStyle windowStyle, labelStyle, fieldStyle, buttonStyle, stepStyle, statusStyle, warningStyle,
+                         questionStyle, answerStyle, errorAnswerStyle, hintStyle, typingStyle, notTypingStyle,
+                         smallButtonStyle;
+
+        /// <summary>Solid-colour textures for the styles; Unity's default skin is see-through.</summary>
+        private readonly List<Texture2D> textures = new();
+
+        /// <summary>Whether a question is running.</summary>
+        private bool Running => process != null;
+
+        /// <summary>Whether SEE's command server can receive the agent's commands.</summary>
+        private static bool CommandServerRunning => AgentCommandServer.Instance != null && AgentCommandServer.Instance.IsListening;
+
+        #region Startup and shutdown
+
+        /// <summary>Creates the box automatically, so no scene has to be edited.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void CreateInstance()
+        {
+            if (Instance != null)
+            {
+                return;
+            }
+            GameObject holder = new(nameof(AskSeeWindow));
+            DontDestroyOnLoad(holder);
+            Instance = holder.AddComponent<AskSeeWindow>();
+        }
+
+        /// <summary>Tells SEE that the mouse is over its UI while it is over the box.</summary>
+        private void OnEnable()
+        {
+            Raycasting.MouseOverImmediateModeGUI += IsMouseOverBox;
+        }
+
+        /// <summary>Stops telling SEE about the box.</summary>
+        private void OnDisable()
+        {
+            Raycasting.MouseOverImmediateModeGUI -= IsMouseOverBox;
+        }
+
+        /// <summary>
+        /// Whether the box is open and the mouse is over it. SEE then treats the mouse as being
+        /// over its UI, so a click on the box does not also select a building behind it, and the
+        /// mouse wheel scrolls the answers instead of zooming the city.
+        /// </summary>
+        /// <returns>True if the mouse is over the open box.</returns>
+        private bool IsMouseOverBox()
+        {
+            if (!open)
+            {
+                return false;
+            }
+            // Input uses a bottom-left origin, OnGUI a top-left one.
+            Vector2 mouse = Input.mousePosition;
+            return windowRect.Contains(new Vector2(mouse.x, Screen.height - mouse.y));
+        }
+
+        /// <summary>Stops a running question and gives the keyboard back to SEE.</summary>
+        private void OnDestroy()
+        {
+            StopProcess();
+            foreach (Texture2D texture in textures)
+            {
+                Destroy(texture);
+            }
+            if (open)
+            {
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
+
+        #endregion
+
+        #region Opening and closing
+
+        /// <summary>Opens the box and stops SEE from reacting to the keys typed into it.</summary>
+        public void Open()
+        {
+            open = true;
+            openedFrame = Time.frameCount;
+            focusQuestion = true;
+            SEEInput.KeyboardShortcutsEnabled = false;
+        }
+
+        /// <summary>Closes the box; a running question keeps running and its answer is kept.</summary>
+        public void Close()
+        {
+            open = false;
+            SEEInput.KeyboardShortcutsEnabled = true;
+            GUI.FocusControl(null);
+        }
+
+        #endregion
+
+        #region Main loop
+
+        /// <summary>Opens the box on <see cref="OpenKey"/> and processes Claude Code's output.</summary>
+        private void Update()
+        {
+            if (!open && SEEInput.KeyboardShortcutsEnabled && Input.GetKeyDown(OpenKey) && !ModifierHeld())
+            {
+                Open();
+            }
+            if (open)
+            {
+                // Something else in SEE may turn the shortcuts back on (e.g. when one of its own
+                // input fields loses focus); typing "w" into the box must not walk the player.
+                SEEInput.KeyboardShortcutsEnabled = false;
+            }
+
+            while (outputLines.TryDequeue(out string line))
+            {
+                HandleOutputLine(line);
+            }
+            while (errorLines.TryDequeue(out string line))
+            {
+                recentErrors.Add(line);
+                if (recentErrors.Count > 8)
+                {
+                    recentErrors.RemoveAt(0);
+                }
+            }
+
+            if (Running)
+            {
+                float elapsed = Time.realtimeSinceStartup - startedAt;
+                if (process.HasExited && outputLines.IsEmpty)
+                {
+                    if (!gotResult)
+                    {
+                        string details = string.Join("\n", recentErrors.Where(l => !string.IsNullOrWhiteSpace(l)));
+                        Finish($"Claude Code stopped without an answer (exit code {process.ExitCode})."
+                               + (details.Length > 0 ? "\n" + details : ""), error: true);
+                    }
+                    else
+                    {
+                        DisposeProcess();
+                    }
+                }
+                else if (elapsed > TimeoutSeconds)
+                {
+                    StopProcess();
+                    Finish($"Stopped after {TimeoutSeconds} s without an answer.", error: true);
+                }
+                else if (!gotResult)
+                {
+                    status = $"Claude is working… {elapsed:F0} s";
+                }
+            }
+        }
+
+        #endregion
+
+        /// <summary>Whether Ctrl, Alt or Shift is held (then J is a debug key, not the box).</summary>
+        /// <returns>True if a modifier key is held.</returns>
+        private static bool ModifierHeld() =>
+            Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+            || Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)
+            || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        #region Asking Claude Code
+
+        /// <summary>Sends <see cref="question"/> to Claude Code.</summary>
+        private void Ask()
+        {
+            string text = question.Trim();
+            if (text.Length == 0 || Running)
+            {
+                return;
+            }
+
+            conversation.Add(new Exchange { Question = text });
+            question = "";
+            recentErrors.Clear();
+            gotResult = false;
+            startedAt = Time.realtimeSinceStartup;
+            ScrollToEnd();
+
+            string executable = FindClaude();
+            if (executable == null)
+            {
+                Finish("Claude Code was not found. Install it, or set ClaudeExecutable on the "
+                       + $"{nameof(AskSeeWindow)} object to the full path of claude.exe.", error: true);
+                return;
+            }
+
+            string repository = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            List<string> arguments = new()
+            {
+                "-p", "--output-format", "stream-json", "--verbose",
+                "--mcp-config", Quote(Path.Combine(repository, ".mcp.json")), "--strict-mcp-config",
+                "--allowedTools", Quote("mcp__see__*"), "Read", "Grep", "Glob",
+                "--disallowedTools", "Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch",
+                "--append-system-prompt", Quote(systemPrompt)
+            };
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                arguments.Add("--resume");
+                arguments.Add(Quote(sessionId));
+            }
+            if (!string.IsNullOrWhiteSpace(Model))
+            {
+                arguments.Add("--model");
+                arguments.Add(Quote(Model.Trim()));
+            }
+
+            ProcessStartInfo startInfo = new(executable, string.Join(" ", arguments))
+            {
+                WorkingDirectory = repository,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
+            };
+
+            status = "Starting Claude Code…";
+
+            try
+            {
+                process = new Process { StartInfo = startInfo };
+                process.OutputDataReceived += (_, e) => { if (e.Data != null) { outputLines.Enqueue(e.Data); } };
+                process.ErrorDataReceived += (_, e) => { if (e.Data != null) { errorLines.Enqueue(e.Data); } };
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                // The question goes through standard input, so no quoting problems.
+                byte[] bytes = new UTF8Encoding(false).GetBytes(text);
+                process.StandardInput.BaseStream.Write(bytes, 0, bytes.Length);
+                process.StandardInput.Close();
+            }
+            catch (Exception e)
+            {
+                DisposeProcess();
+                Finish($"Could not start Claude Code ({executable}): {e.Message}", error: true);
+                return;
+            }
+            Debug.Log($"[{nameof(AskSeeWindow)}] Asked: {text}\n");
+        }
+
+        /// <summary>Handles one JSON line of Claude Code's stream-json output.</summary>
+        /// <param name="line">One output line.</param>
+        private void HandleOutputLine(string line)
+        {
+            JObject message;
+            try
+            {
+                message = JObject.Parse(line);
+            }
+            catch (Exception)
+            {
+                return; // not JSON; ignore
+            }
+
+            switch ((string)message["type"])
+            {
+                case "system" when (string)message["subtype"] == "init":
+                    sessionId = (string)message["session_id"] ?? sessionId;
+                    JToken see = message["mcp_servers"]?.FirstOrDefault(s => (string)s["name"] == "see");
+                    if (see == null || (string)see["status"] != "connected")
+                    {
+                        AddStep($"! SEE tools are not connected ({(string)see?["status"] ?? "missing"}).");
+                    }
+                    break;
+
+                case "assistant":
+                    foreach (JToken content in message["message"]?["content"] ?? new JArray())
+                    {
+                        if ((string)content["type"] == "tool_use")
+                        {
+                            AddStep("→ " + DescribeToolUse((string)content["name"], content["input"] as JObject));
+                        }
+                    }
+                    break;
+
+                case "user":
+                    foreach (JToken content in message["message"]?["content"] as JArray ?? new JArray())
+                    {
+                        if ((string)content["type"] == "tool_result" && (bool?)content["is_error"] == true)
+                        {
+                            AddStep("   ✗ " + Shorten(ToolResultText(content["content"]), 140));
+                        }
+                    }
+                    break;
+
+                case "result":
+                    gotResult = true;
+                    sessionId = (string)message["session_id"] ?? sessionId;
+                    string result = (string)message["result"] ?? "";
+                    bool isError = (bool?)message["is_error"] ?? false;
+                    if (result.Contains("Not logged in"))
+                    {
+                        sessionId = null;
+                        result = "Claude Code is not signed in on this computer. Open PowerShell, run "
+                                 + "'claude', type /login and sign in once. Then ask again.";
+                        isError = true;
+                    }
+                    Finish(result, isError);
+                    break;
+            }
+        }
+
+        /// <summary>Shows the answer and ends the running question.</summary>
+        /// <param name="text">Answer or error message.</param>
+        /// <param name="error">Whether it is an error.</param>
+        private void Finish(string text, bool error)
+        {
+            if (Current == null)
+            {
+                conversation.Add(new Exchange { Question = "" });
+            }
+            Current.Answer = text;
+            Current.IsError = error;
+            ScrollToEnd();
+            focusQuestion = true;
+            float elapsed = Time.realtimeSinceStartup - startedAt;
+            status = error ? "Something went wrong." : $"Answered in {elapsed:F0} s. Ask a follow-up, or start a new conversation.";
+            if (process != null && process.HasExited)
+            {
+                DisposeProcess();
+            }
+            Debug.Log($"[{nameof(AskSeeWindow)}] {(error ? "Error" : "Answer")}: {text}\n");
+        }
+
+        /// <summary>Adds a line to the steps of the current question and scrolls to it.</summary>
+        /// <param name="step">What Claude did.</param>
+        private void AddStep(string step)
+        {
+            Current?.Steps.Add(step);
+            ScrollToEnd();
+        }
+
+        /// <summary>Scrolls the conversation to its end at the next repaint.</summary>
+        private void ScrollToEnd()
+        {
+            scroll.y = float.MaxValue;
+        }
+
+        /// <summary>Kills the running Claude Code process, if any.</summary>
+        private void StopProcess()
+        {
+            try
+            {
+                if (process is { HasExited: false })
+                {
+                    process.Kill();
+                }
+            }
+            catch (Exception)
+            {
+                // already gone
+            }
+            DisposeProcess();
+        }
+
+        /// <summary>Releases the process object.</summary>
+        private void DisposeProcess()
+        {
+            process?.Dispose();
+            process = null;
+        }
+
+        /// <summary>
+        /// The Claude Code executable: <see cref="ClaudeExecutable"/> if it is a full path,
+        /// otherwise searched on PATH and in the folders the installers use. Unity may have been
+        /// started before Claude Code was installed, so its PATH can be out of date.
+        /// </summary>
+        /// <returns>Full path, or null if not found.</returns>
+        private string FindClaude()
+        {
+            if (File.Exists(ClaudeExecutable))
+            {
+                return ClaudeExecutable;
+            }
+            string[] names = { "claude.exe", "claude.cmd", "claude" };
+            IEnumerable<string> folders = (Environment.GetEnvironmentVariable("PATH") ?? "")
+                .Split(Path.PathSeparator)
+                .Where(f => !string.IsNullOrWhiteSpace(f));
+
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            List<string> known = new()
+            {
+                Path.Combine(home, ".local", "bin"),                       // native installer
+                Path.Combine(localAppData, "Microsoft", "WinGet", "Links"),
+                Path.Combine(appData, "npm")                               // npm install -g
+            };
+            string wingetPackages = Path.Combine(localAppData, "Microsoft", "WinGet", "Packages");
+            if (Directory.Exists(wingetPackages))
+            {
+                known.AddRange(Directory.GetDirectories(wingetPackages, "Anthropic.ClaudeCode*"));
+            }
+
+            foreach (string folder in folders.Concat(known))
+            {
+                foreach (string name in names)
+                {
+                    try
+                    {
+                        string candidate = Path.Combine(folder.Trim('"'), name);
+                        if (File.Exists(candidate))
+                        {
+                            return candidate;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        // invalid characters in a PATH entry
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region Drawing
+
+        /// <summary>Draws the box.</summary>
+        private void OnGUI()
+        {
+            if (!open)
+            {
+                return;
+            }
+            CreateStyles();
+            windowRect.width = Mathf.Min(large ? 1000 : 620, Screen.width - 40);
+            // GUILayout.Window only grows to fit its content; starting small every frame lets it
+            // also shrink, e.g. after switching back from the large size.
+            windowRect.height = 50;
+            windowRect = GUILayout.Window(GetInstanceID(), windowRect, DrawWindowWithCursor,
+                                          $"Ask SEE   ({OpenKey} opens · Enter asks · Esc closes)", windowStyle);
+        }
+
+        /// <summary>
+        /// Draws the box with a black, blinking text cursor. The cursor is white by default,
+        /// which is invisible in the white text field. It has to be set here: Unity calls window
+        /// functions after OnGUI has returned, so a setting made around GUILayout.Window would
+        /// already be undone.
+        /// </summary>
+        /// <param name="id">Window ID (unused).</param>
+        private void DrawWindowWithCursor(int id)
+        {
+            Color cursorColor = GUI.skin.settings.cursorColor;
+            float cursorFlashSpeed = GUI.skin.settings.cursorFlashSpeed;
+            GUI.skin.settings.cursorColor = Color.black;
+            GUI.skin.settings.cursorFlashSpeed = 1.5f; // blinks per second, like a normal text field
+            try
+            {
+                DrawWindow(id);
+            }
+            finally
+            {
+                GUI.skin.settings.cursorColor = cursorColor;
+                GUI.skin.settings.cursorFlashSpeed = cursorFlashSpeed;
+            }
+        }
+
+        /// <summary>Draws the content of the box.</summary>
+        /// <param name="id">Window ID (unused).</param>
+        private void DrawWindow(int id)
+        {
+            Event current = Event.current;
+            if (current.type is EventType.ValidateCommand or EventType.ExecuteCommand)
+            {
+                HandleEditCommand(current);
+            }
+            if (current.type == EventType.KeyDown)
+            {
+                if (Time.frameCount == openedFrame)
+                {
+                    current.Use(); // the key that opened the box must not be typed into it
+                }
+                else if (current.keyCode == KeyCode.Escape)
+                {
+                    current.Use();
+                    Close();
+                    return;
+                }
+                else if ((current.keyCode == KeyCode.Return || current.keyCode == KeyCode.KeypadEnter)
+                         && GUI.GetNameOfFocusedControl() == fieldName)
+                {
+                    current.Use();
+                    Ask();
+                }
+            }
+
+            GUILayout.Label("Ask anything about the code: where something is, how it works, what uses it. "
+                            + "Claude reads the code and shows the answer in the city.", labelStyle);
+            GUI.SetNextControlName(fieldName);
+            question = GUILayout.TextField(question, 1000, fieldStyle, GUILayout.ExpandWidth(true));
+            Rect fieldRect = GUILayoutUtility.GetLastRect();
+            bool typing = GUI.GetNameOfFocusedControl() == fieldName;
+            if (question.Length == 0 && current.type == EventType.Repaint)
+            {
+                // Grey hint inside the empty field, like a search box.
+                Rect hintRect = new(fieldRect.x + fieldStyle.padding.left + 2, fieldRect.y + fieldStyle.padding.top,
+                                    fieldRect.width - fieldStyle.padding.horizontal, fieldRect.height - fieldStyle.padding.vertical);
+                GUI.Label(hintRect, typing ? "Type your question here and press Enter" : "Click here to type a question",
+                          hintStyle);
+            }
+            // Focus the question field when the box opens and after each answer, but not every
+            // frame: the user must be able to click into an answer to select and copy it.
+            if (focusQuestion && Time.frameCount > openedFrame && current.type == EventType.Repaint)
+            {
+                GUI.FocusControl(fieldName);
+                focusQuestion = false;
+            }
+            GUILayout.Label(typing
+                                ? "● Typing: SEE's keys are paused until you close this box (Esc)."
+                                : "○ Not typing: click the field above to type.",
+                            typing ? typingStyle : notTypingStyle);
+
+            GUILayout.BeginHorizontal();
+            GUI.enabled = !Running && question.Trim().Length > 0;
+            if (GUILayout.Button("Ask", buttonStyle))
+            {
+                Ask();
+            }
+            GUI.enabled = Running;
+            if (GUILayout.Button("Stop", buttonStyle))
+            {
+                StopProcess();
+                Finish("Stopped.", error: true);
+            }
+            GUI.enabled = !Running && sessionId != null;
+            if (GUILayout.Button("New conversation", buttonStyle))
+            {
+                sessionId = null;
+                conversation.Clear();
+                status = "New conversation. Ask anything about the code.";
+                focusQuestion = true;
+            }
+            GUI.enabled = AgentCityEffects.Instance != null;
+            if (GUILayout.Button("Reset city", buttonStyle))
+            {
+                AgentCityEffects.Instance.ResetEffects();
+            }
+            GUI.enabled = true;
+            if (GUILayout.Button("Close", buttonStyle))
+            {
+                Close();
+                return;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(status, statusStyle, GUILayout.ExpandWidth(true));
+            string lastAnswer = conversation.LastOrDefault(e => e.Answer.Length > 0 && !e.IsError)?.Answer;
+            GUI.enabled = lastAnswer != null;
+            if (GUILayout.Button("Copy last answer", buttonStyle, GUILayout.ExpandWidth(false)))
+            {
+                CopyToClipboard(lastAnswer);
+            }
+            GUI.enabled = true;
+            if (GUILayout.Button(large ? "Smaller" : "Larger", buttonStyle, GUILayout.ExpandWidth(false)))
+            {
+                large = !large;
+            }
+            GUILayout.EndHorizontal();
+
+            if (!CommandServerRunning)
+            {
+                GUILayout.Label($"! SEE's command server is not listening (port {AgentCommandServer.DefaultPort}), "
+                                + "so Claude can answer but cannot highlight buildings. It retries every 2 s; "
+                                + "see the Console for the reason.", warningStyle);
+            }
+
+            if (conversation.Count > 0)
+            {
+                float maxHeight = Screen.height * (large ? 0.75f : 0.45f);
+                scroll = GUILayout.BeginScrollView(scroll, GUILayout.MinHeight(large ? maxHeight : 80),
+                                                   GUILayout.MaxHeight(maxHeight));
+                foreach (Exchange exchange in conversation)
+                {
+                    if (exchange.Question.Length > 0)
+                    {
+                        GUILayout.Label("Q: " + exchange.Question, questionStyle);
+                    }
+                    // Only the newest question shows what Claude did; older ones keep just the answer.
+                    if (exchange == Current)
+                    {
+                        foreach (string step in exchange.Steps)
+                        {
+                            GUILayout.Label(step, stepStyle);
+                        }
+                    }
+                    else if (exchange.Steps.Count > 0)
+                    {
+                        GUILayout.Label($"({exchange.Steps.Count} step(s))", stepStyle);
+                    }
+                    if (exchange.Answer.Length > 0)
+                    {
+                        GUILayout.Space(2);
+                        // A text area instead of a label, so the answer can be selected and copied
+                        // (Ctrl+C). Changes typed into it are thrown away.
+                        GUILayout.TextArea(exchange.Answer, exchange.IsError ? errorAnswerStyle : answerStyle);
+                        GUILayout.BeginHorizontal();
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("Copy", smallButtonStyle, GUILayout.ExpandWidth(false)))
+                        {
+                            CopyToClipboard(exchange.Answer);
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                    GUILayout.Space(10);
+                }
+                GUILayout.EndScrollView();
+            }
+
+            GUI.DragWindow();
+        }
+
+        /// <summary>
+        /// Handles Copy, Cut, Paste and Select All for the question field and the answers.
+        /// In the Unity Editor, Ctrl+C/X/V/A are taken by the Editor's Edit menu, which sends
+        /// them to the Game view as commands instead of key presses. Unity's runtime text fields
+        /// only react to key presses, so without this, copying does nothing in the Editor.
+        /// (A built SEE gets the key presses, which the text fields handle themselves.)
+        /// </summary>
+        /// <param name="current">A ValidateCommand or ExecuteCommand event.</param>
+        private void HandleEditCommand(Event current)
+        {
+            string command = current.commandName;
+            if (command is not ("Copy" or "Cut" or "Paste" or "SelectAll") || GUIUtility.keyboardControl == 0)
+            {
+                return;
+            }
+            if (GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl) is not TextEditor editor)
+            {
+                return;
+            }
+            // Answers are read-only: only the question field may be changed.
+            bool inQuestion = GUI.GetNameOfFocusedControl() == fieldName;
+            if (command is "Cut" or "Paste" && !inQuestion)
+            {
+                return;
+            }
+            if (current.type == EventType.ValidateCommand)
+            {
+                current.Use(); // tells the Editor that the box handles this command
+                return;
+            }
+
+            switch (command)
+            {
+                case "Copy":
+                    CopyToClipboard(editor.hasSelection ? editor.SelectedText : editor.text);
+                    break;
+                case "Cut":
+                    if (editor.hasSelection)
+                    {
+                        CopyToClipboard(editor.SelectedText);
+                        editor.DeleteSelection();
+                        question = editor.text;
+                    }
+                    break;
+                case "Paste":
+                    // Questions are one line; pasted line breaks become spaces.
+                    string pasted = (GUIUtility.systemCopyBuffer ?? "").Replace("\r\n", " ").Replace('\n', ' ');
+                    editor.ReplaceSelection(pasted);
+                    question = editor.text;
+                    break;
+                case "SelectAll":
+                    editor.SelectAll();
+                    break;
+            }
+            current.Use();
+        }
+
+        /// <summary>Puts <paramref name="text"/> on the clipboard and says so in the status line and Console.</summary>
+        /// <param name="text">Text to copy.</param>
+        private void CopyToClipboard(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+            GUIUtility.systemCopyBuffer = text;
+            status = $"Copied {text.Length} characters.";
+            Debug.Log($"[{nameof(AskSeeWindow)}] Copied {text.Length} characters to the clipboard.\n");
+        }
+
+        /// <summary>Creates the styles once (GUI.skin is only available inside OnGUI).</summary>
+        private void CreateStyles()
+        {
+            if (labelStyle != null && labelStyle.fontSize == FontSize)
+            {
+                return;
+            }
+            foreach (Texture2D texture in textures)
+            {
+                Destroy(texture);
+            }
+            textures.Clear();
+
+            Color text = new(0.95f, 0.95f, 0.95f);
+
+            windowStyle = new GUIStyle(GUI.skin.window)
+            {
+                fontSize = FontSize,
+                fontStyle = FontStyle.Bold,
+                padding = new RectOffset(12, 12, FontSize + 16, 12),
+                border = new RectOffset(2, 2, 2, 2)
+            };
+            SetBackground(windowStyle, new Color(0.11f, 0.12f, 0.15f, 0.97f), text);
+
+            labelStyle = new GUIStyle(GUI.skin.label) { fontSize = FontSize, wordWrap = true, richText = false };
+            labelStyle.normal.textColor = text;
+
+            fieldStyle = new GUIStyle(GUI.skin.textField)
+            {
+                fontSize = FontSize + 1,
+                padding = new RectOffset(8, 8, 6, 6),
+                border = new RectOffset(1, 1, 1, 1)
+            };
+            SetBackground(fieldStyle, Color.white, Color.black);
+            fieldStyle.focused.background = Solid(new Color(1f, 1f, 0.92f));
+            fieldStyle.focused.textColor = Color.black;
+
+            buttonStyle = new GUIStyle(GUI.skin.button) { fontSize = FontSize, padding = new RectOffset(10, 10, 5, 5) };
+            SetBackground(buttonStyle, new Color(0.24f, 0.27f, 0.33f), text);
+            buttonStyle.hover.background = Solid(new Color(0.30f, 0.40f, 0.52f));
+            buttonStyle.hover.textColor = Color.white;
+            buttonStyle.active.background = Solid(new Color(0.15f, 0.55f, 0.75f));
+            buttonStyle.active.textColor = Color.white;
+
+            smallButtonStyle = new GUIStyle(buttonStyle) { fontSize = FontSize - 3, padding = new RectOffset(8, 8, 2, 2) };
+
+            stepStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2 };
+            stepStyle.normal.textColor = new Color(0.55f, 0.85f, 1f);
+
+            statusStyle = new GUIStyle(labelStyle) { fontStyle = FontStyle.Italic, fontSize = FontSize - 1 };
+            statusStyle.normal.textColor = new Color(0.75f, 0.78f, 0.82f);
+
+            warningStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 1, fontStyle = FontStyle.Bold };
+            warningStyle.normal.textColor = new Color(1f, 0.7f, 0.3f);
+
+            hintStyle = new GUIStyle(GUI.skin.label) { fontSize = FontSize + 1, fontStyle = FontStyle.Italic, wordWrap = false };
+            hintStyle.normal.textColor = new Color(0.55f, 0.55f, 0.55f);
+
+            typingStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2, fontStyle = FontStyle.Bold };
+            typingStyle.normal.textColor = new Color(0.45f, 0.95f, 0.5f);
+
+            notTypingStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2 };
+            notTypingStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
+
+            questionStyle = new GUIStyle(labelStyle) { fontStyle = FontStyle.Bold };
+            questionStyle.normal.textColor = new Color(1f, 0.86f, 0.45f);
+
+            // A text area that looks like a label: no box, wrapped, selectable.
+            answerStyle = new GUIStyle(GUI.skin.textArea)
+            {
+                fontSize = FontSize,
+                wordWrap = true,
+                richText = false,
+                padding = new RectOffset(2, 2, 2, 2),
+                margin = new RectOffset(4, 4, 2, 2)
+            };
+            SetBackground(answerStyle, new Color(0.15f, 0.16f, 0.20f), text);
+
+            errorAnswerStyle = new GUIStyle(answerStyle);
+            SetBackground(errorAnswerStyle, new Color(0.25f, 0.14f, 0.12f), new Color(1f, 0.75f, 0.6f));
+
+            // A style looks the same whether or not it has keyboard focus or is "on".
+            void SetBackground(GUIStyle style, Color background, Color textColor)
+            {
+                Texture2D texture = Solid(background);
+                foreach (GUIStyleState state in new[] { style.normal, style.onNormal, style.focused, style.onFocused,
+                                                       style.hover, style.onHover, style.active, style.onActive })
+                {
+                    state.background = texture;
+                    state.textColor = textColor;
+                }
+            }
+
+            Texture2D Solid(Color color)
+            {
+                Texture2D texture = new(1, 1) { hideFlags = HideFlags.HideAndDontSave };
+                texture.SetPixel(0, 0, color);
+                texture.Apply();
+                textures.Add(texture);
+                return texture;
+            }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>A short, readable description of a tool call, for the steps list.</summary>
+        /// <param name="name">Tool name, e.g. "mcp__see__focus" or "Grep".</param>
+        /// <param name="input">The tool's arguments.</param>
+        /// <returns>E.g. "SEE: focus ContextMenu" or "Searching code for 'OpenContextMenu'".</returns>
+        private static string DescribeToolUse(string name, JObject input)
+        {
+            input ??= new JObject();
+            string Arg(string key) => input[key] is JArray array
+                ? string.Join(", ", array.Select(t => ShortId(t.ToString())))
+                : ShortId(input[key]?.ToString() ?? "");
+
+            if (name != null && name.StartsWith("mcp__see__"))
+            {
+                string tool = name.Substring("mcp__see__".Length);
+                string detail = Arg("target") + Arg("targets") + Arg("query") + Arg("visited");
+                return $"SEE: {tool} {detail}".TrimEnd();
+            }
+            return name switch
+            {
+                "Grep" => $"Searching code for '{Shorten(Arg("pattern"), 60)}'",
+                "Glob" => $"Looking for files {Shorten(Arg("pattern"), 60)}",
+                "Read" => $"Reading {Path.GetFileName(Arg("file_path"))}",
+                _ => name
+            };
+        }
+
+        /// <summary>
+        /// Node IDs from C# graphs look like "T:SEE.UI.ContextMenu@Temp/bin/Debug/SEE.dll";
+        /// this keeps "SEE.UI.ContextMenu".
+        /// </summary>
+        /// <param name="id">Node ID or name.</param>
+        /// <returns>The shortened ID.</returns>
+        private static string ShortId(string id)
+        {
+            int at = id.IndexOf('@');
+            if (at > 0)
+            {
+                id = id.Substring(0, at);
+            }
+            return id.Length > 2 && id[1] == ':' && char.IsUpper(id[0]) ? id.Substring(2) : id;
+        }
+
+        /// <summary>Text of a tool result, which is either a string or a list of content blocks.</summary>
+        /// <param name="content">The tool result's content.</param>
+        /// <returns>Its text.</returns>
+        private static string ToolResultText(JToken content) => content switch
+        {
+            JArray blocks => string.Join(" ", blocks.Select(b => (string)b["text"] ?? "")),
+            null => "",
+            _ => content.ToString()
+        };
+
+        /// <summary>Cuts <paramref name="text"/> to <paramref name="max"/> characters.</summary>
+        /// <param name="text">The text.</param>
+        /// <param name="max">Maximum length.</param>
+        /// <returns>The text, with "…" if it was cut.</returns>
+        private static string Shorten(string text, int max) =>
+            text.Length <= max ? text : text.Substring(0, max - 1) + "…";
+
+        /// <summary>Quotes a command-line argument for Windows.</summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>The quoted argument.</returns>
+        private static string Quote(string argument) => "\"" + argument.Replace("\"", "\\\"") + "\"";
+
+        #endregion
+    }
+}
+#endif
