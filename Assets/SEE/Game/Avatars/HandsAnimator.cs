@@ -135,51 +135,50 @@ namespace SEE.Game.Avatars
         private readonly MediaPipeHandLandmarks handLandmarks = new();
 
         /// <summary>
-        /// Tracks the number of frames in which right hand is not detected by MediaPipe.
-        /// Used to determine when a hand has been lost for too long and should be reset to a neutral position.
+        /// Tracks how long right hand is not detected by MediaPipe.
+        /// Used to determine when a hand has been lost for too long, triggering a reset to the neutral position.
         /// </summary>
-        private int rightHandLostFrames = 0;
+        private float rightHandLostTime = 0f;
 
         /// <summary>
-        /// Number of frames the right hand has been continuously detected.
+        /// Tracks how long the right hand has been continuously detected.
         /// Used to ensure that the presence of the hand in the camera picture is stable before animating the avatar.
         /// </summary>
-        private int rightHandDetectedFrames = 0;
+        private float rightHandDetectedTime = 0f;
 
         /// <summary>
-        /// Tracks the number of frames in which left hand is not detected by MediaPipe.
-        /// Used to determine when a hand has been lost for too long and should be reset to a neutral position.
-        private int leftHandLostFrames = 0;
-
-        /// <summary>
-        /// Number of frames the left hand has been continuously detected.
+        /// Tracks how long the left hand has been continuously detected.
         /// Used to ensure that the presence of the hand in the camera picture is stable before animating the avatar.
         /// </summary>
-        private int leftHandDetectedFrames = 0;
+        private float leftHandDetectedTime = 0f;
 
         /// <summary>
-        /// Maximum number of lost frames allowed before assigning a neutral hand position
-        /// to the avatar.
+        /// Tracks how long the left hand is not detected by MediaPipe.
+        /// Used to determine when a hand has been lost for too long, triggering a reset to the neutral position.
+        private float leftHandLostTime = 0f;
+
+        /// <summary>
+        /// Maximum duration a hand can remain undetected before assigning the neutral hand position to the avatar.
         /// </summary>
-        private const int maxLostFrames = 100;
+        private const float maxLostTime = 1f;
 
         /// <summary>
-        /// Minimum number of consecutive detected frames required before a hand presence is considered valid
-        /// and movement is animated.
+        /// Minimum duration a hand must remain continuously detected before
+        /// its presence is considered valid and movement is animated.
         /// </summary>
-        private const int minDetectedFrames = 50;
+        private const float minDetectedTime = 0.5f;
 
         /// <summary>
-        /// Number of frames the left hand gesture has been continuously detected.
+        /// The time the left hand gesture has been continuously detected.
         /// Used to ensure the gesture is stable before it is applied to the avatar.
         /// </summary>
-        private int leftHandGestureDetectedFrames = 0;
+        private float leftHandGestureDetectedTime = 0f;
 
         /// <summary>
-        /// Number of consecutive frames the left hand gesture has not been detected.
+        /// Tracks how long the left hand gesture has not been detected.
         /// Used to determine when to stop applying the gesture animation.
         /// </summary>
-        private int leftHandGestureLostFrames = 0;
+        private float leftHandGestureLostTime = 0f;
 
         /// <summary>
         /// Indicates whether a gesture was successfully recognized for the left hand by the MediaPipe <see cref="GestureRecognizer"/> model.
@@ -190,16 +189,16 @@ namespace SEE.Game.Avatars
         private bool wasLeftHandGestureRecognized = false;
 
         /// <summary>
-        /// Number of frames the right hand gesture has been continuously detected.
+        /// Tracks how long the right hand gesture has been continuously detected.
         /// Used to ensure the gesture is stable before it is applied to the avatar.
         /// </summary>
-        private int rightHandGestureDetectedFrames = 0;
+        private float rightHandGestureDetectedTime = 0f;
 
         /// <summary>
-        /// Number of consecutive frames the right hand gesture has not been detected.
+        /// Tracks how long the right hand gesture has not been detected.
         /// Used to determine when to stop applying the gesture animation.
         /// </summary>
-        private int rightHandGestureLostFrames = 0;
+        private float rightHandGestureLostTime = 0f;
 
         /// <summary>
         /// Indicates whether a gesture was successfully recognized for the right hand by the MediaPipe <see cref="GestureRecognizer"/> model.
@@ -210,16 +209,16 @@ namespace SEE.Game.Avatars
         private bool wasRightHandGestureRecognized = false;
 
         /// <summary>
-        /// Minimum number of consecutive detected frames required before a gesture is considered valid
-        /// and applied to the avatar.
+        /// Minimum duration a gesture must remain continuously detected before
+        /// it is considered valid and applied to the avatar.
         /// </summary>
-        private const int minGestureDetectedFrames = 50;
+        private const float minGestureDetectedTime = 1f;
 
         /// <summary>
-        /// Maximum number of consecutive lost frames allowed before a gesture is considered stopped
+        /// Maximum duration a gesture can remain undetected before it is considered unvalid
         /// and the animation of the gesture is disabled.
         /// </summary>
-        private const int maxGestureLostFames = 150;
+        private const float maxGestureLostTime = 1f;
 
         /// <summary>
         /// Indicates whether the first set of detected left hand landmark coordinates has been received.
@@ -487,11 +486,12 @@ namespace SEE.Game.Avatars
             // If the probability with which the left hand is in the picture is acceptable for animation.
             if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability && mediapipeLeftHandPosition.visibility > acceptableHandPresenceProbability)
             {
-                leftHandDetectedFrames++;
-                leftHandLostFrames = Math.Max(leftHandLostFrames / 2, 1);
+                leftHandDetectedTime += Time.deltaTime;
+                leftHandLostTime = Math.Max(0.0001f, leftHandLostTime/2);
 
                 // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
-                if (leftHandDetectedFrames > minDetectedFrames || wasLeftHandGestureRecognized)
+                //if (leftHandDetectedFrames > minDetectedFrames || wasLeftHandGestureRecognized)
+                if (leftHandDetectedTime >= minDetectedTime || wasLeftHandGestureRecognized)
                 {
                     if (ik.solver.leftHandEffector.positionWeight <= 0.95f || ik.solver.leftArmChain.bendConstraint.weight <= 0.37f)
                     {
@@ -579,9 +579,9 @@ namespace SEE.Game.Avatars
             // and no gesture was recognized, assign the neutral position.
             else if (!wasLeftHandGestureRecognized)
             {
-                leftHandLostFrames++;
-                leftHandDetectedFrames = Mathf.Max(leftHandDetectedFrames - 1, 0);
-                if (leftHandLostFrames >= maxLostFrames)
+                leftHandLostTime += Time.deltaTime;
+                leftHandDetectedTime = Math.Max(0f, leftHandDetectedTime - Time.deltaTime);
+                if (leftHandLostTime >= maxLostTime)
                 {
                     if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f)
                     {
@@ -600,11 +600,11 @@ namespace SEE.Game.Avatars
             /// to incorrectly stay in a gesture state instead of returning to the neutral position.
             else
             {
-                leftHandGestureDetectedFrames = Mathf.Max(leftHandGestureDetectedFrames - 1, 0);
-                leftHandGestureLostFrames++;
+                leftHandGestureDetectedTime = Mathf.Max(leftHandGestureDetectedTime - Time.deltaTime, 0);
+                leftHandGestureLostTime += Time.deltaTime;
             }
 
-            if (leftHandGestureLostFrames >= maxGestureLostFames)
+            if (leftHandGestureLostTime >= maxGestureLostTime)
             {
                 wasLeftHandGestureRecognized = false;
             }
@@ -612,11 +612,11 @@ namespace SEE.Game.Avatars
             // If the probability with which the right hand is in the picture is acceptable for animation.
             if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability && mediapipeRightHandPosition.visibility > acceptableHandPresenceProbability)
             {
-                rightHandDetectedFrames++;
-                rightHandLostFrames = Math.Max(rightHandLostFrames / 2, 1);
+                rightHandDetectedTime += Time.deltaTime;
+                rightHandLostTime = Math.Max(0.0001f, rightHandLostTime / 2);
 
                 // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
-                if (rightHandDetectedFrames > minDetectedFrames || wasRightHandGestureRecognized)
+                if (rightHandDetectedTime > minDetectedTime || wasRightHandGestureRecognized)
                 {
                     if (ik.solver.rightHandEffector.positionWeight <= 0.95f || ik.solver.rightArmChain.bendConstraint.weight <= 0.37f)
                     {
@@ -704,9 +704,9 @@ namespace SEE.Game.Avatars
             // and no gesture was recognized, assign the neutral position.
             else if (!wasRightHandGestureRecognized)
             {
-                rightHandLostFrames++;
-                rightHandDetectedFrames = Mathf.Max(rightHandDetectedFrames - 1, 0);
-                if (rightHandLostFrames >= maxLostFrames)
+                rightHandLostTime += Time.deltaTime;
+                rightHandDetectedTime = Math.Max(0f, rightHandDetectedTime - Time.deltaTime);
+                if (rightHandLostTime>= maxLostTime)
                 {
                     if (ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
                     {
@@ -725,11 +725,11 @@ namespace SEE.Game.Avatars
             /// to incorrectly stay in a gesture state instead of returning to the neutral position.
             else
             {
-                rightHandGestureDetectedFrames = Mathf.Max(rightHandGestureDetectedFrames - 1, 0);
-                rightHandGestureLostFrames++;
+                rightHandGestureDetectedTime = Mathf.Max(rightHandGestureDetectedTime - Time.deltaTime, 0);
+                rightHandGestureLostTime += Time.deltaTime;
             }
 
-            if (rightHandGestureLostFrames >= maxGestureLostFames)
+            if (rightHandGestureLostTime >= maxGestureLostTime)
             {
                 wasRightHandGestureRecognized = false;
             }
@@ -776,7 +776,7 @@ namespace SEE.Game.Avatars
             }
 
             // If the left hand was detected, get world coordinates of the keypoints.
-            if (leftHandResultIndex >= 0 && leftHandLostFrames < maxLostFrames)
+            if (leftHandResultIndex >= 0 && leftHandLostTime < maxLostTime)
             {
                 // Use filtered landmarks for animation.
                 ApplyFiterToLeftHandLandmarks(resultGestureRecognizer, samplingTimes);
@@ -850,10 +850,10 @@ namespace SEE.Game.Avatars
                 // If the thumb up or thumb down gesture was recognized, animate accordingly.
                 if (leftHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
                 {
-                    leftHandGestureDetectedFrames++;
-                    leftHandGestureLostFrames = 0;
+                    leftHandGestureDetectedTime += Time.deltaTime;
+                    leftHandGestureLostTime = 0f;
 
-                    if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
+                    if (leftHandGestureDetectedTime >= minGestureDetectedTime && leftHandGestureLostTime <= maxGestureLostTime)
                     {
                         wasLeftHandGestureRecognized = true;
 
@@ -917,10 +917,10 @@ namespace SEE.Game.Avatars
                 }
                 else if (leftHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
                 {
-                    leftHandGestureDetectedFrames++;
-                    leftHandGestureLostFrames = 0;
+                    leftHandGestureDetectedTime += Time.deltaTime;
+                    leftHandGestureLostTime = 0f;
 
-                    if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
+                    if (leftHandGestureDetectedTime >= minGestureDetectedTime && leftHandGestureLostTime <= maxGestureLostTime)
                     {
                         wasLeftHandGestureRecognized = true;
 
@@ -985,11 +985,11 @@ namespace SEE.Game.Avatars
                 // If neither gesture was recognized.
                 else
                 {
-                    leftHandGestureDetectedFrames = Math.Max(leftHandGestureDetectedFrames - 1, 0);
-                    leftHandGestureLostFrames++;
+                    leftHandGestureDetectedTime = Math.Max(leftHandGestureDetectedTime - Time.deltaTime, 0f);
+                    leftHandGestureLostTime += Time.deltaTime;
 
                     // If it is certain that no gesture was recognized, animate the fingers.
-                    if (leftHandGestureDetectedFrames < minGestureDetectedFrames || leftHandGestureLostFrames > maxGestureLostFames)
+                    if (leftHandGestureDetectedTime < minGestureDetectedTime || leftHandGestureLostTime > maxGestureLostTime)
                     {
                         wasLeftHandGestureRecognized = false;
 
@@ -1101,7 +1101,7 @@ namespace SEE.Game.Avatars
             }
 
             // If the right hand was detected, get world coordinates of the keypoints.
-            if (rightHandResultIndex >= 0 && rightHandLostFrames < maxLostFrames)
+            if (rightHandResultIndex >= 0 && rightHandLostTime < maxLostTime)
             {
                 // Use filtered landmarks for animation.
                 ApplyFiterToRightHandLandmarks(resultGestureRecognizer, samplingTimes);
@@ -1175,10 +1175,10 @@ namespace SEE.Game.Avatars
                 // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
                 if (rightHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
                 {
-                    rightHandGestureDetectedFrames++;
-                    rightHandGestureLostFrames = 0;
+                    rightHandGestureDetectedTime += Time.deltaTime;
+                    rightHandGestureLostTime = 0f;
 
-                    if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
+                    if (rightHandGestureDetectedTime >= minGestureDetectedTime && rightHandGestureLostTime <= maxGestureLostTime)
                     {
                         wasRightHandGestureRecognized = true;
 
@@ -1242,10 +1242,10 @@ namespace SEE.Game.Avatars
                 }
                 else if (rightHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
                 {
-                    rightHandGestureDetectedFrames++;
-                    rightHandGestureLostFrames = 0;
+                    rightHandGestureDetectedTime += Time.deltaTime;
+                    rightHandGestureLostTime = 0f;
 
-                    if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
+                    if (rightHandGestureDetectedTime >= minGestureDetectedTime && rightHandGestureLostTime <= maxGestureLostTime)
                     {
                         wasRightHandGestureRecognized = true;
 
@@ -1310,11 +1310,11 @@ namespace SEE.Game.Avatars
                 // If neither gesture was recognized.
                 else
                 {
-                    rightHandGestureDetectedFrames = Mathf.Max(rightHandGestureDetectedFrames - 1, 0);
-                    rightHandGestureLostFrames++;
+                    rightHandGestureDetectedTime = Mathf.Max(rightHandGestureDetectedTime - Time.deltaTime, 0f);
+                    rightHandGestureLostTime += Time.deltaTime;
 
                     // If it is certain that no gesture was recognized, animate the fingers.
-                    if (rightHandGestureDetectedFrames < minGestureDetectedFrames || rightHandGestureLostFrames > maxGestureLostFames)
+                    if (rightHandGestureDetectedTime < minGestureDetectedTime || rightHandGestureLostTime > maxGestureLostTime)
                     {
                         wasRightHandGestureRecognized = false;
 
