@@ -578,7 +578,7 @@ namespace SEE.Tools.LSP
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
-                edge.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
             }
             return;
 
