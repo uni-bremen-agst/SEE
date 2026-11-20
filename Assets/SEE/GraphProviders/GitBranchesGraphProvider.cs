@@ -78,6 +78,7 @@ namespace SEE.GraphProviders
         /// <returns>The generated output graph.</returns>
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity, CancellationToken token)
         {
+            Performance p = Performance.Begin($"{nameof(GitBranchesGraphProvider)}.{nameof(GetGraph)}");
             // Note: repositoryPath is platform dependent.
             string repositoryPath = GitRepository.RepositoryPath.Path;
             if (string.IsNullOrWhiteSpace(repositoryPath))
@@ -102,6 +103,7 @@ namespace SEE.GraphProviders
                  AddCoChangeEdges, changePercentage, token);
 
             changePercentage?.Invoke(1f);
+            p.End(true);
 
             return graph;
         }
