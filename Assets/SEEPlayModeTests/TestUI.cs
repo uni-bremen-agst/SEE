@@ -33,6 +33,33 @@ namespace SEE.UI
         private GameObject createdSettings;
 
         /// <summary>
+        /// The UI canvas created by this test when no scene canvas exists.
+        /// </summary>
+        private GameObject createdUICanvas;
+
+        /// <summary>
+        /// Whether the current test owns a UI canvas that must be
+        /// removed during teardown.
+        /// </summary>
+        protected bool OwnsUICanvas => createdUICanvas != null;
+
+        /// <summary>
+        /// Ensures that a UI canvas is available for drawable menus.
+        /// An existing scene canvas is reused and is never owned
+        /// or destroyed by this test fixture.
+        /// </summary>
+        protected void EnsureUICanvas()
+        {
+            if (GameObject.Find("UI Canvas") == null)
+            {
+                createdUICanvas = new GameObject(
+                    "UI Canvas",
+                    typeof(RectTransform),
+                    typeof(Canvas));
+            }
+        }
+
+        /// <summary>
         /// Sets up desktop input in the Play Mode already entered by the test runner.
         /// </summary>
         /// <returns>An enumerator that waits one frame for UI initialization.</returns>
@@ -52,12 +79,23 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Restores settings and removes objects created by the test setup.
+        /// Restores user settings and removes objects created by the
+        /// shared UI test setup, including an optional UI canvas.
+        /// Derived fixtures must release their menus before this
+        /// teardown destroys an owned canvas.
         /// </summary>
-        /// <returns>An enumerator that waits one frame for object destruction.</returns>
+        /// <returns>
+        /// An enumerator that waits for object destruction.
+        /// </returns>
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            if (createdUICanvas != null)
+            {
+                Object.Destroy(createdUICanvas);
+                createdUICanvas = null;
+            }
+
             if (createdSettings != null)
             {
                 Object.Destroy(createdSettings);
@@ -67,6 +105,7 @@ namespace SEE.UI
             {
                 userSetting.InputType = previousInputType;
             }
+
             yield return null;
         }
 

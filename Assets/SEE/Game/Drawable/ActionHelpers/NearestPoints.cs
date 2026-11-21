@@ -48,17 +48,23 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The first nearest point that was found.</returns>
         public static Vector3 GetNearestPoint(GameObject node, Vector3 point)
         {
-            LineRenderer renderer = node.GetComponentInChildren<LineRenderer>();
+            // Mind Map nodes on other pages may be inactive during restoration.
+            // Their line renderers must still be accessible.
+            LineRenderer renderer = node.GetComponentInChildren<LineRenderer>(true);
+
             Vector3[] positions = new Vector3[renderer.positionCount];
             renderer.GetPositions(positions);
+
             Vector3[] transformedPositions = new Vector3[positions.Length];
             Array.Copy(sourceArray: positions, destinationArray: transformedPositions,
                 length: positions.Length);
+
             node.transform.TransformPoints(transformedPositions);
 
-            List<int> Indices = GetNearestIndices(transformedPositions, point);
-            return transformedPositions[Indices[0]];
+            List<int> indices = GetNearestIndices(transformedPositions, point);
+            return transformedPositions[indices[0]];
         }
+
 
         /// <summary>
         /// Calculates the nearest points of a line to a given point.

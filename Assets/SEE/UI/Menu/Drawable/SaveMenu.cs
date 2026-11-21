@@ -30,42 +30,37 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The instance for the save single or more drawable button.
+        /// Creates the save menu and registers the required button handlers.
         /// </summary>
-        private static ButtonManager saveButton;
-
-        /// <summary>
-        /// The instance for the save current page button.
-        /// </summary>
-        private static ButtonManager saveCurrentPageButton;
-
-        /// <summary>
-        /// The instance for the save all drawables button.
-        /// </summary>
-        private static ButtonManager saveAllButton;
-
-        /// <summary>
-        /// Creates the save menu.
-        /// </summary>
-        /// <param name="saveButtonCall">The action that should be executed when the save button is pressed.</param>
-        /// <param name="saveCurrentPageButtonCall">The action that should be executed when the save current page button is pressed.</param>
-        /// <param name="saveAllButtonCall">The action that should be executed when the save all button is pressed.</param>
-        public static void Enable(UnityAction saveButtonCall,
-                                  UnityAction saveCurrentPageButtonCall,
-                                  UnityAction saveAllButtonCall)
+        /// <param name="saveButtonCall">
+        /// The action that should be executed when the save button is pressed.
+        /// </param>
+        /// <param name="saveCurrentPageButtonCall">
+        /// The action that should be executed when the save-current-page button is pressed.
+        /// </param>
+        /// <param name="saveAllButtonCall">
+        /// The action that should be executed when the save-all button is pressed.
+        /// </param>
+        public void Enable(UnityAction saveButtonCall,
+                           UnityAction saveCurrentPageButtonCall,
+                           UnityAction saveAllButtonCall)
         {
-            /// Instantiate the menu.
-            Instance.Instantiate(saveMenuPrefab);
-            saveButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Save").GetComponent<ButtonManager>();
-            saveCurrentPageButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SaveCurrentPage")
-                .GetComponent<ButtonManager>();
-            saveAllButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SaveAll").GetComponent<ButtonManager>();
+            Instantiate(saveMenuPrefab);
 
-            /// Adds a handler for the <paramref name="saveButtonCall"/>.
+            ButtonManager saveButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Save")
+                    .GetComponent<ButtonManager>();
+
+            ButtonManager saveCurrentPageButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveCurrentPage")
+                    .GetComponent<ButtonManager>();
+
+            ButtonManager saveAllButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveAll")
+                    .GetComponent<ButtonManager>();
+
             saveButton.onClick.AddListener(saveButtonCall);
-            /// Adds a handler for the <paramref name="saveCurrentPageButtonCall"/>.
             saveCurrentPageButton.onClick.AddListener(saveCurrentPageButtonCall);
-            /// Adds a handler for the <paramref name="saveAllButtonCall"/>.
             saveAllButton.onClick.AddListener(saveAllButtonCall);
         }
     }
