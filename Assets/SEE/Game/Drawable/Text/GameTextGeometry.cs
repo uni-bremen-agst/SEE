@@ -19,8 +19,11 @@ namespace SEE.Game.Drawable.Text
         /// <param name="fontSize">The used font size.</param>
         /// <param name="style">The used font styles.</param>
         /// <returns>The calculated width of the text.</returns>
-        private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset,
-            float fontSize, FontStyles style)
+        private static float TextWidthApproximation(
+            string text,
+            TMP_FontAsset fontAsset,
+            float fontSize,
+            FontStyles style)
         {
             string result = RichTextRemover.RemoveRichText(text);
 
@@ -69,8 +72,11 @@ namespace SEE.Game.Drawable.Text
         /// <param name="fontSize">The used font size.</param>
         /// <param name="styles">The used font styles.</param>
         /// <returns>The calculated width and height.</returns>
-        internal static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset,
-            float fontSize, FontStyles styles)
+        internal static Vector2 CalculateWidthAndHeight(
+            string text,
+            TMP_FontAsset fontAsset,
+            float fontSize,
+            FontStyles styles)
         {
             string[] split = text.Split(
                 new string[] { "\n", "<br>" },
