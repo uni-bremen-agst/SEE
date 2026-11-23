@@ -24,9 +24,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="parent">
         /// The value holder of the parent node from which the new layer is derived.
         /// </param>
-        internal static void UpdateMindMapLayer(
-            MMNodeValueHolder holder,
-            MMNodeValueHolder parent)
+        internal static void UpdateMindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
         {
             int oldLayer = holder.Layer;
             holder.Layer = parent.Layer + 1;
@@ -35,8 +33,7 @@ namespace SEE.Game.Drawable.MindMap
             {
                 foreach (GameObject child in holder.GetChildren().Keys)
                 {
-                    MMNodeValueHolder childHolder =
-                        child.GetComponent<MMNodeValueHolder>();
+                    MMNodeValueHolder childHolder = child.GetComponent<MMNodeValueHolder>();
 
                     UpdateMindMapLayer(childHolder, holder);
                 }
@@ -61,30 +58,21 @@ namespace SEE.Game.Drawable.MindMap
         /// True if both objects are Mind Map nodes and assigning
         /// <paramref name="parent"/> would not create a cycle; otherwise false.
         /// </returns>
-        public static bool ParentChangeIsValid(
-            GameObject child,
-            GameObject parent,
-            bool result = true)
+        public static bool ParentChangeIsValid(GameObject child, GameObject parent, bool result = true)
         {
             if (child.CompareTag(Tags.MindMapNode)
                 && parent.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder valueHolder =
-                    child.GetComponent<MMNodeValueHolder>();
+                MMNodeValueHolder valueHolder = child.GetComponent<MMNodeValueHolder>();
 
                 if (child == parent)
                 {
                     result = false;
                 }
 
-                foreach (KeyValuePair<GameObject, GameObject> pair
-                         in valueHolder.GetChildren())
+                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetChildren())
                 {
-                    result = result
-                        && ParentChangeIsValid(
-                            pair.Key,
-                            parent,
-                            result);
+                    result = result && ParentChangeIsValid(pair.Key, parent, result);
                 }
 
                 return result;
@@ -119,13 +107,9 @@ namespace SEE.Game.Drawable.MindMap
         /// can act as its parent. Changing a theme to a leaf additionally
         /// requires that it has no children.
         /// </remarks>
-        public static bool CheckValidNodeKindChange(
-            GameObject node,
-            MindMapNodeKind newNodeKind,
-            MindMapNodeKind oldNodeKind)
+        public static bool CheckValidNodeKindChange(GameObject node, MindMapNodeKind newNodeKind, MindMapNodeKind oldNodeKind)
         {
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
             if (oldNodeKind == MindMapNodeKind.Theme)
             {
@@ -182,14 +166,11 @@ namespace SEE.Game.Drawable.MindMap
         /// A drawable configuration containing the selected node, all descendants,
         /// and their branch lines, or null if <paramref name="node"/> is not a Mind Map node.
         /// </returns>
-        public static DrawableConfig SummarizeSelectedNodeIncChildren(
-            GameObject node)
+        public static DrawableConfig SummarizeSelectedNodeIncChildren(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                DrawableConfig conf =
-                    DrawableConfigManager.GetDrawableConfig(
-                        GameFinder.GetDrawableSurface(node));
+                DrawableConfig conf = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(node));
 
                 conf.TextConfigs.Clear();
                 conf.ImageConfigs.Clear();
@@ -201,17 +182,13 @@ namespace SEE.Game.Drawable.MindMap
                     MindMapNodeConf.GetNodeConf(node)
                 };
 
-                MMNodeValueHolder valueHolder =
-                    node.GetComponent<MMNodeValueHolder>();
+                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
-                foreach (KeyValuePair<GameObject, GameObject> pair
-                         in valueHolder.GetAllChildren())
+                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                 {
-                    selectedNodes.Add(
-                        MindMapNodeConf.GetNodeConf(pair.Key));
+                    selectedNodes.Add(MindMapNodeConf.GetNodeConf(pair.Key));
 
-                    selectedBranchLines.Add(
-                        LineConf.GetLine(pair.Value));
+                    selectedBranchLines.Add(LineConf.GetLine(pair.Value));
                 }
 
                 conf.LineConfigs = selectedBranchLines;

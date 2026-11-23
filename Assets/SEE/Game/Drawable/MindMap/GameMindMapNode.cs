@@ -28,8 +28,14 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="position">The position for the node.</param>
         /// <param name="associatedPage">The associated surface page for this object.</param>
         /// <param name="node">The created node.</param>
-        private static void Setup(GameObject surface, string name, string prefix, string writtenText,
-            Vector3 position, int associatedPage, out GameObject node)
+        private static void Setup(
+            GameObject surface,
+            string name,
+            string prefix,
+            string writtenText,
+            Vector3 position,
+            int associatedPage,
+            out GameObject node)
         {
             if (name.Length > prefix.Length)
             {
@@ -61,17 +67,16 @@ namespace SEE.Game.Drawable.MindMap
             text.transform.SetParent(node.transform);
             border.transform.SetParent(node.transform);
 
-            node.transform.position = position - node.transform.forward * ValueHolder.DistanceToDrawable.z *
-                            border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-            node.AddComponent<OrderInLayerValueHolder>()
-                .OrderInLayer = border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            node.transform.position = position - node.transform.forward * ValueHolder.DistanceToDrawable.z
+                * border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            node.AddComponent<OrderInLayerValueHolder>().OrderInLayer =
+                border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
             border.transform.localPosition = Vector3.zero;
             border.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
 
             // TextMeshPro does not inherit the order in layer from the node.
-            text.GetComponent<TextMeshPro>().sortingOrder =
-                node.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            text.GetComponent<TextMeshPro>().sortingOrder = node.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
             // Text and border must only be editable through the Mind Map node.
             text.GetComponent<MeshCollider>().enabled = false;
@@ -122,7 +127,10 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="text">The text object used to determine the border dimensions.</param>
         /// <param name="prefix">The ID prefix determining the border appearance.</param>
         /// <returns>The created border.</returns>
-        private static GameObject CreateMindMapBorder(GameObject surface, Vector3 position, GameObject text,
+        private static GameObject CreateMindMapBorder(
+            GameObject surface,
+            Vector3 position,
+            GameObject text,
             string prefix)
         {
             GameObject shape;
@@ -146,8 +154,8 @@ namespace SEE.Game.Drawable.MindMap
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
 
             shape = GameLineDrawer.DrawLine(surface, "", positions, ColorKind.Monochrome,
-                        lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
-                        lineKind, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
+                lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
+                lineKind, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
 
             shape = GameLineGeometry.SetPivotShape(shape, convertedHitPoint, updateOriginalAnchors: true);
             return shape;
@@ -285,8 +293,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="borderConf">
         /// The previous border configuration that should be preserved when applicable.
         /// </param>
-        internal static void ApplyNodeKindAppearance(GameObject node, MindMapNodeKind newNodeKind,
-            LineConf borderConf = null)
+        internal static void ApplyNodeKindAppearance(GameObject node, MindMapNodeKind newNodeKind, LineConf borderConf = null)
         {
             GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
             GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);
@@ -299,8 +306,7 @@ namespace SEE.Game.Drawable.MindMap
                     ellipse = true;
                     GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
                     GameTextEdit.ChangeFontSize(nodeText, 1.0f);
-                    GameLineAppearance.ChangeLineKind(
-                        nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
                     GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                     break;
@@ -308,8 +314,7 @@ namespace SEE.Game.Drawable.MindMap
                 case MindMapNodeKind.Subtheme:
                     GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                     GameTextEdit.ChangeFontSize(nodeText, 0.7f);
-                    GameLineAppearance.ChangeLineKind(
-                        nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.black);
                     GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.black);
                     break;
@@ -318,8 +323,7 @@ namespace SEE.Game.Drawable.MindMap
                     ellipse = true;
                     GameTextEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                     GameTextEdit.ChangeFontSize(nodeText, 0.5f);
-                    GameLineAppearance.ChangeLineKind(
-                        nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
+                    GameLineAppearance.ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
                     GameLineAppearance.ChangePrimaryColor(nodeBorder, Color.clear);
                     GameLineAppearance.ChangeSecondaryColor(nodeBorder, Color.clear);
                     break;
@@ -354,9 +358,7 @@ namespace SEE.Game.Drawable.MindMap
         private static void ChangeName(GameObject node, MindMapNodeKind newNodeKind)
         {
             MindMapNodeKind oldNodeKind = node.GetComponent<MMNodeValueHolder>().NodeKind;
-            node.name = node.name.Replace(
-                GetPrefix(oldNodeKind),
-                GetPrefix(newNodeKind));
+            node.name = node.name.Replace(GetPrefix(oldNodeKind), GetPrefix(newNodeKind));
         }
 
         /// <summary>
@@ -461,8 +463,7 @@ namespace SEE.Game.Drawable.MindMap
             border.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
             text.GetComponent<AssociatedPageHolder>().AssociatedPage = conf.AssociatedPage;
 
-            createdNode.SetActive(
-                conf.AssociatedPage == holder.CurrentPage);
+            createdNode.SetActive(conf.AssociatedPage == holder.CurrentPage);
 
             return createdNode;
         }
