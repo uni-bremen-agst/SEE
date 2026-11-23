@@ -30,9 +30,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         /// <param name="controls">The controls to configure.</param>
         /// <param name="state">The state determining the current layout.</param>
-        internal ShapeMenuLayout(
-            ShapeMenuControls controls,
-            ShapeMenuState state)
+        internal ShapeMenuLayout(ShapeMenuControls controls, ShapeMenuState state)
         {
             this.controls = controls;
             this.state = state;
@@ -48,48 +46,20 @@ namespace SEE.UI.Menu.Drawable.Shapes
             ResetAllValues();
             DisableAllValues();
 
-            ShapeMenuLayoutRule rule =
-                ShapeMenuLayoutRules.Get(
-                    state.SelectedShape,
-                    state.SelectedUMLShape);
+            ShapeMenuLayoutRule rule = ShapeMenuLayoutRules.Get(state.SelectedShape, state.SelectedUMLShape);
 
-            ApplyValueLayout(
-                controls.Value1Object,
-                rule.Value1);
-
-            ApplyValueLayout(
-                controls.Value2Object,
-                rule.Value2);
-
-            ApplyValueLayout(
-                controls.Value3Object,
-                rule.Value3);
-
-            ApplyValueLayout(
-                controls.Value4Object,
-                rule.Value4);
-
-            ApplyValueLayout(
-                controls.Angle1Object,
-                rule.Angle1);
-
-            ApplyValueLayout(
-                controls.Angle2Object,
-                rule.Angle2);
-
-            ApplyValueLayout(
-                controls.OffsetObject,
-                rule.Offset);
-
-            ApplyValueLayout(
-                controls.VerticesObject,
-                rule.Vertices);
+            ApplyValueLayout(controls.Value1Object, rule.Value1);
+            ApplyValueLayout(controls.Value2Object, rule.Value2);
+            ApplyValueLayout(controls.Value3Object, rule.Value3);
+            ApplyValueLayout(controls.Value4Object, rule.Value4);
+            ApplyValueLayout(controls.Angle1Object, rule.Angle1);
+            ApplyValueLayout(controls.Angle2Object, rule.Angle2);
+            ApplyValueLayout(controls.OffsetObject, rule.Offset);
+            ApplyValueLayout(controls.VerticesObject, rule.Vertices);
 
             if (rule.ShowBool)
             {
-                ActivateAndConfigureValue(
-                    controls.BoolValueObject,
-                    rule.BoolIdentifier);
+                ActivateAndConfigureValue(controls.BoolValueObject, rule.BoolIdentifier);
             }
 
             if (rule.ShowLineStart)
@@ -106,8 +76,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
             {
                 if (rule.DefaultOrientation.HasValue)
                 {
-                    ActivateAndConfigureOrientation(
-                        rule.DefaultOrientation.Value);
+                    ActivateAndConfigureOrientation(rule.DefaultOrientation.Value);
                 }
                 else
                 {
@@ -115,22 +84,16 @@ namespace SEE.UI.Menu.Drawable.Shapes
                 }
             }
 
-            controls.UMLShapeSelectorObject.SetActive(
-                rule.ShowUMLSelector);
-
-            controls.InfoObject.SetActive(
-                rule.ShowInfo);
-
-            controls.FinishObject.SetActive(
-                rule.ShowFinish);
+            controls.UMLShapeSelectorObject.SetActive(rule.ShowUMLSelector);
+            controls.InfoObject.SetActive(rule.ShowInfo);
+            controls.FinishObject.SetActive(rule.ShowFinish);
 
             if (rule.MoveBoolToLinePosition)
             {
                 MoveBoolValueToLinePosition();
             }
 
-            MenuHelper.CalculateHeight(
-                controls.MenuObject);
+            MenuHelper.CalculateHeight(controls.MenuObject);
         }
 
         /// <summary>
@@ -172,9 +135,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
             ResetSelector(controls.LineStartSelector);
             ResetSelector(controls.LineEndSelector);
 
-            SetLineCaps(
-                LineCapConf.CreateNone(),
-                LineCapConf.CreateNone());
+            SetLineCaps(LineCapConf.CreateNone(), LineCapConf.CreateNone());
 
             state.Orientation = Orientation.Up;
         }
@@ -209,8 +170,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         private void RestoreBoolValuePosition()
         {
-            controls.BoolValueObject.transform.SetSiblingIndex(
-                controls.BoolValueDefaultSiblingIndex);
+            controls.BoolValueObject.transform.SetSiblingIndex(controls.BoolValueDefaultSiblingIndex);
         }
 
         /// <summary>
@@ -218,19 +178,16 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         private void MoveBoolValueToLinePosition()
         {
-            int boolIndex =
-                controls.BoolValueObject.transform.GetSiblingIndex();
+            int boolIndex = controls.BoolValueObject.transform.GetSiblingIndex();
 
-            int finishIndex =
-                controls.FinishObject.transform.GetSiblingIndex();
+            int finishIndex = controls.FinishObject.transform.GetSiblingIndex();
 
             if (boolIndex < finishIndex)
             {
                 finishIndex--;
             }
 
-            controls.BoolValueObject.transform.SetSiblingIndex(
-                finishIndex);
+            controls.BoolValueObject.transform.SetSiblingIndex(finishIndex);
         }
 
         /// <summary>
@@ -258,10 +215,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
             if (!string.IsNullOrWhiteSpace(identifier))
             {
-                TMP_Text tmpText =
-                    valueObject
-                        .GetComponentsInChildren<TMP_Text>()
-                        .FirstOrDefault();
+                TMP_Text tmpText = valueObject.GetComponentsInChildren<TMP_Text>().FirstOrDefault();
 
                 if (tmpText != null)
                 {
@@ -271,13 +225,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
 
             if (defaultValue.HasValue)
             {
-                SliderManager sliderManager =
-                    valueObject.GetComponentInChildren<SliderManager>();
+                SliderManager sliderManager = valueObject.GetComponentInChildren<SliderManager>();
 
                 if (sliderManager != null)
                 {
-                    sliderManager.mainSlider.value =
-                        defaultValue.Value;
+                    sliderManager.mainSlider.value = defaultValue.Value;
                 }
             }
         }
@@ -288,15 +240,13 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="defaultOrientation">
         /// The default orientation.
         /// </param>
-        private void ActivateAndConfigureOrientation(
-            Orientation defaultOrientation)
+        private void ActivateAndConfigureOrientation(Orientation defaultOrientation)
         {
             SetOrientationActive(true);
 
             state.Orientation = defaultOrientation;
 
-            int index =
-                GetOrientations().IndexOf(defaultOrientation);
+            int index = GetOrientations().IndexOf(defaultOrientation);
 
             controls.OrientationSelector.index = index;
             controls.OrientationSelector.defaultIndex = index;
@@ -313,19 +263,14 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="valueLayout">
         /// The layout to apply, or null if the control should stay disabled.
         /// </param>
-        private static void ApplyValueLayout(
-            GameObject valueObject,
-            ShapeMenuValueLayout valueLayout)
+        private static void ApplyValueLayout(GameObject valueObject, ShapeMenuValueLayout valueLayout)
         {
             if (valueLayout == null)
             {
                 return;
             }
 
-            ActivateAndConfigureValue(
-                valueObject,
-                valueLayout.Identifier,
-                valueLayout.DefaultValue);
+            ActivateAndConfigureValue(valueObject, valueLayout.Identifier, valueLayout.DefaultValue);
         }
 
         /// <summary>
@@ -336,10 +281,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </param>
         private void SetLineStartActive(bool isActive)
         {
-            SetUIElementActive(
-                controls.LineStartObject,
-                controls.LineStartTextObject,
-                isActive);
+            SetUIElementActive(controls.LineStartObject, controls.LineStartTextObject, isActive);
         }
 
         /// <summary>
@@ -350,10 +292,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </param>
         private void SetLineEndActive(bool isActive)
         {
-            SetUIElementActive(
-                controls.LineEndObject,
-                controls.LineEndTextObject,
-                isActive);
+            SetUIElementActive(controls.LineEndObject, controls.LineEndTextObject, isActive);
         }
 
         /// <summary>
@@ -364,10 +303,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </param>
         private void SetOrientationActive(bool isActive)
         {
-            SetUIElementActive(
-                controls.OrientationObject,
-                controls.OrientationTextObject,
-                isActive);
+            SetUIElementActive(controls.OrientationObject, controls.OrientationTextObject, isActive);
         }
 
         /// <summary>
@@ -396,9 +332,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="endCapConf">
         /// The end line-cap configuration.
         /// </param>
-        internal void SetLineCaps(
-            LineCapConf startCapConf,
-            LineCapConf endCapConf)
+        internal void SetLineCaps(LineCapConf startCapConf, LineCapConf endCapConf)
         {
             SetLineStartCap(startCapConf);
             SetLineEndCap(endCapConf);
@@ -414,9 +348,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         {
             state.SetLineStartCap(capConf);
 
-            SetSelectorIndex(
-                controls.LineStartSelector,
-                GetAllLineCaps().IndexOf(state.GetLineStartCap()));
+            SetSelectorIndex(controls.LineStartSelector, GetAllLineCaps().IndexOf(state.GetLineStartCap()));
         }
 
         /// <summary>
@@ -429,9 +361,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         {
             state.SetLineEndCap(capConf);
 
-            SetSelectorIndex(
-                controls.LineEndSelector,
-                GetAllLineCaps().IndexOf(state.GetLineEndCap()));
+            SetSelectorIndex(controls.LineEndSelector, GetAllLineCaps().IndexOf(state.GetLineEndCap()));
         }
 
         /// <summary>
@@ -450,9 +380,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         /// <param name="selector">The selector to update.</param>
         /// <param name="index">The index to select.</param>
-        private static void SetSelectorIndex(
-            HorizontalSelector selector,
-            int index)
+        private static void SetSelectorIndex(HorizontalSelector selector, int index)
         {
             if (selector == null || index < 0)
             {

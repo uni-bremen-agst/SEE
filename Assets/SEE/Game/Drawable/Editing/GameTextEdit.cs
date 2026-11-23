@@ -64,12 +64,8 @@ namespace SEE.Game.Drawable.Editing
             {
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.fontSize = fontSize;
-                textMesh.rectTransform.sizeDelta =
-                    GameTextGeometry.CalculateWidthAndHeight(
-                        textMesh.text,
-                        textMesh.font,
-                        fontSize,
-                        textMesh.fontStyle);
+                textMesh.rectTransform.sizeDelta = GameTextGeometry.CalculateWidthAndHeight(
+                    textMesh.text, textMesh.font, fontSize, textMesh.fontStyle);
 
                 textMesh.ForceMeshUpdate(true);
                 GameTextGeometry.RefreshMeshCollider(textObj);
@@ -90,12 +86,8 @@ namespace SEE.Game.Drawable.Editing
             {
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
                 textMesh.fontStyle = styles;
-                textMesh.rectTransform.sizeDelta =
-                    GameTextGeometry.CalculateWidthAndHeight(
-                        textMesh.text,
-                        textMesh.font,
-                        textMesh.fontSize,
-                        textMesh.fontStyle);
+                textMesh.rectTransform.sizeDelta = GameTextGeometry.CalculateWidthAndHeight(
+                    textMesh.text, textMesh.font, textMesh.fontSize, textMesh.fontStyle);
 
                 textMesh.ForceMeshUpdate(true);
                 GameTextGeometry.RefreshMeshCollider(textObj);
