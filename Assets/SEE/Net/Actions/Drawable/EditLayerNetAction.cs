@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.StickyNote;
 using SEE.Extensions;
 using UnityEngine;
 
@@ -45,11 +46,11 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (TryFindChild(TypeName, out GameObject typeName))
             {
-                GameEdit.ChangeLayer(typeName, OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(typeName, OrderInLayer);
             }
             else
             {
-                GameStickyNoteManager.ChangeLayer(Surface.GetRootParent(), OrderInLayer);
+                GameStickyNoteEdit.ChangeLayer(Surface.GetRootParent(), OrderInLayer);
             }
         }
     }

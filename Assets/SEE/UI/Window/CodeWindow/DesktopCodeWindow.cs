@@ -184,7 +184,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Right-click opens menu with LSP actions.
                 if (Input.GetMouseButtonDown(1))
                 {
-                    if (lspHandler != null)
+                    if (LspAvailable)
                     {
                         // We use the word detection instead of the character detection because the latter
                         // needs the cursor to be precisely over a character, while the former works more broadly.
@@ -192,7 +192,11 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             int character = word.firstCharacterIndex;
                             (int line, int column) = GetSourcePosition(character);
-                            contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
+                            if (column > 0)
+                            {
+                                contextMenu ??= ContextMenuHandler.FromCodeWindow(this);
+                                contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
+                            }
                         }
                         return;
                     }
@@ -213,7 +217,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Detect hovering over words (only while the code window is not being scrolled).
                 if (scrollingTo == 0 && !lastHoveredWord.Equals(hoveredWord))
                 {
-                    if (lspHandler != null)
+                    if (LspAvailable)
                     {
                         TriggerLspHoverAsync(hoveredWord).Forget();
                     }
@@ -309,8 +313,16 @@ namespace SEE.UI.Window.CodeWindow
 
             void GoToDefinition(TMP_WordInfo word)
             {
+                if (!LspAvailable)
+                {
+                    return;
+                }
                 (int line, int column) = GetSourcePosition(word.firstCharacterIndex);
-                contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
+                if (column > 0)
+                {
+                    contextMenu ??= ContextMenuHandler.FromCodeWindow(this);
+                    contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
+                }
             }
         }
 
@@ -381,6 +393,13 @@ namespace SEE.UI.Window.CodeWindow
         }
 
         /// <summary>
+        /// True if this code window uses the language server and the server is currently running,
+        /// i.e., LSP-based navigation and hover information are available. The server may have
+        /// been shut down after this window was opened, in which case its client is gone.
+        /// </summary>
+        private bool LspAvailable => lspHandler != null && lspHandler.ServerCapabilities != null;
+
+        /// <summary>
         /// Removes listeners.
         /// </summary>
         protected override void OnDestroy()
@@ -404,9 +423,68 @@ namespace SEE.UI.Window.CodeWindow
         /// <returns>The line and column of the source code position of the given <paramref name="characterIndex"/>.</returns>
         private (int line, int column) GetSourcePosition(int characterIndex)
         {
-            int line = textMesh.textInfo.characterInfo[characterIndex].lineNumber;
-            int column = characterIndex - CodeWindowOffsets[line] - neededPadding;
+            if (characterIndex < 0 || characterIndex >= textMesh.textInfo.characterCount)
+            {
+                return (0, 0);
+            }
+            // Count rendered source line breaks, not visual wrapping or characters inside rich-text tags.
+            int line = 0;
+            int firstCharacter = 0;
+            for (int i = 0; i < characterIndex; i++)
+            {
+                if (textMesh.textInfo.characterInfo[i].character == '\n')
+                {
+                    line++;
+                    firstCharacter = i + 1;
+                }
+            }
+            if (line >= CodeWindowOffsets.Count)
+            {
+                return (0, 0);
+            }
+            int column = characterIndex - firstCharacter - neededPadding;
+            if (column > 0)
+            {
+                column = ToSourceColumn(line, column);
+            }
             return (line + 1, column);
+        }
+
+        /// <summary>
+        /// Maps the given 1-based <paramref name="renderedColumn"/> in the given 0-based <paramref name="line"/>
+        /// of the code window to the 1-based column in the source file by undoing the expansion
+        /// of tabs to spaces (see <see cref="ExpandedTabs"/>). A rendered column within the spaces
+        /// of an expanded tab is mapped to the column of that tab.
+        /// </summary>
+        /// <param name="line">The 0-based line in the code window.</param>
+        /// <param name="renderedColumn">The 1-based column in the rendered line (after the line number).</param>
+        /// <returns>The 1-based column in the source file.</returns>
+        private int ToSourceColumn(int line, int renderedColumn)
+        {
+            if (line >= ExpandedTabs.Count)
+            {
+                return renderedColumn;
+            }
+            int rendered = renderedColumn - 1;
+            int shift = 0;
+            foreach ((int tabColumn, int width) in ExpandedTabs[line])
+            {
+                if (rendered >= tabColumn + width)
+                {
+                    // The tab lies completely before the rendered column.
+                    shift += width - 1;
+                }
+                else
+                {
+                    if (rendered >= tabColumn)
+                    {
+                        // The rendered column lies within the spaces of this tab.
+                        shift += rendered - tabColumn;
+                    }
+                    break;
+                }
+            }
+            return renderedColumn - shift;
         }
 
         /// <summary>

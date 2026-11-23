@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -41,8 +42,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     {
                         isActive = true;
 
-                        memento = EraseSelectedLinePart(hitObject, raycastHit.point,
-                            GameLineSplit.EraseLinePointConnection);
+                        memento = EraseSelectedLinePart(
+                            hitObject,
+                            raycastHit.point,
+                            GameLineSplit.EraseLinePointConnection,
+                            selectConnection: true);
                     }
                 }
 
@@ -63,7 +67,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             base.Undo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameDrawer.ReDrawLine(surface, memento.OriginalLine);
+            GameLineDrawer.ReDrawLine(surface, memento.OriginalLine);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine).Execute();
 
             foreach (LineConf line in memento.Lines)
@@ -87,7 +91,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameDrawer.ReDrawLine(surface, line);
+                GameLineDrawer.ReDrawLine(surface, line);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, line).Execute();
             }
         }

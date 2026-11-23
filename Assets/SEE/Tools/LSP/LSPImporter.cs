@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using MoreLinq;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Graphs;
 using SEE.Graphs.Utils;
-using SEE.Tools;
 using SEE.Utils;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
@@ -171,7 +171,33 @@ namespace SEE.Tools.LSP
         /// A mapping from file paths to their corresponding range trees.
         /// </summary>
         /// <seealso cref="KDIntervalTree{T}"/>
-        private IDictionary<string, KDIntervalTree<Node>> rangeTrees = new Dictionary<string, KDIntervalTree<Node>>();
+        private IDictionary<string, KDIntervalTree<Node>> rangeTrees = new Dictionary<string, KDIntervalTree<Node>>(PathComparer);
+
+        /// <summary>
+        /// Compares file paths the way the file system does: case-insensitively on Windows,
+        /// case-sensitively elsewhere.
+        /// </summary>
+        private static readonly StringComparer PathComparer =
+            Path.DirectorySeparatorChar == '\\' ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+        /// <summary>
+        /// Returns the key under which the file at the given <paramref name="path"/> is stored in
+        /// <see cref="rangeTrees"/>. Paths from SEE's nodes (e.g., <c>C:\a\b/c.cs</c>) and paths
+        /// converted from LSP URIs (e.g., <c>c:\a\b\c.cs</c>) must map to the same key.
+        /// </summary>
+        /// <param name="path">A local file path.</param>
+        /// <returns>The normalized full path.</returns>
+        private static string PathKey(string path) => Path.GetFullPath(path);
+
+        /// <summary>
+        /// Returns the key under which the file identified by the given <paramref name="uri"/> is stored
+        /// in <see cref="rangeTrees"/>.
+        /// </summary>
+        /// <remarks><see cref="DocumentUri.Path"/> cannot be used here, as it is the URI path
+        /// (e.g., <c>/c:/a/b/c.cs</c> on Windows), not a local file path.</remarks>
+        /// <param name="uri">The URI of a local file.</param>
+        /// <returns>The normalized full path.</returns>
+        private static string PathKey(DocumentUri uri) => PathKey(uri.GetFileSystemPath());
 
         /// <summary>
         /// Number of newly added edges.
@@ -240,46 +266,51 @@ namespace SEE.Tools.LSP
             {
                 string path = relevantDocuments[documentCount];
                 Handler.OpenDocument(path);
-                Node dirNode = AddOrGetDirectoryNode(Path.GetDirectoryName(path), graph);
-                Node symbolParent = dirNode;
-                if (IncludeNodeTypes.HasFlag(NodeKind.File))
+                try
                 {
-                    Node fileNode = new()
+                    Node dirNode = AddOrGetDirectoryNode(Path.GetDirectoryName(path), graph);
+                    Node symbolParent = dirNode;
+                    if (IncludeNodeTypes.HasFlag(NodeKind.File))
                     {
-                        ID = Path.GetRelativePath(Handler.ProjectPath, path)
-                    };
-                    fileNode.SourceName = fileNode.Filename = Path.GetFileName(path);
-                    fileNode.Directory = Path.GetDirectoryName(path);
-                    fileNode.Type = NodeKind.File.ToString();
-                    SetFileLOC(fileNode);
-                    graph.AddNode(fileNode);
-                    fileNode.Reparent(dirNode);
-                    symbolParent = fileNode;
-                    if (supportsPullDiagnostics)
-                    {
-                        IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
-                        if (diagnostics != null)
+                        Node fileNode = new()
                         {
-                            HandleDiagnostics(diagnostics, path);
+                            ID = Path.GetRelativePath(Handler.ProjectPath, path)
+                        };
+                        fileNode.SourceName = fileNode.Filename = Path.GetFileName(path);
+                        fileNode.Directory = Path.GetDirectoryName(path);
+                        fileNode.Type = NodeKind.File.ToString();
+                        SetFileLOC(fileNode);
+                        graph.AddNode(fileNode);
+                        fileNode.Reparent(dirNode);
+                        symbolParent = fileNode;
+                        if (supportsPullDiagnostics)
+                        {
+                            IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
+                            if (diagnostics != null)
+                            {
+                                HandleDiagnostics(diagnostics, path);
+                            }
                         }
                     }
-                }
 
-                IUniTaskAsyncEnumerable<SymbolInformationOrDocumentSymbol> symbols = Handler.DocumentSymbols(path);
-                await foreach (SymbolInformationOrDocumentSymbol symbol in symbols)
-                {
-                    if (symbol.IsDocumentSymbolInformation)
+                    IUniTaskAsyncEnumerable<SymbolInformationOrDocumentSymbol> symbols = Handler.DocumentSymbols(path);
+                    await foreach (SymbolInformationOrDocumentSymbol symbol in symbols)
                     {
-                        Logging.Logger.LogError("This language server emits SymbolInformation, which is deprecated and not "
-                                       + "supported by SEE. Please choose a language server that is capable of "
-                                       + "returning hierarchic DocumentSymbols.\n");
-                        return;
+                        if (symbol.IsDocumentSymbolInformation)
+                        {
+                            Logging.Logger.LogError("This language server emits SymbolInformation, which is deprecated and not "
+                                           + "supported by SEE. Please choose a language server that is capable of "
+                                           + "returning hierarchic DocumentSymbols.\n");
+                            return;
+                        }
+
+                        await AddSymbolNodeAsync(symbol.DocumentSymbol, path, graph, symbolParent, token);
                     }
-
-                    await AddSymbolNodeAsync(symbol.DocumentSymbol, path, graph, symbolParent, token);
                 }
-
-                Handler.CloseDocument(path);
+                finally
+                {
+                    Handler.CloseDocument(path);
+                }
                 // ~20% of the progress is made by loading the documents and its symbols.
                 changePercentage?.Invoke((1 - edgeProgressFactor) * documentCount / relevantDocuments.Count);
             }
@@ -302,50 +333,59 @@ namespace SEE.Tools.LSP
 
             // We build a range tree for each file, so that we can quickly find the nodes with the smallest size
             // that contain the given range.
-            Dictionary<string, List<Node>> relevantNodesByPath = relevantNodes.GroupBy(x => x.Path()).ToDictionary(x => x.Key, x => x.ToList());
-            rangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange));
+            Dictionary<string, List<Node>> relevantNodesByPath = relevantNodes.GroupBy(x => PathKey(x.Path()), PathComparer)
+                                                                              .ToDictionary(x => x.Key, x => x.ToList(), PathComparer);
+            rangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange),
+                                                          PathComparer);
 
             int i = 0;
             foreach ((string path, List<Node> nodes) in relevantNodesByPath)
             {
                 Handler.OpenDocument(path);
-                foreach (Node node in nodes)
+                try
                 {
-                    token.ThrowIfCancellationRequested();
+                    foreach (Node node in nodes)
+                    {
+                        token.ThrowIfCancellationRequested();
 
-                    // Depending on capabilities and settings, we connect the nodes with edges.
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Definition, LSP.Definition, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Declaration) && Handler.ServerCapabilities.DeclarationProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Declaration, LSP.Declaration, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.TypeDefinition) && Handler.ServerCapabilities.TypeDefinitionProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.TypeDefinition, LSP.OfType, node, graph, token: token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Implementation) && Handler.ServerCapabilities.ImplementationProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync(Handler.Implementation, LSP.ImplementationOf, node, graph, reverseDirection: true, token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
-                    {
-                        await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
-                    {
-                        await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
-                    }
-                    if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
-                    {
-                        await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
-                    }
+                        // Depending on capabilities and settings, we connect the nodes with edges.
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Definition, LSP.Definition, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Declaration) && Handler.ServerCapabilities.DeclarationProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Declaration, LSP.Declaration, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.TypeDefinition) && Handler.ServerCapabilities.TypeDefinitionProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.TypeDefinition, LSP.OfType, node, graph, token: token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Implementation) && Handler.ServerCapabilities.ImplementationProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync(Handler.Implementation, LSP.ImplementationOf, node, graph, reverseDirection: true, token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
+                        {
+                            await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
+                        {
+                            await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
+                        }
+                        if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
+                        {
+                            await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
+                        }
 
-                    // The remaining 80% of the progress is made by connecting the nodes.
-                    // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
-                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
+                        // The remaining 80% of the progress is made by connecting the nodes.
+                        // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
+                        changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
+                    }
+                }
+                finally
+                {
+                    Handler.CloseDocument(path);
                 }
             }
             Logging.Logger.LogInfo($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
@@ -358,7 +398,7 @@ namespace SEE.Tools.LSP
                 await UniTask.Delay(Handler.TimeoutSpan, cancellationToken: token);
                 foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetUnhandledPublishedDiagnostics())
                 {
-                    HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path);
+                    HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.GetFileSystemPath());
                 }
             }
 
@@ -501,7 +541,7 @@ namespace SEE.Tools.LSP
             {
                 token.ThrowIfCancellationRequested();
 
-                Node targetNode = FindNodesByLocation(item.Uri.Path, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
@@ -513,7 +553,8 @@ namespace SEE.Tools.LSP
 
             bool SelectItem(CallHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && LSPRange.FromLspRange(item.Range) == node.SourceRange;
+                return PathComparer.Equals(PathKey(item.Uri), PathKey(node.Path()))
+                    && LSPRange.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -531,19 +572,20 @@ namespace SEE.Tools.LSP
             {
                 token.ThrowIfCancellationRequested();
 
-                Node targetNode = FindNodesByLocation(item.Uri.Path, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri, LSPRange.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
-                edge.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(item.SelectionRange));
             }
             return;
 
             bool SelectItem(TypeHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && LSPRange.FromLspRange(item.Range) == node.SourceRange;
+                return PathComparer.Equals(PathKey(item.Uri), PathKey(node.Path()))
+                    && LSPRange.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -583,7 +625,8 @@ namespace SEE.Tools.LSP
                 node.SourceName = symbol.Name;
                 node.Filename = Path.GetFileName(path);
                 node.Directory = Path.GetDirectoryName(path);
-                Assert.AreEqual(path, node.Path());
+                // Node.Path() joins with '/', while Windows file paths may use '\\'.
+                Assert.AreEqual(Path.GetFullPath(path), Path.GetFullPath(node.Path()));
                 node.Type = symbol.Kind.ToNodeKind().ToString();
                 node.SourceRange = LSPRange.FromLspRange(symbol.Range);
                 node.SourceLine = symbol.SelectionRange.Start.Line + 1;
@@ -712,14 +755,14 @@ namespace SEE.Tools.LSP
                 if (location.IsLocation)
                 {
                     // NOTE: We assume only local files are used.
-                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri.Path, LSPRange.FromLspRange(location.Location.Range)))
+                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri, LSPRange.FromLspRange(location.Location.Range)))
                     {
                         AddEdge(node, targetNode, type, reverseDirection, graph);
                     }
                 }
                 else
                 {
-                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri.Path, LSPRange.FromLspRange(location.LocationLink.TargetRange)))
+                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri, LSPRange.FromLspRange(location.LocationLink.TargetRange)))
                     {
                         Edge edge = AddEdge(node, targetNode, type, reverseDirection, graph);
                         edge?.SetRange(SelectionRangeAttribute, LSPRange.FromLspRange(location.LocationLink.TargetSelectionRange));
@@ -787,12 +830,12 @@ namespace SEE.Tools.LSP
         /// </summary>
         /// <param name="path">The path of the file in which to search for nodes.</param>
         /// <param name="range">The range in the file at which to search for nodes.</param>
-        /// <returns>The nodes that are located at the given range in the file.</returns>
+        /// <returns>The nodes that are located at the given range in the file. If none
+        /// can be found, the result will be empty.</returns>
         /// <seealso cref="KDIntervalTree{T}"/>
         private IEnumerable<Node> FindNodesByLocation(string path, Range range)
-
         {
-            if (rangeTrees.TryGetValue(path, out KDIntervalTree<Node> tree))
+            if (rangeTrees.TryGetValue(PathKey(path), out KDIntervalTree<Node> tree))
             {
                 // We need to do a stabbing query here, with the caveat that we want the tightest fitting range.
                 // We use our custom-made KDIntervalTree for this purpose.
@@ -801,6 +844,16 @@ namespace SEE.Tools.LSP
 
             return Enumerable.Empty<Node>();
         }
+
+        /// <summary>
+        /// Finds the "most fitting" nodes that are located at the given <paramref name="range"/>
+        /// in the file identified by the given <paramref name="uri"/>.
+        /// </summary>
+        /// <param name="uri">The URI of the file in which to search for nodes.</param>
+        /// <param name="range">The range in the file at which to search for nodes.</param>
+        /// <returns>The nodes that are located at the given range in the file.</returns>
+        private IEnumerable<Node> FindNodesByLocation(DocumentUri uri, Range range)
+            => FindNodesByLocation(uri.GetFileSystemPath(), range);
 
         /// <summary>
         /// Sets the lines of code (LOC) attribute for the given file node to the number of lines in the file.

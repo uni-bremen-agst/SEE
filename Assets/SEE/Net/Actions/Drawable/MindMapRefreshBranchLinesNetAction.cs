@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -34,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Node != null && Node.ID != "")
             {
-                GameMindMap.ReDrawBranchLines(FindChild(Node.BorderConf.ID).transform.parent.gameObject);
+                GameMindMapBranch.ReDrawBranchLines(FindChild(Node.BorderConf.ID).transform.parent.gameObject);
             }
             else
             {
