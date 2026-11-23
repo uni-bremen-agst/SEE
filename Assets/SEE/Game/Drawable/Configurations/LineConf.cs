@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.ValueHolders;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.Graphs.Config;
 using SEE.Utils.Config;
 using System;
@@ -68,12 +69,12 @@ namespace SEE.Game.Drawable.Configurations
         /// Serialized backing field for <see cref="ColorKind"/>.
         /// </summary>
         [SerializeField]
-        private GameDrawer.ColorKind colorKind;
+        private ColorKind colorKind;
 
         /// <summary>
         /// The color kind of the line (Monochrome/Gradient/Two-color dashed).
         /// </summary>
-        public GameDrawer.ColorKind ColorKind
+        public ColorKind ColorKind
         {
             get => colorKind;
             set => colorKind = value;
@@ -98,12 +99,12 @@ namespace SEE.Game.Drawable.Configurations
         /// Serialized backing field for <see cref="LineKind"/>.
         /// </summary>
         [SerializeField]
-        private GameDrawer.LineKind lineKind;
+        private LineKind lineKind;
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
         /// </summary>
-        public GameDrawer.LineKind LineKind
+        public LineKind LineKind
         {
             get => lineKind;
             set => lineKind = value;
@@ -172,35 +173,83 @@ namespace SEE.Game.Drawable.Configurations
         public bool FreehandLine;
 
         /// <summary>
-        /// Creates a <see cref="LineConf"/> for the given game object.
+        /// Whether an open line retains the end cap of a previously split loop.
+        /// If its final segment is too short, the preceding longer segment
+        /// may be used to determine the end cap's visual geometry.
+        /// The original logical positions must remain unchanged.
         /// </summary>
-        /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component.</param>
-        /// <returns>The created <see cref="LineConf"/> object.</returns>
+        public bool UsePreviousSegmentForEndCap;
+
+        /// <summary>
+        /// Creates a <see cref="LineConf"/> for the given game object.
+        /// If the visible renderer geometry differs from the logical geometry,
+        /// the stored original positions are returned instead.
+        /// </summary>
+        /// <param name="lineGameObject">
+        /// The game object with the <see cref="LineRenderer"/> component.
+        /// </param>
+        /// <returns>
+        /// The created line configuration, or null for an invalid line object.
+        /// </returns>
         public static LineConf GetLine(GameObject lineGameObject)
         {
             LineConf line = null;
+
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
-                LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
-                LineAnchorValueHolder anchorHolder = lineGameObject.GetComponent<LineAnchorValueHolder>();
+                LineRenderer renderer =
+                    lineGameObject.GetComponent<LineRenderer>();
+
+                LineAnchorValueHolder anchorHolder =
+                    lineGameObject.GetComponent<LineAnchorValueHolder>();
+
+                bool hasStoredOriginalPositions =
+                    anchorHolder != null
+                    && anchorHolder.OriginalRendererPositions != null;
+
+                bool usesExplicitLoopCapGeometry =
+                    hasStoredOriginalPositions
+                    && anchorHolder.UsesExplicitLoopCapGeometry;
+
+                Vector3[] rendererPositions;
+
+                if (hasStoredOriginalPositions)
+                {
+                    rendererPositions =
+                        new Vector3[anchorHolder.OriginalRendererPositions.Length];
+
+                    Array.Copy(
+                        anchorHolder.OriginalRendererPositions,
+                        rendererPositions,
+                        rendererPositions.Length);
+                }
+                else
+                {
+                    rendererPositions = new Vector3[renderer.positionCount];
+                    renderer.GetPositions(rendererPositions);
+                }
 
                 line = new()
                 {
                     ID = lineGameObject.name,
-                    AssociatedPage = lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
+                    AssociatedPage =
+                        lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
-                    OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Loop = renderer.loop,
+                    OrderInLayer =
+                        lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
+                    Loop = renderer.loop || usesExplicitLoopCapGeometry,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
-                    RendererPositions = new Vector3[renderer.positionCount],
+                    RendererPositions = rendererPositions,
                     LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
                     LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject),
-                    FreehandLine = lineGameObject.TryGetComponent(out LineValueHolder holder)
-                                    && holder.FreehandLine,
+                    FreehandLine =
+                        lineGameObject.TryGetComponent(out LineValueHolder holder)
+                        && holder.FreehandLine,
+                    UsePreviousSegmentForEndCap =
+                        anchorHolder != null
+                        && anchorHolder.UsePreviousSegmentForEndCap
                 };
-
-                renderer.GetPositions(line.RendererPositions);
 
                 if (anchorHolder != null && anchorHolder.HasOriginalAnchors)
                 {
@@ -210,11 +259,16 @@ namespace SEE.Game.Drawable.Configurations
                 else if (line.RendererPositions.Length > 0)
                 {
                     line.OriginalStartAnchor = line.RendererPositions[0];
-                    line.OriginalEndAnchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                    line.OriginalEndAnchor =
+                        line.RendererPositions[line.RendererPositions.Length - 1];
                 }
 
-                LineVisualConfFactory.ApplyVisualProperties(lineGameObject, renderer, line);
+                LineVisualConfFactory.ApplyVisualProperties(
+                    lineGameObject,
+                    renderer,
+                    line);
             }
+
             return line;
         }
 
@@ -244,10 +298,11 @@ namespace SEE.Game.Drawable.Configurations
 
         /// <summary>
         /// Returns an independent clone of this <see cref="LineConf"/>.
-        /// The renderer position array and the start and end line cap configurations
-        /// are copied if present. Null mutable members remain null.
+        /// Mutable renderer positions and line-cap configurations are copied.
+        /// The state used to preserve the end cap after splitting a loop is
+        /// retained as well.
         /// </summary>
-        /// <returns>A new <see cref="LineConf"/> with the values of this object.</returns>
+        /// <returns>An independent copy of this line configuration.</returns>
         public LineConf Clone()
         {
             return new LineConf
@@ -273,6 +328,7 @@ namespace SEE.Game.Drawable.Configurations
                 OriginalStartAnchor = this.OriginalStartAnchor,
                 OriginalEndAnchor = this.OriginalEndAnchor,
                 FreehandLine = this.FreehandLine,
+                UsePreviousSegmentForEndCap = this.UsePreviousSegmentForEndCap
             };
         }
 
@@ -354,9 +410,18 @@ namespace SEE.Game.Drawable.Configurations
         private const string freehandLineLabel = "FreehandLine";
 
         /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
+        /// Label for preserving the end-cap geometry of a split loop.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
+        private const string usePreviousSegmentForEndCapLabel =
+            "UsePreviousSegmentForEndCap";
+
+        /// <summary>
+        /// Saves this instance's attributes using the given
+        /// <see cref="ConfigWriter"/>.
+        /// </summary>
+        /// <param name="writer">
+        /// The <see cref="ConfigWriter"/> to write the attributes.
+        /// </param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(ColorKind.ToString(), colorKindLabel);
@@ -371,6 +436,9 @@ namespace SEE.Game.Drawable.Configurations
             writer.SaveVector(OriginalStartAnchor, originalStartAnchorLabel);
             writer.SaveVector(OriginalEndAnchor, originalEndAnchorLabel);
             writer.Save(FreehandLine, freehandLineLabel);
+            writer.Save(
+                UsePreviousSegmentForEndCap,
+                usePreviousSegmentForEndCapLabel);
 
             List<Vector3Config> rendererPositionConfigs = RendererPositions
                 .Select(pos => new Vector3Config { Value = pos })
@@ -383,33 +451,32 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Given the representation of a <see cref="LineConf"/> as created by the <see cref="ConfigWriter"/>, this
-        /// method parses the attributes from that representation and puts them into this <see cref="LineConf"/>
-        /// instance.
+        /// Restores the attributes of this <see cref="LineConf"/> from their
+        /// configuration representation. The end-cap preservation flag is
+        /// optional for compatibility with older saved configurations.
         /// </summary>
-        /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
-        /// has to be the representation of a <see cref="LineConf"/> as created by
-        /// <see cref="ConfigWriter"/>.</param>
-        /// <returns>Whether or not the <see cref="LineConf"/> was loaded without errors.</returns>
+        /// <param name="attributes">
+        /// The attribute labels and values produced by the configuration writer.
+        /// </param>
+        /// <returns>Whether the configuration was restored without errors.</returns>
         new internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = base.Restore(attributes);
 
-            /// Try to restore the color kind
             if (attributes.TryGetValue(colorKindLabel, out object cKind)
-                && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
+                && Enum.TryParse((string)cKind, out ColorKind colorResult))
             {
                 ColorKind = colorResult;
             }
             else
             {
-                ColorKind = GameDrawer.ColorKind.Monochrome;
+                ColorKind = ColorKind.Monochrome;
                 errors = true;
             }
 
-            /// Try to restore the primary color.
             Color loadedColor = Color.black;
-            if (UnityConfigIO.RestoreColor(attributes, primaryColorLabel, ref loadedColor))
+            if (UnityConfigIO.RestoreColor(
+                attributes, primaryColorLabel, ref loadedColor))
             {
                 PrimaryColor = loadedColor;
             }
@@ -419,9 +486,9 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the secondary color.
             Color loadedSecColor = Color.black;
-            if (UnityConfigIO.RestoreColor(attributes, secondaryColorLabel, ref loadedSecColor))
+            if (UnityConfigIO.RestoreColor(
+                attributes, secondaryColorLabel, ref loadedSecColor))
             {
                 SecondaryColor = loadedSecColor;
             }
@@ -431,8 +498,8 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the fill out status.
-            if (attributes.TryGetValue(fillOutStatusLabel, out object loadedFillOutStatus))
+            if (attributes.TryGetValue(
+                fillOutStatusLabel, out object loadedFillOutStatus))
             {
                 FillOutStatus = (bool)loadedFillOutStatus;
             }
@@ -442,9 +509,9 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the fill out color.
             Color loadedFOColor = Color.black;
-            if (UnityConfigIO.RestoreColor(attributes, fillOutColorLabel, ref loadedFOColor))
+            if (UnityConfigIO.RestoreColor(
+                attributes, fillOutColorLabel, ref loadedFOColor))
             {
                 FillOutColor = loadedFOColor;
             }
@@ -454,7 +521,6 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the thickness.
             if (attributes.TryGetValue(thicknessLabel, out object thick))
             {
                 Thickness = (float)thick;
@@ -465,7 +531,6 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the loop.
             if (attributes.TryGetValue(loopLabel, out object loadedLoop))
             {
                 Loop = (bool)loadedLoop;
@@ -476,47 +541,68 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            UsePreviousSegmentForEndCap =
+                attributes.TryGetValue(
+                    usePreviousSegmentForEndCapLabel,
+                    out object loadedEndCapPreservation)
+                && (bool)loadedEndCapPreservation;
+
             List<Vector3> listRendererPositions = new();
-            /// Try to restore the line position points.
-            if (attributes.TryGetValue(rendererPositionsLabel, out object positionList))
+
+            if (attributes.TryGetValue(
+                rendererPositionsLabel, out object positionList))
             {
-                foreach (object item in (List<object>) positionList)
+                foreach (object item in (List<object>)positionList)
                 {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                    Dictionary<string, object> dict =
+                        (Dictionary<string, object>)item;
+
                     Vector3Config config = new();
                     config.Restore(dict);
                     listRendererPositions.Add(config.Value);
                 }
+
                 RendererPositions = listRendererPositions.ToArray();
             }
 
             Vector3 loadedOriginalStartAnchor = Vector3.zero;
-            if (UnityConfigIO.RestoreVector(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
+
+            if (UnityConfigIO.RestoreVector(
+                attributes,
+                originalStartAnchorLabel,
+                ref loadedOriginalStartAnchor))
             {
                 OriginalStartAnchor = loadedOriginalStartAnchor;
             }
             else
             {
-                OriginalStartAnchor = RendererPositions != null && RendererPositions.Length > 0
-                    ? RendererPositions[0]
-                    : Vector3.zero;
+                OriginalStartAnchor =
+                    RendererPositions != null && RendererPositions.Length > 0
+                        ? RendererPositions[0]
+                        : Vector3.zero;
+
                 errors = true;
             }
 
             Vector3 loadedOriginalEndAnchor = Vector3.zero;
-            if (UnityConfigIO.RestoreVector(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
+
+            if (UnityConfigIO.RestoreVector(
+                attributes,
+                originalEndAnchorLabel,
+                ref loadedOriginalEndAnchor))
             {
                 OriginalEndAnchor = loadedOriginalEndAnchor;
             }
             else
             {
-                OriginalEndAnchor = RendererPositions != null && RendererPositions.Length > 0
-                    ? RendererPositions[RendererPositions.Length - 1]
-                    : Vector3.zero;
+                OriginalEndAnchor =
+                    RendererPositions != null && RendererPositions.Length > 0
+                        ? RendererPositions[RendererPositions.Length - 1]
+                        : Vector3.zero;
+
                 errors = true;
             }
 
-            /// Try to restore the tiling.
             if (attributes.TryGetValue(tilingLabel, out object til))
             {
                 Tiling = (float)til;
@@ -527,26 +613,31 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restore the line kind.
             if (attributes.TryGetValue(lineKindLabel, out object kind)
-                && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
+                && Enum.TryParse<LineKind>((string)kind, out LineKind result))
             {
                 LineKind = result;
             }
             else
             {
-                LineKind = GameDrawer.LineKind.Solid;
+                LineKind = LineKind.Solid;
                 errors = true;
             }
 
-            /// Try to restore whether this line was created by freehand drawing.
-            FreehandLine = attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine)
+            FreehandLine =
+                attributes.TryGetValue(
+                    freehandLineLabel,
+                    out object loadedFreehandLine)
                 && (bool)loadedFreehandLine;
 
-            if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
+            if (attributes.TryGetValue(
+                lineCapStartLabel, out object startCapObject))
             {
-                Dictionary<string, object> startCapDict = (Dictionary<string, object>)startCapObject;
+                Dictionary<string, object> startCapDict =
+                    (Dictionary<string, object>)startCapObject;
+
                 LineCapConf startCap = new();
+
                 if (startCap.Restore(startCapDict))
                 {
                     LineCapStart = startCap;
@@ -563,10 +654,14 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            if (attributes.TryGetValue(lineCapEndLabel, out object endCapObject))
+            if (attributes.TryGetValue(
+                lineCapEndLabel, out object endCapObject))
             {
-                Dictionary<string, object> endCapDict = (Dictionary<string, object>)endCapObject;
+                Dictionary<string, object> endCapDict =
+                    (Dictionary<string, object>)endCapObject;
+
                 LineCapConf endCap = new();
+
                 if (endCap.Restore(endCapDict))
                 {
                     LineCapEnd = endCap;
@@ -585,7 +680,6 @@ namespace SEE.Game.Drawable.Configurations
 
             return !errors;
         }
-
         #endregion
     }
 }

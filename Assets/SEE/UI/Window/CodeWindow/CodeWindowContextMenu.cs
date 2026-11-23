@@ -287,7 +287,7 @@ namespace SEE.UI.Window.CodeWindow
         {
             // When we're going somewhere else, we should deactivate the current tooltip first.
             Tooltip.Deactivate();
-            if (FilePath == uri.LocalPath)
+            if (FileIO.EqualPaths(System.IO.Path.GetFullPath(FilePath), System.IO.Path.GetFullPath(uri.LocalPath)))
             {
                 // If this is the current file, we can just scroll to the range.
                 ScrolledVisibleLine = range.Start.Line;
@@ -309,6 +309,5 @@ namespace SEE.UI.Window.CodeWindow
                 }
             }
         }
-
     }
 }

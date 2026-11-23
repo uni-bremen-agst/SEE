@@ -66,12 +66,18 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// <param name="hitPoint">The world-space hit position used to determine the nearest line points.</param>
         /// <param name="splitAction">The split operation to execute for the selected line.
         /// This allows different erase actions to define their own splitting behavior.</param>
+        /// <param name="selectConnection">
+        /// Whether the selection targets an outgoing connection instead
+        /// of a point. For a loop end cap, this selects the incoming
+        /// closing connection.
+        /// </param>
         /// <returns>A <see cref="Memento"/> containing all information required
         /// for undoing or redoing the erase action.</returns>
         protected Memento EraseSelectedLinePart(
             GameObject hitObject,
             Vector3 hitPoint,
-            Action<GameObject, LineConf, List<int>, List<Vector3>, List<LineConf>> splitAction)
+            Action<GameObject, LineConf, List<int>, List<Vector3>, List<LineConf>> splitAction,
+            bool selectConnection = false)
         {
             GameObject selectedLine = hitObject.CompareTag(Tags.LineCap)
                 ? hitObject.transform.parent.gameObject
@@ -86,15 +92,30 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
                 int lastIndex = selectedLine.GetComponent<LineRenderer>().positionCount - 1;
 
+                if (selectConnection && originLine.Loop && !startCapSelected)
+                {
+                    // The loop end cap belongs to the closing connection
+                    // from the last logical point to the first.
+                    lastIndex =
+                        LinePositionHelper.GetSafeOriginalPositions(selectedLine).Length - 1;
+                }
                 matchedIndices = new List<int>
-                    {
-                        startCapSelected ? 0 : lastIndex
-                    };
+                {
+                    startCapSelected ? 0 : lastIndex
+                };
             }
             else
             {
-                NearestPoints.GetNearestPoints(selectedLine, hitPoint, out List<Vector3> _, out matchedIndices);
+                NearestPoints.GetNearestPoints(
+                    selectedLine,
+                    hitPoint,
+                    out List<Vector3> _,
+                    out matchedIndices);
             }
+
+            matchedIndices = LinePositionHelper.ToLogicalIndices(
+                selectedLine,
+                matchedIndices);
 
             GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
             List<Vector3> originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine).ToList();

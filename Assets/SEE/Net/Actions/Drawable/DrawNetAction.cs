@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.ReversibleActions.Drawable;
-using SEE.Game.Drawable;
+using SEE.Controls.ReversibleActions.Drawable.DrawShapes;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.Line;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -36,7 +37,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Line != null && Line.ID != "")
             {
-                GameDrawer.ReDrawLine(Surface, Line);
+                GameLineDrawer.ReDrawLine(Surface, Line);
             }
             else
             {

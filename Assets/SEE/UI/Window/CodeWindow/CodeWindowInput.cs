@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using SEE.Graphs;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.UI.Notification;
@@ -55,6 +55,17 @@ namespace SEE.UI.Window.CodeWindow
         private List<int> CodeWindowOffsets { get; } = new();
 
         /// <summary>
+        /// For each line (0-based index), the tabs of the source text that were expanded to spaces
+        /// when rendering the line, in ascending order. Each entry consists of the 0-based rendered column
+        /// at which the expansion starts (relative to the start of the source text, i.e., after the line
+        /// number) and the number of spaces the tab was expanded to.
+        ///
+        /// This is needed to map a rendered column back to the column in the source file
+        /// (see <see cref="ToSourceColumn"/>). Filled by <see cref="EnterFromTokens"/> only.
+        /// </summary>
+        private List<List<(int column, int width)>> ExpandedTabs { get; } = new();
+
+        /// <summary>
         /// The graph associated with the code city this code window is in.
         /// </summary>
         private Graph AssociatedGraph;
@@ -97,11 +108,13 @@ namespace SEE.UI.Window.CodeWindow
                            .Aggregate(0, (i, token) => i + token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             neededPadding = Mathf.FloorToInt(Mathf.Log10(assumedLines)) + 1;
-            text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
+            StringBuilder builder = new($"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ");
 
             CodeWindowOffsets.Clear();
              // The first line starts at the beginning of the text after the line number.
             CodeWindowOffsets.Add(0);
+            ExpandedTabs.Clear();
+            ExpandedTabs.Add(new List<(int column, int width)>());
 
              // Line number we'll write down next
             int lineNumber = 2;
@@ -116,7 +129,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 if (token.TokenType == TokenType.Newline)
                 {
-                    AppendNewline(ref lineNumber, ref text, token);
+                    AppendNewline(ref lineNumber, token);
                 }
                 else if (token.TokenType != TokenType.EOF) // Skip EOF token completely.
                 {
@@ -128,28 +141,56 @@ namespace SEE.UI.Window.CodeWindow
             EndIssueSegment();
 
             // Lines are equal to number of newlines, including the initial newline.
+            text = builder.ToString();
             lines = text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
             text = text.TrimStart('\n'); // Remove leading newline.
 
             # region Local Functions
 
+            // Returns the given whitespace with each tab replaced by tabWidth spaces and records each
+            // expansion in ExpandedTabs, so that rendered columns can be mapped back to source columns.
+            string ExpandTabs(string whitespace, int tabWidth)
+            {
+                if (!whitespace.Contains('\t'))
+                {
+                    return whitespace;
+                }
+                // Rendered column (0-based, after the line number) at which the whitespace starts.
+                int column = characterOffset - CodeWindowOffsets[^1] - (neededPadding + 1);
+                StringBuilder result = new(whitespace.Length + tabWidth);
+                foreach (char c in whitespace)
+                {
+                    if (c == '\t')
+                    {
+                        ExpandedTabs[^1].Add((column + result.Length, tabWidth));
+                        result.Append(' ', tabWidth);
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                }
+                return result.ToString();
+            }
+
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
             // Note that newlines MUST be added in this method, not anywhere else, else issue highlighting will break!
-            void AppendNewline(ref int theLineNumber, ref string text, SEEToken token)
+            void AppendNewline(ref int theLineNumber, SEEToken token)
             {
                 // Close an issue marking here if necessary
                 EndIssueSegment();
 
                 // First, of course, the newline.
-                text += "\n";
+                builder.Append("\n");
                 // At this point, we need to remember the offset of this new line.
                 Assert.AreEqual(CodeWindowOffsets.Count, theLineNumber-1);
                 // + 1 for the newline
                 CodeWindowOffsets.Add(++characterOffset);
+                ExpandedTabs.Add(new List<(int column, int width)>());
                 // Add whitespace next to line number, so it's consistent.
                 int padding = neededPadding - (Mathf.FloorToInt(Mathf.Log10(theLineNumber)) + 1);
                 // Line number will be typeset in grey to distinguish it from the rest.
-                text += $"<color=#CCCCCC>{string.Join(string.Empty, Enumerable.Repeat(' ', padding))}{theLineNumber}</color> ";
+                builder.Append($"<color=#CCCCCC>{string.Join(string.Empty, Enumerable.Repeat(' ', padding))}{theLineNumber}</color> ");
                 characterOffset += neededPadding + 1;
 
                 if (issues?.ContainsKey(theLineNumber) ?? false)
@@ -176,7 +217,7 @@ namespace SEE.UI.Window.CodeWindow
                     // Any entry after the first is on a separate line.
                     if (!firstRun)
                     {
-                        AppendNewline(ref lineNumber, ref text, token);
+                        AppendNewline(ref lineNumber, token);
                     }
 
                     // Mark any potential issue
@@ -214,8 +255,8 @@ namespace SEE.UI.Window.CodeWindow
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                        string replaced = line.Replace("\t", new string(' ', token.Language.TabWidth));
-                        text += replaced;
+                        string replaced = ExpandTabs(line, token.Language.TabWidth);
+                        builder.Append(replaced);
                         characterOffset += replaced.Length;
                     }
                     else
@@ -224,23 +265,23 @@ namespace SEE.UI.Window.CodeWindow
                                                  .Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
                         foreach (string textTag in tags)
                         {
-                            text += $"<{textTag}>";
+                            builder.Append($"<{textTag}>");
                         }
                         if (currentlyMarking is not { HasColorTags: true })
                         {
-                            text += $"<color=#{token.TokenType.Color}>";
+                            builder.Append($"<color=#{token.TokenType.Color}>");
                         }
                         string replaced = line.Replace("</noparse>", @"<\noparse>");
-                        text += $"<noparse>{replaced}</noparse>";
+                        builder.Append($"<noparse>{replaced}</noparse>");
                         characterOffset += replaced.Length;
                         if (currentlyMarking is not { HasColorTags: true })
                         {
-                            text += "</color>";
+                            builder.Append("</color>");
                         }
                         tags.Reverse();
                         foreach (string textTag in tags)
                         {
-                            text += $"</{textTag}>";
+                            builder.Append($"</{textTag}>");
                         }
                     }
 
@@ -255,7 +296,7 @@ namespace SEE.UI.Window.CodeWindow
                 IncreaseLinkCounter();
                 issueDictionary[linkCounter] = issueTokens[token].ToHashSet();
                 currentlyMarking = issueTokens[token].First();
-                text += $"<link=\"{linkCounter.ToString()}\">{currentlyMarking.OpeningRichTags}";
+                builder.Append($"<link=\"{linkCounter}\">{currentlyMarking.OpeningRichTags}");
             }
 
             // Ends marking the current issue segment, if there is any.
@@ -263,7 +304,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 if (currentlyMarking != null)
                 {
-                    text += $"{currentlyMarking.ClosingRichTags}</link>";
+                    builder.Append($"{currentlyMarking.ClosingRichTags}</link>");
                 }
                 currentlyMarking = null;
             }
@@ -347,23 +388,25 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             neededPadding = $"{text.Length}".Length;
-            this.text = "";
+            ExpandedTabs.Clear();
+            StringBuilder builder = new();
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent.
-                this.text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
+                builder.Append(string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length)));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                this.text += $"<color=#CCCCCC>{i + 1}</color> ";
+                builder.Append($"<color=#CCCCCC>{i + 1}</color> ");
                 if (asIs)
                 {
-                    this.text += text[i] + "\n";
+                    builder.Append(text[i] + "\n");
                 }
                 else
                 {
-                    this.text += $"<noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                    builder.Append($"<noparse>{text[i].Replace("noparse", "")}</noparse>\n");
                 }
             }
 
+            this.text = builder.ToString();
             lines = text.Length;
         }
 
@@ -400,15 +443,18 @@ namespace SEE.UI.Window.CodeWindow
                     // (inferred from the file extension) must be supported by the server.
                     lspHandler = null;
                     if (go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
-                        && lspHandler.ServerCapabilities.SemanticTokensProvider != null
+                        && lspHandler.ServerCapabilities?.SemanticTokensProvider != null
                         && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
                     {
                         lspHandler.enabled = true;
-                        lspHandler.OpenDocument(filename);
-                        tokens = await LSPToken.FromFileAsync(filename, lspHandler, language);
+                        // Use the contents known to the server, so that text and semantic tokens are consistent.
+                        string contents = lspHandler.OpenDocument(filename);
+                        tokens = await LSPToken.FromFileAsync(filename, lspHandler, language, contents);
                     }
                     else
                     {
+                        // TryGetComponent may have set lspHandler although LSP is not used for this window.
+                        lspHandler = null;
                         tokens = await AntlrToken.FromFileAsync(filename);
                     }
                 }

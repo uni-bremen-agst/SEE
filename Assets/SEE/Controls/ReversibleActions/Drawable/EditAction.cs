@@ -1,16 +1,17 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.KeyActions;
+using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.UI.Notification;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.Line;
+using SEE.UI.Menu.Drawable.MindMap;
+using SEE.UI.Menu.Drawable.Text;
+using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
-using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.ReversibleActions.Drawable
 {
@@ -142,10 +143,10 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     && oldLineHolder.Tiling.Equals(newLineHolder.Tiling)
                     && oldLineHolder.FillOutStatus.Equals(newLineHolder.FillOutStatus)
                     && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor)
-                    // A value-based comparison is required here because LineCapConf is a reference type.
-                    // Using == would only compare object references instead of the actual cap configuration values.
-                    && Equals(oldLineHolder.LineCapStart, newLineHolder.LineCapStart)
-                    && Equals(oldLineHolder.LineCapEnd, newLineHolder.LineCapEnd);
+                    && (oldLineHolder.LineCapStart?.Equals(newLineHolder.LineCapStart)
+                        ?? newLineHolder.LineCapStart is null)
+                    && (oldLineHolder.LineCapEnd?.Equals(newLineHolder.LineCapEnd)
+                        ?? newLineHolder.LineCapEnd is null);
             }
 
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
@@ -262,13 +263,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// when the left mouse button is not released.
         /// Therefore, after the last action has been successfully completed,
         /// the left mouse button must be released to select the same object again.
-        /// Additionally, a ValueResetter component is added to the UI Canvas to reset
-        /// the two static variables after exiting this action type.
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
-                false, true, false, GetActionStateType()))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                false, true, false))
             {
                 oldValueHolder = DrawableType.Get(selectedObj);
                 newValueHolder = DrawableType.Get(selectedObj);
@@ -298,13 +297,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 case Tags.DText:
                     if (!TextMenu.Instance.IsOpen())
                     {
-                        TextMenu.EnableForEditing(selectedObj, newValueHolder);
+                        TextMenu.Instance.EnableForEditing(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.Image:
                     if (!ImageMenu.Instance.IsOpen())
                     {
-                        ImageMenu.Enable(selectedObj, newValueHolder);
+                        ImageMenu.Instance.Enable(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.MindMapNode:
