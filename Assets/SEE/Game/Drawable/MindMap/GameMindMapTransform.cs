@@ -36,11 +36,7 @@ namespace SEE.Game.Drawable.MindMap
         {
             if (includeChildren)
             {
-                PrepareNodeChildren(
-                    node,
-                    setMode,
-                    rotationSetMode);
-
+                PrepareNodeChildren(node, setMode, rotationSetMode);
                 return;
             }
 
@@ -49,32 +45,21 @@ namespace SEE.Game.Drawable.MindMap
                 return;
             }
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
             if (!setMode)
             {
-                GameObject surface =
-                    GameFinder.GetDrawableSurface(node);
+                GameObject surface = GameFinder.GetDrawableSurface(node);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-                string surfaceParentName =
-                    GameFinder.GetDrawableSurfaceParentName(surface);
+                new RbAndCCDestroyerNetAction(surface.name, surfaceParentName, node.name).Execute();
 
-                new RbAndCCDestroyerNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    node.name).Execute();
-
-                foreach (KeyValuePair<GameObject, GameObject> pair
-                         in valueHolder.GetAllChildren())
+                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                 {
                     if (pair.Key.GetComponent<Rigidbody>() != null)
                     {
-                        Destroyer.Destroy(
-                            pair.Key.GetComponent<Rigidbody>());
-
-                        Destroyer.Destroy(
-                            pair.Key.GetComponent<CollisionController>());
+                        Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
+                        Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
                     }
                 }
             }
@@ -90,9 +75,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="includeChildren">
         /// Whether child nodes were included in the transformation.
         /// </param>
-        public static void FinishTransform(
-            GameObject node,
-            bool includeChildren)
+        public static void FinishTransform(GameObject node, bool includeChildren)
         {
             if (includeChildren)
             {
@@ -109,30 +92,25 @@ namespace SEE.Game.Drawable.MindMap
         /// of the given Mind Map node.
         /// </summary>
         /// <param name="node">The selected Mind Map node.</param>
-        public static void DestroyRigidBodiesAndCollisionControllersOfChildren(
-            GameObject node)
+        public static void DestroyRigidBodiesAndCollisionControllersOfChildren(GameObject node)
         {
             if (!node.CompareTag(Tags.MindMapNode))
             {
                 return;
             }
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
-            foreach (KeyValuePair<GameObject, GameObject> pair
-                     in valueHolder.GetAllChildren())
+            foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
             {
                 if (pair.Key.GetComponent<Rigidbody>() != null)
                 {
-                    Destroyer.Destroy(
-                        pair.Key.GetComponent<Rigidbody>());
+                    Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
                 }
 
                 if (pair.Key.GetComponent<CollisionController>() != null)
                 {
-                    Destroyer.Destroy(
-                        pair.Key.GetComponent<CollisionController>());
+                    Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
                 }
             }
         }
@@ -158,22 +136,18 @@ namespace SEE.Game.Drawable.MindMap
                 return;
             }
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
-            foreach (KeyValuePair<GameObject, GameObject> pair
-                     in valueHolder.GetAllChildren())
+            foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
             {
                 if (rotationSetMode)
                 {
-                    pair.Key.transform.localEulerAngles =
-                        node.transform.localEulerAngles;
+                    pair.Key.transform.localEulerAngles = node.transform.localEulerAngles;
                 }
 
                 pair.Key.transform.SetParent(node.transform);
 
-                if (!setMode
-                    && pair.Key.GetComponent<Rigidbody>() == null)
+                if (!setMode && pair.Key.GetComponent<Rigidbody>() == null)
                 {
                     pair.Key.AddComponent<Rigidbody>().isKinematic = true;
                     pair.Key.AddComponent<CollisionController>();
@@ -195,23 +169,14 @@ namespace SEE.Game.Drawable.MindMap
 
             GameMindMapBranch.ReDrawParentBranchLine(node);
 
-            GameObject attachedObjects =
-                GameFinder.GetAttachedObjectsObject(node);
+            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(node);
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
-
-            foreach (KeyValuePair<GameObject, GameObject> pair
-                     in valueHolder.GetAllChildren())
+            foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
             {
-                pair.Key.transform.SetParent(
-                    attachedObjects.transform);
-
-                pair.Value.transform.SetParent(
-                    attachedObjects.transform);
-
-                GameMindMapBranch.ReDrawParentBranchLine(
-                    pair.Key);
+                pair.Key.transform.SetParent(attachedObjects.transform);
+                pair.Value.transform.SetParent(attachedObjects.transform);
+                GameMindMapBranch.ReDrawParentBranchLine(pair.Key);
             }
         }
     }
