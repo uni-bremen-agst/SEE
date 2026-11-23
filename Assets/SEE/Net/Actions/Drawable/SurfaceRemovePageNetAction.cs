@@ -28,7 +28,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameDrawableManager.RemovePage(Surface, Page);
+            GameDrawablePageManager.RemovePage(Surface, Page);
         }
     }
 }

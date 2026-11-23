@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.Line;
+using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -42,7 +43,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (!string.IsNullOrWhiteSpace(LineID))
             {
-                GameDrawer.FillOut(FindChild(LineID), FillOutColor);
+                GameLineFillOut.FillOut(FindChild(LineID), FillOutColor);
             }
             else
             {

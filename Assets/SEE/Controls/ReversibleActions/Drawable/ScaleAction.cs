@@ -2,8 +2,8 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.MindMap;
 using SEE.Net.Actions.Drawable;
-using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -219,14 +219,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// Allows the selection of a drawable type object for scaling, taking into account the object scale in the last run.
         /// It prevents the same object from being accidentally selected again when the left mouse button is not released.
         /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again.
-        /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
         /// The blinking effect is activated to indicate which object has been chosen for scaling.
         /// </summary>
         private void SelectObject()
         {
             /// The selection
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
-                true, false, true, GetActionStateType(), false))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                true, false, true, false))
             {
                 /// If an object was already selected,
                 /// the Rigidbody and Collision Controller are removed if they are still present.
@@ -248,7 +247,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// Initiates scaling by opening the menu and switching to the corresponding state.
             if (SEEInput.MouseUp(MouseButton.Left) && selectedObj != null)
             {
-                ScaleMenu.Enable(selectedObj);
+                ScaleMenu.Instance.Enable(selectedObj);
                 progressState = ProgressState.Scale;
             }
         }
@@ -304,8 +303,8 @@ namespace SEE.Controls.ReversibleActions.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             newScale = GameScaler.Scale(selectedObj, scaleFactor);
-            ScaleMenu.AssignValue(selectedObj);
-            bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
+            ScaleMenu.Instance.AssignValue(selectedObj);
+            bool refresh = GameMindMapBranch.ReDrawBranchLines(selectedObj);
             new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, newScale).Execute();
             if (refresh)
             {
@@ -359,7 +358,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.OldScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                bool refresh = GameMindMapBranch.ReDrawBranchLines(memento.SelectedObject);
                 new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name, memento.OldScale).Execute();
                 if (refresh)
@@ -387,7 +386,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.NewScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                bool refresh = GameMindMapBranch.ReDrawBranchLines(memento.SelectedObject);
                 new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.SelectedObject.name, memento.NewScale).Execute();
                 if (refresh)
                 {

@@ -2,10 +2,8 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
-using System.Collections.Generic;
-using UnityEngine;
 using SEE.UI.Drawable;
-using SEE.Game;
+using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -15,7 +13,7 @@ namespace SEE.UI.Menu.Drawable
     public class MoveMenu : SingletonMenu
     {
         /// <summary>
-        /// The prefab of the rotation menu.
+        /// The prefab of the move menu.
         /// </summary>
         private const string moveMenuPrefab = "Prefabs/UI/Drawable/Move";
 
@@ -29,181 +27,104 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static MoveMenu Instance { get; private set; }
 
+        /// <summary>
+        /// The switch manager of the speed up option.
+        /// </summary>
+        private SwitchManager speedUpManager;
+
+        /// <summary>
+        /// The switch manager of the move by mouse option.
+        /// </summary>
+        private SwitchManager moveByMouseManager;
+
+        /// <summary>
+        /// Controls the Mind Map specific child inclusion behavior of this move menu.
+        /// </summary>
+        private MindMapMoveChildrenController mindMapMoveChildrenController;
+
+        /// <summary>
+        /// Initializes the singleton instance.
+        /// </summary>
         static MoveMenu()
         {
             Instance = new MoveMenu();
         }
 
         /// <summary>
-        /// The instance for the switch manager of the speed up option.
+        /// Whether child nodes of the selected Mind Map node should be included
+        /// in the current movement.
         /// </summary>
-        private static SwitchManager speedUpManager;
+        public bool IncludeChildren => mindMapMoveChildrenController?.IncludeChildren ?? false;
 
         /// <summary>
-        /// The instance for the switch manager of the move by mouse option.
-        /// </summary>
-        private static SwitchManager moveByMouseManager;
-
-        /// <summary>
-        /// The status if the children should included in the movement.
-        /// </summary>
-        public static bool includeChildren;
-
-        /// <summary>
-        /// Creates the move menu and register the necessary Handler.
+        /// Creates the move menu and registers the necessary handlers.
         /// </summary>
         /// <param name="selectedObject">The chosen drawable type object to move.</param>
-        public static void Enable(GameObject selectedObject)
+        public void Enable(GameObject selectedObject)
         {
-            if (Instance.gameObject == null)
+            if (gameObject == null)
             {
                 /// Instantiate the menu.
-                Instance.Instantiate(moveMenuPrefab);
+                Instantiate(moveMenuPrefab);
 
                 /// Initialize the switches for speed and move by mouse.
-                speedUpManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SpeedSwitch").GetComponent<SwitchManager>();
-                moveByMouseManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "MoveSwitch").GetComponent<SwitchManager>();
-
-                /// The new position for the object.
-                Vector3 newObjectPosition;
+                speedUpManager = GameFinder.FindAttachedOrLocalDescendant(
+                    gameObject, "SpeedSwitch").GetComponent<SwitchManager>();
+                moveByMouseManager = GameFinder.FindAttachedOrLocalDescendant(
+                    gameObject, "MoveSwitch").GetComponent<SwitchManager>();
 
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
                 string surfaceName = surface.name;
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-                /// Initialize the button for left moving.
-                /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Left").AddComponent<ButtonHeld>().SetAction(() =>
-                {
-                    moveByMouseManager.isOn = false;
-                    moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Left,
-                        speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
-                        includeChildren).Execute();
-                }, true);
+                /// Initialize the movement buttons.
+                SetUpMoveButton(selectedObject, "Left", ValueHolder.MoveDirection.Left,
+                    surfaceName, surfaceParentName);
+                SetUpMoveButton(selectedObject, "Right", ValueHolder.MoveDirection.Right,
+                    surfaceName, surfaceParentName);
+                SetUpMoveButton(selectedObject, "Up", ValueHolder.MoveDirection.Up,
+                    surfaceName, surfaceParentName);
+                SetUpMoveButton(selectedObject, "Down", ValueHolder.MoveDirection.Down,
+                    surfaceName, surfaceParentName);
 
-                /// Initialize the button for right moving.
-                /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Right").AddComponent<ButtonHeld>().SetAction(() =>
-                {
-                    moveByMouseManager.isOn = false;
-                    moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Right,
-                        speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
-                        includeChildren).Execute();
-                }, true);
-
-                /// Initialize the button for up moving.
-                /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Up").AddComponent<ButtonHeld>().SetAction(() =>
-                {
-                    moveByMouseManager.isOn = false;
-                    moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Up,
-                        speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
-                        includeChildren).Execute();
-                }, true);
-
-                /// Initialize the button for down moving.
-                /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Down").AddComponent<ButtonHeld>().SetAction(() =>
-                {
-                    moveByMouseManager.isOn = false;
-                    moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Down,
-                        speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
-                        includeChildren).Execute();
-                }, true);
-
-                /// For Mind Map Nodes: Provides functionality to also move the children.
-                ControlChildren(selectedObject);
+                /// For Mind Map nodes, provide the option to include their children.
+                mindMapMoveChildrenController =
+                    new MindMapMoveChildrenController(gameObject, selectedObject);
+                mindMapMoveChildrenController.SetUp();
             }
         }
 
         /// <summary>
-        /// Manages the level of children,
-        /// whether they should be move with or without children.
-        /// If a change in the property occurs while movement is already in progress,
-        /// an attempt is made to reset it accordingly.
+        /// Sets up a movement button for the given direction.
+        /// Holding the button repeatedly moves the selected object.
         /// </summary>
-        /// <param name="selectedObject">The selected object for the rotation.</param>
-        private static void ControlChildren(GameObject selectedObject)
+        /// <param name="selectedObject">The object that should be moved.</param>
+        /// <param name="buttonName">The name of the movement button.</param>
+        /// <param name="direction">The direction in which the object should be moved.</param>
+        /// <param name="surfaceName">The name of the Drawable surface.</param>
+        /// <param name="surfaceParentName">The name of the Drawable surface parent.</param>
+        private void SetUpMoveButton(GameObject selectedObject, string buttonName,
+            ValueHolder.MoveDirection direction, string surfaceName, string surfaceParentName)
         {
-            if (selectedObject.CompareTag(Tags.MindMapNode))
-            {
-                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                /// The old position of the object.
-                /// Is needed to include the children later on.
-                Vector3 oldPosition = selectedObject.transform.localPosition;
-
-                MMNodeValueHolder valueHolder = selectedObject.GetComponent<MMNodeValueHolder>();
-
-                /// Save the original positions of the children,
-                /// needed in case the inclusion of children is turned off midway.
-                Dictionary<GameObject, Vector3> oldPositions = new();
-                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+            GameFinder.FindAttachedOrLocalDescendant(gameObject, buttonName)
+                .AddComponent<ButtonHeld>().SetAction(() =>
                 {
-                    oldPositions[pair.Key] = pair.Key.transform.localPosition;
-                }
+                    moveByMouseManager.isOn = false;
+                    moveByMouseManager.UpdateUI();
 
-                /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(true);
-                SwitchManager childrenSwitch = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ChildrenSwitch").GetComponent<SwitchManager>();
-                bool changeSwitch = false;
-                childrenSwitch.OnEvents.RemoveAllListeners();
-                childrenSwitch.OnEvents.AddListener(() =>
-                {
-                    includeChildren = true;
+                    Vector3 newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(
+                        selectedObject, direction, speedUpManager.isOn, IncludeChildren);
 
-                    /// Moves the children to the current position of the parent node.
-                    /// The parent node is first returned to its original position before
-                    /// being moved with the children to the new point.
-                    /// This preserves the node arrangement.
-                    if (valueHolder.GetChildren().Count > 0)
-                    {
-                        Vector3 newPosition = selectedObject.transform.localPosition;
-                        GameMoveRotator.SetPosition(selectedObject, oldPosition, false);
-                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name, oldPosition, false).Execute();
-                        GameMoveRotator.SetPosition(selectedObject, newPosition, true);
-                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name, newPosition, true).Execute();
-                    }
-
-                    changeSwitch = true;
-                });
-                childrenSwitch.OffEvents.RemoveAllListeners();
-                childrenSwitch.OffEvents.AddListener(() =>
-                {
-                    includeChildren = false;
-                    if (changeSwitch)
-                    {
-                        /// Restores the original positions of the child nodes.
-                        foreach (KeyValuePair<GameObject, Vector3> pair in oldPositions)
-                        {
-                            GameMoveRotator.SetPosition(pair.Key, pair.Value, false);
-                            new MoveNetAction(surface.name, surfaceParentName, pair.Key.name, pair.Value, false).Execute();
-                        }
-                    }
-                });
-            }
-            else
-            {
-                /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(false);
-                includeChildren = false;
-            }
+                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name,
+                        newObjectPosition, IncludeChildren).Execute();
+                }, true);
         }
 
         /// <summary>
         /// Gets the speed up switch manager.
         /// </summary>
         /// <returns>The switch manager of the speed up switch.</returns>
-        public static SwitchManager GetSpeedUpManager()
+        public SwitchManager GetSpeedUpManager()
         {
             return speedUpManager;
         }
@@ -212,9 +133,21 @@ namespace SEE.UI.Menu.Drawable
         /// Gets the move by mouse switch manager.
         /// </summary>
         /// <returns>The switch manager of the move by mouse switch.</returns>
-        public static SwitchManager GetMoveByMouseManager()
+        public SwitchManager GetMoveByMouseManager()
         {
             return moveByMouseManager;
+        }
+
+        /// <summary>
+        /// Destroys the move menu and resets its cached controls and
+        /// Mind Map specific child inclusion state.
+        /// </summary>
+        public override void Destroy()
+        {
+            base.Destroy();
+            speedUpManager = null;
+            moveByMouseManager = null;
+            mindMapMoveChildrenController = null;
         }
     }
 }

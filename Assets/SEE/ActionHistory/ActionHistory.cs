@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Controls.Actions;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.ReversibleActions;
@@ -151,6 +152,13 @@ namespace SEE.ReversibleActionHistory
         private readonly bool syncOverNetwork;
 
         /// <summary>
+        /// Is raised when the <see cref="ActionStateType"/> of the currently executing action changes.
+        /// The first argument is the previous action state type and the second argument is the new one.
+        /// Either argument can be null if there was no previous action or there is no current action.
+        /// </summary>
+        public event Action<ActionStateType, ActionStateType> ActionStateChanged;
+
+        /// <summary>
         /// Creates a new <see cref="ActionHistory"/> instance.
         /// </summary>
         /// <param name="syncOverNetwork">Whether to synchronize the action history over the network.</param>
@@ -176,6 +184,20 @@ namespace SEE.ReversibleActionHistory
         public IReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
+        /// Notifies subscribers if the action state changes from
+        /// <paramref name="previousActionState"/> to <paramref name="newActionState"/>.
+        /// </summary>
+        /// <param name="previousActionState">The previous action state.</param>
+        /// <param name="newActionState">The new action state.</param>
+        private void NotifyActionStateChanged(ActionStateType previousActionState, ActionStateType newActionState)
+        {
+            if (previousActionState != newActionState)
+            {
+                ActionStateChanged?.Invoke(previousActionState, newActionState);
+            }
+        }
+
+        /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history.
         /// Then <see cref="IReversibleAction.Stop"/> will be called for C. After that
         /// <see cref="IReversibleAction.Awake()"/> and then <see cref="IReversibleAction.Start"/>
@@ -191,10 +213,13 @@ namespace SEE.ReversibleActionHistory
         /// <param name="action">The action to be executed.</param>
         public void Execute(IReversibleAction action)
         {
+            ActionStateType previousActionState = CurrentAction?.GetActionStateType();
+
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
             LastActionWithEffect();
             UndoHistory.Push(action);
+            NotifyActionStateChanged(previousActionState, action.GetActionStateType());
             action.Awake();
             action.Start();
             // Whenever a new action is excuted, we consider the redo history lost.
@@ -375,6 +400,8 @@ namespace SEE.ReversibleActionHistory
         /// </summary>
         public void Undo()
         {
+            ActionStateType previousActionState = CurrentAction?.GetActionStateType();
+
             if (UndoHistory.Count == 0)
             {
                 throw new UndoImpossible("Undo not possible, no changes left to undo!");
@@ -400,6 +427,7 @@ namespace SEE.ReversibleActionHistory
 
             if (current == null)
             {
+                NotifyActionStateChanged(previousActionState, null);
                 return;
             }
 
@@ -409,6 +437,8 @@ namespace SEE.ReversibleActionHistory
                 Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
                 UndoHistory.Pop();
                 current = LastActionWithEffect();
+                NotifyActionStateChanged(previousActionState, current?.GetActionStateType());
+
                 if (current != null)
                 {
                     Resume(current);
@@ -444,6 +474,8 @@ namespace SEE.ReversibleActionHistory
                 // We will resume with the next top-element of the stack that
                 // has had an effect if there is any.
                 current = LastActionWithEffect();
+                NotifyActionStateChanged(previousActionState, current?.GetActionStateType());
+
                 if (current != null)
                 {
                     Resume(current);
@@ -457,6 +489,8 @@ namespace SEE.ReversibleActionHistory
         /// <exception cref="RedoImpossible">Thrown in there is no action that could be re-done.</exception>
         public void Redo()
         {
+            ActionStateType previousActionState = CurrentAction?.GetActionStateType();
+
             if (RedoHistory.Count == 0)
             {
                 throw new RedoImpossible("Redo not possible, no action left to be redone!");
@@ -479,6 +513,7 @@ namespace SEE.ReversibleActionHistory
                 IReversibleAction redoAction = RedoHistory.Pop();
                 LastActionWithEffect();
                 UndoHistory.Push(redoAction);
+                NotifyActionStateChanged(previousActionState, redoAction.GetActionStateType());
                 redoAction.Redo();
                 Resume(redoAction);
 
