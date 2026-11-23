@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
+using UnityEngine;
 
 namespace SEE.Utils
 {
     /// <summary>
-    /// Provides utilities for File input/output.
+    /// Provides utilities for file input/output and file handling.
     /// </summary>
     public static class FileIO
     {
@@ -61,6 +63,21 @@ namespace SEE.Utils
             {
                 File.Delete(filename);
             }
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="pathA"/> equals <paramref name="pathB"/>.
+        /// On the Windows OS, the comparison is case-insensitive.
+        /// </summary>
+        /// <param name="pathA">First path to be compared.</param>
+        /// <param name="pathB">Second path to be compared.</param>
+        /// <returns>True if <paramref name="pathA"/> equals <paramref name="pathB"/>.</returns>
+        internal static bool EqualPaths(string pathA, string pathB)
+        {
+            return string.Equals(pathA, pathB,
+                                 Application.platform == RuntimePlatform.WindowsEditor
+                                 || Application.platform == RuntimePlatform.WindowsPlayer
+                                    ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
         }
     }
 }

@@ -18,7 +18,6 @@ using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity.Experimental;
-using Mediapipe.Tasks.Vision.HandLandmarker;
 using RootMotion.FinalIK;
 using SEE.Extensions;
 using SEE.Utils;
