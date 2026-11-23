@@ -1,6 +1,7 @@
-﻿using SEE.Graphs.Config;
+﻿using SEE.Game.Drawable.StickyNote;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
+using SEE.Graphs.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,7 +135,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 if (GameFinder.IsStickyNote(surface))
                 {
-                    GameStickyNoteManager.Change(surface, config);
+                    GameStickyNoteEdit.Change(surface, config);
                     new StickyNoteChangeNetAction(config).Execute();
                 } else
                 {
