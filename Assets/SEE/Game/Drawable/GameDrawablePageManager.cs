@@ -21,7 +21,10 @@ namespace SEE.Game.Drawable
         /// <param name="forceChange">
         /// Whether the page should also change if it is already the current page.
         /// </param>
-        public static void ChangeCurrentPage(GameObject obj, int page, bool forceChange = false)
+        public static void ChangeCurrentPage(
+            GameObject obj,
+            int page,
+            bool forceChange = false)
         {
             GameObject surface = GameFinder.GetDrawableSurface(obj);
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
@@ -44,8 +47,7 @@ namespace SEE.Game.Drawable
                     }
                 }
 
-                holder.OrderInLayer =
-                    GetMaximumPageOrderInLayer(GameFinder.GetAttachedObjectsObject(surface));
+                holder.OrderInLayer = GetMaximumPageOrderInLayer(GameFinder.GetAttachedObjectsObject(surface));
             }
 
             if (surface.TryGetDrawableSurface(out DrawableSurface drawableSurface))
@@ -145,8 +147,7 @@ namespace SEE.Game.Drawable
                 return 1;
             }
 
-            OrderInLayerValueHolder[] holders =
-                attachedObjects.GetComponentsInChildren<OrderInLayerValueHolder>();
+            OrderInLayerValueHolder[] holders = attachedObjects.GetComponentsInChildren<OrderInLayerValueHolder>();
 
             return holders.Length > 0
                 ? holders.Max(holder => holder.OrderInLayer) + 1
@@ -167,8 +168,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            AssociatedPageHolder[] holders =
-                attachedObjects.GetComponentsInChildren<AssociatedPageHolder>(true);
+            AssociatedPageHolder[] holders = attachedObjects.GetComponentsInChildren<AssociatedPageHolder>(true);
 
             foreach (AssociatedPageHolder holder in holders)
             {

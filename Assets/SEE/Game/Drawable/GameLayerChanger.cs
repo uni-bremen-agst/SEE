@@ -37,14 +37,19 @@ namespace SEE.Game.Drawable
         /// <param name="state">Query for increase or decrease.</param>
         /// <param name="showInformation">Show a notification when the limit is reached.</param>
         /// <param name="useWorldPos">Use world position for moving, only needed for sticky note.</param>
-        public static void ChangeOrderInLayer(GameObject obj, int order, LayerChangerStates state,
-            bool showInformation = true, bool useWorldPos = false)
+        public static void ChangeOrderInLayer(
+            GameObject obj,
+            int order,
+            LayerChangerStates state,
+            bool showInformation = true,
+            bool useWorldPos = false)
         {
             if (obj.GetComponent<OrderInLayerValueHolder>() != null
                 || obj.GetComponentInChildren<OrderInLayerValueHolder>() != null)
             {
-                OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
-                    obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
+                OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null
+                    ? obj.GetComponent<OrderInLayerValueHolder>()
+                    : obj.GetComponentInChildren<OrderInLayerValueHolder>();
 
                 /// Block that is executed if the order number is not permitted.
                 /// Exceeds the maximum or is equal or less then minimum.
@@ -75,12 +80,14 @@ namespace SEE.Game.Drawable
                         if (state == LayerChangerStates.Increase)
                         {
                             ShowNotification.Info("Increases the order",
-                                "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".", 0.8f);
+                                "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".",
+                                0.8f);
                         }
                         else
                         {
                             ShowNotification.Info("Decreases the order",
-                                "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".", 0.8f);
+                                "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".",
+                                0.8f);
                         }
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
@@ -135,7 +142,8 @@ namespace SEE.Game.Drawable
             /// For sticky notes, it's important to use the original position for the calculation.
             if (useWorldPos)
             {
-                obj.transform.position = oldPos - multiplyValue * ValueHolder.DistanceToDrawable.z * obj.transform.forward;
+                obj.transform.position = oldPos - multiplyValue * ValueHolder.DistanceToDrawable.z
+                    * obj.transform.forward;
             }
             else
             {
