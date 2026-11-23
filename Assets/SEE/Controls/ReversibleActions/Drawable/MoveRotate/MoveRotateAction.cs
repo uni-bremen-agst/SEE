@@ -79,9 +79,16 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
             /// <param name="degree">The degree on that the object was rotated. (Is the z value of the local euler angeles).</param>
             /// <param name="moveOrRotate">Whether the object was moved or rotated.</param>
             /// <param name="includeChildren">Whether child nodes were included in the operation.</param>
-            public Memento(GameObject selectedObject, GameObject surface, string id,
-                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles,
-                float degree, ProgressState moveOrRotate, bool includeChildren)
+            public Memento(
+                GameObject selectedObject,
+                GameObject surface,
+                string id,
+                Vector3 oldObjectPosition,
+                Vector3 newObjectPosition,
+                Vector3 oldObjectLocalEulerAngles,
+                float degree,
+                ProgressState moveOrRotate,
+                bool includeChildren)
             {
                 SelectedObject = selectedObject;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);

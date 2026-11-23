@@ -61,7 +61,8 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
             /// <param name="pageMode">
             /// The mode defining how loaded page indices are handled.
             /// </param>
-            internal State(LoadAction.LoadState mode,
+            internal State(
+                LoadAction.LoadState mode,
                 LoadAction.LoadPageMode pageMode = LoadAction.LoadPageMode.KeepStoredPages)
             {
                 Mode = mode;
@@ -239,10 +240,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
         /// The object containing the drawable objects attached to the surface.
         /// </param>
         /// <param name="prefix">The prefix used when creating a replacement ID.</param>
-        private static void CheckAndChangeID(
-            DrawableType configuration,
-            GameObject attachedObjects,
-            string prefix)
+        private static void CheckAndChangeID(DrawableType configuration, GameObject attachedObjects, string prefix)
         {
             if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, configuration.ID) != null
                 && !configuration.ID.Contains(ValueHolder.MindMapBranchLine))
