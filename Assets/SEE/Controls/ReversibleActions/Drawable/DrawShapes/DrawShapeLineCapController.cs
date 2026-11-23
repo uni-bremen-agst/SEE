@@ -174,7 +174,6 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
             regularPreviewLineKind = ValueHolder.CurrentLineKind;
         }
 
-
         /// <summary>
         /// Creates the currently selected start and end line-cap configurations.
         /// </summary>

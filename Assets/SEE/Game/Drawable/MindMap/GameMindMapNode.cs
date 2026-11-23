@@ -385,7 +385,6 @@ namespace SEE.Game.Drawable.MindMap
             node.FindDescendantWithTag(Tags.DText).GetComponent<Collider>().enabled = false;
         }
 
-
         /// <summary>
         /// Recreates a Mind Map node based on the given configuration.
         /// </summary>

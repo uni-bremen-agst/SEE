@@ -26,7 +26,6 @@ namespace SEE.Controls.ReversibleActions.Drawable
         /// </summary>
         private Vector3? splitMarkerPosition;
 
-
         /// <summary>
         /// This method manages the player's interaction with the mode
         /// <see cref="ActionStateType.LineSplit"/>.
