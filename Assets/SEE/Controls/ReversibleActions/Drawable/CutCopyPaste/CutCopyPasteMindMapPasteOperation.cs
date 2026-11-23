@@ -163,21 +163,17 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
             oldBranchLineConfig = null;
             editToOldBranchLine = false;
 
-            MMNodeValueHolder selectedValueHolder =
-                selectedObject.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder selectedValueHolder = selectedObject.GetComponent<MMNodeValueHolder>();
 
             if (selectedValueHolder.GetParentBranchLine() != null)
             {
-                oldBranchLineConfig =
-                    LineConf.GetLine(selectedValueHolder.GetParentBranchLine());
+                oldBranchLineConfig = LineConf.GetLine(selectedValueHolder.GetParentBranchLine());
             }
 
             nodesToPaste.MindMapNodeConfigs[0].BranchLineToParent = "";
             nodesToPaste.MindMapNodeConfigs[0].ParentNode = "";
 
-            GameMindMap.RenameMindMap(
-                nodesToPaste,
-                GameFinder.GetAttachedObjectsObject(newSurface));
+            GameMindMap.RenameMindMap(nodesToPaste, GameFinder.GetAttachedObjectsObject(newSurface));
 
             int currentPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
 
@@ -187,9 +183,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 DrawableType.Restore(type, newSurface);
             }
 
-            newObject = GameFinder.FindAttachedOrLocalDescendant(
-                newSurface,
-                nodesToPaste.MindMapNodeConfigs[0].ID);
+            newObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, nodesToPaste.MindMapNodeConfigs[0].ID);
 
             CutCopyPastePositioning.MoveToWorldPosition(
                 selectedObject,
@@ -197,8 +191,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 newSurface,
                 newPosition);
 
-            newNodesHolder =
-                GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
+            newNodesHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
 
             newValueHolder = MindMapNodeConf.GetNodeConf(newObject);
         }
@@ -224,8 +217,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
 
                 if (node.BranchLineConf != null)
                 {
-                    node.BranchLineConf.AssociatedPage =
-                        associatedPage;
+                    node.BranchLineConf.AssociatedPage = associatedPage;
                 }
             }
         }
@@ -236,8 +228,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <returns>Whether the parent-selection menu could be opened.</returns>
         internal bool TryOpenParentSelection()
         {
-            GameObject attachedObjects =
-                GameFinder.GetAttachedObjectsObject(newSurface);
+            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(newSurface);
 
             if (attachedObjects == null)
             {
@@ -266,20 +257,16 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
 
                 newValueHolder.ParentNode = parent.name;
 
-                GameObject branchLineToParent =
-                    parent.GetComponent<MMNodeValueHolder>()
-                        .GetChildren()[newObject];
+                GameObject branchLineToParent = parent.GetComponent<MMNodeValueHolder>().GetChildren()[newObject];
 
-                newValueHolder.BranchLineToParent =
-                    branchLineToParent.name;
+                newValueHolder.BranchLineToParent = branchLineToParent.name;
 
                 if (oldBranchLineConfig != null)
                 {
                     ApplyOldBranchLineAppearance(branchLineToParent);
                 }
 
-                newNodesHolder =
-                    GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
+                newNodesHolder = GameMindMapHierarchy.SummarizeSelectedNodeIncChildren(newObject);
 
                 return ParentSelectionResult.Completed;
             }
@@ -292,9 +279,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
 
             if (oldBranchLineConfig != null && !editToOldBranchLine)
             {
-                GameObject branchLineToParent =
-                    newObject.GetComponent<MMNodeValueHolder>()
-                        .GetParentBranchLine();
+                GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
 
                 ApplyOldBranchLineAppearance(branchLineToParent);
                 editToOldBranchLine = true;
@@ -309,9 +294,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <param name="branchLineToParent">The branch line to update.</param>
         private void ApplyOldBranchLineAppearance(GameObject branchLineToParent)
         {
-            GameLineEdit.ChangeLine(
-                branchLineToParent,
-                oldBranchLineConfig);
+            GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConfig);
 
             new EditLineNetAction(
                 newSurface.name,
@@ -344,8 +327,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 return;
             }
 
-            MMNodeValueHolder valueHolder =
-                newObject.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
 
             if (valueHolder == null)
             {
@@ -364,8 +346,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                     MindMapNodeConf.GetNodeConf(newObject)).Execute();
             }
 
-            GameObject branchLineToParent =
-                valueHolder.GetParentBranchLine();
+            GameObject branchLineToParent = valueHolder.GetParentBranchLine();
 
             if (branchLineToParent != null)
             {
@@ -389,10 +370,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
 
             foreach (DrawableType type in newNodesHolder.GetAllDrawableTypes())
             {
-                GameObject typeObject =
-                    GameFinder.FindAttachedOrLocalDescendant(
-                        newSurface,
-                        type.ID);
+                GameObject typeObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, type.ID);
 
                 new EraseNetAction(
                     newSurface.name,
@@ -417,18 +395,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                 return;
             }
 
-            GameObject oldObject =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    oldSurface,
-                    oldValueHolder.ID);
+            GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(oldSurface, oldValueHolder.ID);
 
-            GameObject branchLineToParent =
-                oldObject.GetComponent<MMNodeValueHolder>()
-                    .GetParentBranchLine();
+            GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
 
-            GameLineEdit.ChangeLine(
-                branchLineToParent,
-                oldBranchLineConfig);
+            GameLineEdit.ChangeLine(branchLineToParent, oldBranchLineConfig);
 
             new EditLineNetAction(
                 oldSurface.name,

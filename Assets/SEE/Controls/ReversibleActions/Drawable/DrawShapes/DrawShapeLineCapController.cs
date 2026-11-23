@@ -72,9 +72,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 return;
             }
 
-            RememberRegularPreviewLineKind(
-                hadReference,
-                currentShape.LineKind);
+            RememberRegularPreviewLineKind(hadReference, currentShape.LineKind);
 
             LineKind previewLineKind = ResolvePreviewLineKind(
                 hasReference,
@@ -210,9 +208,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 lastPreviewStartCap == LineCap.Reference
                 || lastPreviewEndCap == LineCap.Reference;
 
-            RememberRegularPreviewLineKind(
-                hadReference,
-                shapeConf.LineKind);
+            RememberRegularPreviewLineKind(hadReference, shapeConf.LineKind);
 
             LineKind lineKind = ResolvePreviewLineKind(
                 hasReference,
@@ -294,11 +290,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                     ? existingCapConf
                     : null;
 
-            LineCapConf capConf =
-                GameLineCapConfiguration.CreateLineCapConf(
-                    shapeConf,
-                    reusableCapConf,
-                    actualCap);
+            LineCapConf capConf = GameLineCapConfiguration.CreateLineCapConf(shapeConf, reusableCapConf, actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);
 

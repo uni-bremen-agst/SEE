@@ -25,15 +25,13 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// The prefab for the switch that opens either the shape menu
         /// or the line configuration menu.
         /// </summary>
-        private const string drawableSwitchPrefab =
-            "Prefabs/UI/Drawable/ShapeSwitch";
+        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/ShapeSwitch";
 
         /// <summary>
         /// The prefab containing the shape type selection,
         /// shape-specific values and information controls.
         /// </summary>
-        private const string drawableShapePrefab =
-            "Prefabs/UI/Drawable/ShapeMenu";
+        private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
         #endregion
 
         #region Controls
@@ -92,27 +90,16 @@ namespace SEE.UI.Menu.Drawable.Shapes
         static ShapeMenu()
         {
             GameObject switchObject =
-                PrefabInstantiator.InstantiatePrefab(
-                    drawableSwitchPrefab,
-                    UICanvas.Canvas.transform,
-                    false);
+                PrefabInstantiator.InstantiatePrefab(drawableSwitchPrefab, UICanvas.Canvas.transform, false);
 
             GameObject menuObject =
-                PrefabInstantiator.InstantiatePrefab(
-                    drawableShapePrefab,
-                    UICanvas.Canvas.transform,
-                    false);
+                PrefabInstantiator.InstantiatePrefab(drawableShapePrefab, UICanvas.Canvas.transform, false);
 
-            controls = new ShapeMenuControls(
-                switchObject,
-                menuObject);
+            controls = new ShapeMenuControls(switchObject, menuObject);
 
-            layout = new ShapeMenuLayout(
-                controls,
-                state);
+            layout = new ShapeMenuLayout(controls, state);
 
-            switcher = new ShapeMenuSwitcher(
-                controls);
+            switcher = new ShapeMenuSwitcher(controls);
 
             switcher.Initialize();
             InitShapeMenu();
@@ -324,20 +311,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         private static void InitShapeMenu()
         {
-            InitializeSelector(
-                controls.ShapeSelector,
-                GetShapes(),
-                selected => SetSelectedShape(selected));
+            InitializeSelector(controls.ShapeSelector, GetShapes(), selected => SetSelectedShape(selected));
 
-            InitializeSelector(
-                controls.UMLShapeSelector,
-                GetUMLShapes(),
-                selected => SetSelectedUMLShape(selected));
+            InitializeSelector(controls.UMLShapeSelector, GetUMLShapes(), selected => SetSelectedUMLShape(selected));
 
-            InitializeSelector(
-                controls.OrientationSelector,
-                GetOrientations(),
-                selected => state.Orientation = selected);
+            InitializeSelector(controls.OrientationSelector, GetOrientations(), selected => state.Orientation = selected);
 
             InitializeSelector(
                 controls.LineStartSelector,
@@ -359,37 +337,21 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     layout.SetLineEndCap(conf);
                 });
 
-            InitializeFloatSlider(
-                controls.Value1Slider,
-                value => state.Value1 = value);
+            InitializeFloatSlider(controls.Value1Slider, value => state.Value1 = value);
 
-            InitializeFloatSlider(
-                controls.Value2Slider,
-                value => state.Value2 = value);
+            InitializeFloatSlider(controls.Value2Slider, value => state.Value2 = value);
 
-            InitializeFloatSlider(
-                controls.Value3Slider,
-                value => state.Value3 = value);
+            InitializeFloatSlider(controls.Value3Slider, value => state.Value3 = value);
 
-            InitializeFloatSlider(
-                controls.Value4Slider,
-                value => state.Value4 = value);
+            InitializeFloatSlider(controls.Value4Slider, value => state.Value4 = value);
 
-            InitializeFloatSlider(
-                controls.Angle1Slider,
-                value => state.Angle1 = value);
+            InitializeFloatSlider(controls.Angle1Slider, value => state.Angle1 = value);
 
-            InitializeFloatSlider(
-                controls.Angle2Slider,
-                value => state.Angle2 = value);
+            InitializeFloatSlider(controls.Angle2Slider, value => state.Angle2 = value);
 
-            InitializeFloatSlider(
-                controls.OffsetSlider,
-                value => state.Offset = value);
+            InitializeFloatSlider(controls.OffsetSlider, value => state.Offset = value);
 
-            InitializeIntSlider(
-                controls.VerticesSlider,
-                value => state.Vertices = value);
+            InitializeIntSlider(controls.VerticesSlider, value => state.Vertices = value);
 
             infoVisibility = false;
 
@@ -433,10 +395,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="onSelected">
         /// The callback invoked when the user selects a value.
         /// </param>
-        private static void InitializeSelector<T>(
-            HorizontalSelector selector,
-            List<T> values,
-            Action<T> onSelected)
+        private static void InitializeSelector<T>(HorizontalSelector selector, List<T> values, Action<T> onSelected)
         {
             foreach (T value in values)
             {
@@ -459,9 +418,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="onValueChanged">
         /// The callback invoked when the value changes.
         /// </param>
-        private static void InitializeFloatSlider(
-            FloatValueSliderController slider,
-            Action<float> onValueChanged)
+        private static void InitializeFloatSlider(FloatValueSliderController slider, Action<float> onValueChanged)
         {
             slider.onValueChanged.AddListener(value =>
             {
@@ -476,9 +433,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="onValueChanged">
         /// The callback invoked when the value changes.
         /// </param>
-        private static void InitializeIntSlider(
-            IntValueSliderController slider,
-            Action<int> onValueChanged)
+        private static void InitializeIntSlider(IntValueSliderController slider, Action<int> onValueChanged)
         {
             onValueChanged(slider.GetValue());
 
@@ -575,8 +530,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     break;
             }
 
-            controls.InfoImage.sprite =
-                Resources.Load<Sprite>(path);
+            controls.InfoImage.sprite = Resources.Load<Sprite>(path);
         }
         #endregion
 
@@ -631,13 +585,9 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </param>
         public static void AssignFinishButton(UnityAction action)
         {
-            controls.FinishButtonManager
-                .onClick
-                .RemoveAllListeners();
+            controls.FinishButtonManager.onClick.RemoveAllListeners();
 
-            controls.FinishButtonManager
-                .onClick
-                .AddListener(action);
+            controls.FinishButtonManager.onClick.AddListener(action);
         }
         #endregion
 
@@ -651,13 +601,9 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="endCapConf">
         /// The end line-cap configuration.
         /// </param>
-        public static void SetLineCaps(
-            LineCapConf startCapConf,
-            LineCapConf endCapConf)
+        public static void SetLineCaps(LineCapConf startCapConf, LineCapConf endCapConf)
         {
-            layout.SetLineCaps(
-                startCapConf,
-                endCapConf);
+            layout.SetLineCaps(startCapConf, endCapConf);
         }
 
         /// <summary>

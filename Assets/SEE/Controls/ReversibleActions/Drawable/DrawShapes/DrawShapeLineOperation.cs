@@ -200,10 +200,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 - ValueHolder.DistanceToDrawable;
 
             Vector3[] newPositions = new Vector3[positions.Length + 1];
-            Array.Copy(
-                sourceArray: positions,
-                destinationArray: newPositions,
-                length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
 
             newPosition.z = 0;
             newPositions[^1] = newPosition;
@@ -324,10 +321,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
             }
 
             Vector3[] newPositions = new Vector3[positions.Length + 1];
-            Array.Copy(
-                sourceArray: positions,
-                destinationArray: newPositions,
-                length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
 
             newPositions[^1] = newPosition;
             positions = newPositions;
@@ -392,10 +386,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 - ValueHolder.DistanceToDrawable;
 
             Vector3[] newPositions = new Vector3[positions.Length + 1];
-            Array.Copy(
-                sourceArray: positions,
-                destinationArray: newPositions,
-                length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
 
             newPositions[^1] = newPosition;
             positions = newPositions;
@@ -448,13 +439,10 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
 
             shape.GetComponent<LineRenderer>().loop = enableLoop;
 
-            GameObject finishedShape =
-                GameLineGeometry.SetPivot(shape, fillOutColor);
+            GameObject finishedShape = GameLineGeometry.SetPivot(shape, fillOutColor);
 
-            LineConf configuration = lineCapController.ApplyFinal(
-                finishedShape,
-                surface,
-                LineConf.GetLine(finishedShape));
+            LineConf configuration =
+                lineCapController.ApplyFinal(finishedShape, surface, LineConf.GetLine(finishedShape));
 
             Reset();
 
@@ -540,8 +528,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 {
                     if (fillOutColor != null)
                     {
-                        UnityEngine.Object.DestroyImmediate(
-                            shape.FindDescendant(ValueHolder.FillOut));
+                        UnityEngine.Object.DestroyImmediate(shape.FindDescendant(ValueHolder.FillOut));
 
                         new DeleteFillOutNetAction(
                             surface.name,
@@ -596,9 +583,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 {
                     fillOutColor = color;
 
-                    GameLineFillOut.ChangeFillOutColor(
-                        shape,
-                        color);
+                    GameLineFillOut.ChangeFillOutColor(shape, color);
 
                     new EditLineFillOutColorNetAction(
                         surface.name,

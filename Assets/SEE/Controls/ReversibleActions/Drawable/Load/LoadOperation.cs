@@ -130,9 +130,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
             {
                 int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
 
-                GameDrawablePageManager.ChangeCurrentPage(
-                    state.SpecificSurface.GetDrawableSurface(),
-                    targetPage);
+                GameDrawablePageManager.ChangeCurrentPage(state.SpecificSurface.GetDrawableSurface(), targetPage);
 
                 GameDrawablePageManager.ChangeMaxPage(
                     state.SpecificSurface.GetDrawableSurface(),
@@ -142,9 +140,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
             }
             else
             {
-                GameDrawablePageManager.ChangeCurrentPage(
-                    state.SpecificSurface.GetDrawableSurface(),
-                    0);
+                GameDrawablePageManager.ChangeCurrentPage(state.SpecificSurface.GetDrawableSurface(), 0);
 
                 int max = DrawableConfigManager.GetDrawableConfig(selectedSurface)
                     .GetAllDrawableTypes()
@@ -152,9 +148,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                     .DefaultIfEmpty(0)
                     .Max();
 
-                GameDrawablePageManager.ChangeMaxPage(
-                    state.SpecificSurface.GetDrawableSurface(),
-                    max + 1);
+                GameDrawablePageManager.ChangeMaxPage(state.SpecificSurface.GetDrawableSurface(), max + 1);
             }
 
             state.Configs = configs;
@@ -174,8 +168,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
 
             foreach (DrawableConfig drawableConfig in configs.Drawables)
             {
-                GameObject surfaceOfFile =
-                    GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
+                GameObject surfaceOfFile = GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
 
                 if (surfaceOfFile != null && GameFinder.IsStickyNote(surfaceOfFile))
                 {
@@ -194,9 +187,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                 }
                 else
                 {
-                    state.OldConfigs.Add(
-                        surfaceOfFile,
-                        DrawableConfigManager.GetDrawableConfig(surfaceOfFile));
+                    state.OldConfigs.Add(surfaceOfFile, DrawableConfigManager.GetDrawableConfig(surfaceOfFile));
                 }
 
                 Restore(surfaceOfFile, drawableConfig);
@@ -275,8 +266,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
 
             foreach (DrawableType type in config.GetAllDrawableTypes())
             {
-                GameObject typeObject =
-                    GameFinder.FindAttachedOrLocalDescendant(attachedObjects, type.ID);
+                GameObject typeObject = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, type.ID);
 
                 if (typeObject != null)
                 {
@@ -324,8 +314,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                     {
                         if (state.AddedSurfaces.Contains(config))
                         {
-                            GameObject surface =
-                                GameFinder.FindDrawableSurface(config.ID, config.ParentID);
+                            GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
 
                             new StickyNoteDeleterNetAction(
                                 DrawableConfigManager.GetDrawableConfig(surface)).Execute();
@@ -334,11 +323,9 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                         }
                         else
                         {
-                            GameObject surface =
-                                GameFinder.FindDrawableSurface(config.ID, config.ParentID);
+                            GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
 
-                            GameObject attachedObject =
-                                GameFinder.GetAttachedObjectsObject(surface);
+                            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(surface);
 
                             DestroyLoadedObjects(attachedObject, config);
                         }
@@ -374,13 +361,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                 case LoadAction.LoadState.Regular:
                     foreach (DrawableConfig config in state.Configs.Drawables)
                     {
-                        GameObject surface =
-                            GameFinder.FindDrawableSurface(config.ID, config.ParentID);
+                        GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
 
                         if (surface == null)
                         {
-                            surface = GameFinder.GetDrawableSurface(
-                                GameStickyNoteManager.Spawn(config));
+                            surface = GameFinder.GetDrawableSurface(GameStickyNoteManager.Spawn(config));
 
                             new StickyNoteSpawnNetAction(config).Execute();
                         }
