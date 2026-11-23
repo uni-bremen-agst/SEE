@@ -198,10 +198,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowValueFacts facts =
                 sourcePositionFacts | enumValueFacts;
 
-            HashSet<ISymbol> inspectedReturnSymbols =
-                new(
-                    inspectedImmutableMembers,
-                    SymbolEqualityComparer.Default);
+            // These leaf bindings cannot enter the guarded local or invocation
+            // branches of IsDefinitelyNonNull. Keep independent guards elsewhere.
+            ArgumentNullException.ThrowIfNull(inspectedImmutableMembers, "collection");
+            bool canBorrowReturnGuard =
+                ReferenceEquals(inspectedImmutableMembers.Comparer, SymbolEqualityComparer.Default)
+                && (unwrappedExpression is IdentifierNameSyntax or MemberAccessExpressionSyntax)
+                && symbolInfo.Symbol is IParameterSymbol or IFieldSymbol or IPropertySymbol;
+            HashSet<ISymbol> inspectedReturnSymbols = canBorrowReturnGuard
+                ? inspectedImmutableMembers
+                : new(inspectedImmutableMembers, SymbolEqualityComparer.Default);
 
             if (IsDefinitelyNonNull(
                     unwrappedExpression,
