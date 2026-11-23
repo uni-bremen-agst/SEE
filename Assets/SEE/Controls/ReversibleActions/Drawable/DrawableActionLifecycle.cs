@@ -39,18 +39,15 @@ namespace SEE.Controls.ReversibleActions.Drawable
             {
                 EditAction.Reset();
             }
-
-            if (previousActionState == ActionStateTypes.CutCopyPaste)
+            else if (previousActionState == ActionStateTypes.CutCopyPaste)
             {
                 CutCopyPasteAction.Reset();
             }
-
-            if (previousActionState == ActionStateTypes.Scale)
+            else if (previousActionState == ActionStateTypes.Scale)
             {
                 ScaleAction.Reset();
             }
-
-            if (previousActionState == ActionStateTypes.LayerChanger)
+            else if (previousActionState == ActionStateTypes.LayerChanger)
             {
                 LayerChangeAction.Reset();
             }

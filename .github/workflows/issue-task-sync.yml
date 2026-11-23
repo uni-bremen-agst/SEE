@@ -1,3 +1,20 @@
+
+# Synchronizes issue checklists with development progress.
+#
+# On pushes to branches such as refactor/961-description, commit messages
+# containing "Checks #961: <checklist item>" mark the matching checklist
+# entry as completed and append a NIM (Not in Master) marker.
+#
+# The marker indicates that the corresponding change has not yet been
+# merged into master. After merging a pull request from the same repository
+# into master, the workflow removes the markers belonging to that branch.
+#
+# A manual workflow_dispatch run can process an already merged pull request
+# if the automatic merge event was missed.
+#
+# Only uniquely matching checklist entries are updated. Existing entries
+# are never automatically unchecked, and unrelated issues are not modified.
+
 name: Issue task sync
 
 "on":

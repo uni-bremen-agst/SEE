@@ -153,12 +153,12 @@ namespace SEE.UI.Menu.Drawable
             infoButton.onClick.AddListener(() =>
             {
                 ShowNotification.Info("Movement Buttons",
-                    "Up-Button moves on Y-axis positiv."
-                    + "\nDown-Button moves on Y-axis negativ."
-                    + "\nLeft-Button moves on X-axis negativ."
-                    + "\nRight-Button moves on X-axis positiv."
-                    + "\nForward-Button moves on Z-axis positiv."
-                    + "\nBack-Button moves on Z-axis negativ.");
+                    "Up-Button moves along the positive local Y-axis."
+                    + "\nDown-Button moves along the negative local Y-axis."
+                    + "\nLeft-Button moves along the negative local X-axis."
+                    + "\nRight-Button moves along the positive local X-axis."
+                    + "\nForward-Button moves along the positive local Z-axis."
+                    + "\nBack-Button moves along the negative local Z-axis.");
             });
         }
 
