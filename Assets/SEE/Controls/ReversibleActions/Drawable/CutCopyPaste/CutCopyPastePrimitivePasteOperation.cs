@@ -17,8 +17,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <param name="targetSurface">The surface on which the copy is created.</param>
         /// <param name="worldPosition">The requested world position of the copy.</param>
         /// <returns>The newly created object.</returns>
-        internal GameObject Execute(GameObject selectedObject, GameObject targetSurface,
-            Vector3 worldPosition)
+        internal GameObject Execute(GameObject selectedObject, GameObject targetSurface, Vector3 worldPosition)
         {
             DrawableType configuration = DrawableType.Get(selectedObject);
             configuration.ID = "";

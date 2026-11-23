@@ -117,8 +117,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
             /// <param name="oldSurface">The drawable surface on which the drawable type object was displayed.</param>
             /// <param name="newSurface">The drawable surface on which the drawable type object is displayed.</param>
             /// <param name="cutCopy">The state whether it was cut or copied.</param>
-            public Memento(DrawableType oldValueHolder,
-                DrawableType newValueHolder, GameObject oldSurface, GameObject newSurface, CutCopy cutCopy)
+            public Memento(
+                DrawableType oldValueHolder,
+                DrawableType newValueHolder,
+                GameObject oldSurface,
+                GameObject newSurface,
+                CutCopy cutCopy)
             {
                 OldValueHolder = oldValueHolder;
                 NewValueHolder = newValueHolder;

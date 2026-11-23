@@ -60,8 +60,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
             /// <param name="oldBranchLineConfig">
             /// The original configuration of the branch line to the parent.
             /// </param>
-            internal Result(GameObject newObject, MindMapNodeConf newValueHolder,
-                DrawableConfig newNodesHolder, LineConf oldBranchLineConfig)
+            internal Result(
+                GameObject newObject,
+                MindMapNodeConf newValueHolder,
+                DrawableConfig newNodesHolder,
+                LineConf oldBranchLineConfig)
             {
                 NewObject = newObject;
                 NewValueHolder = newValueHolder;
@@ -141,10 +144,15 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <param name="newSurface">The target drawable surface.</param>
         /// <param name="newPosition">The requested world position.</param>
         /// <param name="wasCut">Whether the original subtree is being cut.</param>
-        internal void Paste(GameObject selectedObject, GameObject oldSurface,
-            DrawableType oldValueHolder, DrawableConfig oldNodesHolder,
-            DrawableConfig nodesToPaste, GameObject newSurface,
-            Vector3 newPosition, bool wasCut)
+        internal void Paste(
+            GameObject selectedObject,
+            GameObject oldSurface,
+            DrawableType oldValueHolder,
+            DrawableConfig oldNodesHolder,
+            DrawableConfig nodesToPaste,
+            GameObject newSurface,
+            Vector3 newPosition,
+            bool wasCut)
         {
             this.oldSurface = oldSurface;
             this.newSurface = newSurface;
@@ -205,9 +213,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <param name="associatedPage">
         /// The page on which the pasted drawable should be restored.
         /// </param>
-        private static void AssignAssociatedPage(
-            DrawableType type,
-            int associatedPage)
+        private static void AssignAssociatedPage(DrawableType type, int associatedPage)
         {
             type.AssociatedPage = associatedPage;
 

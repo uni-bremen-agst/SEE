@@ -18,8 +18,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// <param name="pastedObject">The pasted object to move.</param>
         /// <param name="targetSurface">The drawable surface containing the pasted object.</param>
         /// <param name="worldPosition">The requested world position.</param>
-        internal static void MoveToWorldPosition(GameObject sourceObject, GameObject pastedObject,
-            GameObject targetSurface, Vector3 worldPosition)
+        internal static void MoveToWorldPosition(
+            GameObject sourceObject,
+            GameObject pastedObject,
+            GameObject targetSurface,
+            Vector3 worldPosition)
         {
             Vector3 localPosition = targetSurface.GetRootParent().transform
                 .InverseTransformPoint(worldPosition);
