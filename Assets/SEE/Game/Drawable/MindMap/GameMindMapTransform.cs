@@ -126,10 +126,7 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="rotationSetMode">
         /// Whether child nodes should adopt the current rotation of the parent.
         /// </param>
-        private static void PrepareNodeChildren(
-            GameObject node,
-            bool setMode,
-            bool rotationSetMode = false)
+        private static void PrepareNodeChildren(GameObject node, bool setMode, bool rotationSetMode = false)
         {
             if (!node.CompareTag(Tags.MindMapNode))
             {

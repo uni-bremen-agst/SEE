@@ -256,10 +256,7 @@ namespace SEE.Game.Drawable.Line
             /// <param name="retainsEndCap">
             /// Whether the original end cap is retained.
             /// </param>
-            public LoopSegment(
-                Vector3[] positions,
-                bool retainsStartCap,
-                bool retainsEndCap)
+            public LoopSegment(Vector3[] positions, bool retainsStartCap, bool retainsEndCap)
             {
                 Positions = positions;
                 RetainsStartCap = retainsStartCap;
@@ -639,10 +636,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="originLine">The original line.</param>
         /// <param name="segmentLine">The segment line to update.</param>
         /// <param name="positions">The positions of the segment line.</param>
-        private static void AdjustLineCapsForSegment(
-            LineConf originLine,
-            LineConf segmentLine,
-            Vector3[] positions)
+        private static void AdjustLineCapsForSegment(LineConf originLine, LineConf segmentLine, Vector3[] positions)
         {
             if (originLine == null || segmentLine == null || positions == null || positions.Length < 2)
             {

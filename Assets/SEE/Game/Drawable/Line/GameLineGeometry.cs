@@ -234,10 +234,7 @@ namespace SEE.Game.Drawable.Line
         /// The indices of the points to move. All specified points receive the same position.
         /// </param>
         /// <param name="point">The new point position.</param>
-        public static void MovePoint(
-            GameObject line,
-            List<int> indices,
-            Vector3 point)
+        public static void MovePoint(GameObject line, List<int> indices, Vector3 point)
         {
             Vector3[] originalPositions = GetOriginalLinePositions(line);
 

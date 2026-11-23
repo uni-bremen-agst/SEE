@@ -34,10 +34,7 @@ namespace SEE.Game.Drawable.Line
         /// True if the fill-out mesh was successfully created or updated,
         /// otherwise false.
         /// </returns>
-        public static bool FillOut(
-            GameObject shape,
-            Color? color = null,
-            bool showInfo = false)
+        public static bool FillOut(GameObject shape, Color? color = null, bool showInfo = false)
         {
             if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
                 && GameLineGeometry.DifferentPositionCounter(shape) > 2)
@@ -149,10 +146,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="shape">The shape whose fill-out should be changed.</param>
         /// <param name="status">Whether the fill-out should be enabled.</param>
         /// <param name="color">The color of the fill-out.</param>
-        internal static void ChangeFillOut(
-            GameObject shape,
-            bool status,
-            Color color)
+        internal static void ChangeFillOut(GameObject shape, bool status, Color color)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {

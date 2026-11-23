@@ -279,10 +279,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="line">The line on which the position should be added.</param>
         /// <param name="position">The position to be added.</param>
         /// <param name="index">The index on which it should be added.</param>
-        public static void DrawPoint(
-            GameObject line,
-            Vector3 position,
-            int index)
+        public static void DrawPoint(GameObject line, Vector3 position, int index)
         {
             LineRenderer renderer = GetRenderer(line);
             position.z = 0;
@@ -306,11 +303,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="fillOutColor">The color to fill out the line; null if the line should not filled out.</param>
         /// <param name="showInfo">Whether the information of the fill out should be shown.</param>
-        public static void FinishDrawing(
-            GameObject line,
-            bool loop,
-            Color? fillOutColor = null,
-            bool showInfo = true)
+        public static void FinishDrawing(GameObject line, bool loop, Color? fillOutColor = null, bool showInfo = true)
         {
             LineRenderer renderer = GetRenderer(line);
             MeshCollider meshCollider = GetMeshCollider(line);

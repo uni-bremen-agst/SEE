@@ -54,10 +54,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="tiling">
         /// The texture tiling used for <see cref="LineKind.Dashed"/>.
         /// </param>
-        public static void ChangeLineKind(
-            GameObject shape,
-            LineKind lineKind,
-            float tiling)
+        public static void ChangeLineKind(GameObject shape, LineKind lineKind, float tiling)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
@@ -81,10 +78,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="conf">
         /// The visual configuration containing the colors to restore.
         /// </param>
-        public static void ChangeColorKind(
-            GameObject shape,
-            ColorKind colorKind,
-            ILineVisualConf conf)
+        public static void ChangeColorKind(GameObject shape, ColorKind colorKind, ILineVisualConf conf)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
@@ -205,10 +199,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="tiling">
         /// The custom texture tiling used for <see cref="LineKind.Dashed"/>.
         /// </param>
-        internal static void SetRendererTextureScale(
-            LineRenderer renderer,
-            LineKind lineKind,
-            float tiling)
+        internal static void SetRendererTextureScale(LineRenderer renderer, LineKind lineKind, float tiling)
         {
             switch (lineKind)
             {

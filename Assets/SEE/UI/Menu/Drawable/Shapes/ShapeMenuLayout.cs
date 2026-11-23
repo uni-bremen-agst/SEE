@@ -314,10 +314,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="isActive">
         /// True to enable both objects; otherwise, false.
         /// </param>
-        private static void SetUIElementActive(
-            GameObject uiObject,
-            GameObject labelObject,
-            bool isActive)
+        private static void SetUIElementActive(GameObject uiObject, GameObject labelObject, bool isActive)
         {
             uiObject.SetActive(isActive);
             labelObject.SetActive(isActive);

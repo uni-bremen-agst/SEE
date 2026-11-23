@@ -26,10 +26,7 @@ namespace SEE.Game.Drawable.MindMap
         /// and child identifiers.
         /// </param>
         /// <returns>The created or recreated branch line.</returns>
-        public static GameObject CreateBranchLine(
-            GameObject child,
-            GameObject parent,
-            string name = "")
+        public static GameObject CreateBranchLine(GameObject child, GameObject parent, string name = "")
         {
             Vector3 endPoint = NearestPoints.GetNearestPoint(parent, child.transform.position);
             Vector3 startPoint = NearestPoints.GetNearestPoint(child, endPoint);

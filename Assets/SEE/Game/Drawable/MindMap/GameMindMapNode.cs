@@ -293,7 +293,10 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="borderConf">
         /// The previous border configuration that should be preserved when applicable.
         /// </param>
-        internal static void ApplyNodeKindAppearance(GameObject node, MindMapNodeKind newNodeKind, LineConf borderConf = null)
+        internal static void ApplyNodeKindAppearance(
+            GameObject node,
+            MindMapNodeKind newNodeKind,
+            LineConf borderConf = null)
         {
             GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
             GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);

@@ -21,10 +21,7 @@ namespace SEE.Game.Drawable
         /// <param name="forceChange">
         /// Whether the page should also change if it is already the current page.
         /// </param>
-        public static void ChangeCurrentPage(
-            GameObject obj,
-            int page,
-            bool forceChange = false)
+        public static void ChangeCurrentPage(GameObject obj, int page, bool forceChange = false)
         {
             GameObject surface = GameFinder.GetDrawableSurface(obj);
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();

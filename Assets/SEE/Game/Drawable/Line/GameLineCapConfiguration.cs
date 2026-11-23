@@ -23,10 +23,7 @@ namespace SEE.Game.Drawable.Line
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="line"/> is null.
         /// </exception>
-        internal static LineCapConf CreateLineCapConf(
-            LineConf line,
-            LineCapConf existingConf,
-            LineCap newCapKind)
+        internal static LineCapConf CreateLineCapConf(LineConf line, LineCapConf existingConf, LineCap newCapKind)
         {
             if (line == null)
             {

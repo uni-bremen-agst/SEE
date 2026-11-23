@@ -91,11 +91,7 @@ namespace SEE.Game.Drawable.Editing
         /// <param name="currentConf">The current line configuration.</param>
         /// <param name="start">The starting line cap.</param>
         /// <param name="end">The ending line cap.</param>
-        internal static void ChangeLineCaps(
-            GameObject line,
-            LineConf currentConf,
-            LineCap start,
-            LineCap end)
+        internal static void ChangeLineCaps(GameObject line, LineConf currentConf, LineCap start, LineCap end)
         {
             if (line == null || !line.CompareTag(Tags.Line) || currentConf == null)
             {
@@ -123,10 +119,7 @@ namespace SEE.Game.Drawable.Editing
         /// True if the start cap should be changed, false if the end cap should be changed.
         /// </param>
         /// <param name="capConf">The new visual configuration of the line cap.</param>
-        internal static void ChangeLineCapStyle(
-            GameObject line,
-            bool isStartCap,
-            LineCapConf capConf)
+        internal static void ChangeLineCapStyle(GameObject line, bool isStartCap, LineCapConf capConf)
         {
             if (line == null || !line.CompareTag(Tags.Line) || capConf == null)
             {
