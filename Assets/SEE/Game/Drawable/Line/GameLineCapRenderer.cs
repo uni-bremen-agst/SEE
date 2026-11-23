@@ -29,12 +29,8 @@ namespace SEE.Game.Drawable.Line
 
             foreach (Transform child in shape.transform)
             {
-                if (child.gameObject.name.StartsWith(
-                        ValueHolder.LineStartCapPrefix,
-                        StringComparison.Ordinal)
-                    || child.gameObject.name.StartsWith(
-                        ValueHolder.LineEndCapPrefix,
-                        StringComparison.Ordinal))
+                if (child.gameObject.name.StartsWith(ValueHolder.LineStartCapPrefix, StringComparison.Ordinal)
+                    || child.gameObject.name.StartsWith(ValueHolder.LineEndCapPrefix, StringComparison.Ordinal))
                 {
                     capsToRemove.Add(child.gameObject);
                 }
@@ -77,14 +73,7 @@ namespace SEE.Game.Drawable.Line
 
             LineCapConf capConf = GameLineCapConfiguration.CreateLineCapConf(line, null, capKind);
 
-            return DrawLineCap(
-                shape,
-                prefix,
-                points,
-                anchor,
-                angleInDegrees,
-                capConf,
-                useOwnVisuals: false);
+            return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf, useOwnVisuals: false);
         }
 
         /// <summary>
@@ -122,10 +111,9 @@ namespace SEE.Game.Drawable.Line
 
             GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
 
-            Color? fillOutColor =
-                capConf.FillOutStatus && CanApplyFillOut(points)
-                    ? capConf.FillOutColor
-                    : null;
+            Color? fillOutColor = capConf.FillOutStatus && CanApplyFillOut(points)
+                ? capConf.FillOutColor
+                : null;
 
             GameObject capObject = GameLineDrawer.DrawLine(
                 drawableSurface,
@@ -146,14 +134,11 @@ namespace SEE.Game.Drawable.Line
             GameLineGeometry.SetPivotShape(capObject, Vector3.zero);
 
             capObject.transform.SetParent(shape.transform, false);
-            capObject.transform.localEulerAngles =
-                new Vector3(0.0f, 0.0f, angleInDegrees);
-            capObject.transform.localPosition =
-                new Vector3(anchor.x, anchor.y, anchor.z);
+            capObject.transform.localEulerAngles = new Vector3(0.0f, 0.0f, angleInDegrees);
+            capObject.transform.localPosition = new Vector3(anchor.x, anchor.y, anchor.z);
             capObject.tag = Tags.LineCap;
 
-            LineCapValueHolder capValueHolder =
-                shape.GetComponent<LineCapValueHolder>();
+            LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
 
             if (name.StartsWith(ValueHolder.LineStartCapPrefix))
             {
@@ -177,15 +162,10 @@ namespace SEE.Game.Drawable.Line
         /// True for start-cap objects, false for end-cap objects.
         /// </param>
         /// <returns>All matching line-cap objects.</returns>
-        internal static List<GameObject> GetLineCapObjects(
-            GameObject shape,
-            bool isStartCap)
+        internal static List<GameObject> GetLineCapObjects(GameObject shape, bool isStartCap)
         {
             string capName = GetLineCapName(
-                shape,
-                isStartCap
-                    ? ValueHolder.LineStartCapPrefix
-                    : ValueHolder.LineEndCapPrefix);
+                shape, isStartCap ? ValueHolder.LineStartCapPrefix : ValueHolder.LineEndCapPrefix);
 
             return shape.FindAllDescendantWithStartingName(capName);
         }
@@ -193,6 +173,11 @@ namespace SEE.Game.Drawable.Line
         /// <summary>
         /// Draws the line-cap object for the given configuration.
         /// </summary>
+        /// <param name="shape">The parent line shape.</param>
+        /// <param name="line">The parent line configuration containing its geometry.</param>
+        /// <param name="conf">The line-cap configuration to apply.</param>
+        /// <param name="position">Whether the cap belongs at the start or end of the line.</param>
+        /// <param name="useCapConfVisuals">Whether to use the cap's own visual configuration.</param>
         internal static void DrawLineCapObject(
             GameObject shape,
             LineConf line,
@@ -222,22 +207,15 @@ namespace SEE.Game.Drawable.Line
             else if (line.Loop)
             {
                 anchor = line.RendererPositions[0];
-
-                direction =
-                    line.RendererPositions[0]
+                direction = line.RendererPositions[0]
                     - line.RendererPositions[line.RendererPositions.Length - 1];
-
                 prefix = ValueHolder.LineEndCapPrefix;
             }
             else
             {
-                anchor =
-                    line.RendererPositions[line.RendererPositions.Length - 1];
-
-                direction =
-                    line.RendererPositions[line.RendererPositions.Length - 1]
+                anchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                direction = line.RendererPositions[line.RendererPositions.Length - 1]
                     - line.RendererPositions[line.RendererPositions.Length - 2];
-
                 prefix = ValueHolder.LineEndCapPrefix;
             }
 
@@ -246,8 +224,7 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            float angleInDegrees =
-                Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
             for (int i = 0; i < capShapes.Count; i++)
             {
@@ -256,25 +233,11 @@ namespace SEE.Game.Drawable.Line
 
                 if (useCapConfVisuals)
                 {
-                    DrawLineCap(
-                        shape,
-                        name,
-                        capShape.Points,
-                        anchor,
-                        angleInDegrees,
-                        conf,
-                        true);
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf, true);
                 }
                 else
                 {
-                    DrawLineCap(
-                        shape,
-                        name,
-                        capShape.Points,
-                        anchor,
-                        angleInDegrees,
-                        line,
-                        conf.CapKind);
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
                 }
             }
         }
@@ -282,6 +245,8 @@ namespace SEE.Game.Drawable.Line
         /// <summary>
         /// Determines whether a fill-out can be applied to the given points.
         /// </summary>
+        /// <param name="points">The line-cap points to examine.</param>
+        /// <returns>Whether the points contain at least three distinct positions.</returns>
         private static bool CanApplyFillOut(Vector3[] points)
         {
             return points != null && points.Distinct().Count() > 2;
@@ -290,6 +255,9 @@ namespace SEE.Game.Drawable.Line
         /// <summary>
         /// Builds the line-cap object name for the given shape and prefix.
         /// </summary>
+        /// <param name="shape">The line shape whose name should be used.</param>
+        /// <param name="prefix">The line-cap prefix to prepend to the line's identifier.</param>
+        /// <returns>The name of the line-cap object.</returns>
         private static string GetLineCapName(GameObject shape, string prefix)
         {
             if (shape == null)
@@ -299,12 +267,9 @@ namespace SEE.Game.Drawable.Line
 
             string shapeName = shape.name;
 
-            if (shapeName.StartsWith(
-                    ValueHolder.LinePrefix,
-                    StringComparison.Ordinal))
+            if (shapeName.StartsWith(ValueHolder.LinePrefix, StringComparison.Ordinal))
             {
-                shapeName =
-                    shapeName.Substring(ValueHolder.LinePrefix.Length);
+                shapeName = shapeName.Substring(ValueHolder.LinePrefix.Length);
             }
 
             return prefix + shapeName;

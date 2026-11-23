@@ -34,13 +34,7 @@ namespace SEE.Game.Drawable.Line
             Color? fillOutColor = null,
             bool useCapConfVisuals = false)
         {
-            ApplyLineCaps(
-                shape,
-                startConf,
-                endConf,
-                fillOutColor,
-                useCapConfVisuals,
-                useCapConfVisuals);
+            ApplyLineCaps(shape, startConf, endConf, fillOutColor, useCapConfVisuals, useCapConfVisuals);
         }
 
         /// <summary>
@@ -81,277 +75,174 @@ namespace SEE.Game.Drawable.Line
             GameLineCapRenderer.RemoveLineCaps(shape);
 
             LineConf line = LineConf.GetLine(shape);
-
             if (line == null)
             {
                 return;
             }
 
-            LineCapValueHolder capValueHolder =
-                shape.GetComponent<LineCapValueHolder>();
-
+            LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
             if (capValueHolder != null)
             {
-                capValueHolder.StartCap =
-                    startConf?.CapKind ?? LineCap.None;
-
-                capValueHolder.EndCap =
-                    endConf?.CapKind ?? LineCap.None;
-
-                capValueHolder.StartCapUsesOwnVisuals =
-                    startConf != null
-                    && startConf.CapKind != LineCap.None
-                    && useStartCapConfVisuals;
-
-                capValueHolder.EndCapUsesOwnVisuals =
-                    endConf != null
-                    && endConf.CapKind != LineCap.None
-                    && useEndCapConfVisuals;
+                capValueHolder.StartCap = startConf?.CapKind ?? LineCap.None;
+                capValueHolder.EndCap = endConf?.CapKind ?? LineCap.None;
+                capValueHolder.StartCapUsesOwnVisuals = startConf != null
+                    && startConf.CapKind != LineCap.None && useStartCapConfVisuals;
+                capValueHolder.EndCapUsesOwnVisuals = endConf != null
+                    && endConf.CapKind != LineCap.None && useEndCapConfVisuals;
             }
 
-            Vector3[] originalPositions =
-                GameLineGeometry.GetOriginalLinePositions(shape);
-
-            if (originalPositions == null
-                || originalPositions.Length < 2)
+            Vector3[] originalPositions = GameLineGeometry.GetOriginalLinePositions(shape);
+            if (originalPositions == null || originalPositions.Length < 2)
             {
                 return;
             }
 
-            bool hasStartCap =
-                startConf != null
-                && startConf.CapKind != LineCap.None;
+            bool hasStartCap = startConf != null && startConf.CapKind != LineCap.None;
+            bool hasEndCap = endConf != null && endConf.CapKind != LineCap.None;
+            bool useExplicitLoopCapGeometry = line.Loop && (hasStartCap || hasEndCap);
 
-            bool hasEndCap =
-                endConf != null
-                && endConf.CapKind != LineCap.None;
-
-            bool useExplicitLoopCapGeometry =
-                line.Loop && (hasStartCap || hasEndCap);
-
-            LineAnchorValueHolder anchorHolder =
-                shape.GetComponent<LineAnchorValueHolder>();
-
+            LineAnchorValueHolder anchorHolder = shape.GetComponent<LineAnchorValueHolder>();
             if (anchorHolder == null)
             {
-                anchorHolder =
-                    shape.AddComponent<LineAnchorValueHolder>();
+                anchorHolder = shape.AddComponent<LineAnchorValueHolder>();
             }
 
             Vector3[] shortenedPositions;
-
             if (useExplicitLoopCapGeometry)
             {
                 anchorHolder.UsesExplicitLoopCapGeometry = true;
+                anchorHolder.OriginalRendererPositions = new Vector3[originalPositions.Length];
+                Array.Copy(originalPositions, anchorHolder.OriginalRendererPositions, originalPositions.Length);
 
-                anchorHolder.OriginalRendererPositions =
-                    new Vector3[originalPositions.Length];
-
-                Array.Copy(
-                    originalPositions,
-                    anchorHolder.OriginalRendererPositions,
-                    originalPositions.Length);
-
-                shortenedPositions =
-                    new Vector3[originalPositions.Length + 1];
-
-                Array.Copy(
-                    originalPositions,
-                    shortenedPositions,
-                    originalPositions.Length);
-
-                shortenedPositions[shortenedPositions.Length - 1] =
-                    originalPositions[0];
+                shortenedPositions = new Vector3[originalPositions.Length + 1];
+                Array.Copy(originalPositions, shortenedPositions, originalPositions.Length);
+                shortenedPositions[shortenedPositions.Length - 1] = originalPositions[0];
 
                 shape.GetComponent<LineRenderer>().loop = false;
             }
             else
             {
-                shortenedPositions =
-                    new Vector3[originalPositions.Length];
-
-                Array.Copy(
-                    originalPositions,
-                    shortenedPositions,
-                    originalPositions.Length);
+                shortenedPositions = new Vector3[originalPositions.Length];
+                Array.Copy(originalPositions, shortenedPositions, originalPositions.Length);
 
                 anchorHolder.UsesExplicitLoopCapGeometry = false;
                 anchorHolder.OriginalRendererPositions = null;
-
                 shape.GetComponent<LineRenderer>().loop = line.Loop;
             }
 
             bool useClosingSegmentFallback = false;
             Vector3[] capCalculationPositions = null;
 
-            bool mayPreserveEndCapDirection =
-                useExplicitLoopCapGeometry
+            bool mayPreserveEndCapDirection = useExplicitLoopCapGeometry
                 || (!line.Loop && line.UsePreviousSegmentForEndCap);
 
-            if (mayPreserveEndCapDirection
-                && hasEndCap
-                && originalPositions.Length >= 3)
+            if (mayPreserveEndCapDirection && hasEndCap && originalPositions.Length >= 3)
             {
                 int lastIndex = originalPositions.Length - 1;
 
-                Vector3 anchor = line.Loop
-                    ? originalPositions[0]
-                    : originalPositions[lastIndex];
-
-                Vector3 nearPoint = line.Loop
-                    ? originalPositions[lastIndex]
-                    : originalPositions[lastIndex - 1];
-
+                Vector3 anchor = line.Loop ? originalPositions[0] : originalPositions[lastIndex];
+                Vector3 nearPoint = line.Loop ? originalPositions[lastIndex] : originalPositions[lastIndex - 1];
                 Vector3 previousPoint = line.Loop
                     ? originalPositions[lastIndex - 1]
                     : originalPositions[lastIndex - 2];
 
-                float closingLength =
-                    Vector3.Distance(nearPoint, anchor);
+                float closingLength = Vector3.Distance(nearPoint, anchor);
+                float incomingLength = Vector3.Distance(previousPoint, anchor);
 
-                float incomingLength =
-                    Vector3.Distance(previousPoint, anchor);
-
-                if (incomingLength > 0.0001f
-                    && closingLength < incomingLength * 0.1f)
+                if (incomingLength > 0.0001f && closingLength < incomingLength * 0.1f)
                 {
-                    capCalculationPositions =
-                        new Vector3[originalPositions.Length];
-
-                    Array.Copy(
-                        originalPositions,
-                        capCalculationPositions,
-                        originalPositions.Length);
+                    capCalculationPositions = new Vector3[originalPositions.Length];
+                    Array.Copy(originalPositions, capCalculationPositions, originalPositions.Length);
 
                     if (line.Loop)
                     {
-                        capCalculationPositions[lastIndex] =
-                            previousPoint;
+                        capCalculationPositions[lastIndex] = previousPoint;
                     }
                     else
                     {
-                        capCalculationPositions[lastIndex - 1] =
-                            previousPoint;
+                        capCalculationPositions[lastIndex - 1] = previousPoint;
                     }
 
                     line.RendererPositions = capCalculationPositions;
 
-                    List<LineCapShape> referenceShapes =
-                        GetShapes(
-                            endConf,
-                            line,
-                            LineCapPosition.End,
-                            useEndCapConfVisuals);
+                    List<LineCapShape> referenceShapes = GetShapes(
+                        endConf, line, LineCapPosition.End, useEndCapConfVisuals);
 
                     float capExtent = 0.0f;
 
                     foreach (LineCapShape capShape in referenceShapes)
                     {
-                        capExtent = Mathf.Max(
-                            capExtent,
-                            Mathf.Abs(capShape.ConnectionPoint.x));
+                        capExtent = Mathf.Max(capExtent, Mathf.Abs(capShape.ConnectionPoint.x));
 
                         foreach (Vector3 capPoint in capShape.Points)
                         {
-                            capExtent = Mathf.Max(
-                                capExtent,
-                                Mathf.Abs(capPoint.x));
+                            capExtent = Mathf.Max(capExtent, Mathf.Abs(capPoint.x));
                         }
                     }
 
-                    useClosingSegmentFallback =
-                        closingLength < capExtent;
+                    useClosingSegmentFallback = closingLength < capExtent;
 
-                    if (useClosingSegmentFallback
-                        && !useExplicitLoopCapGeometry)
+                    if (useClosingSegmentFallback && !useExplicitLoopCapGeometry)
                     {
-                        anchorHolder.OriginalRendererPositions =
-                            new Vector3[originalPositions.Length];
-
-                        Array.Copy(
-                            originalPositions,
-                            anchorHolder.OriginalRendererPositions,
-                            originalPositions.Length);
+                        anchorHolder.OriginalRendererPositions = new Vector3[originalPositions.Length];
+                        Array.Copy(originalPositions, anchorHolder.OriginalRendererPositions, originalPositions.Length);
                     }
                 }
             }
 
-            Vector3[] endCapCalculationPositions =
-                useClosingSegmentFallback
-                    ? capCalculationPositions
-                    : originalPositions;
+            Vector3[] endCapCalculationPositions = useClosingSegmentFallback
+                ? capCalculationPositions
+                : originalPositions;
 
             // The start cap must always use the original first segment.
             // On a three-point open line, the end-cap fallback can
             // otherwise replace the second point with the first point.
             line.RendererPositions = originalPositions;
 
-            ApplyLineCapToPositions(
-                shape,
-                line,
-                shortenedPositions,
-                startConf,
-                LineCapPosition.Start,
-                useStartCapConfVisuals);
+            ApplyLineCapToPositions(shape, line, shortenedPositions, startConf, LineCapPosition.Start, useStartCapConfVisuals);
 
             // Only the end cap may use the corrected closing direction.
             line.RendererPositions = endCapCalculationPositions;
 
-            ApplyLineCapToPositions(
-                shape,
-                line,
-                shortenedPositions,
-                endConf,
-                LineCapPosition.End,
-                useEndCapConfVisuals);
+            ApplyLineCapToPositions(shape, line, shortenedPositions, endConf, LineCapPosition.End, useEndCapConfVisuals);
 
             if (useClosingSegmentFallback)
             {
-                int lastRendererIndex =
-                    shortenedPositions.Length - 1;
+                int lastRendererIndex = shortenedPositions.Length - 1;
 
                 Vector3 previousPoint = line.Loop
                     ? originalPositions[originalPositions.Length - 2]
                     : originalPositions[originalPositions.Length - 3];
 
-                shortenedPositions[lastRendererIndex - 1] =
-                    Vector3.Lerp(
-                        previousPoint,
-                        shortenedPositions[lastRendererIndex],
-                        0.5f);
+                shortenedPositions[lastRendererIndex - 1] = Vector3.Lerp(
+                    previousPoint, shortenedPositions[lastRendererIndex], 0.5f);
             }
 
-            GameLineDrawer.Drawing(
-                shape,
-                shortenedPositions,
-                fillOutColor,
-                preserveFillOutColliderState: true);
+            GameLineDrawer.Drawing(shape, shortenedPositions, fillOutColor, preserveFillOutColliderState: true);
 
             // The start-cap object must use the same original segment
             // that was used to shorten the visible line.
             line.RendererPositions = originalPositions;
 
-            GameLineCapRenderer.DrawLineCapObject(
-                shape,
-                line,
-                startConf,
-                LineCapPosition.Start,
-                useStartCapConfVisuals);
+            GameLineCapRenderer.DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useStartCapConfVisuals);
 
             // Reapply the optional fallback for the end-cap object.
             line.RendererPositions = endCapCalculationPositions;
 
-            GameLineCapRenderer.DrawLineCapObject(
-                shape,
-                line,
-                endConf,
-                LineCapPosition.End,
-                useEndCapConfVisuals);
+            GameLineCapRenderer.DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useEndCapConfVisuals);
         }
 
         /// <summary>
         /// Applies the shortening required for the given line cap.
         /// </summary>
+        /// <param name="shape">The line whose cap is being applied.</param>
+        /// <param name="line">The configuration containing the line's geometry.</param>
+        /// <param name="positions">The positions to adjust for the line cap.</param>
+        /// <param name="conf">The configuration of the line cap.</param>
+        /// <param name="position">Whether the cap is applied at the start or end of the line.</param>
+        /// <param name="useCapConfVisuals">
+        /// Whether the line cap uses its own visual configuration.
+        /// </param>
         private static void ApplyLineCapToPositions(
             GameObject shape,
             LineConf line,
@@ -367,9 +258,7 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            List<LineCapShape> capShapes =
-                GetShapes(conf, line, position, useCapConfVisuals);
-
+            List<LineCapShape> capShapes = GetShapes(conf, line, position, useCapConfVisuals);
             LineCapShape capShape = capShapes[0];
 
             Vector3 anchor;
@@ -378,26 +267,18 @@ namespace SEE.Game.Drawable.Line
             if (position == LineCapPosition.Start)
             {
                 anchor = line.RendererPositions[0];
-
-                direction =
-                    line.RendererPositions[0]
-                    - line.RendererPositions[1];
+                direction = line.RendererPositions[0] - line.RendererPositions[1];
             }
             else if (line.Loop)
             {
                 anchor = line.RendererPositions[0];
-
-                direction =
-                    line.RendererPositions[0]
+                direction = line.RendererPositions[0]
                     - line.RendererPositions[line.RendererPositions.Length - 1];
             }
             else
             {
-                anchor =
-                    line.RendererPositions[line.RendererPositions.Length - 1];
-
-                direction =
-                    line.RendererPositions[line.RendererPositions.Length - 1]
+                anchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                direction = line.RendererPositions[line.RendererPositions.Length - 1]
                     - line.RendererPositions[line.RendererPositions.Length - 2];
             }
 
@@ -406,11 +287,8 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            float angleInDegrees =
-                Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-            Vector3 rotatedConnectionPoint =
-                RotatePoint(capShape.ConnectionPoint, angleInDegrees);
+            float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Vector3 rotatedConnectionPoint = RotatePoint(capShape.ConnectionPoint, angleInDegrees);
 
             if (position == LineCapPosition.Start)
             {
@@ -418,17 +296,17 @@ namespace SEE.Game.Drawable.Line
             }
             else
             {
-                positions[positions.Length - 1] =
-                    anchor + rotatedConnectionPoint;
+                positions[positions.Length - 1] = anchor + rotatedConnectionPoint;
             }
         }
 
         /// <summary>
         /// Rotates a local point around the origin by the given angle.
         /// </summary>
-        private static Vector3 RotatePoint(
-            Vector3 point,
-            float angleInDegrees)
+        /// <param name="point">The local point to rotate.</param>
+        /// <param name="angleInDegrees">The rotation angle in degrees.</param>
+        /// <returns>The rotated point with its original Z-coordinate.</returns>
+        private static Vector3 RotatePoint(Vector3 point, float angleInDegrees)
         {
             float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
             float cos = Mathf.Cos(angleInRadians);

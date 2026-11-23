@@ -34,7 +34,10 @@ namespace SEE.Game.Drawable.Line
         /// True if the fill-out mesh was successfully created or updated,
         /// otherwise false.
         /// </returns>
-        public static bool FillOut(GameObject shape, Color? color = null, bool showInfo = false)
+        public static bool FillOut(
+            GameObject shape,
+            Color? color = null,
+            bool showInfo = false)
         {
             if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
                 && GameLineGeometry.DifferentPositionCounter(shape) > 2)
@@ -55,10 +58,7 @@ namespace SEE.Game.Drawable.Line
 
                     // To avoid an overlapping issue, position the fill slightly
                     // behind the line.
-                    fillOut.transform.position = new Vector3(
-                        pos.x,
-                        pos.y,
-                        pos.z + 0.00001f);
+                    fillOut.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
 
                     meshFilter = fillOut.AddComponent<MeshFilter>();
                     MeshRenderer meshRenderer = fillOut.AddComponent<MeshRenderer>();
@@ -68,8 +68,7 @@ namespace SEE.Game.Drawable.Line
 
                     if (meshRenderer.sharedMaterial == null)
                     {
-                        meshRenderer.sharedMaterial =
-                            GameLineAppearance.GetMaterial(fillColor, LineKind.Solid);
+                        meshRenderer.sharedMaterial = GameLineAppearance.GetMaterial(fillColor, LineKind.Solid);
                     }
                 }
                 else
@@ -150,7 +149,10 @@ namespace SEE.Game.Drawable.Line
         /// <param name="shape">The shape whose fill-out should be changed.</param>
         /// <param name="status">Whether the fill-out should be enabled.</param>
         /// <param name="color">The color of the fill-out.</param>
-        internal static void ChangeFillOut(GameObject shape, bool status, Color color)
+        internal static void ChangeFillOut(
+            GameObject shape,
+            bool status,
+            Color color)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {

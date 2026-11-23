@@ -55,24 +55,14 @@ namespace SEE.Game.Drawable.Line
                 middlePos.z = line.transform.localPosition.z;
 
                 Vector3[] convertedPositions = new Vector3[positions.Length];
-                Array.Copy(
-                    sourceArray: positions,
-                    destinationArray: convertedPositions,
-                    length: positions.Length);
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
 
                 line.transform.TransformPoints(convertedPositions);
-
                 line.transform.localPosition = middlePos;
-
                 line.transform.InverseTransformPoints(convertedPositions);
 
                 GameLineDrawer.Drawing(line, convertedPositions);
-
-                GameLineDrawer.FinishDrawing(
-                    line,
-                    renderer.loop,
-                    fillOutColor);
-
+                GameLineDrawer.FinishDrawing(line, renderer.loop, fillOutColor);
                 UpdateOriginalAnchors(line, convertedPositions);
             }
 
@@ -96,32 +86,22 @@ namespace SEE.Game.Drawable.Line
                 Vector3 middlePos;
 
                 Vector3[] convertedPositions = new Vector3[positions.Length];
-                Array.Copy(
-                    sourceArray: positions,
-                    destinationArray: convertedPositions,
-                    length: positions.Length);
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
 
                 line.transform.TransformPoints(convertedPositions);
 
                 if (convertedPositions.Length % 2 == 1)
                 {
-                    middlePos =
-                        convertedPositions[
-                            (int)Mathf.Round(convertedPositions.Length / 2)];
+                    middlePos = convertedPositions[(int)Mathf.Round(convertedPositions.Length / 2)];
                 }
                 else
                 {
-                    Vector3 left =
-                        convertedPositions[convertedPositions.Length / 2 - 1];
-
-                    Vector3 right =
-                        convertedPositions[convertedPositions.Length / 2];
-
+                    Vector3 left = convertedPositions[convertedPositions.Length / 2 - 1];
+                    Vector3 right = convertedPositions[convertedPositions.Length / 2];
                     middlePos = (left + right) / 2;
                 }
 
                 line.transform.position = middlePos;
-
                 line.transform.InverseTransformPoints(convertedPositions);
 
                 GameLineDrawer.Drawing(line, convertedPositions);
@@ -162,23 +142,14 @@ namespace SEE.Game.Drawable.Line
                 middlePos.z = line.transform.localPosition.z;
 
                 Vector3[] convertedPositions = new Vector3[positions.Length];
-                Array.Copy(
-                    sourceArray: positions,
-                    destinationArray: convertedPositions,
-                    length: positions.Length);
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
 
                 line.transform.TransformPoints(convertedPositions);
-
                 line.transform.localPosition = middlePos;
-
                 line.transform.InverseTransformPoints(convertedPositions);
 
                 GameLineDrawer.Drawing(line, convertedPositions);
-
-                GameLineDrawer.FinishDrawing(
-                    line,
-                    renderer.loop,
-                    fillOutColor);
+                GameLineDrawer.FinishDrawing(line, renderer.loop, fillOutColor);
 
                 if (updateOriginalAnchors)
                 {
@@ -241,24 +212,16 @@ namespace SEE.Game.Drawable.Line
         {
             LineConf line = LineConf.GetLine(shape);
 
-            if (line == null
-                || line.RendererPositions == null
-                || line.RendererPositions.Length < 2)
+            if (line == null || line.RendererPositions == null || line.RendererPositions.Length < 2)
             {
                 return null;
             }
 
-            Vector3[] originalPositions =
-                new Vector3[line.RendererPositions.Length];
-
-            Array.Copy(
-                line.RendererPositions,
-                originalPositions,
-                line.RendererPositions.Length);
+            Vector3[] originalPositions = new Vector3[line.RendererPositions.Length];
+            Array.Copy(line.RendererPositions, originalPositions, line.RendererPositions.Length);
 
             originalPositions[0] = line.OriginalStartAnchor;
-            originalPositions[originalPositions.Length - 1] =
-                line.OriginalEndAnchor;
+            originalPositions[originalPositions.Length - 1] = line.OriginalEndAnchor;
 
             return originalPositions;
         }
@@ -276,8 +239,7 @@ namespace SEE.Game.Drawable.Line
             List<int> indices,
             Vector3 point)
         {
-            Vector3[] originalPositions =
-                GetOriginalLinePositions(line);
+            Vector3[] originalPositions = GetOriginalLinePositions(line);
 
             if (originalPositions == null)
             {
@@ -291,16 +253,10 @@ namespace SEE.Game.Drawable.Line
                     continue;
                 }
 
-                originalPositions[index] =
-                    new Vector3(
-                        point.x,
-                        point.y,
-                        originalPositions[index].z);
+                originalPositions[index] = new Vector3(point.x, point.y, originalPositions[index].z);
             }
 
-            ApplyOriginalLinePositions(
-                line,
-                originalPositions);
+            ApplyOriginalLinePositions(line, originalPositions);
         }
 
         /// <summary>
@@ -309,37 +265,23 @@ namespace SEE.Game.Drawable.Line
         /// </summary>
         /// <param name="line">The line whose anchors should be updated.</param>
         /// <param name="positions">The new original positions.</param>
-        public static void UpdateOriginalAnchors(
-            GameObject line,
-            Vector3[] positions)
+        public static void UpdateOriginalAnchors(GameObject line, Vector3[] positions)
         {
-            if (line == null
-                || positions == null
-                || positions.Length < 2)
+            if (line == null || positions == null || positions.Length < 2)
             {
                 return;
             }
 
-            LineAnchorValueHolder anchorHolder =
-                line.GetComponent<LineAnchorValueHolder>();
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
 
             if (anchorHolder == null)
             {
-                anchorHolder =
-                    line.AddComponent<LineAnchorValueHolder>();
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
             }
 
-            anchorHolder.OriginalStartAnchor =
-                new Vector3(
-                    positions[0].x,
-                    positions[0].y,
-                    0.0f);
-
-            anchorHolder.OriginalEndAnchor =
-                new Vector3(
-                    positions[positions.Length - 1].x,
-                    positions[positions.Length - 1].y,
-                    0.0f);
+            anchorHolder.OriginalStartAnchor = new Vector3(positions[0].x, positions[0].y, 0.0f);
+            anchorHolder.OriginalEndAnchor = new Vector3(
+                positions[positions.Length - 1].x, positions[positions.Length - 1].y, 0.0f);
 
             anchorHolder.HasOriginalAnchors = true;
         }
@@ -353,32 +295,21 @@ namespace SEE.Game.Drawable.Line
         /// <param name="positions">
         /// The original, unshortened line positions.
         /// </param>
-        public static void ApplyOriginalLinePositions(
-            GameObject line,
-            Vector3[] positions)
+        public static void ApplyOriginalLinePositions(GameObject line, Vector3[] positions)
         {
-            if (line == null
-                || positions == null
-                || positions.Length < 2)
+            if (line == null || positions == null || positions.Length < 2)
             {
                 return;
             }
 
             UpdateOriginalAnchors(line, positions);
 
-            LineAnchorValueHolder anchorHolder =
-                line.GetComponent<LineAnchorValueHolder>();
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
 
-            if (anchorHolder != null
-                && anchorHolder.OriginalRendererPositions != null)
+            if (anchorHolder != null && anchorHolder.OriginalRendererPositions != null)
             {
-                anchorHolder.OriginalRendererPositions =
-                    new Vector3[positions.Length];
-
-                Array.Copy(
-                    positions,
-                    anchorHolder.OriginalRendererPositions,
-                    positions.Length);
+                anchorHolder.OriginalRendererPositions = new Vector3[positions.Length];
+                Array.Copy(positions, anchorHolder.OriginalRendererPositions, positions.Length);
             }
 
             LineConf lineConf = LineConf.GetLine(line);
@@ -388,21 +319,11 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            Color? fillOutColor =
-                LineConf.GetFillOutColor(lineConf);
+            Color? fillOutColor = LineConf.GetFillOutColor(lineConf);
 
-            GameLineDrawer.Drawing(
-                line,
-                positions,
-                fillOutColor,
-                preserveFillOutColliderState: true);
-
+            GameLineDrawer.Drawing(line, positions, fillOutColor, preserveFillOutColliderState: true);
             GameLineCapApplicator.ApplyLineCaps(
-                line,
-                lineConf.LineCapStart,
-                lineConf.LineCapEnd,
-                fillOutColor,
-                useCapConfVisuals: true);
+                line, lineConf.LineCapStart, lineConf.LineCapEnd, fillOutColor, useCapConfVisuals: true);
 
             RefreshCollider(line);
         }
@@ -420,37 +341,27 @@ namespace SEE.Game.Drawable.Line
         /// The configuration containing the stored original anchors
         /// and the end-cap preservation state.
         /// </param>
-        internal static void ApplyStoredOriginalAnchors(
-            GameObject line,
-            LineConf lineConf)
+        internal static void ApplyStoredOriginalAnchors(GameObject line, LineConf lineConf)
         {
             if (line == null || lineConf == null)
             {
                 return;
             }
 
-            LineAnchorValueHolder anchorHolder =
-                line.GetComponent<LineAnchorValueHolder>();
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
 
             if (anchorHolder == null)
             {
-                anchorHolder =
-                    line.AddComponent<LineAnchorValueHolder>();
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
             }
 
-            anchorHolder.OriginalStartAnchor =
-                lineConf.OriginalStartAnchor;
-
-            anchorHolder.OriginalEndAnchor =
-                lineConf.OriginalEndAnchor;
-
+            anchorHolder.OriginalStartAnchor = lineConf.OriginalStartAnchor;
+            anchorHolder.OriginalEndAnchor = lineConf.OriginalEndAnchor;
             anchorHolder.HasOriginalAnchors = true;
 
             anchorHolder.UsesExplicitLoopCapGeometry = false;
             anchorHolder.OriginalRendererPositions = null;
-
-            anchorHolder.UsePreviousSegmentForEndCap =
-                lineConf.UsePreviousSegmentForEndCap;
+            anchorHolder.UsePreviousSegmentForEndCap = lineConf.UsePreviousSegmentForEndCap;
         }
 
         /// <summary>
@@ -474,10 +385,7 @@ namespace SEE.Game.Drawable.Line
         /// <returns>The count of different positions.</returns>
         public static int DifferentPositionCounter(Vector3[] positions)
         {
-            return new List<Vector3>(positions)
-                .Distinct()
-                .ToList()
-                .Count;
+            return new List<Vector3>(positions).Distinct().ToList().Count;
         }
 
         /// <summary>
@@ -487,14 +395,10 @@ namespace SEE.Game.Drawable.Line
         /// <returns>The count of different positions.</returns>
         public static int DifferentPositionCounter(GameObject shape)
         {
-            if (shape.CompareTag(Tags.Line)
-                || shape.CompareTag(Tags.LineCap))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineRenderer renderer =
-                    shape.GetComponent<LineRenderer>();
-
-                Vector3[] positions =
-                    new Vector3[renderer.positionCount];
+                LineRenderer renderer = shape.GetComponent<LineRenderer>();
+                Vector3[] positions = new Vector3[renderer.positionCount];
 
                 renderer.GetPositions(positions);
 
@@ -514,16 +418,12 @@ namespace SEE.Game.Drawable.Line
         {
             if (line.CompareTag(Tags.Line))
             {
-                LineRenderer renderer =
-                    line.GetComponent<LineRenderer>();
+                LineRenderer renderer = line.GetComponent<LineRenderer>();
 
                 Mesh mesh = new();
                 renderer.BakeMesh(mesh);
 
-                return mesh.vertices
-                    .Distinct()
-                    .ToList()
-                    .Count;
+                return mesh.vertices.Distinct().ToList().Count;
             }
 
             return 0;
@@ -536,17 +436,12 @@ namespace SEE.Game.Drawable.Line
         /// <param name="surface">The targeted drawable surface.</param>
         /// <param name="position">The world-space position to convert.</param>
         /// <returns>The converted local position.</returns>
-        public static Vector3 GetConvertedPosition(
-            GameObject surface,
-            Vector3 position)
+        public static Vector3 GetConvertedPosition(GameObject surface, Vector3 position)
         {
-            DrawableSetupManager.Setup(
-                surface,
-                out GameObject _,
-                out GameObject attachedObjects);
+            DrawableSetupManager.Setup(surface, out GameObject _, out GameObject attachedObjects);
 
             return attachedObjects.transform.InverseTransformPoint(position)
-                   - ValueHolder.DistanceToDrawable;
+                - ValueHolder.DistanceToDrawable;
         }
     }
 }

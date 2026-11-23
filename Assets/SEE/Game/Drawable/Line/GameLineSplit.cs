@@ -25,20 +25,18 @@ namespace SEE.Game.Drawable.Line
         /// <param name="positions">The positions of the line.</param>
         /// <param name="lines">List that holds the newly created line configurations.</param>
         /// <param name="removeMatchedIndex">Specifies whether the split points should be deleted.</param>
-        public static void Split(GameObject surface, LineConf originLine, List<int> matchedIndices,
-            List<Vector3> positions, List<LineConf> lines, bool removeMatchedIndex)
+        public static void Split(
+            GameObject surface,
+            LineConf originLine,
+            List<int> matchedIndices,
+            List<Vector3> positions,
+            List<LineConf> lines,
+            bool removeMatchedIndex)
         {
             if (originLine != null && originLine.Loop)
             {
-                ReDrawLoopSegments(
-                    surface,
-                    originLine,
-                    matchedIndices,
-                    positions,
-                    lines,
-                    removeMatchedIndex
-                        ? LoopEditOperation.ErasePoint
-                        : LoopEditOperation.SplitPoint);
+                ReDrawLoopSegments(surface, originLine, matchedIndices, positions, lines,
+                    removeMatchedIndex ? LoopEditOperation.ErasePoint : LoopEditOperation.SplitPoint);
 
                 return;
             }
@@ -124,18 +122,16 @@ namespace SEE.Game.Drawable.Line
         /// be erased.</param>
         /// <param name="positions">The positions of the line.</param>
         /// <param name="lines">List that holds the new created line configurations.</param>
-        public static void EraseLinePointConnection(GameObject surface, LineConf originLine, List<int> matchedIndices,
-            List<Vector3> positions, List<LineConf> lines)
+        public static void EraseLinePointConnection(
+            GameObject surface,
+            LineConf originLine,
+            List<int> matchedIndices,
+            List<Vector3> positions,
+            List<LineConf> lines)
         {
             if (originLine != null && originLine.Loop)
             {
-                ReDrawLoopSegments(
-                    surface,
-                    originLine,
-                    matchedIndices,
-                    positions,
-                    lines,
-                    LoopEditOperation.EraseConnection);
+                ReDrawLoopSegments(surface, originLine, matchedIndices, positions, lines, LoopEditOperation.EraseConnection);
 
                 return;
             }
@@ -175,8 +171,7 @@ namespace SEE.Game.Drawable.Line
                 }
 
                 /// Block for the case where an attempt was made to split at the start or end point.
-                if (lines.Count == 1
-                    && lines[0].RendererPositions.Length == positions.Count)
+                if (lines.Count == 1 && lines[0].RendererPositions.Length == positions.Count)
                 {
                     ShowNotification.Warn("Line Connector Erase Problem:",
                         "You can't erase a line connector on the endpoint. " +
@@ -208,7 +203,6 @@ namespace SEE.Game.Drawable.Line
                 }
             }
         }
-
 
         /// <summary>
         /// Specifies how a closed line is split into open segments.
@@ -317,10 +311,8 @@ namespace SEE.Game.Drawable.Line
             // Some closed shapes already contain their first point
             // again as their final logical position. Such a point
             // must not be appended a second time.
-            bool hasExplicitClosingPoint =
-                originalPointCount > 2
-                && logicalPositions[0].Equals(
-                    logicalPositions[originalPointCount - 1]);
+            bool hasExplicitClosingPoint = originalPointCount > 2
+                && logicalPositions[0].Equals(logicalPositions[originalPointCount - 1]);
 
             int pointCount = hasExplicitClosingPoint
                 ? originalPointCount - 1
@@ -388,21 +380,13 @@ namespace SEE.Game.Drawable.Line
                         {
                             if (selected.Contains(index))
                             {
-                                AddLoopSegment(
-                                    segments,
-                                    traversal,
-                                    segmentStart,
-                                    index);
+                                AddLoopSegment(segments, traversal, segmentStart, index);
 
                                 segmentStart = index;
                             }
                         }
 
-                        AddLoopSegment(
-                            segments,
-                            traversal,
-                            segmentStart,
-                            pointCount);
+                        AddLoopSegment(segments, traversal, segmentStart, pointCount);
 
                         break;
                     }
@@ -416,18 +400,13 @@ namespace SEE.Game.Drawable.Line
                             // The additional closing position represents
                             // logical point zero and must be removed together
                             // with that point.
-                            bool removePoint =
-                                selected.Contains(index % pointCount);
+                            bool removePoint = selected.Contains(index % pointCount);
 
                             if (removePoint)
                             {
                                 if (segmentStart >= 0)
                                 {
-                                    AddLoopSegment(
-                                        segments,
-                                        traversal,
-                                        segmentStart,
-                                        index - 1);
+                                    AddLoopSegment(segments, traversal, segmentStart, index - 1);
 
                                     segmentStart = -1;
                                 }
@@ -440,11 +419,7 @@ namespace SEE.Game.Drawable.Line
 
                         if (segmentStart >= 0)
                         {
-                            AddLoopSegment(
-                                segments,
-                                traversal,
-                                segmentStart,
-                                pointCount);
+                            AddLoopSegment(segments, traversal, segmentStart, pointCount);
                         }
 
                         break;
@@ -460,29 +435,19 @@ namespace SEE.Game.Drawable.Line
                             // connection from i to the following point.
                             if (selected.Contains(index))
                             {
-                                AddLoopSegment(
-                                    segments,
-                                    traversal,
-                                    segmentStart,
-                                    index);
+                                AddLoopSegment(segments, traversal, segmentStart, index);
 
                                 segmentStart = index + 1;
                             }
                         }
 
-                        AddLoopSegment(
-                            segments,
-                            traversal,
-                            segmentStart,
-                            pointCount);
+                        AddLoopSegment(segments, traversal, segmentStart, pointCount);
 
                         break;
                     }
 
                 default:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(operation),
-                        operation,
+                    throw new ArgumentOutOfRangeException(nameof(operation), operation,
                         "Unsupported loop editing operation.");
             }
 
@@ -509,19 +474,14 @@ namespace SEE.Game.Drawable.Line
                 return;
             }
 
-            Vector3[] positions =
-                new Vector3[lastIndex - firstIndex + 1];
+            Vector3[] positions = new Vector3[lastIndex - firstIndex + 1];
 
             for (int index = firstIndex; index <= lastIndex; index++)
             {
                 positions[index - firstIndex] = traversal[index];
             }
 
-            segments.Add(
-                new LoopSegment(
-                    positions,
-                    firstIndex == 0,
-                    lastIndex == traversal.Count - 1));
+            segments.Add(new LoopSegment(positions, firstIndex == 0, lastIndex == traversal.Count - 1));
         }
 
         /// <summary>
@@ -542,20 +502,12 @@ namespace SEE.Game.Drawable.Line
             List<LineConf> lines,
             LoopEditOperation operation)
         {
-            List<LoopSegment> segments = GetLoopSegments(
-                positions,
-                matchedIndices,
-                operation);
+            List<LoopSegment> segments = GetLoopSegments(positions, matchedIndices, operation);
 
             foreach (LoopSegment segment in segments)
             {
-                TryReDraw(
-                    surface,
-                    originLine,
-                    segment.Positions,
-                    lines,
-                    segment.RetainsStartCap,
-                    segment.RetainsEndCap);
+                TryReDraw(surface, originLine, segment.Positions, lines,
+                    segment.RetainsStartCap, segment.RetainsEndCap);
             }
         }
 
@@ -584,13 +536,7 @@ namespace SEE.Game.Drawable.Line
         {
             if (positions.Length > 1)
             {
-                lines.Add(
-                    ReDraw(
-                        surface,
-                        originLine,
-                        positions,
-                        retainLoopStartCap,
-                        retainLoopEndCap));
+                lines.Add(ReDraw(surface, originLine, positions, retainLoopStartCap, retainLoopEndCap));
             }
         }
 
@@ -628,58 +574,46 @@ namespace SEE.Game.Drawable.Line
             // Every resulting segment is an open line.
             lineToCreate.Loop = false;
 
-            AdjustLineCapsForSegment(
-                originLine,
-                lineToCreate,
-                positions);
+            AdjustLineCapsForSegment(originLine, lineToCreate, positions);
 
             if (originLine.Loop)
             {
-                lineToCreate.LineCapStart =
-                    retainLoopStartCap && originLine.LineCapStart != null
-                        ? originLine.LineCapStart.Clone()
-                        : LineCapConf.CreateNone();
+                lineToCreate.LineCapStart = retainLoopStartCap && originLine.LineCapStart != null
+                    ? originLine.LineCapStart.Clone()
+                    : LineCapConf.CreateNone();
 
-                lineToCreate.LineCapEnd =
-                    retainLoopEndCap && originLine.LineCapEnd != null
-                        ? originLine.LineCapEnd.Clone()
-                        : LineCapConf.CreateNone();
+                lineToCreate.LineCapEnd = retainLoopEndCap && originLine.LineCapEnd != null
+                    ? originLine.LineCapEnd.Clone()
+                    : LineCapConf.CreateNone();
             }
 
-            bool retainsOriginalEndCap =
-                lineToCreate.LineCapEnd != null
+            bool retainsOriginalEndCap = lineToCreate.LineCapEnd != null
                 && lineToCreate.LineCapEnd.CapKind != LineCap.None;
 
-            lineToCreate.UsePreviousSegmentForEndCap =
-                retainsOriginalEndCap
+            lineToCreate.UsePreviousSegmentForEndCap = retainsOriginalEndCap
                 && (originLine.Loop
                     ? retainLoopEndCap
                     : originLine.UsePreviousSegmentForEndCap
                       && positions[^1].Equals(originLine.OriginalEndAnchor));
 
-            LineCapConf startCap =
-                lineToCreate.LineCapStart != null
-                    ? lineToCreate.LineCapStart.Clone()
-                    : LineCapConf.CreateNone();
+            LineCapConf startCap = lineToCreate.LineCapStart != null
+                ? lineToCreate.LineCapStart.Clone()
+                : LineCapConf.CreateNone();
 
-            LineCapConf endCap =
-                lineToCreate.LineCapEnd != null
-                    ? lineToCreate.LineCapEnd.Clone()
-                    : LineCapConf.CreateNone();
+            LineCapConf endCap = lineToCreate.LineCapEnd != null
+                ? lineToCreate.LineCapEnd.Clone()
+                : LineCapConf.CreateNone();
 
             lineToCreate.LineCapStart = LineCapConf.CreateNone();
             lineToCreate.LineCapEnd = LineCapConf.CreateNone();
 
-            GameObject newLine =
-                GameLineDrawer.ReDrawLine(surface, lineToCreate);
+            GameObject newLine = GameLineDrawer.ReDrawLine(surface, lineToCreate);
 
             GameLineGeometry.ChangePivot(newLine);
 
             LineConf pivotAdjustedLine = LineConf.GetLine(newLine);
 
-            GameLineGeometry.UpdateOriginalAnchors(
-                newLine,
-                pivotAdjustedLine.RendererPositions);
+            GameLineGeometry.UpdateOriginalAnchors(newLine, pivotAdjustedLine.RendererPositions);
 
             pivotAdjustedLine = LineConf.GetLine(newLine);
 
@@ -687,18 +621,13 @@ namespace SEE.Game.Drawable.Line
             pivotAdjustedLine.LineCapEnd = endCap;
 
             GameLineCapApplicator.ApplyLineCaps(
-                newLine,
-                pivotAdjustedLine.LineCapStart,
-                pivotAdjustedLine.LineCapEnd,
-                LineConf.GetFillOutColor(pivotAdjustedLine),
-                true);
+                newLine, pivotAdjustedLine.LineCapStart, pivotAdjustedLine.LineCapEnd,
+                LineConf.GetFillOutColor(pivotAdjustedLine), true);
 
             LineConf result = LineConf.GetLine(newLine);
 
             new DrawNetAction(
-                surface.name,
-                GameFinder.GetDrawableSurfaceParentName(surface),
-                result).Execute();
+                surface.name, GameFinder.GetDrawableSurfaceParentName(surface), result).Execute();
 
             return result;
         }
@@ -710,7 +639,10 @@ namespace SEE.Game.Drawable.Line
         /// <param name="originLine">The original line.</param>
         /// <param name="segmentLine">The segment line to update.</param>
         /// <param name="positions">The positions of the segment line.</param>
-        private static void AdjustLineCapsForSegment(LineConf originLine, LineConf segmentLine, Vector3[] positions)
+        private static void AdjustLineCapsForSegment(
+            LineConf originLine,
+            LineConf segmentLine,
+            Vector3[] positions)
         {
             if (originLine == null || segmentLine == null || positions == null || positions.Length < 2)
             {
