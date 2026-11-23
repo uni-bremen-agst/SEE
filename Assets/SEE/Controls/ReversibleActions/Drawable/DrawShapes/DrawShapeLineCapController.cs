@@ -43,8 +43,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="previewPositions">The positions currently shown by the preview.</param>
         /// <param name="fillOutColor">The current fill-out color.</param>
         /// <param name="previewActive">Whether a shape preview is currently active.</param>
-        public void RefreshPreviewIfMenuChanged(GameObject shape, GameObject surface,
-            Vector3[] previewPositions, Color? fillOutColor, bool previewActive)
+        public void RefreshPreviewIfMenuChanged(
+            GameObject shape,
+            GameObject surface,
+            Vector3[] previewPositions,
+            Color? fillOutColor,
+            bool previewActive)
         {
             if (shape == null || previewPositions == null || !previewActive)
             {
@@ -329,9 +333,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="currentLineKind">
         /// The line kind currently applied to the preview.
         /// </param>
-        private void RememberRegularPreviewLineKind(
-            bool hadReference,
-            LineKind currentLineKind)
+        private void RememberRegularPreviewLineKind(bool hadReference, LineKind currentLineKind)
         {
             if (!hadReference)
             {
@@ -347,8 +349,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="currentLineKind">The current line kind of the preview.</param>
         /// <param name="drawingLineKind">The regular line kind configured for drawing.</param>
         /// <returns>The line kind to apply.</returns>
-        internal static LineKind ResolvePreviewLineKind(bool hasReference, bool hadReference,
-            LineKind currentLineKind, LineKind drawingLineKind)
+        internal static LineKind ResolvePreviewLineKind(
+            bool hasReference,
+            bool hadReference,
+            LineKind currentLineKind,
+            LineKind drawingLineKind)
         {
             if (hasReference)
             {

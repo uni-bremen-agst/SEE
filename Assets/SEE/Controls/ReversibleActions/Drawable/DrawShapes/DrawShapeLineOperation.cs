@@ -179,8 +179,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="lineCapController">
         /// The controller used to update the line-cap preview.
         /// </param>
-        internal void UpdatePreview(GameObject shape, GameObject surface,
-            DrawShapeLineCapController lineCapController)
+        internal void UpdatePreview(GameObject shape, GameObject surface, DrawShapeLineCapController lineCapController)
         {
             if (!IsDrawing
                 || SEEInput.LeftMouseInteraction()
@@ -255,7 +254,9 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="lineCapController">
         /// The controller used to restore the line-cap preview.
         /// </param>
-        private void RestoreCommittedPreview(GameObject shape, GameObject surface,
+        private void RestoreCommittedPreview(
+            GameObject shape,
+            GameObject surface,
             DrawShapeLineCapController lineCapController)
         {
             if (shape == null
@@ -300,8 +301,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// <param name="lineCapController">
         /// The controller used to update the line-cap preview.
         /// </param>
-        internal void AddPoint(GameObject shape, GameObject surface,
-            DrawShapeLineCapController lineCapController)
+        internal void AddPoint(GameObject shape, GameObject surface, DrawShapeLineCapController lineCapController)
         {
             if (!SEEInput.LeftMouseDown()
                 || Input.GetKey(KeyCode.LeftControl)
@@ -508,8 +508,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// through the part-undo button.
         /// </param>
         /// <returns>Whether removing the point canceled and destroyed the line.</returns>
-        internal bool RemoveLastPoint(GameObject shape, GameObject surface,
-            bool ignorePartUndoButton = false)
+        internal bool RemoveLastPoint(GameObject shape, GameObject surface, bool ignorePartUndoButton = false)
         {
             if (!IsDrawing || !SEEInput.PartUndo() && !ignorePartUndoButton)
             {
