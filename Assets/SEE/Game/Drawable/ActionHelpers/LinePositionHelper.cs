@@ -65,9 +65,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thrown if a rendered index is invalid or cannot be mapped
         /// to an original line position.
         /// </exception>
-        public static List<int> ToLogicalIndices(
-            GameObject line,
-            IEnumerable<int> rendererIndices)
+        public static List<int> ToLogicalIndices(GameObject line, IEnumerable<int> rendererIndices)
         {
             if (line == null)
             {
@@ -83,8 +81,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             Vector3[] originalPositions = GetSafeOriginalPositions(line);
             LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
 
-            bool hasSyntheticClosingPoint =
-                anchorHolder != null
+            bool hasSyntheticClosingPoint = anchorHolder != null
                 && anchorHolder.UsesExplicitLoopCapGeometry
                 && originalPositions.Length > 0
                 && renderer.positionCount == originalPositions.Length + 1;
@@ -101,11 +98,9 @@ namespace SEE.Game.Drawable.ActionHelpers
                         "The index is outside the renderer positions.");
                 }
 
-                int logicalIndex =
-                    hasSyntheticClosingPoint
-                    && rendererIndex == originalPositions.Length
-                        ? 0
-                        : rendererIndex;
+                int logicalIndex = hasSyntheticClosingPoint && rendererIndex == originalPositions.Length
+                    ? 0
+                    : rendererIndex;
 
                 if (logicalIndex >= originalPositions.Length)
                 {

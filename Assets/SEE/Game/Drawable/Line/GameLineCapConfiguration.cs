@@ -33,13 +33,9 @@ namespace SEE.Game.Drawable.Line
                 throw new ArgumentNullException(nameof(line));
             }
 
-            bool hasExistingCap =
-                existingConf != null
-                && existingConf.CapKind != LineCap.None;
+            bool hasExistingCap = existingConf != null && existingConf.CapKind != LineCap.None;
 
-            bool capKindChanged =
-                existingConf == null
-                || existingConf.CapKind != newCapKind;
+            bool capKindChanged = existingConf == null || existingConf.CapKind != newCapKind;
 
             LineCapConf capConf = new();
 
