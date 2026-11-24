@@ -205,11 +205,7 @@ namespace SEE.UI.Menu.Drawable.Line
             objectMenu.SetUpOrderInLayerSlider(selectedLine, lineHolder, surface, surfaceParentName);
             objectMenu.SetUpLoopSwitch(selectedLine, lineHolder, surface, surfaceParentName);
 
-            colorMenu.SetUpColorPicker(
-                selectedLine,
-                lineHolder,
-                surface,
-                surfaceParentName);
+            colorMenu.SetUpColorPicker(selectedLine, lineHolder, surface, surfaceParentName);
 
             colorMenu.SetUpColorKindTypeButton(
                 selectedLine,
@@ -225,11 +221,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 surfaceParentName,
                 colorMenu.HideControls);
 
-            fillOutMenu.SetUpFillOutSwitch(
-                selectedLine,
-                lineHolder,
-                surface,
-                surfaceParentName);
+            fillOutMenu.SetUpFillOutSwitch(selectedLine, lineHolder, surface, surfaceParentName);
         }
 
         /// <summary>
@@ -253,20 +245,14 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="clearFillOutAction">
         /// The action registered for clearing an externally stored fill-out color.
         /// </param>
-        internal void AssignFillOut(
-            Color? fillOut,
-            UnityAction<Color> setFillOutAction,
-            UnityAction clearFillOutAction)
+        internal void AssignFillOut(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
             if (!IsMainSegment)
             {
                 return;
             }
 
-            fillOutMenu.AssignFillOut(
-                fillOut,
-                setFillOutAction,
-                clearFillOutAction);
+            fillOutMenu.AssignFillOut(fillOut, setFillOutAction, clearFillOutAction);
         }
 
         /// <summary>
@@ -274,9 +260,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         /// <param name="newColorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
-        internal void AssignColorArea(
-            UnityAction<Color> newColorAction,
-            Color color)
+        internal void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
             colorMenu.AssignColorArea(newColorAction, color);
         }
@@ -393,11 +377,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 IsRefreshingUI = false;
             }
 
-            colorMenu.SetUpColorPicker(
-                selectedLine,
-                lineHolder,
-                surface,
-                surfaceParentName);
+            colorMenu.SetUpColorPicker(selectedLine, lineHolder, surface, surfaceParentName);
 
             MenuHelper.CalculateHeight(lineMenu, true);
         }

@@ -123,17 +123,13 @@ namespace SEE.UI.Menu.Drawable.Line
             this.lineMenu = lineMenu;
             this.isInEditMode = isInEditMode;
 
-            segmentText =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SegmentText");
+            segmentText = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SegmentText");
 
-            segmentSelection =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SegmentSelection");
+            segmentSelection = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SegmentSelection");
 
-            lineCapText =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineCapText");
+            lineCapText = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineCapText");
 
-            lineCapSelection =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineCapSelection");
+            lineCapSelection = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineCapSelection");
 
             segmentSelector = segmentSelection.GetComponent<HorizontalSelector>();
             lineCapSelector = lineCapSelection.GetComponent<HorizontalSelector>();
@@ -171,9 +167,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="lineCapsChanged">
         /// Optional callback invoked after a line-cap configuration has changed.
         /// </param>
-        internal void BeginEditing(
-            LineConf line,
-            UnityAction<LineConf> lineCapsChanged = null)
+        internal void BeginEditing(LineConf line, UnityAction<LineConf> lineCapsChanged = null)
         {
             editState.Initialize(line);
             this.lineCapsChanged = lineCapsChanged;
@@ -214,7 +208,8 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="resetColorTypeSelection">
         /// Resets the color-type selection to its default state.
         /// </param>
-        internal void SetUpSegmentEditing(LineConf line,
+        internal void SetUpSegmentEditing(
+            LineConf line,
             UnityAction disableLineCap,
             UnityAction<LineCap> updateLineOptions,
             UnityAction refreshEditingUI,
@@ -336,16 +331,11 @@ namespace SEE.UI.Menu.Drawable.Line
                     : line.LineCapEnd;
 
                 bool restoredFillOut =
-                    editState.RestoreRememberedFillOutIfNotChangedByUser(
-                        selectedCapConf,
-                        isStartCap);
+                    editState.RestoreRememberedFillOutIfNotChangedByUser(selectedCapConf, isStartCap);
 
                 if (restoredFillOut)
                 {
-                    ApplySelectedCapStyle(
-                        selectedLine,
-                        line,
-                        surface);
+                    ApplySelectedCapStyle(selectedLine, line, surface);
                 }
                 else
                 {
@@ -449,8 +439,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="selectedLine">The edited line.</param>
         /// <param name="line">The edited line configuration.</param>
         /// <param name="surface">The drawable surface containing the line.</param>
-        internal void ApplySelectedCapStyle(GameObject selectedLine,
-            LineConf line, GameObject surface)
+        internal void ApplySelectedCapStyle(GameObject selectedLine, LineConf line, GameObject surface)
         {
             LineCapConf capConf = GetSelectedCapConf(line);
             if (capConf == null || capConf.CapKind == LineCap.None)
@@ -467,7 +456,7 @@ namespace SEE.UI.Menu.Drawable.Line
             NotifyLineCapsChanged(line);
 
             new EditLineCapStyleNetAction(
-                            surface.name,
+                surface.name,
                 GameFinder.GetDrawableSurfaceParentName(surface),
                 selectedLine.name,
                 isStartCap,

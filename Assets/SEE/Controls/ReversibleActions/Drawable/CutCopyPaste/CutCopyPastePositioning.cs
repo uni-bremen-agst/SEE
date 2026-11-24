@@ -27,10 +27,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
             Vector3 localPosition = targetSurface.GetRootParent().transform
                 .InverseTransformPoint(worldPosition);
 
-            localPosition = new Vector3(
-                localPosition.x,
-                localPosition.y,
-                sourceObject.transform.localPosition.z);
+            localPosition = new Vector3(localPosition.x, localPosition.y, sourceObject.transform.localPosition.z);
 
             GameMoveRotator.SetPosition(pastedObject, localPosition, true);
 

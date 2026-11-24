@@ -21,11 +21,9 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         {
             DrawableType configuration = DrawableType.Get(selectedObject);
             configuration.ID = "";
-            configuration.AssociatedPage =
-                targetSurface.GetComponent<DrawableHolder>().CurrentPage;
+            configuration.AssociatedPage = targetSurface.GetComponent<DrawableHolder>().CurrentPage;
 
-            GameObject pastedObject =
-                DrawableType.Restore(configuration, targetSurface);
+            GameObject pastedObject = DrawableType.Restore(configuration, targetSurface);
 
             CutCopyPastePositioning.MoveToWorldPosition(
                 selectedObject,

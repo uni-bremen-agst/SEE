@@ -103,9 +103,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.StickyNote
         /// <returns>Whether a scale interaction occurred.</returns>
         internal bool TryGetScaleFactor(out float scaleFactor)
         {
-            return TryGetWheelInteraction(
-                WheelInteractionType.Scale,
-                out scaleFactor);
+            return TryGetWheelInteraction(WheelInteractionType.Scale, out scaleFactor);
         }
 
         /// <summary>

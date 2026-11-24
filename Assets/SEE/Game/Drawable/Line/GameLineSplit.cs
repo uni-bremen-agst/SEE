@@ -623,8 +623,7 @@ namespace SEE.Game.Drawable.Line
 
             LineConf result = LineConf.GetLine(newLine);
 
-            new DrawNetAction(
-                surface.name, GameFinder.GetDrawableSurfaceParentName(surface), result).Execute();
+            new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), result).Execute();
 
             return result;
         }

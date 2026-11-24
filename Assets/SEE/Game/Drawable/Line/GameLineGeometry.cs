@@ -437,8 +437,7 @@ namespace SEE.Game.Drawable.Line
         {
             DrawableSetupManager.Setup(surface, out GameObject _, out GameObject attachedObjects);
 
-            return attachedObjects.transform.InverseTransformPoint(position)
-                - ValueHolder.DistanceToDrawable;
+            return attachedObjects.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;
         }
     }
 }

@@ -259,10 +259,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
                     break;
 
                 case ProgressState.Rotate:
-                    rotationOperation.Restore(
-                        selectedObject,
-                        oldObjectPosition,
-                        oldObjectLocalEulerAngles.z);
+                    rotationOperation.Restore(selectedObject, oldObjectPosition, oldObjectLocalEulerAngles.z);
                     break;
             }
         }
@@ -415,7 +412,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
                 if (memento.MoveOrRotate == ProgressState.Move)
                 {
                     GameMoveRotator.SetPosition(memento.SelectedObject, memento.OldObjectPosition,
-                                            memento.IncludeChildren);
+                        memento.IncludeChildren);
                     new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.OldObjectPosition, memento.IncludeChildren).Execute();
                 }

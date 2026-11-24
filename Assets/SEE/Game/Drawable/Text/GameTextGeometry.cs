@@ -32,8 +32,7 @@ namespace SEE.Game.Drawable.Text
             bool htmlUpperCase = text.Contains("<uppercase>");
             bool htmlSmallCaps = text.Contains("<smallcaps>");
 
-            float pointSizeScale =
-                fontSize / (fontAsset.faceInfo.pointSize * fontAsset.faceInfo.scale * 10);
+            float pointSizeScale = fontSize / (fontAsset.faceInfo.pointSize * fontAsset.faceInfo.scale * 10);
             float emScale = fontSize * 0.001f;
 
             float styleSpacingAdjustment =
