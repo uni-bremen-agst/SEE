@@ -58,9 +58,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                             out List<Vector3> positionsList,
                             out List<int> matchedIndices);
 
-                        matchedIndices = LinePositionHelper.ToLogicalIndices(
-                            hitObject,
-                            matchedIndices);
+                        matchedIndices = LinePositionHelper.ToLogicalIndices(hitObject, matchedIndices);
 
                         List<Vector3> originalPositions =
                             LinePositionHelper.GetSafeOriginalPositions(hitObject).ToList();
@@ -77,8 +75,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
                             ShowNotification.Info("Line split", description);
 
-                            Vector3 markerPosition =
-                                originalPositions[matchedIndices[0]];
+                            Vector3 markerPosition = originalPositions[matchedIndices[0]];
 
                             splitMarkerPosition = markerPosition;
                             MarkSplitPosition(hitObject, markerPosition);

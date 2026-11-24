@@ -125,13 +125,9 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                     if (selectedSurface != null)
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        browser.LoadDrawableConfiguration(
-                            LoadState.Specific,
-                            LoadPageMode.CurrentSelectedPage);
+                        browser.LoadDrawableConfiguration(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
 
-                        memento = new LoadOperation.State(
-                            LoadState.Specific,
-                            LoadPageMode.CurrentSelectedPage);
+                        memento = new LoadOperation.State(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
                     }
                     else
                     {
@@ -180,8 +176,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.Load
                     && (browser == null || !browser.IsOpen()))
                 {
                     clicked = true;
-                    ManageHighlightEffect(
-                        GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
+                    ManageHighlightEffect(GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
                 }
 
                 if (SEEInput.MouseUp(MouseButton.Left))

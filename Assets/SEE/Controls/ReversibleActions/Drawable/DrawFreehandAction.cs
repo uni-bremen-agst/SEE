@@ -252,8 +252,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
             if (line != null)
             {
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                    memento.Line.ID).Execute();
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.ID).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -268,8 +267,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             line = GameLineDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
             if (line != null)
             {
-                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                    LineConf.GetLine(line)).Execute();
+                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, LineConf.GetLine(line)).Execute();
             }
         }
 

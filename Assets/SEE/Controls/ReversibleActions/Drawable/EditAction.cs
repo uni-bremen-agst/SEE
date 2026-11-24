@@ -75,8 +75,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// <param name="newValueHolder">The newly edited values of the drawable type object.</param>
             /// <param name="surface">The drawable surface on which the drawable type object is displayed.</param>
             /// <param name="id">The ID of the drawable type object.</param>
-            public Memento(GameObject obj, DrawableType oldValueHolder,
-                DrawableType newValueHolder, GameObject surface, string id)
+            public Memento(
+                GameObject obj,
+                DrawableType oldValueHolder,
+                DrawableType newValueHolder,
+                GameObject surface,
+                string id)
             {
                 SelectedObj = obj;
                 OldValueHolder = oldValueHolder;
@@ -350,7 +354,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (!CheckEquals(oldValueHolder, newValueHolder))
             {
                 memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
-                         GameFinder.GetDrawableSurface(selectedObj), selectedObj.name);
+                    GameFinder.GetDrawableSurface(selectedObj), selectedObj.name);
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }

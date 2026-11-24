@@ -69,8 +69,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// <param name="id">The object ID to save into this Memento.</param>
             /// <param name="oldOrder">The old order in layer value to save into this Memento.</param>
             /// <param name="newOrder">The new order in layer value to save into this Memento.</param>
-            public Memento(GameObject surface, GameLayerChanger.LayerChangerStates state,
-                GameObject obj, string id, int oldOrder, int newOrder)
+            public Memento(
+                GameObject surface,
+                GameLayerChanger.LayerChangerStates state,
+                GameObject obj,
+                string id,
+                int oldOrder,
+                int newOrder)
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 State = state;
@@ -120,7 +125,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     if (SEEInput.LeftMouseInteraction())
                     {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Increase);
-                    } else if (SEEInput.RightMouseInteraction()) {
+                    }
+                    else if (SEEInput.RightMouseInteraction())
+                    {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Decrease);
                     }
                 }
@@ -149,14 +156,14 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (state == GameLayerChanger.LayerChangerStates.Increase)
             {
                 newOrder = oldOrder + 1;
-            } else
+            }
+            else
             {
                 newOrder = oldOrder - 1;
                 newOrder = newOrder < 0 ? 0 : newOrder;
             }
             GameLayerChanger.ChangeOrderInLayer(hitObject, newOrder, state);
-            memento = new Memento(surface, state,
-                            hitObject, hitObject.name, oldOrder, newOrder);
+            memento = new Memento(surface, state, hitObject, hitObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Obj.name, memento.State, memento.NewOrder).Execute();
             CurrentState = IReversibleAction.Progress.InProgress;
@@ -174,7 +181,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.OldOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                                      memento.Obj.name, memento.State, memento.OldOrder).Execute();
+                memento.Obj.name, memento.State, memento.OldOrder).Execute();
         }
 
         /// <summary>
@@ -189,7 +196,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.NewOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                                      memento.Obj.name, memento.State, memento.NewOrder).Execute();
+                memento.Obj.name, memento.State, memento.NewOrder).Execute();
         }
 
         /// <summary>

@@ -199,8 +199,8 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             holder.OrderInLayer = 1;
-            List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(surface).
-                        GetAllDrawableTypes();
+            List<DrawableType> allDrawableTypes =
+                DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes();
 
             foreach (DrawableType type in allDrawableTypes)
             {

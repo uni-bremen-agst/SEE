@@ -96,8 +96,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     // The loop end cap belongs to the closing connection
                     // from the last logical point to the first.
-                    lastIndex =
-                        LinePositionHelper.GetSafeOriginalPositions(selectedLine).Length - 1;
+                    lastIndex = LinePositionHelper.GetSafeOriginalPositions(selectedLine).Length - 1;
                 }
                 matchedIndices = new List<int>
                 {
@@ -113,9 +112,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     out matchedIndices);
             }
 
-            matchedIndices = LinePositionHelper.ToLogicalIndices(
-                selectedLine,
-                matchedIndices);
+            matchedIndices = LinePositionHelper.ToLogicalIndices(selectedLine, matchedIndices);
 
             GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
             List<Vector3> originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine).ToList();

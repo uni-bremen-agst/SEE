@@ -293,7 +293,10 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// <param name="pickForSecondColor">Color was picked for
             ///     <see cref="ValueHolder.CurrentSecondaryColor"/>.</param>
             ///
-            public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor,
+            public Memento(
+                Color oldChosenPrimaryColor,
+                Color oldChosenSecondColor,
+                Color pickedColor,
                 bool pickForSecondColor)
             {
                 OldChosenPrimaryColor = oldChosenPrimaryColor;
