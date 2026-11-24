@@ -34,13 +34,11 @@ namespace SEE.Game.Drawable.MindMap
 
             if (attachedObjects != null && conf.ParentNode != "")
             {
-                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(
-                    attachedObjects, conf.ParentNode);
+                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
 
                 if (parent != null)
                 {
-                    GameMindMapBranch.CreateBranchLine(
-                        createdNode, parent, conf.BranchLineToParent);
+                    GameMindMapBranch.CreateBranchLine(createdNode, parent, conf.BranchLineToParent);
                 }
             }
 

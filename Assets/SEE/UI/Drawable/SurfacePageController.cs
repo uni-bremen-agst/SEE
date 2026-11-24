@@ -81,9 +81,9 @@ namespace SEE.UI.Drawable
             forward.onClick.AddListener(() =>
             {
                 int page;
-                if (holder.CurrentPage < holder.MaxPageSize-1)
+                if (holder.CurrentPage < holder.MaxPageSize - 1)
                 {
-                    page = holder.CurrentPage+ 1;
+                    page = holder.CurrentPage + 1;
                 } else
                 {
                     page = 0;

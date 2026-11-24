@@ -211,8 +211,7 @@ namespace SEE.Game.Drawable.Configurations
                 case LineConf line:
                     createdObject = GameLineDrawer.ReDrawLine(surface, line);
                     EnsureValidity(type, createdObject);
-                    new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
-                        line).Execute();
+                    new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), line).Execute();
                     break;
                 case TextConf text:
                     createdObject = GameTexter.ReWriteText(surface, text);
