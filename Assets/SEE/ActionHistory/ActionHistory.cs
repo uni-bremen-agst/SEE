@@ -198,19 +198,17 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Let C be the currently executed action (if there is any) in this action history.
-        /// Then <see cref="IReversibleAction.Stop"/> will be called for C. After that
-        /// <see cref="IReversibleAction.Awake()"/> and then <see cref="IReversibleAction.Start"/>
-        /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to
-        /// the action history and becomes the currently executed action for which
-        /// <see cref="IReversibleAction.Update"/> will be called whenever a client
-        /// of this action history calls the action history's <see cref="Update"/> method.
+        /// Starts executing the given <paramref name="action"/>.
+        /// The currently executing action is stopped and the new action is added
+        /// to the undo history.
         ///
-        /// No action previously undone can be redone anymore.
+        /// Previously undone actions remain redoable until a newly executed
+        /// action actually produces an effect.
         ///
-        /// Precondition: <paramref name="action"/> is not already present in the action history.
+        /// Precondition: <paramref name="action"/> is not already present
+        /// in the action history.
         /// </summary>
-        /// <param name="action">The action to be executed.</param>
+        /// <param name="action">The action to execute.</param>
         public void Execute(IReversibleAction action)
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -218,30 +216,51 @@ namespace SEE.ReversibleActionHistory
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
             LastActionWithEffect();
+
             UndoHistory.Push(action);
             NotifyActionStateChanged(previousActionState, action.GetActionStateType());
             action.Awake();
             action.Start();
-            // Whenever a new action is excuted, we consider the redo history lost.
-            DeleteAllRedos();
+
+            // Activating an unused action must not invalidate Redo.
+            // An action may already produce an effect during Start().
+            if (RedoHistory.Count > 0
+                && action.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
         }
 
-        /// Calls <see cref="IReversibleAction.Update"/> for the currently executed action of this
-        /// action history if there is any. If that action signals that it is complete (via
-        /// <see cref="IReversibleAction.Update"/>), a new instance of the same kind as this
-        /// action will be created, added to the action history and become the new currently
-        /// executed action. The Update is propagated to all clients in the network.
+        /// <summary>
+        /// Updates the currently executing action, if any.
         ///
-        /// If there is no currently executed action, nothing happens.
+        /// Invalidates the redo history when a new action produces its first
+        /// effect. Resuming an already running action does not invalidate
+        /// the redo history merely because it remains in progress.
+        ///
+        /// Completed actions are added to the global history and followed
+        /// by a new instance of the same action kind.
         /// </summary>
         public void Update()
         {
             IReversibleAction lastAction = CurrentAction;
-            if (lastAction != null && lastAction.Update())
+            if (lastAction == null)
             {
-                // Note: An action is put to the global history only when
-                // its execution is completed, that is, if its Update
-                // yields true. Here is the place, where this is the fact.
+                return;
+            }
+
+            bool hadNoEffect = lastAction.CurrentProgress() == IReversibleAction.Progress.NoEffect;
+            bool completed = lastAction.Update();
+
+            if (RedoHistory.Count > 0
+                && hadNoEffect
+                && lastAction.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
+
+            if (completed)
+            {
                 AddToGlobalHistory(lastAction);
                 Execute(lastAction.NewInstance());
             }

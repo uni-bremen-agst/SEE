@@ -211,6 +211,230 @@ namespace SEE.ReversibleActionHistory
             CheckCalls(c, value: true, awake: 1, start: 2, update: 2, stop: 1);
         }
 
+        /// <summary>
+        /// Verifies that the first completed action can be undone and redone
+        /// when no other action is activated between Undo and Redo.
+        /// </summary>
+        [Test]
+        public void FirstCompletedActionCanBeRedoneDirectly()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that automatically activating an unused default tool
+        /// after undoing the first completed action does not discard Redo.
+        /// This reproduces the relevant action-history sequence in PlayerMenu.
+        /// </summary>
+        [Test]
+        public void FirstActionRedoSurvivesDefaultToolActivation()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // PlayerMenu activates a default action when the undo
+            // history becomes empty. This substitute has no effect.
+            hist.Execute(new TestAction());
+
+            Assert.That(hist.CurrentAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                        "Activating an unused default tool must preserve Redo.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Verifies that selecting another tool without performing a new
+        /// modification preserves the redo history of a completed action.
+        /// </summary>
+        [Test]
+        public void SwitchingToUnusedToolPreservesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Switch to another tool without executing its operation.
+            hist.Execute(new Decrement());
+
+            Assert.That(hist.CurrentAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                        "An unused tool must not discard undone actions.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+        }
+
+        /// <summary>
+        /// Verifies that switching to an unused tool preserves Redo
+        /// when the undone action had an effect but was not completed.
+        /// </summary>
+        [Test]
+        public void SwitchingToolsPreservesRedoOfInProgressAction()
+        {
+            TestAction action = new();
+
+            hist.Execute(action);
+            hist.Update();
+
+            Assert.That(action.IsOn, Is.True);
+            Assert.That(action.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.InProgress));
+
+            hist.Undo();
+
+            Assert.That(action.IsOn, Is.False);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Execute(new TestAction());
+
+            Assert.That(hist.CurrentAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                        "An unused tool must preserve an interrupted action.");
+
+            hist.Redo();
+
+            Assert.That(action.IsOn, Is.True);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that a newly completed modification invalidates
+        /// the redo history after an earlier action was undone.
+        /// </summary>
+        [Test]
+        public void NewEffectiveActionInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Execute(new Decrement());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+        }
+
+        /// <summary>
+        /// Verifies that a newly started action invalidates Redo when
+        /// its first Update produces a preliminary effect.
+        /// </summary>
+        [Test]
+        public void NewInProgressActionInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            TestAction newAction = new();
+            hist.Execute(newAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            Assert.That(newAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            hist.Update();
+
+            Assert.That(newAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.InProgress));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+        }
+
+        /// <summary>
+        /// Verifies that updating a previously interrupted action
+        /// does not discard other redoable actions merely because
+        /// the resumed action is already in progress.
+        /// </summary>
+        [Test]
+        public void ResumingInProgressActionPreservesRedoHistory()
+        {
+            TestAction first = new();
+            TestAction second = new();
+
+            hist.Execute(first);
+            hist.Update();
+
+            hist.Execute(second);
+            hist.Update();
+
+            Assert.That(first.IsOn, Is.True);
+            Assert.That(second.IsOn, Is.True);
+
+            hist.Undo();
+
+            Assert.That(second.IsOn, Is.False);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            Assert.That(first.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.InProgress));
+
+            // Updating the resumed first action does not introduce
+            // a new action into the history.
+            hist.Update();
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Redo();
+
+            Assert.That(second.IsOn, Is.True);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
         [Test]
         public void MultipleActions()
         {
@@ -759,11 +983,8 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Test scenario for a non-continuous action with immediate effect.
-        /// Every Update call for Decrement and Increment will yield true.
-        /// Thus, their progress state is initially <see cref="IReversibleAction.Progress.NoEffect"/>
-        /// and after the first Update call <see cref="IReversibleAction.Progress.Completed"/>
-        /// for the rest of their life.
+        /// Tests the action history with non-continuous actions that complete on Update.
+        /// Activating an unused action preserves Redo, while a new modification invalidates it.
         /// </summary>
         [Test]
         public void TestCounterAction()
@@ -772,110 +993,93 @@ namespace SEE.ReversibleActionHistory
             Assert.That(Counter.Value, Is.EqualTo(0));
             Assert.That(hist.UndoCount(), Is.EqualTo(1));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(3));
             Assert.That(hist.UndoCount(), Is.EqualTo(4));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // Because Increment.Update yields true every time it is called,
-            // the execution will always continue with a new instance of
-            // Increment. We have had three calls to Update. Including the
-            // first Execute, we should have four actions on the UndoStack.
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(2));
-            // Undo will remove one completed action and then resume with
-            // a new instance of Increment.
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(0));
-            // The UndoStack has one completed Increment action and one
-            // instance of Increment that has had no effect yet.
-            // If Undo is called, all actions without any effect will
-            // be removed. This leaves the single action with effect,
-            // which then is moved from the UndoStack to the RedoStack.
-            // Thus, the UndoStack will be empty at this point.
             Assert.That(hist.UndoCount(), Is.EqualTo(0));
             Assert.That(hist.RedoCount(), Is.EqualTo(3));
+
             hist.Redo();
             Assert.That(Counter.Value, Is.EqualTo(1));
-            // Redo moves an action from the RedoStack to the UndoStack.
-            // Because that action was completed, a new instance of
-            // Increment will be put onto the UndoStack that will be used
-            // to resume.
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
+
             hist.Redo();
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Activating Decrement does not yet modify the counter.
+            // The remaining redo entry must therefore be preserved.
             hist.Execute(new Decrement());
-            // The new instance of the Increment action that was put on
-            // the stack due to Redo above has not received any Update call.
-            // Hence, it will be popped off the UndoStack. Thus, UndoCount
-            // remains the same.
-            Assert.That(Counter.Value, Is.EqualTo(2)); // still 2 because no Update was called
-            Assert.That(hist.UndoCount(), Is.EqualTo(3));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0)); // RedoStack is lost
-            hist.Update();
-            // Update has completed Decrement. A new instance of Decrement will
-            // be put on the Undo stack.
-            Assert.That(Counter.Value, Is.EqualTo(1));
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // No Update has been called for the new instance of Decrement just put
-            // on the UndoStack, hence, the Decrement at the top of the UndoStack
-            // has still progress state NoEffect. Thus it will be popped off the UndoStack
-            // when the next Increment is added by the following line.
-            hist.Execute(new Increment());
-            Assert.That(Counter.Value, Is.EqualTo(1));  // still 1 because no Update was called
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // Undo without prior Update for the Increment just added; that means we are actually
-            // undoing Decrement. The Increment will be popped off the UndoStack. Then the
-            // Decrement will be undone and moved from the UndoStack to the RedoStack.
-            // Now a completed Increment will be at the top of the stack. Because it is
-            // completed, a new instance of Increment will be added.
-            hist.Undo();
+
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
-            hist.Undo(); // undoing an Increment
-            // No Update has been called for the new instance of the Increment with
-            // progress state NoEffect. Hence, it will be popped off the UndoStack.
-            // Now the completed Increment will be at the top of the UndoStack again.
-            // This is now undone, that is, moved from the UndoStack to the RedoStack.
-            // After that a completed Increment (actually the very first Increment
-            // executed) is at the top of the UndoStack again, and as a consequence
-            // a new instance of Increment is added to the UndoStack in progress state
-            // NoEffect.
+
+            // The first actual Decrement invalidates the redo history.
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            // An unused Increment does not affect the counter.
+            hist.Execute(new Increment());
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            // Undo skips the unused Increment and undoes Decrement.
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Undo the preceding Increment.
+            hist.Undo();
+
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
-            // The current situation is a follows: the UndoStack consists of an
-            // Increment with no effect and one completed Increment. The RedoStack
-            // has a completed Increment and a completed Decrement.
-            hist.Redo(); // re-doing an Increment
-            // The Increment with no effect is popped off the UndoStack.
-            // The completed Increment is moved from the RedoStack to the UndoStack.
-            // Because that Increment is completed, a new instance of Increment
-            // with progress state NoEffect will be added to the UndoStack.
+
+            // Redo the Increment.
+            hist.Redo();
+
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
-            hist.Redo(); // re-doing a Decrement
+
+            // Redo Decrement.
+            hist.Redo();
+
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(4));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
