@@ -138,8 +138,11 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="imageConf">The configuration storing the changed values.</param>
         /// <param name="surface">The drawable surface containing the image.</param>
         /// <param name="surfaceParentName">The ID of the drawable surface parent.</param>
-        private void InitializeMirrorSwitch(GameObject imageObj, ImageConf imageConf,
-            GameObject surface, string surfaceParentName)
+        private void InitializeMirrorSwitch(
+            GameObject imageObj,
+            ImageConf imageConf,
+            GameObject surface,
+            string surfaceParentName)
         {
             mirrorSwitch.OnEvents.RemoveAllListeners();
             mirrorSwitch.OffEvents.RemoveAllListeners();

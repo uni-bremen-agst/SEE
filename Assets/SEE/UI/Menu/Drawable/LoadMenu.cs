@@ -42,28 +42,25 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="loadSpecificCurrentPageButtonCall">
         /// The action that should be executed when loading onto the current page is pressed.
         /// </param>
-        public void Enable(UnityAction loadButtonCall,
-                           UnityAction loadSpecificButtonCall,
-                           UnityAction loadSpecificCurrentPageButtonCall)
+        public void Enable(
+            UnityAction loadButtonCall,
+            UnityAction loadSpecificButtonCall,
+            UnityAction loadSpecificCurrentPageButtonCall)
         {
             Instantiate(loadMenuPrefab);
 
             ButtonManager loadButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Load")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Load").GetComponent<ButtonManager>();
 
             ButtonManager loadSpecificButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecific")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecific").GetComponent<ButtonManager>();
 
             ButtonManager loadSpecificCurrentPageButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecificCurrentPage")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "LoadSpecificCurrentPage").GetComponent<ButtonManager>();
 
             loadButton.onClick.AddListener(loadButtonCall);
             loadSpecificButton.onClick.AddListener(loadSpecificButtonCall);
-            loadSpecificCurrentPageButton.onClick.AddListener(
-                loadSpecificCurrentPageButtonCall);
+            loadSpecificCurrentPageButton.onClick.AddListener(loadSpecificCurrentPageButtonCall);
         }
     }
 }

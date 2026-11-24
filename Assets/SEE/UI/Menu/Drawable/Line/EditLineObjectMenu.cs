@@ -43,8 +43,7 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject surface,
             string surfaceParentName)
         {
-            controls.LayerSliderController.AssignMaxOrder(
-                surface.GetComponent<DrawableHolder>().OrderInLayer);
+            controls.LayerSliderController.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
 
             controls.LayerSliderController.AssignValue(lineHolder.OrderInLayer);
 
@@ -95,8 +94,7 @@ namespace SEE.UI.Menu.Drawable.Line
                     controls.LoopManager.isOn = false;
                     controls.LoopManager.UpdateUI();
 
-                    controls.LoopManager.StartCoroutine(
-                        RestoreRejectedLoopSwitch(selectedLine));
+                    controls.LoopManager.StartCoroutine(RestoreRejectedLoopSwitch(selectedLine));
 
                     if (appliedLine != null
                         && GameLineGeometry.HasExplicitClosingPoint(

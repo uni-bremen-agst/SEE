@@ -88,8 +88,7 @@ namespace SEE.UI.Menu.Drawable
                     surfaceName, surfaceParentName);
 
                 /// For Mind Map nodes, provide the option to include their children.
-                mindMapMoveChildrenController =
-                    new MindMapMoveChildrenController(gameObject, selectedObject);
+                mindMapMoveChildrenController = new MindMapMoveChildrenController(gameObject, selectedObject);
                 mindMapMoveChildrenController.SetUp();
             }
         }
@@ -103,8 +102,12 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="direction">The direction in which the object should be moved.</param>
         /// <param name="surfaceName">The name of the Drawable surface.</param>
         /// <param name="surfaceParentName">The name of the Drawable surface parent.</param>
-        private void SetUpMoveButton(GameObject selectedObject, string buttonName,
-            ValueHolder.MoveDirection direction, string surfaceName, string surfaceParentName)
+        private void SetUpMoveButton(
+            GameObject selectedObject,
+            string buttonName,
+            ValueHolder.MoveDirection direction,
+            string surfaceName,
+            string surfaceParentName)
         {
             GameFinder.FindAttachedOrLocalDescendant(gameObject, buttonName)
                 .AddComponent<ButtonHeld>().SetAction(() =>
