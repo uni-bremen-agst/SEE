@@ -174,8 +174,8 @@ namespace SEE.ReversibleActionHistory
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
-            UnityEngine.Assertions.Assert.IsTrue
-               (UndoHistory.Skip(1).All(action => action.CurrentProgress() != IReversibleAction.Progress.NoEffect));
+            UnityEngine.Assertions.Assert.IsTrue(
+                UndoHistory.Skip(1).All(action => action.CurrentProgress() != IReversibleAction.Progress.NoEffect));
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace SEE.ReversibleActionHistory
             if (!isNetwork && syncOverNetwork)
             {
                 new NetActionHistory().Replace(oldItem.ActionID, oldItem.ActionType, oldItem.ChangedObjects,
-                                               newItem.ActionType, newItem.ChangedObjects);
+                    newItem.ActionType, newItem.ChangedObjects);
             }
         }
 

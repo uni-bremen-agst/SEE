@@ -83,10 +83,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// <param name="returnCall">
         /// An optional callback returning to the parent menu.
         /// </param>
-        internal void Enable(
-            GameObject selectedText,
-            DrawableType newValueHolder,
-            UnityAction returnCall = null)
+        internal void Enable(GameObject selectedText, DrawableType newValueHolder, UnityAction returnCall = null)
         {
             if (newValueHolder is not TextConf textHolder)
             {
@@ -94,8 +91,7 @@ namespace SEE.UI.Menu.Drawable.Text
             }
 
             GameObject surface = GameFinder.GetDrawableSurface(selectedText);
-            string surfaceParentName =
-                GameFinder.GetDrawableSurfaceParentName(surface);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             enableTextMenu(
                 color =>
@@ -103,10 +99,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     GameTextEdit.ChangeFontColor(selectedText, color);
                     textHolder.FontColor = color;
 
-                    new EditTextNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 },
                 textHolder.FontColor,
                 true,
@@ -114,17 +107,9 @@ namespace SEE.UI.Menu.Drawable.Text
 
             SetUpReturnButton(returnCall);
 
-            SetUpFontColorButton(
-                selectedText,
-                textHolder,
-                surface,
-                surfaceParentName);
+            SetUpFontColorButton(selectedText, textHolder, surface, surfaceParentName);
 
-            SetUpOutlineColorButton(
-                selectedText,
-                textHolder,
-                surface,
-                surfaceParentName);
+            SetUpOutlineColorButton(selectedText, textHolder, surface, surfaceParentName);
 
             textStyleMenu.AssignOutlineThickness(
                 thickness =>
@@ -132,18 +117,11 @@ namespace SEE.UI.Menu.Drawable.Text
                     GameTextEdit.ChangeOutlineThickness(selectedText, thickness);
                     textHolder.OutlineThickness = thickness;
 
-                    new EditTextNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 },
                 textHolder.OutlineThickness);
 
-            SetUpOutlineStatus(
-                selectedText,
-                textHolder,
-                surface,
-                surfaceParentName);
+            SetUpOutlineStatus(selectedText, textHolder, surface, surfaceParentName);
 
             controls.OutlineSwitch.isOn = textHolder.IsOutlined;
             controls.OutlineSwitch.UpdateUI();
@@ -154,10 +132,7 @@ namespace SEE.UI.Menu.Drawable.Text
                     GameTextEdit.ChangeFontSize(selectedText, size);
                     textHolder.FontSize = size;
 
-                    new EditTextNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 },
                 textHolder.FontSize);
 
@@ -167,27 +142,15 @@ namespace SEE.UI.Menu.Drawable.Text
                     GameTextEdit.ChangeFontStyles(selectedText, style);
                     textHolder.FontStyles = style;
 
-                    new EditTextNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 },
                 textHolder.FontStyles);
 
-            SetUpEditTextButton(
-                selectedText,
-                textHolder,
-                surface,
-                surfaceParentName);
+            SetUpEditTextButton(selectedText, textHolder, surface, surfaceParentName);
 
-            controls.OrderInLayerSlider.AssignMaxOrder(
-                surface.GetComponent<DrawableHolder>().OrderInLayer);
+            controls.OrderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
 
-            SetUpOrderInLayer(
-                selectedText,
-                textHolder,
-                surface,
-                surfaceParentName);
+            SetUpOrderInLayer(selectedText, textHolder, surface, surfaceParentName);
 
             MenuHelper.CalculateHeight(textMenu);
         }
@@ -247,10 +210,7 @@ namespace SEE.UI.Menu.Drawable.Text
                         GameTextEdit.ChangeFontColor(selectedText, color);
                         textHolder.FontColor = color;
 
-                        new EditTextNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            TextConf.GetText(selectedText)).Execute();
+                        new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                     },
                     textHolder.FontColor);
 
@@ -304,10 +264,7 @@ namespace SEE.UI.Menu.Drawable.Text
                         GameTextEdit.ChangeOutlineColor(selectedText, color);
                         textHolder.OutlineColor = color;
 
-                        new EditTextNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            TextConf.GetText(selectedText)).Execute();
+                        new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                     },
                     textHolder.OutlineColor);
 
@@ -343,10 +300,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 GameTextEdit.ChangeOutlineStatus(selectedText, false);
                 textHolder.IsOutlined = false;
 
-                new EditTextNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    TextConf.GetText(selectedText)).Execute();
+                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
             });
 
             controls.OutlineSwitch.OnEvents.AddListener(() =>
@@ -359,15 +313,10 @@ namespace SEE.UI.Menu.Drawable.Text
                 if (textHolder.OutlineColor != tmp.outlineColor
                     && tmp.outlineColor == Color.clear)
                 {
-                    GameTextEdit.ChangeOutlineColor(
-                        selectedText,
-                        textHolder.OutlineColor);
+                    GameTextEdit.ChangeOutlineColor(selectedText, textHolder.OutlineColor);
                 }
 
-                new EditTextNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    TextConf.GetText(selectedText)).Execute();
+                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
             });
         }
 
@@ -405,8 +354,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 {
                     if (textOut != null && textOut != "")
                     {
-                        TextMeshPro tmp =
-                            selectedText.GetComponent<TextMeshPro>();
+                        TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
 
                         tmp.rectTransform.sizeDelta =
                             GameTextGeometry.CalculateWidthAndHeight(
@@ -418,10 +366,7 @@ namespace SEE.UI.Menu.Drawable.Text
                         GameTextEdit.ChangeText(selectedText, textOut);
                         textHolder.Text = textOut;
 
-                        new EditTextNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            TextConf.GetText(selectedText)).Execute();
+                        new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                     }
                     else
                     {
@@ -466,10 +411,7 @@ namespace SEE.UI.Menu.Drawable.Text
                 GameLayerChanger.SetOrderInLayer(selectedText, order);
                 textHolder.OrderInLayer = order;
 
-                new EditTextNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    TextConf.GetText(selectedText)).Execute();
+                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
             });
         }
     }
