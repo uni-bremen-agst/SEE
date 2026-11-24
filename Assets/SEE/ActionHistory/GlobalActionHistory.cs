@@ -115,6 +115,12 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
+        /// Gets the action that would be redone next, or null if no
+        /// redoable action exists.
+        /// </summary>
+        public static IReversibleAction NextRedoAction => history.NextRedoAction;
+
+        /// <summary>
         /// True if the action history is empty.
         /// </summary>
         /// <returns>True if the action history is empty.</returns>

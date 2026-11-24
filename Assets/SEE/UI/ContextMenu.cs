@@ -971,17 +971,23 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Ensures that the previous action is executed again after the current action has
-        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>) or canceled.
-        /// Additionally, the <see cref="PlayerMenu"/> is updated.
+        /// Marks the given action as originating from the context menu
+        /// and restores the previously selected action after the context-menu
+        /// action has completed or been canceled.
         /// </summary>
-        /// <param name="action">The current action which was executed via context menu.</param>
-        /// <param name="previousAction">The previously executed action to be re-executed.</param>
+        /// <param name="action">The action initiated through the context menu.</param>
+        /// <param name="previousAction">The action state to restore afterward.</param>
+        /// <returns>A task waiting for the context-menu action to finish.</returns>
         private static async UniTask ExecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
         {
+            if (action is AbstractPlayerAction playerAction)
+            {
+                playerAction.WasExecutedViaContextMenu = true;
+            }
+
             await UniTask.WaitUntil(() =>
                 action.CurrentProgress() == IReversibleAction.Progress.Completed
-                || action is AbstractPlayerAction playerAction && playerAction.IsCanceled);
+                || action is AbstractPlayerAction currentAction && currentAction.IsCanceled);
 
             GlobalActionHistory.Execute(previousAction);
             UpdatePlayerMenu();

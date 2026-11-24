@@ -184,6 +184,12 @@ namespace SEE.ReversibleActionHistory
         public IReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
+        /// Gets the action that would be redone next, or null if there
+        /// is no redoable action.
+        /// </summary>
+        public IReversibleAction NextRedoAction => RedoHistory.Count > 0 ? RedoHistory.Peek() : null;
+
+        /// <summary>
         /// Notifies subscribers if the action state changes from
         /// <paramref name="previousActionState"/> to <paramref name="newActionState"/>.
         /// </summary>
