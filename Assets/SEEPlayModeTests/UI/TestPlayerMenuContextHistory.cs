@@ -34,6 +34,16 @@ namespace SEE.UI
         private GameObject previousLocalPlayer;
 
         /// <summary>
+        /// Original state of the VR undo shortcut.
+        /// </summary>
+        private bool previousUndoToggle;
+
+        /// <summary>
+        /// Original state of the VR redo shortcut.
+        /// </summary>
+        private bool previousRedoToggle;
+
+        /// <summary>
         /// The player menu under test.
         /// </summary>
         private PlayerMenu playerMenu;
@@ -120,6 +130,15 @@ namespace SEE.UI
 
             previousLocalPlayer = LocalPlayer.Instance;
 
+            previousUndoToggle = XRSEEActions.UndoToggle;
+            previousRedoToggle = XRSEEActions.RedoToggle;
+
+            // Stop the previous action before isolating the test history.
+            history.CurrentAction?.Stop();
+            undoStack.Clear();
+            redoStack.Clear();
+            globalEntries.Clear();
+
             EnsureUICanvas();
 
             if (EventSystem.current == null)
@@ -169,8 +188,8 @@ namespace SEE.UI
         [UnityTearDown]
         public IEnumerator TearDownPlayerMenu()
         {
-            XRSEEActions.UndoToggle = false;
-            XRSEEActions.RedoToggle = false;
+            XRSEEActions.UndoToggle = previousUndoToggle;
+            XRSEEActions.RedoToggle = previousRedoToggle;
 
             if (playerMenu != null)
             {

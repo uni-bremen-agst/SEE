@@ -435,6 +435,71 @@ namespace SEE.ReversibleActionHistory
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
         }
 
+        /// <summary>
+        /// Verifies that a new effect reported outside ActionHistory.Update
+        /// invalidates the redo history.
+        /// </summary>
+        [Test]
+        public void ExternalEffectInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            Increment externalAction = new();
+            hist.Execute(externalAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            externalAction.ApplyExternalEffect();
+            hist.InvalidateRedoHistory(externalAction);
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that an action without an effect or an inactive action
+        /// cannot invalidate the existing redo history.
+        /// </summary>
+        [Test]
+        public void InactiveOrUnusedActionDoesNotInvalidateRedoHistory()
+        {
+            Increment completedAction = new();
+
+            hist.Execute(completedAction);
+            hist.Update();
+            hist.Undo();
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            Decrement unusedAction = new();
+            hist.Execute(unusedAction);
+
+            hist.InvalidateRedoHistory(unusedAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                "An unused action must not invalidate Redo.");
+
+            hist.InvalidateRedoHistory(completedAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                "An inactive action must not invalidate Redo.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+        }
+
         [Test]
         public void MultipleActions()
         {
@@ -741,6 +806,15 @@ namespace SEE.ReversibleActionHistory
             public override void Undo()
             {
                 counter--;
+            }
+
+            /// <summary>
+            /// Simulates a modification reported outside ActionHistory.Update.
+            /// </summary>
+            public void ApplyExternalEffect()
+            {
+                currentProgress = IReversibleAction.Progress.InProgress;
+                counter++;
             }
 
             public override bool Update()

@@ -101,6 +101,11 @@ namespace SEE.Controls.ReversibleActions
                         /// Here, <see cref="AddNode"/> is used since the check for whether adding is possible has
                         /// already been performed in the <see cref="ContextMenuAction"/>.
                         AddNode(contextMenuTargetParent, contextMenuTargetLocalPosition);
+
+                        if (progress == ProgressState.NoNodeSelected)
+                        {
+                            IsCanceled = true;
+                        }
                     }
                     break;
                 case ProgressState.WaitingForInput:
@@ -537,6 +542,11 @@ namespace SEE.Controls.ReversibleActions
                 new DeleteNetAction(go.name).Execute();
                 progress = ProgressState.NoNodeSelected;
                 SEEInput.KeyboardShortcutsEnabled = true;
+
+                if (WasExecutedViaContextMenu)
+                {
+                    IsCanceled = true;
+                }
             }
         }
 

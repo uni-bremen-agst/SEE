@@ -262,8 +262,8 @@ namespace SEE.Controls.ReversibleActions
                 }
             }
 
-            // U clears the current selection without leaving the tool.
-            if (SEEInput.Unselect())
+            // U or Escape clears the current selection without leaving the tool.
+            if (SEEInput.Unselect() || (!ExecuteViaContextMenu && SEEInput.Cancel()))
             {
                 from = null;
                 to = null;

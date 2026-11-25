@@ -238,6 +238,23 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
+        /// Discards redoable actions when the currently executing action reports a new effect
+        /// outside the regular <see cref="Update"/> call.
+        /// An inactive action or an action without an effect cannot invalidate Redo.
+        /// The existing cleanup also synchronizes the removal of global history entries.
+        /// </summary>
+        /// <param name="action">The action that produced the new effect.</param>
+        public void InvalidateRedoHistory(IReversibleAction action)
+        {
+            if (RedoHistory.Count > 0
+                && ReferenceEquals(CurrentAction, action)
+                && action.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
+        }
+
+        /// <summary>
         /// Updates the currently executing action, if any.
         ///
         /// Invalidates the redo history when a new action produces its first
