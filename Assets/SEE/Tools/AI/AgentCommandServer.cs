@@ -40,9 +40,11 @@ namespace SEE.Tools.AI
         public const int DefaultPort = 8765;
 
         /// <summary>Port the server listens on (127.0.0.1 only).</summary>
+        [Tooltip("Port the server listens on (127.0.0.1 only).")]
         public int Port = DefaultPort;
 
         /// <summary>Whether each command shows a short notification in SEE.</summary>
+        [Tooltip("Whether each command shows a short notification in SEE.")]
         public bool ShowNotifications = true;
 
         /// <summary>How long a request waits for the main thread, in milliseconds.</summary>
@@ -63,6 +65,18 @@ namespace SEE.Tools.AI
         /// <summary>A command received from the agent, waiting for its answer.</summary>
         private class PendingCommand
         {
+            /// <summary>Value of <see cref="State"/>: the command waits for the main thread.</summary>
+            internal const int Waiting = 0;
+
+            /// <summary>Value of <see cref="State"/>: the main thread has started the command.</summary>
+            internal const int Started = 1;
+
+            /// <summary>
+            /// Value of <see cref="State"/>: the request timed out before the command started;
+            /// the main thread must skip it.
+            /// </summary>
+            internal const int Cancelled = 2;
+
             /// <summary>The parsed request body.</summary>
             internal JObject Request;
 
@@ -71,6 +85,13 @@ namespace SEE.Tools.AI
 
             /// <summary>Signalled when <see cref="Response"/> is set.</summary>
             internal readonly ManualResetEventSlim Done = new(false);
+
+            /// <summary>
+            /// <see cref="Waiting"/>, <see cref="Started"/> or <see cref="Cancelled"/>. Changed only
+            /// with <see cref="Interlocked.CompareExchange(ref int, int, int)"/>, so the listener
+            /// thread (on timeout) and the main thread cannot both claim the same command.
+            /// </summary>
+            internal int State = Waiting;
         }
 
         #region Startup and shutdown
@@ -98,6 +119,7 @@ namespace SEE.Tools.AI
         private bool failureLogged;
 
         /// <summary>Whether the server is listening for commands.</summary>
+        [Tooltip("Whether the server is listening for commands.")]
         public bool IsListening => listener is { IsListening: true };
 
         /// <summary>Starts listening and makes sure the port is released whenever SEE stops.</summary>
@@ -256,8 +278,16 @@ namespace SEE.Tools.AI
             queue.Enqueue(pending);
             if (!pending.Done.Wait(mainThreadTimeoutMs))
             {
-                Respond(context, 504, Error("SEE did not answer in time. Is Play mode paused?"));
-                return;
+                if (Interlocked.CompareExchange(ref pending.State, PendingCommand.Cancelled, PendingCommand.Waiting)
+                    == PendingCommand.Waiting)
+                {
+                    // Not started yet: it never will be, so the agent's failure report stays true.
+                    Respond(context, 504, Error("SEE did not answer in time, so the command was cancelled. "
+                                                + "Is Play mode paused?"));
+                    return;
+                }
+                // The main thread started the command just now; it finishes within this frame.
+                pending.Done.Wait();
             }
             Respond(context, 200, pending.Response);
         }
@@ -290,6 +320,12 @@ namespace SEE.Tools.AI
 
             while (queue.TryDequeue(out PendingCommand pending))
             {
+                if (Interlocked.CompareExchange(ref pending.State, PendingCommand.Started, PendingCommand.Waiting)
+                    != PendingCommand.Waiting)
+                {
+                    // The request timed out and was answered with a failure; do not run it now.
+                    continue;
+                }
                 try
                 {
                     pending.Response = Execute(pending.Request);
@@ -335,13 +371,13 @@ namespace SEE.Tools.AI
                 _ => Error($"Unknown tool '{tool}'.")
             };
 
-            bool ok = (bool?)response["ok"] ?? false;
+            bool callSucceeded = (bool?)response["ok"] ?? false;
             string message = (string)response["message"] ?? "";
             Debug.Log($"[{nameof(AgentCommandServer)}] {tool} {args.ToString(Newtonsoft.Json.Formatting.None)} -> "
-                      + $"{(ok ? "OK" : "FAILED")}: {message}\n");
+                      + $"{(callSucceeded ? "OK" : "FAILED")}: {message}\n");
             if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors"))
             {
-                if (ok)
+                if (callSucceeded)
                 {
                     ShowNotification.Info($"Agent: {tool}", message, log: false);
                 }
@@ -392,9 +428,9 @@ namespace SEE.Tools.AI
             }
             query = query.Trim();
             List<(int score, Node node)> scored = new();
-            foreach (GameObject building in GameObject.FindGameObjectsWithTag(Tags.Node))
+            foreach (GameObject gameNode in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
-                if (!building.activeInHierarchy || !building.TryGetNode(out Node node))
+                if (!gameNode.activeInHierarchy || !gameNode.TryGetNode(out Node node))
                 {
                     continue;
                 }
@@ -448,14 +484,14 @@ namespace SEE.Tools.AI
         /// <returns>The JSON answer with "incoming" and "outgoing" arrays.</returns>
         private static JObject Neighbors(string target, int limit)
         {
-            AgentCityEffects.EffectResult resolved = AgentCityEffects.Instance.Resolve(target, out GameObject building);
-            if (!resolved.Ok)
+            AgentCityEffects.EffectResult resolved = AgentCityEffects.Instance.Resolve(target, out GameObject gameNode);
+            if (!resolved.CallSucceeded)
             {
                 return ToJson(resolved);
             }
-            if (!building.TryGetNode(out Node node))
+            if (!gameNode.TryGetNode(out Node node))
             {
-                return Error($"'{building.name}' is not a graph node.");
+                return Error($"'{gameNode.name}' is not a graph node.");
             }
             return new JObject
             {
@@ -484,8 +520,8 @@ namespace SEE.Tools.AI
         /// <returns>JSON with id, name, type, file, line, city and whether it is drawn.</returns>
         private static JObject Describe(Node node)
         {
-            GameObject building = node.GameObject(false);
-            AbstractSEECity city = building != null ? building.ContainingCity() : null;
+            GameObject gameNode = node.GameObject(false);
+            AbstractSEECity city = gameNode != null ? gameNode.ContainingCity() : null;
             return new JObject
             {
                 ["id"] = node.ID,
@@ -494,7 +530,7 @@ namespace SEE.Tools.AI
                 ["file"] = node.Path(),
                 ["line"] = node.SourceLine,
                 ["city"] = city != null ? city.name : null,
-                ["drawn"] = building != null && building.activeInHierarchy
+                ["drawn"] = gameNode != null && gameNode.activeInHierarchy
             };
         }
 
@@ -507,7 +543,7 @@ namespace SEE.Tools.AI
         /// <returns>JSON with ok, message and node_ids.</returns>
         private static JObject ToJson(AgentCityEffects.EffectResult result) => new()
         {
-            ["ok"] = result.Ok,
+            ["ok"] = result.CallSucceeded,
             ["message"] = result.Message,
             ["node_ids"] = new JArray(result.NodeIds)
         };

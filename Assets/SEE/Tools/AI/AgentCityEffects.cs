@@ -30,125 +30,149 @@ namespace SEE.Tools.AI
     /// <see cref="NodeOperator.HitEffect"/>, <see cref="NodeOperator.MoveYTo"/>
     /// and <see cref="MarkerFactory"/>.
     ///
-    /// Debug keys (Editor and development builds only, Game view must have focus),
-    /// using <see cref="DebugKey"/> (default J; F10 clashes with Unity Recorder and Windows;
-    /// plain J opens the Ask SEE box, see <see cref="AskSeeWindow"/>):
-    ///   Ctrl + J   play a search trail over a few buildings, then focus the test building
-    ///              (<see cref="TestTarget"/>)
-    ///   Alt + J    show a path that follows outgoing edges from the test building
-    ///   Shift + J  reset all effects
+    /// Debug keys (Editor and development builds only, Game view must have focus): the key of
+    /// <see cref="KeyAction.AskSee"/> (default J, bound in <see cref="KeyBindings"/>) together with
+    ///   Ctrl   play a search trail over a few buildings, then focus the test building
+    ///          (<see cref="TestTarget"/>)
+    ///   Alt    show a path that follows outgoing edges from the test building
+    ///   Shift  reset all effects
+    /// Without Ctrl, Alt or Shift, the key opens the Ask SEE box (<see cref="AskSeeWindow"/>).
     /// </summary>
-    public class AgentCityEffects : MonoBehaviour
+    internal class AgentCityEffects : MonoBehaviour
     {
         #region Tunable settings
 
         /// <summary>Alpha of all non-focused buildings while an answer is shown.</summary>
-        [Range(0f, 1f)] public float DimAlpha = 0.2f;
+        [Tooltip("Alpha of all non-focused buildings while an answer is shown."), Range(0f, 1f)]
+        public float DimAlpha = 0.2f;
 
         /// <summary>Glow colour of the focused building. Contrasts with SEE's pink/red cities.</summary>
+        [Tooltip("Glow colour of the focused building. Contrasts with SEE's pink/red cities.")]
         public Color FocusGlowColor = Color.cyan;
 
         /// <summary>Strength of the colour tint on highlighted buildings (0 = none, 1 = fully tinted).</summary>
-        [Range(0f, 1f)] public float OverlayIntensity = 0.9f;
+        [Tooltip("Strength of the colour tint on highlighted buildings (0 = none, 1 = fully tinted)."), Range(0f, 1f)]
+        public float OverlayIntensity = 0.9f;
 
         /// <summary>Speed of the pulsing tint; 0 makes it steady.</summary>
+        [Tooltip("Speed of the pulsing tint; 0 makes it steady.")]
         public float PulseSpeed = 2.5f;
 
         /// <summary>Weakest tint while pulsing, relative to <see cref="OverlayIntensity"/>.</summary>
-        [Range(0f, 1f)] public float PulseMinIntensity = 0.15f;
+        [Tooltip("Weakest tint while pulsing, relative to OverlayIntensity."), Range(0f, 1f)]
+        public float PulseMinIntensity = 0.15f;
 
         /// <summary>Width of the outline around highlighted buildings (SEE's default is 0.45).</summary>
+        [Tooltip("Width of the outline around highlighted buildings (SEE's default is 0.45).")]
         public float OutlineWidth = 1.5f;
 
         /// <summary>Colour of the marker beam above the focused building.</summary>
+        [Tooltip("Colour of the marker beam above the focused building.")]
         public Color BeamColor = Color.cyan;
 
         /// <summary>Beam height in world units (SEE's own Show in City uses 1).</summary>
+        [Tooltip("Beam height in world units (SEE's own Show in City uses 1).")]
         public float BeamHeight = 0.8f;
 
         /// <summary>Beam width in world units (SEE's own Show in City uses 0.01, which is hard to see).</summary>
+        [Tooltip("Beam width in world units (SEE's own Show in City uses 0.01, which is hard to see).")]
         public float BeamWidth = 0.03f;
 
         /// <summary>How far the building pops up, relative to its own height.</summary>
+        [Tooltip("How far the building pops up, relative to its own height.")]
         public float PopHeightFactor = 0.3f;
 
         /// <summary>Animation speed factor passed to the operators (1 = city's base duration).</summary>
+        [Tooltip("Animation speed factor passed to the operators (1 = city's base duration).")]
         public float AnimationFactor = 1f;
 
         /// <summary>Whether <see cref="Focus"/> also flies the camera to the building.</summary>
+        [Tooltip("Whether Focus also flies the camera to the building.")]
         public bool MoveCameraOnFocus = true;
 
         /// <summary>Duration of the camera flight in seconds.</summary>
+        [Tooltip("Duration of the camera flight in seconds.")]
         public float CameraFlightSeconds = 1.2f;
 
         /// <summary>
         /// How much room is left around the building: 1 makes the building just fill the
         /// camera's view, 2 makes it take up about half of it.
         /// </summary>
-        [Range(1f, 6f)] public float CameraFrameMargin = 3f;
+        [Tooltip("How much room is left around the building: 1 makes the building just fill the camera's view, 2 makes it take up about half of it."), Range(1f, 6f)]
+        public float CameraFrameMargin = 3f;
 
         /// <summary>
         /// Smallest camera distance in world units, so the camera does not end up inside
         /// the city and the neighbouring buildings stay in view.
         /// </summary>
+        [Tooltip("Smallest camera distance in world units, so the camera does not end up inside the city and the neighbouring buildings stay in view.")]
         public float MinCameraDistance = 0.8f;
 
         /// <summary>Largest camera distance in world units, so huge buildings do not send the camera far away.</summary>
+        [Tooltip("Largest camera distance in world units, so huge buildings do not send the camera far away.")]
         public float MaxCameraDistance = 2.5f;
 
         /// <summary>
         /// Downward viewing angle of the camera at the end of the flight, in degrees.
         /// It gets steeper when the avatar would otherwise have to sink below the floor.
         /// </summary>
-        [Range(0f, 90f)] public float CameraPitch = 25f;
+        [Tooltip("Downward viewing angle of the camera at the end of the flight, in degrees. It gets steeper when the avatar would otherwise have to sink below the floor."), Range(0f, 90f)]
+        public float CameraPitch = 25f;
 
         /// <summary>Time per step of <see cref="ShowPath"/> (one node and the edge to the next), in seconds.</summary>
+        [Tooltip("Time per step of ShowPath (one node and the edge to the next), in seconds.")]
         public float PathStepSeconds = 0.6f;
 
         /// <summary>Longest connection <see cref="ShowPath"/> searches between two given nodes, in steps.</summary>
+        [Tooltip("Longest connection ShowPath searches between two given nodes, in steps.")]
         public int MaxPathSteps = 6;
 
         /// <summary>Most nodes the path search visits before giving up.</summary>
+        [Tooltip("Most nodes the path search visits before giving up.")]
         public int MaxPathSearchNodes = 5000;
 
         /// <summary>
         /// Time the camera spends at each building of a tour (flight included), in seconds.
         /// Also the step time of <see cref="ShowPath"/> while the camera follows the path.
         /// </summary>
+        [Tooltip("Time the camera spends at each building of a tour (flight included), in seconds. Also the step time of ShowPath while the camera follows the path.")]
         public float TourStopSeconds = 2.2f;
 
         /// <summary>With more results than this, the camera shows them together instead of visiting each.</summary>
+        [Tooltip("With more results than this, the camera shows them together instead of visiting each.")]
         public int MaxTourStops = 6;
 
         /// <summary>Downward viewing angle of the overview of several buildings, in degrees.</summary>
-        [Range(0f, 90f)] public float OverviewPitch = 50f;
+        [Tooltip("Downward viewing angle of the overview of several buildings, in degrees."), Range(0f, 90f)]
+        public float OverviewPitch = 50f;
 
         /// <summary>Room left around the buildings in the overview (1 = just fits).</summary>
-        [Range(1f, 4f)] public float OverviewFrameMargin = 1.4f;
+        [Tooltip("Room left around the buildings in the overview (1 = just fits)."), Range(1f, 4f)]
+        public float OverviewFrameMargin = 1.4f;
 
         /// <summary>Largest camera distance of the overview, in world units.</summary>
+        [Tooltip("Largest camera distance of the overview, in world units.")]
         public float MaxOverviewDistance = 4f;
 
         /// <summary>Glow colour of nodes that depend on the shown node (incoming edges) in <see cref="ShowNeighbors"/>.</summary>
+        [Tooltip("Glow colour of nodes that depend on the shown node (incoming edges) in ShowNeighbors.")]
         public Color IncomingColor = new(1f, 0.55f, 0f);
 
         /// <summary>Glow colour of nodes the shown node depends on (outgoing edges) in <see cref="ShowNeighbors"/>.</summary>
+        [Tooltip("Glow colour of nodes the shown node depends on (outgoing edges) in ShowNeighbors.")]
         public Color OutgoingColor = Color.green;
 
         /// <summary>At most this many incoming and this many outgoing neighbours are shown.</summary>
+        [Tooltip("At most this many incoming and this many outgoing neighbours are shown.")]
         public int MaxNeighborsPerSide = 25;
 
         /// <summary>Delay between buildings in the search trail, in seconds.</summary>
+        [Tooltip("Delay between buildings in the search trail, in seconds.")]
         public float SearchTrailStepSeconds = 0.15f;
 
         /// <summary>Source name (or node ID) used by the debug key.</summary>
+        [Tooltip("Source name (or node ID) used by the debug key.")]
         public string TestTarget = "RuntimeTabMenu";
-
-        /// <summary>
-        /// Debug key (see class summary). J is not bound by SEE. Avoid F10: Ctrl+F10 starts
-        /// Unity Recorder in the Editor, and F10/Shift+F10 are menu keys on Windows.
-        /// </summary>
-        public KeyCode DebugKey = KeyCode.J;
 
         #endregion
 
@@ -199,7 +223,7 @@ namespace SEE.Tools.AI
         public readonly struct EffectResult
         {
             /// <summary>Whether the call did what was asked.</summary>
-            public bool Ok { get; }
+            public bool CallSucceeded { get; }
 
             /// <summary>Human-readable explanation, meant to be passed back to Claude.</summary>
             public string Message { get; }
@@ -211,12 +235,12 @@ namespace SEE.Tools.AI
             public IReadOnlyList<string> NodeIds { get; }
 
             /// <summary>Creates a result; use <see cref="Success"/> or <see cref="Failure"/>.</summary>
-            /// <param name="ok">Whether the call succeeded.</param>
+            /// <param name="callSucceeded">Whether the call succeeded.</param>
             /// <param name="message">Explanation of the outcome.</param>
             /// <param name="nodeIds">Node IDs involved; null means none.</param>
-            private EffectResult(bool ok, string message, IReadOnlyList<string> nodeIds)
+            private EffectResult(bool callSucceeded, string message, IReadOnlyList<string> nodeIds)
             {
-                Ok = ok;
+                CallSucceeded = callSucceeded;
                 Message = message;
                 NodeIds = nodeIds ?? new List<string>();
             }
@@ -224,19 +248,19 @@ namespace SEE.Tools.AI
             /// <summary>Returns a successful result.</summary>
             /// <param name="message">Explanation of what was done.</param>
             /// <param name="ids">Node IDs the call acted on.</param>
-            /// <returns>A result with <see cref="Ok"/> set to true.</returns>
+            /// <returns>A result with <see cref="CallSucceeded"/> set to true.</returns>
             public static EffectResult Success(string message, params string[] ids) => new(true, message, ids);
 
             /// <summary>Returns a failed result.</summary>
             /// <param name="message">Explanation of what went wrong.</param>
             /// <param name="candidates">Node IDs that were found anyway, if any.</param>
-            /// <returns>A result with <see cref="Ok"/> set to false.</returns>
+            /// <returns>A result with <see cref="CallSucceeded"/> set to false.</returns>
             public static EffectResult Failure(string message, IReadOnlyList<string> candidates = null) => new(false, message, candidates);
 
             /// <summary>One-line summary for the console.</summary>
             /// <returns>"OK: ..." or "FAILED: ..." followed by the node IDs.</returns>
             public override string ToString() =>
-                $"{(Ok ? "OK" : "FAILED")}: {Message}" + (NodeIds.Count > 0 ? $" [{string.Join(", ", NodeIds)}]" : "");
+                $"{(CallSucceeded ? "OK" : "FAILED")}: {Message}" + (NodeIds.Count > 0 ? $" [{string.Join(", ", NodeIds)}]" : "");
         }
 
         #endregion
@@ -282,28 +306,28 @@ namespace SEE.Tools.AI
         /// <returns>The result, with the focused node ID on success.</returns>
         public EffectResult Focus(string idOrName)
         {
-            EffectResult resolved = Resolve(idOrName, out GameObject building);
-            if (!resolved.Ok)
+            EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
+            if (!resolved.CallSucceeded)
             {
                 return resolved;
             }
 
             ResetEffects();
-            focused = building;
+            focused = gameNode;
 
-            DimCityExcept(building);
-            GlowStrong(building);
-            PutBeamAbove(building);
-            Pop(building);
+            DimCityExcept(gameNode);
+            GlowStrong(gameNode);
+            PutBeamAbove(gameNode);
+            Pop(gameNode);
 
             string cameraNote = "";
             if (MoveCameraOnFocus)
             {
-                EffectResult flown = FlyCameraTo(building);
-                cameraNote = flown.Ok ? " Camera moved." : $" Camera not moved: {flown.Message}";
+                EffectResult flown = FlyCameraTo(gameNode);
+                cameraNote = flown.CallSucceeded ? " Camera moved." : $" Camera not moved: {flown.Message}";
             }
 
-            return EffectResult.Success($"Focused '{Describe(building)}'.{cameraNote}", building.name);
+            return EffectResult.Success($"Focused '{Describe(gameNode)}'.{cameraNote}", gameNode.name);
         }
 
         /// <summary>
@@ -314,15 +338,15 @@ namespace SEE.Tools.AI
         /// <returns>The result, with the node ID on success.</returns>
         public EffectResult FocusCamera(string idOrName)
         {
-            EffectResult resolved = Resolve(idOrName, out GameObject building);
-            if (!resolved.Ok)
+            EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
+            if (!resolved.CallSucceeded)
             {
                 return resolved;
             }
-            EffectResult flown = FlyCameraTo(building);
-            return flown.Ok
-                ? EffectResult.Success($"Camera moved to '{Describe(building)}'.", building.name)
-                : EffectResult.Failure(flown.Message, new[] { building.name });
+            EffectResult flown = FlyCameraTo(gameNode);
+            return flown.CallSucceeded
+                ? EffectResult.Success($"Camera moved to '{Describe(gameNode)}'.", gameNode.name)
+                : EffectResult.Failure(flown.Message, new[] { gameNode.name });
         }
 
         /// <summary>
@@ -336,15 +360,15 @@ namespace SEE.Tools.AI
         /// (the found ones are highlighted anyway).</returns>
         public EffectResult Highlight(IEnumerable<string> idsOrNames)
         {
-            List<GameObject> buildings = new();
+            List<GameObject> gameNodes = new();
             List<string> missing = new();
             foreach (string idOrName in idsOrNames)
             {
-                if (Resolve(idOrName, out GameObject building).Ok)
+                if (Resolve(idOrName, out GameObject gameNode).CallSucceeded)
                 {
-                    if (!buildings.Contains(building))
+                    if (!gameNodes.Contains(gameNode))
                     {
-                        buildings.Add(building);
+                        gameNodes.Add(gameNode);
                     }
                 }
                 else
@@ -352,21 +376,21 @@ namespace SEE.Tools.AI
                     missing.Add(idOrName);
                 }
             }
-            if (buildings.Count == 0)
+            if (gameNodes.Count == 0)
             {
                 return EffectResult.Failure($"Not found: {string.Join(", ", missing)}");
             }
 
             ResetEffects();
-            DimCityExcept(buildings);
-            foreach (GameObject building in buildings)
+            DimCityExcept(gameNodes);
+            foreach (GameObject gameNode in gameNodes)
             {
-                GlowStrong(building);
-                highlighted.Add(building);
+                GlowStrong(gameNode);
+                highlighted.Add(gameNode);
             }
-            string cameraNote = StartCameraTour(buildings, buildings);
+            string cameraNote = StartCameraTour(gameNodes, gameNodes);
 
-            string[] found = buildings.Select(b => b.name).ToArray();
+            string[] found = gameNodes.Select(b => b.name).ToArray();
             return missing.Count == 0
                 ? EffectResult.Success($"Highlighted {found.Length} building(s).{cameraNote}", found)
                 : EffectResult.Failure($"Highlighted {found.Length}; not found: {string.Join(", ", missing)}.{cameraNote}", found);
@@ -381,17 +405,12 @@ namespace SEE.Tools.AI
         /// <returns>The result, with the node IDs that will be flashed.</returns>
         public EffectResult ShowSearchTrail(IEnumerable<string> visitedIdsOrNames, string finalIdOrName = null)
         {
-            List<GameObject> buildings = new();
-            foreach (string idOrName in visitedIdsOrNames)
-            {
-                if (Resolve(idOrName, out GameObject building).Ok)
-                {
-                    buildings.Add(building);
-                }
-            }
-            StartCoroutine(SearchTrail(buildings, finalIdOrName));
-            return EffectResult.Success($"Search trail over {buildings.Count} building(s).",
-                                        buildings.Select(b => b.name).ToArray());
+            List<GameObject> gameNodes = visitedIdsOrNames.Select(ResolveOrNull)
+                                                          .Where(gameNode => gameNode != null)
+                                                          .ToList();
+            StartCoroutine(SearchTrail(gameNodes, finalIdOrName));
+            return EffectResult.Success($"Search trail over {gameNodes.Count} building(s).",
+                                        gameNodes.Select(b => b.name).ToArray());
         }
 
         /// <summary>
@@ -415,9 +434,9 @@ namespace SEE.Tools.AI
             List<string> missing = new();
             foreach (string idOrName in idsOrNames)
             {
-                if (Resolve(idOrName, out GameObject building).Ok)
+                if (Resolve(idOrName, out GameObject gameNode).CallSucceeded)
                 {
-                    nodes.Add(building);
+                    nodes.Add(gameNode);
                 }
                 else
                 {
@@ -573,28 +592,28 @@ namespace SEE.Tools.AI
         /// <returns>The result, with the node ID first and then the neighbours' IDs.</returns>
         public EffectResult ShowNeighbors(string idOrName)
         {
-            EffectResult resolved = Resolve(idOrName, out GameObject building);
-            if (!resolved.Ok)
+            EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
+            if (!resolved.CallSucceeded)
             {
                 return resolved;
             }
-            if (!building.TryGetNode(out Node node))
+            if (!gameNode.TryGetNode(out Node node))
             {
-                return EffectResult.Failure($"'{building.name}' is not a graph node.");
+                return EffectResult.Failure($"'{gameNode.name}' is not a graph node.");
             }
 
             List<(GameObject other, EdgeOperator edge)> incoming = DrawnNeighbors(node.Incomings, e => e.Source);
             List<(GameObject other, EdgeOperator edge)> outgoing = DrawnNeighbors(node.Outgoings, e => e.Target);
 
             ResetEffects();
-            List<GameObject> keep = new() { building };
+            List<GameObject> keep = new() { gameNode };
             keep.AddRange(incoming.Select(n => n.other));
             keep.AddRange(outgoing.Select(n => n.other));
             DimCityExcept(keep);
 
-            GlowStrong(building);
-            highlighted.Add(building);
-            building.NodeOperator().HitEffect();
+            GlowStrong(gameNode);
+            highlighted.Add(gameNode);
+            gameNode.NodeOperator().HitEffect();
             foreach ((GameObject other, EdgeOperator edge) in incoming)
             {
                 GlowStrong(other, IncomingColor);
@@ -610,12 +629,12 @@ namespace SEE.Tools.AI
             }
 
             // Visit the node itself, then pull back to show it with all its neighbours.
-            string cameraNote = StartCameraTour(new List<GameObject> { building }, keep);
+            string cameraNote = StartCameraTour(new List<GameObject> { gameNode }, keep);
 
-            List<string> ids = new() { building.name };
+            List<string> ids = new() { gameNode.name };
             ids.AddRange(incoming.Select(n => n.other.name));
             ids.AddRange(outgoing.Select(n => n.other.name));
-            return EffectResult.Success($"'{Describe(building)}': {incoming.Count} incoming (orange), "
+            return EffectResult.Success($"'{Describe(gameNode)}': {incoming.Count} incoming (orange), "
                                         + $"{outgoing.Count} outgoing (green).{cameraNote}",
                                         ids.Distinct().ToArray());
 
@@ -651,14 +670,14 @@ namespace SEE.Tools.AI
         /// <returns>The result, or a failure if the source file is unknown or not found.</returns>
         public EffectResult OpenCode(string idOrName, int? line = null)
         {
-            EffectResult resolved = Resolve(idOrName, out GameObject building);
-            if (!resolved.Ok)
+            EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
+            if (!resolved.CallSucceeded)
             {
                 return resolved;
             }
-            if (!building.TryGetComponent(out GraphElementRef elementRef) || elementRef.Elem == null)
+            if (!gameNode.TryGetComponent(out GraphElementRef elementRef) || elementRef.Elem == null)
             {
-                return EffectResult.Failure($"'{building.name}' has no graph element.");
+                return EffectResult.Failure($"'{gameNode.name}' has no graph element.");
             }
 
             // ShowCodeAction reports these problems only as notifications from inside an
@@ -666,17 +685,17 @@ namespace SEE.Tools.AI
             GraphElement element = elementRef.Elem;
             if (string.IsNullOrEmpty(element.Filename))
             {
-                return EffectResult.Failure($"'{Describe(building)}' has no source file in the graph "
-                                            + "(e.g. a GXL graph without source locations).", new[] { building.name });
+                return EffectResult.Failure($"'{Describe(gameNode)}' has no source file in the graph "
+                                            + "(e.g. a GXL graph without source locations).", new[] { gameNode.name });
             }
             if (!element.TryGetCommitID(out string _))
             {
                 string path = element.AbsolutePlatformPath();
                 if (!System.IO.File.Exists(path))
                 {
-                    return EffectResult.Failure($"Source file of '{Describe(building)}' not found at '{path}'. "
+                    return EffectResult.Failure($"Source file of '{Describe(gameNode)}' not found at '{path}'. "
                                                 + "The city's source code folder may not point to the code.",
-                                                new[] { building.name });
+                                                new[] { gameNode.name });
                 }
             }
 
@@ -692,7 +711,7 @@ namespace SEE.Tools.AI
 
             int? shownLine = scrollTo ?? element.SourceLine;
             return EffectResult.Success($"Opened {element.Filename}" + (shownLine.HasValue ? $" at line {shownLine}." : "."),
-                                        building.name);
+                                        gameNode.name);
         }
 
         /// <summary>
@@ -704,15 +723,15 @@ namespace SEE.Tools.AI
         {
             StopAllCoroutines();
 
-            foreach (GameObject building in dimmed.Where(b => b != null))
+            foreach (GameObject gameNode in dimmed.Where(b => b != null))
             {
-                building.NodeOperator().FadeTo(1f, AnimationFactor);
+                gameNode.NodeOperator().FadeTo(1f, AnimationFactor);
             }
             dimmed.Clear();
 
-            foreach (GameObject building in highlighted.Where(b => b != null))
+            foreach (GameObject gameNode in highlighted.Where(b => b != null))
             {
-                RemoveStrongGlow(building);
+                RemoveStrongGlow(gameNode);
             }
             highlighted.Clear();
 
@@ -738,15 +757,15 @@ namespace SEE.Tools.AI
 
             // Put popped buildings back where they were, even if a pop was interrupted.
             // The remembered heights are kept (see LandAt); only destroyed buildings are dropped.
-            foreach (GameObject building in restingLocalY.Keys.ToList())
+            foreach (GameObject gameNode in restingLocalY.Keys.ToList())
             {
-                if (building == null)
+                if (gameNode == null)
                 {
-                    restingLocalY.Remove(building);
+                    restingLocalY.Remove(gameNode);
                 }
                 else
                 {
-                    LandAt(building);
+                    LandAt(gameNode);
                 }
             }
 
@@ -758,8 +777,8 @@ namespace SEE.Tools.AI
         #region Effects
 
         /// <summary>Fades all other buildings of the same city to <see cref="DimAlpha"/>.</summary>
-        /// <param name="building">The building that stays fully visible.</param>
-        private void DimCityExcept(GameObject building) => DimCityExcept(new List<GameObject> { building });
+        /// <param name="gameNode">The building that stays fully visible.</param>
+        private void DimCityExcept(GameObject gameNode) => DimCityExcept(new List<GameObject> { gameNode });
 
         /// <summary>
         /// Fades all buildings of the cities containing <paramref name="keep"/> to
@@ -769,11 +788,14 @@ namespace SEE.Tools.AI
         private void DimCityExcept(ICollection<GameObject> keep)
         {
             HashSet<GameObject> kept = new(keep);
-            HashSet<AbstractSEECity> cities = new(keep.Select(b => b.ContainingCity()).Where(c => c != null));
+            HashSet<AbstractSEECity> cities = new(keep.Select(gameNode => gameNode.ContainingCity())
+                                                      .Where(city => city != null));
             foreach (AbstractSEECity city in cities)
-            foreach (GameObject other in city.gameObject.FindAllDescendantsWithTag(Tags.Node, includeInactive: false))
             {
-                if (!kept.Contains(other))
+                IEnumerable<GameObject> others = city.gameObject
+                                                     .FindAllDescendantsWithTag(Tags.Node, includeInactive: false)
+                                                     .Where(gameNode => !kept.Contains(gameNode));
+                foreach (GameObject other in others)
                 {
                     other.NodeOperator().FadeTo(DimAlpha, AnimationFactor);
                     dimmed.Add(other);
@@ -782,20 +804,20 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>Glow in <see cref="FocusGlowColor"/> (or <paramref name="color"/>) instead of SEE's default yellow.</summary>
-        /// <param name="building">The building to make glow.</param>
+        /// <param name="gameNode">The building to make glow.</param>
         /// <param name="color">Glow colour; null means <see cref="FocusGlowColor"/>.</param>
-        private void GlowStrong(GameObject building, Color? color = null)
+        private void GlowStrong(GameObject gameNode, Color? color = null)
         {
             // NodeOperator, not Operator(): FadeTo and HitEffect only exist on the generic
             // GraphElementOperator<Color> that NodeOperator derives from.
-            NodeOperator op = building.NodeOperator();
+            NodeOperator op = gameNode.NodeOperator();
             op.FadeTo(1f, AnimationFactor); // make sure it is fully visible
             op.GlowIn(AnimationFactor);
             // The operator creates the HighlightEffect in its OnEnable, so it exists by now.
-            if (building.TryGetComponent(out HighlightEffect effect))
+            if (gameNode.TryGetComponent(out HighlightEffect effect))
             {
                 effect.SetGlowColor(color ?? FocusGlowColor);
-                ApplyPulse(building, effect, color ?? FocusGlowColor);
+                ApplyPulse(gameNode, effect, color ?? FocusGlowColor);
                 effect.UpdateMaterialProperties();
             }
         }
@@ -831,30 +853,25 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>
-        /// The drawn edge between two buildings, preferring the direction
-        /// <paramref name="from"/> → <paramref name="to"/>, or null if there is none.
+        /// The drawn edge leading from <paramref name="from"/> to <paramref name="to"/>, or null
+        /// if there is none. Only edges in the direction of the path count: an edge from
+        /// <paramref name="to"/> back to <paramref name="from"/> is left to
+        /// <see cref="ShortestDrawnRoute"/>, which first looks for a route in the dependency
+        /// direction and otherwise reports that the path goes against it.
         /// </summary>
-        /// <param name="from">Building the path comes from.</param>
-        /// <param name="to">Building the path goes to.</param>
+        /// <param name="from">Game node the path comes from.</param>
+        /// <param name="to">Game node the path goes to.</param>
         /// <returns>The operator of the game edge, or null.</returns>
         private static EdgeOperator DrawnEdgeBetween(GameObject from, GameObject to)
         {
-            if (!from.TryGetNode(out Node a) || !to.TryGetNode(out Node b))
+            if (!from.TryGetNode(out Node source) || !to.TryGetNode(out Node target))
             {
                 return null;
             }
-            IEnumerable<Edge> candidates = a.Outgoings.Where(e => e.Target == b)
-                                            .Concat(b.Outgoings.Where(e => e.Target == a));
-            foreach (Edge edge in candidates)
-            {
-                // Edges can exist in the graph without a game edge; Operator yields null then.
-                EdgeOperator op = edge.Operator(mustFind: false);
-                if (op != null)
-                {
-                    return op;
-                }
-            }
-            return null;
+            // Edges can exist in the graph without a game edge; Operator yields null then.
+            return source.Outgoings.Where(edge => edge.Target == target)
+                                   .Select(edge => edge.Operator(mustFind: false))
+                                   .FirstOrDefault(edgeOperator => edgeOperator != null);
         }
 
         /// <summary>
@@ -1006,16 +1023,16 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>Turns glow and pulse off and restores SEE's highlight settings.</summary>
-        /// <param name="building">The building or edge whose highlight is removed.</param>
-        private void RemoveStrongGlow(GameObject building)
+        /// <param name="gameNode">The building or edge whose highlight is removed.</param>
+        private void RemoveStrongGlow(GameObject gameNode)
         {
-            building.Operator().GlowOut(AnimationFactor);
-            if (building.TryGetComponent(out HighlightEffect effect))
+            gameNode.Operator().GlowOut(AnimationFactor);
+            if (gameNode.TryGetComponent(out HighlightEffect effect))
             {
-                if (savedHighlights.TryGetValue(building, out SavedHighlight saved))
+                if (savedHighlights.TryGetValue(gameNode, out SavedHighlight saved))
                 {
                     saved.Restore(effect);
-                    savedHighlights.Remove(building);
+                    savedHighlights.Remove(gameNode);
                 }
                 effect.SetGlowColor(defaultGlowColor);
                 effect.UpdateMaterialProperties();
@@ -1058,21 +1075,21 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>A thicker, contrasting version of the beam SEE's Show in City uses.</summary>
-        /// <param name="building">The building to put the beam on.</param>
-        private void PutBeamAbove(GameObject building)
+        /// <param name="gameNode">The building to put the beam on.</param>
+        private void PutBeamAbove(GameObject gameNode)
         {
             markerFactory = new MarkerFactory(new MarkerAttributes(BeamHeight, BeamWidth, BeamColor, BeamColor, BeamColor));
-            markerFactory.MarkBorn(building);
+            markerFactory.MarkBorn(gameNode);
         }
 
         /// <summary>
         /// Flies the local desktop player's camera so it looks down at the centre of
-        /// <paramref name="building"/>, from just far enough away that the whole building
+        /// <paramref name="gameNode"/>, from just far enough away that the whole building
         /// fits into the camera's view (plus <see cref="CameraFrameMargin"/>).
         /// </summary>
-        /// <param name="building">The building to look at.</param>
+        /// <param name="gameNode">The building to look at.</param>
         /// <returns>Success, or a failure if there is no desktop player (e.g. in VR).</returns>
-        private EffectResult FlyCameraTo(GameObject building)
+        private EffectResult FlyCameraTo(GameObject gameNode)
         {
             DesktopPlayerMovement player = DesktopPlayerMovement.Local;
             if (player == null)
@@ -1080,29 +1097,29 @@ namespace SEE.Tools.AI
                 return EffectResult.Failure("No desktop player (camera flights are not supported in VR yet).");
             }
 
-            Bounds bounds = BoundsOf(building);
+            Bounds bounds = BoundsOf(gameNode);
             float distance = Mathf.Clamp(FittingDistance(bounds) * CameraFrameMargin,
                                          MinCameraDistance, Mathf.Max(MinCameraDistance, MaxCameraDistance));
             player.FlyToLookAt(bounds.center, distance, CameraPitch, CameraFlightSeconds);
-            return EffectResult.Success("Camera flight started.", building.name);
+            return EffectResult.Success("Camera flight started.", gameNode.name);
         }
 
         /// <summary>
-        /// Flies the camera up and back so that all <paramref name="buildings"/> are in view at once,
+        /// Flies the camera up and back so that all <paramref name="gameNodes"/> are in view at once,
         /// looking down more steeply (<see cref="OverviewPitch"/>) than for a single building.
         /// </summary>
-        /// <param name="buildings">The buildings to show; must not be empty.</param>
-        private void FlyCameraOver(List<GameObject> buildings)
+        /// <param name="gameNodes">The buildings to show; must not be empty.</param>
+        private void FlyCameraOver(List<GameObject> gameNodes)
         {
             DesktopPlayerMovement player = DesktopPlayerMovement.Local;
-            if (player == null || buildings.Count == 0)
+            if (player == null || gameNodes.Count == 0)
             {
                 return;
             }
-            Bounds all = BoundsOf(buildings[0]);
-            foreach (GameObject building in buildings.Skip(1))
+            Bounds all = BoundsOf(gameNodes[0]);
+            foreach (GameObject gameNode in gameNodes.Skip(1))
             {
-                all.Encapsulate(BoundsOf(building));
+                all.Encapsulate(BoundsOf(gameNode));
             }
             float distance = Mathf.Clamp(FittingDistance(all) * OverviewFrameMargin,
                                          MinCameraDistance, Mathf.Max(MinCameraDistance, MaxOverviewDistance));
@@ -1110,12 +1127,12 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>World-space bounds of a building (its collider, or its transform as a fallback).</summary>
-        /// <param name="building">The building.</param>
+        /// <param name="gameNode">The building.</param>
         /// <returns>Its bounds.</returns>
-        private static Bounds BoundsOf(GameObject building) =>
-            building.TryGetComponent(out Collider collider)
+        private static Bounds BoundsOf(GameObject gameNode) =>
+            gameNode.TryGetComponent(out Collider collider)
                 ? collider.bounds
-                : new Bounds(building.transform.position, building.transform.lossyScale);
+                : new Bounds(gameNode.transform.position, gameNode.transform.lossyScale);
 
         /// <summary>
         /// Distance at which a sphere around <paramref name="bounds"/> just fits into the narrower
@@ -1135,67 +1152,67 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>Lifts the building a little and drops it back, so the eye catches the moment.</summary>
-        /// <param name="building">The building to pop.</param>
-        private void Pop(GameObject building)
+        /// <param name="gameNode">The building to pop.</param>
+        private void Pop(GameObject gameNode)
         {
             // Remember the resting height only the first time. If the building is still in the
             // air from an earlier pop, its current position is NOT its resting position.
-            if (!restingLocalY.ContainsKey(building))
+            if (!restingLocalY.ContainsKey(gameNode))
             {
-                restingLocalY[building] = building.transform.localPosition.y;
+                restingLocalY[gameNode] = gameNode.transform.localPosition.y;
             }
 
-            float restingY = RestingWorldY(building);
-            float lift = Mathf.Max(0.01f, building.transform.lossyScale.y * PopHeightFactor);
+            float restingY = RestingWorldY(gameNode);
+            float lift = Mathf.Max(0.01f, gameNode.transform.lossyScale.y * PopHeightFactor);
             // If ResetEffects or another Focus moves the building before the lift ends,
             // this tween is killed and OnComplete does not run; whoever moved it lands it.
-            building.NodeOperator().MoveYTo(restingY + lift, AnimationFactor * 0.5f)
-                    .OnComplete(() => LandAt(building));
+            gameNode.NodeOperator().MoveYTo(restingY + lift, AnimationFactor * 0.5f)
+                    .OnComplete(() => LandAt(gameNode));
         }
 
         /// <summary>
-        /// Moves <paramref name="building"/> back to its remembered resting height.
+        /// Moves <paramref name="gameNode"/> back to its remembered resting height.
         /// The height is deliberately never forgotten while the building exists: SEE's operator
         /// reports "done" immediately when asked to move to a target it is already heading for,
         /// so "forget once landed" cannot be detected reliably, and forgetting too early makes
         /// the next <see cref="Pop"/> record a mid-air height as the resting height.
         /// </summary>
-        /// <param name="building">A building that may be in <see cref="restingLocalY"/>.</param>
-        private void LandAt(GameObject building)
+        /// <param name="gameNode">A building that may be in <see cref="restingLocalY"/>.</param>
+        private void LandAt(GameObject gameNode)
         {
-            if (building != null && restingLocalY.ContainsKey(building))
+            if (gameNode != null && restingLocalY.ContainsKey(gameNode))
             {
-                building.NodeOperator().MoveYTo(RestingWorldY(building), AnimationFactor * 0.5f);
+                gameNode.NodeOperator().MoveYTo(RestingWorldY(gameNode), AnimationFactor * 0.5f);
             }
         }
 
         /// <summary>
-        /// The world Y coordinate of <paramref name="building"/> at its remembered resting height
+        /// The world Y coordinate of <paramref name="gameNode"/> at its remembered resting height
         /// (<see cref="NodeOperator.MoveYTo"/> expects world coordinates).
         /// </summary>
-        /// <param name="building">A building that is in <see cref="restingLocalY"/>.</param>
+        /// <param name="gameNode">A building that is in <see cref="restingLocalY"/>.</param>
         /// <returns>World Y coordinate of the resting position.</returns>
-        private float RestingWorldY(GameObject building)
+        private float RestingWorldY(GameObject gameNode)
         {
-            Vector3 local = building.transform.localPosition;
-            local.y = restingLocalY[building];
-            Transform parent = building.transform.parent;
+            Vector3 local = gameNode.transform.localPosition;
+            local.y = restingLocalY[gameNode];
+            Transform parent = gameNode.transform.parent;
             return parent != null ? parent.TransformPoint(local).y : local.y;
         }
 
         /// <summary>
         /// Flashes each building in turn, then focuses <paramref name="finalIdOrName"/>.
         /// </summary>
-        /// <param name="buildings">Buildings to flash, in order.</param>
+        /// <param name="gameNodes">Buildings to flash, in order.</param>
         /// <param name="finalIdOrName">Building to focus at the end, or null.</param>
         /// <returns>Coroutine enumerator.</returns>
-        private IEnumerator SearchTrail(List<GameObject> buildings, string finalIdOrName)
+        private IEnumerator SearchTrail(List<GameObject> gameNodes, string finalIdOrName)
         {
-            foreach (GameObject building in buildings)
+            foreach (GameObject gameNode in gameNodes)
             {
-                if (building != null)
+                if (gameNode != null)
                 {
-                    building.NodeOperator().HitEffect();
+                    gameNode.NodeOperator().HitEffect();
                 }
                 yield return new WaitForSeconds(SearchTrailStepSeconds);
             }
@@ -1216,11 +1233,11 @@ namespace SEE.Tools.AI
         /// are reported in the message (a later tool can ask Claude to choose).
         /// </summary>
         /// <param name="idOrName">Node ID or source name.</param>
-        /// <param name="building">The building found, or null.</param>
+        /// <param name="gameNode">The building found, or null.</param>
         /// <returns>Success with the matching node ID(s), or a failure.</returns>
-        public EffectResult Resolve(string idOrName, out GameObject building)
+        public EffectResult Resolve(string idOrName, out GameObject gameNode)
         {
-            building = null;
+            gameNode = null;
             if (string.IsNullOrWhiteSpace(idOrName))
             {
                 return EffectResult.Failure("No node ID or name given.");
@@ -1229,7 +1246,7 @@ namespace SEE.Tools.AI
             if (GraphElementIDMap.TryGetValue(idOrName, out GameObject byId)
                 && byId != null && byId.activeInHierarchy && byId.IsNode())
             {
-                building = byId;
+                gameNode = byId;
                 return EffectResult.Success("Found by ID.", byId.name);
             }
 
@@ -1248,22 +1265,31 @@ namespace SEE.Tools.AI
                 return EffectResult.Failure($"No building named or with ID '{idOrName}' in the drawn cities.");
             }
 
-            building = matches[0];
+            gameNode = matches[0];
             return matches.Count == 1
-                ? EffectResult.Success("Found by name.", building.name)
+                ? EffectResult.Success("Found by name.", gameNode.name)
                 : EffectResult.Success($"{matches.Count} buildings named '{idOrName}', using the first.",
                                        matches.Select(m => m.name).ToArray());
         }
+
+        /// <summary>
+        /// The game node for <paramref name="idOrName"/> (see <see cref="Resolve"/>), or null
+        /// if there is none.
+        /// </summary>
+        /// <param name="idOrName">Node ID or source name.</param>
+        /// <returns>The game node, or null.</returns>
+        private GameObject ResolveOrNull(string idOrName) =>
+            Resolve(idOrName, out GameObject gameNode).CallSucceeded ? gameNode : null;
 
         /// <summary>
         /// Readable name for messages: the source name (e.g. "Graph"), or the node ID if there
         /// is none. Node IDs can be very long (e.g. with the path of the analysed assembly);
         /// they are returned separately in <see cref="EffectResult.NodeIds"/>.
         /// </summary>
-        /// <param name="building">The building to describe.</param>
+        /// <param name="gameNode">The building to describe.</param>
         /// <returns>Source name, or the node ID.</returns>
-        private static string Describe(GameObject building) =>
-            building.TryGetNode(out Node node) && !string.IsNullOrEmpty(node.SourceName) ? node.SourceName : building.name;
+        private static string Describe(GameObject gameNode) =>
+            gameNode.TryGetNode(out Node node) && !string.IsNullOrEmpty(node.SourceName) ? node.SourceName : gameNode.name;
 
         #endregion
 
@@ -1271,12 +1297,12 @@ namespace SEE.Tools.AI
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         /// <summary>
-        /// Handles the <see cref="DebugKey"/> debug keys (see the class summary). Only compiled
-        /// into the Editor and development builds.
+        /// Handles the debug keys (see the class summary). Only compiled into the Editor and
+        /// development builds.
         /// </summary>
         private void Update()
         {
-            if (!SEEInput.KeyboardShortcutsEnabled || !Input.GetKeyDown(DebugKey))
+            if (!SEEInput.AgentEffectsDebugKey())
             {
                 return;
             }
@@ -1305,7 +1331,7 @@ namespace SEE.Tools.AI
             }
             else
             {
-                // Plain J opens the Ask SEE box (AskSeeWindow); only the combinations are debug keys.
+                // Without a modifier, the key opens the Ask SEE box (see AskSeeWindow).
                 return;
             }
             Debug.Log($"[{nameof(AgentCityEffects)}] {result}\n");
@@ -1321,7 +1347,7 @@ namespace SEE.Tools.AI
         private List<string> DebugPathFrom(string start, int maxSteps)
         {
             List<string> path = new();
-            if (!Resolve(start, out GameObject building).Ok || !building.TryGetNode(out Node node))
+            if (!Resolve(start, out GameObject gameNode).CallSucceeded || !gameNode.TryGetNode(out Node node))
             {
                 path.Add(start); // ShowPath reports it as not found
                 return path;

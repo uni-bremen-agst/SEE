@@ -309,6 +309,45 @@ namespace SEE.Controls.KeyActions
         }
 
         /// <summary>
+        /// The user wants to open the Ask SEE box: the key of <see cref="KeyAction.AskSee"/> was
+        /// pressed without Ctrl, Alt or Shift.
+        /// </summary>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
+        internal static bool OpenAskSee()
+        {
+            bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.AskSee) && !ModifierKeyHeld();
+
+            if (result)
+            {
+                TracingHelperService.Instance?.TrackKeyPress("OpenAskSee");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// The user pressed a debug key of the AI agent's city effects: the key of
+        /// <see cref="KeyAction.AskSee"/> together with Ctrl, Alt or Shift. Which modifier is
+        /// held decides the debug action (see <c>AgentCityEffects</c>).
+        /// </summary>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
+        internal static bool AgentEffectsDebugKey()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.AskSee) && ModifierKeyHeld();
+        }
+
+        /// <summary>
+        /// Whether Ctrl, Alt or Shift is held.
+        /// </summary>
+        /// <returns>True if at least one of these modifier keys is held.</returns>
+        private static bool ModifierKeyHeld()
+        {
+            return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+                || Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)
+                || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        }
+
+        /// <summary>
         /// Checks if the user wants to open the snapshot window.
         /// </summary>
         /// <returns>True if the right buttons are pressed to request this action.</returns>

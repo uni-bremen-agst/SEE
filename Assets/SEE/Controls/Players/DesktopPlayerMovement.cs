@@ -411,13 +411,48 @@ namespace SEE.Controls.Players
         /// </summary>
         private class Flight
         {
+            /// <summary>
+            /// World position of the player (in Unity units) when the flight started.
+            /// </summary>
             internal Vector3 StartPosition;
+
+            /// <summary>
+            /// World position of the player (in Unity units) at the end of the flight.
+            /// </summary>
             internal Vector3 EndPosition;
+
+            /// <summary>
+            /// Yaw (rotation around the vertical axis) of the camera when the flight started,
+            /// in degrees.
+            /// </summary>
             internal float StartYaw;
+
+            /// <summary>
+            /// Yaw (rotation around the vertical axis) of the camera at the end of the flight,
+            /// in degrees.
+            /// </summary>
             internal float EndYaw;
+
+            /// <summary>
+            /// Pitch (looking up or down) of the camera when the flight started, in degrees
+            /// within [-90, 90]; positive values look down.
+            /// </summary>
             internal float StartPitch;
+
+            /// <summary>
+            /// Pitch (looking up or down) of the camera at the end of the flight, in degrees
+            /// within [-90, 90]; positive values look down.
+            /// </summary>
             internal float EndPitch;
+
+            /// <summary>
+            /// Total duration of the flight in seconds; 0 means the camera jumps immediately.
+            /// </summary>
             internal float Duration;
+
+            /// <summary>
+            /// Time that has passed since the flight started, in seconds.
+            /// </summary>
             internal float Elapsed;
         }
 

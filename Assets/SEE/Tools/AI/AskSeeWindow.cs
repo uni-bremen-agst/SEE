@@ -15,7 +15,8 @@ using Debug = UnityEngine.Debug;
 namespace SEE.Tools.AI
 {
     /// <summary>
-    /// The "Ask SEE" box: press <see cref="OpenKey"/> (J) in SEE, type a question about the
+    /// The "Ask SEE" box: press the key of <see cref="KeyAction.AskSee"/> (default J) in SEE,
+    /// type a question about the
     /// code and press Enter. The question goes to Claude Code, which runs in the background
     /// (headless, <c>claude -p</c>) in the repository folder with the <c>see</c> MCP server
     /// from <c>.mcp.json</c>. Claude searches the code and calls the SEE tools, so the
@@ -33,25 +34,22 @@ namespace SEE.Tools.AI
         #region Settings
 
         /// <summary>
-        /// Key that opens the box (without Ctrl, Alt or Shift). J is the only letter SEE does not
-        /// bind (F became "Toggle EchoFace"); with Ctrl, Alt or Shift, J triggers the debug keys of
-        /// <see cref="AgentCityEffects"/>.
-        /// </summary>
-        public KeyCode OpenKey = KeyCode.J;
-
-        /// <summary>
         /// The Claude Code executable: "claude" (searched on PATH and in the usual install
         /// folders) or a full path.
         /// </summary>
+        [Tooltip("The Claude Code executable: \"claude\" (searched on PATH and in the usual install folders) or a full path.")]
         public string ClaudeExecutable = "claude";
 
         /// <summary>Model passed to Claude Code; empty uses Claude Code's default.</summary>
+        [Tooltip("Model passed to Claude Code; empty uses Claude Code's default.")]
         public string Model = "";
 
         /// <summary>A question is stopped after this many seconds.</summary>
+        [Tooltip("A question is stopped after this many seconds.")]
         public int TimeoutSeconds = 240;
 
         /// <summary>Font size of the box.</summary>
+        [Tooltip("Font size of the box.")]
         public int FontSize = 15;
 
         #endregion
@@ -207,7 +205,7 @@ namespace SEE.Tools.AI
             StopProcess();
             foreach (Texture2D texture in textures)
             {
-                Destroy(texture);
+                Destroyer.Destroy(texture);
             }
             if (open)
             {
@@ -244,10 +242,10 @@ namespace SEE.Tools.AI
 
         #region Main loop
 
-        /// <summary>Opens the box on <see cref="OpenKey"/> and processes Claude Code's output.</summary>
+        /// <summary>Opens the box on the key of <see cref="KeyAction.AskSee"/> and processes Claude Code's output.</summary>
         private void Update()
         {
-            if (!open && SEEInput.KeyboardShortcutsEnabled && Input.GetKeyDown(OpenKey) && !ModifierHeld())
+            if (!open && SEEInput.OpenAskSee())
             {
                 Open();
             }
@@ -301,12 +299,10 @@ namespace SEE.Tools.AI
 
         #endregion
 
-        /// <summary>Whether Ctrl, Alt or Shift is held (then J is a debug key, not the box).</summary>
-        /// <returns>True if a modifier key is held.</returns>
-        private static bool ModifierHeld() =>
-            Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
-            || Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)
-            || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        /// <summary>The name of the key that opens the box, for the title.</summary>
+        /// <returns>The key bound to <see cref="KeyAction.AskSee"/>, e.g. "J".</returns>
+        private static string OpenKeyName() =>
+            KeyBindings.TryGetKeyCode(KeyAction.AskSee, out KeyCode key) ? key.ToString() : "J";
 
         #region Asking Claude Code
 
@@ -329,16 +325,23 @@ namespace SEE.Tools.AI
             string executable = FindClaude();
             if (executable == null)
             {
-                Finish("Claude Code was not found. Install it, or set ClaudeExecutable on the "
-                       + $"{nameof(AskSeeWindow)} object to the full path of claude.exe.", error: true);
+                Finish("Claude Code was not found. Install its command-line tool "
+                       + "(https://docs.claude.com/en/docs/claude-code/setup), or set ClaudeExecutable on the "
+                       + $"{nameof(AskSeeWindow)} object to its full path.", error: true);
                 return;
             }
 
             string repository = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string mcpConfig = WriteMcpConfig(repository, out string mcpProblem);
+            if (mcpConfig == null)
+            {
+                Finish(mcpProblem, error: true);
+                return;
+            }
             List<string> arguments = new()
             {
                 "-p", "--output-format", "stream-json", "--verbose",
-                "--mcp-config", Quote(Path.Combine(repository, ".mcp.json")), "--strict-mcp-config",
+                "--mcp-config", Quote(mcpConfig), "--strict-mcp-config",
                 "--allowedTools", Quote("mcp__see__*"), "Read", "Grep", "Glob",
                 "--disallowedTools", "Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch",
                 "--append-system-prompt", Quote(systemPrompt)
@@ -354,7 +357,8 @@ namespace SEE.Tools.AI
                 arguments.Add(Quote(Model.Trim()));
             }
 
-            ProcessStartInfo startInfo = new(executable, string.Join(" ", arguments))
+            (string fileName, string commandLine) = ExecutableLocator.CommandLineFor(executable, string.Join(" ", arguments));
+            ProcessStartInfo startInfo = new(fileName, commandLine)
             {
                 WorkingDirectory = repository,
                 UseShellExecute = false,
@@ -365,6 +369,9 @@ namespace SEE.Tools.AI
                 StandardOutputEncoding = Encoding.UTF8,
                 StandardErrorEncoding = Encoding.UTF8
             };
+            // Unity may run with a minimal PATH (e.g. when started from the Hub on macOS);
+            // Claude Code and the tools it starts (node, python) must still be found.
+            startInfo.EnvironmentVariables["PATH"] = ExecutableLocator.ChildPath(executable);
 
             status = "Starting Claude Code…";
 
@@ -444,7 +451,7 @@ namespace SEE.Tools.AI
                     if (result.Contains("Not logged in"))
                     {
                         sessionId = null;
-                        result = "Claude Code is not signed in on this computer. Open PowerShell, run "
+                        result = "Claude Code is not signed in on this computer. Open a terminal, run "
                                  + "'claude', type /login and sign in once. Then ask again.";
                         isError = true;
                     }
@@ -515,55 +522,64 @@ namespace SEE.Tools.AI
 
         /// <summary>
         /// The Claude Code executable: <see cref="ClaudeExecutable"/> if it is a full path,
-        /// otherwise searched on PATH and in the folders the installers use. Unity may have been
-        /// started before Claude Code was installed, so its PATH can be out of date.
+        /// otherwise searched on PATH and in the folders the installers use on Windows, macOS
+        /// and Linux (see <see cref="ExecutableLocator"/>). Unity may have been started before
+        /// Claude Code was installed, or with a minimal PATH, so PATH alone is not enough.
         /// </summary>
         /// <returns>Full path, or null if not found.</returns>
-        private string FindClaude()
+        private string FindClaude() => ExecutableLocator.FindClaude(ClaudeExecutable);
+
+        /// <summary>
+        /// Writes the MCP configuration for Claude Code into Unity's temporary cache folder and
+        /// returns its path. Unlike the repository's <c>.mcp.json</c>, which runs <c>python</c>,
+        /// it names the Python interpreter found on this computer (<c>python3</c> on most macOS
+        /// and Linux systems) and the absolute path of the MCP server, and passes the port of
+        /// <see cref="AgentCommandServer"/>.
+        /// </summary>
+        /// <param name="repository">The root folder of the SEE repository.</param>
+        /// <param name="problem">Why no configuration could be written; null on success.</param>
+        /// <returns>Path of the configuration file, or null on failure.</returns>
+        private static string WriteMcpConfig(string repository, out string problem)
         {
-            if (File.Exists(ClaudeExecutable))
+            string server = Path.Combine(repository, "Tools", "SeeMcp", "see_mcp_server.py");
+            if (!File.Exists(server))
             {
-                return ClaudeExecutable;
+                problem = $"The SEE MCP server was not found at {server}.";
+                return null;
             }
-            string[] names = { "claude.exe", "claude.cmd", "claude" };
-            IEnumerable<string> folders = (Environment.GetEnvironmentVariable("PATH") ?? "")
-                .Split(Path.PathSeparator)
-                .Where(f => !string.IsNullOrWhiteSpace(f));
-
-            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            List<string> known = new()
+            string python = ExecutableLocator.FindPython();
+            if (python == null)
             {
-                Path.Combine(home, ".local", "bin"),                       // native installer
-                Path.Combine(localAppData, "Microsoft", "WinGet", "Links"),
-                Path.Combine(appData, "npm")                               // npm install -g
-            };
-            string wingetPackages = Path.Combine(localAppData, "Microsoft", "WinGet", "Packages");
-            if (Directory.Exists(wingetPackages))
-            {
-                known.AddRange(Directory.GetDirectories(wingetPackages, "Anthropic.ClaudeCode*"));
+                problem = "Python 3 was not found, but the SEE tools need it. Install Python 3 "
+                          + "(python3 on macOS and Linux, python or py on Windows) and ask again.";
+                return null;
             }
-
-            foreach (string folder in folders.Concat(known))
+            int port = AgentCommandServer.Instance != null ? AgentCommandServer.Instance.Port
+                                                           : AgentCommandServer.DefaultPort;
+            JObject config = new()
             {
-                foreach (string name in names)
+                ["mcpServers"] = new JObject
                 {
-                    try
+                    ["see"] = new JObject
                     {
-                        string candidate = Path.Combine(folder.Trim('"'), name);
-                        if (File.Exists(candidate))
-                        {
-                            return candidate;
-                        }
-                    }
-                    catch (ArgumentException)
-                    {
-                        // invalid characters in a PATH entry
+                        ["command"] = python,
+                        ["args"] = new JArray(server),
+                        ["env"] = new JObject { ["SEE_AGENT_PORT"] = port.ToString() }
                     }
                 }
+            };
+            try
+            {
+                string path = Path.Combine(Application.temporaryCachePath, "ask-see-mcp.json");
+                File.WriteAllText(path, config.ToString(), new UTF8Encoding(false));
+                problem = null;
+                return path;
             }
-            return null;
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                problem = $"Could not write the MCP configuration: {e.Message}";
+                return null;
+            }
         }
 
         #endregion
@@ -583,7 +599,7 @@ namespace SEE.Tools.AI
             // also shrink, e.g. after switching back from the large size.
             windowRect.height = 50;
             windowRect = GUILayout.Window(GetInstanceID(), windowRect, DrawWindowWithCursor,
-                                          $"Ask SEE   ({OpenKey} opens · Enter asks · Esc closes)", windowStyle);
+                                          $"Ask SEE   ({OpenKeyName()} opens · Enter asks · Esc closes)", windowStyle);
         }
 
         /// <summary>
@@ -693,6 +709,8 @@ namespace SEE.Tools.AI
             GUI.enabled = true;
             if (GUILayout.Button("Close", buttonStyle))
             {
+                // End the group opened above; returning without it unbalances IMGUI's layout stack.
+                GUILayout.EndHorizontal();
                 Close();
                 return;
             }
@@ -844,7 +862,7 @@ namespace SEE.Tools.AI
             }
             foreach (Texture2D texture in textures)
             {
-                Destroy(texture);
+                Destroyer.Destroy(texture);
             }
             textures.Clear();
 
