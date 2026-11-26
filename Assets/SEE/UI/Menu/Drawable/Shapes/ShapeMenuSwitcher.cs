@@ -164,17 +164,11 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         private void BindLineMenu()
         {
-            LineMenu.Instance.GameObject.transform.SetParent(
-                controls.SwitchContent);
+            LineMenu.Instance.GameObject.transform.SetParent(controls.SwitchContent);
 
-            GameObject dragger =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    LineMenu.Instance.GameObject,
-                    "Dragger");
+            GameObject dragger = GameFinder.FindAttachedOrLocalDescendant(LineMenu.Instance.GameObject, "Dragger");
 
-            dragger
-                .GetComponent<WindowDragger>()
-                .enabled = false;
+            dragger.GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>
@@ -182,8 +176,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// </summary>
         private void BindShapeMenu()
         {
-            controls.MenuObject.transform.SetParent(
-                controls.SwitchContent);
+            controls.MenuObject.transform.SetParent(controls.SwitchContent);
 
             controls.MenuDragger.enabled = false;
         }

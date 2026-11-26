@@ -52,13 +52,11 @@ namespace SEE.UI.Drawable
             {
                 MenuTransform = menuInstance.GetComponent<RectTransform>();
 
-                GameObject content =
-                    GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Content");
+                GameObject content = GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Content");
                 ContentTransform = content.GetComponent<RectTransform>();
                 ContentSizeFitter = content.GetComponent<ContentSizeFitter>();
 
-                GameObject dragger =
-                    GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Dragger");
+                GameObject dragger = GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Dragger");
                 DraggerTransform = dragger.GetComponent<RectTransform>();
             }
 

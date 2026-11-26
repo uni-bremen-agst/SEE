@@ -167,8 +167,11 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="node">The selected Mind Map node.</param>
         /// <param name="conf">The configuration that holds the changes.</param>
         /// <param name="callback">The callback used to return to the edit menu.</param>
-        private static void InitializeChangeParent(GameObject attached, GameObject node,
-            MindMapNodeConf conf, UnityAction callback)
+        private static void InitializeChangeParent(
+            GameObject attached,
+            GameObject node,
+            MindMapNodeConf conf,
+            UnityAction callback)
         {
             ButtonManager changeParent = GetButton("Parent");
             changeParent.onClick.AddListener(() =>

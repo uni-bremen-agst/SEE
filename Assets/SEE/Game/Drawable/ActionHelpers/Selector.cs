@@ -55,10 +55,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             }
 
             GameObject hitObject = raycastHit.collider.gameObject;
-            GameObject selectableObject = ResolveSelectableObject(
-                hitObject,
-                isDrawableType,
-                allowSelectViaChild);
+            GameObject selectableObject = ResolveSelectableObject(hitObject, isDrawableType, allowSelectViaChild);
 
             if (selectableObject == null)
             {
@@ -170,7 +167,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="leftMouseButton">Status indicating whether the left or right mouse button should be used.</param>
         /// <param name="onlyLeftDown">True if only the down click should be registered. Not holding them.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, bool leftMouseButton = true, bool onlyLeftDown = false)
+        public static bool SelectQueryHasOrIsDrawableSurface(
+            out RaycastHit raycastHit,
+            bool leftMouseButton = true,
+            bool onlyLeftDown = false)
         {
             if ((SEEInput.LeftMouseInteraction() && leftMouseButton && !onlyLeftDown
                  || SEEInput.LeftMouseDown() && leftMouseButton && onlyLeftDown

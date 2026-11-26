@@ -178,7 +178,7 @@ namespace SEE.Controls.ReversibleActions
             DrawFreehand =
                 new("Draw Freehand", "Draws a line on a drawable.",
                     Color.magenta.Darker(), Icons.Brush,
-            DrawFreehandAction.CreateReversibleAction,
+                    DrawFreehandAction.CreateReversibleAction,
                     parent: Drawable);
 
             DrawShapes =

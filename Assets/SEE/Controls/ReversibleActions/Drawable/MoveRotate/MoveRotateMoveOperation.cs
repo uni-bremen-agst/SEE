@@ -86,8 +86,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
         /// <param name="speedUp">Controls whether accelerated keyboard movement is enabled.</param>
         /// <param name="surface">The drawable surface containing the selected object.</param>
         /// <param name="surfaceParentName">The name of the drawable surface parent.</param>
-        private static void MoveByKey(GameObject selectedObject, SwitchManager moveByMouse, SwitchManager speedUp,
-            GameObject surface, string surfaceParentName)
+        private static void MoveByKey(
+            GameObject selectedObject,
+            SwitchManager moveByMouse,
+            SwitchManager speedUp,
+            GameObject surface,
+            string surfaceParentName)
         {
             if (!SEEInput.MoveObjectLeft() && !SEEInput.MoveObjectRight()
                 && !SEEInput.MoveObjectUp() && !SEEInput.MoveObjectDown())
@@ -137,8 +141,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
         /// <param name="childInCollision">Whether a child node is currently involved in a collision.</param>
         /// <param name="surface">The drawable surface containing the selected object.</param>
         /// <param name="surfaceParentName">The name of the drawable surface parent.</param>
-        private static void MoveByMouse(GameObject selectedObject, SwitchManager moveByMouse,
-            bool childInCollision, GameObject surface, string surfaceParentName)
+        private static void MoveByMouse(
+            GameObject selectedObject,
+            SwitchManager moveByMouse,
+            bool childInCollision,
+            GameObject surface,
+            string surfaceParentName)
         {
             if (!moveByMouse.isOn || !Raycasting.RaycastAnything(out RaycastHit hit)
                 || selectedObject.GetComponent<CollisionController>().IsInCollision() || childInCollision)

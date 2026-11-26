@@ -122,9 +122,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 EnsureValidSecondaryColor);
 
             /// Initializes the line-cap menu component.
-            Instance.lineCapMenu = new LineCapMenu(
-                Instance.gameObject,
-                () => Instance.IsInEditMode());
+            Instance.lineCapMenu = new LineCapMenu(Instance.gameObject, () => Instance.IsInEditMode());
 
             /// Initializes the editing-specific line-menu component.
             Instance.editLineMenu = new EditLineMenu(
@@ -147,19 +145,15 @@ namespace SEE.UI.Menu.Drawable.Line
             /// Initializes and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
-            Instance.controls.PrimaryColorButtonManager.onClick.AddListener(
-                Instance.MutuallyExclusiveColorButtons);
+            Instance.controls.PrimaryColorButtonManager.onClick.AddListener(Instance.MutuallyExclusiveColorButtons);
             Instance.controls.PrimaryColorButtonManager.Interactable(false);
 
-            Instance.controls.SecondaryColorButtonManager.onClick.AddListener(
-                Instance.MutuallyExclusiveColorButtons);
+            Instance.controls.SecondaryColorButtonManager.onClick.AddListener(Instance.MutuallyExclusiveColorButtons);
 
-            Instance.controls.ColorKindButtonManager.onClick.AddListener(
-                Instance.MutuallyExclusiveColorTypeButtons);
+            Instance.controls.ColorKindButtonManager.onClick.AddListener(Instance.MutuallyExclusiveColorTypeButtons);
             Instance.controls.ColorKindButtonManager.Interactable(false);
 
-            Instance.controls.FillOutButtonManager.onClick.AddListener(
-                Instance.MutuallyExclusiveColorTypeButtons);
+            Instance.controls.FillOutButtonManager.onClick.AddListener(Instance.MutuallyExclusiveColorTypeButtons);
 
             Instance.mode = Mode.None;
             Instance.Disable();
@@ -194,8 +188,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 {
                     AssignColorKind(ColorKind.Monochrome);
 
-                    controls.ColorKindSelector.label.text =
-                        ColorKind.Monochrome.ToString();
+                    controls.ColorKindSelector.label.text = ColorKind.Monochrome.ToString();
                     controls.ColorKindSelector.index = 0;
                     controls.ColorKindSelector.UpdateUI();
                 }
@@ -438,8 +431,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             try
             {
-                bool isFreehandLine =
-                    EditLineMenu.IsFreehandLine(selectedLine);
+                bool isFreehandLine = EditLineMenu.IsFreehandLine(selectedLine);
 
                 if (returnCall == null)
                 {
@@ -485,10 +477,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             if (Instance.IsInEditMode())
             {
-                Instance.editLineMenu.AssignFillOut(
-                    fillOut,
-                    setFillOutAction,
-                    clearFillOutAction);
+                Instance.editLineMenu.AssignFillOut(fillOut, setFillOutAction, clearFillOutAction);
             }
         }
         #endregion
@@ -536,13 +525,9 @@ namespace SEE.UI.Menu.Drawable.Line
         /// The color action that should be assigned.
         /// </param>
         /// <param name="color">The color that should be assigned.</param>
-        public static void AssignColorArea(
-            UnityAction<Color> newColorAction,
-            Color color)
+        public static void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
-            Instance.editLineMenu.AssignColorArea(
-                newColorAction,
-                color);
+            Instance.editLineMenu.AssignColorArea(newColorAction, color);
         }
 
         /// <summary>
@@ -640,11 +625,9 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorButtons()
         {
-            controls.PrimaryColorButtonManager.Interactable(
-                !controls.PrimaryColorButtonManager.isInteractable);
+            controls.PrimaryColorButtonManager.Interactable(!controls.PrimaryColorButtonManager.isInteractable);
 
-            controls.SecondaryColorButtonManager.Interactable(
-                !controls.SecondaryColorButtonManager.isInteractable);
+            controls.SecondaryColorButtonManager.Interactable(!controls.SecondaryColorButtonManager.isInteractable);
         }
 
         /// <summary>
@@ -653,11 +636,9 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorTypeButtons()
         {
-            controls.ColorKindButtonManager.Interactable(
-                !controls.ColorKindButtonManager.isInteractable);
+            controls.ColorKindButtonManager.Interactable(!controls.ColorKindButtonManager.isInteractable);
 
-            controls.FillOutButtonManager.Interactable(
-                !controls.FillOutButtonManager.isInteractable);
+            controls.FillOutButtonManager.Interactable(!controls.FillOutButtonManager.isInteractable);
         }
         #endregion
 

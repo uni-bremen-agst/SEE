@@ -29,10 +29,8 @@ namespace SEE.Game.Drawable.StickyNote
         /// <returns>The new position.</returns>
         public static Vector3 FinishMoving(GameObject stickyNoteHolder)
         {
-            stickyNoteHolder.transform.position -=
-                stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OrderInLayer
-                * ValueHolder.DistanceToDrawable.z
-                * stickyNoteHolder.transform.forward;
+            stickyNoteHolder.transform.position -= stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OrderInLayer
+                * ValueHolder.DistanceToDrawable.z * stickyNoteHolder.transform.forward;
 
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OriginPosition =
                 stickyNoteHolder.transform.position;
@@ -47,8 +45,7 @@ namespace SEE.Game.Drawable.StickyNote
         /// <param name="direction">The direction in which the holder should be moved.</param>
         /// <param name="speed">The movement speed.</param>
         /// <returns>The new position.</returns>
-        public static Vector3 MoveByMenu(GameObject stickyNoteHolder,
-            ValueHolder.MoveDirection direction, float speed)
+        public static Vector3 MoveByMenu(GameObject stickyNoteHolder, ValueHolder.MoveDirection direction, float speed)
         {
             switch (direction)
             {
@@ -87,9 +84,7 @@ namespace SEE.Game.Drawable.StickyNote
         {
             Transform transform = obj.transform;
             transform.localEulerAngles = new Vector3(
-                transform.localEulerAngles.x,
-                localEulerAngleY,
-                transform.localEulerAngles.z);
+                transform.localEulerAngles.x, localEulerAngleY, transform.localEulerAngles.z);
         }
 
         /// <summary>
@@ -102,21 +97,16 @@ namespace SEE.Game.Drawable.StickyNote
         /// <param name="changePos">
         /// Whether the minimum distance to the surface should be preserved.
         /// </param>
-        public static void SetRotateX(GameObject obj, float localEulerAngleX,
-            Vector3 oldPos, bool changePos)
+        public static void SetRotateX(GameObject obj, float localEulerAngleX, Vector3 oldPos, bool changePos)
         {
             Transform transform = obj.transform;
             transform.localEulerAngles = new Vector3(
-                localEulerAngleX,
-                transform.localEulerAngles.y,
-                transform.localEulerAngles.z);
+                localEulerAngleX, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
             if (changePos)
             {
                 obj.transform.position = oldPos
-                    - obj.transform.forward
-                    * ValueHolder.DistanceToDrawable.z
-                    * ValueHolder.MaxOrderInLayer;
+                    - obj.transform.forward * ValueHolder.DistanceToDrawable.z * ValueHolder.MaxOrderInLayer;
             }
         }
 
@@ -129,9 +119,7 @@ namespace SEE.Game.Drawable.StickyNote
         {
             Transform transform = obj.transform;
             transform.localEulerAngles = new Vector3(
-                localEulerAngleX,
-                transform.localEulerAngles.y,
-                transform.localEulerAngles.z);
+                localEulerAngleX, transform.localEulerAngles.y, transform.localEulerAngles.z);
         }
 
         /// <summary>

@@ -26,17 +26,10 @@ namespace SEE.Game.Drawable.MindMap
         /// and child identifiers.
         /// </param>
         /// <returns>The created or recreated branch line.</returns>
-
-        public static GameObject CreateBranchLine(
-            GameObject child,
-            GameObject parent,
-            string name = "")
+        public static GameObject CreateBranchLine(GameObject child, GameObject parent, string name = "")
         {
-            Vector3 endPoint =
-                NearestPoints.GetNearestPoint(parent, child.transform.position);
-
-            Vector3 startPoint =
-                NearestPoints.GetNearestPoint(child, endPoint);
+            Vector3 endPoint = NearestPoints.GetNearestPoint(parent, child.transform.position);
+            Vector3 startPoint = NearestPoints.GetNearestPoint(child, endPoint);
 
             Vector3[] positions =
             {
@@ -70,35 +63,22 @@ namespace SEE.Game.Drawable.MindMap
 
             int order = GetBranchLineOrder(child, parent);
 
-            GameLayerChanger.ChangeOrderInLayer(
-                branchLine,
-                order,
-                GameLayerChanger.LayerChangerStates.Decrease,
-                false);
+            GameLayerChanger.ChangeOrderInLayer(branchLine, order, GameLayerChanger.LayerChangerStates.Decrease, false);
 
-            MMNodeValueHolder parentValueHolder =
-                parent.GetComponent<MMNodeValueHolder>();
-
+            MMNodeValueHolder parentValueHolder = parent.GetComponent<MMNodeValueHolder>();
             parentValueHolder.AddChild(child, branchLine);
 
-            MMNodeValueHolder childValueHolder =
-                child.GetComponent<MMNodeValueHolder>();
-
+            MMNodeValueHolder childValueHolder = child.GetComponent<MMNodeValueHolder>();
             childValueHolder.SetParent(parent, branchLine);
 
-            GameMindMapHierarchy.UpdateMindMapLayer(
-                childValueHolder, parentValueHolder);
+            GameMindMapHierarchy.UpdateMindMapLayer(childValueHolder, parentValueHolder);
 
             // Branch lines must belong to the same page as their Mind Map nodes.
             // The currently active surface page may differ during restoration.
-            int associatedPage =
-                child.GetComponent<AssociatedPageHolder>().AssociatedPage;
+            int associatedPage = child.GetComponent<AssociatedPageHolder>().AssociatedPage;
 
-            branchLine.GetComponent<AssociatedPageHolder>().AssociatedPage =
-                associatedPage;
-
-            branchLine.SetActive(
-                associatedPage == surface.GetComponent<DrawableHolder>().CurrentPage);
+            branchLine.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            branchLine.SetActive(associatedPage == surface.GetComponent<DrawableHolder>().CurrentPage);
 
             // Branch lines are edited through their Mind Map nodes.
             branchLine.GetComponent<MeshCollider>().enabled = false;
@@ -114,19 +94,12 @@ namespace SEE.Game.Drawable.MindMap
         /// <param name="child">The child Mind Map node.</param>
         /// <param name="parent">The parent Mind Map node.</param>
         /// <returns>The calculated order in layer.</returns>
-        private static int GetBranchLineOrder(
-            GameObject child,
-            GameObject parent)
+        private static int GetBranchLineOrder(GameObject child, GameObject parent)
         {
-            int childOrder =
-                child.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            int childOrder = child.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            int parentOrder = parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
-            int parentOrder =
-                parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-
-            return Mathf.Max(
-                0,
-                Mathf.Min(childOrder, parentOrder) - 1);
+            return Mathf.Max(0, Mathf.Min(childOrder, parentOrder) - 1);
         }
 
         /// <summary>
@@ -143,15 +116,11 @@ namespace SEE.Game.Drawable.MindMap
                 return;
             }
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
             if (valueHolder.GetParentBranchLine() != null)
             {
-                CreateBranchLine(
-                    node,
-                    valueHolder.GetParent(),
-                    valueHolder.GetParentBranchLine().name);
+                CreateBranchLine(node, valueHolder.GetParent(), valueHolder.GetParentBranchLine().name);
             }
         }
 
@@ -173,18 +142,13 @@ namespace SEE.Game.Drawable.MindMap
                 return false;
             }
 
-            MMNodeValueHolder valueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
 
             ReDrawParentBranchLine(node);
 
-            foreach (KeyValuePair<GameObject, GameObject> pair
-                     in valueHolder.GetChildren())
+            foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetChildren())
             {
-                CreateBranchLine(
-                    pair.Key,
-                    node,
-                    pair.Value.name);
+                CreateBranchLine(pair.Key, node, pair.Value.name);
             }
 
             return true;

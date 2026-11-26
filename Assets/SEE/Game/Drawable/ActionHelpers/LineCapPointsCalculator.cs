@@ -152,10 +152,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown if the given <paramref name="capKind"/> is not supported.
         /// </exception>
-        public static List<LineCapShape> GetShapes(
-            LineCap capKind,
-            LineConf lineConf,
-            LineCapPosition position)
+        public static List<LineCapShape> GetShapes(LineCap capKind, LineConf lineConf, LineCapPosition position)
         {
             if (lineConf == null)
             {
@@ -278,8 +275,11 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="segmentStart">The start point of the selected segment.</param>
         /// <param name="segmentEnd">The end point of the selected segment.</param>
         /// <returns>True if a valid segment could be determined, false otherwise.</returns>
-        private static bool TryGetSegment(LineConf line, LineCapPosition position,
-            out Vector3 segmentStart, out Vector3 segmentEnd)
+        private static bool TryGetSegment(
+            LineConf line,
+            LineCapPosition position,
+            out Vector3 segmentStart,
+            out Vector3 segmentEnd)
         {
             segmentStart = Vector3.zero;
             segmentEnd = Vector3.zero;
@@ -301,19 +301,15 @@ namespace SEE.Game.Drawable.ActionHelpers
                     {
                         if (line.Loop)
                         {
-                            segmentStart =
-                                line.RendererPositions[line.RendererPositions.Length - 1];
+                            segmentStart = line.RendererPositions[line.RendererPositions.Length - 1];
 
-                            segmentEnd =
-                                line.RendererPositions[0];
+                            segmentEnd = line.RendererPositions[0];
                         }
                         else
                         {
-                            segmentStart =
-                                line.RendererPositions[line.RendererPositions.Length - 2];
+                            segmentStart = line.RendererPositions[line.RendererPositions.Length - 2];
 
-                            segmentEnd =
-                                line.RendererPositions[line.RendererPositions.Length - 1];
+                            segmentEnd = line.RendererPositions[line.RendererPositions.Length - 1];
                         }
 
                         return true;
@@ -339,8 +335,11 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <exception cref="ArgumentException">
         /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
         /// </exception>
-        private static float GetValidatedSegment(LineConf line, LineCapPosition position,
-            out Vector3 segmentStart, out Vector3 segmentEnd)
+        private static float GetValidatedSegment(
+            LineConf line,
+            LineCapPosition position,
+            out Vector3 segmentStart,
+            out Vector3 segmentEnd)
         {
             if (line == null)
             {
@@ -451,10 +450,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated arrowhead shape.</returns>
-        private static LineCapShape Arrowhead(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static LineCapShape Arrowhead(LineConf line, LineCapPosition position, float thickness)
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
             float size = GetArrowheadSize(thickness, segmentLength);
@@ -476,10 +472,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated arrow shape.</returns>
-        private static LineCapShape Arrow(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static LineCapShape Arrow(LineConf line, LineCapPosition position, float thickness)
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
             float size = GetArrowSize(thickness, segmentLength);
@@ -500,10 +493,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated diamond shape.</returns>
-        private static LineCapShape Diamond(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static LineCapShape Diamond(LineConf line, LineCapPosition position, float thickness)
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
             float size = GetDiamondSize(thickness, segmentLength);
@@ -525,10 +515,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated provided-interface shape.</returns>
-        private static LineCapShape Ball(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static LineCapShape Ball(LineConf line, LineCapPosition position, float thickness)
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
             float radius = GetInterfaceRadius(thickness, segmentLength);
@@ -548,10 +535,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated required-interface shape.</returns>
-        private static LineCapShape Socket(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static LineCapShape Socket(LineConf line, LineCapPosition position, float thickness)
         {
             return Socket(
                 line,
@@ -585,8 +569,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 connectionPoint = new Vector3(radius, 0.0f, 0.0f);
             }
 
-            Vector3[] halfCircle =
-                ShapePointsCalculator.HalfCircle(center, radius, orientation);
+            Vector3[] halfCircle = ShapePointsCalculator.HalfCircle(center, radius, orientation);
 
             return new LineCapShape(halfCircle, connectionPoint);
         }
@@ -618,10 +601,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated combined interface shapes.</returns>
-        private static List<LineCapShape> RequiredProvided(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static List<LineCapShape> RequiredProvided(LineConf line, LineCapPosition position, float thickness)
         {
             GetCombinedInterfaceLayout(
                 line,
@@ -661,10 +641,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
         /// <param name="thickness">The effective thickness of the line cap.</param>
         /// <returns>The calculated combined interface shapes.</returns>
-        private static List<LineCapShape> ProvidedRequired(
-            LineConf line,
-            LineCapPosition position,
-            float thickness)
+        private static List<LineCapShape> ProvidedRequired(LineConf line, LineCapPosition position, float thickness)
         {
             GetCombinedInterfaceLayout(
                 line,

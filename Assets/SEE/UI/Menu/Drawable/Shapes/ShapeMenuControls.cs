@@ -275,8 +275,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
             MenuObject = menuObject;
 
             Button[] switchButtons = switchObject.GetComponentsInChildren<Button>();
-            ButtonManager[] switchButtonManagers =
-                switchObject.GetComponentsInChildren<ButtonManager>();
+            ButtonManager[] switchButtonManagers = switchObject.GetComponentsInChildren<ButtonManager>();
 
             ShapeButton = switchButtons[0];
             ShapeButtonManager = switchButtonManagers[0];
@@ -284,113 +283,69 @@ namespace SEE.UI.Menu.Drawable.Shapes
             ConfigButton = switchButtons[1];
             ConfigButtonManager = switchButtonManagers[1];
 
-            GameObject shapeSelectorObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "ShapeSelection");
-            ShapeSelector =
-                shapeSelectorObject.GetComponent<HorizontalSelector>();
+            GameObject shapeSelectorObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "ShapeSelection");
+            ShapeSelector = shapeSelectorObject.GetComponent<HorizontalSelector>();
 
-            UMLShapeSelectorObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "UMLShapeSelection");
-            UMLShapeSelector =
-                UMLShapeSelectorObject.GetComponent<HorizontalSelector>();
+            UMLShapeSelectorObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "UMLShapeSelection");
+            UMLShapeSelector = UMLShapeSelectorObject.GetComponent<HorizontalSelector>();
 
-            Value1Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value1");
-            Value1Slider =
-                Value1Object.GetComponent<FloatValueSliderController>();
+            Value1Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value1");
+            Value1Slider = Value1Object.GetComponent<FloatValueSliderController>();
 
-            Value2Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value2");
-            Value2Slider =
-                Value2Object.GetComponent<FloatValueSliderController>();
+            Value2Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value2");
+            Value2Slider = Value2Object.GetComponent<FloatValueSliderController>();
 
-            Value3Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value3");
-            Value3Slider =
-                Value3Object.GetComponent<FloatValueSliderController>();
+            Value3Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value3");
+            Value3Slider = Value3Object.GetComponent<FloatValueSliderController>();
 
-            Value4Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value4");
-            Value4Slider =
-                Value4Object.GetComponent<FloatValueSliderController>();
+            Value4Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Value4");
+            Value4Slider = Value4Object.GetComponent<FloatValueSliderController>();
 
-            Angle1Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Angle1");
-            Angle1Slider =
-                Angle1Object.GetComponent<FloatValueSliderController>();
+            Angle1Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Angle1");
+            Angle1Slider = Angle1Object.GetComponent<FloatValueSliderController>();
 
-            Angle2Object =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Angle2");
-            Angle2Slider =
-                Angle2Object.GetComponent<FloatValueSliderController>();
+            Angle2Object = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Angle2");
+            Angle2Slider = Angle2Object.GetComponent<FloatValueSliderController>();
 
-            OffsetObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Offset");
-            OffsetSlider =
-                OffsetObject.GetComponent<FloatValueSliderController>();
+            OffsetObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Offset");
+            OffsetSlider = OffsetObject.GetComponent<FloatValueSliderController>();
 
-            VerticesObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Vertices");
-            VerticesSlider =
-                VerticesObject.GetComponent<IntValueSliderController>();
+            VerticesObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Vertices");
+            VerticesSlider = VerticesObject.GetComponent<IntValueSliderController>();
 
-            BoolValueObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "BoolValue");
-            BoolValueManager =
-                BoolValueObject.GetComponentInChildren<SwitchManager>();
-            BoolValueDefaultSiblingIndex =
-                BoolValueObject.transform.GetSiblingIndex();
+            BoolValueObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "BoolValue");
+            BoolValueManager = BoolValueObject.GetComponentInChildren<SwitchManager>();
+            BoolValueDefaultSiblingIndex = BoolValueObject.transform.GetSiblingIndex();
 
-            OrientationObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Orientation");
-            OrientationSelector =
-                OrientationObject.GetComponent<HorizontalSelector>();
-            OrientationTextObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "OrientationText");
+            OrientationObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Orientation");
+            OrientationSelector = OrientationObject.GetComponent<HorizontalSelector>();
+            OrientationTextObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "OrientationText");
 
-            InfoObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "InfoPlaceHolder");
-            InfoButtonManager =
-                InfoObject.GetComponentInChildren<ButtonManager>();
+            InfoObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "InfoPlaceHolder");
+            InfoButtonManager = InfoObject.GetComponentInChildren<ButtonManager>();
 
-            ImageObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Image");
-            InfoImage =
-                ImageObject.GetComponent<Image>();
+            ImageObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Image");
+            InfoImage = ImageObject.GetComponent<Image>();
 
-            LineStartObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineStart");
-            LineStartSelector =
-                LineStartObject.GetComponent<HorizontalSelector>();
-            LineStartTextObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineStartText");
+            LineStartObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineStart");
+            LineStartSelector = LineStartObject.GetComponent<HorizontalSelector>();
+            LineStartTextObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineStartText");
 
-            LineEndObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineEnd");
-            LineEndSelector =
-                LineEndObject.GetComponent<HorizontalSelector>();
-            LineEndTextObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineEndText");
+            LineEndObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineEnd");
+            LineEndSelector = LineEndObject.GetComponent<HorizontalSelector>();
+            LineEndTextObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "LineEndText");
 
-            FinishObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "FinishBtn");
-            FinishButtonManager =
-                FinishObject.GetComponent<ButtonManager>();
+            FinishObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "FinishBtn");
+            FinishButtonManager = FinishObject.GetComponent<ButtonManager>();
 
-            PartUndoObject =
-                GameFinder.FindAttachedOrLocalDescendant(BoolValueObject, "PartUndoBtn");
-            PartUndoButtonManager =
-                PartUndoObject.GetComponent<ButtonManager>();
+            PartUndoObject = GameFinder.FindAttachedOrLocalDescendant(BoolValueObject, "PartUndoBtn");
+            PartUndoButtonManager = PartUndoObject.GetComponent<ButtonManager>();
 
-            DraggerInfoObject =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "DraggerInfo");
-            DraggerInfoButtonManager =
-                DraggerInfoObject.GetComponent<ButtonManager>();
+            DraggerInfoObject = GameFinder.FindAttachedOrLocalDescendant(menuObject, "DraggerInfo");
+            DraggerInfoButtonManager = DraggerInfoObject.GetComponent<ButtonManager>();
 
-            GameObject dragger =
-                GameFinder.FindAttachedOrLocalDescendant(menuObject, "Dragger");
-            MenuDragger =
-                dragger.GetComponent<WindowDragger>();
+            GameObject dragger = GameFinder.FindAttachedOrLocalDescendant(menuObject, "Dragger");
+            MenuDragger = dragger.GetComponent<WindowDragger>();
         }
     }
 }

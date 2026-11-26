@@ -29,7 +29,8 @@ namespace SEE.Game.Drawable.StickyNote
             GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName);
 
             /// Sets the name of the sticky note.
-            stickyNote.name = CreateUnusedName();//ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
+            stickyNote.name = CreateUnusedName();
+            //ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
 
             /// Adopts the rotation of the hit object,
             /// unless it is a <see cref="DrawableType"/> object.
@@ -47,9 +48,7 @@ namespace SEE.Game.Drawable.StickyNote
             /// Ensures that the visible side of the sticky note faces away from
             /// the surface, even if the hit object's forward axis points in the
             /// opposite direction.
-            EnsureFrontFacesAwayFromSurface(
-                stickyNote,
-                raycastHit.normal);
+            EnsureFrontFacesAwayFromSurface(stickyNote, raycastHit.normal);
 
             /// Adopt the position of the hit object, but preserve the distance.
             stickyNote.transform.position = raycastHit.point
@@ -61,7 +60,8 @@ namespace SEE.Game.Drawable.StickyNote
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
 
             /// Sets a random color for the drawable.
-            GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = Random.ColorHSV().Darker();
+            GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color =
+                Random.ColorHSV().Darker();
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
@@ -83,9 +83,7 @@ namespace SEE.Game.Drawable.StickyNote
         /// <param name="surfaceNormal">
         /// The normal of the surface on which the sticky note was placed.
         /// </param>
-        private static void EnsureFrontFacesAwayFromSurface(
-            GameObject stickyNote,
-            Vector3 surfaceNormal)
+        private static void EnsureFrontFacesAwayFromSurface(GameObject stickyNote, Vector3 surfaceNormal)
         {
             Transform transform = stickyNote.transform;
 
@@ -162,7 +160,8 @@ namespace SEE.Game.Drawable.StickyNote
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.OriginPosition = config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
+            holder.OriginPosition = config.Position + config.Order * ValueHolder.DistanceToDrawable.z
+                * stickyNote.transform.forward;
             holder.OrderInLayer = config.Order;
 
             DrawableHolder drawableHolder = stickyNote.GetComponentInChildren<DrawableHolder>();
@@ -190,7 +189,9 @@ namespace SEE.Game.Drawable.StickyNote
         /// <param name="stickyNote">The sticky note to be restored.</param>
         /// <param name="config">The depending config to restore.</param>
         /// <returns>Nothing, it waits until the sticky note has been converted.</returns>
-        private static async UniTask ChangeVisibilityAfterLoadDrawablesAsync(GameObject stickyNote, DrawableConfig config)
+        private static async UniTask ChangeVisibilityAfterLoadDrawablesAsync(
+            GameObject stickyNote,
+            DrawableConfig config)
         {
             while (!stickyNote.GetRootParent().name.Contains(ValueHolder.DrawableHolderPrefix))
             {

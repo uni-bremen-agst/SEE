@@ -116,8 +116,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             assignColorKind(lineHolder.ColorKind);
 
-            controls.ColorKindSelector.index =
-                GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
+            controls.ColorKindSelector.index = GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
             controls.ColorKindSelector.UpdateUI();
 
             if (colorKindAction != null)
@@ -143,10 +142,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 ColorKind requestedKind = GameLineAppearance.GetColorKinds(true)[index];
 
-                ColorKind newKind = GetValidColorKind(
-                    requestedKind,
-                    visualConf.ColorKind,
-                    visualConf.LineKind);
+                ColorKind newKind = GetValidColorKind(requestedKind, visualConf.ColorKind, visualConf.LineKind);
 
                 if (getSelectedColorKind() != newKind)
                 {
@@ -154,31 +150,22 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
 
                 controls.ColorKindSelector.label.text = newKind.ToString();
-                controls.ColorKindSelector.index =
-                    GameLineAppearance.GetColorKinds(true).IndexOf(newKind);
+                controls.ColorKindSelector.index = GameLineAppearance.GetColorKinds(true).IndexOf(newKind);
 
                 visualConf.ColorKind = newKind;
 
                 if (visualConf.ColorKind == ColorKind.Monochrome)
                 {
-                    SelectPrimaryColor(
-                        selectedLine,
-                        lineHolder,
-                        surface,
-                        surfaceParentName);
+                    SelectPrimaryColor(selectedLine, lineHolder, surface, surfaceParentName);
                 }
                 else
                 {
-                    visualConf.SecondaryColor =
-                        ensureValidSecondaryColor(visualConf.SecondaryColor);
+                    visualConf.SecondaryColor = ensureValidSecondaryColor(visualConf.SecondaryColor);
                 }
 
                 if (IsMainSegment)
                 {
-                    GameLineAppearance.ChangeColorKind(
-                        selectedLine,
-                        lineHolder.ColorKind,
-                        lineHolder);
+                    GameLineAppearance.ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
 
                     new ChangeColorKindNetAction(
                         surface.name,
@@ -188,10 +175,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
                 else
                 {
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
+                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             };
 
@@ -206,10 +190,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="currentKind">The currently selected color kind.</param>
         /// <param name="lineKind">The line kind to which the color kind will be applied.</param>
         /// <returns>The valid color kind to apply.</returns>
-        internal static ColorKind GetValidColorKind(
-            ColorKind requestedKind,
-            ColorKind currentKind,
-            LineKind lineKind)
+        internal static ColorKind GetValidColorKind(ColorKind requestedKind, ColorKind currentKind, LineKind lineKind)
         {
             if (lineKind != LineKind.Solid
                 || requestedKind != ColorKind.TwoDashed)
@@ -275,11 +256,7 @@ namespace SEE.UI.Menu.Drawable.Line
             GameObject surface,
             string surfaceParentName)
         {
-            SelectPrimaryColor(
-                selectedLine,
-                lineHolder,
-                surface,
-                surfaceParentName);
+            SelectPrimaryColor(selectedLine, lineHolder, surface, surfaceParentName);
         }
 
         /// <summary>
@@ -310,8 +287,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 hideFillOutControls();
                 ShowControls();
 
-                ILineVisualConf visualConf =
-                    GetSelectedVisualConf(lineHolder);
+                ILineVisualConf visualConf = GetSelectedVisualConf(lineHolder);
 
                 if (visualConf == null)
                 {
@@ -321,24 +297,14 @@ namespace SEE.UI.Menu.Drawable.Line
                 if (visualConf.ColorKind == ColorKind.Monochrome
                     || !controls.PrimaryColorButtonManager.isInteractable)
                 {
-                    SelectPrimaryColor(
-                        selectedLine,
-                        lineHolder,
-                        surface,
-                        surfaceParentName);
+                    SelectPrimaryColor(selectedLine, lineHolder, surface, surfaceParentName);
                 }
                 else
                 {
-                    SelectSecondaryColor(
-                        selectedLine,
-                        lineHolder,
-                        surface,
-                        surfaceParentName);
+                    SelectSecondaryColor(selectedLine, lineHolder, surface, surfaceParentName);
                 }
 
-                MenuHelper.CalculateHeight(
-                    lineMenu,
-                    true);
+                MenuHelper.CalculateHeight(lineMenu, true);
             });
 
             controls.ColorKindButtonManager.Interactable(false);
@@ -387,10 +353,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 {
                     capConf.PrimaryColor = color;
 
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
+                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }, capConf.PrimaryColor);
             }
         }
@@ -419,16 +382,11 @@ namespace SEE.UI.Menu.Drawable.Line
 
             if (visualConf.ColorKind == ColorKind.Monochrome)
             {
-                SelectPrimaryColor(
-                    selectedLine,
-                    lineHolder,
-                    surface,
-                    surfaceParentName);
+                SelectPrimaryColor(selectedLine, lineHolder, surface, surfaceParentName);
                 return;
             }
 
-            visualConf.SecondaryColor =
-                ensureValidSecondaryColor(visualConf.SecondaryColor);
+            visualConf.SecondaryColor = ensureValidSecondaryColor(visualConf.SecondaryColor);
 
             SetSecondaryColorButtonState();
 
@@ -459,10 +417,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 {
                     capConf.SecondaryColor = color;
 
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
+                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }, capConf.SecondaryColor);
             }
         }
@@ -505,9 +460,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         /// <param name="newColorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
-        internal void AssignColorArea(
-            UnityAction<Color> newColorAction,
-            Color color)
+        internal void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
             if (colorAction != null)
             {
@@ -580,8 +533,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             controls.ColorKindSelectionObject.SetActive(true);
 
-            controls.ColorAreaSelectorObject.SetActive(
-                getSelectedColorKind() != ColorKind.Monochrome);
+            controls.ColorAreaSelectorObject.SetActive(getSelectedColorKind() != ColorKind.Monochrome);
         }
 
         /// <summary>
@@ -637,8 +589,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void RefreshColorKindSelectorUI()
         {
-            controls.ColorKindSelector.index =
-                GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
+            controls.ColorKindSelector.index = GameLineAppearance.GetColorKinds(true).IndexOf(getSelectedColorKind());
             controls.ColorKindSelector.UpdateUI();
         }
 

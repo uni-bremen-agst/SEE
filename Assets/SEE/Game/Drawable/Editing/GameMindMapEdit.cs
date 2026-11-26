@@ -27,35 +27,25 @@ namespace SEE.Game.Drawable.Editing
             MindMapNodeKind newNodeKind,
             LineConf borderConf = null)
         {
-            MMNodeValueHolder nodeValueHolder =
-                node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
 
             if (nodeValueHolder.NodeKind != newNodeKind
-                && GameMindMapHierarchy.CheckValidNodeKindChange(
-                    node,
-                    newNodeKind,
-                    nodeValueHolder.NodeKind))
+                && GameMindMapHierarchy.CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
             {
                 if (newNodeKind == MindMapNodeKind.Theme)
                 {
                     // Themes cannot have a parent.
                     if (nodeValueHolder.GetParent() != null)
                     {
-                        nodeValueHolder.GetParent()
-                            .GetComponent<MMNodeValueHolder>()
-                            .RemoveChild(node);
+                        nodeValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
                     }
 
-                    Destroyer.Destroy(
-                        nodeValueHolder.GetParentBranchLine());
+                    Destroyer.Destroy(nodeValueHolder.GetParentBranchLine());
 
                     nodeValueHolder.SetParent(null, null);
                 }
 
-                GameMindMapNode.ApplyNodeKindAppearance(
-                    node,
-                    newNodeKind,
-                    borderConf);
+                GameMindMapNode.ApplyNodeKindAppearance(node, newNodeKind, borderConf);
 
                 nodeValueHolder.NodeKind = newNodeKind;
                 GameMindMapBranch.ReDrawBranchLines(node);
@@ -72,9 +62,7 @@ namespace SEE.Game.Drawable.Editing
         /// </summary>
         /// <param name="child">The Mind Map node whose parent should be changed.</param>
         /// <param name="parent">The new parent Mind Map node.</param>
-        internal static void ChangeParent(
-            GameObject child,
-            GameObject parent)
+        internal static void ChangeParent(GameObject child, GameObject parent)
         {
             if (!child.CompareTag(Tags.MindMapNode)
                 || parent == null
@@ -83,46 +71,33 @@ namespace SEE.Game.Drawable.Editing
                 return;
             }
 
-            MMNodeValueHolder childValueHolder =
-                child.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder childValueHolder = child.GetComponent<MMNodeValueHolder>();
 
             if (childValueHolder.GetParent() == parent
-                || !GameMindMapHierarchy.ParentChangeIsValid(
-                    child,
-                    parent))
+                || !GameMindMapHierarchy.ParentChangeIsValid(child, parent))
             {
                 return;
             }
 
             if (childValueHolder.GetParent() != null)
             {
-                childValueHolder.GetParent()
-                    .GetComponent<MMNodeValueHolder>()
-                    .RemoveChild(child);
+                childValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(child);
             }
 
             LineConf oldBranchLine = null;
 
             if (childValueHolder.GetParentBranchLine() != null)
             {
-                oldBranchLine =
-                    LineConf.GetLine(
-                        childValueHolder.GetParentBranchLine());
+                oldBranchLine = LineConf.GetLine(childValueHolder.GetParentBranchLine());
             }
 
-            Destroyer.Destroy(
-                childValueHolder.GetParentBranchLine());
+            Destroyer.Destroy(childValueHolder.GetParentBranchLine());
 
-            GameObject newBranchLine =
-                GameMindMapBranch.CreateBranchLine(
-                    child,
-                    parent);
+            GameObject newBranchLine = GameMindMapBranch.CreateBranchLine(child, parent);
 
             if (oldBranchLine != null)
             {
-                GameLineEdit.ChangeLine(
-                    newBranchLine,
-                    oldBranchLine);
+                GameLineEdit.ChangeLine(newBranchLine, oldBranchLine);
             }
         }
 
@@ -135,55 +110,34 @@ namespace SEE.Game.Drawable.Editing
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                ChangeNodeKind(
-                    node,
-                    conf.NodeKind,
-                    conf.BorderConf);
+                ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
 
-                GameLineEdit.ChangeLine(
-                    node.FindDescendantWithTag(Tags.Line),
-                    conf.BorderConf);
+                GameLineEdit.ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
 
-                GameTextEdit.ChangeText(
-                    node.FindDescendantWithTag(Tags.DText),
-                    conf.TextConf);
+                GameTextEdit.ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
 
-                GameObject attachedObjects =
-                    GameFinder.GetAttachedObjectsObject(
-                        GameFinder.GetDrawableSurface(node));
+                GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(GameFinder.GetDrawableSurface(node));
 
-                GameObject parent =
-                    GameFinder.FindAttachedOrLocalDescendant(
-                        attachedObjects,
-                        conf.ParentNode);
+                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
 
                 ChangeParent(node, parent);
 
                 GameMindMapNode.ChangeBoxSize(node);
 
-                node.FindDescendantWithTag(Tags.Line)
-                    .GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.Line).GetComponent<MeshCollider>().enabled = false;
 
-                node.FindDescendantWithTag(Tags.DText)
-                    .GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;
 
                 if (conf.BranchLineToParent != "")
                 {
-                    GameObject branch =
-                        GameFinder.FindAttachedOrLocalDescendant(
-                            attachedObjects,
-                            conf.BranchLineToParent);
+                    GameObject branch = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.BranchLineToParent);
 
-                    GameLineEdit.ChangeLine(
-                        branch,
-                        conf.BranchLineConf);
+                    GameLineEdit.ChangeLine(branch, conf.BranchLineConf);
 
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
 
-                GameLayerChanger.SetOrderInLayer(
-                    node,
-                    conf.OrderInLayer);
+                GameLayerChanger.SetOrderInLayer(node, conf.OrderInLayer);
             }
         }
     }

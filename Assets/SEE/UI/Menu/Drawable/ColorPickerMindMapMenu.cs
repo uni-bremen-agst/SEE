@@ -103,7 +103,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfBorderButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManager border = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Border").GetComponent<ButtonManager>();
+            ButtonManager border = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Border")
+                .GetComponent<ButtonManager>();
             border.onClick.AddListener(() =>
             {
                 chosenColor = GetLineColor(conf.BorderConf, primaryColor);
@@ -120,7 +121,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfTextButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManager text = GameFinder.FindAttachedOrLocalDescendant(gameObject, "NodeText").GetComponent<ButtonManager>();
+            ButtonManager text = GameFinder.FindAttachedOrLocalDescendant(gameObject, "NodeText")
+                .GetComponent<ButtonManager>();
             text.onClick.AddListener(() =>
             {
                 chosenColor = primaryColor ? conf.TextConf.FontColor : conf.TextConf.OutlineColor;
@@ -137,11 +139,9 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Whether the primary color should be selected.</param>
         private void InitializeColorOfBranchLine(MindMapNodeConf conf, bool primaryColor)
         {
-            GameObject branchLineButtonArea =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "BranchLine");
+            GameObject branchLineButtonArea = GameFinder.FindAttachedOrLocalDescendant(gameObject, "BranchLine");
 
-            ButtonManager branchButton =
-                branchLineButtonArea.GetComponent<ButtonManager>();
+            ButtonManager branchButton = branchLineButtonArea.GetComponent<ButtonManager>();
 
             if (conf.BranchLineToParent != "")
             {
@@ -161,8 +161,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Keep the unavailable option visible but prevent pointer
                 /// interactions and animations on the entire button hierarchy.
-                CanvasGroup canvasGroup =
-                    branchLineButtonArea.GetComponent<CanvasGroup>();
+                CanvasGroup canvasGroup = branchLineButtonArea.GetComponent<CanvasGroup>();
 
                 if (canvasGroup == null)
                 {

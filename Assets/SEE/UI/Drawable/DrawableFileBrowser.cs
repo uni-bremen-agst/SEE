@@ -42,8 +42,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific).</param>
         /// <param name="pageMode">The mode defining how loaded page indices should be handled.</param>
-        public void LoadDrawableConfiguration(LoadState loadState,
-                                              LoadPageMode pageMode = LoadPageMode.KeepStoredPages)
+        public void LoadDrawableConfiguration(LoadState loadState, LoadPageMode pageMode = LoadPageMode.KeepStoredPages)
         {
             string title = "";
             switch (loadState)
@@ -72,8 +71,9 @@ namespace SEE.UI.Drawable
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all).</param>
         /// <param name="contentMode">The mode defining whether the complete drawable or only the current page should be saved.</param>
-        public void SaveDrawableConfiguration(SaveState saveState,
-                                              SaveContentMode contentMode = SaveContentMode.WholeDrawable)
+        public void SaveDrawableConfiguration(
+            SaveState saveState,
+            SaveContentMode contentMode = SaveContentMode.WholeDrawable)
         {
             string title = "";
             if (contentMode == SaveContentMode.CurrentPage)

@@ -85,8 +85,10 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// <param name="surfaces">The drawable surface configurations to save into this file.</param>
             /// <param name="savedState">Represents whether one or more drawables are saved in this file.</param>
             /// <param name="contentMode">Represents whether complete drawables or only the current page should be saved.</param>
-            internal Memento(DrawableConfig[] surfaces, SaveState savedState,
-                             SaveContentMode contentMode = SaveContentMode.WholeDrawable)
+            internal Memento(
+                DrawableConfig[] surfaces,
+                SaveState savedState,
+                SaveContentMode contentMode = SaveContentMode.WholeDrawable)
             {
                 Surfaces = surfaces;
                 SavedState = savedState;
@@ -327,11 +329,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
             else if (memento.SavedState == SaveState.Multiple)
             {
                 ShowNotification.Info("Saved!",
-                        "The chosen " + surfaces.Length + $" drawables have been successfully saved to the file {filePath}.");
+                    "The chosen " + surfaces.Length + $" drawables have been successfully saved to the file {filePath}.");
             } else
             {
                 ShowNotification.Info("Saved!",
-                        $"All drawables have been successfully saved to the file {filePath}.");
+                    $"All drawables have been successfully saved to the file {filePath}.");
             }
         }
 

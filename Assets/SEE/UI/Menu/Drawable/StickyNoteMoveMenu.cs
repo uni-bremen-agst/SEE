@@ -69,8 +69,8 @@ namespace SEE.UI.Menu.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Register the switch for the speed-up option.
-            speedUpManager = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "SpeedSwitch").GetComponent<SwitchManager>();
+            speedUpManager =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SpeedSwitch").GetComponent<SwitchManager>();
 
             speed = speedUpManager.isOn ? ValueHolder.MoveFast : ValueHolder.Move;
 
@@ -84,8 +84,8 @@ namespace SEE.UI.Menu.Drawable
             speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
 
             /// Register the finish button.
-            ButtonManager finishButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Finish").GetComponent<ButtonManager>();
+            ButtonManager finishButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Finish").GetComponent<ButtonManager>();
 
             finishButton.onClick.RemoveAllListeners();
             finishButton.onClick.AddListener(() =>
@@ -123,15 +123,18 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="spawnMode">
         /// Whether network actions should be omitted because the sticky note is still being spawned.
         /// </param>
-        private void SetUpMovementButton(GameObject stickyNoteHolder, string buttonName,
-            ValueHolder.MoveDirection direction, GameObject surface, string surfaceParentName,
+        private void SetUpMovementButton(
+            GameObject stickyNoteHolder,
+            string buttonName,
+            ValueHolder.MoveDirection direction,
+            GameObject surface,
+            string surfaceParentName,
             bool spawnMode)
         {
             GameFinder.FindAttachedOrLocalDescendant(gameObject, buttonName)
                 .AddComponent<ButtonHeld>().SetAction(() =>
                 {
-                    Vector3 newPosition = GameStickyNoteTransform.MoveByMenu(
-                        stickyNoteHolder, direction, speed);
+                    Vector3 newPosition = GameStickyNoteTransform.MoveByMenu(stickyNoteHolder, direction, speed);
 
                     if (!spawnMode)
                     {
@@ -146,8 +149,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void SetUpInfoButton()
         {
-            ButtonManager infoButton = GameFinder.FindAttachedOrLocalDescendant(
-                gameObject, "Info").GetComponent<ButtonManager>();
+            ButtonManager infoButton =
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Info").GetComponent<ButtonManager>();
 
             infoButton.onClick.RemoveAllListeners();
             infoButton.onClick.AddListener(() =>

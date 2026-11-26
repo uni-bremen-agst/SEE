@@ -256,8 +256,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             if (!string.IsNullOrWhiteSpace(filePath))
             {
                 DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
-                imageObj = GameImage.PlaceImage(Surface, filePath, position,
-                    holder.OrderInLayer);
+                imageObj = GameImage.PlaceImage(Surface, filePath, position, holder.OrderInLayer);
                 imageObj.GetComponent<ImageValueHolder>().URL = url;
                 new AddImageNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                     ImageConf.GetImageConf(imageObj)).Execute();
@@ -276,8 +275,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             base.Undo();
             GameObject obj = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(),
                 memento.Image.ID);
-            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Image.ID).Execute();
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Image.ID).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -288,8 +286,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         {
             base.Redo();
             GameImage.RePlaceImage(memento.Surface.GetDrawableSurface(), memento.Image);
-            new AddImageNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Image).Execute();
+            new AddImageNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Image).Execute();
         }
 
         /// <summary>

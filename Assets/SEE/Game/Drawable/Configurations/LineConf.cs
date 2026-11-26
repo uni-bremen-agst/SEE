@@ -197,11 +197,9 @@ namespace SEE.Game.Drawable.Configurations
 
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
-                LineRenderer renderer =
-                    lineGameObject.GetComponent<LineRenderer>();
+                LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
 
-                LineAnchorValueHolder anchorHolder =
-                    lineGameObject.GetComponent<LineAnchorValueHolder>();
+                LineAnchorValueHolder anchorHolder = lineGameObject.GetComponent<LineAnchorValueHolder>();
 
                 bool hasStoredOriginalPositions =
                     anchorHolder != null
@@ -215,13 +213,9 @@ namespace SEE.Game.Drawable.Configurations
 
                 if (hasStoredOriginalPositions)
                 {
-                    rendererPositions =
-                        new Vector3[anchorHolder.OriginalRendererPositions.Length];
+                    rendererPositions = new Vector3[anchorHolder.OriginalRendererPositions.Length];
 
-                    Array.Copy(
-                        anchorHolder.OriginalRendererPositions,
-                        rendererPositions,
-                        rendererPositions.Length);
+                    Array.Copy(anchorHolder.OriginalRendererPositions, rendererPositions, rendererPositions.Length);
                 }
                 else
                 {
@@ -232,12 +226,10 @@ namespace SEE.Game.Drawable.Configurations
                 line = new()
                 {
                     ID = lineGameObject.name,
-                    AssociatedPage =
-                        lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
+                    AssociatedPage = lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
-                    OrderInLayer =
-                        lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
+                    OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Loop = renderer.loop || usesExplicitLoopCapGeometry,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
                     RendererPositions = rendererPositions,
@@ -259,14 +251,10 @@ namespace SEE.Game.Drawable.Configurations
                 else if (line.RendererPositions.Length > 0)
                 {
                     line.OriginalStartAnchor = line.RendererPositions[0];
-                    line.OriginalEndAnchor =
-                        line.RendererPositions[line.RendererPositions.Length - 1];
+                    line.OriginalEndAnchor = line.RendererPositions[line.RendererPositions.Length - 1];
                 }
 
-                LineVisualConfFactory.ApplyVisualProperties(
-                    lineGameObject,
-                    renderer,
-                    line);
+                LineVisualConfFactory.ApplyVisualProperties(lineGameObject, renderer, line);
             }
 
             return line;
@@ -412,8 +400,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Label for preserving the end-cap geometry of a split loop.
         /// </summary>
-        private const string usePreviousSegmentForEndCapLabel =
-            "UsePreviousSegmentForEndCap";
+        private const string usePreviousSegmentForEndCapLabel = "UsePreviousSegmentForEndCap";
 
         /// <summary>
         /// Saves this instance's attributes using the given
@@ -436,9 +423,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.SaveVector(OriginalStartAnchor, originalStartAnchorLabel);
             writer.SaveVector(OriginalEndAnchor, originalEndAnchorLabel);
             writer.Save(FreehandLine, freehandLineLabel);
-            writer.Save(
-                UsePreviousSegmentForEndCap,
-                usePreviousSegmentForEndCapLabel);
+            writer.Save(UsePreviousSegmentForEndCap, usePreviousSegmentForEndCapLabel);
 
             List<Vector3Config> rendererPositionConfigs = RendererPositions
                 .Select(pos => new Vector3Config { Value = pos })
@@ -554,8 +539,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 foreach (object item in (List<object>)positionList)
                 {
-                    Dictionary<string, object> dict =
-                        (Dictionary<string, object>)item;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
 
                     Vector3Config config = new();
                     config.Restore(dict);
@@ -633,8 +617,7 @@ namespace SEE.Game.Drawable.Configurations
             if (attributes.TryGetValue(
                 lineCapStartLabel, out object startCapObject))
             {
-                Dictionary<string, object> startCapDict =
-                    (Dictionary<string, object>)startCapObject;
+                Dictionary<string, object> startCapDict = (Dictionary<string, object>)startCapObject;
 
                 LineCapConf startCap = new();
 
@@ -657,8 +640,7 @@ namespace SEE.Game.Drawable.Configurations
             if (attributes.TryGetValue(
                 lineCapEndLabel, out object endCapObject))
             {
-                Dictionary<string, object> endCapDict =
-                    (Dictionary<string, object>)endCapObject;
+                Dictionary<string, object> endCapDict = (Dictionary<string, object>)endCapObject;
 
                 LineCapConf endCap = new();
 

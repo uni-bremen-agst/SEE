@@ -20,9 +20,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <param name="defaultValue">
         /// The optional default value assigned to the control.
         /// </param>
-        internal ShapeMenuValueLayout(
-            string identifier,
-            int? defaultValue = null)
+        internal ShapeMenuValueLayout(string identifier, int? defaultValue = null)
         {
             Identifier = identifier;
             DefaultValue = defaultValue;
@@ -154,9 +152,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <exception cref="NotImplementedException">
         /// Thrown if the selected shape has no layout rule.
         /// </exception>
-        internal static ShapeMenuLayoutRule Get(
-            Shape shape,
-            UMLShape umlShape)
+        internal static ShapeMenuLayoutRule Get(Shape shape, UMLShape umlShape)
         {
             switch (shape)
             {
@@ -264,12 +260,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     {
                         Value1 = new ShapeMenuValueLayout("Radius"),
                         Angle1 = new ShapeMenuValueLayout("Start Angle"),
-                        Angle2 = new ShapeMenuValueLayout(
-                            "End Angle",
-                            360),
-                        Vertices = new ShapeMenuValueLayout(
-                            "Verticies",
-                            PointsCalculator.DefaultVertices)
+                        Angle2 = new ShapeMenuValueLayout("End Angle", 360),
+                        Vertices = new ShapeMenuValueLayout("Verticies", PointsCalculator.DefaultVertices)
                     };
 
                 case Shape.UML:
@@ -289,8 +281,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
         /// <exception cref="NotImplementedException">
         /// Thrown if the selected UML shape has no layout rule.
         /// </exception>
-        private static ShapeMenuLayoutRule GetUMLRule(
-            UMLShape umlShape)
+        private static ShapeMenuLayoutRule GetUMLRule(UMLShape umlShape)
         {
             switch (umlShape)
             {
@@ -298,47 +289,32 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "Length",
-                            10)
+                        Value1 = new ShapeMenuValueLayout("Length", 10)
                     };
 
                 case UMLShape.Note:
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "a",
-                            30),
-                        Value2 = new ShapeMenuValueLayout(
-                            "b",
-                            20)
+                        Value1 = new ShapeMenuValueLayout("a", 30),
+                        Value2 = new ShapeMenuValueLayout("b", 20)
                     };
 
                 case UMLShape.Package:
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "a",
-                            30),
-                        Value2 = new ShapeMenuValueLayout(
-                            "b",
-                            20),
-                        Value3 = new ShapeMenuValueLayout(
-                            "Title-Width",
-                            15),
-                        Value4 = new ShapeMenuValueLayout(
-                            "Title-Height")
+                        Value1 = new ShapeMenuValueLayout("a", 30),
+                        Value2 = new ShapeMenuValueLayout("b", 20),
+                        Value3 = new ShapeMenuValueLayout("Title-Width", 15),
+                        Value4 = new ShapeMenuValueLayout("Title-Height")
                     };
 
                 case UMLShape.ProvideInterf:
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "Radius",
-                            10),
+                        Value1 = new ShapeMenuValueLayout("Radius", 10),
                         ShowOrientation = true,
                         DefaultOrientation = Orientation.Left
                     };
@@ -347,9 +323,7 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "Radius",
-                            10),
+                        Value1 = new ShapeMenuValueLayout("Radius", 10),
                         ShowOrientation = true,
                         DefaultOrientation = Orientation.Right
                     };
@@ -358,12 +332,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "a",
-                            20),
-                        Value2 = new ShapeMenuValueLayout(
-                            "b",
-                            10),
+                        Value1 = new ShapeMenuValueLayout("a", 20),
+                        Value2 = new ShapeMenuValueLayout("b", 10),
                         ShowOrientation = true,
                         DefaultOrientation = Orientation.Right
                     };
@@ -372,12 +342,8 @@ namespace SEE.UI.Menu.Drawable.Shapes
                     return new ShapeMenuLayoutRule
                     {
                         ShowUMLSelector = true,
-                        Value1 = new ShapeMenuValueLayout(
-                            "a",
-                            20),
-                        Value2 = new ShapeMenuValueLayout(
-                            "b",
-                            10),
+                        Value1 = new ShapeMenuValueLayout("a", 20),
+                        Value2 = new ShapeMenuValueLayout("b", 10),
                         ShowOrientation = true,
                         DefaultOrientation = Orientation.Left
                     };

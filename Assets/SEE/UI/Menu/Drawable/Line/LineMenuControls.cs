@@ -157,84 +157,51 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </param>
         internal LineMenuControls(GameObject lineMenu)
         {
-            LineKindSelectionObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineKindSelection");
-            LineKindTextObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineKindText");
+            LineKindSelectionObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineKindSelection");
+            LineKindTextObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "LineKindText");
+            LineKindSelector = LineKindSelectionObject.GetComponent<HorizontalSelector>();
 
-            LineKindSelector =
-                LineKindSelectionObject.GetComponent<HorizontalSelector>();
+            ColorKindSelectionObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorKindSelection");
+            ColorKindSelector = ColorKindSelectionObject.GetComponent<HorizontalSelector>();
 
-            ColorKindSelectionObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorKindSelection");
-            ColorKindSelector =
-                ColorKindSelectionObject.GetComponent<HorizontalSelector>();
+            TilingObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Tiling");
+            TilingSlider = TilingObject.GetComponentInChildren<FloatValueSliderController>(true);
 
-            TilingObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Tiling");
-            TilingSlider =
-                TilingObject.GetComponentInChildren<FloatValueSliderController>(true);
+            LayerObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Layer");
+            LayerSlider = LayerObject.GetComponentInChildren<Slider>(true);
+            LayerSliderController = LayerObject.GetComponentInChildren<LayerSliderController>(true);
 
-            LayerObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Layer");
-            LayerSlider =
-                LayerObject.GetComponentInChildren<Slider>(true);
-            LayerSliderController =
-                LayerObject.GetComponentInChildren<LayerSliderController>(true);
+            ThicknessObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Thickness");
+            ThicknessSlider = ThicknessObject.GetComponentInChildren<ThicknessSliderController>(true);
 
-            ThicknessObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Thickness");
-            ThicknessSlider =
-                ThicknessObject.GetComponentInChildren<ThicknessSliderController>(true);
+            LoopObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Loop");
+            LoopManager = LoopObject.GetComponentInChildren<SwitchManager>(true);
 
-            LoopObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Loop");
-            LoopManager =
-                LoopObject.GetComponentInChildren<SwitchManager>(true);
+            GameObject primaryColorButton = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "PrimaryColorBtn");
+            PrimaryColorButtonManager = primaryColorButton.GetComponent<ButtonManager>();
 
-            GameObject primaryColorButton =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "PrimaryColorBtn");
-            PrimaryColorButtonManager =
-                primaryColorButton.GetComponent<ButtonManager>();
+            GameObject secondaryColorButton = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SecondaryColorBtn");
+            SecondaryColorButtonManager = secondaryColorButton.GetComponent<ButtonManager>();
 
-            GameObject secondaryColorButton =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "SecondaryColorBtn");
-            SecondaryColorButtonManager =
-                secondaryColorButton.GetComponent<ButtonManager>();
+            GameObject colorKindButton = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorKindBtn");
+            ColorKindButtonManager = colorKindButton.GetComponent<ButtonManager>();
 
-            GameObject colorKindButton =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorKindBtn");
-            ColorKindButtonManager =
-                colorKindButton.GetComponent<ButtonManager>();
+            GameObject fillOutButton = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOutBtn");
+            FillOutButtonManager = fillOutButton.GetComponent<ButtonManager>();
 
-            GameObject fillOutButton =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOutBtn");
-            FillOutButtonManager =
-                fillOutButton.GetComponent<ButtonManager>();
+            FillOutObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOut");
+            FillOutManager = FillOutObject.GetComponentInChildren<SwitchManager>(true);
 
-            FillOutObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "FillOut");
-            FillOutManager =
-                FillOutObject.GetComponentInChildren<SwitchManager>(true);
+            ColorAreaSelectorObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorAreaSelector");
+            ColorTypeSelectorObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorTypeSelector");
 
-            ColorAreaSelectorObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorAreaSelector");
+            ColorPickerObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Picker 2.0");
+            ColorPicker = ColorPickerObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
 
-            ColorTypeSelectorObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ColorTypeSelector");
+            ReturnButtonObject = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ReturnBtn");
+            ReturnButtonManager = ReturnButtonObject.GetComponent<ButtonManager>();
 
-            ColorPickerObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Picker 2.0");
-            ColorPicker =
-                ColorPickerObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
-
-            ReturnButtonObject =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "ReturnBtn");
-            ReturnButtonManager =
-                ReturnButtonObject.GetComponent<ButtonManager>();
-
-            GameObject dragger =
-                GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Dragger");
+            GameObject dragger = GameFinder.FindAttachedOrLocalDescendant(lineMenu, "Dragger");
             WindowDragger = dragger.GetComponent<WindowDragger>();
         }
     }
