@@ -44,8 +44,7 @@ namespace SEE.Game.Drawable
                     }
                 }
 
-                holder.OrderInLayer =
-                    GetMaximumPageOrderInLayer(GameFinder.GetAttachedObjectsObject(surface));
+                holder.OrderInLayer = GetMaximumPageOrderInLayer(GameFinder.GetAttachedObjectsObject(surface));
             }
 
             if (surface.TryGetDrawableSurface(out DrawableSurface drawableSurface))
@@ -145,8 +144,7 @@ namespace SEE.Game.Drawable
                 return 1;
             }
 
-            OrderInLayerValueHolder[] holders =
-                attachedObjects.GetComponentsInChildren<OrderInLayerValueHolder>();
+            OrderInLayerValueHolder[] holders = attachedObjects.GetComponentsInChildren<OrderInLayerValueHolder>();
 
             return holders.Length > 0
                 ? holders.Max(holder => holder.OrderInLayer) + 1
@@ -167,8 +165,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            AssociatedPageHolder[] holders =
-                attachedObjects.GetComponentsInChildren<AssociatedPageHolder>(true);
+            AssociatedPageHolder[] holders = attachedObjects.GetComponentsInChildren<AssociatedPageHolder>(true);
 
             foreach (AssociatedPageHolder holder in holders)
             {

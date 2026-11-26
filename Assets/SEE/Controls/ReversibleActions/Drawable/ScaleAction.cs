@@ -105,8 +105,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// <param name="id">The ID of the selected object.</param>
             /// <param name="oldScale">The old scale of the selected object.</param>
             /// <param name="newScale">The new scale of the selected object.</param>
-            public Memento(GameObject selectedObject, GameObject surface, string id,
-                Vector3 oldScale, Vector3 newScale)
+            public Memento(GameObject selectedObject, GameObject surface, string id, Vector3 oldScale, Vector3 newScale)
             {
                 SelectedObject = selectedObject;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);

@@ -79,8 +79,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConfig">The configuration storing the changed order.</param>
         private void InitializeLayerSlider(GameObject stickyNote, DrawableConfig newConfig)
         {
-            LayerSliderController orderInLayerSlider =
-                gameObject.GetComponentInChildren<LayerSliderController>(true);
+            LayerSliderController orderInLayerSlider = gameObject.GetComponentInChildren<LayerSliderController>(true);
 
             orderInLayerSlider.AssignValue(newConfig.Order);
             orderInLayerSlider.OnValueChanged.AddListener(order =>
@@ -132,8 +131,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConfig">The configuration storing the changed color.</param>
         private void InitializeColorPicker(GameObject stickyNote, DrawableConfig newConfig)
         {
-            HSVPicker.ColorPicker picker =
-                gameObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
+            HSVPicker.ColorPicker picker = gameObject.GetComponentInChildren<HSVPicker.ColorPicker>(true);
 
             picker.AssignColor(newConfig.Color);
             picker.onValueChanged.AddListener(color =>

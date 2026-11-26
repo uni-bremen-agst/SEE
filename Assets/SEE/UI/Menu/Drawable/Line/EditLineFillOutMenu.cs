@@ -148,9 +148,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     assignColorArea(color =>
                     {
-                        GameLineFillOut.ChangeFillOutColor(
-                            selectedLine,
-                            color);
+                        GameLineFillOut.ChangeFillOutColor(selectedLine, color);
 
                         lineHolder.FillOutColor = color;
 
@@ -163,8 +161,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
                 else
                 {
-                    LineCapConf capConf =
-                        GetSelectedCapConf(lineHolder);
+                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
 
                     if (capConf == null)
                     {
@@ -175,19 +172,13 @@ namespace SEE.UI.Menu.Drawable.Line
                     {
                         capConf.FillOutColor = color;
 
-                        lineCapMenu.UpdateFillOutChangedByUser(
-                            capConf);
+                        lineCapMenu.UpdateFillOutChangedByUser(capConf);
 
-                        lineCapMenu.ApplySelectedCapStyle(
-                            selectedLine,
-                            lineHolder,
-                            surface);
+                        lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                     }, capConf.FillOutColor);
                 }
 
-                MenuHelper.CalculateHeight(
-                    lineMenu,
-                    true);
+                MenuHelper.CalculateHeight(lineMenu, true);
             });
 
             controls.FillOutButtonManager.Interactable(true);
@@ -224,8 +215,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     if (lineHolder.FillOutColor == Color.clear)
                     {
-                        lineHolder.FillOutColor =
-                            lineHolder.PrimaryColor;
+                        lineHolder.FillOutColor = lineHolder.PrimaryColor;
                     }
 
                     if (GameLineFillOut.FillOut(
@@ -240,16 +230,13 @@ namespace SEE.UI.Menu.Drawable.Line
 
                         if (BlinkEffect.CanFillOutBeAdded(selectedLine))
                         {
-                            BlinkEffect.AddFillOutToEffect(
-                                selectedLine);
+                            BlinkEffect.AddFillOutToEffect(selectedLine);
                         }
                     }
 
                     assignColorArea(color =>
                     {
-                        GameLineFillOut.ChangeFillOutColor(
-                            selectedLine,
-                            color);
+                        GameLineFillOut.ChangeFillOutColor(selectedLine, color);
 
                         lineHolder.FillOutColor = color;
 
@@ -262,8 +249,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
                 else
                 {
-                    LineCapConf capConf =
-                        GetSelectedCapConf(lineHolder);
+                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
 
                     if (capConf == null)
                     {
@@ -272,19 +258,14 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     capConf.FillOutStatus = true;
 
-                    lineCapMenu.UpdateFillOutChangedByUser(
-                        capConf);
+                    lineCapMenu.UpdateFillOutChangedByUser(capConf);
 
                     if (capConf.FillOutColor == Color.clear)
                     {
-                        capConf.FillOutColor =
-                            capConf.PrimaryColor;
+                        capConf.FillOutColor = capConf.PrimaryColor;
                     }
 
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
+                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
 
@@ -303,17 +284,13 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     clearFillOutColorAction?.Invoke();
 
-                    BlinkEffect.RemoveFillOutFromEffect(
-                        selectedLine);
+                    BlinkEffect.RemoveFillOutFromEffect(selectedLine);
 
-                    GameObject mainFillOut =
-                        GameLineFillOut.GetOwnFillOutObject(
-                            selectedLine);
+                    GameObject mainFillOut = GameLineFillOut.GetOwnFillOutObject(selectedLine);
 
                     if (mainFillOut != null)
                     {
-                        UnityEngine.Object.DestroyImmediate(
-                            mainFillOut);
+                        UnityEngine.Object.DestroyImmediate(mainFillOut);
                     }
 
                     new DeleteFillOutNetAction(
@@ -323,8 +300,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
                 else
                 {
-                    LineCapConf capConf =
-                        GetSelectedCapConf(lineHolder);
+                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
 
                     if (capConf == null)
                     {
@@ -333,13 +309,9 @@ namespace SEE.UI.Menu.Drawable.Line
 
                     capConf.FillOutStatus = false;
 
-                    lineCapMenu.UpdateFillOutChangedByUser(
-                        capConf);
+                    lineCapMenu.UpdateFillOutChangedByUser(capConf);
 
-                    lineCapMenu.ApplySelectedCapStyle(
-                        selectedLine,
-                        lineHolder,
-                        surface);
+                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
 
@@ -365,10 +337,7 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="clearFillOutAction">
         /// The action registered for clearing the externally stored fill-out color.
         /// </param>
-        internal void AssignFillOut(
-            Color? fillOut,
-            UnityAction<Color> setFillOutAction,
-            UnityAction clearFillOutAction)
+        internal void AssignFillOut(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
             clearFillOutColorAction = clearFillOutAction;
 
@@ -391,9 +360,7 @@ namespace SEE.UI.Menu.Drawable.Line
             {
                 if (!isColorAreaAssigned(setFillOutAction))
                 {
-                    assignColorArea(
-                        setFillOutAction,
-                        fillOut.Value);
+                    assignColorArea(setFillOutAction, fillOut.Value);
                 }
             }
             else

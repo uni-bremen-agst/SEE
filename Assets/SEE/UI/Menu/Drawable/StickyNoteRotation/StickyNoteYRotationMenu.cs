@@ -17,8 +17,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// <summary>
         /// The prefab of the sticky note y rotation menu.
         /// </summary>
-        private const string yRotationMenuPrefab =
-            "Prefabs/UI/Drawable/StickyNoteYRotation";
+        private const string yRotationMenuPrefab = "Prefabs/UI/Drawable/StickyNoteYRotation";
 
         /// <summary>
         /// The instantiated sticky note y rotation menu.
@@ -56,8 +55,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             yRotationMenu = Menu.InstantiatePrefab(yRotationMenuPrefab);
 
-            RotationSliderController slider =
-                yRotationMenu.GetComponentInChildren<RotationSliderController>();
+            RotationSliderController slider = yRotationMenu.GetComponentInChildren<RotationSliderController>();
 
             SetUpSlider(slider, stickyNoteHolder, spawnMode);
 
@@ -190,17 +188,13 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameObject surface,
             string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    yRotationMenu,
-                    buttonName)
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, buttonName)
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(() =>
                 {
                     slider.AssignValue(degree);
 
-                    GameStickyNoteTransform.SetRotateY(
-                        stickyNoteHolder,
-                        degree);
+                    GameStickyNoteTransform.SetRotateY(stickyNoteHolder, degree);
 
                     if (!spawnMode)
                     {
@@ -226,16 +220,11 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// <param name="spawnMode">
         /// Whether the sticky note is currently being spawned.
         /// </param>
-        private void SetUpSlider(
-            RotationSliderController slider,
-            GameObject stickyNote,
-            bool spawnMode)
+        private void SetUpSlider(RotationSliderController slider, GameObject stickyNote, bool spawnMode)
         {
-            GameObject surface =
-                GameFinder.GetDrawableSurface(stickyNote);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
 
-            string surfaceParentName =
-                GameFinder.GetDrawableSurfaceParentName(surface);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             Transform transform = stickyNote.transform;
 
@@ -243,9 +232,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
 
             slider.OnValueChanged.AddListener(degree =>
             {
-                GameStickyNoteTransform.SetRotateY(
-                    stickyNote,
-                    degree);
+                GameStickyNoteTransform.SetRotateY(stickyNote, degree);
 
                 if (!spawnMode)
                 {
@@ -267,9 +254,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </param>
         private void SetUpBackButton(UnityAction backCall)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    yRotationMenu,
-                    "Back")
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Back")
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(backCall);
         }
@@ -282,9 +267,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </param>
         private void SetUpFinishButton(UnityAction finishCall)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    yRotationMenu,
-                    "Finish")
+            GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "Finish")
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(finishCall);
         }
@@ -298,10 +281,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </param>
         private void SetUpReturnButton(UnityAction returnCall)
         {
-            GameObject returnButton =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    yRotationMenu,
-                    "ReturnBtn");
+            GameObject returnButton = GameFinder.FindAttachedOrLocalDescendant(yRotationMenu, "ReturnBtn");
 
             if (returnCall != null)
             {

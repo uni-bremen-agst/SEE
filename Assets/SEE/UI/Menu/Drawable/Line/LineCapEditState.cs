@@ -241,8 +241,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
             if (HasOwnFillOutDefault(cap.CapKind))
             {
-                LineCapConf rememberedOwnDefaultCap =
-                    GetRememberedOwnFillOutDefaultCapConf(cap.CapKind, isStartCap);
+                LineCapConf rememberedOwnDefaultCap = GetRememberedOwnFillOutDefaultCapConf(cap.CapKind, isStartCap);
 
                 if (rememberedOwnDefaultCap == null)
                 {

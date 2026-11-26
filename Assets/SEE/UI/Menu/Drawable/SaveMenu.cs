@@ -41,23 +41,21 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="saveAllButtonCall">
         /// The action that should be executed when the save-all button is pressed.
         /// </param>
-        public void Enable(UnityAction saveButtonCall,
-                           UnityAction saveCurrentPageButtonCall,
-                           UnityAction saveAllButtonCall)
+        public void Enable(
+            UnityAction saveButtonCall,
+            UnityAction saveCurrentPageButtonCall,
+            UnityAction saveAllButtonCall)
         {
             Instantiate(saveMenuPrefab);
 
             ButtonManager saveButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Save")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Save").GetComponent<ButtonManager>();
 
             ButtonManager saveCurrentPageButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveCurrentPage")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveCurrentPage").GetComponent<ButtonManager>();
 
             ButtonManager saveAllButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveAll")
-                    .GetComponent<ButtonManager>();
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "SaveAll").GetComponent<ButtonManager>();
 
             saveButton.onClick.AddListener(saveButtonCall);
             saveCurrentPageButton.onClick.AddListener(saveCurrentPageButtonCall);

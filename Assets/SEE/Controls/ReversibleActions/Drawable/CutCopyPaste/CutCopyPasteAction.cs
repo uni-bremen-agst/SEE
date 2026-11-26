@@ -117,8 +117,12 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
             /// <param name="oldSurface">The drawable surface on which the drawable type object was displayed.</param>
             /// <param name="newSurface">The drawable surface on which the drawable type object is displayed.</param>
             /// <param name="cutCopy">The state whether it was cut or copied.</param>
-            public Memento(DrawableType oldValueHolder,
-                DrawableType newValueHolder, GameObject oldSurface, GameObject newSurface, CutCopy cutCopy)
+            public Memento(
+                DrawableType oldValueHolder,
+                DrawableType newValueHolder,
+                GameObject oldSurface,
+                GameObject newSurface,
+                CutCopy cutCopy)
             {
                 OldValueHolder = oldValueHolder;
                 NewValueHolder = newValueHolder;
@@ -391,10 +395,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                     case LineConf:
                     case TextConf:
                     case ImageConf:
-                        newObject = primitivePasteOperation.Execute(
-                            selectedObj,
-                            newSurface,
-                            newPosition);
+                        newObject = primitivePasteOperation.Execute(selectedObj, newSurface, newPosition);
 
                         newValueHolder = DrawableType.Get(newObject);
                         break;
@@ -440,8 +441,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
         /// </summary>
         private void ApplyMindMapPasteResult()
         {
-            CutCopyPasteMindMapPasteOperation.Result result =
-                mindMapPasteOperation.CurrentResult;
+            CutCopyPasteMindMapPasteOperation.Result result = mindMapPasteOperation.CurrentResult;
 
             newObject = result.NewObject;
             newValueHolder = result.NewValueHolder;
@@ -562,8 +562,8 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                         GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(oldSurface, memento.OldValueHolder.ID);
                         if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                         {
-                            GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
-                                GetParentBranchLine();
+                            GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>()
+                                .GetParentBranchLine();
                             GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                             new EditLineNetAction(oldSurface.name, GameFinder.GetDrawableSurfaceParentName(oldSurface),
                                 LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
@@ -623,8 +623,8 @@ namespace SEE.Controls.ReversibleActions.Drawable.CutCopyPaste
                     GameObject restoredObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, memento.NewValueHolder.ID);
                     if (restoredObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
-                        GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>().
-                            GetParentBranchLine();
+                        GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>()
+                            .GetParentBranchLine();
                         GameLineEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();

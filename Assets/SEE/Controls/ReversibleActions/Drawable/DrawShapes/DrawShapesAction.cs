@@ -168,8 +168,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 && (LineMenu.Instance.IsInDrawingMode()
                     || LineMenu.Instance.IsInEditMode()))
             {
-                bool switchToEditMode =
-                    LineMenu.Instance.IsInDrawingMode();
+                bool switchToEditMode = LineMenu.Instance.IsInDrawingMode();
 
                 editMode = true;
 
@@ -301,8 +300,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         /// </summary>
         private void FinishLineDrawing()
         {
-            (GameObject finishedShape, LineConf finalShape) =
-                lineOperation.Finish(Shape, Surface, lineCapController);
+            (GameObject finishedShape, LineConf finalShape) = lineOperation.Finish(Shape, Surface, lineCapController);
 
             Shape = finishedShape;
             memento = new Memento(Surface, finalShape);
@@ -362,10 +360,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                     ? previewController.FixedPosition
                     : raycastHit.point;
 
-            Vector3 convertedHitPoint =
-                GameLineGeometry.GetConvertedPosition(
-                    Surface,
-                    targetPosition);
+            Vector3 convertedHitPoint = GameLineGeometry.GetConvertedPosition(Surface, targetPosition);
 
             if (!previewController.IsFixed)
             {
@@ -515,10 +510,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 Color? fillOutColor = LineConf.GetFillOutColor(currentShape);
 
                 // Restore the original, unshortened shape geometry before moving the pivot.
-                GameLineDrawer.Drawing(
-                    Shape,
-                    positions,
-                    fillOutColor);
+                GameLineDrawer.Drawing(Shape, positions, fillOutColor);
 
                 Shape = GameLineGeometry.SetPivotShape(
                     Shape,
@@ -526,10 +518,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                     fillOutColor,
                     true);
 
-                currentShape = lineCapController.ApplyFinal(
-                    Shape,
-                    Surface,
-                    LineConf.GetLine(Shape));
+                currentShape = lineCapController.ApplyFinal(Shape, Surface, LineConf.GetLine(Shape));
 
                 previewController.Reset();
 
@@ -613,7 +602,10 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 Shape.GetComponent<LineRenderer>().loop = false;
                 Shape.AddOrGetComponent<BlinkEffect>();
                 lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
-                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
+                new DrawNetAction(
+                    Surface.name,
+                    GameFinder.GetDrawableSurfaceParentName(Surface),
+                    LineConf.GetLine(Shape)).Execute();
             }
             else
             {
@@ -625,7 +617,10 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 }
                 GameLineDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
                 lineCapController.ApplyPreview(Shape, positions, shapeFillOut);
-                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
+                new DrawNetAction(
+                    Surface.name,
+                    GameFinder.GetDrawableSurfaceParentName(Surface),
+                    LineConf.GetLine(Shape)).Execute();
             }
         }
         #endregion
@@ -659,9 +654,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
                 {
                     shapeFillOut = color;
 
-                    GameLineFillOut.ChangeFillOutColor(
-                        Shape,
-                        color);
+                    GameLineFillOut.ChangeFillOutColor(Shape, color);
 
                     new EditLineFillOutColorNetAction(
                         Surface.name,
@@ -684,9 +677,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.DrawShapes
         {
             if (lineOperation.IsDrawing)
             {
-                lineOperation.RegisterFillOutCallbacks(
-                    Shape,
-                    Surface);
+                lineOperation.RegisterFillOutCallbacks(Shape, Surface);
             }
             else
             {

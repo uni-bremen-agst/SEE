@@ -67,9 +67,12 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public DrawableWindowContextMenu(PopupMenu contextMenu,
-                                     UnityEvent<List<GameObject>> rebuild, ButtonManager filterButton, ButtonManager sortButton,
-                                     ButtonManager groupButton)
+        public DrawableWindowContextMenu(
+            PopupMenu contextMenu,
+            UnityEvent<List<GameObject>> rebuild,
+            ButtonManager filterButton,
+            ButtonManager sortButton,
+            ButtonManager groupButton)
         {
             this.contextMenu = contextMenu;
             this.rebuild = rebuild;

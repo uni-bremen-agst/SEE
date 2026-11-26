@@ -34,10 +34,22 @@ namespace SEE.Game.Drawable.Line
         /// <param name="addLineCapValueHolder">
         /// Whether a LineCapValueHolder should be added. True for normal lines, false for line caps.
         /// </param>
-        private static void Setup(GameObject surface, string name, Vector3[] positions,
-            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
-            int order, LineKind lineKind, float tiling, int associatedPage,
-            out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider, bool addLineCapValueHolder = true)
+        private static void Setup(
+            GameObject surface,
+            string name,
+            Vector3[] positions,
+            ColorKind colorKind,
+            Color primaryColor,
+            Color secondaryColor,
+            float thickness,
+            int order,
+            LineKind lineKind,
+            float tiling,
+            int associatedPage,
+            out GameObject line,
+            out LineRenderer renderer,
+            out MeshCollider meshCollider,
+            bool addLineCapValueHolder = true)
         {
             /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
@@ -119,7 +131,8 @@ namespace SEE.Game.Drawable.Line
 
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
-            line.transform.SetPositionAndRotation(attachedObjects.transform.position, attachedObjects.transform.rotation);
+            line.transform.SetPositionAndRotation(
+                attachedObjects.transform.position, attachedObjects.transform.rotation);
             line.transform.position -= order * ValueHolder.DistanceToDrawable.z * line.transform.forward;
 
             /// Adds the order in layer value holder component to the line object and sets the order.
@@ -179,8 +192,15 @@ namespace SEE.Game.Drawable.Line
         /// segments can be too short or unstable for reliable cap calculation.
         /// </param>
         /// <returns>The created line.</returns>
-        public static GameObject StartDrawing(GameObject surface, Vector3[] positions, ColorKind colorKind,
-            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling,
+        public static GameObject StartDrawing(
+            GameObject surface,
+            Vector3[] positions,
+            ColorKind colorKind,
+            Color primaryColor,
+            Color secondaryColor,
+            float thickness,
+            LineKind lineKind,
+            float tiling,
             bool freehandLine = false)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
@@ -328,10 +348,21 @@ namespace SEE.Game.Drawable.Line
         /// </param>
         /// <param name="showFillOutInfo">Whether the information of the fill out should be shown.</param>
         /// <returns>The created or updated line.</returns>
-        public static GameObject DrawLine(GameObject surface, string name, Vector3[] positions, ColorKind colorKind,
-            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
-            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null,
-            bool addLineCapValueHolder = true, bool showFillOutInfo = true)
+        public static GameObject DrawLine(
+            GameObject surface,
+            string name,
+            Vector3[] positions,
+            ColorKind colorKind,
+            Color primaryColor,
+            Color secondaryColor,
+            float thickness,
+            bool loop,
+            LineKind lineKind,
+            float tiling,
+            bool increaseCurrentOrder = true,
+            Color? fillOutColor = null,
+            bool addLineCapValueHolder = true,
+            bool showFillOutInfo = true)
         {
             GameObject lineObject;
             /// Updates the z axis values of the positions to 0.
@@ -349,7 +380,8 @@ namespace SEE.Game.Drawable.Line
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
                     holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
-                    out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider, addLineCapValueHolder);
+                    out GameObject line, out LineRenderer renderer,
+                    out MeshCollider meshCollider, addLineCapValueHolder);
                 lineObject = line;
                 renderer.SetPositions(positions);
                 if (increaseCurrentOrder)
@@ -389,10 +421,23 @@ namespace SEE.Game.Drawable.Line
         /// <param name="associatedPage">The associated page of the line.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The recreated or updated line.</returns>
-        private static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
-            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
-            int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
-            LineKind lineKind, float tiling, int associatedPage, Color? fillOutColor)
+        private static GameObject ReDrawLine(
+            GameObject surface,
+            string name,
+            Vector3[] positions,
+            ColorKind colorKind,
+            Color primaryColor,
+            Color secondaryColor,
+            float thickness,
+            int orderInLayer,
+            Vector3 position,
+            Vector3 eulerAngles,
+            Vector3 scale,
+            bool loop,
+            LineKind lineKind,
+            float tiling,
+            int associatedPage,
+            Color? fillOutColor)
         {
             /// Updates the z axis values of the positions to 0.
             GameLineGeometry.UpdateZPositions(ref positions);
@@ -452,32 +497,24 @@ namespace SEE.Game.Drawable.Line
         /// <param name="surface">The drawable surface.</param>
         /// <param name="lineToRedraw">The stored line configuration.</param>
         /// <returns>The restored line.</returns>
-        public static GameObject ReDrawLine(
-            GameObject surface,
-            LineConf lineToRedraw)
+        public static GameObject ReDrawLine(GameObject surface, LineConf lineToRedraw)
         {
-            bool hasExplicitClosingPoint =
-                GameLineGeometry.HasExplicitClosingPoint(
-                    lineToRedraw.RendererPositions);
+            bool hasExplicitClosingPoint = GameLineGeometry.HasExplicitClosingPoint(lineToRedraw.RendererPositions);
 
-            bool hasCaps =
-                lineToRedraw.LineCapStart != null
-                    && lineToRedraw.LineCapStart.CapKind != LineCap.None
+            bool hasCaps = lineToRedraw.LineCapStart != null
+                && lineToRedraw.LineCapStart.CapKind != LineCap.None
                 || lineToRedraw.LineCapEnd != null
-                    && lineToRedraw.LineCapEnd.CapKind != LineCap.None;
+                && lineToRedraw.LineCapEnd.CapKind != LineCap.None;
 
             // Caps may shorten the renderer endpoints. For saved
             // capped lines, the original anchors describe the
             // unshortened geometry.
             if (!hasExplicitClosingPoint && hasCaps)
             {
-                hasExplicitClosingPoint =
-                    lineToRedraw.OriginalStartAnchor.Equals(
-                        lineToRedraw.OriginalEndAnchor);
+                hasExplicitClosingPoint = lineToRedraw.OriginalStartAnchor.Equals(lineToRedraw.OriginalEndAnchor);
             }
 
-            bool effectiveLoop =
-                lineToRedraw.Loop && !hasExplicitClosingPoint;
+            bool effectiveLoop = lineToRedraw.Loop && !hasExplicitClosingPoint;
 
             GameObject line = ReDrawLine(
                 surface,
@@ -497,22 +534,16 @@ namespace SEE.Game.Drawable.Line
                 lineToRedraw.AssociatedPage,
                 LineConf.GetFillOutColor(lineToRedraw));
 
-            line.GetComponent<LineValueHolder>()
-                .Initialize(lineToRedraw.FreehandLine);
+            line.GetComponent<LineValueHolder>().Initialize(lineToRedraw.FreehandLine);
 
-            GameLineGeometry.ApplyStoredOriginalAnchors(
-                line,
-                lineToRedraw);
+            GameLineGeometry.ApplyStoredOriginalAnchors(line, lineToRedraw);
 
             if (lineToRedraw.LineCapStart.CapKind != LineCap.None
                 || lineToRedraw.LineCapEnd.CapKind != LineCap.None)
             {
                 GameLineCapApplicator.ApplyLineCaps(
-                    line,
-                    lineToRedraw.LineCapStart,
-                    lineToRedraw.LineCapEnd,
-                    LineConf.GetFillOutColor(lineToRedraw),
-                    true);
+                    line, lineToRedraw.LineCapStart, lineToRedraw.LineCapEnd,
+                    LineConf.GetFillOutColor(lineToRedraw), true);
             }
 
             return line;

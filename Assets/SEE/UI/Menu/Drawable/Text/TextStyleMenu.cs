@@ -99,9 +99,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         /// <param name="textMenu">The root object of the complete text menu.</param>
         /// <param name="controls">The shared text-menu controls.</param>
-        internal TextStyleMenu(
-            GameObject textMenu,
-            TextMenuControls controls)
+        internal TextStyleMenu(GameObject textMenu, TextMenuControls controls)
         {
             this.textMenu = textMenu;
             this.controls = controls;
@@ -164,13 +162,9 @@ namespace SEE.UI.Menu.Drawable.Text
             controls.FontColorButton.interactable = false;
             controls.FontColorButtonManager.Interactable(false);
 
-            controls.FontColorButtonManager
-                .onClick
-                .AddListener(ToggleColorButtons);
+            controls.FontColorButtonManager.onClick.AddListener(ToggleColorButtons);
 
-            controls.OutlineColorButtonManager
-                .onClick
-                .AddListener(ToggleColorButtons);
+            controls.OutlineColorButtonManager.onClick.AddListener(ToggleColorButtons);
 
             controls.OutlineObject.SetActive(false);
             controls.ThicknessObject.SetActive(false);
@@ -181,26 +175,19 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         private void InitializeFontStyleButtons()
         {
-            controls.BoldButtonManager.onClick.AddListener(
-                () => Press(Bold));
+            controls.BoldButtonManager.onClick.AddListener(() => Press(Bold));
 
-            controls.ItalicButtonManager.onClick.AddListener(
-                () => Press(Italic));
+            controls.ItalicButtonManager.onClick.AddListener(() => Press(Italic));
 
-            controls.UnderlineButtonManager.onClick.AddListener(
-                () => Press(Underline));
+            controls.UnderlineButtonManager.onClick.AddListener(() => Press(Underline));
 
-            controls.StrikethroughButtonManager.onClick.AddListener(
-                () => Press(Strikethrough));
+            controls.StrikethroughButtonManager.onClick.AddListener(() => Press(Strikethrough));
 
-            controls.LowerCaseButtonManager.onClick.AddListener(
-                () => Press(LowerCase));
+            controls.LowerCaseButtonManager.onClick.AddListener(() => Press(LowerCase));
 
-            controls.UpperCaseButtonManager.onClick.AddListener(
-                () => Press(UpperCase));
+            controls.UpperCaseButtonManager.onClick.AddListener(() => Press(UpperCase));
 
-            controls.SmallCapsButtonManager.onClick.AddListener(
-                () => Press(SmallCaps));
+            controls.SmallCapsButtonManager.onClick.AddListener(() => Press(SmallCaps));
         }
 
         /// <summary>
@@ -212,12 +199,10 @@ namespace SEE.UI.Menu.Drawable.Text
             ResetStyles();
 
             controls.FontColorButtonManager.onClick.RemoveAllListeners();
-            controls.FontColorButtonManager.onClick.AddListener(
-                ToggleColorButtons);
+            controls.FontColorButtonManager.onClick.AddListener(ToggleColorButtons);
 
             controls.OutlineColorButtonManager.onClick.RemoveAllListeners();
-            controls.OutlineColorButtonManager.onClick.AddListener(
-                ToggleColorButtons);
+            controls.OutlineColorButtonManager.onClick.AddListener(ToggleColorButtons);
 
             controls.ThicknessSlider.onValueChanged.RemoveAllListeners();
 
@@ -243,26 +228,19 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         private void ToggleColorButtons()
         {
-            controls.FontColorButton.interactable =
-                !controls.FontColorButton.IsInteractable();
+            controls.FontColorButton.interactable = !controls.FontColorButton.IsInteractable();
 
-            controls.FontColorButtonManager.Interactable(
-                controls.FontColorButton.interactable);
+            controls.FontColorButtonManager.Interactable(controls.FontColorButton.interactable);
 
-            controls.OutlineColorButton.interactable =
-                !controls.OutlineColorButton.IsInteractable();
+            controls.OutlineColorButton.interactable = !controls.OutlineColorButton.IsInteractable();
 
-            controls.OutlineColorButtonManager.Interactable(
-                controls.OutlineColorButton.interactable);
+            controls.OutlineColorButtonManager.Interactable(controls.OutlineColorButton.interactable);
 
-            bool outlineColorSelected =
-                !controls.OutlineColorButton.interactable;
+            bool outlineColorSelected = !controls.OutlineColorButton.interactable;
 
-            controls.ThicknessObject.SetActive(
-                outlineColorSelected);
+            controls.ThicknessObject.SetActive(outlineColorSelected);
 
-            controls.OutlineObject.SetActive(
-                outlineColorSelected);
+            controls.OutlineObject.SetActive(outlineColorSelected);
 
             MenuHelper.CalculateHeight(textMenu, true);
         }
@@ -272,14 +250,11 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         /// <param name="colorAction">The color action to be assigned.</param>
         /// <param name="color">The color to be assigned.</param>
-        internal void AssignColorArea(
-            UnityAction<Color> colorAction,
-            Color color)
+        internal void AssignColorArea(UnityAction<Color> colorAction, Color color)
         {
             if (pickerAction != null)
             {
-                controls.ColorPicker.onValueChanged.RemoveListener(
-                    pickerAction);
+                controls.ColorPicker.onValueChanged.RemoveListener(pickerAction);
             }
 
             pickerAction = colorAction;
@@ -295,14 +270,11 @@ namespace SEE.UI.Menu.Drawable.Text
         /// The action invoked when the thickness changes.
         /// </param>
         /// <param name="thickness">The initial outline thickness.</param>
-        internal void AssignOutlineThickness(
-            UnityAction<float> thicknessAction,
-            float thickness)
+        internal void AssignOutlineThickness(UnityAction<float> thicknessAction, float thickness)
         {
             controls.ThicknessSlider.onValueChanged.RemoveAllListeners();
             controls.ThicknessSlider.AssignValue(thickness);
-            controls.ThicknessSlider.onValueChanged.AddListener(
-                thicknessAction);
+            controls.ThicknessSlider.onValueChanged.AddListener(thicknessAction);
         }
 
         /// <summary>
@@ -312,14 +284,11 @@ namespace SEE.UI.Menu.Drawable.Text
         /// The action invoked when the font size changes.
         /// </param>
         /// <param name="fontSize">The initial font size.</param>
-        internal void AssignFontSize(
-            UnityAction<float> fontSizeAction,
-            float fontSize)
+        internal void AssignFontSize(UnityAction<float> fontSizeAction, float fontSize)
         {
             controls.FontSizeInput.OnValueChanged.RemoveAllListeners();
             controls.FontSizeInput.AssignValue(fontSize);
-            controls.FontSizeInput.OnValueChanged.AddListener(
-                fontSizeAction);
+            controls.FontSizeInput.OnValueChanged.AddListener(fontSizeAction);
         }
 
         /// <summary>
@@ -329,9 +298,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// The action invoked when the selected font styles change.
         /// </param>
         /// <param name="fontStyles">The font styles to be assigned.</param>
-        internal void AssignFontStyles(
-            UnityAction<FontStyles> action,
-            FontStyles fontStyles)
+        internal void AssignFontStyles(UnityAction<FontStyles> action, FontStyles fontStyles)
         {
             fontStyleAction = action;
             AssignStyles(fontStyles);
@@ -370,9 +337,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </param>
         private void MutuallyExclusiveStyles(string selectedStyle)
         {
-            FontStyles excludedStyles =
-                GetMutuallyExclusiveFontStyles(
-                    GetFontStyleOfKey(selectedStyle));
+            FontStyles excludedStyles = GetMutuallyExclusiveFontStyles(GetFontStyleOfKey(selectedStyle));
 
             if ((excludedStyles & FontStyles.LowerCase) != 0)
             {
@@ -443,8 +408,7 @@ namespace SEE.UI.Menu.Drawable.Text
             styles[Bold] = (style & FontStyles.Bold) != 0;
             styles[Italic] = (style & FontStyles.Italic) != 0;
             styles[Underline] = (style & FontStyles.Underline) != 0;
-            styles[Strikethrough] =
-                (style & FontStyles.Strikethrough) != 0;
+            styles[Strikethrough] = (style & FontStyles.Strikethrough) != 0;
             styles[LowerCase] = (style & FontStyles.LowerCase) != 0;
             styles[UpperCase] = (style & FontStyles.UpperCase) != 0;
             styles[SmallCaps] = (style & FontStyles.SmallCaps) != 0;

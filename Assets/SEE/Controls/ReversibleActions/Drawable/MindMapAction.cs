@@ -186,11 +186,11 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 if (MindMapParentSelectionMenu.GetChosenParent() != null)
                 {
                     Vector3[] positions = new Vector3[2];
-                    positions[0] = node.GetRootParent().transform.
-                        InverseTransformPoint(NearestPoints.GetNearestPoint(node,
+                    positions[0] = node.GetRootParent().transform
+                        .InverseTransformPoint(NearestPoints.GetNearestPoint(node,
                             MindMapParentSelectionMenu.GetChosenParent().transform.position));
-                    positions[1] = node.GetRootParent().transform.
-                        InverseTransformPoint(NearestPoints.GetNearestPoint(
+                    positions[1] = node.GetRootParent().transform
+                        .InverseTransformPoint(NearestPoints.GetNearestPoint(
                             MindMapParentSelectionMenu.GetChosenParent(),
                             node.transform.position));
                     branchLineRenderer.positionCount = 2;
@@ -364,7 +364,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 else
                 {
                     ShowNotification.Warn("Wrong selection.",
-                                          "You need to select a theme or a subtheme node of the currently selected drawable.");
+                        "You need to select a theme or a subtheme node of the currently selected drawable.");
                 }
             }
         }
@@ -425,10 +425,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             if (attachedObjects != null)
             {
-                foreach (GameObject candidate in
-                         attachedObjects.FindAllDescendantsWithTag(
-                             Tags.MindMapNode,
-                             false))
+                foreach (GameObject candidate in attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode, false))
                 {
                     if (candidate.TryGetComponent(out MMNodeValueHolder valueHolder)
                         && valueHolder.NodeKind != MindMapNodeKind.Leaf)
@@ -483,15 +480,12 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     parent.GetComponent<MMNodeValueHolder>().RemoveChild(targetNode);
                 }
-                new MindMapRemoveChildNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                    memento.Conf).Execute();
+                new MindMapRemoveChildNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
                 GameObject branchToParent = GameFinder.FindAttachedOrLocalDescendant(attached, memento.Conf.BranchLineToParent);
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                    branchToParent.name).Execute();
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, branchToParent.name).Execute();
                 Destroyer.Destroy(branchToParent);
             }
-            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Conf.ID).Execute();
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf.ID).Execute();
             Destroyer.Destroy(targetNode);
         }
 

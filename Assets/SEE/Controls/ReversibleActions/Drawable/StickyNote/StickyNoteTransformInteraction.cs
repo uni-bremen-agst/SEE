@@ -103,9 +103,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.StickyNote
         /// <returns>Whether a scale interaction occurred.</returns>
         internal bool TryGetScaleFactor(out float scaleFactor)
         {
-            return TryGetWheelInteraction(
-                WheelInteractionType.Scale,
-                out scaleFactor);
+            return TryGetWheelInteraction(WheelInteractionType.Scale, out scaleFactor);
         }
 
         /// <summary>
@@ -148,9 +146,7 @@ namespace SEE.Controls.ReversibleActions.Drawable.StickyNote
         /// <param name="interactionType">The requested interaction type.</param>
         /// <param name="value">The calculated interaction value.</param>
         /// <returns>Whether a mouse-wheel interaction occurred.</returns>
-        private static bool TryGetWheelInteraction(
-            WheelInteractionType interactionType,
-            out float value)
+        private static bool TryGetWheelInteraction(WheelInteractionType interactionType, out float value)
         {
             value = 0;
 

@@ -42,8 +42,7 @@ namespace SEE.Game.Drawable.Editing
                 return;
             }
 
-            Vector3[] originalPositions =
-                GameLineGeometry.GetOriginalLinePositions(line);
+            Vector3[] originalPositions = GameLineGeometry.GetOriginalLinePositions(line);
 
             if (originalPositions == null)
             {
@@ -62,17 +61,10 @@ namespace SEE.Game.Drawable.Editing
                 return;
             }
 
-            Color? fillOutColor =
-                LineConf.GetFillOutColor(currentConf);
+            Color? fillOutColor = LineConf.GetFillOutColor(currentConf);
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
 
-            LineAnchorValueHolder anchorHolder =
-                line.GetComponent<LineAnchorValueHolder>();
-
-            GameLineDrawer.Drawing(
-                line,
-                originalPositions,
-                fillOutColor,
-                preserveFillOutColliderState: true);
+            GameLineDrawer.Drawing(line, originalPositions, fillOutColor, preserveFillOutColliderState: true);
 
             if (anchorHolder != null)
             {
@@ -80,22 +72,14 @@ namespace SEE.Game.Drawable.Editing
                 anchorHolder.OriginalRendererPositions = null;
             }
 
-            LineRenderer renderer =
-                line.GetComponent<LineRenderer>();
-
+            LineRenderer renderer = line.GetComponent<LineRenderer>();
             renderer.loop = loop;
 
-            GameLineGeometry.UpdateOriginalAnchors(
-                line,
-                originalPositions);
+            GameLineGeometry.UpdateOriginalAnchors(line, originalPositions);
 
             GameLineCapApplicator.ApplyLineCaps(
-                line,
-                currentConf.LineCapStart,
-                currentConf.LineCapEnd,
-                fillOutColor,
-                currentConf.LineCapStart.UseOwnVisuals,
-                currentConf.LineCapEnd.UseOwnVisuals);
+                line, currentConf.LineCapStart, currentConf.LineCapEnd, fillOutColor,
+                currentConf.LineCapStart.UseOwnVisuals, currentConf.LineCapEnd.UseOwnVisuals);
 
             GameLineGeometry.RefreshCollider(line);
         }
@@ -107,36 +91,22 @@ namespace SEE.Game.Drawable.Editing
         /// <param name="currentConf">The current line configuration.</param>
         /// <param name="start">The starting line cap.</param>
         /// <param name="end">The ending line cap.</param>
-        internal static void ChangeLineCaps(
-            GameObject line,
-            LineConf currentConf,
-            LineCap start,
-            LineCap end)
+        internal static void ChangeLineCaps(GameObject line, LineConf currentConf, LineCap start, LineCap end)
         {
             if (line == null || !line.CompareTag(Tags.Line) || currentConf == null)
             {
                 return;
             }
 
-            currentConf.LineCapStart =
-                GameLineCapConfiguration.CreateLineCapConf(
-                    currentConf,
-                    currentConf.LineCapStart,
-                    start);
+            currentConf.LineCapStart = GameLineCapConfiguration.CreateLineCapConf(
+                currentConf, currentConf.LineCapStart, start);
 
-            currentConf.LineCapEnd =
-                GameLineCapConfiguration.CreateLineCapConf(
-                    currentConf,
-                    currentConf.LineCapEnd,
-                    end);
+            currentConf.LineCapEnd = GameLineCapConfiguration.CreateLineCapConf(
+                currentConf, currentConf.LineCapEnd, end);
 
             GameLineCapApplicator.ApplyLineCaps(
-                line,
-                currentConf.LineCapStart,
-                currentConf.LineCapEnd,
-                LineConf.GetFillOutColor(currentConf),
-                currentConf.LineCapStart.UseOwnVisuals,
-                currentConf.LineCapEnd.UseOwnVisuals);
+                line, currentConf.LineCapStart, currentConf.LineCapEnd, LineConf.GetFillOutColor(currentConf),
+                currentConf.LineCapStart.UseOwnVisuals, currentConf.LineCapEnd.UseOwnVisuals);
         }
 
         /// <summary>
@@ -149,10 +119,7 @@ namespace SEE.Game.Drawable.Editing
         /// True if the start cap should be changed, false if the end cap should be changed.
         /// </param>
         /// <param name="capConf">The new visual configuration of the line cap.</param>
-        internal static void ChangeLineCapStyle(
-            GameObject line,
-            bool isStartCap,
-            LineCapConf capConf)
+        internal static void ChangeLineCapStyle(GameObject line, bool isStartCap, LineCapConf capConf)
         {
             if (line == null || !line.CompareTag(Tags.Line) || capConf == null)
             {
@@ -200,39 +167,26 @@ namespace SEE.Game.Drawable.Editing
                     currentLine.LineCapEnd = capConf.Clone();
                 }
 
-                bool useStartCapVisuals = isStartCap
-                    || holder.StartCapUsesOwnVisuals;
-
-                bool useEndCapVisuals = !isStartCap
-                    || holder.EndCapUsesOwnVisuals;
+                bool useStartCapVisuals = isStartCap || holder.StartCapUsesOwnVisuals;
+                bool useEndCapVisuals = !isStartCap || holder.EndCapUsesOwnVisuals;
 
                 GameLineCapApplicator.ApplyLineCaps(
-                    line,
-                    currentLine.LineCapStart,
-                    currentLine.LineCapEnd,
-                    LineConf.GetFillOutColor(currentLine),
-                    useStartCapVisuals,
-                    useEndCapVisuals);
+                    line, currentLine.LineCapStart, currentLine.LineCapEnd, LineConf.GetFillOutColor(currentLine),
+                    useStartCapVisuals, useEndCapVisuals);
 
                 return;
             }
 
-            List<GameObject> caps =
-                GameLineCapRenderer.GetLineCapObjects(line, isStartCap);
+            List<GameObject> caps = GameLineCapRenderer.GetLineCapObjects(line, isStartCap);
 
             foreach (GameObject capGO in caps)
             {
                 ChangeThickness(capGO, capConf.Thickness);
-                GameLineAppearance.ChangeColorKind(
-                    capGO, capConf.ColorKind, capConf);
-                GameLineAppearance.ChangeLineKind(
-                    capGO, capConf.LineKind, capConf.Tiling);
-                GameLineAppearance.ChangePrimaryColor(
-                    capGO, capConf.PrimaryColor);
-                GameLineAppearance.ChangeSecondaryColor(
-                    capGO, capConf.SecondaryColor);
-                GameLineFillOut.ChangeFillOut(
-                    capGO, capConf.FillOutStatus, capConf.FillOutColor);
+                GameLineAppearance.ChangeColorKind(capGO, capConf.ColorKind, capConf);
+                GameLineAppearance.ChangeLineKind(capGO, capConf.LineKind, capConf.Tiling);
+                GameLineAppearance.ChangePrimaryColor(capGO, capConf.PrimaryColor);
+                GameLineAppearance.ChangeSecondaryColor(capGO, capConf.SecondaryColor);
+                GameLineFillOut.ChangeFillOut(capGO, capConf.FillOutStatus, capConf.FillOutColor);
             }
         }
 
@@ -247,22 +201,13 @@ namespace SEE.Game.Drawable.Editing
             {
                 ChangeThickness(lineObj, line.Thickness);
                 GameLayerChanger.SetOrderInLayer(lineObj, line.OrderInLayer);
-                GameLineAppearance.ChangeColorKind(
-                    lineObj, line.ColorKind, line);
-                GameLineAppearance.ChangePrimaryColor(
-                    lineObj, line.PrimaryColor);
-                GameLineAppearance.ChangeSecondaryColor(
-                    lineObj, line.SecondaryColor);
-                GameLineFillOut.ChangeFillOut(
-                    lineObj, line.FillOutStatus, line.FillOutColor);
+                GameLineAppearance.ChangeColorKind(lineObj, line.ColorKind, line);
+                GameLineAppearance.ChangePrimaryColor(lineObj, line.PrimaryColor);
+                GameLineAppearance.ChangeSecondaryColor(lineObj, line.SecondaryColor);
+                GameLineFillOut.ChangeFillOut(lineObj, line.FillOutStatus, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
-                GameLineAppearance.ChangeLineKind(
-                    lineObj, line.LineKind, line.Tiling);
-                ChangeLineCaps(
-                    lineObj,
-                    line,
-                    line.LineCapStart.CapKind,
-                    line.LineCapEnd.CapKind);
+                GameLineAppearance.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
+                ChangeLineCaps(lineObj, line, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
                 ChangeLineCapStyle(lineObj, true, line.LineCapStart);
                 ChangeLineCapStyle(lineObj, false, line.LineCapEnd);
             }

@@ -64,27 +64,24 @@ namespace SEE.UI.Menu.Drawable
 
             Instantiate(imageSourceMenuPrefab);
 
-            ButtonManager local =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Local")
-                    .GetComponent<ButtonManager>();
+            ButtonManager local = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Local")
+                .GetComponent<ButtonManager>();
 
             local.onClick.AddListener(() =>
             {
                 SelectSource(Source.Local);
             });
 
-            ButtonManager web =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Web")
-                    .GetComponent<ButtonManager>();
+            ButtonManager web = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Web")
+                .GetComponent<ButtonManager>();
 
             web.onClick.AddListener(() =>
             {
                 SelectSource(Source.Web);
             });
 
-            ButtonManager cancelButton =
-                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Cancel")
-                    .GetComponent<ButtonManager>();
+            ButtonManager cancelButton = GameFinder.FindAttachedOrLocalDescendant(gameObject, "Cancel")
+                .GetComponent<ButtonManager>();
 
             cancelButton.onClick.AddListener(Destroy);
         }

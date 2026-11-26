@@ -55,10 +55,7 @@ namespace SEE.Game.Drawable.Line
 
                     // To avoid an overlapping issue, position the fill slightly
                     // behind the line.
-                    fillOut.transform.position = new Vector3(
-                        pos.x,
-                        pos.y,
-                        pos.z + 0.00001f);
+                    fillOut.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
 
                     meshFilter = fillOut.AddComponent<MeshFilter>();
                     MeshRenderer meshRenderer = fillOut.AddComponent<MeshRenderer>();
@@ -68,8 +65,7 @@ namespace SEE.Game.Drawable.Line
 
                     if (meshRenderer.sharedMaterial == null)
                     {
-                        meshRenderer.sharedMaterial =
-                            GameLineAppearance.GetMaterial(fillColor, LineKind.Solid);
+                        meshRenderer.sharedMaterial = GameLineAppearance.GetMaterial(fillColor, LineKind.Solid);
                     }
                 }
                 else

@@ -18,8 +18,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// <summary>
         /// The prefab of the sticky note x rotation menu.
         /// </summary>
-        private const string xRotationMenuPrefab =
-            "Prefabs/UI/Drawable/StickyNoteXRotation";
+        private const string xRotationMenuPrefab = "Prefabs/UI/Drawable/StickyNoteXRotation";
 
         /// <summary>
         /// The instantiated sticky note x rotation menu.
@@ -48,26 +47,15 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             UnityAction returnCall,
             UnityAction nextCall)
         {
-            xRotationMenu =
-                Menu.InstantiatePrefab(xRotationMenuPrefab);
+            xRotationMenu = Menu.InstantiatePrefab(xRotationMenuPrefab);
 
-            GameObject surface =
-                GameFinder.GetDrawableSurface(stickyNoteHolder);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
 
-            string surfaceParentName =
-                GameFinder.GetDrawableSurfaceParentName(surface);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-            SetUpLayingButton(
-                stickyNoteHolder,
-                hitObject,
-                surface,
-                surfaceParentName);
+            SetUpLayingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
 
-            SetUpHangingButton(
-                stickyNoteHolder,
-                hitObject,
-                surface,
-                surfaceParentName);
+            SetUpHangingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
 
             SetUpNextButton(nextCall);
             SetUpReturnButton(returnCall);
@@ -128,9 +116,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameObject surface,
             string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    xRotationMenu,
-                    "Laying")
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Laying")
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(() =>
                 {
@@ -144,9 +130,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
                     }
                     else
                     {
-                        GameStickyNoteTransform.SetRotateX(
-                            stickyNoteHolder,
-                            90);
+                        GameStickyNoteTransform.SetRotateX(stickyNoteHolder, 90);
 
                         new StickyNoteRotateXNetAction(
                             surface.name,
@@ -178,15 +162,11 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
             GameObject surface,
             string surfaceParentName)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    xRotationMenu,
-                    "Hanging")
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Hanging")
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(() =>
                 {
-                    GameStickyNoteTransform.SetRotateX(
-                        stickyNoteHolder,
-                        0);
+                    GameStickyNoteTransform.SetRotateX(stickyNoteHolder, 0);
 
                     if (hitObject == null)
                     {
@@ -206,9 +186,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </param>
         private void SetUpNextButton(UnityAction nextCall)
         {
-            GameFinder.FindAttachedOrLocalDescendant(
-                    xRotationMenu,
-                    "Next")
+            GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "Next")
                 .GetComponent<ButtonManager>()
                 .onClick.AddListener(nextCall);
         }
@@ -222,10 +200,7 @@ namespace SEE.UI.Menu.Drawable.StickyNoteRotation
         /// </param>
         private void SetUpReturnButton(UnityAction returnCall)
         {
-            GameObject returnButton =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    xRotationMenu,
-                    "ReturnBtn");
+            GameObject returnButton = GameFinder.FindAttachedOrLocalDescendant(xRotationMenu, "ReturnBtn");
 
             if (returnCall != null)
             {

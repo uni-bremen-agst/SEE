@@ -221,9 +221,13 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="borderConf">The configuration of the node border.</param>
         /// <param name="surface">The Drawable surface containing the Mind Map node.</param>
         /// <param name="surfaceParentName">The name of the Drawable surface parent.</param>
-        private static void ApplyNodeKindChange(GameObject addedNode, MindMapNodeConf newConf,
-            MindMapNodeKind newNodeKind, LineConf borderConf,
-            GameObject surface, string surfaceParentName)
+        private static void ApplyNodeKindChange(
+            GameObject addedNode,
+            MindMapNodeConf newConf,
+            MindMapNodeKind newNodeKind,
+            LineConf borderConf,
+            GameObject surface,
+            string surfaceParentName)
         {
             GameMindMapEdit.ChangeNodeKind(addedNode, newNodeKind, borderConf);
 

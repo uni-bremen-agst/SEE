@@ -27,9 +27,7 @@ namespace SEE.Game.Drawable.Line
         {
             if (isDashedLineKind)
             {
-                return Enum.GetValues(typeof(ColorKind))
-                    .Cast<ColorKind>()
-                    .ToList();
+                return Enum.GetValues(typeof(ColorKind)).Cast<ColorKind>().ToList();
             }
 
             return new List<ColorKind>
@@ -45,9 +43,7 @@ namespace SEE.Game.Drawable.Line
         /// <returns>All available line kinds.</returns>
         public static IList<LineKind> GetLineKinds()
         {
-            return Enum.GetValues(typeof(LineKind))
-                .Cast<LineKind>()
-                .ToList();
+            return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
 
         /// <summary>
@@ -58,18 +54,14 @@ namespace SEE.Game.Drawable.Line
         /// <param name="tiling">
         /// The texture tiling used for <see cref="LineKind.Dashed"/>.
         /// </param>
-        public static void ChangeLineKind(
-            GameObject shape,
-            LineKind lineKind,
-            float tiling)
+        public static void ChangeLineKind(GameObject shape, LineKind lineKind, float tiling)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
                 LineValueHolder holder = shape.GetComponent<LineValueHolder>();
                 LineRenderer renderer = shape.GetComponent<LineRenderer>();
 
-                renderer.sharedMaterial =
-                    GetMaterial(renderer.material.color, lineKind);
+                renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
 
                 SetTextureMode(renderer, lineKind);
                 SetRendererTextureScale(renderer, lineKind, tiling);
@@ -86,10 +78,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="conf">
         /// The visual configuration containing the colors to restore.
         /// </param>
-        public static void ChangeColorKind(
-            GameObject shape,
-            ColorKind colorKind,
-            ILineVisualConf conf)
+        public static void ChangeColorKind(GameObject shape, ColorKind colorKind, ILineVisualConf conf)
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
@@ -210,10 +199,7 @@ namespace SEE.Game.Drawable.Line
         /// <param name="tiling">
         /// The custom texture tiling used for <see cref="LineKind.Dashed"/>.
         /// </param>
-        internal static void SetRendererTextureScale(
-            LineRenderer renderer,
-            LineKind lineKind,
-            float tiling)
+        internal static void SetRendererTextureScale(LineRenderer renderer, LineKind lineKind, float tiling)
         {
             switch (lineKind)
             {
@@ -249,9 +235,7 @@ namespace SEE.Game.Drawable.Line
         /// </summary>
         /// <param name="renderer">The renderer whose texture mode should be updated.</param>
         /// <param name="lineKind">The line kind defining the texture mode.</param>
-        internal static void SetTextureMode(
-            LineRenderer renderer,
-            LineKind lineKind)
+        internal static void SetTextureMode(LineRenderer renderer, LineKind lineKind)
         {
             switch (lineKind)
             {
@@ -279,8 +263,7 @@ namespace SEE.Game.Drawable.Line
         {
             ColorRange colorRange = new(color, color, 1);
 
-            MaterialsFactory.ShaderType shaderType =
-                lineKind == LineKind.Solid
+            MaterialsFactory.ShaderType shaderType = lineKind == LineKind.Solid
                     ? MaterialsFactory.ShaderType.PortalFreeLine
                     : MaterialsFactory.ShaderType.DrawableDashedLine;
 

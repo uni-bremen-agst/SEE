@@ -55,8 +55,11 @@ namespace SEE.Controls.ReversibleActions.Drawable.MoveRotate
             /// <param name="oldPosition">The object's position before the operation starts.</param>
             /// <param name="oldLocalEulerAngles">The object's local rotation before the operation starts.</param>
             /// <param name="selectedOperation">The selected operation.</param>
-            internal Result(GameObject selectedObject, Vector3 oldPosition,
-                Vector3 oldLocalEulerAngles, Operation selectedOperation)
+            internal Result(
+                GameObject selectedObject,
+                Vector3 oldPosition,
+                Vector3 oldLocalEulerAngles,
+                Operation selectedOperation)
             {
                 SelectedObject = selectedObject;
                 OldPosition = oldPosition;

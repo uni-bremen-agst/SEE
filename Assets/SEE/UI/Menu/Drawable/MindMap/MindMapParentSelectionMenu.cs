@@ -63,10 +63,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         {
             Instance.Instantiate(parentSelectionMenuPrefab);
 
-            GameObject returnButton =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    Instance.gameObject,
-                    "ReturnBtn");
+            GameObject returnButton = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ReturnBtn");
 
             if (returnCall != null)
             {
@@ -78,9 +75,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
                 returnButton.SetActive(false);
             }
 
-            return GameFinder.FindAttachedOrLocalDescendant(
-                    Instance.gameObject,
-                    "ParentSelection")
+            return GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ParentSelection")
                 .GetComponent<HorizontalSelector>();
         }
 
@@ -97,15 +92,10 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <returns>
         /// All Mind Map nodes that can generally be used as parents.
         /// </returns>
-        private static List<GameObject> CollectParentCandidates(
-            GameObject attachedObjects,
-            GameObject addedNode)
+        private static List<GameObject> CollectParentCandidates(GameObject attachedObjects, GameObject addedNode)
         {
             /// Gets all Mind Map Nodes of the given attached objects object.
-            IList<GameObject> allNodes =
-                attachedObjects.FindAllDescendantsWithTag(
-                    Tags.MindMapNode,
-                    false);
+            IList<GameObject> allNodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode, false);
 
             /// Gather all Mind Map Nodes with the <see cref="MindMapNodeKind"/>:
             /// <see cref="MindMapNodeKind.Theme"/> or
@@ -134,15 +124,12 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <param name="nodes">
         /// The Mind Map nodes that should be available for selection.
         /// </param>
-        private static void PopulateParentSelector(
-            HorizontalSelector parentSelector,
-            IEnumerable<GameObject> nodes)
+        private static void PopulateParentSelector(HorizontalSelector parentSelector, IEnumerable<GameObject> nodes)
         {
             /// Create an item in the parent selector for each collected node.
             foreach (GameObject node in nodes)
             {
-                parentSelector.CreateNewItem(
-                    node.GetComponentInChildren<TextMeshPro>(true).text);
+                parentSelector.CreateNewItem(node.GetComponentInChildren<TextMeshPro>(true).text);
             }
         }
 
@@ -152,9 +139,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <returns>The finish button of the instantiated menu.</returns>
         private static GameObject GetFinishButton()
         {
-            return GameFinder.FindAttachedOrLocalDescendant(
-                Instance.gameObject,
-                "Finish");
+            return GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Finish");
         }
 
         /// <summary>
@@ -168,10 +153,7 @@ namespace SEE.UI.Menu.Drawable.MindMap
             HorizontalSelector parentSelector = InitializeMenu(null);
 
             /// Gather all Mind Map Nodes that qualify as possible parents.
-            List<GameObject> nodes =
-                CollectParentCandidates(
-                    attachedObjects,
-                    addedNode);
+            List<GameObject> nodes = CollectParentCandidates(attachedObjects, addedNode);
 
             /// Create an item in the parent selector for the collected nodes.
             PopulateParentSelector(parentSelector, nodes);
@@ -216,8 +198,12 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// The instantiated menu, or null if the provided configuration is not a
         /// <see cref="MindMapNodeConf"/> or no valid parent can be selected.
         /// </returns>
-        public static GameObject EnableForEditing(GameObject attachedObjects, GameObject addedNode,
-            DrawableType valueHolder, UnityAction returnCall, bool cutCopyMode = false)
+        public static GameObject EnableForEditing(
+            GameObject attachedObjects,
+            GameObject addedNode,
+            DrawableType valueHolder,
+            UnityAction returnCall,
+            bool cutCopyMode = false)
         {
             if (valueHolder is MindMapNodeConf newConf)
             {
@@ -319,8 +305,10 @@ namespace SEE.UI.Menu.Drawable.MindMap
         /// <returns>
         /// The instantiated parent selection menu, or null if no valid parent exists.
         /// </returns>
-        public static GameObject EnableForRequiredParentSelection(GameObject attachedObjects,
-            GameObject addedNode, UnityAction<GameObject> confirmCall)
+        public static GameObject EnableForRequiredParentSelection(
+            GameObject attachedObjects,
+            GameObject addedNode,
+            UnityAction<GameObject> confirmCall)
         {
             HorizontalSelector parentSelector = InitializeMenu(null);
 

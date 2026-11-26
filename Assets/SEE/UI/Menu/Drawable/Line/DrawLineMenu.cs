@@ -78,7 +78,8 @@ namespace SEE.UI.Menu.Drawable.Line
         /// <param name="ensureValidSecondaryColor">
         /// Ensures that a secondary color is visible and usable.
         /// </param>
-        internal DrawLineMenu(GameObject lineMenu,
+        internal DrawLineMenu(
+            GameObject lineMenu,
             LineMenuControls controls,
             Action<LineKind> assignLineKind,
             Action<ColorKind> assignColorKind,
@@ -174,8 +175,7 @@ namespace SEE.UI.Menu.Drawable.Line
         {
             assignLineKind(ValueHolder.CurrentLineKind);
 
-            controls.LineKindSelector.index =
-                GameLineAppearance.GetLineKinds().IndexOf(ValueHolder.CurrentLineKind);
+            controls.LineKindSelector.index = GameLineAppearance.GetLineKinds().IndexOf(ValueHolder.CurrentLineKind);
             controls.LineKindSelector.UpdateUI();
 
             if (lineKindAction != null)
@@ -224,8 +224,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 }
                 else if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
-                    ValueHolder.CurrentSecondaryColor =
-                        ValueHolder.CurrentPrimaryColor;
+                    ValueHolder.CurrentSecondaryColor = ValueHolder.CurrentPrimaryColor;
                 }
             };
 
@@ -274,8 +273,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SetUpColorKindTypeButton()
         {
             controls.ColorKindButtonManager.onClick.RemoveAllListeners();
-            controls.ColorKindButtonManager.onClick.AddListener(
-                MutuallyExclusiveColorTypeButtons);
+            controls.ColorKindButtonManager.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
             controls.ColorKindButtonManager.onClick.AddListener(() =>
             {
@@ -303,8 +301,7 @@ namespace SEE.UI.Menu.Drawable.Line
         private void SetUpFillOutTypeButton()
         {
             controls.FillOutButtonManager.onClick.RemoveAllListeners();
-            controls.FillOutButtonManager.onClick.AddListener(
-                MutuallyExclusiveColorTypeButtons);
+            controls.FillOutButtonManager.onClick.AddListener(MutuallyExclusiveColorTypeButtons);
 
             controls.FillOutButtonManager.onClick.AddListener(() =>
             {
@@ -314,8 +311,7 @@ namespace SEE.UI.Menu.Drawable.Line
 
                 if (ValueHolder.CurrentTertiaryColor == Color.clear)
                 {
-                    ValueHolder.CurrentTertiaryColor =
-                        ValueHolder.CurrentPrimaryColor;
+                    ValueHolder.CurrentTertiaryColor = ValueHolder.CurrentPrimaryColor;
                 }
 
                 AssignColorArea(
@@ -388,8 +384,7 @@ namespace SEE.UI.Menu.Drawable.Line
                 return;
             }
 
-            ValueHolder.CurrentSecondaryColor =
-                ensureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
+            ValueHolder.CurrentSecondaryColor = ensureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
 
             SetSecondaryColorButtonState();
 
@@ -421,11 +416,9 @@ namespace SEE.UI.Menu.Drawable.Line
         /// </summary>
         private void MutuallyExclusiveColorTypeButtons()
         {
-            controls.ColorKindButtonManager.Interactable(
-                !controls.ColorKindButtonManager.isInteractable);
+            controls.ColorKindButtonManager.Interactable(!controls.ColorKindButtonManager.isInteractable);
 
-            controls.FillOutButtonManager.Interactable(
-                !controls.FillOutButtonManager.isInteractable);
+            controls.FillOutButtonManager.Interactable(!controls.FillOutButtonManager.isInteractable);
         }
 
         /// <summary>

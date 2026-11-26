@@ -65,8 +65,13 @@ namespace SEE.Controls.ReversibleActions.Drawable
             /// It can be more then one, because points can overlap.</param>
             /// <param name="oldPointPosition">The old position of the selected points.</param>
             /// <param name="newPointPosition">The new position for the selected points.</param>
-            public Memento(GameObject line, GameObject surface, string id, List<int> indices,
-                Vector3 oldPointPosition, Vector3 newPointPosition)
+            public Memento(
+                GameObject line,
+                GameObject surface,
+                string id,
+                List<int> indices,
+                Vector3 oldPointPosition,
+                Vector3 newPointPosition)
             {
                 Line = line;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
@@ -188,11 +193,9 @@ namespace SEE.Controls.ReversibleActions.Drawable
                 {
                     selectedLine = hitObject.transform.parent.gameObject;
 
-                    LineRenderer renderer =
-                        selectedLine.GetComponent<LineRenderer>();
+                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
 
-                    bool startCapSelected =
-                        hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+                    bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
 
                     Indices = new List<int>
                     {
@@ -212,9 +215,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     Indices = matchedIndices;
                 }
 
-                Indices = LinePositionHelper.ToLogicalIndices(
-                    selectedLine,
-                    Indices);
+                Indices = LinePositionHelper.ToLogicalIndices(selectedLine, Indices);
 
                 if (Indices.Count == 0)
                 {
@@ -222,8 +223,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
                     return;
                 }
 
-                Vector3[] originalPositions =
-                    LinePositionHelper.GetSafeOriginalPositions(selectedLine);
+                Vector3[] originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine);
 
                 oldPointPosition = originalPositions[Indices[0]];
 

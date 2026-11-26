@@ -48,21 +48,11 @@ namespace SEE.UI.Menu.Drawable.Text
 
             controls = new TextMenuControls(gameObject);
 
-            textStyleMenu = new TextStyleMenu(
-                gameObject,
-                controls);
+            textStyleMenu = new TextStyleMenu(gameObject, controls);
 
-            writeTextMenu = new WriteTextMenu(
-                gameObject,
-                controls,
-                EnableTextMenu,
-                textStyleMenu);
+            writeTextMenu = new WriteTextMenu(gameObject, controls, EnableTextMenu, textStyleMenu);
 
-            editTextMenu = new EditTextMenu(
-                gameObject,
-                controls,
-                EnableTextMenu,
-                textStyleMenu);
+            editTextMenu = new EditTextMenu(gameObject, controls, EnableTextMenu, textStyleMenu);
         }
 
         /// <summary>
@@ -113,9 +103,7 @@ namespace SEE.UI.Menu.Drawable.Text
         /// </summary>
         public override void Enable()
         {
-            Enable(
-                reset: true,
-                showEditMode: false);
+            Enable(reset: true, showEditMode: false);
         }
 
         /// <summary>
@@ -215,10 +203,7 @@ namespace SEE.UI.Menu.Drawable.Text
             DrawableType newValueHolder,
             UnityAction returnCall = null)
         {
-            editTextMenu.Enable(
-                selectedText,
-                newValueHolder,
-                returnCall);
+            editTextMenu.Enable(selectedText, newValueHolder, returnCall);
         }
 
         /// <summary>

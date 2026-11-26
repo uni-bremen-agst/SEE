@@ -56,8 +56,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             renderer.GetPositions(positions);
 
             Vector3[] transformedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: transformedPositions,
-                length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
 
             node.transform.TransformPoints(transformedPositions);
 
@@ -74,8 +73,11 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// should be found.</param>
         /// <param name="positionsList">The line positions as a list.</param>
         /// <param name="matchedIndices">The found indices asa list.</param>
-        public static void GetNearestPoints(GameObject line, Vector3 point,
-            out List<Vector3> positionsList, out List<int> matchedIndices)
+        public static void GetNearestPoints(
+            GameObject line,
+            Vector3 point,
+            out List<Vector3> positionsList,
+            out List<int> matchedIndices)
         {
             LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
             Vector3[] positions = new Vector3[lineRenderer.positionCount];
@@ -83,8 +85,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             positionsList = positions.ToList();
 
             Vector3[] transformedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: transformedPositions,
-                length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
             line.transform.TransformPoints(transformedPositions);
             matchedIndices = GetNearestIndices(transformedPositions, point);
         }

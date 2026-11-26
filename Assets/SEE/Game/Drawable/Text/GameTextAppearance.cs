@@ -24,8 +24,7 @@ namespace SEE.Game.Drawable.Text
             if (textObj.CompareTag(Tags.DText))
             {
                 TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
-                LocalKeyword keyword =
-                    new(textMesh.fontMaterial.shader, outlineKeyword);
+                LocalKeyword keyword = new(textMesh.fontMaterial.shader, outlineKeyword);
 
                 textMesh.fontMaterial.SetKeyword(keyword, status);
             }

@@ -32,9 +32,19 @@ namespace SEE.Game.Drawable.Text
         /// <param name="styles">The chosen font styles for the text.</param>
         /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="textObj">The created drawable text object.</param>
-        private static void Setup(GameObject surface, string name, string text, Vector3 position,
-            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness,
-            float fontSize, int order, FontStyles styles, int associatedPage,
+        private static void Setup(
+            GameObject surface,
+            string name,
+            string text,
+            Vector3 position,
+            Color fontColor,
+            Color outlineColor,
+            bool outlineStatus,
+            float outlineThickness,
+            float fontSize,
+            int order,
+            FontStyles styles,
+            int associatedPage,
             out GameObject textObj)
         {
             /// If the object has been created earlier, it already has a name,
@@ -129,8 +139,17 @@ namespace SEE.Game.Drawable.Text
         /// <param name="order">The current order in layer.</param>
         /// <param name="styles">The chosen font styles for the text.</param>
         /// <returns>The created drawable text object.</returns>
-        public static GameObject WriteText(GameObject surface, string text, Vector3 position,
-            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
+        public static GameObject WriteText(
+            GameObject surface,
+            string text,
+            Vector3 position,
+            Color fontColor,
+            Color outlineColor,
+            bool outlineStatus,
+            float outlineThickness,
+            float fontSize,
+            int order,
+            FontStyles styles)
         {
             Setup(surface, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
                 order, styles, surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject textObj);
@@ -159,9 +178,21 @@ namespace SEE.Game.Drawable.Text
         /// <param name="order">The current order in layer.</param>
         /// <param name="styles">The chosen font styles for the text.</param>
         /// <returns>The created drawable text object.</returns>
-        private static GameObject ReWriteText(GameObject surface, string id, string text, Vector3 position,
-            Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
-            float outlineThickness, float fontSize, int order, FontStyles styles, int associatedPage)
+        private static GameObject ReWriteText(
+            GameObject surface,
+            string id,
+            string text,
+            Vector3 position,
+            Vector3 scale,
+            Vector3 eulerAngles,
+            Color fontColor,
+            Color outlineColor,
+            bool outlineStatus,
+            float outlineThickness,
+            float fontSize,
+            int order,
+            FontStyles styles,
+            int associatedPage)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             /// Adjusts the current order in the layer if the

@@ -60,8 +60,7 @@ namespace SEE.UI.Menu.Drawable
                 SetUpSlider(slider, selectedObject);
 
                 /// For Mind Map nodes, provide the option to include their children.
-                mindMapRotationChildrenController =
-                    new MindMapRotationChildrenController(gameObject, selectedObject);
+                mindMapRotationChildrenController = new MindMapRotationChildrenController(gameObject, selectedObject);
                 mindMapRotationChildrenController.SetUp();
             }
             else
@@ -110,8 +109,7 @@ namespace SEE.UI.Menu.Drawable
                 /// Executes the rotation if there are changes.
                 if (unequal)
                 {
-                    GameMoveRotator.RotateObject(
-                        selectedObject, currentDirection, degreeToMove, IncludeChildren);
+                    GameMoveRotator.RotateObject(selectedObject, currentDirection, degreeToMove, IncludeChildren);
 
                     new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
                         currentDirection, degreeToMove, IncludeChildren).Execute();

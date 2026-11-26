@@ -63,7 +63,11 @@ namespace SEE.Game.Drawable
         /// <param name="direction">The direction for the movement.</param>
         /// <param name="speedUp">If true the speed is 0.01f. otherwise it's 0.001.</param>
         /// <returns>The new position of the object.</returns>
-        public static Vector3 MoveObjectByKeyboard(GameObject obj, ValueHolder.MoveDirection direction, bool speedUp, bool includeChildren)
+        public static Vector3 MoveObjectByKeyboard(
+            GameObject obj,
+            ValueHolder.MoveDirection direction,
+            bool speedUp,
+            bool includeChildren)
         {
             /// For mind map nodes.
             /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.

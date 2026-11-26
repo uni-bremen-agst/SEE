@@ -26,9 +26,13 @@ namespace SEE.UI.FilePicker
         /// dialog using the cancel button.</param>
         /// <param name="extensions">The file extensions; only files with one of these extensions
         /// can be picked.</param>
-        public static void GetPath(string title, bool load, string initialPath,
-                                   Action<string> onSuccess, Action onCancel,
-                                   params string[] extensions)
+        public static void GetPath(
+            string title,
+            bool load,
+            string initialPath,
+            Action<string> onSuccess,
+            Action onCancel,
+            params string[] extensions)
         {
             SEEInput.KeyboardShortcutsEnabled = false;
 
