@@ -35,6 +35,9 @@ When the user asks where something is in the code ("where is X handled?"):
 Only state dependencies (calls, uses) that the SEE tools report or that you saw in the source;
 never add a step to a path yourself. If a tool reports no connection, say so.
 
+To find the building for a file:line (e.g. from a stack trace or a log), call node_at
+and use its focus_id with focus or show_path.
+
 Use show_path for call chains, show_neighbors for "what uses / is used by X",
 highlight for several related buildings, and reset when the user wants a clean city.
 If a tool says SEE is not reachable, tell the user to start Play mode in Unity.
@@ -70,6 +73,32 @@ TOOLS = [
             "type": "object",
             "properties": {"target": TARGET, "limit": {"type": "integer", "description": "Maximum per direction (default 30)."}},
             "required": ["target"],
+        },
+    },
+    {
+        "name": "node_at",
+        "description": "Find the node declared at a source location (file and line), e.g. the method "
+                       "containing that line. Give file+line, or several locations at once. Returns the "
+                       "node and focus_id, the building to use with focus or show_path (the node itself "
+                       "or its nearest drawn ancestor). match 'range' is exact; 'nearest_declaration' "
+                       "means the graph has no source ranges and the node declared last before the "
+                       "line was taken, which may be wrong. Does not change the city.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file": {"type": "string", "description": "Absolute or relative path, e.g. 'Assets/SEE/Game/Foo.cs'."},
+                "line": {"type": "integer", "description": "Line number (1-based)."},
+                "locations": {
+                    "type": "array",
+                    "description": "Several locations instead of file+line.",
+                    "items": {
+                        "type": "object",
+                        "properties": {"file": {"type": "string"}, "line": {"type": "integer"}},
+                        "required": ["file", "line"],
+                    },
+                },
+                "city": {"type": "string", "description": "Only search this city (name from status)."},
+            },
         },
     },
     {

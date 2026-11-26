@@ -62,6 +62,9 @@ namespace SEE.Tools.AI
         /// <summary>Commands waiting for the main thread.</summary>
         private readonly ConcurrentQueue<PendingCommand> queue = new();
 
+        /// <summary>Maps source locations onto nodes for the <c>node_at</c> tool.</summary>
+        private readonly SourceLocator sourceLocator = new();
+
         /// <summary>A command received from the agent, waiting for its answer.</summary>
         private class PendingCommand
         {
@@ -359,6 +362,7 @@ namespace SEE.Tools.AI
                 "status" => Status(),
                 "find_symbol" => FindSymbol(StringArgument(args, "query"), IntArgument(args, "limit") ?? 10),
                 "neighbors" => Neighbors(StringArgument(args, "target"), IntArgument(args, "limit") ?? 30),
+                "node_at" => NodeAt(args),
                 "focus" => ToJson(effects.Focus(StringArgument(args, "target"))),
                 "focus_camera" => ToJson(effects.FocusCamera(StringArgument(args, "target"))),
                 "highlight" => ToJson(effects.Highlight(StringListArgument(args, "targets"))),
@@ -375,7 +379,7 @@ namespace SEE.Tools.AI
             string message = (string)response["message"] ?? "";
             Debug.Log($"[{nameof(AgentCommandServer)}] {tool} {args.ToString(Newtonsoft.Json.Formatting.None)} -> "
                       + $"{(callSucceeded ? "OK" : "FAILED")}: {message}\n");
-            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors"))
+            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors" or "node_at"))
             {
                 if (callSucceeded)
                 {
@@ -527,6 +531,55 @@ namespace SEE.Tools.AI
                 }
                 return result;
             }
+        }
+
+        /// <summary>
+        /// The nodes declared at source locations: either the single location in the arguments
+        /// "file" and "line", or each object {"file", "line"} of the argument "locations".
+        /// The optional argument "city" restricts the search to the city with that name.
+        /// </summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <returns>The JSON answer with one entry per location in "locations"; ok if at
+        /// least one location was found.</returns>
+        private JObject NodeAt(JObject args)
+        {
+            IEnumerable<JToken> requested = args["locations"] is JArray array
+                ? array
+                : new JToken[] { new JObject { ["file"] = args["file"], ["line"] = args["line"] } };
+            string cityName = StringArgument(args, "city");
+
+            JArray results = new();
+            int found = 0;
+            foreach (JToken token in requested)
+            {
+                JObject location = token as JObject ?? new();
+                string file = StringArgument(location, "file");
+                int line = IntArgument(location, "line") ?? 0;
+                JObject result = new() { ["file"] = file, ["line"] = line };
+                if (sourceLocator.TryLocate(file, line, cityName, out Node node, out SourceLocator.MatchKind match,
+                                            out string problem))
+                {
+                    found++;
+                    Node drawn = SourceLocator.DrawnNodeOrAncestor(node);
+                    result["ok"] = true;
+                    result["match"] = match == SourceLocator.MatchKind.Range ? "range" : "nearest_declaration";
+                    result["node"] = Describe(node);
+                    // The building to pass to focus or show_path; null if nothing of it is drawn.
+                    result["focus_id"] = drawn?.ID;
+                }
+                else
+                {
+                    result["ok"] = false;
+                    result["message"] = problem;
+                }
+                results.Add(result);
+            }
+            return new()
+            {
+                ["ok"] = found > 0,
+                ["message"] = $"{found} of {results.Count} location(s) found.",
+                ["locations"] = results
+            };
         }
 
         /// <summary>The fields of a node the agent needs to choose and cite it.</summary>
