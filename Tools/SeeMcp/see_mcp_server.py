@@ -16,6 +16,8 @@ import sys
 import urllib.error
 import urllib.request
 
+import probe
+
 SERVER_NAME = "see"
 SERVER_VERSION = "0.1.0"
 SEE_URL = f"http://127.0.0.1:{int(os.environ.get('SEE_AGENT_PORT', '8765'))}/command"
@@ -37,6 +39,10 @@ never add a step to a path yourself. If a tool reports no connection, say so.
 
 To find the building for a file:line (e.g. from a stack trace or a log), call node_at
 and use its focus_id with focus or show_path.
+
+For runtime questions ("which code runs, in which order, with which values?") use probe_run:
+it adds temporary log statements in a copy of the project, runs a command and shows the path.
+Report only the values and order that probe_run returned.
 
 Use show_path for call chains, show_neighbors for "what uses / is used by X",
 highlight for several related buildings, and reset when the user wants a clean city.
@@ -160,6 +166,7 @@ TOOLS = [
         "description": "Remove all effects (glow, dimming, beam, drawn edges). The camera stays where it is.",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    probe.TOOL,
 ]
 TOOL_NAMES = {tool["name"] for tool in TOOLS}
 
@@ -217,7 +224,12 @@ def handle(message):
         name = params.get("name")
         if name not in TOOL_NAMES:
             return error_response(msg_id, -32602, f"Unknown tool: {name}")
-        is_error, text = call_see(name, params.get("arguments") or {})
+        arguments = params.get("arguments") or {}
+        if name == probe.TOOL["name"]:
+            # Runs here, not in SEE; it calls SEE itself for node_at and show_path.
+            is_error, text = probe.run_tool(arguments, call_see)
+        else:
+            is_error, text = call_see(name, arguments)
         result = {"content": [{"type": "text", "text": text}], "isError": is_error}
     else:
         return error_response(msg_id, -32601, f"Method not found: {method}")
