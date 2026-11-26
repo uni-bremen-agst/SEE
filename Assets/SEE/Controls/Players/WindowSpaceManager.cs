@@ -117,8 +117,7 @@ namespace SEE.Controls.Players
         {
             if (valueObject.HasActiveWindow && valueObject.ActiveWindow == null)
             {
-                throw new InvalidOperationException(
-                    "The received window space has no active window values.");
+                throw new InvalidOperationException("The received window space has no active window values.");
             }
 
             if (!windowSpaces.ContainsKey(playerName))
@@ -168,9 +167,7 @@ namespace SEE.Controls.Players
                 else if (windowSpaces[playerName].ActiveWindow == null
                          || windowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)
                 {
-                    windowSpaces[playerName].ActiveWindow =
-                        windowSpaces[playerName].Windows.First(
-                            x => x.Title == valueObject.ActiveWindow.Title);
+                    windowSpaces[playerName].ActiveWindow = windowSpaces[playerName].Windows.First(x => x.Title == valueObject.ActiveWindow.Title);
                 }
             }
         }
