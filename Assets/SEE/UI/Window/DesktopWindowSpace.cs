@@ -231,8 +231,7 @@ namespace SEE.UI.Window
             bool activeWindowChanged = false;
 
             // Remove references to panels already destroyed by Unity.
-            foreach (Panel destroyedPanel in panels.Keys
-                         .Where(panel => panel == null).ToList())
+            foreach (Panel destroyedPanel in panels.Keys.Where(panel => panel == null).ToList())
             {
                 List<BaseWindow> affectedWindows = panels[destroyedPanel].ToList();
                 panels.Remove(destroyedPanel);
@@ -306,8 +305,7 @@ namespace SEE.UI.Window
 
             // Remove tabs whose content GameObjects were destroyed.
             // Valid tabs, including those owned by other spaces, remain.
-            foreach (Panel panel in panels.Keys
-                         .Where(panel => panel != null).ToList())
+            foreach (Panel panel in panels.Keys.Where(panel => panel != null).ToList())
             {
                 RemoveDestroyedTabs(panel);
             }
@@ -372,11 +370,9 @@ namespace SEE.UI.Window
                          .Where(window => window != null && window.Window != null)
                          .ToList())
             {
-                RectTransform rectTransform =
-                    (RectTransform)window.Window.transform;
+                RectTransform rectTransform = (RectTransform)window.Window.transform;
 
-                Panel targetPanel = panels.Keys.LastOrDefault(
-                    panel => panel != null);
+                Panel targetPanel = panels.Keys.LastOrDefault(panel => panel != null);
 
                 if (targetPanel == null)
                 {
@@ -501,8 +497,7 @@ namespace SEE.UI.Window
                 return;
             }
 
-            Panel firstPanel = PanelUtils.CreatePanelFor(
-                (RectTransform)firstWindow.Window.transform, panelsCanvas);
+            Panel firstPanel = PanelUtils.CreatePanelFor((RectTransform)firstWindow.Window.transform, panelsCanvas);
 
             if (firstPanel == null)
             {
@@ -529,9 +524,7 @@ namespace SEE.UI.Window
                 return;
             }
 
-            ISet<BaseWindow> panelWindows =
-                CollectionExtensions.GetValueOrDefault(
-                    panels, panel, new List<BaseWindow>()).ToHashSet();
+            ISet<BaseWindow> panelWindows = CollectionExtensions.GetValueOrDefault(panels, panel, new List<BaseWindow>()).ToHashSet();
 
             for (int index = 0; index < panel.NumberOfTabs; index++)
             {
@@ -586,8 +579,7 @@ namespace SEE.UI.Window
                 panelWindows.Remove(movedWindow);
             }
 
-            List<BaseWindow> targetWindows =
-                panels.GetOrAdd(tab.Panel, () => new List<BaseWindow>());
+            List<BaseWindow> targetWindows = panels.GetOrAdd(tab.Panel, () => new List<BaseWindow>());
 
             if (!targetWindows.Contains(movedWindow))
             {
@@ -607,8 +599,7 @@ namespace SEE.UI.Window
                 return;
             }
 
-            if (!panels.TryGetValue(tab.Panel,
-                                   out List<BaseWindow> panelWindows))
+            if (!panels.TryGetValue(tab.Panel, out List<BaseWindow> panelWindows))
             {
                 return;
             }
@@ -633,8 +624,7 @@ namespace SEE.UI.Window
         private void ClosePanel(Panel panel)
         {
             if (panel == null
-                || !panels.TryGetValue(panel,
-                                       out List<BaseWindow> panelWindows))
+                || !panels.TryGetValue(panel, out List<BaseWindow> panelWindows))
             {
                 return;
             }
@@ -643,8 +633,7 @@ namespace SEE.UI.Window
             {
                 if (window != null && window.Window != null)
                 {
-                    PanelTab tab = panel.GetTab(
-                        (RectTransform)window.Window.transform);
+                    PanelTab tab = panel.GetTab((RectTransform)window.Window.transform);
 
                     if (tab != null)
                     {
@@ -666,8 +655,7 @@ namespace SEE.UI.Window
 
             if (ActiveWindow == null || !windows.Contains(ActiveWindow))
             {
-                ActiveWindow = windows.FirstOrDefault(
-                    window => window != null && window.Window != null);
+                ActiveWindow = windows.FirstOrDefault(window => window != null && window.Window != null);
             }
 
             if (currentActiveWindow == null
@@ -693,8 +681,7 @@ namespace SEE.UI.Window
                 return;
             }
 
-            if (!panels.TryGetValue(panelTab.Panel,
-                                   out List<BaseWindow> panelWindows))
+            if (!panels.TryGetValue(panelTab.Panel, out List<BaseWindow> panelWindows))
             {
                 return;
             }
