@@ -14,13 +14,13 @@ namespace SEE.Tools.AI
     /// therefore also searches the folders those installers use, and builds a PATH for child
     /// processes that contains them (e.g. an npm-installed <c>claude</c> needs <c>node</c>).
     /// </summary>
-    public static class ExecutableLocator
+    internal static class ExecutableLocator
     {
         /// <summary>
         /// Whether we run on Windows. Determined by the path separator, so it also works outside
         /// of Unity (e.g. in tests) and does not depend on Unity's platform defines.
         /// </summary>
-        public static bool IsWindows => Path.DirectorySeparatorChar == '\\';
+        internal static bool IsWindows => Path.DirectorySeparatorChar == '\\';
 
         /// <summary>
         /// Returns the full path of the program <paramref name="nameOrPath"/>: the path itself if
@@ -32,7 +32,7 @@ namespace SEE.Tools.AI
         /// <param name="folders">The folders to search, in order.</param>
         /// <param name="skip">Optional filter; candidates for which it returns true are ignored.</param>
         /// <returns>The full path, or null if the program was not found.</returns>
-        public static string Find(string nameOrPath, IEnumerable<string> folders, Func<string, bool> skip = null)
+        internal static string Find(string nameOrPath, IEnumerable<string> folders, Func<string, bool> skip = null)
         {
             if (string.IsNullOrWhiteSpace(nameOrPath))
             {
@@ -70,7 +70,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="configured">The configured name or full path, usually <c>claude</c>.</param>
         /// <returns>The full path, or null if Claude Code is not installed.</returns>
-        public static string FindClaude(string configured = "claude")
+        internal static string FindClaude(string configured = "claude")
         {
             return Find(string.IsNullOrWhiteSpace(configured) ? "claude" : configured, SearchFolders());
         }
@@ -81,7 +81,7 @@ namespace SEE.Tools.AI
         /// skipped, because they open the Store instead of running Python.
         /// </summary>
         /// <returns>The full path, or null if no Python was found.</returns>
-        public static string FindPython()
+        internal static string FindPython()
         {
             string[] names = IsWindows ? new[] { "python", "py" } : new[] { "python3", "python" };
             IList<string> folders = SearchFolders();
@@ -93,7 +93,7 @@ namespace SEE.Tools.AI
         /// the current operating system. Duplicates and missing folders are removed.
         /// </summary>
         /// <returns>Existing folders, in search order.</returns>
-        public static IList<string> SearchFolders()
+        internal static IList<string> SearchFolders()
         {
             IEnumerable<string> path = (Environment.GetEnvironmentVariable("PATH") ?? "")
                 .Split(Path.PathSeparator);
@@ -112,7 +112,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="executable">Full path of the program to be started; may be null.</param>
         /// <returns>The PATH value.</returns>
-        public static string ChildPath(string executable)
+        internal static string ChildPath(string executable)
         {
             IEnumerable<string> first = string.IsNullOrEmpty(executable)
                 ? Enumerable.Empty<string>()
@@ -132,7 +132,7 @@ namespace SEE.Tools.AI
         /// <param name="executable">Full path of the program or script.</param>
         /// <param name="arguments">The arguments, already quoted as needed.</param>
         /// <returns>The file name and the arguments for <see cref="System.Diagnostics.ProcessStartInfo"/>.</returns>
-        public static (string FileName, string Arguments) CommandLineFor(string executable, string arguments)
+        internal static (string FileName, string Arguments) CommandLineFor(string executable, string arguments)
         {
             string extension = Path.GetExtension(executable ?? "");
             bool isScript = extension.Equals(".cmd", StringComparison.OrdinalIgnoreCase)

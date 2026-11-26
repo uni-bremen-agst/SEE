@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using SEE.Controls.Players;
 using SEE.Extensions;
 using SEE.Game;
@@ -15,7 +16,6 @@ using SEE.Game.City;
 using SEE.Graphs;
 using SEE.UI.Notification;
 using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.Tools.AI
 {
@@ -34,24 +34,24 @@ namespace SEE.Tools.AI
     /// Only compiled into the Editor and development builds, and only reachable from this
     /// computer. Requests need the custom header, so a web page in a browser cannot send them.
     /// </summary>
-    public class AgentCommandServer : MonoBehaviour
+    internal class AgentCommandServer : MonoBehaviour
     {
         /// <summary>Default port; the MCP server uses the same default (env var SEE_AGENT_PORT).</summary>
-        public const int DefaultPort = 8765;
+        internal const int DefaultPort = 8765;
 
         /// <summary>Port the server listens on (127.0.0.1 only).</summary>
-        [Tooltip("Port the server listens on (127.0.0.1 only).")]
-        public int Port = DefaultPort;
+        [SerializeField, Tooltip("Port the server listens on (127.0.0.1 only).")]
+        internal int Port = DefaultPort;
 
         /// <summary>Whether each command shows a short notification in SEE.</summary>
-        [Tooltip("Whether each command shows a short notification in SEE.")]
-        public bool ShowNotifications = true;
+        [SerializeField, Tooltip("Whether each command shows a short notification in SEE.")]
+        internal bool ShowNotifications = true;
 
         /// <summary>How long a request waits for the main thread, in milliseconds.</summary>
         private const int mainThreadTimeoutMs = 15000;
 
         /// <summary>The single instance, created automatically when the game starts.</summary>
-        public static AgentCommandServer Instance { get; private set; }
+        internal static AgentCommandServer Instance { get; private set; }
 
         /// <summary>The HTTP listener, or null if not running.</summary>
         private HttpListener listener;
@@ -119,8 +119,7 @@ namespace SEE.Tools.AI
         private bool failureLogged;
 
         /// <summary>Whether the server is listening for commands.</summary>
-        [Tooltip("Whether the server is listening for commands.")]
-        public bool IsListening => listener is { IsListening: true };
+        internal bool IsListening => listener is { IsListening: true };
 
         /// <summary>Starts listening and makes sure the port is released whenever SEE stops.</summary>
         private void Start()
@@ -175,7 +174,7 @@ namespace SEE.Tools.AI
             listener = newListener;
             // The thread gets its own listener, so it ends with that listener even if a new
             // one is started later.
-            listenerThread = new Thread(() => Listen(newListener)) { IsBackground = true, Name = nameof(AgentCommandServer) };
+            listenerThread = new(() => Listen(newListener)) { IsBackground = true, Name = nameof(AgentCommandServer) };
             listenerThread.Start();
             failureLogged = false;
             Debug.Log($"[{nameof(AgentCommandServer)}] Listening on http://127.0.0.1:{Port}/command\n");
@@ -348,7 +347,7 @@ namespace SEE.Tools.AI
         private JObject Execute(JObject request)
         {
             string tool = (string)request["tool"];
-            JObject args = request["args"] as JObject ?? new JObject();
+            JObject args = request["args"] as JObject ?? new();
             AgentCityEffects effects = AgentCityEffects.Instance;
             if (effects == null && tool != "status")
             {
@@ -358,15 +357,16 @@ namespace SEE.Tools.AI
             JObject response = tool switch
             {
                 "status" => Status(),
-                "find_symbol" => FindSymbol(Str(args, "query"), Int(args, "limit") ?? 10),
-                "neighbors" => Neighbors(Str(args, "target"), Int(args, "limit") ?? 30),
-                "focus" => ToJson(effects.Focus(Str(args, "target"))),
-                "focus_camera" => ToJson(effects.FocusCamera(Str(args, "target"))),
-                "highlight" => ToJson(effects.Highlight(StrList(args, "targets"))),
-                "show_path" => ToJson(effects.ShowPath(StrList(args, "targets"))),
-                "show_neighbors" => ToJson(effects.ShowNeighbors(Str(args, "target"))),
-                "search_trail" => ToJson(effects.ShowSearchTrail(StrList(args, "visited"), Str(args, "final"))),
-                "open_code" => ToJson(effects.OpenCode(Str(args, "target"), Int(args, "line"))),
+                "find_symbol" => FindSymbol(StringArgument(args, "query"), IntArgument(args, "limit") ?? 10),
+                "neighbors" => Neighbors(StringArgument(args, "target"), IntArgument(args, "limit") ?? 30),
+                "focus" => ToJson(effects.Focus(StringArgument(args, "target"))),
+                "focus_camera" => ToJson(effects.FocusCamera(StringArgument(args, "target"))),
+                "highlight" => ToJson(effects.Highlight(StringListArgument(args, "targets"))),
+                "show_path" => ToJson(effects.ShowPath(StringListArgument(args, "targets"))),
+                "show_neighbors" => ToJson(effects.ShowNeighbors(StringArgument(args, "target"))),
+                "search_trail" => ToJson(effects.ShowSearchTrail(StringListArgument(args, "visited"),
+                                                                 StringArgument(args, "final"))),
+                "open_code" => ToJson(effects.OpenCode(StringArgument(args, "target"), IntArgument(args, "line"))),
                 "reset" => ToJson(effects.ResetEffects()),
                 _ => Error($"Unknown tool '{tool}'.")
             };
@@ -403,7 +403,7 @@ namespace SEE.Tools.AI
                 int nodes = city.gameObject.FindAllDescendantsWithTag(Tags.Node, includeInactive: false).Count;
                 cities.Add(new JObject { ["name"] = city.name, ["type"] = city.GetType().Name, ["drawn_nodes"] = nodes });
             }
-            return new JObject
+            return new()
             {
                 ["ok"] = true,
                 ["message"] = $"SEE is running with {cities.Count} city/cities.",
@@ -448,7 +448,7 @@ namespace SEE.Tools.AI
             {
                 matches.Add(Describe(node));
             }
-            return new JObject
+            return new()
             {
                 ["ok"] = matches.Count > 0,
                 ["message"] = matches.Count > 0
@@ -457,24 +457,32 @@ namespace SEE.Tools.AI
                 ["matches"] = matches
             };
 
+            /// <summary>
+            /// How well <paramref name="node"/> matches <paramref name="query"/>, ignoring case.
+            /// </summary>
+            /// <param name="node">The node to rate.</param>
+            /// <param name="query">The trimmed query.</param>
+            /// <returns>4 for an exact name or ID, 3 for the file name, 2 for a name prefix,
+            /// 1 for any substring, and 0 for no match.</returns>
             static int Score(Node node, string query)
             {
-                const StringComparison ic = StringComparison.OrdinalIgnoreCase;
+                const StringComparison ignoreCase = StringComparison.OrdinalIgnoreCase;
                 string name = node.SourceName ?? "";
                 string file = node.Filename ?? "";
-                if (name.Equals(query, ic) || node.ID.Equals(query, ic))
+                if (name.Equals(query, ignoreCase) || node.ID.Equals(query, ignoreCase))
                 {
                     return 4;
                 }
-                if (Path.GetFileNameWithoutExtension(file).Equals(query, ic) || file.Equals(query, ic))
+                if (Path.GetFileNameWithoutExtension(file).Equals(query, ignoreCase) || file.Equals(query, ignoreCase))
                 {
                     return 3;
                 }
-                if (name.StartsWith(query, ic))
+                if (name.StartsWith(query, ignoreCase))
                 {
                     return 2;
                 }
-                return name.Contains(query, ic) || node.ID.Contains(query, ic) || file.Contains(query, ic) ? 1 : 0;
+                return name.Contains(query, ignoreCase) || node.ID.Contains(query, ignoreCase)
+                       || file.Contains(query, ignoreCase) ? 1 : 0;
             }
         }
 
@@ -493,7 +501,7 @@ namespace SEE.Tools.AI
             {
                 return Error($"'{gameNode.name}' is not a graph node.");
             }
-            return new JObject
+            return new()
             {
                 ["ok"] = true,
                 ["message"] = $"{node.Incomings.Count} incoming, {node.Outgoings.Count} outgoing edge(s).",
@@ -502,6 +510,12 @@ namespace SEE.Tools.AI
                 ["outgoing"] = Edges(node.Outgoings, e => e.Target)
             };
 
+            /// <summary>
+            /// Describes at most <c>limit</c> of <paramref name="edges"/> by the node at their other end.
+            /// </summary>
+            /// <param name="edges">The edges to describe.</param>
+            /// <param name="otherEnd">Yields the node at the other end of an edge.</param>
+            /// <returns>One JSON object per edge, with the other node and the edge type.</returns>
             JArray Edges(IEnumerable<Edge> edges, Func<Edge, Node> otherEnd)
             {
                 JArray result = new();
@@ -522,7 +536,7 @@ namespace SEE.Tools.AI
         {
             GameObject gameNode = node.GameObject(false);
             AbstractSEECity city = gameNode != null ? gameNode.ContainingCity() : null;
-            return new JObject
+            return new()
             {
                 ["id"] = node.ID,
                 ["name"] = node.SourceName,
@@ -553,15 +567,25 @@ namespace SEE.Tools.AI
         /// <returns>JSON with ok = false.</returns>
         private static JObject Error(string message) => new() { ["ok"] = false, ["message"] = message };
 
-        /// <summary>A string argument, or null.</summary>
-        private static string Str(JObject args, string name) => args[name]?.Type == JTokenType.String ? (string)args[name] : args[name]?.ToString();
+        /// <summary>A string argument; any other JSON value is converted to its text.</summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <param name="name">Name of the argument.</param>
+        /// <returns>The argument as a string, or null if it is missing.</returns>
+        private static string StringArgument(JObject args, string name) =>
+            args[name]?.Type == JTokenType.String ? (string)args[name] : args[name]?.ToString();
 
-        /// <summary>An integer argument, or null.</summary>
-        private static int? Int(JObject args, string name) =>
-            args[name] is JValue { Type: JTokenType.Integer or JTokenType.Float } v ? (int)(double)v : null;
+        /// <summary>An integer argument; a fractional number is truncated.</summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <param name="name">Name of the argument.</param>
+        /// <returns>The argument as an integer, or null if it is missing or not a number.</returns>
+        private static int? IntArgument(JObject args, string name) =>
+            args[name] is JValue { Type: JTokenType.Integer or JTokenType.Float } value ? (int)(double)value : null;
 
         /// <summary>A list-of-strings argument; a single string counts as a list of one.</summary>
-        private static List<string> StrList(JObject args, string name) => args[name] switch
+        /// <param name="args">The arguments of the request.</param>
+        /// <param name="name">Name of the argument.</param>
+        /// <returns>The strings of the argument; empty if it is missing or of another type.</returns>
+        private static List<string> StringListArgument(JObject args, string name) => args[name] switch
         {
             JArray array => array.Select(t => t.ToString()).ToList(),
             JValue { Type: JTokenType.String } single => new List<string> { (string)single },

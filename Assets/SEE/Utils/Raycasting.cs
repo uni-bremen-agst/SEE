@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-using System;
-using SEE.Controls;
-using SEE.Graphs;
-using SEE.Extensions;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using SEE.XR;
-using SEE.Game;
-using SEE.UI;
+using SEE.Controls;
 using SEE.Controls.Interactables;
+using SEE.Extensions;
+using SEE.Game;
 using SEE.GraphElementRefs;
+using SEE.Graphs;
+using SEE.UI;
 using SEE.UserSettings;
+using SEE.XR;
 
 namespace SEE.Utils
 {
@@ -360,7 +360,7 @@ namespace SEE.Utils
         /// <see cref="EventSystem"/> does not know about. Each returns true if the mouse is over
         /// such a window, so that clicks and scrolling on it do not also reach the code city.
         /// </summary>
-        public static event Func<bool> MouseOverImmediateModeGUI;
+        internal static event Func<bool> MouseOverImmediateModeGUI;
 
         /// <summary>Whether any of the <see cref="MouseOverImmediateModeGUI"/> checks is true.</summary>
         /// <returns>True if the mouse is over an immediate-mode GUI window.</returns>

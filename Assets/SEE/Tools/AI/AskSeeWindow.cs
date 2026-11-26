@@ -7,10 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using SEE.Controls.KeyActions;
-using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE.Controls.KeyActions;
+using SEE.Utils;
 
 namespace SEE.Tools.AI
 {
@@ -29,7 +29,7 @@ namespace SEE.Tools.AI
     /// Requires the Claude Code command-line tool, signed in once with <c>claude</c> → <c>/login</c>.
     /// Only compiled into the Editor and development builds, like <see cref="AgentCommandServer"/>.
     /// </summary>
-    public class AskSeeWindow : MonoBehaviour
+    internal class AskSeeWindow : MonoBehaviour
     {
         #region Settings
 
@@ -37,25 +37,25 @@ namespace SEE.Tools.AI
         /// The Claude Code executable: "claude" (searched on PATH and in the usual install
         /// folders) or a full path.
         /// </summary>
-        [Tooltip("The Claude Code executable: \"claude\" (searched on PATH and in the usual install folders) or a full path.")]
-        public string ClaudeExecutable = "claude";
+        [SerializeField, Tooltip("The Claude Code executable: \"claude\" (searched on PATH and in the usual install folders) or a full path.")]
+        internal string ClaudeExecutable = "claude";
 
         /// <summary>Model passed to Claude Code; empty uses Claude Code's default.</summary>
-        [Tooltip("Model passed to Claude Code; empty uses Claude Code's default.")]
-        public string Model = "";
+        [SerializeField, Tooltip("Model passed to Claude Code; empty uses Claude Code's default.")]
+        internal string Model = "";
 
         /// <summary>A question is stopped after this many seconds.</summary>
-        [Tooltip("A question is stopped after this many seconds.")]
-        public int TimeoutSeconds = 240;
+        [SerializeField, Tooltip("A question is stopped after this many seconds.")]
+        internal int TimeoutSeconds = 240;
 
         /// <summary>Font size of the box.</summary>
-        [Tooltip("Font size of the box.")]
-        public int FontSize = 15;
+        [SerializeField, Tooltip("Font size of the box.")]
+        internal int FontSize = 15;
 
         #endregion
 
         /// <summary>The single instance, created automatically when the game starts.</summary>
-        public static AskSeeWindow Instance { get; private set; }
+        internal static AskSeeWindow Instance { get; private set; }
 
         /// <summary>Extra instructions for Claude, on top of those of the see MCP server.</summary>
         private const string systemPrompt =
@@ -65,8 +65,8 @@ namespace SEE.Tools.AI
             + "focus (or show_path, show_neighbors or highlight when that fits better). The city may "
             + "be built from an older version of the code; if no building matches, say so and focus "
             + "the closest match. For a path, give show_path the start and the end and report the "
-            + "path it returns; never invent a dependency or a step. Match the length of your reply to the question: for 'where is' "
-            + "questions, at most four short sentences that name the file and line; for 'how', "
+            + "path it returns; never invent a dependency or a step. Match the length of your reply "
+            + "to the question: for 'where is' questions, at most four short sentences that name the file and line; for 'how', "
             + "'why' or 'explain' questions, explain clearly in up to about fifteen sentences or a "
             + "short list (lines starting with '- '), citing files and lines. Use plain text: no "
             + "Markdown headings, bold, tables or code blocks, because the reply is shown as plain text.";
@@ -141,10 +141,49 @@ namespace SEE.Tools.AI
         /// <summary>Scroll position of the answer area.</summary>
         private Vector2 scroll;
 
-        /// <summary>Styles, created on first use inside OnGUI.</summary>
-        private GUIStyle windowStyle, labelStyle, fieldStyle, buttonStyle, stepStyle, statusStyle, warningStyle,
-                         questionStyle, answerStyle, errorAnswerStyle, hintStyle, typingStyle, notTypingStyle,
-                         smallButtonStyle;
+        // The styles below are created on first use inside OnGUI (see CreateStyles).
+
+        /// <summary>Style of the box itself, including its title.</summary>
+        private GUIStyle windowStyle;
+
+        /// <summary>Style of the explanation above the question field.</summary>
+        private GUIStyle labelStyle;
+
+        /// <summary>Style of the question field.</summary>
+        private GUIStyle fieldStyle;
+
+        /// <summary>Style of the buttons.</summary>
+        private GUIStyle buttonStyle;
+
+        /// <summary>Style of the steps Claude took for the newest question.</summary>
+        private GUIStyle stepStyle;
+
+        /// <summary>Style of the status line.</summary>
+        private GUIStyle statusStyle;
+
+        /// <summary>Style of the warning shown when the command server is not listening.</summary>
+        private GUIStyle warningStyle;
+
+        /// <summary>Style of a question in the conversation.</summary>
+        private GUIStyle questionStyle;
+
+        /// <summary>Style of an answer in the conversation.</summary>
+        private GUIStyle answerStyle;
+
+        /// <summary>Style of an error message in the conversation.</summary>
+        private GUIStyle errorAnswerStyle;
+
+        /// <summary>Style of the grey hint inside the empty question field.</summary>
+        private GUIStyle hintStyle;
+
+        /// <summary>Style of the line saying that SEE's keys are paused while typing.</summary>
+        private GUIStyle typingStyle;
+
+        /// <summary>Style of the line saying that the user is not typing.</summary>
+        private GUIStyle notTypingStyle;
+
+        /// <summary>Style of the small Copy buttons below the answers.</summary>
+        private GUIStyle smallButtonStyle;
 
         /// <summary>Solid-colour textures for the styles; Unity's default skin is see-through.</summary>
         private readonly List<Texture2D> textures = new();
@@ -222,7 +261,7 @@ namespace SEE.Tools.AI
         #region Opening and closing
 
         /// <summary>Opens the box and stops SEE from reacting to the keys typed into it.</summary>
-        public void Open()
+        internal void Open()
         {
             open = true;
             openedFrame = Time.frameCount;
@@ -231,7 +270,7 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>Closes the box; a running question keeps running and its answer is kept.</summary>
-        public void Close()
+        internal void Close()
         {
             open = false;
             SEEInput.KeyboardShortcutsEnabled = true;
@@ -315,7 +354,7 @@ namespace SEE.Tools.AI
                 return;
             }
 
-            conversation.Add(new Exchange { Question = text });
+            conversation.Add(new() { Question = text });
             question = "";
             recentErrors.Clear();
             gotResult = false;
@@ -377,7 +416,7 @@ namespace SEE.Tools.AI
 
             try
             {
-                process = new Process { StartInfo = startInfo };
+                process = new() { StartInfo = startInfo };
                 process.OutputDataReceived += (_, e) => { if (e.Data != null) { outputLines.Enqueue(e.Data); } };
                 process.ErrorDataReceived += (_, e) => { if (e.Data != null) { errorLines.Enqueue(e.Data); } };
                 process.Start();
@@ -467,7 +506,7 @@ namespace SEE.Tools.AI
         {
             if (Current == null)
             {
-                conversation.Add(new Exchange { Question = "" });
+                conversation.Add(new() { Question = "" });
             }
             Current.Answer = text;
             Current.IsError = error;
@@ -608,8 +647,8 @@ namespace SEE.Tools.AI
         /// functions after OnGUI has returned, so a setting made around GUILayout.Window would
         /// already be undone.
         /// </summary>
-        /// <param name="id">Window ID (unused).</param>
-        private void DrawWindowWithCursor(int id)
+        /// <param name="_">Window ID (unused).</param>
+        private void DrawWindowWithCursor(int _)
         {
             Color cursorColor = GUI.skin.settings.cursorColor;
             float cursorFlashSpeed = GUI.skin.settings.cursorFlashSpeed;
@@ -617,7 +656,7 @@ namespace SEE.Tools.AI
             GUI.skin.settings.cursorFlashSpeed = 1.5f; // blinks per second, like a normal text field
             try
             {
-                DrawWindow(id);
+                DrawWindow();
             }
             finally
             {
@@ -627,8 +666,7 @@ namespace SEE.Tools.AI
         }
 
         /// <summary>Draws the content of the box.</summary>
-        /// <param name="id">Window ID (unused).</param>
-        private void DrawWindow(int id)
+        private void DrawWindow()
         {
             Event current = Event.current;
             if (current.type is EventType.ValidateCommand or EventType.ExecuteCommand)
@@ -868,73 +906,79 @@ namespace SEE.Tools.AI
 
             Color text = new(0.95f, 0.95f, 0.95f);
 
-            windowStyle = new GUIStyle(GUI.skin.window)
+            windowStyle = new(GUI.skin.window)
             {
                 fontSize = FontSize,
                 fontStyle = FontStyle.Bold,
-                padding = new RectOffset(12, 12, FontSize + 16, 12),
-                border = new RectOffset(2, 2, 2, 2)
+                padding = new(12, 12, FontSize + 16, 12),
+                border = new(2, 2, 2, 2)
             };
-            SetBackground(windowStyle, new Color(0.11f, 0.12f, 0.15f, 0.97f), text);
+            SetBackground(windowStyle, new(0.11f, 0.12f, 0.15f, 0.97f), text);
 
-            labelStyle = new GUIStyle(GUI.skin.label) { fontSize = FontSize, wordWrap = true, richText = false };
+            labelStyle = new(GUI.skin.label) { fontSize = FontSize, wordWrap = true, richText = false };
             labelStyle.normal.textColor = text;
 
-            fieldStyle = new GUIStyle(GUI.skin.textField)
+            fieldStyle = new(GUI.skin.textField)
             {
                 fontSize = FontSize + 1,
-                padding = new RectOffset(8, 8, 6, 6),
-                border = new RectOffset(1, 1, 1, 1)
+                padding = new(8, 8, 6, 6),
+                border = new(1, 1, 1, 1)
             };
             SetBackground(fieldStyle, Color.white, Color.black);
-            fieldStyle.focused.background = Solid(new Color(1f, 1f, 0.92f));
+            fieldStyle.focused.background = Solid(new(1f, 1f, 0.92f));
             fieldStyle.focused.textColor = Color.black;
 
-            buttonStyle = new GUIStyle(GUI.skin.button) { fontSize = FontSize, padding = new RectOffset(10, 10, 5, 5) };
-            SetBackground(buttonStyle, new Color(0.24f, 0.27f, 0.33f), text);
-            buttonStyle.hover.background = Solid(new Color(0.30f, 0.40f, 0.52f));
+            buttonStyle = new(GUI.skin.button) { fontSize = FontSize, padding = new(10, 10, 5, 5) };
+            SetBackground(buttonStyle, new(0.24f, 0.27f, 0.33f), text);
+            buttonStyle.hover.background = Solid(new(0.30f, 0.40f, 0.52f));
             buttonStyle.hover.textColor = Color.white;
-            buttonStyle.active.background = Solid(new Color(0.15f, 0.55f, 0.75f));
+            buttonStyle.active.background = Solid(new(0.15f, 0.55f, 0.75f));
             buttonStyle.active.textColor = Color.white;
 
-            smallButtonStyle = new GUIStyle(buttonStyle) { fontSize = FontSize - 3, padding = new RectOffset(8, 8, 2, 2) };
+            smallButtonStyle = new(buttonStyle) { fontSize = FontSize - 3, padding = new(8, 8, 2, 2) };
 
-            stepStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2 };
-            stepStyle.normal.textColor = new Color(0.55f, 0.85f, 1f);
+            stepStyle = new(labelStyle) { fontSize = FontSize - 2 };
+            stepStyle.normal.textColor = new(0.55f, 0.85f, 1f);
 
-            statusStyle = new GUIStyle(labelStyle) { fontStyle = FontStyle.Italic, fontSize = FontSize - 1 };
-            statusStyle.normal.textColor = new Color(0.75f, 0.78f, 0.82f);
+            statusStyle = new(labelStyle) { fontStyle = FontStyle.Italic, fontSize = FontSize - 1 };
+            statusStyle.normal.textColor = new(0.75f, 0.78f, 0.82f);
 
-            warningStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 1, fontStyle = FontStyle.Bold };
-            warningStyle.normal.textColor = new Color(1f, 0.7f, 0.3f);
+            warningStyle = new(labelStyle) { fontSize = FontSize - 1, fontStyle = FontStyle.Bold };
+            warningStyle.normal.textColor = new(1f, 0.7f, 0.3f);
 
-            hintStyle = new GUIStyle(GUI.skin.label) { fontSize = FontSize + 1, fontStyle = FontStyle.Italic, wordWrap = false };
-            hintStyle.normal.textColor = new Color(0.55f, 0.55f, 0.55f);
+            hintStyle = new(GUI.skin.label) { fontSize = FontSize + 1, fontStyle = FontStyle.Italic, wordWrap = false };
+            hintStyle.normal.textColor = new(0.55f, 0.55f, 0.55f);
 
-            typingStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2, fontStyle = FontStyle.Bold };
-            typingStyle.normal.textColor = new Color(0.45f, 0.95f, 0.5f);
+            typingStyle = new(labelStyle) { fontSize = FontSize - 2, fontStyle = FontStyle.Bold };
+            typingStyle.normal.textColor = new(0.45f, 0.95f, 0.5f);
 
-            notTypingStyle = new GUIStyle(labelStyle) { fontSize = FontSize - 2 };
-            notTypingStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
+            notTypingStyle = new(labelStyle) { fontSize = FontSize - 2 };
+            notTypingStyle.normal.textColor = new(0.7f, 0.7f, 0.7f);
 
-            questionStyle = new GUIStyle(labelStyle) { fontStyle = FontStyle.Bold };
-            questionStyle.normal.textColor = new Color(1f, 0.86f, 0.45f);
+            questionStyle = new(labelStyle) { fontStyle = FontStyle.Bold };
+            questionStyle.normal.textColor = new(1f, 0.86f, 0.45f);
 
             // A text area that looks like a label: no box, wrapped, selectable.
-            answerStyle = new GUIStyle(GUI.skin.textArea)
+            answerStyle = new(GUI.skin.textArea)
             {
                 fontSize = FontSize,
                 wordWrap = true,
                 richText = false,
-                padding = new RectOffset(2, 2, 2, 2),
-                margin = new RectOffset(4, 4, 2, 2)
+                padding = new(2, 2, 2, 2),
+                margin = new(4, 4, 2, 2)
             };
-            SetBackground(answerStyle, new Color(0.15f, 0.16f, 0.20f), text);
+            SetBackground(answerStyle, new(0.15f, 0.16f, 0.20f), text);
 
-            errorAnswerStyle = new GUIStyle(answerStyle);
-            SetBackground(errorAnswerStyle, new Color(0.25f, 0.14f, 0.12f), new Color(1f, 0.75f, 0.6f));
+            errorAnswerStyle = new(answerStyle);
+            SetBackground(errorAnswerStyle, new(0.25f, 0.14f, 0.12f), new(1f, 0.75f, 0.6f));
 
-            // A style looks the same whether or not it has keyboard focus or is "on".
+            /// <summary>
+            /// Gives all states of <paramref name="style"/> the same background and text colour,
+            /// so it looks the same whether or not it has keyboard focus or is "on".
+            /// </summary>
+            /// <param name="style">The style to change.</param>
+            /// <param name="background">Background colour.</param>
+            /// <param name="textColor">Text colour.</param>
             void SetBackground(GUIStyle style, Color background, Color textColor)
             {
                 Texture2D texture = Solid(background);
@@ -946,6 +990,12 @@ namespace SEE.Tools.AI
                 }
             }
 
+            /// <summary>
+            /// Creates a texture of one pixel in <paramref name="color"/> and remembers it in
+            /// <see cref="textures"/>, so that it is destroyed with the box.
+            /// </summary>
+            /// <param name="color">Colour of the texture.</param>
+            /// <returns>The new texture.</returns>
             Texture2D Solid(Color color)
             {
                 Texture2D texture = new(1, 1) { hideFlags = HideFlags.HideAndDontSave };
@@ -966,22 +1016,28 @@ namespace SEE.Tools.AI
         /// <returns>E.g. "SEE: focus ContextMenu" or "Searching code for 'OpenContextMenu'".</returns>
         private static string DescribeToolUse(string name, JObject input)
         {
-            input ??= new JObject();
-            string Arg(string key) => input[key] is JArray array
+            input ??= new();
+            /// <summary>
+            /// The shortened text of an argument of the tool call; the elements of a list are
+            /// separated by commas.
+            /// </summary>
+            /// <param name="key">Name of the argument.</param>
+            /// <returns>The text, or an empty string if the argument is missing.</returns>
+            string Argument(string key) => input[key] is JArray array
                 ? string.Join(", ", array.Select(t => ShortId(t.ToString())))
                 : ShortId(input[key]?.ToString() ?? "");
 
             if (name != null && name.StartsWith("mcp__see__"))
             {
                 string tool = name.Substring("mcp__see__".Length);
-                string detail = Arg("target") + Arg("targets") + Arg("query") + Arg("visited");
+                string detail = Argument("target") + Argument("targets") + Argument("query") + Argument("visited");
                 return $"SEE: {tool} {detail}".TrimEnd();
             }
             return name switch
             {
-                "Grep" => $"Searching code for '{Shorten(Arg("pattern"), 60)}'",
-                "Glob" => $"Looking for files {Shorten(Arg("pattern"), 60)}",
-                "Read" => $"Reading {Path.GetFileName(Arg("file_path"))}",
+                "Grep" => $"Searching code for '{Shorten(Argument("pattern"), 60)}'",
+                "Glob" => $"Looking for files {Shorten(Argument("pattern"), 60)}",
+                "Read" => $"Reading {Path.GetFileName(Argument("file_path"))}",
                 _ => name
             };
         }

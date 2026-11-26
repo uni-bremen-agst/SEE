@@ -471,13 +471,13 @@ namespace SEE.Controls.Players
         /// The local player's movement component, or null if there is no desktop player.
         /// Only the local player gets this component (see <c>AvatarAdapter</c>).
         /// </summary>
-        public static DesktopPlayerMovement Local { get; private set; }
+        internal static DesktopPlayerMovement Local { get; private set; }
 
         /// <summary>
         /// When the user last moved or turned the camera (realtime seconds; -1 if never).
         /// Automatic camera tours stop once the user takes over.
         /// </summary>
-        public float LastUserInputTime { get; private set; } = -1f;
+        internal float LastUserInputTime { get; private set; } = -1f;
 
         /// <summary>
         /// Registers this component as <see cref="Local"/>.
@@ -488,7 +488,7 @@ namespace SEE.Controls.Players
         }
 
         /// <summary>
-        /// Unregisters this component as <see cref="Local"/>.
+        /// Ends a running camera flight and unregisters this component as <see cref="Local"/>.
         /// </summary>
         private void OnDisable()
         {
@@ -518,7 +518,7 @@ namespace SEE.Controls.Players
         /// <param name="pitch">Downward viewing angle at the end, in degrees.</param>
         /// <param name="duration">Duration of the flight in seconds; 0 jumps immediately.</param>
         /// <returns>The world position the camera will have at the end of the flight.</returns>
-        public Vector3 FlyToLookAt(Vector3 target, float distance, float pitch, float duration)
+        internal Vector3 FlyToLookAt(Vector3 target, float distance, float pitch, float duration)
         {
             Transform cameraTransform = Camera.main != null ? Camera.main.transform : transform;
 
@@ -553,7 +553,7 @@ namespace SEE.Controls.Players
             // A flight ends in free mode: locked mode only orbits around FocusedObject.
             cameraState.FreeMode = true;
 
-            flight = new Flight
+            flight = new()
             {
                 StartPosition = transform.position,
                 EndPosition = endPlayerPosition,

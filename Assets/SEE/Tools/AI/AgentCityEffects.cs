@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HighlightPlus;
+using UnityEngine;
 using SEE.Components.GameEdges;
 using SEE.Controls.KeyActions;
 using SEE.Controls.Players;
@@ -15,15 +16,14 @@ using SEE.GraphElementRefs;
 using SEE.GraphProviders.VCS;
 using SEE.Graphs;
 using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.Tools.AI
 {
     /// <summary>
     /// Visual effects an AI agent uses to point at buildings in a code city.
     ///
-    /// All public methods take node IDs or source names, so the same calls can
-    /// later be made by the MCP server / SEE API without any change here.
+    /// All methods called by <see cref="AgentCommandServer"/> (the SEE API that the MCP
+    /// server talks to) take node IDs or source names.
     ///
     /// Built only from existing SEE functionality:
     /// <see cref="NodeOperator.FadeTo"/>, <see cref="GraphElementOperator.GlowIn"/>,
@@ -43,141 +43,141 @@ namespace SEE.Tools.AI
         #region Tunable settings
 
         /// <summary>Alpha of all non-focused buildings while an answer is shown.</summary>
-        [Tooltip("Alpha of all non-focused buildings while an answer is shown."), Range(0f, 1f)]
-        public float DimAlpha = 0.2f;
+        [SerializeField, Tooltip("Alpha of all non-focused buildings while an answer is shown."), Range(0f, 1f)]
+        internal float DimAlpha = 0.2f;
 
         /// <summary>Glow colour of the focused building. Contrasts with SEE's pink/red cities.</summary>
-        [Tooltip("Glow colour of the focused building. Contrasts with SEE's pink/red cities.")]
-        public Color FocusGlowColor = Color.cyan;
+        [SerializeField, Tooltip("Glow colour of the focused building. Contrasts with SEE's pink/red cities.")]
+        internal Color FocusGlowColor = Color.cyan;
 
         /// <summary>Strength of the colour tint on highlighted buildings (0 = none, 1 = fully tinted).</summary>
-        [Tooltip("Strength of the colour tint on highlighted buildings (0 = none, 1 = fully tinted)."), Range(0f, 1f)]
-        public float OverlayIntensity = 0.9f;
+        [SerializeField, Tooltip("Strength of the colour tint on highlighted buildings (0 = none, 1 = fully tinted)."), Range(0f, 1f)]
+        internal float OverlayIntensity = 0.9f;
 
         /// <summary>Speed of the pulsing tint; 0 makes it steady.</summary>
-        [Tooltip("Speed of the pulsing tint; 0 makes it steady.")]
-        public float PulseSpeed = 2.5f;
+        [SerializeField, Tooltip("Speed of the pulsing tint; 0 makes it steady.")]
+        internal float PulseSpeed = 2.5f;
 
         /// <summary>Weakest tint while pulsing, relative to <see cref="OverlayIntensity"/>.</summary>
-        [Tooltip("Weakest tint while pulsing, relative to OverlayIntensity."), Range(0f, 1f)]
-        public float PulseMinIntensity = 0.15f;
+        [SerializeField, Tooltip("Weakest tint while pulsing, relative to OverlayIntensity."), Range(0f, 1f)]
+        internal float PulseMinIntensity = 0.15f;
 
         /// <summary>Width of the outline around highlighted buildings (SEE's default is 0.45).</summary>
-        [Tooltip("Width of the outline around highlighted buildings (SEE's default is 0.45).")]
-        public float OutlineWidth = 1.5f;
+        [SerializeField, Tooltip("Width of the outline around highlighted buildings (SEE's default is 0.45).")]
+        internal float OutlineWidth = 1.5f;
 
         /// <summary>Colour of the marker beam above the focused building.</summary>
-        [Tooltip("Colour of the marker beam above the focused building.")]
-        public Color BeamColor = Color.cyan;
+        [SerializeField, Tooltip("Colour of the marker beam above the focused building.")]
+        internal Color BeamColor = Color.cyan;
 
         /// <summary>Beam height in world units (SEE's own Show in City uses 1).</summary>
-        [Tooltip("Beam height in world units (SEE's own Show in City uses 1).")]
-        public float BeamHeight = 0.8f;
+        [SerializeField, Tooltip("Beam height in world units (SEE's own Show in City uses 1).")]
+        internal float BeamHeight = 0.8f;
 
         /// <summary>Beam width in world units (SEE's own Show in City uses 0.01, which is hard to see).</summary>
-        [Tooltip("Beam width in world units (SEE's own Show in City uses 0.01, which is hard to see).")]
-        public float BeamWidth = 0.03f;
+        [SerializeField, Tooltip("Beam width in world units (SEE's own Show in City uses 0.01, which is hard to see).")]
+        internal float BeamWidth = 0.03f;
 
         /// <summary>How far the building pops up, relative to its own height.</summary>
-        [Tooltip("How far the building pops up, relative to its own height.")]
-        public float PopHeightFactor = 0.3f;
+        [SerializeField, Tooltip("How far the building pops up, relative to its own height.")]
+        internal float PopHeightFactor = 0.3f;
 
         /// <summary>Animation speed factor passed to the operators (1 = city's base duration).</summary>
-        [Tooltip("Animation speed factor passed to the operators (1 = city's base duration).")]
-        public float AnimationFactor = 1f;
+        [SerializeField, Tooltip("Animation speed factor passed to the operators (1 = city's base duration).")]
+        internal float AnimationFactor = 1f;
 
         /// <summary>Whether <see cref="Focus"/> also flies the camera to the building.</summary>
-        [Tooltip("Whether Focus also flies the camera to the building.")]
-        public bool MoveCameraOnFocus = true;
+        [SerializeField, Tooltip("Whether Focus also flies the camera to the building.")]
+        internal bool MoveCameraOnFocus = true;
 
         /// <summary>Duration of the camera flight in seconds.</summary>
-        [Tooltip("Duration of the camera flight in seconds.")]
-        public float CameraFlightSeconds = 1.2f;
+        [SerializeField, Tooltip("Duration of the camera flight in seconds.")]
+        internal float CameraFlightSeconds = 1.2f;
 
         /// <summary>
         /// How much room is left around the building: 1 makes the building just fill the
         /// camera's view, 2 makes it take up about half of it.
         /// </summary>
-        [Tooltip("How much room is left around the building: 1 makes the building just fill the camera's view, 2 makes it take up about half of it."), Range(1f, 6f)]
-        public float CameraFrameMargin = 3f;
+        [SerializeField, Tooltip("How much room is left around the building: 1 makes the building just fill the camera's view, 2 makes it take up about half of it."), Range(1f, 6f)]
+        internal float CameraFrameMargin = 3f;
 
         /// <summary>
         /// Smallest camera distance in world units, so the camera does not end up inside
         /// the city and the neighbouring buildings stay in view.
         /// </summary>
-        [Tooltip("Smallest camera distance in world units, so the camera does not end up inside the city and the neighbouring buildings stay in view.")]
-        public float MinCameraDistance = 0.8f;
+        [SerializeField, Tooltip("Smallest camera distance in world units, so the camera does not end up inside the city and the neighbouring buildings stay in view.")]
+        internal float MinCameraDistance = 0.8f;
 
         /// <summary>Largest camera distance in world units, so huge buildings do not send the camera far away.</summary>
-        [Tooltip("Largest camera distance in world units, so huge buildings do not send the camera far away.")]
-        public float MaxCameraDistance = 2.5f;
+        [SerializeField, Tooltip("Largest camera distance in world units, so huge buildings do not send the camera far away.")]
+        internal float MaxCameraDistance = 2.5f;
 
         /// <summary>
         /// Downward viewing angle of the camera at the end of the flight, in degrees.
         /// It gets steeper when the avatar would otherwise have to sink below the floor.
         /// </summary>
-        [Tooltip("Downward viewing angle of the camera at the end of the flight, in degrees. It gets steeper when the avatar would otherwise have to sink below the floor."), Range(0f, 90f)]
-        public float CameraPitch = 25f;
+        [SerializeField, Tooltip("Downward viewing angle of the camera at the end of the flight, in degrees. It gets steeper when the avatar would otherwise have to sink below the floor."), Range(0f, 90f)]
+        internal float CameraPitch = 25f;
 
         /// <summary>Time per step of <see cref="ShowPath"/> (one node and the edge to the next), in seconds.</summary>
-        [Tooltip("Time per step of ShowPath (one node and the edge to the next), in seconds.")]
-        public float PathStepSeconds = 0.6f;
+        [SerializeField, Tooltip("Time per step of ShowPath (one node and the edge to the next), in seconds.")]
+        internal float PathStepSeconds = 0.6f;
 
         /// <summary>Longest connection <see cref="ShowPath"/> searches between two given nodes, in steps.</summary>
-        [Tooltip("Longest connection ShowPath searches between two given nodes, in steps.")]
-        public int MaxPathSteps = 6;
+        [SerializeField, Tooltip("Longest connection ShowPath searches between two given nodes, in steps.")]
+        internal int MaxPathSteps = 6;
 
         /// <summary>Most nodes the path search visits before giving up.</summary>
-        [Tooltip("Most nodes the path search visits before giving up.")]
-        public int MaxPathSearchNodes = 5000;
+        [SerializeField, Tooltip("Most nodes the path search visits before giving up.")]
+        internal int MaxPathSearchNodes = 5000;
 
         /// <summary>
         /// Time the camera spends at each building of a tour (flight included), in seconds.
         /// Also the step time of <see cref="ShowPath"/> while the camera follows the path.
         /// </summary>
-        [Tooltip("Time the camera spends at each building of a tour (flight included), in seconds. Also the step time of ShowPath while the camera follows the path.")]
-        public float TourStopSeconds = 2.2f;
+        [SerializeField, Tooltip("Time the camera spends at each building of a tour (flight included), in seconds. Also the step time of ShowPath while the camera follows the path.")]
+        internal float TourStopSeconds = 2.2f;
 
         /// <summary>With more results than this, the camera shows them together instead of visiting each.</summary>
-        [Tooltip("With more results than this, the camera shows them together instead of visiting each.")]
-        public int MaxTourStops = 6;
+        [SerializeField, Tooltip("With more results than this, the camera shows them together instead of visiting each.")]
+        internal int MaxTourStops = 6;
 
         /// <summary>Downward viewing angle of the overview of several buildings, in degrees.</summary>
-        [Tooltip("Downward viewing angle of the overview of several buildings, in degrees."), Range(0f, 90f)]
-        public float OverviewPitch = 50f;
+        [SerializeField, Tooltip("Downward viewing angle of the overview of several buildings, in degrees."), Range(0f, 90f)]
+        internal float OverviewPitch = 50f;
 
         /// <summary>Room left around the buildings in the overview (1 = just fits).</summary>
-        [Tooltip("Room left around the buildings in the overview (1 = just fits)."), Range(1f, 4f)]
-        public float OverviewFrameMargin = 1.4f;
+        [SerializeField, Tooltip("Room left around the buildings in the overview (1 = just fits)."), Range(1f, 4f)]
+        internal float OverviewFrameMargin = 1.4f;
 
         /// <summary>Largest camera distance of the overview, in world units.</summary>
-        [Tooltip("Largest camera distance of the overview, in world units.")]
-        public float MaxOverviewDistance = 4f;
+        [SerializeField, Tooltip("Largest camera distance of the overview, in world units.")]
+        internal float MaxOverviewDistance = 4f;
 
         /// <summary>Glow colour of nodes that depend on the shown node (incoming edges) in <see cref="ShowNeighbors"/>.</summary>
-        [Tooltip("Glow colour of nodes that depend on the shown node (incoming edges) in ShowNeighbors.")]
-        public Color IncomingColor = new(1f, 0.55f, 0f);
+        [SerializeField, Tooltip("Glow colour of nodes that depend on the shown node (incoming edges) in ShowNeighbors.")]
+        internal Color IncomingColor = new(1f, 0.55f, 0f);
 
         /// <summary>Glow colour of nodes the shown node depends on (outgoing edges) in <see cref="ShowNeighbors"/>.</summary>
-        [Tooltip("Glow colour of nodes the shown node depends on (outgoing edges) in ShowNeighbors.")]
-        public Color OutgoingColor = Color.green;
+        [SerializeField, Tooltip("Glow colour of nodes the shown node depends on (outgoing edges) in ShowNeighbors.")]
+        internal Color OutgoingColor = Color.green;
 
         /// <summary>At most this many incoming and this many outgoing neighbours are shown.</summary>
-        [Tooltip("At most this many incoming and this many outgoing neighbours are shown.")]
-        public int MaxNeighborsPerSide = 25;
+        [SerializeField, Tooltip("At most this many incoming and this many outgoing neighbours are shown.")]
+        internal int MaxNeighborsPerSide = 25;
 
         /// <summary>Delay between buildings in the search trail, in seconds.</summary>
-        [Tooltip("Delay between buildings in the search trail, in seconds.")]
-        public float SearchTrailStepSeconds = 0.15f;
+        [SerializeField, Tooltip("Delay between buildings in the search trail, in seconds.")]
+        internal float SearchTrailStepSeconds = 0.15f;
 
         /// <summary>Source name (or node ID) used by the debug key.</summary>
-        [Tooltip("Source name (or node ID) used by the debug key.")]
-        public string TestTarget = "RuntimeTabMenu";
+        [SerializeField, Tooltip("Source name (or node ID) used by the debug key.")]
+        internal string TestTarget = "RuntimeTabMenu";
 
         #endregion
 
         /// <summary>The single instance, created automatically when the game starts.</summary>
-        public static AgentCityEffects Instance { get; private set; }
+        internal static AgentCityEffects Instance { get; private set; }
 
         /// <summary>The building currently in focus, or null.</summary>
         private GameObject focused;
@@ -215,24 +215,24 @@ namespace SEE.Tools.AI
         /// <summary>Glow colour SEE uses by default (see <c>Highlighter.GetHighlightEffect</c>).</summary>
         private static readonly Color defaultGlowColor = Color.yellow;
 
-        #region Result type (shape of a future tool response)
+        #region Result type (shape of a tool response)
 
         /// <summary>
-        /// Result of an effect call. This is the shape the SEE API / MCP tool can return to Claude.
+        /// Result of an effect call. <see cref="AgentCommandServer"/> returns it to Claude as JSON.
         /// </summary>
-        public readonly struct EffectResult
+        internal readonly struct EffectResult
         {
             /// <summary>Whether the call did what was asked.</summary>
-            public bool CallSucceeded { get; }
+            internal bool CallSucceeded { get; }
 
             /// <summary>Human-readable explanation, meant to be passed back to Claude.</summary>
-            public string Message { get; }
+            internal string Message { get; }
 
             /// <summary>
             /// The node IDs the call acted on. On failure, the candidates that were found
             /// (if any), so the caller can choose between them.
             /// </summary>
-            public IReadOnlyList<string> NodeIds { get; }
+            internal IReadOnlyList<string> NodeIds { get; }
 
             /// <summary>Creates a result; use <see cref="Success"/> or <see cref="Failure"/>.</summary>
             /// <param name="callSucceeded">Whether the call succeeded.</param>
@@ -249,13 +249,13 @@ namespace SEE.Tools.AI
             /// <param name="message">Explanation of what was done.</param>
             /// <param name="ids">Node IDs the call acted on.</param>
             /// <returns>A result with <see cref="CallSucceeded"/> set to true.</returns>
-            public static EffectResult Success(string message, params string[] ids) => new(true, message, ids);
+            internal static EffectResult Success(string message, params string[] ids) => new(true, message, ids);
 
             /// <summary>Returns a failed result.</summary>
             /// <param name="message">Explanation of what went wrong.</param>
             /// <param name="candidates">Node IDs that were found anyway, if any.</param>
             /// <returns>A result with <see cref="CallSucceeded"/> set to false.</returns>
-            public static EffectResult Failure(string message, IReadOnlyList<string> candidates = null) => new(false, message, candidates);
+            internal static EffectResult Failure(string message, IReadOnlyList<string> candidates = null) => new(false, message, candidates);
 
             /// <summary>One-line summary for the console.</summary>
             /// <returns>"OK: ..." or "FAILED: ..." followed by the node IDs.</returns>
@@ -295,7 +295,7 @@ namespace SEE.Tools.AI
 
         #endregion
 
-        #region Public API (to be called by the SEE API / MCP tools later)
+        #region API (called by AgentCommandServer)
 
         /// <summary>
         /// Points at one building: dims the rest of the city, makes the building glow
@@ -304,7 +304,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="idOrName">Node ID or source name (e.g. "ContextMenu").</param>
         /// <returns>The result, with the focused node ID on success.</returns>
-        public EffectResult Focus(string idOrName)
+        internal EffectResult Focus(string idOrName)
         {
             EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
             if (!resolved.CallSucceeded)
@@ -336,7 +336,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="idOrName">Node ID or source name.</param>
         /// <returns>The result, with the node ID on success.</returns>
-        public EffectResult FocusCamera(string idOrName)
+        internal EffectResult FocusCamera(string idOrName)
         {
             EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
             if (!resolved.CallSucceeded)
@@ -358,7 +358,7 @@ namespace SEE.Tools.AI
         /// <param name="idsOrNames">Node IDs or source names.</param>
         /// <returns>Success if all were found, otherwise a failure listing the missing ones
         /// (the found ones are highlighted anyway).</returns>
-        public EffectResult Highlight(IEnumerable<string> idsOrNames)
+        internal EffectResult Highlight(IEnumerable<string> idsOrNames)
         {
             List<GameObject> gameNodes = new();
             List<string> missing = new();
@@ -403,7 +403,7 @@ namespace SEE.Tools.AI
         /// <param name="visitedIdsOrNames">Node IDs or source names, in the order they were visited.</param>
         /// <param name="finalIdOrName">Building to focus at the end, or null.</param>
         /// <returns>The result, with the node IDs that will be flashed.</returns>
-        public EffectResult ShowSearchTrail(IEnumerable<string> visitedIdsOrNames, string finalIdOrName = null)
+        internal EffectResult ShowSearchTrail(IEnumerable<string> visitedIdsOrNames, string finalIdOrName = null)
         {
             List<GameObject> gameNodes = visitedIdsOrNames.Select(ResolveOrNull)
                                                           .Where(gameNode => gameNode != null)
@@ -428,7 +428,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="idsOrNames">Node IDs or source names, in path order; at least two.</param>
         /// <returns>Success with the node IDs of the complete path, or a failure naming the nodes not found.</returns>
-        public EffectResult ShowPath(IEnumerable<string> idsOrNames)
+        internal EffectResult ShowPath(IEnumerable<string> idsOrNames)
         {
             List<GameObject> nodes = new();
             List<string> missing = new();
@@ -590,7 +590,7 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <param name="idOrName">Node ID or source name.</param>
         /// <returns>The result, with the node ID first and then the neighbours' IDs.</returns>
-        public EffectResult ShowNeighbors(string idOrName)
+        internal EffectResult ShowNeighbors(string idOrName)
         {
             EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
             if (!resolved.CallSucceeded)
@@ -629,7 +629,7 @@ namespace SEE.Tools.AI
             }
 
             // Visit the node itself, then pull back to show it with all its neighbours.
-            string cameraNote = StartCameraTour(new List<GameObject> { gameNode }, keep);
+            string cameraNote = StartCameraTour(new() { gameNode }, keep);
 
             List<string> ids = new() { gameNode.name };
             ids.AddRange(incoming.Select(n => n.other.name));
@@ -638,7 +638,13 @@ namespace SEE.Tools.AI
                                         + $"{outgoing.Count} outgoing (green).{cameraNote}",
                                         ids.Distinct().ToArray());
 
-            // Neighbours over the given edges that have a game edge and a drawn building.
+            /// <summary>
+            /// The neighbours of <c>node</c> over <paramref name="edges"/> that have a game edge
+            /// and a drawn building; at most <see cref="MaxNeighborsPerSide"/>.
+            /// </summary>
+            /// <param name="edges">The incoming or outgoing edges of <c>node</c>.</param>
+            /// <param name="otherEnd">Yields the node at the other end of an edge.</param>
+            /// <returns>The drawn neighbours, each with the game edge leading to it.</returns>
             List<(GameObject, EdgeOperator)> DrawnNeighbors(IEnumerable<Edge> edges, System.Func<Edge, Node> otherEnd)
             {
                 List<(GameObject, EdgeOperator)> result = new();
@@ -668,7 +674,7 @@ namespace SEE.Tools.AI
         /// <param name="idOrName">Node ID or source name.</param>
         /// <param name="line">Line to scroll to (1-based), or null for the node's source line.</param>
         /// <returns>The result, or a failure if the source file is unknown or not found.</returns>
-        public EffectResult OpenCode(string idOrName, int? line = null)
+        internal EffectResult OpenCode(string idOrName, int? line = null)
         {
             EffectResult resolved = Resolve(idOrName, out GameObject gameNode);
             if (!resolved.CallSucceeded)
@@ -719,7 +725,7 @@ namespace SEE.Tools.AI
         /// and hides drawn edges that were hidden before.
         /// </summary>
         /// <returns>Always a successful result.</returns>
-        public EffectResult ResetEffects()
+        internal EffectResult ResetEffects()
         {
             StopAllCoroutines();
 
@@ -810,9 +816,9 @@ namespace SEE.Tools.AI
         {
             // NodeOperator, not Operator(): FadeTo and HitEffect only exist on the generic
             // GraphElementOperator<Color> that NodeOperator derives from.
-            NodeOperator op = gameNode.NodeOperator();
-            op.FadeTo(1f, AnimationFactor); // make sure it is fully visible
-            op.GlowIn(AnimationFactor);
+            NodeOperator nodeOperator = gameNode.NodeOperator();
+            nodeOperator.FadeTo(1f, AnimationFactor); // make sure it is fully visible
+            nodeOperator.GlowIn(AnimationFactor);
             // The operator creates the HighlightEffect in its OnEnable, so it exists by now.
             if (gameNode.TryGetComponent(out HighlightEffect effect))
             {
@@ -1009,7 +1015,7 @@ namespace SEE.Tools.AI
         {
             if (!savedHighlights.ContainsKey(target))
             {
-                savedHighlights[target] = new SavedHighlight(effect);
+                savedHighlights[target] = new(effect);
             }
             effect.highlighted = true;
             effect.overlay = OverlayIntensity;
@@ -1042,8 +1048,29 @@ namespace SEE.Tools.AI
         /// <summary>The highlight settings <see cref="ApplyPulse"/> changes, to restore them later.</summary>
         private readonly struct SavedHighlight
         {
-            private readonly float overlay, overlayAnimationSpeed, overlayMinIntensity, overlayBlending, outline, outlineWidth;
-            private readonly Color overlayColor, outlineColor;
+            /// <summary>Saved <see cref="HighlightEffect.overlay"/>.</summary>
+            private readonly float overlay;
+
+            /// <summary>Saved <see cref="HighlightEffect.overlayAnimationSpeed"/>.</summary>
+            private readonly float overlayAnimationSpeed;
+
+            /// <summary>Saved <see cref="HighlightEffect.overlayMinIntensity"/>.</summary>
+            private readonly float overlayMinIntensity;
+
+            /// <summary>Saved <see cref="HighlightEffect.overlayBlending"/>.</summary>
+            private readonly float overlayBlending;
+
+            /// <summary>Saved <see cref="HighlightEffect.outline"/>.</summary>
+            private readonly float outline;
+
+            /// <summary>Saved <see cref="HighlightEffect.outlineWidth"/>.</summary>
+            private readonly float outlineWidth;
+
+            /// <summary>Saved <see cref="HighlightEffect.overlayColor"/>.</summary>
+            private readonly Color overlayColor;
+
+            /// <summary>Saved <see cref="HighlightEffect.outlineColor"/>.</summary>
+            private readonly Color outlineColor;
 
             /// <summary>Saves the settings of <paramref name="effect"/>.</summary>
             /// <param name="effect">The highlight effect.</param>
@@ -1078,7 +1105,7 @@ namespace SEE.Tools.AI
         /// <param name="gameNode">The building to put the beam on.</param>
         private void PutBeamAbove(GameObject gameNode)
         {
-            markerFactory = new MarkerFactory(new MarkerAttributes(BeamHeight, BeamWidth, BeamColor, BeamColor, BeamColor));
+            markerFactory = new(new MarkerAttributes(BeamHeight, BeamWidth, BeamColor, BeamColor, BeamColor));
             markerFactory.MarkBorn(gameNode);
         }
 
@@ -1235,7 +1262,7 @@ namespace SEE.Tools.AI
         /// <param name="idOrName">Node ID or source name.</param>
         /// <param name="gameNode">The building found, or null.</param>
         /// <returns>Success with the matching node ID(s), or a failure.</returns>
-        public EffectResult Resolve(string idOrName, out GameObject gameNode)
+        internal EffectResult Resolve(string idOrName, out GameObject gameNode)
         {
             gameNode = null;
             if (string.IsNullOrWhiteSpace(idOrName))

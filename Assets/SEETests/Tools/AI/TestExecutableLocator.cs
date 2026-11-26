@@ -44,6 +44,9 @@ namespace SEE.Tools.AI
         /// Creates an empty file for the program <paramref name="name"/> in <paramref name="parent"/>,
         /// named as an installer on the current operating system would name it.
         /// </summary>
+        /// <param name="parent">The folder in which the file is created.</param>
+        /// <param name="name">The program name, without extension.</param>
+        /// <returns>The full path of the created file.</returns>
         private static string CreateProgram(string parent, string name)
         {
             string path = Path.Combine(parent, ExecutableLocator.IsWindows ? name + ".exe" : name);
@@ -51,6 +54,9 @@ namespace SEE.Tools.AI
             return path;
         }
 
+        /// <summary>
+        /// A program in one of the given folders is found there.
+        /// </summary>
         [Test]
         public void TestFindsProgramInGivenFolders()
         {
@@ -59,6 +65,9 @@ namespace SEE.Tools.AI
             Assert.That(ExecutableLocator.Find("tool", new[] { folder, otherFolder }), Is.EqualTo(program));
         }
 
+        /// <summary>
+        /// If several folders contain the program, the first of them wins.
+        /// </summary>
         [Test]
         public void TestFirstFolderWins()
         {
@@ -68,6 +77,9 @@ namespace SEE.Tools.AI
             Assert.That(ExecutableLocator.Find("tool", new[] { folder, otherFolder }), Is.EqualTo(first));
         }
 
+        /// <summary>
+        /// A full path is returned as it is if the file exists, otherwise null.
+        /// </summary>
         [Test]
         public void TestFullPathIsReturnedIfItExists()
         {
@@ -77,6 +89,9 @@ namespace SEE.Tools.AI
             Assert.That(ExecutableLocator.Find(program + "-missing", new[] { folder }), Is.Null);
         }
 
+        /// <summary>
+        /// A missing program, a blank name and null find nothing.
+        /// </summary>
         [Test]
         public void TestMissingOrBlankNameFindsNothing()
         {
@@ -85,6 +100,9 @@ namespace SEE.Tools.AI
             Assert.That(ExecutableLocator.Find(null, new[] { folder }), Is.Null);
         }
 
+        /// <summary>
+        /// Candidates rejected by the skip filter are not returned.
+        /// </summary>
         [Test]
         public void TestSkippedCandidatesAreIgnored()
         {
@@ -95,6 +113,9 @@ namespace SEE.Tools.AI
                         Is.EqualTo(program));
         }
 
+        /// <summary>
+        /// Invalid and quoted folder entries do not stop the search.
+        /// </summary>
         [Test]
         public void TestInvalidFolderEntriesAreTolerated()
         {
@@ -104,6 +125,9 @@ namespace SEE.Tools.AI
                         Is.EqualTo(program));
         }
 
+        /// <summary>
+        /// Programs that are not command scripts are started directly.
+        /// </summary>
         [Test]
         public void TestRealProgramsAreStartedDirectly()
         {
@@ -113,6 +137,9 @@ namespace SEE.Tools.AI
             Assert.That(arguments, Is.EqualTo("-p --verbose"));
         }
 
+        /// <summary>
+        /// Command scripts are run through cmd.exe on Windows, and directly elsewhere.
+        /// </summary>
         [Test]
         public void TestCommandScriptsGoThroughCmdOnWindowsOnly()
         {
@@ -130,6 +157,9 @@ namespace SEE.Tools.AI
             }
         }
 
+        /// <summary>
+        /// The PATH for a child process starts with the folder of the program.
+        /// </summary>
         [Test]
         public void TestChildPathStartsWithFolderOfProgram()
         {
