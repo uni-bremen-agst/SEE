@@ -167,8 +167,7 @@ namespace SEE.UI.Window
             {
                 if (valueObject.ActiveWindow == null)
                 {
-                    throw new InvalidOperationException(
-                        "The serialized window space has no active window values.");
+                    throw new InvalidOperationException("The serialized window space has no active window values.");
                 }
 
                 space.ActiveWindow = space.windows.First(
