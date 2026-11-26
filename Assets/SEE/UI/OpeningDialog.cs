@@ -1,312 +1,148 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.UI.Menu;
+using System;
+using UnityEngine;
+using SEE.Audio;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.UserSettings;
-using SEE.Utils;
-using SEE.Extensions;
-using Sirenix.Utilities;
-using UnityEngine;
 
+/// <summary>
+/// User interface components for SEE.
+/// </summary>
 namespace SEE.UI
 {
     /// <summary>
-    /// Implements the behaviour of the in-game menu for the selection of the general
-    /// configuration (host, server, client, network and user-settings) that is shown at the start up.
+    /// Connects the Penpot start menu to SEE's existing network and user-settings services.
     /// </summary>
+    /// <remarks>
+    /// Attached to the existing SEEStart scene. The menu is constructed at startup and remains
+    /// a desktop interface even when the selected player will use VR after connecting.
+    /// </remarks>
     internal class OpeningDialog : MonoBehaviour
     {
         /// <summary>
-        /// The UI object representing the menu the user chooses the action from.
+        /// The view created for this startup dialog.
         /// </summary>
-        private SimpleListMenu menu;
-
+        private OpeningMenuView menu;
         /// <summary>
-        /// This creates and returns the action menu, with which a user can configure the
-        /// networking.
+        /// Whether a network startup is pending and duplicate requests must be ignored.
         /// </summary>
-        /// <returns>The newly created action menu component.</returns>
-        private SimpleListMenu CreateMenu()
-        {
-            GameObject actionMenuGO = new() { name = "Start Menu" };
-            IList<MenuEntry> entries = SelectionEntries();
-            SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
-            actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
-            actionMenu.Title = "Configuration";
-            actionMenu.Description = "Please select the configuration you want to activate.";
-            entries.ForEach(actionMenu.AddEntry);
-            // We will handle the closing of the menu ourselves: we need to wait until a network
-            // connection can be established.
-            actionMenu.HideAfterSelection = false;
-            return actionMenu;
-        }
-
+        private bool starting;
         /// <summary>
-        /// Returns the menu entries for this dialog.
-        /// </summary>
-        /// <returns>Menu entries for this dialog.</returns>
-        private IList<MenuEntry> SelectionEntries()
-        {
-            Color color = Color.blue;
-
-            return new List<MenuEntry>
-            {
-                new(SelectAction: StartHost,
-                    Title: "Host",
-                    Description: "Starts a server and local client process.",
-                    EntryColor: NextColor(),
-                    Icon: Icons.Broadcast),
-
-                new(SelectAction: StartClient,
-                    Title: "Client",
-                    Description: "Starts a local client connecting to a server.",
-                    EntryColor: NextColor(),
-                    Icon: Icons.Link),
-
-#if ENABLE_VR
-                new(SelectAction: ToggleEnvironment,
-                    Title: "Toggle Desktop/VR",
-                    Description: "Toggles between desktop and VR hardware.",
-                    EntryColor: NextColor(),
-                    Icon: Icons.VR),
-#endif
-                new(
-                    SelectAction: TelemetrySettings,
-                    Title: "Telemetry Mode",
-                    Description: $"Currently: {UserSetting.Instance ?.Telemetry.Mode}",
-                    EntryColor: NextColor(),
-                    Icon: Icons.Export),
-
-                new(SelectAction: UserSettings,
-                    Title: "Settings",
-                    Description: "Allows to set additional network and user settings.",
-                    EntryColor: Color.gray,
-                    Icon: Icons.Gear),
-            };
-
-            Color NextColor()
-            {
-                Color result = color;
-                color = color.Lighter();
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Starts a host (= server + local client) on this machine.
-        /// </summary>
-        private void StartHost()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu = false;
-                UserSetting.Instance.InputType = inputType;
-                UserSetting.Instance.Network.StartHost(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu = true;
-                ShowNotification.Error("Host cannot be started", exception.Message, log: false);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Starts a client on this machine.
-        /// </summary>
-        private void StartClient()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu = false;
-                UserSetting.Instance.InputType = inputType;
-                UserSetting.Instance.Network.StartClient(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu = true;
-                ShowNotification.Error("Server connection failed", exception.Message, log: false);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Starts a dedicated server on this machine (only server, no client).
-        /// </summary>
-        private void StartServer()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // cannot select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu = false;
-                UserSetting.Instance.InputType = PlayerInputType.None;
-                UserSetting.Instance.Network.StartServer(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu = true;
-                ShowNotification.Error("Server cannot be started", exception.Message);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.
-        ///
-        /// This method is used as a callback in <see cref="StartClient"/>, <see cref="StartServer"/>,
-        /// and <see cref="StartHost"/>.
-        /// </summary>
-        /// <param name="success">True tells us that the network could be started successfully.</param>
-        /// <param name="message">A description of what happened.</param>
-        private void NetworkCallBack(bool success, string message)
-        {
-            menu.ShowMenu = !success;
-            if (!success)
-            {
-                ShowNotification.Error("Network problem", message);
-            }
-        }
-
-        /// <summary>
-        /// Opens the dialog to configure the network settings.
-        /// </summary>
-        private void UserSettings()
-        {
-            /// Note: We arrive here because the user pressed one of the buttons of the
-            /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
-            /// at this time, menu is no longer visible. When the following dialog
-            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            UserSettingsDialog dialog = new(UserSetting.Instance?.Network, Reactivate);
-            dialog.Open();
-            menu.ShowMenu = false;
-        }
-
-        /// <summary>
-        /// The telemetry settings dialog currently open, or null if no dialog is open.
-        /// </summary>
-        private TelemetryPropertyDialog telemetryDialog;
-
-        /// <summary>
-        /// Opens the telemetry settings dialog and disables the main menu while the dialog is active.
-        /// When the dialog is closed, the <see cref="Reactivate"/> method will be called to show the menu again.
-        /// </summary>
-        private void TelemetrySettings()
-        {
-            telemetryDialog = new TelemetryPropertyDialog(Reactivate);
-            telemetryDialog.Open();
-            menu.ShowMenu = false;
-        }
-
-        /// <summary>
-        /// Turns on the <see cref="menu"/>.
-        /// </summary>
-        private void Reactivate()
-        {
-            menu.ShowMenu = true;
-        }
-
-        /// <summary>
-        /// Sets <see cref="network"/> if it exists as a component attached to
-        /// this game object; otherwise this component is disabled.
+        /// Disables this dialog if the scene has no user settings.
         /// </summary>
         private void Awake()
         {
             if (UserSetting.Instance == null)
             {
-                Debug.LogWarning($"No {typeof(UserSetting)} component exists in the scene! "
-                    + $"{typeof(OpeningDialog)} requires a {typeof(UserSetting)} component to be present. "
-                    + "Disabling this component.\n");
+                Debug.LogWarning($"{nameof(OpeningDialog)} requires a {nameof(UserSetting)} component.\n");
                 enabled = false;
-                return;
             }
         }
 
         /// <summary>
-        /// Creates and shows the <see cref="menu"/>.
+        /// Restores the configuration and constructs the startup menu.
         /// </summary>
         private void Start()
         {
-            menu = CreateMenu();
             UserSetting.Instance.Load();
-            inputType = UserSetting.Instance.InputType;
-            // While this OpeningDialog is open, we want to run in a desktop environment,
-            // because our GUI implementation is not yet complete for VR. The NetworkPropertyDialog
-            // uses widgets that are not implemented for VR. Neither are ShowNotifications not
-            // implemented for VR yet.
-            // We reset the InputType here to a desktop environment.
-            // The loaded settings for the input type is kept in inputType. This field
-            // will be toggled by request of the user and only when the host or client is
-            // actually started, we assign the value of inputType to UserSettings.Instance.InputType.
+            RestoreDisplaySettings();
+            PlayerInputType inputType = UserSetting.Instance.InputType;
             UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
-            menu.ShowMenu = true;
-            ShowEnvironment();
+            menu = gameObject.AddComponent<OpeningMenuView>();
+            menu.Initialize(UserSetting.Instance, inputType, OpeningMenuConnection.FromSettings(UserSetting.Instance), StartNetwork, OpenPlayerSettings, AudioManagerImpl.Instance());
         }
 
         /// <summary>
-        /// The currently selected player input type.
+        /// Restores the display preferences previously changed in the menu.
         /// </summary>
-        private PlayerInputType inputType;
+        private static void RestoreDisplaySettings()
+        {
+            if (PlayerPrefs.HasKey("SEE.DisplayWidth") && PlayerPrefs.HasKey("SEE.DisplayHeight"))
+            {
+                int width = PlayerPrefs.GetInt("SEE.DisplayWidth");
+                int height = PlayerPrefs.GetInt("SEE.DisplayHeight");
+                FullScreenMode mode = (FullScreenMode)PlayerPrefs.GetInt("SEE.DisplayMode", (int)Screen.fullScreenMode);
+                if (width > 0 && height > 0 && Enum.IsDefined(typeof(FullScreenMode), mode))
+                {
+                    Screen.SetResolution(width, height, mode);
+                }
+            }
+        }
 
         /// <summary>
-        /// Toggles <see cref="inputType"/> between <see cref="PlayerInputType.VRPlayer"/>
-        /// and <see cref="PlayerInputType.DesktopPlayer"/>. The resulting value is saved.
+        /// Validates and saves the draft, then starts the selected network mode once.
         /// </summary>
-        private void ToggleEnvironment()
+        /// <param name="host">Whether to start a host rather than connect as a client.</param>
+        private void StartNetwork(bool host)
         {
-            if (inputType == PlayerInputType.DesktopPlayer)
+            if (starting || !menu.TryApplyConnection())
             {
-                inputType = PlayerInputType.VRPlayer;
+                return;
+            }
+
+            starting = true;
+            try
+            {
+                UserSetting.Instance.InputType = menu.SelectedInputType;
+                UserSetting.Instance.Save();
+                menu.ShowLoading(host);
+                if (host)
+                {
+                    UserSetting.Instance.Network.StartHost(NetworkCallBack);
+                }
+                else
+                {
+                    UserSetting.Instance.Network.StartClient(NetworkCallBack);
+                }
+            }
+            catch (Exception exception)
+            {
+                NetworkCallBack(false, exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Hides the menu after success or restores the form after a startup failure.
+        /// </summary>
+        /// <param name="success">Whether the network started successfully.</param>
+        /// <param name="message">The network's result message.</param>
+        private void NetworkCallBack(bool success, string message)
+        {
+            starting = false;
+            if (menu == null)
+            {
+                return;
+            }
+
+            if (success)
+            {
+                menu.SetVisible(false);
             }
             else
             {
-                inputType = PlayerInputType.DesktopPlayer;
+                UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
+                menu.ShowConnection();
+                menu.ShowError(message);
+                ShowNotification.Error("Network problem", message, log: false);
             }
-
-            UserSetting.Instance.Save();
-            ShowEnvironment();
         }
 
         /// <summary>
-        /// Notifies the user via <see cref="ShowNotification.Info(string, string, float, bool)"/>
-        /// which player input type was chosen.
+        /// Opens SEE's existing player, avatar and voice-chat settings and refreshes the form on return.
         /// </summary>
-        private void ShowEnvironment()
+        private void OpenPlayerSettings()
         {
-            ShowNotification.Info("Environment", Environment());
-
-            string Environment()
+            menu.SaveSettings();
+            menu.SetVisible(false);
+            UserSettingsDialog dialog = new(UserSetting.Instance.Network, () =>
             {
-                return inputType switch
+                if (menu != null)
                 {
-                    PlayerInputType.DesktopPlayer => "Desktop environment is selected.",
-                    PlayerInputType.VRPlayer => "VR environment is selected.",
-                    PlayerInputType.TouchGamepadPlayer => "Touch gamepad environment is selected.",
-                    PlayerInputType.None => "No environment is selected.",
-                    _ => throw new NotImplementedException($"Case {inputType} is not handled")
-                };
-            }
-        }
-        /// <summary>
-        /// Delegates the Unity frame-based update call to the telemetry dialog,
-        /// so that changes in the dropdown selection can be polled and handled.
-        /// This ensures that the telemetry mode is updated dynamically even
-        /// without event-based support from the underlying UI component.
-        /// </summary>
-        private void Update()
-        {
-            telemetryDialog?.Update();
+                    menu.RefreshConnection(OpeningMenuConnection.FromSettings(UserSetting.Instance));
+                    menu.SetVisible(true);
+                }
+            });
+            dialog.Open();
         }
     }
 }

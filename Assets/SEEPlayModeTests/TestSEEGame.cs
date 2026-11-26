@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using SEE.UI;
 using SEE.UserSettings;
 
 /// <summary>
@@ -92,7 +93,7 @@ namespace SEE.Net
         /// Run before every test case. It will wait until the <see cref="currentlyLoadedScene"/>
         /// has been unloaded. Then it will load <see cref="StartScene"/> (and wait until its
         /// loading has been completed) in order to simulate pressing the Host button
-        /// (identified by <see cref="HostButtonPath"/>) in the dialog to select the network
+        /// (identified by <see cref="hostButtonPath"/>) in the dialog to select the network
         /// configuration and start the game. After that, play-mode tests can be run.
         /// </summary>
         /// <returns>An enumerator that waits for the scene transition.</returns>
@@ -131,16 +132,18 @@ namespace SEE.Net
             // Simulate that the Host button in the Network Configuration dialog is
             // pressed by the user.
             float menuDeadline = Time.realtimeSinceStartup + 10f;
-            while (GameObject.Find(HostButtonPath) == null && Time.realtimeSinceStartup < menuDeadline)
+            while (Object.FindAnyObjectByType<OpeningMenuView>() == null && Time.realtimeSinceStartup < menuDeadline)
             {
                 yield return null;
             }
-            Debug.Log($"[SetUp] Pressing button {HostButtonPath}...\n");
-            PressButton(HostButtonPath);
+            Debug.Log($"[SetUp] Pressing button {hostButtonPath}...\n");
+            PressButton("Home/Sidebar/StartButton");
+            yield return null;
+            PressButton(hostButtonPath);
             yield return new WaitForEndOfFrame();
 
             Assert.That(UserSetting.Instance, Is.Not.Null,
-                        $"There is no {nameof(UserSetting.Instance)} instance after pressing {HostButtonPath}.");
+                        $"There is no {nameof(UserSetting.Instance)} instance after pressing {hostButtonPath}.");
             Debug.Log($"[SetUp] Finished.\n");
             yield return null;
         }
@@ -206,18 +209,24 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The full name of the button to select the "Host" network configuration.
+        /// The host startup action wrapper path relative to the opening-menu canvas.
         /// </summary>
-        private const string HostButtonPath = "/UI Canvas/Configuration/Main Content/Content Mask/Content/Menu Entries/Scroll Area/List/Host";
+        private const string hostButtonPath = "Connection/StarthostingButton";
 
         /// <summary>
         /// Simulates that a user presses the button identified by <paramref name="buttonPath"/>.
         /// </summary>
-        /// <param name="buttonPath">the path name of the game object holding a <see cref="Button"/> component</param>
+        /// <param name="buttonPath">The button wrapper path relative to the opening-menu canvas.</param>
         private static void PressButton(string buttonPath)
         {
             // Retrieve the button
-            GameObject buttonObject = GameObject.Find(buttonPath);
+            OpeningMenuView menu = Object.FindAnyObjectByType<OpeningMenuView>();
+            Assert.That(menu, Is.Not.Null, "The opening menu has not initialized.");
+            Transform container = menu.GetComponentInChildren<Canvas>(true).transform.Find(buttonPath);
+            Assert.That(container, Is.Not.Null, $"Button path {buttonPath} not found.");
+            Michsky.MUIP.ButtonManager manager = container.GetComponentInChildren<Michsky.MUIP.ButtonManager>(true);
+            Assert.That(manager, Is.Not.Null, $"Button path {buttonPath} has no MUIP button.");
+            GameObject buttonObject = manager.gameObject;
             Assert.That(buttonObject, Is.Not.Null, $"Button path {buttonPath} not found.");
             // Make sure the object is really holding a button.
             Assert.That(buttonObject.GetComponent<Button>(), Is.Not.Null,
