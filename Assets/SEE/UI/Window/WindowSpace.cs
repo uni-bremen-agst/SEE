@@ -159,9 +159,8 @@ namespace SEE.UI.Window
 
             WindowSpace space = attachTo.AddComponent<WindowSpace>();
 
-            space.windows.AddRange(valueObject.Windows.Select(
-                x => BaseWindow.FromValueObject<BaseWindow>(
-                    x, attachWindows ? attachTo : null)));
+            space.windows.AddRange(valueObject.Windows.Select
+                (x => BaseWindow.FromValueObject<BaseWindow>(x, attachWindows ? attachTo : null)));
 
             if (valueObject.HasActiveWindow)
             {
