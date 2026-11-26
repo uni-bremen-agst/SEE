@@ -527,8 +527,9 @@ namespace SEE.ReversibleActionHistory
 
         /// <summary>
         /// Redoes the last undone action of a specific player.
+        /// Completed actions restore their effects; interrupted actions restart without replaying their effects.
         /// </summary>
-        /// <exception cref="RedoImpossible">Thrown in there is no action that could be re-done.</exception>
+        /// <exception cref="RedoImpossible">Thrown if no action can be redone or a conflict exists.</exception>
         public void Redo()
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -539,15 +540,22 @@ namespace SEE.ReversibleActionHistory
             }
             else
             {
+                if (RedoHistory.Peek().CurrentProgress() == IReversibleAction.Progress.InProgress)
+                {
+                    IReversibleAction interruptedAction = RedoHistory.Pop();
+                    Execute(interruptedAction.NewInstance());
+                    return;
+                }
+
                 CurrentAction?.Stop();
-                // If the action to be redone has not been executed completely,
-                // it will not be contained in the global history, in which case
-                // lastUndoneAction.ActionID will be null.
+                // Incomplete actions do not have an entry in the global history.
                 GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);
-                if (lastUndoneAction.ActionID != null && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
+                if (lastUndoneAction.ActionID != null
+                    && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
-                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
+                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction,
+                        lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
                     CurrentAction.Start();
                     throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
@@ -560,14 +568,13 @@ namespace SEE.ReversibleActionHistory
                 Resume(redoAction);
 
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
-                                 || RedoHistory.Peek().CurrentProgress() != IReversibleAction.Progress.NoEffect);
+                    || RedoHistory.Peek().CurrentProgress() != IReversibleAction.Progress.NoEffect);
 
-                // Only if the action to be redone has been executed completely
-                // and is, thus, contained in the global history, we need to update
-                // the global history.
+                // Only completed actions are contained in the global history.
                 if (lastUndoneAction.ActionID != null)
                 {
-                    GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
+                    GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(
+                        true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                     RemoveAction(lastUndoneAction.ActionID);
                     if (syncOverNetwork)
                     {
