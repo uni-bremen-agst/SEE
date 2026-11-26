@@ -442,7 +442,8 @@ namespace SEE.UI.Window.CodeWindow
                     // the language server must support semantic tokens, and the language of the file
                     // (inferred from the file extension) must be supported by the server.
                     lspHandler = null;
-                    if (go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
+                    // go is null for windows not belonging to a city, e.g., those opened by the debugger.
+                    if (go != null && go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
                         && lspHandler.ServerCapabilities?.SemanticTokensProvider != null
                         && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
                     {
@@ -473,7 +474,7 @@ namespace SEE.UI.Window.CodeWindow
                     SetupBreakpoints();
                 }
 
-                if (go.TryGetComponentOrLog(out AbstractSEECity city))
+                if (go != null && go.TryGetComponentOrLog(out AbstractSEECity city))
                 {
                     AssociatedGraph = city.LoadedGraph;
                     bool useDashboardIssues = city.ErosionSettings.ShowDashboardIssuesInCodeWindow;
