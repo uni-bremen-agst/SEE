@@ -155,12 +155,7 @@ namespace SEE.UI.Window
 
             BaseWindow requestedWindow = ActiveWindow;
 
-            if (PanelTabForWindow(requestedWindow) is not ({ } panel, { } tab))
-            {
-                return;
-            }
-
-            if (panel == null)
+            if (PanelTabForWindow(requestedWindow) is not ({ } panel, { } tab) || panel == null)
             {
                 return;
             }
