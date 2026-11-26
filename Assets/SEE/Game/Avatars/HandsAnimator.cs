@@ -67,9 +67,20 @@ namespace SEE.Game.Avatars
         private const float arrivalThreshold = 0.01f;
 
         /// <summary>
-        /// The probability with which the presence of a hand in the camera can be considered acceptable for animation.
+        /// The hand presence and visibility probability required to consider a hand reliably detected.
+        /// This value is used to determine how long the hand must remain sufficiently visible before
+        /// its presence is considered confirmed for animation.
         /// </summary>
         private const float acceptableHandPresenceProbability = 0.7f;
+
+        /// <summary>
+        /// The minimum hand presence and visibility probability required to animate the avatar's hand.
+        /// This lower threshold allows animations to continue when hand detection confidence temporarily drops below
+        /// <see cref="acceptableHandPresenceProbability"/>, preventing a delay between the avatar's hand and the user's
+        /// actual movements due to detection confidence fluctuations. Values below this threshold are considered
+        /// too ureliable and may cause chaotic hand movemnts.
+        /// </summary>
+        private const float minimumAcceptableHandPresenceProbability = 0.2f;
 
         /// <summary>
         /// If true, the avatar's hands to have reached their start positions and are ready for live animation.
@@ -483,14 +494,36 @@ namespace SEE.Game.Avatars
             RightHandTransformState.NewMediapipeCoordinates.y = mediapipeRightHandPosition.y;
             RightHandTransformState.NewMediapipeCoordinates.z = mediapipeRightHandPosition.z;
 
-            // If the probability with which the left hand is in the picture is acceptable for animation.
+            // Increase the detection duration and reduce the lost duration when hand presence and visibility are reliable.
             if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability && mediapipeLeftHandPosition.visibility > acceptableHandPresenceProbability)
             {
                 leftHandDetectedTime += Time.deltaTime;
                 leftHandLostTime = Math.Max(0.0001f, leftHandLostTime/2);
+            }
+            // If the probability with which the left hand is in the picture is NOT acceptable for animation
+            // and no gesture was recognized, reduce the detection duration and increase the lost duration.
+            else if (!wasLeftHandGestureRecognized)
+            {
+                leftHandLostTime += Time.deltaTime;
+                leftHandDetectedTime = Math.Max(0f, leftHandDetectedTime - Time.deltaTime);
+            }
+            /// If the probability that the left hand is visible in the camera frame is insufficient for animation,
+            /// but <see cref="wasLeftHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
+            /// This is required to reset <see cref="wasLeftHandGestureRecognized"/> to false when the last animated hand pose
+            /// was a gesture (e.g., thumb up or thumb down) and the left hand is no longer visible in the camera frame.
+            /// Without this reset, <see cref="wasLeftHandGestureRecognized"/> will remain true, causing the hand
+            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
+            else
+            {
+                leftHandGestureDetectedTime = Mathf.Max(leftHandGestureDetectedTime - Time.deltaTime, 0);
+                leftHandGestureLostTime += Time.deltaTime;
+            }
 
-                // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
-                //if (leftHandDetectedFrames > minDetectedFrames || wasLeftHandGestureRecognized)
+            // Continue animating the hand as long as its presence and visibility remain above the minimum acceptable threshold.
+            if (mediapipeLeftHandPosition.presence >= minimumAcceptableHandPresenceProbability
+                && mediapipeLeftHandPosition.visibility >= minimumAcceptableHandPresenceProbability)
+            {
+                // Animate the hand if it has been detected for a sufficient duration or if a gesture was recognized.
                 if (leftHandDetectedTime >= minDetectedTime || wasLeftHandGestureRecognized)
                 {
                     if (ik.solver.leftHandEffector.positionWeight <= 0.95f || ik.solver.leftArmChain.bendConstraint.weight <= 0.37f)
@@ -575,47 +608,55 @@ namespace SEE.Game.Avatars
                     }
                 }
             }
-            // If the probability with which the left hand is in the picture is NOT acceptable for animation
-            // and no gesture was recognized, assign the neutral position.
-            else if (!wasLeftHandGestureRecognized)
+
+            // If the hand has been lost for too long - assign the neutral position.
+            if (leftHandLostTime >= maxLostTime)
             {
-                leftHandLostTime += Time.deltaTime;
-                leftHandDetectedTime = Math.Max(0f, leftHandDetectedTime - Time.deltaTime);
-                if (leftHandLostTime >= maxLostTime)
+                if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f)
                 {
-                    if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f)
-                    {
-                        StoreRotationsLeftHand();
-                        ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                        ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                        ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
-                    }
+                    StoreRotationsLeftHand();
+                    ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                 }
             }
-            /// If the probability that the left hand is visible in the camera frame is insufficient for animation,
-            /// but <see cref="wasLeftHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
-            /// This is required to reset <see cref="wasLeftHandGestureRecognized"/> to false when the last animated hand pose
-            /// was a gesture (e.g., thumb up or thumb down) and the left hand is no longer visible in the camera frame.
-            /// Without this reset, <see cref="wasLeftHandGestureRecognized"/> will remain true, causing the hand
-            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
-            else
-            {
-                leftHandGestureDetectedTime = Mathf.Max(leftHandGestureDetectedTime - Time.deltaTime, 0);
-                leftHandGestureLostTime += Time.deltaTime;
-            }
 
+            // If a gesture has been lost for too long - set the corresponding indicator to false.
             if (leftHandGestureLostTime >= maxGestureLostTime)
             {
                 wasLeftHandGestureRecognized = false;
             }
 
-            // If the probability with which the right hand is in the picture is acceptable for animation.
+            // Increase the detection duration and reduce the lost duration when hand presence and visibility are reliable.
             if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability && mediapipeRightHandPosition.visibility > acceptableHandPresenceProbability)
             {
                 rightHandDetectedTime += Time.deltaTime;
                 rightHandLostTime = Math.Max(0.0001f, rightHandLostTime / 2);
+            }
+            // If the probability with which the left hand is in the picture is NOT acceptable for animation
+            // and no gesture was recognized, reduce the detection duration and increase the lost duration.
+            else if (!wasRightHandGestureRecognized)
+            {
+                rightHandLostTime += Time.deltaTime;
+                rightHandDetectedTime = Math.Max(0f, rightHandDetectedTime - Time.deltaTime);
+            }
+            /// If the probability that the right hand is visible in the camera frame is insufficient for animation,
+            /// but <see cref="wasRightHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
+            /// This is required to reset <see cref="wasRightHandGestureRecognized"/> to false when the last animated hand pose
+            /// was a gesture (e.g., thumb up or thumb down) and the right hand is no longer visible in the camera frame.
+            /// Without this reset, <see cref="wasRightHandGestureRecognized"/> will remain true, causing the hand
+            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
+            else
+            {
+                rightHandGestureDetectedTime = Mathf.Max(rightHandGestureDetectedTime - Time.deltaTime, 0);
+                rightHandGestureLostTime += Time.deltaTime;
+            }
 
-                // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
+            // Continue animating the hand as long as its presence and visibility remain above the minimum acceptable threshold.
+            if (mediapipeRightHandPosition.presence >= minimumAcceptableHandPresenceProbability
+                && mediapipeRightHandPosition.visibility >= minimumAcceptableHandPresenceProbability)
+            {
+                // Animate the hand if it has been detected for a sufficient duration or if a gesture was recognized.
                 if (rightHandDetectedTime > minDetectedTime || wasRightHandGestureRecognized)
                 {
                     if (ik.solver.rightHandEffector.positionWeight <= 0.95f || ik.solver.rightArmChain.bendConstraint.weight <= 0.37f)
@@ -700,40 +741,26 @@ namespace SEE.Game.Avatars
                     }
                 }
             }
-            // If the probability with which the right hand is in the picture is NOT acceptable for animation
-            // and no gesture was recognized, assign the neutral position.
-            else if (!wasRightHandGestureRecognized)
+
+            // If the hand has been lost for too long - assign the neutral position.
+            if (rightHandLostTime >= maxLostTime)
             {
-                rightHandLostTime += Time.deltaTime;
-                rightHandDetectedTime = Math.Max(0f, rightHandDetectedTime - Time.deltaTime);
-                if (rightHandLostTime>= maxLostTime)
+                if (ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
                 {
-                    if (ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
-                    {
-                        StoreRotationsRightHand();
-                        ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                        ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                        ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
-                    }
+                    StoreRotationsRightHand();
+                    ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                 }
             }
-            /// If the probability that the right hand is visible in the camera frame is insufficient for animation,
-            /// but <see cref="wasRightHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
-            /// This is required to reset <see cref="wasRightHandGestureRecognized"/> to false when the last animated hand pose
-            /// was a gesture (e.g., thumb up or thumb down) and the right hand is no longer visible in the camera frame.
-            /// Without this reset, <see cref="wasRightHandGestureRecognized"/> will remain true, causing the hand
-            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
-            else
-            {
-                rightHandGestureDetectedTime = Mathf.Max(rightHandGestureDetectedTime - Time.deltaTime, 0);
-                rightHandGestureLostTime += Time.deltaTime;
-            }
 
+            // If a gesture has been lost for too long - set the corresponding indicator to false.
             if (rightHandGestureLostTime >= maxGestureLostTime)
             {
                 wasRightHandGestureRecognized = false;
             }
 
+            // If the avatar is pointing with its right hand - do not animate this hand.
             if (IsPointing)
             {
                 ik.solver.rightHandEffector.positionWeight = 0f;
