@@ -44,6 +44,10 @@ For runtime questions ("which code runs, in which order, with which values?") us
 it adds temporary log statements in a copy of the project, runs a command and shows the path.
 Report only the values and order that probe_run returned.
 
+If the user debugs in SEE (they press Run in SEE's debugger), use set_breakpoint, debug_continue,
+debug_step and then debug_status (focus: true) to show where the program stopped; read values
+with debug_stack and debug_variables. Continue and step return at once: always check debug_status.
+
 Use show_path for call chains, show_neighbors for "what uses / is used by X",
 highlight for several related buildings, and reset when the user wants a clean city.
 If a tool says SEE is not reachable, tell the user to start Play mode in Unity.
@@ -51,6 +55,10 @@ If a tool says SEE is not reachable, tell the user to start Play mode in Unity.
 
 TARGET = {"type": "string", "description": "Node ID (from find_symbol) or source name, e.g. 'ContextMenu'."}
 TARGETS = {"type": "array", "items": {"type": "string"}, "description": "Node IDs or source names."}
+BREAKPOINT = {
+    "file": {"type": "string", "description": "Absolute path, or a file a city knows, e.g. 'Program.cs'."},
+    "line": {"type": "integer", "description": "Line number (1-based)."},
+}
 
 TOOLS = [
     {
@@ -167,6 +175,59 @@ TOOLS = [
         "inputSchema": {"type": "object", "properties": {}},
     },
     probe.TOOL,
+    {
+        "name": "debug_status",
+        "description": "State of SEE's debugger: whether a debug session runs, whether the program is stopped, "
+                       "why, and where (function, file:line, node and focus_id); plus all breakpoints. "
+                       "Use after debug_continue/debug_step. The user starts sessions with SEE's Run button.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"focus": {"type": "boolean", "description": "Also focus the building of the stop location."}},
+        },
+    },
+    {
+        "name": "set_breakpoint",
+        "description": "Set a breakpoint in SEE's debugger (shown in SEE's code window too). Works before a "
+                       "session starts; it is sent when the session starts.",
+        "inputSchema": {"type": "object", "properties": BREAKPOINT, "required": ["file", "line"]},
+    },
+    {
+        "name": "remove_breakpoint",
+        "description": "Remove a breakpoint from SEE's debugger.",
+        "inputSchema": {"type": "object", "properties": BREAKPOINT, "required": ["file", "line"]},
+    },
+    {
+        "name": "debug_continue",
+        "description": "Let the stopped program run to the next breakpoint. Returns at once; "
+                       "call debug_status to see where it stopped.",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "debug_step",
+        "description": "Execute one step of the stopped program. Returns at once; call debug_status to see where it is.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"kind": {"type": "string", "enum": ["over", "in", "out"],
+                                    "description": "over (default): next line; in: into the call; out: to the caller."}},
+        },
+    },
+    {
+        "name": "debug_stack",
+        "description": "Call stack at the current stop, innermost first, with file:line and node of each frame.",
+        "inputSchema": {"type": "object",
+                        "properties": {"limit": {"type": "integer", "description": "Maximum frames (default 20)."}}},
+    },
+    {
+        "name": "debug_variables",
+        "description": "Variables of one stack frame at the current stop (top level, by scope).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "frame": {"type": "integer", "description": "Frame index from debug_stack (default 0 = innermost)."},
+                "limit": {"type": "integer", "description": "Maximum variables per scope (default 50)."},
+            },
+        },
+    },
 ]
 TOOL_NAMES = {tool["name"] for tool in TOOLS}
 

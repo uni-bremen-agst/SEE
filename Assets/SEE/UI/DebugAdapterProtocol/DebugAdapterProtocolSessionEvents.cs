@@ -217,6 +217,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="stoppedEvent">The event.</param>
         private void OnStoppedEvent(StoppedEvent stoppedEvent)
         {
+            RecordStop(stoppedEvent);
             IsRunning = false;
             if (stoppedEvent.Reason == StoppedEvent.ReasonValue.Exception)
             {

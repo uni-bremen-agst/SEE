@@ -187,6 +187,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     actions.Enqueue(UpdateVariables);
                     actions.Enqueue(UpdateHoverTooltip);
                 }
+                OnRunningChanged(value);
             }
         }
 

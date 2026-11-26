@@ -65,6 +65,12 @@ namespace SEE.Tools.AI
         /// <summary>Maps source locations onto nodes for the <c>node_at</c> tool.</summary>
         private readonly SourceLocator sourceLocator = new();
 
+        /// <summary>The debugger tools; created on first use.</summary>
+        private AgentDebugger debugger;
+
+        /// <summary>The debugger tools.</summary>
+        private AgentDebugger Debugger => debugger ??= new(sourceLocator);
+
         /// <summary>A command received from the agent, waiting for its answer.</summary>
         private class PendingCommand
         {
@@ -372,6 +378,13 @@ namespace SEE.Tools.AI
                                                                  StringArgument(args, "final"))),
                 "open_code" => ToJson(effects.OpenCode(StringArgument(args, "target"), IntArgument(args, "line"))),
                 "reset" => ToJson(effects.ResetEffects()),
+                "debug_status" => Debugger.Status(BoolArgument(args, "focus") ?? false),
+                "set_breakpoint" => Debugger.SetBreakpoint(StringArgument(args, "file"), IntArgument(args, "line"), add: true),
+                "remove_breakpoint" => Debugger.SetBreakpoint(StringArgument(args, "file"), IntArgument(args, "line"), add: false),
+                "debug_continue" => Debugger.Continue(),
+                "debug_step" => Debugger.Step(StringArgument(args, "kind")),
+                "debug_stack" => Debugger.Stack(IntArgument(args, "limit") ?? 20),
+                "debug_variables" => Debugger.Variables(IntArgument(args, "frame") ?? 0, IntArgument(args, "limit") ?? 50),
                 _ => Error($"Unknown tool '{tool}'.")
             };
 
@@ -379,7 +392,8 @@ namespace SEE.Tools.AI
             string message = (string)response["message"] ?? "";
             Debug.Log($"[{nameof(AgentCommandServer)}] {tool} {args.ToString(Newtonsoft.Json.Formatting.None)} -> "
                       + $"{(callSucceeded ? "OK" : "FAILED")}: {message}\n");
-            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors" or "node_at"))
+            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors" or "node_at"
+                                                  or "debug_status" or "debug_stack" or "debug_variables"))
             {
                 if (callSucceeded)
                 {
@@ -585,7 +599,7 @@ namespace SEE.Tools.AI
         /// <summary>The fields of a node the agent needs to choose and cite it.</summary>
         /// <param name="node">The node.</param>
         /// <returns>JSON with id, name, type, file, line, city and whether it is drawn.</returns>
-        private static JObject Describe(Node node)
+        internal static JObject Describe(Node node)
         {
             GameObject gameNode = node.GameObject(false);
             AbstractSEECity city = gameNode != null ? gameNode.ContainingCity() : null;
@@ -618,7 +632,7 @@ namespace SEE.Tools.AI
         /// <summary>A failed answer.</summary>
         /// <param name="message">What went wrong.</param>
         /// <returns>JSON with ok = false.</returns>
-        private static JObject Error(string message) => new() { ["ok"] = false, ["message"] = message };
+        internal static JObject Error(string message) => new() { ["ok"] = false, ["message"] = message };
 
         /// <summary>A string argument; any other JSON value is converted to its text.</summary>
         /// <param name="args">The arguments of the request.</param>
@@ -633,6 +647,13 @@ namespace SEE.Tools.AI
         /// <returns>The argument as an integer, or null if it is missing or not a number.</returns>
         private static int? IntArgument(JObject args, string name) =>
             args[name] is JValue { Type: JTokenType.Integer or JTokenType.Float } value ? (int)(double)value : null;
+
+        /// <summary>A boolean argument.</summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <param name="name">Name of the argument.</param>
+        /// <returns>The argument, or null if it is missing or not a boolean.</returns>
+        private static bool? BoolArgument(JObject args, string name) =>
+            args[name] is JValue { Type: JTokenType.Boolean } value ? (bool)value : null;
 
         /// <summary>A list-of-strings argument; a single string counts as a list of one.</summary>
         /// <param name="args">The arguments of the request.</param>
