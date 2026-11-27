@@ -97,6 +97,9 @@ namespace SEE.Controls.Players
         /// </summary>
         private void Start()
         {
+            // The player is spawned standing on the floor.
+            floorY = transform.position.y;
+
             controller = gameObject.MustGetComponent<CharacterController>();
 
             // The default layer should be ignored by the collider.
@@ -166,6 +169,25 @@ namespace SEE.Controls.Players
         /// </summary>
         private void Update()
         {
+            if (AnyMovementInput() || SEEInput.RotateCamera())
+            {
+                LastUserInputTime = Time.realtimeSinceStartup;
+            }
+
+            if (flight != null)
+            {
+                if (AnyMovementInput() || SEEInput.RotateCamera() || SEEInput.ToggleCameraLock())
+                {
+                    // The user takes over; stay where the flight got to.
+                    EndFlight();
+                }
+                else
+                {
+                    AdvanceFlight();
+                    return;
+                }
+            }
+
             if (FocusedObject != null && SEEInput.ToggleCameraLock())
             {
                 cameraState.FreeMode = !cameraState.FreeMode;
@@ -381,5 +403,217 @@ namespace SEE.Controls.Players
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;
         }
+
+        #region Automatic camera flight
+
+        /// <summary>
+        /// The state of a running camera flight started by <see cref="FlyToLookAt"/>.
+        /// </summary>
+        private class Flight
+        {
+            /// <summary>
+            /// World position of the player (in Unity units) when the flight started.
+            /// </summary>
+            internal Vector3 StartPosition;
+
+            /// <summary>
+            /// World position of the player (in Unity units) at the end of the flight.
+            /// </summary>
+            internal Vector3 EndPosition;
+
+            /// <summary>
+            /// Yaw (rotation around the vertical axis) of the camera when the flight started,
+            /// in degrees.
+            /// </summary>
+            internal float StartYaw;
+
+            /// <summary>
+            /// Yaw (rotation around the vertical axis) of the camera at the end of the flight,
+            /// in degrees.
+            /// </summary>
+            internal float EndYaw;
+
+            /// <summary>
+            /// Pitch (looking up or down) of the camera when the flight started, in degrees
+            /// within [-90, 90]; positive values look down.
+            /// </summary>
+            internal float StartPitch;
+
+            /// <summary>
+            /// Pitch (looking up or down) of the camera at the end of the flight, in degrees
+            /// within [-90, 90]; positive values look down.
+            /// </summary>
+            internal float EndPitch;
+
+            /// <summary>
+            /// Total duration of the flight in seconds; 0 means the camera jumps immediately.
+            /// </summary>
+            internal float Duration;
+
+            /// <summary>
+            /// Time that has passed since the flight started, in seconds.
+            /// </summary>
+            internal float Elapsed;
+        }
+
+        /// <summary>
+        /// The running camera flight, or null if there is none.
+        /// </summary>
+        private Flight flight;
+
+        /// <summary>
+        /// Height of the floor: the player's Y position when it was spawned.
+        /// A camera flight never puts the player's feet below it.
+        /// </summary>
+        private float floorY = float.NegativeInfinity;
+
+        /// <summary>
+        /// The local player's movement component, or null if there is no desktop player.
+        /// Only the local player gets this component (see <c>AvatarAdapter</c>).
+        /// </summary>
+        internal static DesktopPlayerMovement Local { get; private set; }
+
+        /// <summary>
+        /// When the user last moved or turned the camera (realtime seconds; -1 if never).
+        /// Automatic camera tours stop once the user takes over.
+        /// </summary>
+        internal float LastUserInputTime { get; private set; } = -1f;
+
+        /// <summary>
+        /// Registers this component as <see cref="Local"/>.
+        /// </summary>
+        private void OnEnable()
+        {
+            Local = this;
+        }
+
+        /// <summary>
+        /// Ends a running camera flight and unregisters this component as <see cref="Local"/>.
+        /// </summary>
+        private void OnDisable()
+        {
+            if (flight != null)
+            {
+                EndFlight();
+            }
+            if (Local == this)
+            {
+                Local = null;
+            }
+        }
+
+        /// <summary>
+        /// Smoothly flies the camera so that it looks down at <paramref name="target"/>
+        /// from <paramref name="distance"/> under <paramref name="pitch"/> degrees.
+        /// The horizontal viewing direction is the direction from the camera to the target,
+        /// so the camera turns towards the target instead of circling around it.
+        /// The player's feet never go below the floor (<see cref="floorY"/>); if the camera
+        /// would have to be lower than eye height, it looks down more steeply instead.
+        ///
+        /// The camera is switched to free mode. Any movement, rotation or camera-lock input
+        /// by the user ends the flight where it is. A new call replaces a running flight.
+        /// </summary>
+        /// <param name="target">World position to look at.</param>
+        /// <param name="distance">Distance between camera and target at the end, in world units.</param>
+        /// <param name="pitch">Downward viewing angle at the end, in degrees.</param>
+        /// <param name="duration">Duration of the flight in seconds; 0 jumps immediately.</param>
+        /// <returns>The world position the camera will have at the end of the flight.</returns>
+        internal Vector3 FlyToLookAt(Vector3 target, float distance, float pitch, float duration)
+        {
+            Transform cameraTransform = Camera.main != null ? Camera.main.transform : transform;
+
+            // The camera is a child of the player. The player itself only rotates around
+            // the y axis (see Update), so the camera's offset is fixed in the player's yaw frame.
+            Vector3 offsetInYawFrame = Quaternion.Inverse(transform.rotation)
+                                     * (cameraTransform.position - transform.position);
+
+            Vector3 horizontal = target - cameraTransform.position;
+            horizontal.y = 0;
+            float endYaw = horizontal.sqrMagnitude > 1e-8f
+                ? Quaternion.LookRotation(horizontal).eulerAngles.y
+                : cameraState.Yaw;
+            float endPitch = Mathf.Clamp(pitch, -90, 90);
+
+            Quaternion endRotation = Quaternion.Euler(endPitch, endYaw, 0.0f);
+            Vector3 endCameraPosition = target - endRotation * Vector3.forward * distance;
+            Vector3 endPlayerPosition = endCameraPosition - Quaternion.Euler(0.0f, endYaw, 0.0f) * offsetInYawFrame;
+
+            // The camera sits at the eyes of a standing avatar. If the wanted camera position
+            // is lower than eye height, the avatar would sink into the floor. Instead it stays
+            // on the floor and looks down at the target more steeply, keeping the target centred.
+            if (endPlayerPosition.y < floorY)
+            {
+                endPlayerPosition.y = floorY;
+                endCameraPosition = endPlayerPosition + Quaternion.Euler(0.0f, endYaw, 0.0f) * offsetInYawFrame;
+                Vector3 toTarget = target - endCameraPosition;
+                float horizontalDistance = new Vector2(toTarget.x, toTarget.z).magnitude;
+                endPitch = Mathf.Clamp(Mathf.Atan2(-toTarget.y, horizontalDistance) * Mathf.Rad2Deg, -90, 90);
+            }
+
+            // A flight ends in free mode: locked mode only orbits around FocusedObject.
+            cameraState.FreeMode = true;
+
+            flight = new()
+            {
+                StartPosition = transform.position,
+                EndPosition = endPlayerPosition,
+                StartYaw = cameraState.Yaw,
+                EndYaw = endYaw,
+                StartPitch = cameraState.Pitch,
+                EndPitch = endPitch,
+                Duration = Mathf.Max(0f, duration),
+                Elapsed = 0f
+            };
+
+            // The CharacterController would block the flight at buildings and may
+            // override positions set directly, so it is off while flying.
+            if (controller != null)
+            {
+                controller.enabled = false;
+            }
+            AdvanceFlight();
+            return endCameraPosition;
+        }
+
+        /// <summary>
+        /// Moves the camera one frame further along <see cref="flight"/>.
+        /// </summary>
+        private void AdvanceFlight()
+        {
+            flight.Elapsed += Time.deltaTime;
+            float t = flight.Duration > 0 ? Mathf.Clamp01(flight.Elapsed / flight.Duration) : 1f;
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+
+            cameraState.Yaw = Mathf.LerpAngle(flight.StartYaw, flight.EndYaw, eased);
+            cameraState.Pitch = Mathf.Lerp(flight.StartPitch, flight.EndPitch, eased);
+            transform.position = Vector3.Lerp(flight.StartPosition, flight.EndPosition, eased);
+            transform.rotation = Quaternion.Euler(0.0f, cameraState.Yaw, 0.0f);
+            if (Camera.main != null)
+            {
+                Camera.main.transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+            }
+
+            // Keep the mouse position current, so rotating right after the flight does not jump.
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+            if (t >= 1f)
+            {
+                EndFlight();
+            }
+        }
+
+        /// <summary>
+        /// Ends <see cref="flight"/> at the current position and gives control back to the user.
+        /// </summary>
+        private void EndFlight()
+        {
+            flight = null;
+            if (controller != null)
+            {
+                controller.enabled = true;
+            }
+        }
+
+        #endregion
     }
 }

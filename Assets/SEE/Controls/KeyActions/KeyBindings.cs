@@ -276,6 +276,14 @@ namespace SEE.Controls.KeyActions
             // EchoFace
             Register(KeyAction.ToggleEchoFace, KeyCode.F, "Toggle EchoFace",
                      KeyActionCategory.General, "Toggles facial tracking with EchoFace on and off.");
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // Ask SEE (AI agent); like the agent itself, only in the Editor and development builds.
+            Register(KeyAction.AskSee, KeyCode.J, "Ask SEE",
+                     KeyActionCategory.General,
+                     "Opens the Ask SEE box to ask an AI agent about the code. "
+                     + "With Ctrl, Alt or Shift: debug keys of the agent's city effects.");
+#endif
         }
 
         /// <summary>

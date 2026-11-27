@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
-using SEE.Controls;
-using SEE.Graphs;
-using SEE.Extensions;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using SEE.XR;
-using SEE.Game;
-using SEE.UI;
+using SEE.Controls;
 using SEE.Controls.Interactables;
+using SEE.Extensions;
+using SEE.Game;
 using SEE.GraphElementRefs;
+using SEE.Graphs;
+using SEE.UI;
 using SEE.UserSettings;
+using SEE.XR;
 
 namespace SEE.Utils
 {
@@ -355,6 +356,31 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Checks for windows drawn with Unity's immediate-mode GUI (<c>OnGUI</c>), which the
+        /// <see cref="EventSystem"/> does not know about. Each returns true if the mouse is over
+        /// such a window, so that clicks and scrolling on it do not also reach the code city.
+        /// </summary>
+        internal static event Func<bool> MouseOverImmediateModeGUI;
+
+        /// <summary>Whether any of the <see cref="MouseOverImmediateModeGUI"/> checks is true.</summary>
+        /// <returns>True if the mouse is over an immediate-mode GUI window.</returns>
+        private static bool IsMouseOverImmediateModeGUI()
+        {
+            if (MouseOverImmediateModeGUI == null)
+            {
+                return false;
+            }
+            foreach (Delegate check in MouseOverImmediateModeGUI.GetInvocationList())
+            {
+                if (((Func<bool>)check)())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
         /// <para>
         /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fail
@@ -369,6 +395,10 @@ namespace SEE.Utils
             if (UserSetting.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
+            }
+            if (IsMouseOverImmediateModeGUI())
+            {
+                return true;
             }
             InputSystemUIInputModule inputModule = EventSystem.current.currentInputModule as InputSystemUIInputModule;
             if (inputModule == null)

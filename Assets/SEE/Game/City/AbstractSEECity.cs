@@ -824,7 +824,9 @@ namespace SEE.Game.City
                     // The first one is that the user wanted the edge type to be hidden.
                     if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
-                        edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: 0);
+                        // Not every edge of the graph has a game edge (e.g. when one of its
+                        // nodes is not drawn); such edges are skipped.
+                        edge.Operator(mustFind: false)?.Hide(EdgeLayoutSettings.AnimationKind, factor: 0);
                     }
                     else
                     {
@@ -852,11 +854,13 @@ namespace SEE.Game.City
             {
                 case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
                     edge.SetToggle(Edge.IsHiddenToggle);
-                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    // Not every edge of the graph has a game edge (e.g. when one of its nodes
+                    // is not drawn); the toggle is still set, but there is nothing to animate.
+                    edge.Operator(mustFind: false)?.Hide(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
                     break;
                 case ShowEdgeStrategy.Always:
                     edge.UnsetToggle(Edge.IsHiddenToggle);
-                    edge.Operator().Show(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    edge.Operator(mustFind: false)?.Show(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled {EdgeLayoutSettings.ShowEdges}");

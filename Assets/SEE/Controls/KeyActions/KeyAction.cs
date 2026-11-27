@@ -243,5 +243,11 @@
         /// Toggles the EchoFace facial animation on/off.
         /// </summary>
         ToggleEchoFace,
+        /// <summary>
+        /// Opens the Ask SEE box, in which the user can ask an AI agent about the code.
+        /// Together with Ctrl, Alt or Shift, it triggers the debug keys of the agent's city effects.
+        /// Only bound in the Editor and in development builds.
+        /// </summary>
+        AskSee,
     }
 }

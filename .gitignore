@@ -185,3 +185,18 @@ env/
 /Assets/Resources/Prefabs/Cinemachines/Scenes.meta
 /Assets/Resources/Prefabs/Cinemachines/Roots/
 /Assets/Resources/Prefabs/Cinemachines/Roots.meta
+
+########################
+# For Claude Code
+########################
+
+# Claude Code local overrides and personal context
+CLAUDE.local.md
+**/CLAUDE.local.md
+.claude/*.local.json
+.claude/*.local.md
+
+# Claude Code local cache, session state, or temporary worktrees
+.claude/cache/
+.claude/projects/
+.claude/todos/
