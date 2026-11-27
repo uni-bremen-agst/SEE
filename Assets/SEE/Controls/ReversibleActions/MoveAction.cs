@@ -130,7 +130,7 @@ namespace SEE.Controls.ReversibleActions
                         return false;
                     }
                 }
-                else if ((!movementRequested || UserSetting.IsVR) && ExecuteViaContextMenu)
+                else if (ExecuteViaContextMenu && (UserSetting.IsVR || !SEEInput.LeftMouseInteraction()))
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -157,7 +157,7 @@ namespace SEE.Controls.ReversibleActions
             }
             // Drag grabbed object
             else if (
-                    ((UserSetting.IsDesktop && (movementRequested ^ ExecuteViaContextMenu)) // exclusive OR
+                    ((UserSetting.IsDesktop && (ExecuteViaContextMenu ? !SEEInput.LeftMouseInteraction() : movementRequested)) // exclusive OR
                         || (UserSetting.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {

@@ -32,6 +32,14 @@ namespace SEE.Controls.ReversibleActions
         public bool ExecuteViaContextMenu { get; set; } = false;
 
         /// <summary>
+        /// Whether this action was initiated through the context menu.
+        /// Unlike <see cref="ExecuteViaContextMenu"/>, this information
+        /// remains available after the action has completed so that undo
+        /// and redo can preserve the user's selected tool.
+        /// </summary>
+        public bool WasExecutedViaContextMenu { get; internal set; }
+
+        /// <summary>
         /// Whether the current action was canceled without being completed.
         /// </summary>
         public bool IsCanceled { get; protected set; }

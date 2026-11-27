@@ -183,14 +183,13 @@ namespace SEE.ReversibleActionHistory
             Counter.Reset();
         }
 
+        /// <summary>
+        /// Verifies that an action with preliminary effects can be undone and restarted with a fresh instance.
+        /// </summary>
         [Test]
         public void OneAction()
         {
-            /// Note: TestAction is an action that continues forever, that is,
-            /// no Update call will ever return true and its progress state
-            /// is initially <see cref="IReversibleAction.Progress.NoEffect"/>
-            /// and after the first Update call <see cref="IReversibleAction.Progress.InProgress"/>
-            /// for the rest of its life.
+            // TestAction never finishes; Update changes its state from NoEffect to InProgress.
             TestAction c = new();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
@@ -199,18 +198,353 @@ namespace SEE.ReversibleActionHistory
             CheckCalls(c, value: true, awake: 1, start: 1, update: 1, stop: 0);
             hist.Update();
             CheckCalls(c, value: true, awake: 1, start: 1, update: 2, stop: 0);
-            // c is in progress, but not yet completed. The following Undo call will interrupt c.
+
+            // Undo stops c, removes its preliminary effect, and makes it available for Redo.
             hist.Undo();
-            // Because c is interrupted, Undo will trigger a Stop. Because Undo moves
-            // c from the UndoStack to the RedoStack, the UndoStack will be empty.
-            // c will not receive another Start message.
             CheckCalls(c, value: false, awake: 1, start: 1, update: 2, stop: 1);
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Redo starts a new action instead of restoring the old effects.
             hist.Redo();
-            // Because c was not completed, Redo will resume with it.
-            // The call of Start will be received by c.
-            CheckCalls(c, value: true, awake: 1, start: 2, update: 2, stop: 1);
+            TestAction restarted = (TestAction)hist.CurrentAction;
+            Assert.That(restarted, Is.Not.SameAs(c));
+            CheckCalls(c, value: false, awake: 1, start: 1, update: 2, stop: 1);
+            CheckCalls(restarted, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(hist.UndoCount(), Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            hist.Update();
+            CheckCalls(restarted, value: true, awake: 1, start: 1, update: 1, stop: 0);
+            CheckCalls(c, value: false, awake: 1, start: 1, update: 2, stop: 1);
         }
 
+        /// <summary>
+        /// Verifies that Redo restarts an interrupted action without restoring its effects
+        /// or changing the effects of a previously completed action.
+        /// </summary>
+        [Test]
+        public void RedoInterruptedActionStartsFresh()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            Assert.That(Counter.Value, Is.EqualTo(1));
+
+            TestAction interruptedAction = new();
+            hist.Execute(interruptedAction);
+            hist.Update();
+            CheckCalls(interruptedAction, value: true, awake: 1, start: 1, update: 1, stop: 0);
+            Assert.That(interruptedAction.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.InProgress));
+
+            hist.Undo();
+            CheckCalls(interruptedAction, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Redo();
+            Assert.That(hist.CurrentAction, Is.InstanceOf<TestAction>());
+            TestAction restartedAction = (TestAction)hist.CurrentAction;
+            Assert.That(restartedAction, Is.Not.SameAs(interruptedAction));
+            CheckCalls(interruptedAction, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedAction, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(restartedAction.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.NoEffect));
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that the first completed action can be undone and redone
+        /// when no other action is activated between Undo and Redo.
+        /// </summary>
+        [Test]
+        public void FirstCompletedActionCanBeRedoneDirectly()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that automatically activating an unused default tool
+        /// after undoing the first completed action does not discard Redo.
+        /// This reproduces the relevant action-history sequence in PlayerMenu.
+        /// </summary>
+        [Test]
+        public void FirstActionRedoSurvivesDefaultToolActivation()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // PlayerMenu activates a default action when the undo
+            // history becomes empty. This substitute has no effect.
+            hist.Execute(new TestAction());
+
+            Assert.That(hist.CurrentAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                        "Activating an unused default tool must preserve Redo.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Verifies that selecting another tool without performing a new
+        /// modification preserves the redo history of a completed action.
+        /// </summary>
+        [Test]
+        public void SwitchingToUnusedToolPreservesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Switch to another tool without executing its operation.
+            hist.Execute(new Decrement());
+
+            Assert.That(hist.CurrentAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                        "An unused tool must not discard undone actions.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+        }
+
+        /// <summary>
+        /// Verifies that choosing an unused tool preserves the option to restart an interrupted action.
+        /// </summary>
+        [Test]
+        public void SwitchingToolsPreservesRedoOfInProgressAction()
+        {
+            TestAction action = new();
+
+            hist.Execute(action);
+            hist.Update();
+            CheckCalls(action, value: true, awake: 1, start: 1, update: 1, stop: 0);
+            Assert.That(action.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.InProgress));
+
+            hist.Undo();
+            CheckCalls(action, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            TestAction unusedTool = new();
+            hist.Execute(unusedTool);
+            CheckCalls(unusedTool, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(hist.CurrentAction.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.NoEffect));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1), "An unused tool must preserve an interrupted action.");
+
+            hist.Redo();
+            TestAction restarted = (TestAction)hist.CurrentAction;
+            Assert.That(restarted, Is.Not.SameAs(action));
+            Assert.That(restarted, Is.Not.SameAs(unusedTool));
+            CheckCalls(action, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(unusedTool, value: false, awake: 1, start: 1, update: 0, stop: 1);
+            CheckCalls(restarted, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that a newly completed modification invalidates
+        /// the redo history after an earlier action was undone.
+        /// </summary>
+        [Test]
+        public void NewEffectiveActionInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Execute(new Decrement());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+        }
+
+        /// <summary>
+        /// Verifies that a newly started action invalidates Redo when
+        /// its first Update produces a preliminary effect.
+        /// </summary>
+        [Test]
+        public void NewInProgressActionInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            TestAction newAction = new();
+            hist.Execute(newAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            Assert.That(newAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.NoEffect));
+
+            hist.Update();
+
+            Assert.That(newAction.CurrentProgress(),
+                        Is.EqualTo(IReversibleAction.Progress.InProgress));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+        }
+
+        /// <summary>
+        /// Verifies that updating a resumed action preserves Redo when its progress state stays InProgress.
+        /// An interrupted action is restarted with a fresh instance rather than replaying its effects.
+        /// </summary>
+        [Test]
+        public void ResumingInProgressActionPreservesRedoHistory()
+        {
+            TestAction first = new();
+            TestAction second = new();
+
+            hist.Execute(first);
+            hist.Update();
+            CheckCalls(first, value: true, awake: 1, start: 1, update: 1, stop: 0);
+
+            hist.Execute(second);
+            hist.Update();
+            CheckCalls(first, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(second, value: true, awake: 1, start: 1, update: 1, stop: 0);
+
+            hist.Undo();
+            CheckCalls(first, value: true, awake: 1, start: 2, update: 1, stop: 1);
+            CheckCalls(second, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(first.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.InProgress));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // The current test action has no new visible change when updated again.
+            hist.Update();
+            CheckCalls(first, value: true, awake: 1, start: 2, update: 2, stop: 1);
+            CheckCalls(second, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            hist.Redo();
+            TestAction restartedSecond = (TestAction)hist.CurrentAction;
+            Assert.That(restartedSecond, Is.Not.SameAs(second));
+            CheckCalls(first, value: true, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(second, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedSecond, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that a new effect reported outside ActionHistory.Update
+        /// invalidates the redo history.
+        /// </summary>
+        [Test]
+        public void ExternalEffectInvalidatesRedoHistory()
+        {
+            hist.Execute(new Increment());
+            hist.Update();
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            Increment externalAction = new();
+            hist.Execute(externalAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            externalAction.ApplyExternalEffect();
+            hist.InvalidateRedoHistory(externalAction);
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            Assert.Throws<RedoImpossible>(() => hist.Redo());
+
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Verifies that an action without an effect or an inactive action
+        /// cannot invalidate the existing redo history.
+        /// </summary>
+        [Test]
+        public void InactiveOrUnusedActionDoesNotInvalidateRedoHistory()
+        {
+            Increment completedAction = new();
+
+            hist.Execute(completedAction);
+            hist.Update();
+            hist.Undo();
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            Decrement unusedAction = new();
+            hist.Execute(unusedAction);
+
+            hist.InvalidateRedoHistory(unusedAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                "An unused action must not invalidate Redo.");
+
+            hist.InvalidateRedoHistory(completedAction);
+
+            Assert.That(hist.RedoCount(), Is.EqualTo(1),
+                "An inactive action must not invalidate Redo.");
+
+            hist.Redo();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+        }
+
+
+        /// <summary>
+        /// Verifies the complete lifecycle of multiple actions, including undo, fresh redo restarts,
+        /// preservation of earlier effects, and invalidation of remaining redo entries.
+        /// </summary>
         [Test]
         public void MultipleActions()
         {
@@ -225,10 +559,8 @@ namespace SEE.ReversibleActionHistory
             CheckCalls(c4, value: false, awake: 0, start: 0, update: 0, stop: 0);
 
             hist.Execute(c1);
-            // No Update has occurred so far.
             CheckCalls(c1, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
-            // Update has set the new value.
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
             hist.Execute(c2);
@@ -258,171 +590,198 @@ namespace SEE.ReversibleActionHistory
             CheckCalls(c3, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c4, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
-            // c4 is undone; execution will resume with c3, because c3 is still
-            // in progress (TestAction.Update() always yields false).
+            // Undo c4 and resume c3.
             hist.Undo();
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c3, value: true, awake: 1, start: 2, update: 1, stop: 1);
             CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c3, value: true,  awake: 1, start: 2, update: 2, stop: 1);
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c3, value: true, awake: 1, start: 2, update: 2, stop: 1);
             CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
 
-            // c3 is undone; c2 is running
+            // Undo c3 and resume c2.
             hist.Undo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 1, stop: 1);
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(2));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 2, update: 1, stop: 1);
             CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
             CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 1);
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 2, update: 2, stop: 1);
             CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
             CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
 
-            // c3 is redone
+            // Redo c3 starts a fresh action without restoring the old preliminary effect.
             hist.Redo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 3, update: 2, stop: 2);
+            TestAction restartedC3 = (TestAction)hist.CurrentAction;
+            Assert.That(restartedC3, Is.Not.SameAs(c3));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
             CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 3, update: 3, stop: 2);
-            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedC3, value: false, awake: 1, start: 1, update: 0, stop: 0);
 
-            // c4 is redone
+            // Redo c4 before the fresh c3 produces any new effect.
             hist.Redo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 3, update: 3, stop: 3);
-            CheckCalls(c4, value: true,  awake: 1, start: 2, update: 1, stop: 1);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 3, update: 3, stop: 3);
-            CheckCalls(c4, value: true,  awake: 1, start: 2, update: 2, stop: 1);
+            TestAction restartedC4 = (TestAction)hist.CurrentAction;
+            Assert.That(restartedC4, Is.Not.SameAs(c4));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedC3, value: false, awake: 1, start: 1, update: 0, stop: 1);
+            CheckCalls(restartedC4, value: false, awake: 1, start: 1, update: 0, stop: 0);
 
-            // c4 is undone; c3 is running
+            hist.Update();
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedC3, value: false, awake: 1, start: 1, update: 0, stop: 1);
+            CheckCalls(restartedC4, value: true, awake: 1, start: 1, update: 1, stop: 0);
+
+            // Undo restarted c4; the unused restarted c3 is skipped.
             hist.Undo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 4, update: 3, stop: 3);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c3, value: true,  awake: 1, start: 4, update: 4, stop: 3);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            Assert.That(hist.CurrentAction, Is.SameAs(c2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 3, update: 2, stop: 2);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedC3, value: false, awake: 1, start: 1, update: 0, stop: 1);
+            CheckCalls(restartedC4, value: false, awake: 1, start: 1, update: 1, stop: 1);
 
-            // c3 is undone; c2 is running
-            hist.Undo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 3, update: 2, stop: 2);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 3, update: 3, stop: 2);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-
-            // new action is executed => c3 and c4 are lost
-            TestAction c5 = new TestAction();
+            // A newly selected unused action preserves the remaining redo.
+            TestAction c5 = new();
             CheckCalls(c5, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c5);
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 3, update: 3, stop: 3);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false,  awake: 1, start: 1, update: 0, stop: 0);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 3, update: 3, stop: 3);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: true,  awake: 1, start: 1, update: 1, stop: 0);
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 3, update: 2, stop: 3);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 0, stop: 0);
 
-            // c5 is undone; c2 is running
-            hist.Undo();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 4, update: 3, stop: 3);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            // A new effect from c5 invalidates the remaining redo history.
             hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true,  awake: 1, start: 4, update: 4, stop: 3);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 3, update: 2, stop: 3);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
-            // c2 is undone; c1 is running
+            // Undo c5 and resume c2.
             hist.Undo();
-            CheckCalls(c1, value: true,  awake: 1, start: 2, update: 1, stop: 1);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            hist.Update();
-            CheckCalls(c1, value: true,  awake: 1, start: 2, update: 2, stop: 1);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            Assert.That(hist.CurrentAction, Is.SameAs(c2));
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 4, update: 2, stop: 3);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
 
-            // c1 is undone, action history is empty
+            hist.Update();
+            CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c2, value: true, awake: 1, start: 4, update: 3, stop: 3);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+
+            // Undo c2 and resume c1.
             hist.Undo();
+            Assert.That(hist.CurrentAction, Is.SameAs(c1));
+            CheckCalls(c1, value: true, awake: 1, start: 2, update: 1, stop: 1);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+
+            hist.Update();
+            CheckCalls(c1, value: true, awake: 1, start: 2, update: 2, stop: 1);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+
+            // Undo c1 and verify that no effect-bearing action remains.
+            hist.Undo();
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(3));
             CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            hist.Update();
-            CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
 
-            // new action is executed => c1, c2, and c5 are lost
-            TestAction c6 = new TestAction();
+            hist.Update();
+            CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+
+            // An unused c6 does not invalidate undone actions.
+            TestAction c6 = new();
             CheckCalls(c6, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c6);
+            Assert.That(hist.RedoCount(), Is.EqualTo(3));
             CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c6, value: false,  awake: 1, start: 1, update: 0, stop: 0);
-            hist.Update();
-            CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c6, value: true,  awake: 1, start: 1, update: 1, stop: 0);
+            CheckCalls(c6, value: false, awake: 1, start: 1, update: 0, stop: 0);
 
-            // c6 is undone
+            hist.Update();
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+            CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(c6, value: true, awake: 1, start: 1, update: 1, stop: 0);
+
+            // Undo c6 and verify that its previous effect stays undone.
             hist.Undo();
             CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c6, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
             hist.Update();
             CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
-            CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c2, value: false, awake: 1, start: 4, update: 3, stop: 4);
+            CheckCalls(c3, value: false, awake: 1, start: 2, update: 2, stop: 2);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c6, value: false, awake: 1, start: 1, update: 1, stop: 1);
+
+            // Redo c6 starts over rather than restoring the old effect.
+            hist.Redo();
+            TestAction restartedC6 = (TestAction)hist.CurrentAction;
+            Assert.That(restartedC6, Is.Not.SameAs(c6));
+            CheckCalls(c6, value: false, awake: 1, start: 1, update: 1, stop: 1);
+            CheckCalls(restartedC6, value: false, awake: 1, start: 1, update: 0, stop: 0);
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            hist.Update();
+            CheckCalls(restartedC6, value: true, awake: 1, start: 1, update: 1, stop: 0);
         }
 
         /// <summary>
@@ -517,6 +876,15 @@ namespace SEE.ReversibleActionHistory
             public override void Undo()
             {
                 counter--;
+            }
+
+            /// <summary>
+            /// Simulates a modification reported outside ActionHistory.Update.
+            /// </summary>
+            public void ApplyExternalEffect()
+            {
+                currentProgress = IReversibleAction.Progress.InProgress;
+                counter++;
             }
 
             public override bool Update()
@@ -759,11 +1127,8 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Test scenario for a non-continuous action with immediate effect.
-        /// Every Update call for Decrement and Increment will yield true.
-        /// Thus, their progress state is initially <see cref="IReversibleAction.Progress.NoEffect"/>
-        /// and after the first Update call <see cref="IReversibleAction.Progress.Completed"/>
-        /// for the rest of their life.
+        /// Tests the action history with non-continuous actions that complete on Update.
+        /// Activating an unused action preserves Redo, while a new modification invalidates it.
         /// </summary>
         [Test]
         public void TestCounterAction()
@@ -772,110 +1137,93 @@ namespace SEE.ReversibleActionHistory
             Assert.That(Counter.Value, Is.EqualTo(0));
             Assert.That(hist.UndoCount(), Is.EqualTo(1));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
             hist.Update();
             Assert.That(Counter.Value, Is.EqualTo(3));
             Assert.That(hist.UndoCount(), Is.EqualTo(4));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // Because Increment.Update yields true every time it is called,
-            // the execution will always continue with a new instance of
-            // Increment. We have had three calls to Update. Including the
-            // first Execute, we should have four actions on the UndoStack.
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(2));
-            // Undo will remove one completed action and then resume with
-            // a new instance of Increment.
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
+
             hist.Undo();
             Assert.That(Counter.Value, Is.EqualTo(0));
-            // The UndoStack has one completed Increment action and one
-            // instance of Increment that has had no effect yet.
-            // If Undo is called, all actions without any effect will
-            // be removed. This leaves the single action with effect,
-            // which then is moved from the UndoStack to the RedoStack.
-            // Thus, the UndoStack will be empty at this point.
             Assert.That(hist.UndoCount(), Is.EqualTo(0));
             Assert.That(hist.RedoCount(), Is.EqualTo(3));
+
             hist.Redo();
             Assert.That(Counter.Value, Is.EqualTo(1));
-            // Redo moves an action from the RedoStack to the UndoStack.
-            // Because that action was completed, a new instance of
-            // Increment will be put onto the UndoStack that will be used
-            // to resume.
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
+
             hist.Redo();
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Activating Decrement does not yet modify the counter.
+            // The remaining redo entry must therefore be preserved.
             hist.Execute(new Decrement());
-            // The new instance of the Increment action that was put on
-            // the stack due to Redo above has not received any Update call.
-            // Hence, it will be popped off the UndoStack. Thus, UndoCount
-            // remains the same.
-            Assert.That(Counter.Value, Is.EqualTo(2)); // still 2 because no Update was called
-            Assert.That(hist.UndoCount(), Is.EqualTo(3));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0)); // RedoStack is lost
-            hist.Update();
-            // Update has completed Decrement. A new instance of Decrement will
-            // be put on the Undo stack.
-            Assert.That(Counter.Value, Is.EqualTo(1));
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // No Update has been called for the new instance of Decrement just put
-            // on the UndoStack, hence, the Decrement at the top of the UndoStack
-            // has still progress state NoEffect. Thus it will be popped off the UndoStack
-            // when the next Increment is added by the following line.
-            hist.Execute(new Increment());
-            Assert.That(Counter.Value, Is.EqualTo(1));  // still 1 because no Update was called
-            Assert.That(hist.UndoCount(), Is.EqualTo(4));
-            Assert.That(hist.RedoCount(), Is.EqualTo(0));
-            // Undo without prior Update for the Increment just added; that means we are actually
-            // undoing Decrement. The Increment will be popped off the UndoStack. Then the
-            // Decrement will be undone and moved from the UndoStack to the RedoStack.
-            // Now a completed Increment will be at the top of the stack. Because it is
-            // completed, a new instance of Increment will be added.
-            hist.Undo();
+
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
-            hist.Undo(); // undoing an Increment
-            // No Update has been called for the new instance of the Increment with
-            // progress state NoEffect. Hence, it will be popped off the UndoStack.
-            // Now the completed Increment will be at the top of the UndoStack again.
-            // This is now undone, that is, moved from the UndoStack to the RedoStack.
-            // After that a completed Increment (actually the very first Increment
-            // executed) is at the top of the UndoStack again, and as a consequence
-            // a new instance of Increment is added to the UndoStack in progress state
-            // NoEffect.
+
+            // The first actual Decrement invalidates the redo history.
+            hist.Update();
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            // An unused Increment does not affect the counter.
+            hist.Execute(new Increment());
+
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
+
+            // Undo skips the unused Increment and undoes Decrement.
+            hist.Undo();
+
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
+
+            // Undo the preceding Increment.
+            hist.Undo();
+
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(2));
             Assert.That(hist.RedoCount(), Is.EqualTo(2));
-            // The current situation is a follows: the UndoStack consists of an
-            // Increment with no effect and one completed Increment. The RedoStack
-            // has a completed Increment and a completed Decrement.
-            hist.Redo(); // re-doing an Increment
-            // The Increment with no effect is popped off the UndoStack.
-            // The completed Increment is moved from the RedoStack to the UndoStack.
-            // Because that Increment is completed, a new instance of Increment
-            // with progress state NoEffect will be added to the UndoStack.
+
+            // Redo the Increment.
+            hist.Redo();
+
             Assert.That(Counter.Value, Is.EqualTo(2));
             Assert.That(hist.UndoCount(), Is.EqualTo(3));
             Assert.That(hist.RedoCount(), Is.EqualTo(1));
-            hist.Redo(); // re-doing a Decrement
+
+            // Redo Decrement.
+            hist.Redo();
+
             Assert.That(Counter.Value, Is.EqualTo(1));
             Assert.That(hist.UndoCount(), Is.EqualTo(4));
             Assert.That(hist.RedoCount(), Is.EqualTo(0));

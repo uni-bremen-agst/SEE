@@ -184,6 +184,12 @@ namespace SEE.ReversibleActionHistory
         public IReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
+        /// Gets the action that would be redone next, or null if there
+        /// is no redoable action.
+        /// </summary>
+        public IReversibleAction NextRedoAction => RedoHistory.Count > 0 ? RedoHistory.Peek() : null;
+
+        /// <summary>
         /// Notifies subscribers if the action state changes from
         /// <paramref name="previousActionState"/> to <paramref name="newActionState"/>.
         /// </summary>
@@ -198,19 +204,17 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Let C be the currently executed action (if there is any) in this action history.
-        /// Then <see cref="IReversibleAction.Stop"/> will be called for C. After that
-        /// <see cref="IReversibleAction.Awake()"/> and then <see cref="IReversibleAction.Start"/>
-        /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to
-        /// the action history and becomes the currently executed action for which
-        /// <see cref="IReversibleAction.Update"/> will be called whenever a client
-        /// of this action history calls the action history's <see cref="Update"/> method.
+        /// Starts executing the given <paramref name="action"/>.
+        /// The currently executing action is stopped and the new action is added
+        /// to the undo history.
         ///
-        /// No action previously undone can be redone anymore.
+        /// Previously undone actions remain redoable until a newly executed
+        /// action actually produces an effect.
         ///
-        /// Precondition: <paramref name="action"/> is not already present in the action history.
+        /// Precondition: <paramref name="action"/> is not already present
+        /// in the action history.
         /// </summary>
-        /// <param name="action">The action to be executed.</param>
+        /// <param name="action">The action to execute.</param>
         public void Execute(IReversibleAction action)
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -218,30 +222,68 @@ namespace SEE.ReversibleActionHistory
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
             LastActionWithEffect();
+
             UndoHistory.Push(action);
             NotifyActionStateChanged(previousActionState, action.GetActionStateType());
             action.Awake();
             action.Start();
-            // Whenever a new action is excuted, we consider the redo history lost.
-            DeleteAllRedos();
+
+            // Activating an unused action must not invalidate Redo.
+            // An action may already produce an effect during Start().
+            if (RedoHistory.Count > 0
+                && action.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
         }
 
-        /// Calls <see cref="IReversibleAction.Update"/> for the currently executed action of this
-        /// action history if there is any. If that action signals that it is complete (via
-        /// <see cref="IReversibleAction.Update"/>), a new instance of the same kind as this
-        /// action will be created, added to the action history and become the new currently
-        /// executed action. The Update is propagated to all clients in the network.
+        /// <summary>
+        /// Discards redoable actions when the currently executing action reports a new effect
+        /// outside the regular <see cref="Update"/> call.
+        /// An inactive action or an action without an effect cannot invalidate Redo.
+        /// The existing cleanup also synchronizes the removal of global history entries.
+        /// </summary>
+        /// <param name="action">The action that produced the new effect.</param>
+        public void InvalidateRedoHistory(IReversibleAction action)
+        {
+            if (RedoHistory.Count > 0
+                && ReferenceEquals(CurrentAction, action)
+                && action.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
+        }
+
+        /// <summary>
+        /// Updates the currently executing action, if any.
         ///
-        /// If there is no currently executed action, nothing happens.
+        /// Invalidates the redo history when a new action produces its first
+        /// effect. Resuming an already running action does not invalidate
+        /// the redo history merely because it remains in progress.
+        ///
+        /// Completed actions are added to the global history and followed
+        /// by a new instance of the same action kind.
         /// </summary>
         public void Update()
         {
             IReversibleAction lastAction = CurrentAction;
-            if (lastAction != null && lastAction.Update())
+            if (lastAction == null)
             {
-                // Note: An action is put to the global history only when
-                // its execution is completed, that is, if its Update
-                // yields true. Here is the place, where this is the fact.
+                return;
+            }
+
+            bool hadNoEffect = lastAction.CurrentProgress() == IReversibleAction.Progress.NoEffect;
+            bool completed = lastAction.Update();
+
+            if (RedoHistory.Count > 0
+                && hadNoEffect
+                && lastAction.CurrentProgress() != IReversibleAction.Progress.NoEffect)
+            {
+                DeleteAllRedos();
+            }
+
+            if (completed)
+            {
                 AddToGlobalHistory(lastAction);
                 Execute(lastAction.NewInstance());
             }
@@ -395,9 +437,15 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Undoes the last action with an effect of a specific player.
-        /// If a undo isn't possible or no one is remaining the user gets a notification.
+        /// Undoes the last action with an effect.
+        /// Actions without effects are discarded rather than added to the redo history.
+        /// Completed actions can be redone by restoring their effects.
+        /// Interrupted actions are undone, but redo starts a new instance without replaying their previous effects.
+        /// The previous action is resumed when another action with an effect remains in the undo history.
         /// </summary>
+        /// <exception cref="UndoImpossible">
+        /// Thrown if there is no action to undo or conflicting changes prevent undo.
+        /// </exception>
         public void Undo()
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -413,10 +461,10 @@ namespace SEE.ReversibleActionHistory
             // In that case, it may have had some preliminary effects already
             // or not. If it has had preliminary effects,
             // we will treat it similarly to a completed action, that is, undo
-            // its effects and push it onto the RedoStack. This way it may
-            // be resumed by way of Redo. If it has had no effect yet, we do not
-            // undo it and it will not be pushed onto RedoStack. Instead we
-            // will just pop it off the UndoStack and continue with the next action
+            // its effects and push it onto the RedoStack. Redo then starts
+            // a new instance of the interrupted action without restoring its effects.
+            // If the action has had no effect yet, it is not added to the RedoStack.
+            // Instead, we will just pop it off the UndoStack and continue with the next action
             // on the UndoStack. The reason for this decision is as follows: It would
             // be confusing for a user if we would undo actions without any effect
             // as normal actions because the user would not get any visible
@@ -485,8 +533,9 @@ namespace SEE.ReversibleActionHistory
 
         /// <summary>
         /// Redoes the last undone action of a specific player.
+        /// Completed actions restore their effects; interrupted actions restart without replaying their effects.
         /// </summary>
-        /// <exception cref="RedoImpossible">Thrown in there is no action that could be re-done.</exception>
+        /// <exception cref="RedoImpossible">Thrown if no action can be redone or a conflict exists.</exception>
         public void Redo()
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -497,15 +546,22 @@ namespace SEE.ReversibleActionHistory
             }
             else
             {
+                if (RedoHistory.Peek().CurrentProgress() == IReversibleAction.Progress.InProgress)
+                {
+                    IReversibleAction interruptedAction = RedoHistory.Pop();
+                    Execute(interruptedAction.NewInstance());
+                    return;
+                }
+
                 CurrentAction?.Stop();
-                // If the action to be redone has not been executed completely,
-                // it will not be contained in the global history, in which case
-                // lastUndoneAction.ActionID will be null.
+                // Incomplete actions do not have an entry in the global history.
                 GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);
-                if (lastUndoneAction.ActionID != null && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
+                if (lastUndoneAction.ActionID != null
+                    && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
-                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
+                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction,
+                        lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
                     CurrentAction.Start();
                     throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
@@ -518,14 +574,13 @@ namespace SEE.ReversibleActionHistory
                 Resume(redoAction);
 
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
-                                 || RedoHistory.Peek().CurrentProgress() != IReversibleAction.Progress.NoEffect);
+                    || RedoHistory.Peek().CurrentProgress() != IReversibleAction.Progress.NoEffect);
 
-                // Only if the action to be redone has been executed completely
-                // and is, thus, contained in the global history, we need to update
-                // the global history.
+                // Only completed actions are contained in the global history.
                 if (lastUndoneAction.ActionID != null)
                 {
-                    GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
+                    GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(
+                        true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                     RemoveAction(lastUndoneAction.ActionID);
                     if (syncOverNetwork)
                     {

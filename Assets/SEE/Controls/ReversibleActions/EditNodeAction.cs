@@ -237,6 +237,11 @@ namespace SEE.Controls.ReversibleActions
             {
                 progress = ProgressState.EditIsCanceled;
                 SEEInput.KeyboardShortcutsEnabled = true;
+
+                if (WasExecutedViaContextMenu)
+                {
+                    IsCanceled = true;
+                }
             }
         }
     }

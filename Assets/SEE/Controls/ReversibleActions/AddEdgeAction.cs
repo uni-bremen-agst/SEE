@@ -49,6 +49,11 @@ namespace SEE.Controls.ReversibleActions
         private GameObject to;
 
         /// <summary>
+        /// Whether the initial source-selection notification has been shown.
+        /// </summary>
+        private bool sourceSelectionNotificationShown;
+
+        /// <summary>
         /// The information we need to (re-)create an edge.
         /// </summary>
         private struct Memento
@@ -139,7 +144,29 @@ namespace SEE.Controls.ReversibleActions
         /// <returns>True if completed.</returns>
         public override bool Update()
         {
+            // Escape cancels a temporary context-menu action and restores the previous tool.
+            if (ExecuteViaContextMenu && SEEInput.Cancel())
+            {
+                from = null;
+                to = null;
+                ExecuteViaContextMenu = false;
+                IsCanceled = true;
+                CurrentState = IReversibleAction.Progress.NoEffect;
+
+                AudioManagerImpl.EnqueueSoundEffect(
+                    IAudioManager.SoundEffect.DropSound);
+
+                ShowNotification.Info(
+                    "New edge canceled",
+                    "Edge creation was canceled.",
+                    duration: 4f,
+                    log: false);
+
+                return false;
+            }
+
             bool result = false;
+
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
@@ -153,6 +180,12 @@ namespace SEE.Controls.ReversibleActions
                     {
                         from = InteractableObject.HoveredObjectWithWorldFlag.gameObject;
                         XRSEEActions.Selected = false;
+
+                        ShowNotification.Info(
+                            "Select target",
+                            "Next, select a target node for the line.",
+                            duration: 5f,
+                            log: false);
                     }
                     else if (to == null)
                     {
@@ -172,6 +205,12 @@ namespace SEE.Controls.ReversibleActions
                     {
                         // No source selected yet; this interaction is meant to set the source.
                         from = HoveredObject;
+
+                        ShowNotification.Info(
+                            "Select target",
+                            "Next, select a target node for the line.",
+                            duration: 5f,
+                            log: false);
                     }
                     else if (to == null)
                     {
@@ -180,6 +219,7 @@ namespace SEE.Controls.ReversibleActions
                     }
                 }
             }
+
             // Note: from == to may be possible.
             if (from != null && to != null)
             {
@@ -187,37 +227,73 @@ namespace SEE.Controls.ReversibleActions
                 // FIXME: In the future, we need to query the edge type from the user.
                 memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
-                // Note: If the edge creation failed, createdEdge will be null and
-                // memento.EdgeID will remain null. This is not a problem because
-                // in that case, this action will simply be considered unfinished,
-                // having no effect yet, and there will be nothing to undo.
+
+                // If creation failed, allow another attempt with different nodes.
                 if (createdEdge != null)
                 {
                     memento.EdgeID = createdEdge.name;
                 }
 
-                // forget from and to--successfully or not. If the edge creation succeeded,
-                // we don't need from and to anymore. If it failed, we want to allow the
-                // user to try again with different nodes.
                 result = createdEdge != null;
+
                 if (result)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound, createdEdge, true);
+                    AudioManagerImpl.EnqueueSoundEffect(
+                        IAudioManager.SoundEffect.NewEdgeSound,
+                        createdEdge, true);
                 }
                 else
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.CancelSound, from, false);
+                    AudioManagerImpl.EnqueueSoundEffect(
+                        IAudioManager.SoundEffect.CancelSound,
+                        from, false);
                 }
+
                 from = null;
                 to = null;
-                CurrentState = result ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+
+                CurrentState = result
+                    ? IReversibleAction.Progress.Completed
+                    : IReversibleAction.Progress.NoEffect;
+
+                if (result)
+                {
+                    ExecuteViaContextMenu = false;
+                }
             }
-            // Forget from and to upon user request.
-            if (SEEInput.Unselect())
+
+            // U or Escape clears the current selection without leaving the tool.
+            if (SEEInput.Unselect() || (!ExecuteViaContextMenu && SEEInput.Cancel()))
             {
                 from = null;
                 to = null;
+
+                ShowNotification.Info(
+                    "Selection cleared",
+                    "Select a source node to start a new edge.",
+                    duration: 4f,
+                    log: false);
+
+                sourceSelectionNotificationShown = true;
             }
+
+            // Show the initial instruction once for the regular New Edge tool.
+            // Context-menu actions already receive their source node and target instruction.
+            if (!ExecuteViaContextMenu
+                && !IsCanceled
+                && !sourceSelectionNotificationShown
+                && from == null
+                && !result)
+            {
+                sourceSelectionNotificationShown = true;
+
+                ShowNotification.Info(
+                    "Select source",
+                    "First, select a source node for the new edge.",
+                    duration: 5f,
+                    log: false);
+            }
+
             return result;
         }
 
@@ -229,6 +305,7 @@ namespace SEE.Controls.ReversibleActions
         public void ContextMenuExecution(GameObject source)
         {
             from = source;
+            ExecuteViaContextMenu = true;
             ShowNotification.Info("Select target", "Next, select a target node for the line.");
         }
 

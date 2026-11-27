@@ -184,12 +184,14 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The menu can be enabled/disabled by pressing the space bar.
-        /// Additionally, the action state can be selected via number keys.
+        /// Handles keyboard selection, menu visibility, undo, redo, and
+        /// updates the currently executing action.
+        /// Context-menu actions preserve the user's selected tool when
+        /// they are undone or redone.
         /// </summary>
         private void Update()
         {
-            // Select action state via numbers on the keyboard
+            // Select action state via numbers on the keyboard.
             for (int i = 0; i < modeMenu.Entries.Count; i++)
             {
                 if (SEEInput.DigitKeyPressed(i))
@@ -199,11 +201,10 @@ namespace SEE.UI
                 }
             }
 
-            // When the menu is shown, we still want the ToggleMenu key to work,
-            // except if the search field is focussed. Hence, we cannot rely on
-            // SEEInput here, but need to check the key directly.
+            // Allow toggling the menu unless its search field is focused.
             bool shouldReactToToggleMenu = (modeMenu.ShowMenu && !modeMenu.IsSearchFocused)
                 || (!modeMenu.ShowMenu && SEEInput.KeyboardShortcutsEnabled);
+
             if (shouldReactToToggleMenu && KeyBindings.IsDown(KeyAction.ToggleMenu))
             {
                 modeMenu.ToggleMenu();
@@ -211,39 +212,83 @@ namespace SEE.UI
 
             if (SEEInput.Undo())
             {
+                ActionStateType selectedTool = GetSelectedTool();
+                IReversibleAction previousRedoAction = GlobalActionHistory.NextRedoAction;
+
                 GlobalActionHistory.Undo();
 
-                if (GlobalActionHistory.IsEmpty())
+                IReversibleAction undoneAction = GlobalActionHistory.NextRedoAction;
+
+                if (undoneAction != null
+                    && !ReferenceEquals(undoneAction, previousRedoAction)
+                    && undoneAction is AbstractPlayerAction contextAction
+                    && contextAction.WasExecutedViaContextMenu
+                    && selectedTool != null)
                 {
-                    // The first/default action is assumed to be at top level of the
-                    // player menu hierarchy. If the last action is undone and we create
-                    // a new first action to be pushed onto the action history, it could
-                    // happen that we are currently in a submenu, in which case the
-                    // first/default would not exist in this submenu level; hence we
-                    // need to reset the menu to the top level.
+                    // Undoing a context-menu action must not replace
+                    // the tool the user had selected.
+                    if (GlobalActionHistory.Current() != selectedTool)
+                    {
+                        GlobalActionHistory.Execute(selectedTool);
+                    }
+                }
+                else if (GlobalActionHistory.IsEmpty())
+                {
                     modeMenu.ResetToBase();
-                    // We always want to have an action running.
-                    // The default action will be the first action state type.
                     GlobalActionHistory.Execute(ActionStateTypes.FirstActionStateType());
                 }
+
                 ActionStateType currentAction = GlobalActionHistory.Current();
                 SetPlayerMenu(currentAction.Name);
                 indicator.ChangeActionState(currentAction);
             }
             else if (SEEInput.Redo())
             {
+                ActionStateType selectedTool = GetSelectedTool();
+                IReversibleAction actionToRedo = GlobalActionHistory.NextRedoAction;
+
                 GlobalActionHistory.Redo();
+
+                if (actionToRedo is AbstractPlayerAction contextAction
+                    && contextAction.WasExecutedViaContextMenu
+                    && selectedTool != null
+                    && GlobalActionHistory.Current() != selectedTool)
+                {
+                    // Restore the selected tool after redoing the
+                    // context-menu action. The completed action remains
+                    // in the undo history.
+                    GlobalActionHistory.Execute(selectedTool);
+                }
+
                 ActionStateType currentAction = GlobalActionHistory.Current();
                 SetPlayerMenu(currentAction.Name);
                 indicator.ChangeActionState(currentAction);
             }
+
             if (RadialSelection.IndicatorChange)
             {
                 ActionStateType currentAction = GlobalActionHistory.Current();
                 indicator.ChangeActionState(currentAction);
                 RadialSelection.IndicatorChange = false;
             }
+
             GlobalActionHistory.Update();
+        }
+
+        /// <summary>
+        /// Returns the action state associated with the tool currently
+        /// selected in the player menu. Falls back to the current history
+        /// action when no matching menu entry can be found.
+        /// </summary>
+        /// <returns>The selected tool's action state, or null if unavailable.</returns>
+        private ActionStateType GetSelectedTool()
+        {
+            string selectedName = modeMenu.ActiveEntry?.Title;
+
+            return ActionStateTypes.AllRootTypes.AllElements()
+                .OfType<ActionStateType>()
+                .FirstOrDefault(actionType => actionType.Name == selectedName)
+                ?? GlobalActionHistory.Current();
         }
 
         /// <summary>

@@ -26,6 +26,16 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
+        /// Forwards an effect reported outside the regular history update to the local action history.
+        /// Only the currently executing action can cause the existing redo entries to be discarded.
+        /// </summary>
+        /// <param name="action">The action that produced the new effect.</param>
+        public static void InvalidateRedoHistory(IReversibleAction action)
+        {
+            history.InvalidateRedoHistory(action);
+        }
+
+        /// <summary>
         /// Executes the currently active action (if there is any).
         /// Expected to be called once for every frame.
         /// </summary>
@@ -113,6 +123,12 @@ namespace SEE.ReversibleActionHistory
         {
             return history.CurrentAction;
         }
+
+        /// <summary>
+        /// Gets the action that would be redone next, or null if no
+        /// redoable action exists.
+        /// </summary>
+        public static IReversibleAction NextRedoAction => history.NextRedoAction;
 
         /// <summary>
         /// True if the action history is empty.

@@ -11,6 +11,7 @@ using Plane = UnityEngine.Plane;
 using SEE.Factories;
 using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
+using SEE.ReversibleActionHistory;
 
 namespace SEE.Controls.ReversibleActions
 {
@@ -173,8 +174,6 @@ namespace SEE.Controls.ReversibleActions
             interactable.SetSelect(true, true);
 
             InteractableObject.MultiSelectionAllowed = false;
-            InteractableObject.LocalAnySelectIn += OnSelectionChanged;
-            InteractableObject.LocalAnySelectOut += OnSelectionChanged;
         }
 
         /// <summary>
@@ -196,6 +195,11 @@ namespace SEE.Controls.ReversibleActions
                 if (CurrentState == IReversibleAction.Progress.InProgress)
                 {
                     finished = true;
+                }
+                else if (WasExecutedViaContextMenu
+                    && CurrentState == IReversibleAction.Progress.NoEffect)
+                {
+                    IsCanceled = true;
                 }
                 return;
             }
@@ -221,23 +225,29 @@ namespace SEE.Controls.ReversibleActions
         }
 
         /// <summary>
-        /// Event handler that is called by <see cref="ResizeGizmo"/> each time a resize step is finished.
-        /// <para>
-        /// One resize step is finished each time a handle is released. This, however, does not finish the
-        /// <see cref="ResizeNodeAction"/>.
-        /// </para>
+        /// Handles a resize step reported by <see cref="ResizeGizmo"/> when the mouse button is released.
+        /// A release without a scale or position change does not affect the history or the network.
+        /// An actual change invalidates Redo but does not complete the resize action.
         /// </summary>
-        /// <param name="newLocalScale">The new local scale after the resize step.</param>
-        /// <param name="newPosition">The new world-space position after the resize step.</param>
+        /// <param name="newLocalScale">The node's local scale after the resize step.</param>
+        /// <param name="newPosition">The node's world-space position after the resize step.</param>
         private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
+            if (memento.NewLocalScale == newLocalScale
+                && memento.NewPosition == newPosition)
+            {
+                return;
+            }
+
             CurrentState = IReversibleAction.Progress.InProgress;
+            GlobalActionHistory.InvalidateRedoHistory(this);
 
             memento.NewLocalScale = newLocalScale;
             memento.NewPosition = newPosition;
 
-            // Apply new position and scale to update edges and propagate changes to other players
+            // Apply the new size and propagate the modification to other players.
             memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false, updateLayers: false);
+
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
