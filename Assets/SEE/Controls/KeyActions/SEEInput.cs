@@ -1112,6 +1112,23 @@ namespace SEE.Controls.KeyActions
             return result;
         }
 
+        /// <summary>
+        /// Toggles the transcription of the local player's voice chat.
+        /// </summary>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
+        public static bool ToggleTranscription()
+        {
+            bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleTranscription);
+
+            if (result)
+            {
+                // Track the ToggleTranscription action
+                TracingHelperService.Instance?.TrackKeyPress("ToggleTranscription");
+            }
+
+            return result;
+        }
+
         #endregion
 
         //----------------------------------------------------
