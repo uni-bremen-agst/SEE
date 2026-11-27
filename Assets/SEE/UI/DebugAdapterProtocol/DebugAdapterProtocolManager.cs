@@ -67,6 +67,11 @@ namespace SEE.UI.DebugAdapterProtocol
         private static DebugAdapterProtocolSession session;
 
         /// <summary>
+        /// The active debug session, or null if there is none (also after it was destroyed).
+        /// </summary>
+        internal static DebugAdapterProtocolSession ActiveSession => session != null ? session : null;
+
+        /// <summary>
         /// The run button.
         /// </summary>
         public GameObject RunButton;

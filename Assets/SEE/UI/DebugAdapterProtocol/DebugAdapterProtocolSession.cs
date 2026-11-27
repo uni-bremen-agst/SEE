@@ -9,6 +9,7 @@ using SEE.UI.Window.ConsoleWindow;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -137,9 +138,14 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <para>
         /// Ensures that the actions are executed on the main thread and after the debug adapter is initialized.
         /// </para>
+        /// <para>
+        /// Thread-safe, because the debug adapter host raises its events (e.g. stopped, continued)
+        /// on its own thread, and their handlers enqueue actions while <see cref="Update"/>
+        /// dequeues them on the main thread.
+        /// </para>
         /// <seealso cref="Update"/>
         /// </summary>
-        private readonly Queue<Action> actions = new();
+        private readonly ConcurrentQueue<Action> actions = new();
 
         /// <summary>
         /// Buffers the hovered word if the debuggee is currently running.
@@ -181,6 +187,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     actions.Enqueue(UpdateVariables);
                     actions.Enqueue(UpdateHoverTooltip);
                 }
+                OnRunningChanged(value);
             }
         }
 
@@ -310,9 +317,9 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (capabilities != null)
             {
-                while (actions.Count > 0)
+                while (actions.TryDequeue(out Action action))
                 {
-                    actions.Dequeue()();
+                    action();
                 }
             }
         }

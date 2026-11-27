@@ -62,6 +62,15 @@ namespace SEE.Tools.AI
         /// <summary>Commands waiting for the main thread.</summary>
         private readonly ConcurrentQueue<PendingCommand> queue = new();
 
+        /// <summary>Maps source locations onto nodes for the <c>node_at</c> tool.</summary>
+        private readonly SourceLocator sourceLocator = new();
+
+        /// <summary>The debugger tools; created on first use.</summary>
+        private AgentDebugger debugger;
+
+        /// <summary>The debugger tools.</summary>
+        private AgentDebugger Debugger => debugger ??= new(sourceLocator);
+
         /// <summary>A command received from the agent, waiting for its answer.</summary>
         private class PendingCommand
         {
@@ -359,6 +368,7 @@ namespace SEE.Tools.AI
                 "status" => Status(),
                 "find_symbol" => FindSymbol(StringArgument(args, "query"), IntArgument(args, "limit") ?? 10),
                 "neighbors" => Neighbors(StringArgument(args, "target"), IntArgument(args, "limit") ?? 30),
+                "node_at" => NodeAt(args),
                 "focus" => ToJson(effects.Focus(StringArgument(args, "target"))),
                 "focus_camera" => ToJson(effects.FocusCamera(StringArgument(args, "target"))),
                 "highlight" => ToJson(effects.Highlight(StringListArgument(args, "targets"))),
@@ -368,6 +378,13 @@ namespace SEE.Tools.AI
                                                                  StringArgument(args, "final"))),
                 "open_code" => ToJson(effects.OpenCode(StringArgument(args, "target"), IntArgument(args, "line"))),
                 "reset" => ToJson(effects.ResetEffects()),
+                "debug_status" => Debugger.Status(BoolArgument(args, "focus") ?? false),
+                "set_breakpoint" => Debugger.SetBreakpoint(StringArgument(args, "file"), IntArgument(args, "line"), add: true),
+                "remove_breakpoint" => Debugger.SetBreakpoint(StringArgument(args, "file"), IntArgument(args, "line"), add: false),
+                "debug_continue" => Debugger.Continue(),
+                "debug_step" => Debugger.Step(StringArgument(args, "kind")),
+                "debug_stack" => Debugger.Stack(IntArgument(args, "limit") ?? 20),
+                "debug_variables" => Debugger.Variables(IntArgument(args, "frame") ?? 0, IntArgument(args, "limit") ?? 50),
                 _ => Error($"Unknown tool '{tool}'.")
             };
 
@@ -375,7 +392,8 @@ namespace SEE.Tools.AI
             string message = (string)response["message"] ?? "";
             Debug.Log($"[{nameof(AgentCommandServer)}] {tool} {args.ToString(Newtonsoft.Json.Formatting.None)} -> "
                       + $"{(callSucceeded ? "OK" : "FAILED")}: {message}\n");
-            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors"))
+            if (ShowNotifications && tool is not ("status" or "find_symbol" or "neighbors" or "node_at"
+                                                  or "debug_status" or "debug_stack" or "debug_variables"))
             {
                 if (callSucceeded)
                 {
@@ -393,7 +411,10 @@ namespace SEE.Tools.AI
 
         #region Queries
 
-        /// <summary>What is loaded: cities, number of drawn nodes, and whether effects can run.</summary>
+        /// <summary>
+        /// What is loaded: cities with their number of drawn nodes and the folder of their source
+        /// code, and whether effects can run.
+        /// </summary>
         /// <returns>The JSON answer.</returns>
         private static JObject Status()
         {
@@ -401,7 +422,13 @@ namespace SEE.Tools.AI
             foreach (AbstractSEECity city in FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
             {
                 int nodes = city.gameObject.FindAllDescendantsWithTag(Tags.Node, includeInactive: false).Count;
-                cities.Add(new JObject { ["name"] = city.name, ["type"] = city.GetType().Name, ["drawn_nodes"] = nodes });
+                cities.Add(new JObject
+                {
+                    ["name"] = city.name,
+                    ["type"] = city.GetType().Name,
+                    ["drawn_nodes"] = nodes,
+                    ["source_directory"] = SourceLocator.SourceDirectoryOf(city)
+                });
             }
             return new()
             {
@@ -529,10 +556,64 @@ namespace SEE.Tools.AI
             }
         }
 
+        /// <summary>
+        /// The nodes declared at source locations: either the single location in the arguments
+        /// "file" and "line", or each object {"file", "line"} of the argument "locations".
+        /// The optional argument "city" restricts the search to the city with that name.
+        /// Each location found also names its city and that city's source code directory.
+        /// </summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <returns>The JSON answer with one entry per location in "locations"; ok if at
+        /// least one location was found.</returns>
+        private JObject NodeAt(JObject args)
+        {
+            IEnumerable<JToken> requested = args["locations"] is JArray array
+                ? array
+                : new JToken[] { new JObject { ["file"] = args["file"], ["line"] = args["line"] } };
+            string cityName = StringArgument(args, "city");
+
+            JArray results = new();
+            int found = 0;
+            foreach (JToken token in requested)
+            {
+                JObject location = token as JObject ?? new();
+                string file = StringArgument(location, "file");
+                int line = IntArgument(location, "line") ?? 0;
+                JObject result = new() { ["file"] = file, ["line"] = line };
+                if (sourceLocator.TryLocate(file, line, cityName, out Node node, out SourceLocator.MatchKind match,
+                                            out AbstractSEECity city, out string problem))
+                {
+                    found++;
+                    Node drawn = SourceLocator.DrawnNodeOrAncestor(node);
+                    result["ok"] = true;
+                    result["match"] = match == SourceLocator.MatchKind.Range ? "range" : "nearest_declaration";
+                    result["node"] = Describe(node);
+                    // The building to pass to focus or show_path; null if nothing of it is drawn.
+                    result["focus_id"] = drawn?.ID;
+                    // The city of the graph, also if the node is not drawn; probe_run takes its
+                    // source code directory as the project folder.
+                    result["city"] = city != null ? city.name : null;
+                    result["source_directory"] = SourceLocator.SourceDirectoryOf(city);
+                }
+                else
+                {
+                    result["ok"] = false;
+                    result["message"] = problem;
+                }
+                results.Add(result);
+            }
+            return new()
+            {
+                ["ok"] = found > 0,
+                ["message"] = $"{found} of {results.Count} location(s) found.",
+                ["locations"] = results
+            };
+        }
+
         /// <summary>The fields of a node the agent needs to choose and cite it.</summary>
         /// <param name="node">The node.</param>
         /// <returns>JSON with id, name, type, file, line, city and whether it is drawn.</returns>
-        private static JObject Describe(Node node)
+        internal static JObject Describe(Node node)
         {
             GameObject gameNode = node.GameObject(false);
             AbstractSEECity city = gameNode != null ? gameNode.ContainingCity() : null;
@@ -565,7 +646,7 @@ namespace SEE.Tools.AI
         /// <summary>A failed answer.</summary>
         /// <param name="message">What went wrong.</param>
         /// <returns>JSON with ok = false.</returns>
-        private static JObject Error(string message) => new() { ["ok"] = false, ["message"] = message };
+        internal static JObject Error(string message) => new() { ["ok"] = false, ["message"] = message };
 
         /// <summary>A string argument; any other JSON value is converted to its text.</summary>
         /// <param name="args">The arguments of the request.</param>
@@ -580,6 +661,13 @@ namespace SEE.Tools.AI
         /// <returns>The argument as an integer, or null if it is missing or not a number.</returns>
         private static int? IntArgument(JObject args, string name) =>
             args[name] is JValue { Type: JTokenType.Integer or JTokenType.Float } value ? (int)(double)value : null;
+
+        /// <summary>A boolean argument.</summary>
+        /// <param name="args">The arguments of the request.</param>
+        /// <param name="name">Name of the argument.</param>
+        /// <returns>The argument, or null if it is missing or not a boolean.</returns>
+        private static bool? BoolArgument(JObject args, string name) =>
+            args[name] is JValue { Type: JTokenType.Boolean } value ? (bool)value : null;
 
         /// <summary>A list-of-strings argument; a single string counts as a list of one.</summary>
         /// <param name="args">The arguments of the request.</param>

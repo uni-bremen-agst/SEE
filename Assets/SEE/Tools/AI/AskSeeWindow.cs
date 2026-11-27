@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using SEE.Controls.KeyActions;
+using SEE.Game.City;
 using SEE.Utils;
 
 namespace SEE.Tools.AI
@@ -23,8 +24,10 @@ namespace SEE.Tools.AI
     /// buildings light up while it works; its answer then appears in the box.
     ///
     /// Claude may only read code (Read, Grep, Glob) and use the SEE tools; it cannot edit
-    /// files or run commands. Follow-up questions continue the same conversation until
-    /// "New conversation" is pressed.
+    /// files or run commands itself. The SEE tool <c>probe_run</c> builds and runs the loaded
+    /// project, but only in a disposable copy. Claude may read the repository and the source
+    /// code directories of the loaded cities. Follow-up questions continue the same
+    /// conversation until "New conversation" is pressed.
     ///
     /// Requires the Claude Code command-line tool, signed in once with <c>claude</c> → <c>/login</c>.
     /// Only compiled into the Editor and development builds, like <see cref="AgentCommandServer"/>.
@@ -65,7 +68,10 @@ namespace SEE.Tools.AI
             + "focus (or show_path, show_neighbors or highlight when that fits better). The city may "
             + "be built from an older version of the code; if no building matches, say so and focus "
             + "the closest match. For a path, give show_path the start and the end and report the "
-            + "path it returns; never invent a dependency or a step. Match the length of your reply "
+            + "path it returns; never invent a dependency or a step. For questions about what happens "
+            + "at runtime (which code runs, in which order, with which values), use probe_run as the "
+            + "see instructions describe; if the user debugs in SEE, use the debug tools. "
+            + "Match the length of your reply "
             + "to the question: for 'where is' questions, at most four short sentences that name the file and line; for 'how', "
             + "'why' or 'explain' questions, explain clearly in up to about fifteen sentences or a "
             + "short list (lines starting with '- '), citing files and lines. Use plain text: no "
@@ -381,10 +387,19 @@ namespace SEE.Tools.AI
             {
                 "-p", "--output-format", "stream-json", "--verbose",
                 "--mcp-config", Quote(mcpConfig), "--strict-mcp-config",
+                // The wildcard allows every tool of the see server, including tools added later
+                // (node_at, probe_run, the debugger tools, ...).
                 "--allowedTools", Quote("mcp__see__*"), "Read", "Grep", "Glob",
                 "--disallowedTools", "Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch",
                 "--append-system-prompt", Quote(systemPrompt)
             };
+            // The loaded project may lie outside the repository (e.g. a city of another program);
+            // without this, Claude could not read its files and build scripts.
+            foreach (string directory in LoadedSourceDirectories(repository))
+            {
+                arguments.Add("--add-dir");
+                arguments.Add(Quote(directory));
+            }
             if (!string.IsNullOrEmpty(sessionId))
             {
                 arguments.Add("--resume");
@@ -567,6 +582,35 @@ namespace SEE.Tools.AI
         /// </summary>
         /// <returns>Full path, or null if not found.</returns>
         private string FindClaude() => ExecutableLocator.FindClaude(ClaudeExecutable);
+
+        /// <summary>
+        /// The source code directories of the cities that have a loaded graph, if they exist
+        /// and lie outside <paramref name="repository"/>. Cities without a graph are skipped:
+        /// their directory is only a default from the scene (possibly of another computer).
+        /// </summary>
+        /// <param name="repository">The folder Claude Code runs in; it can be read anyway.</param>
+        /// <returns>Absolute paths without a trailing separator (which would escape the closing
+        /// quote on the command line), without duplicates.</returns>
+        private static IEnumerable<string> LoadedSourceDirectories(string repository)
+        {
+            string repositoryPrefix = Path.GetFullPath(repository).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
+            HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
+            foreach (AbstractSEECity city in FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
+            {
+                string directory = city.LoadedGraph != null ? SourceLocator.SourceDirectoryOf(city) : null;
+                if (directory == null || !Directory.Exists(directory))
+                {
+                    continue;
+                }
+                directory = Path.GetFullPath(directory).TrimEnd('\\', '/');
+                bool insideRepository = (directory + Path.DirectorySeparatorChar)
+                    .StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase);
+                if (directory.Length > 0 && !insideRepository && seen.Add(directory))
+                {
+                    yield return directory;
+                }
+            }
+        }
 
         /// <summary>
         /// Writes the MCP configuration for Claude Code into Unity's temporary cache folder and
@@ -1027,10 +1071,27 @@ namespace SEE.Tools.AI
                 ? string.Join(", ", array.Select(t => ShortId(t.ToString())))
                 : ShortId(input[key]?.ToString() ?? "");
 
+            /// <summary>The file name and line of a location argument, e.g. "Program.cs:25".</summary>
+            /// <param name="location">An object with "file" and "line".</param>
+            /// <returns>The text.</returns>
+            static string Location(JObject location) =>
+                $"{Path.GetFileName(location["file"]?.ToString() ?? "")}:{location["line"]}";
+
             if (name != null && name.StartsWith("mcp__see__"))
             {
                 string tool = name.Substring("mcp__see__".Length);
-                string detail = Argument("target") + Argument("targets") + Argument("query") + Argument("visited");
+                string detail = Argument("target") + Argument("targets") + Argument("query") + Argument("visited")
+                                + Argument("kind");
+                if (input["probes"] is JArray probes)
+                {
+                    // probe_run: the probed locations.
+                    detail += string.Join(", ", probes.OfType<JObject>().Select(Location));
+                }
+                else if (input["file"] != null)
+                {
+                    // node_at, set_breakpoint and remove_breakpoint.
+                    detail += Location(input);
+                }
                 return $"SEE: {tool} {detail}".TrimEnd();
             }
             return name switch
