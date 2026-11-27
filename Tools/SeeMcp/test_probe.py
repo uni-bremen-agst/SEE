@@ -33,18 +33,31 @@ def no_see(tool, args):
 
 
 class FakeSee:
-    """Records the commands sent to SEE and maps every location to the node 'n<line>'."""
+    """Records the commands sent to SEE and maps every location to the node 'n<line>'.
 
-    def __init__(self):
+    directories maps a file name to the source directory of the city that knows it;
+    files not in it are unknown. Without directories, every file is known (directory None).
+    """
+
+    def __init__(self, directories=None):
         self.calls = []
+        self.directories = directories
 
     def __call__(self, tool, args):
         self.calls.append((tool, args))
         if tool == "node_at":
-            located = [{"ok": True, "match": "range", "focus_id": f"n{loc['line']}", "node": {"name": f"N{loc['line']}"}}
-                       for loc in args["locations"]]
-            return False, json.dumps({"ok": True, "locations": located})
+            located = [self.locate(loc) for loc in args["locations"]]
+            return False, json.dumps({"ok": any(l["ok"] for l in located), "locations": located})
         return False, json.dumps({"ok": True, "message": "Path shown."})
+
+    def locate(self, location):
+        """The node_at answer for one location."""
+        name = os.path.basename(location["file"])
+        if self.directories is not None and name not in self.directories:
+            return {"ok": False, "message": f"No node of any city is declared in '{location['file']}'."}
+        return {"ok": True, "match": "range", "focus_id": f"n{location['line']}", "city": "CodeCity",
+                "source_directory": (self.directories or {}).get(name),
+                "node": {"name": f"N{location['line']}", "file": name}}
 
 
 class InstrumentTest(unittest.TestCase):
@@ -172,6 +185,43 @@ class RunTest(unittest.TestCase):
                                                  probes=[{"file": "slow.py", "line": 3, "expressions": []}]), no_see)
         self.assertTrue(answer["timed_out"])
         self.assertEqual(answer["hits_total"], 1)
+
+    def test_root_from_see_takes_the_city_source_directory(self):
+        arguments = self.arguments(probes=[{"file": os.path.join(self.folder, "app.py"), "line": 4, "expressions": ["i"]}])
+        del arguments["root"]
+        answer = probe.run_probes(arguments, FakeSee({"app.py": self.folder}))
+        self.assertTrue(answer["ok"], answer)
+        self.assertEqual(answer["root"], os.path.abspath(self.folder))
+        self.assertEqual(answer["probes"][0]["file"], "app.py")  # rewritten to the node's path
+        self.assertEqual(answer["hits_total"], 2)
+
+    def test_root_from_see_unknown_file(self):
+        arguments = self.arguments()
+        del arguments["root"]
+        is_error, text = probe.run_tool(arguments, FakeSee({}))
+        self.assertTrue(is_error)
+        self.assertIn("no city in SEE knows app.py", json.loads(text)["message"])
+
+    def test_root_from_see_without_see(self):
+        arguments = self.arguments()
+        del arguments["root"]
+        is_error, text = probe.run_tool(arguments, no_see)
+        self.assertTrue(is_error)
+        self.assertIn("SEE cannot tell the project folder", json.loads(text)["message"])
+
+    def test_root_from_see_two_projects(self):
+        arguments = self.arguments(probes=[{"file": "app.py", "line": 4}, {"file": "other.py", "line": 1}])
+        del arguments["root"]
+        is_error, text = probe.run_tool(arguments, FakeSee({"app.py": self.folder, "other.py": tempfile.gettempdir()}))
+        self.assertTrue(is_error)
+        self.assertIn("several projects", json.loads(text)["message"])
+
+    def test_root_from_see_city_without_source_directory(self):
+        arguments = self.arguments()
+        del arguments["root"]
+        is_error, text = probe.run_tool(arguments, FakeSee())
+        self.assertTrue(is_error)
+        self.assertIn("has no source code directory", json.loads(text)["message"])
 
     def test_unsupported_file_type(self):
         is_error, text = probe.run_tool(self.arguments(probes=[{"file": "main.cpp", "line": 1}]), no_see)

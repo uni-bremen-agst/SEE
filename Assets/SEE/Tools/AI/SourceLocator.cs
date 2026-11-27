@@ -6,6 +6,7 @@ using UnityEngine;
 using SEE.Game.City;
 using SEE.Graphs;
 using SEE.Utils;
+using SEE.Utils.Paths;
 using Range = SEE.Graphs.Range;
 
 namespace SEE.Tools.AI
@@ -62,14 +63,17 @@ namespace SEE.Tools.AI
         /// <param name="cityName">Name of the only city to search, or null for all cities.</param>
         /// <param name="node">The node found, or null.</param>
         /// <param name="match">How <paramref name="node"/> was found.</param>
+        /// <param name="city">The city whose graph contains <paramref name="node"/>, or null.
+        /// If the same file is in several cities, the first one is used.</param>
         /// <param name="problem">Why no node was found, or the candidate files if the file is
         /// ambiguous; null on success.</param>
         /// <returns>Whether a node was found.</returns>
         internal bool TryLocate(string file, int line, string cityName,
-                                out Node node, out MatchKind match, out string problem)
+                                out Node node, out MatchKind match, out AbstractSEECity city, out string problem)
         {
             node = null;
             match = MatchKind.Range;
+            city = null;
             if (string.IsNullOrWhiteSpace(file))
             {
                 problem = "No file given.";
@@ -82,19 +86,19 @@ namespace SEE.Tools.AI
             }
 
             string wanted = Normalize(file);
-            List<(int score, string path, List<Node> nodes)> candidates = new();
-            foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
+            List<(int score, string path, List<Node> nodes, AbstractSEECity city)> candidates = new();
+            foreach (AbstractSEECity candidateCity in UnityEngine.Object.FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
             {
-                if (cityName != null && !string.Equals(city.name, cityName, StringComparison.OrdinalIgnoreCase))
+                if (cityName != null && !string.Equals(candidateCity.name, cityName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
-                foreach ((string path, List<Node> nodes) in FilesOf(city))
+                foreach ((string path, List<Node> nodes) in FilesOf(candidateCity))
                 {
                     int score = Score(wanted, path);
                     if (score > 0)
                     {
-                        candidates.Add((score, path, nodes));
+                        candidates.Add((score, path, nodes, candidateCity));
                     }
                 }
             }
@@ -105,7 +109,8 @@ namespace SEE.Tools.AI
                 return false;
             }
             int best = candidates.Max(c => c.score);
-            List<(int score, string path, List<Node> nodes)> bestCandidates = candidates.Where(c => c.score == best).ToList();
+            List<(int score, string path, List<Node> nodes, AbstractSEECity city)> bestCandidates =
+                candidates.Where(c => c.score == best).ToList();
             // The same file in several cities is fine; different files are not.
             List<string> bestPaths = bestCandidates.Select(c => c.path).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
             if (bestPaths.Count > 1)
@@ -121,8 +126,33 @@ namespace SEE.Tools.AI
                 match = MatchKind.NearestDeclaration;
                 node = NearestDeclaration(inFile, line);
             }
-            problem = node == null ? $"No node in '{bestPaths[0]}' is declared at or before line {line}." : null;
-            return node != null;
+            if (node == null)
+            {
+                problem = $"No node in '{bestPaths[0]}' is declared at or before line {line}.";
+                return false;
+            }
+            Graph graph = node.ItsGraph;
+            city = bestCandidates.Select(c => c.city).FirstOrDefault(c => c.LoadedGraph == graph);
+            problem = null;
+            return true;
+        }
+
+        /// <summary>
+        /// The folder with the source code of <paramref name="city"/> (its
+        /// <see cref="AbstractSEECity.SourceCodeDirectory"/>) as an absolute path.
+        /// </summary>
+        /// <param name="city">The city, or null.</param>
+        /// <returns>The absolute path, or null if the city is null, has no source code
+        /// directory, or its source code is behind a URL.</returns>
+        internal static string SourceDirectoryOf(AbstractSEECity city)
+        {
+            DataPath directory = city != null ? city.SourceCodeDirectory : null;
+            if (directory == null || directory.Root == DataPath.RootKind.Url)
+            {
+                return null;
+            }
+            string path = directory.Path;
+            return string.IsNullOrWhiteSpace(path) ? null : path;
         }
 
         /// <summary>

@@ -289,6 +289,36 @@ def normalize_probes(raw_probes):
     return probes
 
 
+def project_root_from_see(probes, see):
+    """The project folder of the probes: the source code directory of the city that contains them.
+
+    Used when root is not given. Each probe's file is replaced by the path of its node in that
+    city, which is relative to the source code directory. Raises ProbeError if SEE cannot tell.
+    """
+    is_error, text = see("node_at", {"locations": [{"file": p["file"], "line": p["line"]} for p in probes]})
+    try:
+        answer = json.loads(text)
+    except json.JSONDecodeError:
+        raise ProbeError(f"root was not given, and SEE cannot tell the project folder: {text}") from None
+    located_all = answer.get("locations") or []
+    if len(located_all) != len(probes):
+        raise ProbeError(f"root was not given, and SEE cannot tell the project folder: {answer.get('message', text)}")
+
+    roots = {}
+    for probe, located in zip(probes, located_all):
+        if not located.get("ok"):
+            raise ProbeError(f"root was not given, and no city in SEE knows {probe['file']}: {located.get('message')}")
+        directory = located.get("source_directory")
+        if not directory:
+            raise ProbeError(f"City '{located.get('city')}' has no source code directory; give root.")
+        roots.setdefault(os.path.normcase(os.path.normpath(directory)), directory)
+        probe["file"] = (located.get("node") or {}).get("file") or probe["file"]
+    if len(roots) > 1:
+        raise ProbeError(f"The probes lie in several projects ({', '.join(roots.values())}); "
+                         "probe one project at a time or give root.")
+    return next(iter(roots.values()))
+
+
 def instrument_copy(copy, probes):
     """Inserts the statements of all probes into the files of copy."""
     by_file = {}
@@ -353,10 +383,11 @@ def run_probes(arguments, see):
     command = arguments.get("command")
     if not isinstance(command, str) or not command.strip():
         raise ProbeError("command (the shell command that builds and runs the program) is required.")
-    project_root = os.path.abspath(arguments.get("root") or os.getcwd())
+    probes = normalize_probes(arguments.get("probes"))
+    # Without root, the project is the one loaded in SEE, not the folder the MCP server runs in.
+    project_root = os.path.abspath(arguments.get("root") or project_root_from_see(probes, see))
     if not os.path.isdir(project_root):
         raise ProbeError(f"Project folder not found: {project_root}")
-    probes = normalize_probes(arguments.get("probes"))
     timeout_s = int(arguments.get("timeout_s") or DEFAULT_TIMEOUT_S)
     max_hits = int(arguments.get("max_hits") or DEFAULT_MAX_HITS)
 
@@ -387,6 +418,7 @@ def run_probes(arguments, see):
         "ok": not failed,
         "message": message,
         "mode": "source",
+        "root": project_root,
         "copy": copy.kind,
         "exit_code": exit_code,
         "timed_out": timed_out,
@@ -431,13 +463,17 @@ TOOL = {
             "command": {"type": "string",
                         "description": "Shell command that builds and runs the program, executed in the copy "
                                        "of root (cmd.exe on Windows, so chain with &&)."},
-            "root": {"type": "string", "description": "Project folder (default: the current folder)."},
+            "root": {"type": "string",
+                     "description": "Project folder. Default: the source code directory of the SEE city "
+                                    "whose graph contains the probed files (see status)."},
             "probes": {
                 "type": "array",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "file": {"type": "string", "description": "Path relative to root, or absolute inside it."},
+                        "file": {"type": "string",
+                                 "description": "Path relative to root, or absolute inside it. Without root, "
+                                                "a file name a city knows (e.g. 'Program.cs') is enough."},
                         "line": {"type": "integer", "description": "The values are logged before this line (1-based)."},
                         "expressions": {"type": "array", "items": {"type": "string"},
                                         "description": "Expressions to log, e.g. [\"sum\", \"i\"]; may be empty."},

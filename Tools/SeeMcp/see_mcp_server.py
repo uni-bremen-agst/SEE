@@ -42,6 +42,10 @@ and use its focus_id with focus or show_path.
 
 For runtime questions ("which code runs, in which order, with which values?") use probe_run:
 it adds temporary log statements in a copy of the project, runs a command and shows the path.
+For runtime questions about the loaded project, take the project folder from status (not the
+SEE repo the CLI runs in), infer how to build and run it from the files there (build scripts,
+.csproj, package.json, Makefile, pyproject.toml), then use probe_run. If you omit root,
+probe_run uses the source directory of the city containing the probed file.
 Report only the values and order that probe_run returned.
 
 If the user debugs in SEE (they press Run in SEE's debugger), use set_breakpoint, debug_continue,

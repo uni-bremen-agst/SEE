@@ -250,7 +250,7 @@ namespace SEE.Tools.AI
                 ["line"] = frame.Line
             };
             if (frame.Source?.Path != null
-                && sourceLocator.TryLocate(frame.Source.Path, frame.Line, null, out Node node, out _, out _))
+                && sourceLocator.TryLocate(frame.Source.Path, frame.Line, null, out Node node, out _, out _, out _))
             {
                 result["node"] = AgentCommandServer.Describe(node);
                 result["focus_id"] = SourceLocator.DrawnNodeOrAncestor(node)?.ID;
@@ -274,8 +274,8 @@ namespace SEE.Tools.AI
             string absolute = file;
             if (!Path.IsPathRooted(file))
             {
-                if (!sourceLocator.TryLocate(file, line, null, out Node node, out _, out problem)
-                    && !sourceLocator.TryLocate(file, int.MaxValue, null, out node, out _, out problem))
+                if (!sourceLocator.TryLocate(file, line, null, out Node node, out _, out _, out problem)
+                    && !sourceLocator.TryLocate(file, int.MaxValue, null, out node, out _, out _, out problem))
                 {
                     problem = $"'{file}' is not an absolute path, and no city knows it: {problem}";
                     return false;

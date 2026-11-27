@@ -411,7 +411,10 @@ namespace SEE.Tools.AI
 
         #region Queries
 
-        /// <summary>What is loaded: cities, number of drawn nodes, and whether effects can run.</summary>
+        /// <summary>
+        /// What is loaded: cities with their number of drawn nodes and the folder of their source
+        /// code, and whether effects can run.
+        /// </summary>
         /// <returns>The JSON answer.</returns>
         private static JObject Status()
         {
@@ -419,7 +422,13 @@ namespace SEE.Tools.AI
             foreach (AbstractSEECity city in FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
             {
                 int nodes = city.gameObject.FindAllDescendantsWithTag(Tags.Node, includeInactive: false).Count;
-                cities.Add(new JObject { ["name"] = city.name, ["type"] = city.GetType().Name, ["drawn_nodes"] = nodes });
+                cities.Add(new JObject
+                {
+                    ["name"] = city.name,
+                    ["type"] = city.GetType().Name,
+                    ["drawn_nodes"] = nodes,
+                    ["source_directory"] = SourceLocator.SourceDirectoryOf(city)
+                });
             }
             return new()
             {
@@ -551,6 +560,7 @@ namespace SEE.Tools.AI
         /// The nodes declared at source locations: either the single location in the arguments
         /// "file" and "line", or each object {"file", "line"} of the argument "locations".
         /// The optional argument "city" restricts the search to the city with that name.
+        /// Each location found also names its city and that city's source code directory.
         /// </summary>
         /// <param name="args">The arguments of the request.</param>
         /// <returns>The JSON answer with one entry per location in "locations"; ok if at
@@ -571,7 +581,7 @@ namespace SEE.Tools.AI
                 int line = IntArgument(location, "line") ?? 0;
                 JObject result = new() { ["file"] = file, ["line"] = line };
                 if (sourceLocator.TryLocate(file, line, cityName, out Node node, out SourceLocator.MatchKind match,
-                                            out string problem))
+                                            out AbstractSEECity city, out string problem))
                 {
                     found++;
                     Node drawn = SourceLocator.DrawnNodeOrAncestor(node);
@@ -580,6 +590,10 @@ namespace SEE.Tools.AI
                     result["node"] = Describe(node);
                     // The building to pass to focus or show_path; null if nothing of it is drawn.
                     result["focus_id"] = drawn?.ID;
+                    // The city of the graph, also if the node is not drawn; probe_run takes its
+                    // source code directory as the project folder.
+                    result["city"] = city != null ? city.name : null;
+                    result["source_directory"] = SourceLocator.SourceDirectoryOf(city);
                 }
                 else
                 {
