@@ -228,8 +228,7 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Verifies that undoing and redoing a context-menu action preserves
-        /// the selected Move tool in the actual player menu.
+        /// Verifies that redoing an interrupted context-menu action preserves the selected Move tool.
         /// </summary>
         /// <returns>An enumerator for the Unity Test Runner.</returns>
         [UnityTest]
@@ -239,23 +238,27 @@ namespace SEE.UI
             SimulatedAction action = PrepareAction(fromContextMenu: true);
 
             AssertSelectedTool(ActionStateTypes.Move);
+            Assert.That(action.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.InProgress));
 
             InvokeHistoryShortcut(undo: true);
 
             Assert.That(action.IsUndone, Is.True);
             AssertSelectedTool(ActionStateTypes.Move);
+            Assert.That(redoStack.Count, Is.EqualTo(1));
+            Assert.That(redoStack.Peek(), Is.SameAs(action));
 
             InvokeHistoryShortcut(undo: false);
 
-            Assert.That(action.IsUndone, Is.False);
+            Assert.That(action.IsUndone, Is.True);
+            Assert.That(history.CurrentAction, Is.Not.SameAs(action));
+            Assert.That(redoStack.Count, Is.EqualTo(0));
             AssertSelectedTool(ActionStateTypes.Move);
 
             yield return null;
         }
 
         /// <summary>
-        /// Verifies that redoing a regular action continues to activate
-        /// the tool associated with that action.
+        /// Verifies that redoing an interrupted regular action activates a fresh instance of its tool.
         /// </summary>
         /// <returns>An enumerator for the Unity Test Runner.</returns>
         [UnityTest]
@@ -264,28 +267,35 @@ namespace SEE.UI
         {
             SimulatedAction action = PrepareAction(fromContextMenu: false);
 
+            AssertSelectedTool(ActionStateTypes.Move);
+
             InvokeHistoryShortcut(undo: true);
 
             Assert.That(action.IsUndone, Is.True);
+            Assert.That(redoStack.Count, Is.EqualTo(1));
+            Assert.That(redoStack.Peek(), Is.SameAs(action));
 
             InvokeHistoryShortcut(undo: false);
 
-            Assert.That(action.IsUndone, Is.False);
+            Assert.That(action.IsUndone, Is.True);
+            Assert.That(redoStack.Count, Is.EqualTo(0));
+            Assert.That(GlobalActionHistory.CurrentAction(), Is.InstanceOf<SimulatedAction>());
 
+            SimulatedAction restarted = (SimulatedAction)GlobalActionHistory.CurrentAction();
+            Assert.That(restarted, Is.Not.SameAs(action));
+            Assert.That(restarted.IsUndone, Is.False);
+            Assert.That(restarted.CurrentProgress(), Is.EqualTo(IReversibleAction.Progress.NoEffect));
             AssertSelectedTool(ActionStateTypes.Delete);
 
             yield return null;
         }
 
         /// <summary>
-        /// Creates a simulated reversible Delete action and subsequently
-        /// selects Move, representing the tool restored after a
-        /// context-menu operation or selected after a regular operation.
+        /// Creates an in-progress simulated Delete action and selects Move afterward.
+        /// The action has a preliminary effect but remains incomplete for the undo/redo scenario.
         /// </summary>
-        /// <param name="fromContextMenu">
-        /// Whether the simulated action originated from the context menu.
-        /// </param>
-        /// <returns>The action retained in the undo history.</returns>
+        /// <param name="fromContextMenu">Whether the simulated action originates from the context menu.</param>
+        /// <returns>The original simulated action retained in the undo history.</returns>
         private SimulatedAction PrepareAction(bool fromContextMenu)
         {
             ActionStateType simulatedType = new(
@@ -298,10 +308,9 @@ namespace SEE.UI
 
             GlobalActionHistory.Execute(simulatedType);
 
-            SimulatedAction action =
-                (SimulatedAction)GlobalActionHistory.CurrentAction();
-
+            SimulatedAction action = (SimulatedAction)GlobalActionHistory.CurrentAction();
             action.WasExecutedViaContextMenu = fromContextMenu;
+            action.SimulateEffect();
 
             GlobalActionHistory.Execute(ActionStateTypes.Move);
             playerMenu.UpdateActiveEntry();
@@ -405,9 +414,17 @@ namespace SEE.UI
             public bool IsUndone { get; private set; }
 
             /// <summary>
-            /// Initializes the simulated operation as having a preliminary effect.
+            /// Initializes the simulated action without any preliminary effect.
             /// </summary>
             public override void Awake()
+            {
+                CurrentState = IReversibleAction.Progress.NoEffect;
+            }
+
+            /// <summary>
+            /// Simulates the first modification without completing the action.
+            /// </summary>
+            public void SimulateEffect()
             {
                 CurrentState = IReversibleAction.Progress.InProgress;
             }
@@ -449,10 +466,11 @@ namespace SEE.UI
             }
 
             /// <summary>
-            /// Reapplies the simulated modification.
+            /// Reapplies a completed simulated modification and validates the base action contract.
             /// </summary>
             public override void Redo()
             {
+                base.Redo();
                 IsUndone = false;
             }
 
