@@ -437,9 +437,15 @@ namespace SEE.ReversibleActionHistory
         }
 
         /// <summary>
-        /// Undoes the last action with an effect of a specific player.
-        /// If a undo isn't possible or no one is remaining the user gets a notification.
+        /// Undoes the last action with an effect.
+        /// Actions without effects are discarded rather than added to the redo history.
+        /// Completed actions can be redone by restoring their effects.
+        /// Interrupted actions are undone, but redo starts a new instance without replaying their previous effects.
+        /// The previous action is resumed when another action with an effect remains in the undo history.
         /// </summary>
+        /// <exception cref="UndoImpossible">
+        /// Thrown if there is no action to undo or conflicting changes prevent undo.
+        /// </exception>
         public void Undo()
         {
             ActionStateType previousActionState = CurrentAction?.GetActionStateType();
@@ -455,10 +461,10 @@ namespace SEE.ReversibleActionHistory
             // In that case, it may have had some preliminary effects already
             // or not. If it has had preliminary effects,
             // we will treat it similarly to a completed action, that is, undo
-            // its effects and push it onto the RedoStack. This way it may
-            // be resumed by way of Redo. If it has had no effect yet, we do not
-            // undo it and it will not be pushed onto RedoStack. Instead we
-            // will just pop it off the UndoStack and continue with the next action
+            // its effects and push it onto the RedoStack. Redo then starts
+            // a new instance of the interrupted action without restoring its effects.
+            // If the action has had no effect yet, it is not added to the RedoStack.
+            // Instead, we will just pop it off the UndoStack and continue with the next action
             // on the UndoStack. The reason for this decision is as follows: It would
             // be confusing for a user if we would undo actions without any effect
             // as normal actions because the user would not get any visible
