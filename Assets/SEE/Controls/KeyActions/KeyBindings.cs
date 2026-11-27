@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace SEE.Controls.KeyActions
 {
@@ -194,7 +195,7 @@ namespace SEE.Controls.KeyActions
         {
             if (inputActionMap == null)
             {
-                inputActionAsset = Resources.Load<InputActionAsset>("KeyActions/SEE Keyboard Actions");
+                inputActionAsset = Resources.Load<InputActionAsset>("SEE Keyboard Actions");
                 if (inputActionAsset == null)
                 {
                     throw new InvalidOperationException("Could not load the SEE Keyboard Actions Input Action Asset.");

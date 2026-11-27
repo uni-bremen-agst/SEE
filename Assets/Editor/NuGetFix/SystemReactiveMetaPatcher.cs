@@ -64,6 +64,15 @@ public class SystemReactiveMetaPatcher
                     continue;
                 }
 
+                // Minimal NuGet-generated meta files can omit the importer settings entirely.
+                // An absent setting must not be treated as explicitly disabled validation.
+                if (!content.Contains($"{validateReferences}:"))
+                {
+                    content = content.Contains("PluginImporter:")
+                        ? content.Replace("PluginImporter:", "PluginImporter:\n  validateReferences: 1")
+                        : content.TrimEnd() + "\nPluginImporter:\n  validateReferences: 1\n";
+                }
+
                 // If reference validation is enabled, disable it.
                 if (content.Contains($"{validateReferences}: 1"))
                 {

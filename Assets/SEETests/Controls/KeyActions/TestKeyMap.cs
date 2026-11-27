@@ -3,6 +3,8 @@ using SEE.Utils;
 using System;
 using System.IO;
 using UnityEngine;
+using Newtonsoft.Json;
+using UnityEngine.TestTools;
 
 namespace SEE.Controls.KeyActions
 {
@@ -90,6 +92,149 @@ namespace SEE.Controls.KeyActions
             {
                 FileIO.DeleteIfExists(filename);
             }
+        }
+
+        /// <summary>Checks legacy spelling conversions, including platform-specific modifier aliases.</summary>
+        /// <param name="legacy">Stored KeyCode name.</param>
+        /// <param name="expected">Expected keyboard path.</param>
+        [TestCase("a", "<Keyboard>/a")]
+        [TestCase("Alpha0", "<Keyboard>/0")]
+        [TestCase("Keypad3", "<Keyboard>/numpad3")]
+        [TestCase("Return", "<Keyboard>/enter")]
+        [TestCase("LeftControl", "<Keyboard>/leftCtrl")]
+        [TestCase("RightControl", "<Keyboard>/rightCtrl")]
+        [TestCase("LeftCommand", "<Keyboard>/leftMeta")]
+        [TestCase("RightCommand", "<Keyboard>/rightMeta")]
+        [TestCase("LeftApple", "<Keyboard>/leftMeta")]
+        [TestCase("RightApple", "<Keyboard>/rightMeta")]
+        [TestCase("LeftWindows", "<Keyboard>/leftMeta")]
+        [TestCase("RightWindows", "<Keyboard>/rightMeta")]
+        public void TestLegacyConversion(string legacy, string expected)
+        {
+            KeyMap map = LoadEntries(new { ActionName = "Help", KeyCode = legacy });
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor descriptor), Is.True);
+            Assert.That(descriptor.BindingPath, Is.EqualTo(expected));
+        }
+
+        /// <summary>Invalid legacy codes are rejected and leave the existing binding unchanged.</summary>
+        /// <param name="legacy">Invalid or unsupported stored key.</param>
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("NotAKey")]
+        [TestCase("999999")]
+        [TestCase("None")]
+        [TestCase("Mouse0")]
+        public void TestInvalidLegacyConversion(string legacy)
+        {
+            LogAssert.Expect(LogType.Warning, $"Ignoring invalid legacy key '{legacy}' for action 'Help'.");
+            AssertHelpUnchanged(LoadEntries(new { ActionName = "Help", KeyCode = legacy }));
+        }
+
+        /// <summary>Explicit keyboard paths take precedence over the legacy KeyCode field.</summary>
+        [Test]
+        public void TestExplicitBindingPath()
+        {
+            KeyMap map = LoadEntries(new { ActionName = "Help", BindingPath = "<Keyboard>/f12", KeyCode = "H" });
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor descriptor), Is.True);
+            Assert.That(descriptor.BindingPath, Is.EqualTo("<Keyboard>/f12"));
+        }
+
+        /// <summary>Malformed and non-keyboard paths are skipped even with a valid legacy fallback.</summary>
+        /// <param name="path">Invalid imported path.</param>
+        [TestCase(" ")]
+        [TestCase("Keyboard/h")]
+        [TestCase("<Keyboard>")]
+        [TestCase("<Mouse>/leftButton")]
+        [TestCase("<Gamepad>/buttonSouth")]
+        public void TestInvalidBindingPath(string path)
+        {
+            LogAssert.Expect(LogType.Warning, $"Ignoring invalid control path '{path}' for action 'Help'.");
+            AssertHelpUnchanged(LoadEntries(new { ActionName = "Help", BindingPath = path, KeyCode = "H" }));
+        }
+
+        /// <summary>Null entries and missing action names are skipped; later valid entries still import.</summary>
+        [Test]
+        public void TestIncompleteEntries()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                LogAssert.Expect(LogType.Warning, "Ignoring an incomplete entry in the legacy key bindings.");
+            }
+            LogAssert.Expect(LogType.Warning, "Ignoring legacy key binding for unknown action 'Unknown'.");
+            KeyMap map = LoadEntries(null, new { KeyCode = "H" }, new { ActionName = " " },
+                                     new { ActionName = "Unknown", KeyCode = "H" },
+                                     new { ActionName = "Help", KeyCode = "H" });
+            Assert.That(map.Count, Is.EqualTo(1));
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor descriptor), Is.True);
+            Assert.That(descriptor.BindingPath, Is.EqualTo("<Keyboard>/h"));
+        }
+
+        /// <summary>Case-insensitive conflicts with retained bindings reject the entire import atomically.</summary>
+        [Test]
+        public void TestImportConflictIsAtomic()
+        {
+            KeyMap map = new();
+            map.Bind(KeyAction.Help, NewDescriptor("Help", "<Keyboard>/x"));
+            map.Bind(KeyAction.ToggleMenu, NewDescriptor("Menu", "<Keyboard>/y"));
+            Assert.That(() => ImportEntries(map, new { ActionName = "Help", BindingPath = "<Keyboard>/Y" }),
+                        Throws.TypeOf<Exception>());
+            AssertHelpUnchanged(map);
+            Assert.That(map.TryGetValue(KeyAction.ToggleMenu, out KeyActionDescriptor menu), Is.True);
+            Assert.That(menu.BindingPath, Is.EqualTo("<Keyboard>/y"));
+        }
+
+        /// <summary>Swapped keys are valid when the complete import contains no duplicates.</summary>
+        [Test]
+        public void TestImportSwappedBindings()
+        {
+            KeyMap map = new();
+            map.Bind(KeyAction.Help, NewDescriptor("Help", "<Keyboard>/x"));
+            map.Bind(KeyAction.ToggleMenu, NewDescriptor("Menu", "<Keyboard>/y"));
+            ImportEntries(map, new { ActionName = "Help", BindingPath = "<Keyboard>/y" },
+                          new { ActionName = "Menu", BindingPath = "<Keyboard>/x" });
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor help), Is.True);
+            Assert.That(help.BindingPath, Is.EqualTo("<Keyboard>/y"));
+            Assert.That(map.TryGetValue(KeyAction.ToggleMenu, out KeyActionDescriptor menu), Is.True);
+            Assert.That(menu.BindingPath, Is.EqualTo("<Keyboard>/x"));
+        }
+
+        /// <summary>Creates an isolated map and imports the supplied entries.</summary>
+        /// <param name="entries">JSON entries to import.</param>
+        /// <returns>The imported map.</returns>
+        private static KeyMap LoadEntries(params object[] entries)
+        {
+            KeyMap map = new();
+            map.Bind(KeyAction.Help, NewDescriptor("Help", "<Keyboard>/x"));
+            ImportEntries(map, entries);
+            return map;
+        }
+
+        /// <summary>Imports through a unique temporary file which is removed even when loading fails.</summary>
+        /// <param name="map">Isolated destination map.</param>
+        /// <param name="entries">JSON entries to import.</param>
+        private static void ImportEntries(KeyMap map, params object[] entries)
+        {
+            string filename = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(filename, JsonConvert.SerializeObject(entries));
+                map.Load(filename);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
+        }
+
+        /// <summary>Checks that a skipped or rejected entry preserves the original shortcut.</summary>
+        /// <param name="map">Imported map.</param>
+        private static void AssertHelpUnchanged(KeyMap map)
+        {
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor descriptor), Is.True);
+            Assert.That(descriptor.BindingPath, Is.EqualTo("<Keyboard>/x"));
+            Assert.That(descriptor.Name, Is.EqualTo("Help"));
+            Assert.That(descriptor.Description, Is.EqualTo("Provides help"));
+            Assert.That(descriptor.Category, Is.EqualTo(KeyActionCategory.General));
         }
 
         private static KeyActionDescriptor NewDescriptor(string keyActionName, string bindingPath)

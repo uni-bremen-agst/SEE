@@ -1,0 +1,27 @@
+{
+    "groups": [
+        {
+            "name": "Favorites",
+            "objectIds": [],
+            "objectColors": [],
+            "objectIconOverrides": [],
+            "objectIconBgs": [],
+            "color": {
+                "r": 0.3499999940395355,
+                "g": 0.30000001192092898,
+                "b": 0.10000000149011612,
+                "a": 1.0
+            },
+            "iconOverride": "",
+            "iconBgColor": {
+                "r": 0.0,
+                "g": 0.0,
+                "b": 0.0,
+                "a": 0.0
+            },
+            "isSmartGroup": false,
+            "filters": [],
+            "combineMode": 0
+        }
+    ]
+}
