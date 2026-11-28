@@ -38,6 +38,7 @@ namespace SEE.Tools.MeetingSecretary
         [TestCase("ggml-small-q5_1.bin")]
         [TestCase("ggml-large-v3-turbo-q5_0.bin")]
         [TestCase("my model.bin")]
+        [TestCase("ggml-base-q5_1.bin")]
         public void TestValidFileNames(string fileName)
         {
             Assert.That(WhisperModels.IsValidFileName(fileName), Is.True);
@@ -56,6 +57,9 @@ namespace SEE.Tools.MeetingSecretary
         [TestCase("folder\\ggml-small-q5_1.bin")]
         [TestCase("C:\\model.bin")]
         [TestCase("model..bin")]
+        [TestCase("C:ggml.bin")]
+        [TestCase("/tmp/x.bin")]
+        [TestCase("x/y.bin")]
         public void TestInvalidFileNames(string fileName)
         {
             Assert.That(WhisperModels.IsValidFileName(fileName), Is.False);

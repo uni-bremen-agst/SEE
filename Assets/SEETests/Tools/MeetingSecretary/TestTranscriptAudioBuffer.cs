@@ -164,7 +164,7 @@ namespace SEE.Tools.MeetingSecretary
                     // The samples are the numbers 0, 1, 2, ... so that their order can be checked.
                     for (int i = 0; i < chunkSize; i++)
                     {
-                        chunk[i] = c * chunkSize + i;
+                        chunk[i] = (float)c * chunkSize + i;
                     }
                     buffer.Write(chunk, 0, chunkSize);
                 }
@@ -173,23 +173,18 @@ namespace SEE.Tools.MeetingSecretary
 
             float[] destination = new float[1000];
             int received = 0;
-            bool inOrder = true;
             // The writer is checked first: once it has finished, the count is final.
             while (writer.IsAlive || buffer.Count > 0)
             {
                 int count = buffer.Read(destination);
                 for (int i = 0; i < count; i++)
                 {
-                    if (destination[i] != received + i)
-                    {
-                        inOrder = false;
-                    }
+                    Assert.AreEqual(received + i, destination[i], 0.001f, "Samples must arrive exactly once and in order.");
                 }
                 received += count;
             }
             writer.Join();
 
-            Assert.That(inOrder, Is.True, "Samples must arrive exactly once and in order.");
             Assert.That(received, Is.EqualTo(total));
             Assert.That(buffer.DroppedSamples, Is.EqualTo(0));
         }

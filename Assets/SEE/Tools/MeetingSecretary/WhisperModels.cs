@@ -41,7 +41,7 @@ namespace SEE.Tools.MeetingSecretary
         /// </summary>
         /// <param name="fileName">The file name to be checked.</param>
         /// <returns>True if <paramref name="fileName"/> is neither empty nor contains
-        /// a path separator or "..".</returns>
+        /// a path separator, a colon, or "..", and is not a path.</returns>
         public static bool IsValidFileName(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -49,6 +49,19 @@ namespace SEE.Tools.MeetingSecretary
                 return false;
             }
             if (fileName.Contains("/") || fileName.Contains("\\") || fileName.Contains(".."))
+            {
+                return false;
+            }
+            // A colon may introduce a drive on Windows, e.g., "C:model.bin".
+            if (fileName.Contains(":"))
+            {
+                return false;
+            }
+            if (Path.IsPathRooted(fileName))
+            {
+                return false;
+            }
+            if (Path.GetFileName(fileName) != fileName)
             {
                 return false;
             }

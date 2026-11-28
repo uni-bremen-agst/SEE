@@ -58,16 +58,9 @@ namespace SEE.Net.Actions
         /// <returns>The entry made of the fields of this action.</returns>
         public TranscriptEntry ToEntry()
         {
-            DateTime time;
-            if (TimeUtcTicks >= DateTime.MinValue.Ticks && TimeUtcTicks <= DateTime.MaxValue.Ticks)
-            {
-                time = new DateTime(TimeUtcTicks, DateTimeKind.Utc);
-            }
-            else
-            {
-                // The value comes from the network; a wrong value must not raise an exception.
-                time = DateTime.UtcNow;
-            }
+            // The value comes from the network; a wrong value must not raise an exception.
+            bool validTicks = TimeUtcTicks >= DateTime.MinValue.Ticks && TimeUtcTicks <= DateTime.MaxValue.Ticks;
+            DateTime time = validTicks ? new DateTime(TimeUtcTicks, DateTimeKind.Utc) : DateTime.UtcNow;
             return new TranscriptEntry(Speaker, Text, time, Kind);
         }
 
