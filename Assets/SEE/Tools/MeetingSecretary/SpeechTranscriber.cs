@@ -245,7 +245,7 @@ namespace SEE.Tools.MeetingSecretary
                         continue;
                     }
 
-                    string text = result.Result.Trim();
+                    string text = HallucinationFilter.RemoveAnnotations(result.Result);
                     if (!HallucinationFilter.IsHallucination(text))
                     {
                         OnTranscribed?.Invoke(text, utterance.SpokenAt);

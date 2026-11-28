@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace SEE.Tools.MeetingSecretary
 {
@@ -37,6 +38,44 @@ namespace SEE.Tools.MeetingSecretary
             "untertitel der amara.org",
             "untertitelung des zdf",
         };
+
+        /// <summary>
+        /// Matches an annotation: a text in square brackets, in parentheses, or
+        /// between two asterisks, e.g., "[Musik]", "(Husten)", or "*klopft*".
+        /// Whisper writes noises that way.
+        /// </summary>
+        private static readonly Regex annotation = new(@"\[[^\]]*\]|\([^)]*\)|\*[^*]*\*");
+
+        /// <summary>
+        /// Matches one or more white spaces in a row.
+        /// </summary>
+        private static readonly Regex whiteSpaces = new(@"\s+");
+
+        /// <summary>
+        /// Matches a space in front of a punctuation mark. Such a space is left
+        /// behind when an annotation in front of the punctuation mark is removed.
+        /// </summary>
+        private static readonly Regex spaceBeforePunctuation = new(@" (?=[,.!?;:])");
+
+        /// <summary>
+        /// Returns <paramref name="text"/> without the annotations Whisper writes for
+        /// noises, e.g., "Hallo [Husten] zusammen" becomes "Hallo zusammen". Repeated
+        /// white spaces and those at the beginning and the end are removed, too.
+        /// </summary>
+        /// <param name="text">The text returned by Whisper for one utterance; may be null.</param>
+        /// <returns>The cleaned text; empty if nothing but annotations was in <paramref name="text"/>.</returns>
+        public static string RemoveAnnotations(string text)
+        {
+            if (text == null)
+            {
+                return "";
+            }
+
+            string result = annotation.Replace(text, " ");
+            result = whiteSpaces.Replace(result, " ");
+            result = spaceBeforePunctuation.Replace(result, "");
+            return result.Trim();
+        }
 
         /// <summary>
         /// True if <paramref name="text"/> should not be shown: it is null, empty,
