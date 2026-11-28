@@ -248,6 +248,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Chat, "Toggles the text chat.");
             Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
                      KeyActionCategory.Chat, "Toggles the voice chat.");
+            Register(KeyAction.ToggleTranscription, KeyCode.J, "Toggle transcription",
+                     KeyActionCategory.Chat, "Toggles the transcription of your voice chat. The text is shown to all players.");
 
             // Drawable
             Register(KeyAction.PartUndo, KeyCode.CapsLock, "Part undo",

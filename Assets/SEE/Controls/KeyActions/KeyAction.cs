@@ -243,5 +243,9 @@
         /// Toggles the EchoFace facial animation on/off.
         /// </summary>
         ToggleEchoFace,
+        /// <summary>
+        /// Toggles the transcription of the local player's voice chat.
+        /// </summary>
+        ToggleTranscription,
     }
 }

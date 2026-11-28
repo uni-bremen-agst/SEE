@@ -5,6 +5,7 @@ using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Extensions;
 using SEE.UI;
+using SEE.Tools.MeetingSecretary;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using Unity.Netcode;
@@ -341,6 +342,7 @@ namespace SEE.Game.Avatars
             }
 
             gameObject.AddComponent<DesktopPlayerMovement>();
+            gameObject.AddOrGetComponent<MeetingSecretaryController>();
         }
 
         #region ENABLE_VR
